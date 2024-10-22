@@ -29,6 +29,9 @@ public:
 			case BlockType::OakFenceGate:
 			case BlockType::SpruceFenceGate:
 			case BlockType::WarpedFenceGate:
+			case BlockType::BambooFenceGate:
+			case BlockType::CherryFenceGate:
+			case BlockType::MangroveFenceGate:
 				return true;
 			default: return false;
 		}
@@ -45,14 +48,17 @@ public:
 		auto Self = a_ChunkInterface.GetBlock(a_Pos);
 		switch (Self.Type())
 		{
-			case BlockType::AcaciaFenceGate:  TOGGLE(AcaciaFenceGate);
-			case BlockType::BirchFenceGate:   TOGGLE(BirchFenceGate);
-			case BlockType::CrimsonFenceGate: TOGGLE(CrimsonFenceGate);
-			case BlockType::DarkOakFenceGate: TOGGLE(DarkOakFenceGate);
-			case BlockType::JungleFenceGate:  TOGGLE(JungleFenceGate);
-			case BlockType::OakFenceGate:     TOGGLE(OakFenceGate);
-			case BlockType::SpruceFenceGate:  TOGGLE(SpruceFenceGate);
-			case BlockType::WarpedFenceGate:  TOGGLE(WarpedFenceGate);
+			case BlockType::AcaciaFenceGate:   TOGGLE(AcaciaFenceGate);
+			case BlockType::BirchFenceGate:    TOGGLE(BirchFenceGate);
+			case BlockType::CrimsonFenceGate:  TOGGLE(CrimsonFenceGate);
+			case BlockType::DarkOakFenceGate:  TOGGLE(DarkOakFenceGate);
+			case BlockType::JungleFenceGate:   TOGGLE(JungleFenceGate);
+			case BlockType::OakFenceGate:      TOGGLE(OakFenceGate);
+			case BlockType::SpruceFenceGate:   TOGGLE(SpruceFenceGate);
+			case BlockType::WarpedFenceGate:   TOGGLE(WarpedFenceGate);
+			case BlockType::BambooFenceGate:   TOGGLE(BambooFenceGate);
+			case BlockType::CherryFenceGate:   TOGGLE(CherryFenceGate);
+			case BlockType::MangroveFenceGate: TOGGLE(MangroveFenceGate);
 			default: break;
 		}
 	}
@@ -114,6 +120,9 @@ private:
 			case BlockType::OakFenceGate:     return 13;
 			case BlockType::SpruceFenceGate:  return 34;
 			case BlockType::WarpedFenceGate:  return 56;
+			case BlockType::BambooFenceGate:
+			case BlockType::CherryFenceGate:
+			case BlockType::MangroveFenceGate: return 0;
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in fence gate handler!");

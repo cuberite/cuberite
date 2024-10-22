@@ -97,6 +97,17 @@ public:
 				Facing = IronDoor::Facing(a_Block);
 				break;
 			}
+			case BlockType::BambooDoor:               Facing = BambooDoor::Facing(a_Block); break;
+			case BlockType::CherryDoor:               Facing = CherryDoor::Facing(a_Block); break;
+			case BlockType::CopperDoor:               Facing = CopperDoor::Facing(a_Block); break;
+			case BlockType::MangroveDoor:             Facing = MangroveDoor::Facing(a_Block); break;
+			case BlockType::ExposedCopperDoor:        Facing = ExposedCopperDoor::Facing(a_Block); break;
+			case BlockType::WeatheredCopperDoor:      Facing = WeatheredCopperDoor::Facing(a_Block); break;
+			case BlockType::OxidizedCopperDoor:       Facing = OxidizedCopperDoor::Facing(a_Block); break;
+			case BlockType::WaxedCopperDoor:          Facing = WaxedCopperDoor::Facing(a_Block); break;
+			case BlockType::WaxedExposedCopperDoor:   Facing = WaxedExposedCopperDoor::Facing(a_Block); break;
+			case BlockType::WaxedWeatheredCopperDoor: Facing = WaxedWeatheredCopperDoor::Facing(a_Block); break;
+			case BlockType::WaxedOxidizedCopperDoor:  Facing = WaxedOxidizedCopperDoor::Facing(a_Block); break;
 			default: return Vector3i();
 		}
 
@@ -124,6 +135,17 @@ public:
 			case BlockType::SpruceDoor:
 			case BlockType::WarpedDoor:
 			case BlockType::IronDoor:
+			case BlockType::BambooDoor:
+			case BlockType::CherryDoor:
+			case BlockType::CopperDoor:
+			case BlockType::MangroveDoor:
+			case BlockType::ExposedCopperDoor:
+			case BlockType::WeatheredCopperDoor:
+			case BlockType::OxidizedCopperDoor:
+			case BlockType::WaxedCopperDoor:
+			case BlockType::WaxedExposedCopperDoor:
+			case BlockType::WaxedWeatheredCopperDoor:
+			case BlockType::WaxedOxidizedCopperDoor:
 			{
 				return true;
 			}
@@ -151,6 +173,17 @@ public:
 			case BlockType::SpruceDoor:  return SpruceDoor::Open(State);
 			case BlockType::WarpedDoor:  return WarpedDoor::Open(State);
 			case BlockType::IronDoor:    return IronDoor::Open(State);
+			case BlockType::BambooDoor:  return BambooDoor::Open(State);
+			case BlockType::CherryDoor:  return CherryDoor::Open(State);
+			case BlockType::CopperDoor:  return CopperDoor::Open(State);
+			case BlockType::MangroveDoor:             return MangroveDoor::Open(State);
+			case BlockType::ExposedCopperDoor:        return ExposedCopperDoor::Open(State);
+			case BlockType::WeatheredCopperDoor:      return WeatheredCopperDoor::Open(State);
+			case BlockType::OxidizedCopperDoor:       return OxidizedCopperDoor::Open(State);
+			case BlockType::WaxedCopperDoor:          return WaxedCopperDoor::Open(State);
+			case BlockType::WaxedExposedCopperDoor:   return WaxedExposedCopperDoor::Open(State);
+			case BlockType::WaxedWeatheredCopperDoor: return WaxedWeatheredCopperDoor::Open(State);
+			case BlockType::WaxedOxidizedCopperDoor:  return WaxedOxidizedCopperDoor::Open(State);
 
 			default: return false;
 		}
@@ -173,6 +206,17 @@ public:
 			case BlockType::SpruceDoor:  return ISTOP(SpruceDoor);
 			case BlockType::WarpedDoor:  return ISTOP(WarpedDoor);
 			case BlockType::IronDoor:    return ISTOP(IronDoor);
+			case BlockType::BambooDoor:              return ISTOP(BambooDoor);
+			case BlockType::CherryDoor:              return ISTOP(CherryDoor);
+			case BlockType::CopperDoor:              return ISTOP(CopperDoor);
+			case BlockType::MangroveDoor:            return ISTOP(MangroveDoor);
+			case BlockType::ExposedCopperDoor:       return ISTOP(ExposedCopperDoor);
+			case BlockType::WeatheredCopperDoor:     return ISTOP(WeatheredCopperDoor);
+			case BlockType::OxidizedCopperDoor:      return ISTOP(OxidizedCopperDoor);
+			case BlockType::WaxedCopperDoor:         return ISTOP(WaxedCopperDoor);
+			case BlockType::WaxedExposedCopperDoor:  return ISTOP(WaxedExposedCopperDoor);
+			case BlockType::WaxedWeatheredCopperDoor:return ISTOP(WaxedWeatheredCopperDoor);
+			case BlockType::WaxedOxidizedCopperDoor: return ISTOP(WaxedOxidizedCopperDoor);
 			default: return false;
 		}
 	}
@@ -215,6 +259,17 @@ public:
 			case BlockType::SpruceDoor:  SETOPEN(SpruceDoor)
 			case BlockType::WarpedDoor:  SETOPEN(WarpedDoor)
 			case BlockType::IronDoor:    SETOPEN(IronDoor)
+			case BlockType::BambooDoor:               SETOPEN(BambooDoor)
+			case BlockType::CherryDoor:               SETOPEN(CherryDoor)
+			case BlockType::CopperDoor:               SETOPEN(CopperDoor)
+			case BlockType::MangroveDoor:             SETOPEN(MangroveDoor);
+			case BlockType::ExposedCopperDoor:        SETOPEN(ExposedCopperDoor)
+			case BlockType::WeatheredCopperDoor:      SETOPEN(WeatheredCopperDoor)
+			case BlockType::OxidizedCopperDoor:       SETOPEN(OxidizedCopperDoor)
+			case BlockType::WaxedCopperDoor:          SETOPEN(WaxedCopperDoor)
+			case BlockType::WaxedExposedCopperDoor:   SETOPEN(WaxedExposedCopperDoor)
+			case BlockType::WaxedWeatheredCopperDoor: SETOPEN(WaxedWeatheredCopperDoor)
+			case BlockType::WaxedOxidizedCopperDoor:  SETOPEN(WaxedOxidizedCopperDoor)
 			default: return;
 		}
 
@@ -255,6 +310,17 @@ public:
 			case BlockType::SpruceDoor:  DoorBlock = SETPOWERED(SpruceDoor); break;
 			case BlockType::WarpedDoor:  DoorBlock = SETPOWERED(WarpedDoor); break;
 			case BlockType::IronDoor:    DoorBlock = SETPOWERED(IronDoor); break;
+			case BlockType::BambooDoor:               DoorBlock = SETPOWERED(BambooDoor); break;
+			case BlockType::CherryDoor:               DoorBlock = SETPOWERED(CherryDoor); break;
+			case BlockType::CopperDoor:               DoorBlock = SETPOWERED(CopperDoor); break;
+			case BlockType::MangroveDoor:             DoorBlock = SETPOWERED(MangroveDoor); break;;
+			case BlockType::ExposedCopperDoor:        DoorBlock = SETPOWERED(ExposedCopperDoor); break;
+			case BlockType::WeatheredCopperDoor:      DoorBlock = SETPOWERED(WeatheredCopperDoor); break;
+			case BlockType::OxidizedCopperDoor:       DoorBlock = SETPOWERED(OxidizedCopperDoor); break;
+			case BlockType::WaxedCopperDoor:          DoorBlock = SETPOWERED(WaxedCopperDoor); break;
+			case BlockType::WaxedExposedCopperDoor:   DoorBlock = SETPOWERED(WaxedExposedCopperDoor); break;
+			case BlockType::WaxedWeatheredCopperDoor: DoorBlock = SETPOWERED(WaxedWeatheredCopperDoor); break;
+			case BlockType::WaxedOxidizedCopperDoor:  DoorBlock = SETPOWERED(WaxedOxidizedCopperDoor); break;
 			default: return;
 		}
 		a_ChunkInterface.SetBlock(a_BlockPos, DoorBlock);
@@ -310,9 +376,20 @@ private:
 			case BlockType::SpruceDoor:  return cItem(Item::SpruceDoor);
 			case BlockType::WarpedDoor:  return cItem(Item::WarpedDoor);
 			case BlockType::IronDoor:    return cItem(Item::IronDoor);
+			case BlockType::BambooDoor:                return cItem(Item::BambooDoor);
+			case BlockType::CherryDoor:                return cItem(Item::CherryDoor);
+			case BlockType::CopperDoor:                return cItem(Item::CopperDoor);
+			case BlockType::MangroveDoor:              return cItem(Item::MangroveDoor);
+			case BlockType::ExposedCopperDoor:         return cItem(Item::ExposedCopperDoor);
+			case BlockType::WeatheredCopperDoor:       return cItem(Item::WeatheredCopperDoor);
+			case BlockType::OxidizedCopperDoor:        return cItem(Item::OxidizedCopperDoor);
+			case BlockType::WaxedCopperDoor:           return cItem(Item::WaxedCopperDoor);
+			case BlockType::WaxedExposedCopperDoor:    return cItem(Item::WaxedExposedCopperDoor);
+			case BlockType::WaxedWeatheredCopperDoor:  return cItem(Item::WaxedWeatheredCopperDoor);
+			case BlockType::WaxedOxidizedCopperDoor:   return cItem(Item::WaxedOxidizedCopperDoor);
 			default:
 			{
-				ASSERT(!"Unhandled door type!");
+				ASSERT(!"Unhandled door type!");;
 				return {};
 			}
 		}
@@ -366,6 +443,17 @@ private:
 			case BlockType::SpruceDoor:  return 34;
 			case BlockType::WarpedDoor:  return 56;
 			case BlockType::IronDoor:    return 6;
+			case BlockType::BambooDoor:
+			case BlockType::CherryDoor:
+			case BlockType::CopperDoor:
+			case BlockType::MangroveDoor:
+			case BlockType::ExposedCopperDoor:
+			case BlockType::WeatheredCopperDoor:
+			case BlockType::OxidizedCopperDoor:
+			case BlockType::WaxedCopperDoor:
+			case BlockType::WaxedExposedCopperDoor:
+			case BlockType::WaxedWeatheredCopperDoor:
+			case BlockType::WaxedOxidizedCopperDoor: return 0;
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in door handler!");

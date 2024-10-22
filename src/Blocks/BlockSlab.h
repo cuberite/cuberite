@@ -70,6 +70,26 @@ public:
 			case BlockType::StoneBrickSlab:
 			case BlockType::StoneSlab:
 			case BlockType::WarpedSlab:
+			case BlockType::BambooMosaicSlab:
+			case BlockType::BambooSlab: 
+            case BlockType::CherrySlab:
+			case BlockType::CobbledDeepslateSlab:
+			case BlockType::TuffSlab:
+			case BlockType::TuffBrickSlab:
+			case BlockType::PolishedTuffSlab:
+			case BlockType::MudBrickSlab:
+			case BlockType::MangroveSlab:
+			case BlockType::DeepslateTileSlab:
+			case BlockType::DeepslateBrickSlab:
+			case BlockType::PolishedDeepslateSlab:    
+			case BlockType::CutCopperSlab:
+			case BlockType::ExposedCutCopperSlab:
+			case BlockType::WeatheredCutCopperSlab:
+			case BlockType::OxidizedCutCopperSlab:
+			case BlockType::WaxedCutCopperSlab:
+			case BlockType::WaxedExposedCutCopperSlab:
+			case BlockType::WaxedWeatheredCutCopperSlab:
+			case BlockType::WaxedOxidizedCutCopperSlab:
 				return true;
 			default: return false;
 		}
@@ -243,6 +263,26 @@ public:
 			{
 				ISSLABTOP(WarpedSlab)
 			}
+			case BlockType::BambooMosaicSlab:            ISSLABTOP(BambooMosaicSlab)
+			case BlockType::BambooSlab:                  ISSLABTOP(BambooSlab)
+            case BlockType::CherrySlab:                  ISSLABTOP(CherrySlab)
+			case BlockType::CobbledDeepslateSlab:        ISSLABTOP(CobbledDeepslateSlab)
+			case BlockType::TuffSlab:                    ISSLABTOP(TuffSlab)
+			case BlockType::TuffBrickSlab:               ISSLABTOP(TuffBrickSlab)
+			case BlockType::PolishedTuffSlab:            ISSLABTOP(PolishedTuffSlab)
+			case BlockType::MudBrickSlab:                ISSLABTOP(MudBrickSlab)
+			case BlockType::MangroveSlab:                ISSLABTOP(MangroveSlab)
+			case BlockType::DeepslateTileSlab:           ISSLABTOP(DeepslateTileSlab)
+			case BlockType::DeepslateBrickSlab:          ISSLABTOP(DeepslateBrickSlab)
+			case BlockType::PolishedDeepslateSlab:       ISSLABTOP(PolishedDeepslateSlab)
+			case BlockType::CutCopperSlab:               ISSLABTOP(CutCopperSlab)
+			case BlockType::ExposedCutCopperSlab:        ISSLABTOP(ExposedCutCopperSlab)
+			case BlockType::WeatheredCutCopperSlab:      ISSLABTOP(WeatheredCutCopperSlab)
+			case BlockType::OxidizedCutCopperSlab:       ISSLABTOP(OxidizedCutCopperSlab)
+			case BlockType::WaxedCutCopperSlab:          ISSLABTOP(WaxedCutCopperSlab)
+			case BlockType::WaxedExposedCutCopperSlab:        ISSLABTOP(WaxedExposedCutCopperSlab)
+			case BlockType::WaxedWeatheredCutCopperSlab:      ISSLABTOP(WaxedWeatheredCutCopperSlab)
+			case BlockType::WaxedOxidizedCutCopperSlab:       ISSLABTOP(WaxedOxidizedCutCopperSlab)
 			default: return false;
 		}
 	}
@@ -415,6 +455,26 @@ public:
 			{
 				ISSLABFULL(WarpedSlab)
 			}
+			case BlockType::BambooMosaicSlab:            ISSLABFULL(BambooMosaicSlab)
+			case BlockType::BambooSlab:                  ISSLABFULL(BambooSlab)
+            case BlockType::CherrySlab:                  ISSLABFULL(CherrySlab)
+			case BlockType::CobbledDeepslateSlab:        ISSLABFULL(CobbledDeepslateSlab)
+			case BlockType::TuffSlab:                    ISSLABFULL(TuffSlab)
+			case BlockType::TuffBrickSlab:               ISSLABFULL(TuffBrickSlab)
+			case BlockType::PolishedTuffSlab:            ISSLABFULL(PolishedTuffSlab)
+			case BlockType::MudBrickSlab:                ISSLABFULL(MudBrickSlab)
+			case BlockType::MangroveSlab:                ISSLABFULL(MangroveSlab)
+			case BlockType::DeepslateTileSlab:           ISSLABFULL(DeepslateTileSlab)
+			case BlockType::DeepslateBrickSlab:          ISSLABFULL(DeepslateBrickSlab)
+			case BlockType::PolishedDeepslateSlab:       ISSLABFULL(PolishedDeepslateSlab)
+			case BlockType::CutCopperSlab:               ISSLABFULL(CutCopperSlab)
+			case BlockType::ExposedCutCopperSlab:        ISSLABFULL(ExposedCutCopperSlab)
+			case BlockType::WeatheredCutCopperSlab:      ISSLABFULL(WeatheredCutCopperSlab)
+			case BlockType::OxidizedCutCopperSlab:       ISSLABFULL(OxidizedCutCopperSlab)
+			case BlockType::WaxedCutCopperSlab:          ISSLABFULL(WaxedCutCopperSlab)
+			case BlockType::WaxedExposedCutCopperSlab:        ISSLABFULL(WaxedExposedCutCopperSlab)
+			case BlockType::WaxedWeatheredCutCopperSlab:      ISSLABFULL(WaxedWeatheredCutCopperSlab)
+			case BlockType::WaxedOxidizedCutCopperSlab:       ISSLABFULL(WaxedOxidizedCutCopperSlab)
 			default: return false;
 		}
 	}
@@ -469,6 +529,27 @@ private:
 			case BlockType::StoneBrickSlab:               return cItem(Item::StoneBrickSlab);
 			case BlockType::StoneSlab:                    return cItem(Item::StoneSlab);
 			case BlockType::WarpedSlab:                   return cItem(Item::WarpedSlab);
+			case BlockType::BambooMosaicSlab:             return cItem(Item::BambooMosaicSlab);
+			case BlockType::BambooSlab:                   return cItem(Item::BambooSlab);
+            case BlockType::CherrySlab:                   return cItem(Item::CherrySlab);
+			case BlockType::CobbledDeepslateSlab:         return cItem(Item::CobbledDeepslateSlab);
+			case BlockType::TuffSlab:                     return cItem(Item::TuffSlab);
+			case BlockType::TuffBrickSlab:                return cItem(Item::TuffBrickSlab);
+			case BlockType::PolishedTuffSlab:             return cItem(Item::PolishedTuffSlab);
+			case BlockType::MudBrickSlab:                 return cItem(Item::MudBrickSlab);
+			case BlockType::MangroveSlab:                 return cItem(Item::MangroveSlab);
+			case BlockType::DeepslateTileSlab:            return cItem(Item::DeepslateTileSlab);
+			case BlockType::DeepslateBrickSlab:           return cItem(Item::DeepslateBrickSlab);
+			case BlockType::PolishedDeepslateSlab:        return cItem(Item::PolishedDeepslateSlab);
+			case BlockType::CutCopperSlab:                return cItem(Item::CutCopperSlab);
+			case BlockType::ExposedCutCopperSlab:         return cItem(Item::ExposedCutCopperSlab);
+			case BlockType::WeatheredCutCopperSlab:       return cItem(Item::WeatheredCutCopperSlab);
+			case BlockType::OxidizedCutCopperSlab:        return cItem(Item::OxidizedCutCopperSlab);
+			case BlockType::WaxedCutCopperSlab:           return cItem(Item::WaxedCutCopperSlab);
+			case BlockType::WaxedExposedCutCopperSlab:    return cItem(Item::WaxedExposedCutCopperSlab);
+			case BlockType::WaxedWeatheredCutCopperSlab:  return cItem(Item::WaxedWeatheredCutCopperSlab);
+			case BlockType::WaxedOxidizedCutCopperSlab:   return cItem(Item::WaxedOxidizedCutCopperSlab);
+
 			default: return cItem();
 		}
 	}
@@ -576,6 +657,26 @@ private:
 			case BlockType::StoneBrickSlab:              METAMIRRORXZ(StoneBrickSlab)
 			case BlockType::StoneSlab:                   METAMIRRORXZ(StoneSlab)
 			case BlockType::WarpedSlab:                  METAMIRRORXZ(WarpedSlab)
+			case BlockType::BambooMosaicSlab:            METAMIRRORXZ(BambooMosaicSlab)
+			case BlockType::BambooSlab:                  METAMIRRORXZ(BambooSlab)
+            case BlockType::CherrySlab:                  METAMIRRORXZ(CherrySlab)
+			case BlockType::CobbledDeepslateSlab:        METAMIRRORXZ(CobbledDeepslateSlab)
+			case BlockType::TuffSlab:                    METAMIRRORXZ(TuffSlab)
+			case BlockType::TuffBrickSlab:               METAMIRRORXZ(TuffBrickSlab)
+			case BlockType::PolishedTuffSlab:            METAMIRRORXZ(PolishedTuffSlab)
+			case BlockType::MudBrickSlab:                METAMIRRORXZ(MudBrickSlab)
+			case BlockType::MangroveSlab:                METAMIRRORXZ(MangroveSlab)
+			case BlockType::DeepslateTileSlab:           METAMIRRORXZ(DeepslateTileSlab)
+			case BlockType::DeepslateBrickSlab:          METAMIRRORXZ(DeepslateBrickSlab)
+			case BlockType::PolishedDeepslateSlab:       METAMIRRORXZ(PolishedDeepslateSlab)
+			case BlockType::CutCopperSlab:               METAMIRRORXZ(CutCopperSlab)
+			case BlockType::ExposedCutCopperSlab:        METAMIRRORXZ(ExposedCutCopperSlab)
+			case BlockType::WeatheredCutCopperSlab:      METAMIRRORXZ(WeatheredCutCopperSlab)
+			case BlockType::OxidizedCutCopperSlab:       METAMIRRORXZ(OxidizedCutCopperSlab)
+			case BlockType::WaxedCutCopperSlab:          METAMIRRORXZ(WaxedCutCopperSlab)
+			case BlockType::WaxedExposedCutCopperSlab:        METAMIRRORXZ(WaxedExposedCutCopperSlab)
+			case BlockType::WaxedWeatheredCutCopperSlab:      METAMIRRORXZ(WaxedWeatheredCutCopperSlab)
+			case BlockType::WaxedOxidizedCutCopperSlab:       METAMIRRORXZ(WaxedOxidizedCutCopperSlab)
 			default: return a_Block;
 		}
 	}
@@ -628,6 +729,26 @@ private:
 			case BlockType::StoneBrickSlab:              return 11;
 			case BlockType::StoneSlab:                   return 11;
 			case BlockType::WarpedSlab:                  return 0;  // TODO
+			case BlockType::BambooMosaicSlab:
+			case BlockType::BambooSlab: 
+            case BlockType::CherrySlab:
+			case BlockType::CobbledDeepslateSlab:
+			case BlockType::TuffSlab:
+			case BlockType::TuffBrickSlab:
+			case BlockType::PolishedTuffSlab:
+			case BlockType::MudBrickSlab:
+			case BlockType::MangroveSlab:
+			case BlockType::DeepslateTileSlab:
+			case BlockType::DeepslateBrickSlab:
+			case BlockType::PolishedDeepslateSlab:    
+			case BlockType::CutCopperSlab:
+			case BlockType::ExposedCutCopperSlab:
+			case BlockType::WeatheredCutCopperSlab:
+			case BlockType::OxidizedCutCopperSlab:
+			case BlockType::WaxedCutCopperSlab:
+			case BlockType::WaxedExposedCutCopperSlab:
+			case BlockType::WaxedWeatheredCutCopperSlab:
+			case BlockType::WaxedOxidizedCutCopperSlab: return 0; // TODO
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in slab handler!");

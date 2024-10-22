@@ -21,6 +21,8 @@ public:
 			case BlockType::JungleLog:
 			case BlockType::OakLog:
 			case BlockType::SpruceLog:
+			case BlockType::CherryLog:
+			case BlockType::MangroveLog:
 				return true;
 			default: return false;
 		}

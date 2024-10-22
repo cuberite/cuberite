@@ -56,10 +56,34 @@ public:
 			case BlockType::StoneBrickStairs:
 			case BlockType::StoneStairs:
 			case BlockType::WarpedStairs:
+			case BlockType::BambooMosaicStairs:
+			case BlockType::BambooStairs: 
+            case BlockType::CherryStairs:
+			case BlockType::CobbledDeepslateStairs:
+			case BlockType::TuffStairs:
+			case BlockType::TuffBrickStairs:
+			case BlockType::PolishedTuffStairs:
+			case BlockType::MudBrickStairs:
+			case BlockType::MangroveStairs:
+			case BlockType::DeepslateTileStairs:
+			case BlockType::DeepslateBrickStairs:
+			case BlockType::PolishedDeepslateStairs:    
+			case BlockType::CutCopperStairs:
+			case BlockType::ExposedCutCopperStairs:
+			case BlockType::WeatheredCutCopperStairs:
+			case BlockType::OxidizedCutCopperStairs:
+			case BlockType::WaxedCutCopperStairs:
+			case BlockType::WaxedExposedCutCopperStairs:
+			case BlockType::WaxedWeatheredCutCopperStairs:
+			case BlockType::WaxedOxidizedCutCopperStairs:
+
 				return true;
 			default: return false;
 		}
 	}
+
+#define IS_STAIR_TOP_HALF(StairType) \
+	return StairType::Half(a_Block) == StairType::Half::Top;
 
 	static inline bool IsStairsTopHalf(BlockState a_Block)
 	{
@@ -103,6 +127,26 @@ public:
 			case BlockType::StoneBrickStairs:              return StoneBrickStairs::Half(a_Block) == StoneBrickStairs::Half::Top;
 			case BlockType::StoneStairs:                   return StoneStairs::Half(a_Block) == StoneStairs::Half::Top;
 			case BlockType::WarpedStairs:                  return WarpedStairs::Half(a_Block) == WarpedStairs::Half::Top;
+			case BlockType::BambooMosaicStairs:            IS_STAIR_TOP_HALF(BambooMosaicStairs)
+			case BlockType::BambooStairs:                  IS_STAIR_TOP_HALF(BambooStairs) 
+            case BlockType::CherryStairs:                  IS_STAIR_TOP_HALF(BambooMosaicStairs)
+			case BlockType::CobbledDeepslateStairs:        IS_STAIR_TOP_HALF(CobbledDeepslateStairs)
+			case BlockType::TuffStairs:                    IS_STAIR_TOP_HALF(TuffStairs)
+			case BlockType::TuffBrickStairs:               IS_STAIR_TOP_HALF(TuffBrickStairs)
+			case BlockType::PolishedTuffStairs:            IS_STAIR_TOP_HALF(PolishedTuffStairs)
+			case BlockType::MudBrickStairs:                IS_STAIR_TOP_HALF(MudBrickStairs)
+			case BlockType::MangroveStairs:                IS_STAIR_TOP_HALF(MangroveStairs)
+			case BlockType::DeepslateTileStairs:           IS_STAIR_TOP_HALF(DeepslateTileStairs)
+			case BlockType::DeepslateBrickStairs:          IS_STAIR_TOP_HALF(DeepslateBrickStairs)
+			case BlockType::PolishedDeepslateStairs:       IS_STAIR_TOP_HALF(PolishedDeepslateStairs)    
+			case BlockType::CutCopperStairs:               IS_STAIR_TOP_HALF(CutCopperStairs)
+			case BlockType::ExposedCutCopperStairs:        IS_STAIR_TOP_HALF(ExposedCutCopperStairs)
+			case BlockType::WeatheredCutCopperStairs:      IS_STAIR_TOP_HALF(WeatheredCutCopperStairs)
+			case BlockType::OxidizedCutCopperStairs:       IS_STAIR_TOP_HALF(OxidizedCutCopperStairs)
+			case BlockType::WaxedCutCopperStairs:          IS_STAIR_TOP_HALF(WaxedCutCopperStairs)
+			case BlockType::WaxedExposedCutCopperStairs:   IS_STAIR_TOP_HALF(WaxedExposedCutCopperStairs)
+			case BlockType::WaxedWeatheredCutCopperStairs: IS_STAIR_TOP_HALF(WaxedWeatheredCutCopperStairs)
+			case BlockType::WaxedOxidizedCutCopperStairs:  IS_STAIR_TOP_HALF(WaxedOxidizedCutCopperStairs)
 			default: return false;
 		}
 	}
@@ -176,6 +220,26 @@ private:
 			case BlockType::StoneBrickStairs:              return 11;
 			case BlockType::StoneStairs:                   return 11;
 			case BlockType::WarpedStairs:                  return 23;
+			case BlockType::BambooMosaicStairs:
+			case BlockType::BambooStairs: 
+            case BlockType::CherryStairs:
+			case BlockType::CobbledDeepslateStairs:
+			case BlockType::TuffStairs:
+			case BlockType::TuffBrickStairs:
+			case BlockType::PolishedTuffStairs:
+			case BlockType::MudBrickStairs:
+			case BlockType::MangroveStairs:
+			case BlockType::DeepslateTileStairs:
+			case BlockType::DeepslateBrickStairs:
+			case BlockType::PolishedDeepslateStairs:    
+			case BlockType::CutCopperStairs:
+			case BlockType::ExposedCutCopperStairs:
+			case BlockType::WeatheredCutCopperStairs:
+			case BlockType::OxidizedCutCopperStairs:
+			case BlockType::WaxedCutCopperStairs:
+			case BlockType::WaxedExposedCutCopperStairs:
+			case BlockType::WaxedWeatheredCutCopperStairs:
+			case BlockType::WaxedOxidizedCutCopperStairs: return 0;
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in stairs handler!");

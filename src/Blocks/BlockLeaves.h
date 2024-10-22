@@ -34,6 +34,10 @@ public:
 			case BlockType::JungleLeaves:
 			case BlockType::OakLeaves:
 			case BlockType::SpruceLeaves:
+			case BlockType::AzaleaLeaves:
+			case BlockType::CherryLeaves:
+			case BlockType::MangroveLeaves:
+			case BlockType::FloweringAzaleaLeaves:
 				return true;
 			default: return false;
 		}
@@ -51,6 +55,10 @@ public:
 			case BlockType::JungleLeaves:  return JungleLeaves::Distance(a_Block);
 			case BlockType::OakLeaves:     return OakLeaves::Distance(a_Block);
 			case BlockType::SpruceLeaves:  return SpruceLeaves::Distance(a_Block);
+			case BlockType::AzaleaLeaves:  return AzaleaLeaves::Distance(a_Block);
+			case BlockType::CherryLeaves:  return CherryLeaves::Distance(a_Block);
+			case BlockType::MangroveLeaves:return MangroveLeaves::Distance(a_Block);
+			case BlockType::FloweringAzaleaLeaves:return FloweringAzaleaLeaves::Distance(a_Block);
 			default: return 0;
 		}
 	}
@@ -67,6 +75,10 @@ public:
 			case BlockType::JungleLeaves:  return JungleLeaves::JungleLeaves   (a_Distance, JungleLeaves::Persistent(a_Block), JungleLeaves::Waterlogged(a_Block));
 			case BlockType::OakLeaves:     return OakLeaves::OakLeaves         (a_Distance, OakLeaves::Persistent(a_Block), OakLeaves::Waterlogged(a_Block));
 			case BlockType::SpruceLeaves:  return SpruceLeaves::SpruceLeaves   (a_Distance, SpruceLeaves::Persistent(a_Block), SpruceLeaves::Waterlogged(a_Block));
+			case BlockType::AzaleaLeaves:  return AzaleaLeaves::AzaleaLeaves   (a_Distance, AzaleaLeaves::Persistent(a_Block),AzaleaLeaves::Waterlogged(a_Block));
+			case BlockType::CherryLeaves:  return CherryLeaves::CherryLeaves   (a_Distance, CherryLeaves::Persistent(a_Block),CherryLeaves::Waterlogged(a_Block));
+			case BlockType::MangroveLeaves:return MangroveLeaves::MangroveLeaves(a_Distance, MangroveLeaves::Persistent(a_Block),MangroveLeaves::Waterlogged(a_Block));
+			case BlockType::FloweringAzaleaLeaves:return FloweringAzaleaLeaves::FloweringAzaleaLeaves(a_Distance, FloweringAzaleaLeaves::Persistent(a_Block),FloweringAzaleaLeaves::Waterlogged(a_Block));
 			default: return a_Block;
 		}
 	}
@@ -82,6 +94,10 @@ public:
 			case BlockType::JungleLeaves:  return JungleLeaves::Persistent(a_Block);
 			case BlockType::OakLeaves:     return OakLeaves::Persistent(a_Block);
 			case BlockType::SpruceLeaves:  return SpruceLeaves::Persistent(a_Block);
+			case BlockType::AzaleaLeaves:  return AzaleaLeaves::Persistent(a_Block);
+			case BlockType::CherryLeaves:  return CherryLeaves::Persistent(a_Block);
+			case BlockType::MangroveLeaves:return MangroveLeaves::Persistent(a_Block);
+			case BlockType::FloweringAzaleaLeaves:return FloweringAzaleaLeaves::Persistent(a_Block);
 			default: return false;
 		}
 	}
@@ -97,6 +113,10 @@ public:
 			case BlockType::JungleLeaves:  return JungleLeaves::JungleLeaves   (JungleLeaves::Distance(a_Block),  a_IsPersistant, JungleLeaves::Waterlogged(a_Block));
 			case BlockType::OakLeaves:     return OakLeaves::OakLeaves         (OakLeaves::Distance(a_Block),     a_IsPersistant, OakLeaves::Waterlogged(a_Block));
 			case BlockType::SpruceLeaves:  return SpruceLeaves::SpruceLeaves   (SpruceLeaves::Distance(a_Block),  a_IsPersistant, SpruceLeaves::Waterlogged(a_Block));
+			case BlockType::AzaleaLeaves:  return AzaleaLeaves::AzaleaLeaves   (AzaleaLeaves::Distance(a_Block),  a_IsPersistant, AzaleaLeaves::Waterlogged(a_Block));
+			case BlockType::CherryLeaves:  return CherryLeaves::CherryLeaves   (CherryLeaves::Distance(a_Block),  a_IsPersistant, CherryLeaves::Waterlogged(a_Block));
+			case BlockType::MangroveLeaves:return MangroveLeaves::MangroveLeaves(MangroveLeaves::Distance(a_Block), a_IsPersistant,MangroveLeaves::Waterlogged(a_Block));
+			case BlockType::FloweringAzaleaLeaves:return FloweringAzaleaLeaves::FloweringAzaleaLeaves(FloweringAzaleaLeaves::Distance(a_Block), a_IsPersistant, FloweringAzaleaLeaves::Waterlogged(a_Block));
 			default: return a_Block;
 		}
 	}
@@ -206,6 +226,7 @@ private:
 				}
 				break;
 			}
+			//todo azlea trees
 			default: return {};
 		}
 
@@ -243,6 +264,10 @@ private:
 				case BlockType::JungleLog:
 				case BlockType::OakLog:
 				case BlockType::SpruceLog:
+				case BlockType::CherryLog:
+				case BlockType::MangroveLog:
+				case BlockType::AzaleaLeaves:
+				case BlockType::FloweringAzaleaLeaves:
 				{
 					break;
 				}
@@ -269,13 +294,18 @@ private:
 					case BlockType::JungleLeaves:
 					case BlockType::OakLeaves:
 					case BlockType::SpruceLeaves:
+					case BlockType::CherryLeaves:
+					case BlockType::MangroveLeaves:
+					case BlockType::FloweringAzaleaLeaves:
 						a_Area.SetBlock({cbx, cby, cbz}, BlockState(static_cast<uint_least16_t>(Block::Sponge::Sponge().ID + i + 1))); break;
 					case BlockType::AcaciaLog:
 					case BlockType::BirchLog:
 					case BlockType::DarkOakLog:
 					case BlockType::JungleLog:
 					case BlockType::OakLog:
-					case BlockType::SpruceLog: return true;
+					case BlockType::SpruceLog:
+					case BlockType::CherryLog:
+					case BlockType::MangroveLog: return true;
 					default: break;
 				}
 				return false;
