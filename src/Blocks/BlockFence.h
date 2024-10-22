@@ -32,6 +32,10 @@ public:
 			case BlockType::OakFence:
 			case BlockType::SpruceFence:
 			case BlockType::WarpedFence:
+			case BlockType::BambooFence:
+			case BlockType::CherryFence:
+			case BlockType::CrimsonFence:
+			case BlockType::MangroveFence:
 				return true;
 			default: return false;
 		}
