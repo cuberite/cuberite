@@ -37,6 +37,9 @@ public:
 			case BlockType::SpruceButton:
 			case BlockType::StoneButton:
 			case BlockType::WarpedButton:
+			case BlockType::BambooButton:
+			case BlockType::CherryButton:
+			case BlockType::MangroveButton:
 				return true;
 			default: return false;
 		}
@@ -57,6 +60,9 @@ public:
 			case BlockType::SpruceButton:             return SpruceButton::Powered(a_Block);
 			case BlockType::StoneButton:              return StoneButton::Powered(a_Block);
 			case BlockType::WarpedButton:             return WarpedButton::Powered(a_Block);
+			case BlockType::BambooButton:             return BambooButton::Powered(a_Block);
+			case BlockType::CherryButton:             return CherryButton::Powered(a_Block);
+			case BlockType::MangroveButton:           return MangroveButton::Powered(a_Block);
 			default: return false;
 		}
 	}
@@ -71,16 +77,19 @@ public:
 
 		switch (Self.Type())
 		{
-			case BlockType::AcaciaButton:             TOGGLEBUTTON(PolishedBlackstoneButton);
-			case BlockType::BirchButton:              TOGGLEBUTTON(PolishedBlackstoneButton);
-			case BlockType::CrimsonButton:            TOGGLEBUTTON(PolishedBlackstoneButton);
-			case BlockType::DarkOakButton:            TOGGLEBUTTON(PolishedBlackstoneButton);
-			case BlockType::JungleButton:             TOGGLEBUTTON(PolishedBlackstoneButton);
-			case BlockType::OakButton:                TOGGLEBUTTON(PolishedBlackstoneButton);
+			case BlockType::AcaciaButton:             TOGGLEBUTTON(AcaciaButton);
+			case BlockType::BirchButton:              TOGGLEBUTTON(BirchButton);
+			case BlockType::CrimsonButton:            TOGGLEBUTTON(CrimsonButton);
+			case BlockType::DarkOakButton:            TOGGLEBUTTON(DarkOakButton);
+			case BlockType::JungleButton:             TOGGLEBUTTON(JungleButton);
+			case BlockType::OakButton:                TOGGLEBUTTON(OakButton);
 			case BlockType::PolishedBlackstoneButton: TOGGLEBUTTON(PolishedBlackstoneButton);
-			case BlockType::SpruceButton:             TOGGLEBUTTON(PolishedBlackstoneButton);
-			case BlockType::StoneButton:              TOGGLEBUTTON(PolishedBlackstoneButton);
-			case BlockType::WarpedButton:             TOGGLEBUTTON(PolishedBlackstoneButton);
+			case BlockType::SpruceButton:             TOGGLEBUTTON(SpruceButton);
+			case BlockType::StoneButton:              TOGGLEBUTTON(StoneButton);
+			case BlockType::WarpedButton:             TOGGLEBUTTON(WarpedButton);
+			case BlockType::BambooButton:             TOGGLEBUTTON(BambooButton);
+			case BlockType::CherryButton:             TOGGLEBUTTON(CherryButton);
+			case BlockType::MangroveButton:           TOGGLEBUTTON(MangroveButton);
 			default: break;
 		}
 	}
@@ -265,7 +274,10 @@ private:
 			case BlockType::OakButton:
 			case BlockType::PolishedBlackstoneButton:
 			case BlockType::SpruceButton:
-			case BlockType::WarpedButton: break;
+			case BlockType::WarpedButton:
+			case BlockType::BambooButton:
+			case BlockType::CherryButton:
+			case BlockType::MangroveButton: break;
 			default: return false;
 		}
 
@@ -289,15 +301,18 @@ private:
 		switch (a_Block.Type())
 		{
 			case BlockType::StoneButton:              return GETFACE(StoneButton);
-			case BlockType::AcaciaButton:             return GETFACE(StoneButton);
-			case BlockType::BirchButton:              return GETFACE(StoneButton);
-			case BlockType::CrimsonButton:            return GETFACE(StoneButton);
-			case BlockType::DarkOakButton:            return GETFACE(StoneButton);
-			case BlockType::JungleButton:             return GETFACE(StoneButton);
-			case BlockType::OakButton:                return GETFACE(StoneButton);
-			case BlockType::PolishedBlackstoneButton: return GETFACE(StoneButton);
-			case BlockType::SpruceButton:             return GETFACE(StoneButton);
-			case BlockType::WarpedButton:             return GETFACE(StoneButton);
+			case BlockType::AcaciaButton:             return GETFACE(AcaciaButton);
+			case BlockType::BirchButton:              return GETFACE(BirchButton);
+			case BlockType::CrimsonButton:            return GETFACE(CrimsonButton);
+			case BlockType::DarkOakButton:            return GETFACE(DarkOakButton);
+			case BlockType::JungleButton:             return GETFACE(JungleButton);
+			case BlockType::OakButton:                return GETFACE(OakButton);
+			case BlockType::PolishedBlackstoneButton: return GETFACE(PolishedBlackstoneButton);
+			case BlockType::SpruceButton:             return GETFACE(SpruceButton);
+			case BlockType::WarpedButton:             return GETFACE(WarpedButton);
+			case BlockType::BambooButton:             return GETFACE(BambooButton);
+			case BlockType::CherryButton:             return GETFACE(CherryButton);
+			case BlockType::MangroveButton:           return GETFACE(MangroveButton);
 			default: return eBlockFace::BLOCK_FACE_NONE;
 		}
 	}

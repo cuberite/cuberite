@@ -39,7 +39,7 @@ private:
 	{
 		//auto FillState = Block::Cauldron::Level(a_ChunkInterface.GetBlock(a_BlockPos));
 		auto EquippedItem = a_Player.GetEquippedItem();
-		//TODO: either creta sperate header file fore water and laav or handle them herer
+		//TODO: either create a seperate header file fore water and lava or handle them here
 		switch (EquippedItem.m_ItemType)
 		{
 			//case Item::Bucket:
