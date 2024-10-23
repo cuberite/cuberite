@@ -115,7 +115,7 @@ bool cJukeboxEntity::EjectRecord(void)
 		return false;
 	}
 
-	m_World->SpawnItemPickups(cItem(PaletteUpgrade::FromItem(static_cast<short>(m_Record), 0)), Vector3d(0.5, 0.5, 0.5) + m_Pos, 10);
+	m_World->SpawnItemPickups(cItem(m_Record), Vector3d(0.5, 0.5, 0.5) + m_Pos, 10);
 	m_World->SetBlock(m_Pos, Block::Jukebox::Jukebox(false));
 	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), 0);
 

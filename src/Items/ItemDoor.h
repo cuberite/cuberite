@@ -9,23 +9,19 @@
 
 
 
-class cItemDoorHandler:
+class cItemDoorHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemDoorHandler(Item a_ItemType):
-		Super(a_ItemType)
-	{
+	using Super::Super;
 
-	}
+#define GET_DOOR_TYPE(DoorType) \
+	BlockType = BlockType::DoorType;     break;
 
-
-
-
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
 		// Vanilla only allows door placement while clicking on the top face of the block below the door:
 		if (a_ClickedBlockFace != BLOCK_FACE_TOP)
@@ -44,6 +40,17 @@ public:
 			case Item::JungleDoor:   BlockType = BlockType::JungleDoor;  break;
 			case Item::DarkOakDoor:  BlockType = BlockType::DarkOakDoor; break;
 			case Item::AcaciaDoor:   BlockType = BlockType::AcaciaDoor;  break;
+			case Item::BambooDoor:               GET_DOOR_TYPE(BambooDoor)
+			case Item::CherryDoor:               GET_DOOR_TYPE(CherryDoor)
+			case Item::CopperDoor:               GET_DOOR_TYPE(CopperDoor)
+			case Item::MangroveDoor:             GET_DOOR_TYPE(MangroveDoor);
+			case Item::ExposedCopperDoor:        GET_DOOR_TYPE(ExposedCopperDoor)
+			case Item::WeatheredCopperDoor:      GET_DOOR_TYPE(WeatheredCopperDoor)
+			case Item::OxidizedCopperDoor:       GET_DOOR_TYPE(OxidizedCopperDoor)
+			case Item::WaxedCopperDoor:          GET_DOOR_TYPE(WaxedCopperDoor)
+			case Item::WaxedExposedCopperDoor:   GET_DOOR_TYPE(WaxedExposedCopperDoor)
+			case Item::WaxedWeatheredCopperDoor: GET_DOOR_TYPE(WaxedWeatheredCopperDoor)
+			case Item::WaxedOxidizedCopperDoor:  GET_DOOR_TYPE(WaxedOxidizedCopperDoor)
 			default:
 			{
 				UNREACHABLE("Unhandled door type");
@@ -101,6 +108,15 @@ public:
 		}
 
 		using namespace Block;
+
+#define PLACE_DOOR(DoorType) \
+			{\
+				return a_Player.PlaceBlocks(\
+				{\
+					{ a_PlacePosition, DoorType::DoorType(Facing, DoorType::Half::Lower, HingeRight ? DoorType::Hinge::Right : DoorType::Hinge::Left, false, false) },\
+					{ UpperBlockPosition,    DoorType::DoorType(Facing, DoorType::Half::Upper, HingeRight ? DoorType::Hinge::Right : DoorType::Hinge::Left, false, false) }\
+				});\
+			}\
 
 		switch (BlockType)
 		{
@@ -176,6 +192,17 @@ public:
 					{ UpperBlockPosition, IronDoor::IronDoor(Facing, IronDoor::Half::Upper, HingeRight ? IronDoor::Hinge::Right : IronDoor::Hinge::Left, false, false) }
 				});
 			}
+			case BlockType::BambooDoor:               PLACE_DOOR(BambooDoor)
+			case BlockType::CherryDoor:               PLACE_DOOR(CherryDoor)
+			case BlockType::CopperDoor:               PLACE_DOOR(CopperDoor)
+			case BlockType::MangroveDoor:             PLACE_DOOR(MangroveDoor)
+			case BlockType::ExposedCopperDoor:        PLACE_DOOR(ExposedCopperDoor)
+			case BlockType::WeatheredCopperDoor:      PLACE_DOOR(WeatheredCopperDoor)
+			case BlockType::OxidizedCopperDoor:       PLACE_DOOR(OxidizedCopperDoor)
+			case BlockType::WaxedCopperDoor:          PLACE_DOOR(WaxedCopperDoor)
+			case BlockType::WaxedExposedCopperDoor:   PLACE_DOOR(WaxedExposedCopperDoor)
+			case BlockType::WaxedWeatheredCopperDoor: PLACE_DOOR(WaxedWeatheredCopperDoor)
+			case BlockType::WaxedOxidizedCopperDoor:  PLACE_DOOR(WaxedOxidizedCopperDoor)
 			default: return false;
 		}
 		return true;
@@ -184,7 +211,7 @@ public:
 
 
 
-	virtual bool IsPlaceable(void) override
+	virtual bool IsPlaceable(void) const override
 	{
 		return true;
 	}

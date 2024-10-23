@@ -49,6 +49,9 @@ private:
 
 		bool IsPlacedInWater = a_Player.GetWorld()->GetBlock(a_PlacePosition).Type() == BlockType::Water;
 
+#define SET_BLOCK_TO_PLACE(StairType) \
+	BlockToPlace = StairType::StairType(BlockFace, Inverse ? StairType::Half::Top : StairType::Half::Bottom, StairType::Shape::Straight, IsPlacedInWater); break; \
+
 		switch (BlockItemConverter::FromItem(a_HeldItem.m_ItemType))
 		{
 			case BlockType::AcaciaStairs:                  BlockToPlace = AcaciaStairs::AcaciaStairs(                                   BlockFace, Inverse ? AcaciaStairs::Half::Top                  : AcaciaStairs::Half::Bottom,                  AcaciaStairs::Shape::Straight, IsPlacedInWater); break;
@@ -87,6 +90,26 @@ private:
 			case BlockType::StoneBrickStairs:              BlockToPlace = StoneBrickStairs::StoneBrickStairs(                           BlockFace, Inverse ? StoneBrickStairs::Half::Top              : StoneBrickStairs::Half::Bottom,              StoneBrickStairs::Shape::Straight, IsPlacedInWater); break;
 			case BlockType::StoneStairs:                   BlockToPlace = StoneStairs::StoneStairs(                                     BlockFace, Inverse ? StoneStairs::Half::Top                   : StoneStairs::Half::Bottom,                   StoneStairs::Shape::Straight, IsPlacedInWater); break;
 			case BlockType::WarpedStairs:                  BlockToPlace = WarpedStairs::WarpedStairs(                                   BlockFace, Inverse ? WarpedStairs::Half::Top                  : WarpedStairs::Half::Bottom,                  WarpedStairs::Shape::Straight, IsPlacedInWater); break;
+			case BlockType::BambooMosaicStairs:            SET_BLOCK_TO_PLACE(BambooMosaicStairs)
+			case BlockType::BambooStairs:                  SET_BLOCK_TO_PLACE(BambooStairs) 
+            case BlockType::CherryStairs:                  SET_BLOCK_TO_PLACE(BambooMosaicStairs)
+			case BlockType::CobbledDeepslateStairs:        SET_BLOCK_TO_PLACE(CobbledDeepslateStairs)
+			case BlockType::TuffStairs:                    SET_BLOCK_TO_PLACE(TuffStairs)
+			case BlockType::TuffBrickStairs:               SET_BLOCK_TO_PLACE(TuffBrickStairs)
+			case BlockType::PolishedTuffStairs:            SET_BLOCK_TO_PLACE(PolishedTuffStairs)
+			case BlockType::MudBrickStairs:                SET_BLOCK_TO_PLACE(MudBrickStairs)
+			case BlockType::MangroveStairs:                SET_BLOCK_TO_PLACE(MangroveStairs)
+			case BlockType::DeepslateTileStairs:           SET_BLOCK_TO_PLACE(DeepslateTileStairs)
+			case BlockType::DeepslateBrickStairs:          SET_BLOCK_TO_PLACE(DeepslateBrickStairs)
+			case BlockType::PolishedDeepslateStairs:       SET_BLOCK_TO_PLACE(PolishedDeepslateStairs)    
+			case BlockType::CutCopperStairs:               SET_BLOCK_TO_PLACE(CutCopperStairs)
+			case BlockType::ExposedCutCopperStairs:        SET_BLOCK_TO_PLACE(ExposedCutCopperStairs)
+			case BlockType::WeatheredCutCopperStairs:      SET_BLOCK_TO_PLACE(WeatheredCutCopperStairs)
+			case BlockType::OxidizedCutCopperStairs:       SET_BLOCK_TO_PLACE(OxidizedCutCopperStairs)
+			case BlockType::WaxedCutCopperStairs:          SET_BLOCK_TO_PLACE(WaxedCutCopperStairs)
+			case BlockType::WaxedExposedCutCopperStairs:   SET_BLOCK_TO_PLACE(WaxedExposedCutCopperStairs)
+			case BlockType::WaxedWeatheredCutCopperStairs: SET_BLOCK_TO_PLACE(WaxedWeatheredCutCopperStairs)
+			case BlockType::WaxedOxidizedCutCopperStairs:  SET_BLOCK_TO_PLACE(WaxedOxidizedCutCopperStairs)
 			default: return false;
 		}
 		return a_Player.PlaceBlock(a_PlacePosition, BlockToPlace);
