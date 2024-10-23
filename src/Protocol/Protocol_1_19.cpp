@@ -2721,7 +2721,7 @@ void cProtocol_1_19_4::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 				Writer.AddString("type", "minecraft:damage_type");
 				Writer.BeginList("value", eTagType::TAG_Compound);
 				int id = 0;
-					for each (auto ds in dmgsrc)
+					for (auto ds : dmgsrc)
 					{
 						Writer.BeginCompound("");
 							Writer.BeginCompound("element");

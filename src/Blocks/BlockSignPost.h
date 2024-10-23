@@ -30,6 +30,9 @@ public:
 			case BlockType::OakSign:
 			case BlockType::SpruceSign:
 			case BlockType::WarpedSign:
+			case BlockType::CherrySign:
+			case BlockType::BambooSign:
+			case BlockType::MangroveSign:
 				return true;
 			default: return false;
 		}
@@ -58,7 +61,8 @@ private:
 
 
 
-
+#define ROTATE_CW(SignType) \
+	return SignType::SignType(  (SignType::Rotation(a_Block)  + 4) % 16, SignType::Waterlogged(a_Block)); \
 
 	virtual BlockState RotateCW(BlockState a_Block) const override
 	{
@@ -73,13 +77,17 @@ private:
 			case BlockType::OakSign:     return OakSign::OakSign(        (OakSign::Rotation(a_Block)     + 4) % 16, OakSign::Waterlogged(a_Block));
 			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(  (SpruceSign::Rotation(a_Block)  + 4) % 16, SpruceSign::Waterlogged(a_Block));
 			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(  (WarpedSign::Rotation(a_Block)  + 4) % 16, WarpedSign::Waterlogged(a_Block));
+			case BlockType::CherrySign:  ROTATE_CW(CherrySign)
+			case BlockType::BambooSign:  ROTATE_CW(BambooSign)
+			case BlockType::MangroveSign:  ROTATE_CW(MangroveSign)
 			default: return a_Block;
 		}
 	}
 
 
 
-
+#define ROTATE_CCW(SignType) \
+	return SignType::SignType(  (SignType::Rotation(a_Block)  + 12) % 16, SignType::Waterlogged(a_Block)); \
 
 	virtual BlockState RotateCCW(BlockState a_Block) const override
 	{
@@ -94,12 +102,17 @@ private:
 			case BlockType::OakSign:     return OakSign::OakSign(         (OakSign::Rotation(a_Block)    + 12) % 16, OakSign::Waterlogged(a_Block));
 			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(   (SpruceSign::Rotation(a_Block) + 12) % 16, SpruceSign::Waterlogged(a_Block));
 			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(   (WarpedSign::Rotation(a_Block) + 12) % 16, WarpedSign::Waterlogged(a_Block));
+			case BlockType::CherrySign:  ROTATE_CCW(CherrySign)
+			case BlockType::BambooSign:  ROTATE_CCW(BambooSign)
+			case BlockType::MangroveSign:  ROTATE_CCW(MangroveSign)
 			default: return a_Block;
 		}
 	}
 
+	//TODO: check is mirrorXY and mirrorYZ are identical
 
-
+#define MIRROR_XY(SignType) \
+	return SignType::SignType(  (SignType::Rotation(a_Block)  + 8) % 16, SignType::Waterlogged(a_Block)); \
 
 
 	virtual BlockState MirrorXY(BlockState a_Block) const override
@@ -116,11 +129,15 @@ private:
 			case BlockType::OakSign:     return OakSign::OakSign(         (OakSign::Rotation(a_Block)    + 8) % 16, OakSign::Waterlogged(a_Block));
 			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(   (SpruceSign::Rotation(a_Block) + 8) % 16, SpruceSign::Waterlogged(a_Block));
 			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(   (WarpedSign::Rotation(a_Block) + 8) % 16, WarpedSign::Waterlogged(a_Block));
+			case BlockType::CherrySign:  MIRROR_XY(CherrySign)
+			case BlockType::BambooSign:  MIRROR_XY(BambooSign)
+			case BlockType::MangroveSign:  MIRROR_XY(MangroveSign)
 			default: return a_Block;
 		}
 	}
 
-
+#define MIRROR_YZ(SignType) \
+	return SignType::SignType(  (SignType::Rotation(a_Block)  + 8) % 16, SignType::Waterlogged(a_Block)); \
 
 
 	// TODO: Sanity Check
@@ -138,6 +155,9 @@ private:
 			case BlockType::OakSign:     return OakSign::OakSign(         (OakSign::Rotation(a_Block)    + 8) % 16, OakSign::Waterlogged(a_Block));
 			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(   (SpruceSign::Rotation(a_Block) + 8) % 16, SpruceSign::Waterlogged(a_Block));
 			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(   (WarpedSign::Rotation(a_Block) + 8) % 16, WarpedSign::Waterlogged(a_Block));
+			case BlockType::CherrySign:  MIRROR_YZ(CherrySign)
+			case BlockType::BambooSign:  MIRROR_YZ(BambooSign)
+			case BlockType::MangroveSign:  MIRROR_YZ(MangroveSign)
 			default: return a_Block;
 		}
 	}

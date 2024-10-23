@@ -787,7 +787,7 @@ bool cMojangAPI::VerifyUsingMojangKeys(ContiguousByteBuffer DataToVerify, Contig
 		LOGWARN("Failed to calculate hash");
 		return false;
 	}
-	for each (auto ctx in MojangPublicKeys)
+	for (auto ctx : MojangPublicKeys)
 	{
 		int verify_error = mbedtls_pk_verify(&ctx, hash_type, Digest, mdinfo->size, reinterpret_cast<const unsigned char*>(Signature.c_str()), Signature.size());
 		if (verify_error == 0)

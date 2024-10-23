@@ -186,7 +186,7 @@ void cProtocol_1_13::SendCommandTree()
 		{
 			cPacketizer Pkt(*this, pktCommnadTree);
 			Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size()) + 1);  // + 1 for the root node
-			for each (AString var in Callback.m_Commands)
+			for (AString var : Callback.m_Commands)
 			{
 				Pkt.WriteVarInt32(1);  // Flags
 				Pkt.WriteVarInt32(0);  // Size of Array of child nodes
@@ -317,7 +317,7 @@ void cProtocol_1_13::SendTabCompletionResults(const AStringVector & a_Results, U
 		Pkt.WriteVarInt32(0);  //  Start
 		Pkt.WriteVarInt32(0);  //  Length
 		Pkt.WriteVarInt32(static_cast<UInt32>(a_Results.size()));
-		for each (AString Match in a_Results)
+		for (AString Match : a_Results)
 		{
 			Pkt.WriteString(Match);
 			Pkt.WriteBool(false); // Has Tooltip

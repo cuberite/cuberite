@@ -1274,12 +1274,12 @@ namespace
     constexpr cSimplePlaceableItemHandler   ItemMudBrickWallHandler                      (Item::MudBrickWall);
     constexpr cSimplePlaceableItemHandler   ItemMudBricksHandler                         (Item::MudBricks);
     constexpr cSimplePlaceableItemHandler   ItemMuddyMangroveRootsHandler                (Item::MuddyMangroveRoots);
-    constexpr cUnimplementedItemHandler     ItemMusicDisc5Handler                        (Item::MusicDisc5);
-    constexpr cUnimplementedItemHandler     ItemMusicDiscCreatorHandler                  (Item::MusicDiscCreator);
-    constexpr cUnimplementedItemHandler     ItemMusicDiscCreatorMusicBoxHandler          (Item::MusicDiscCreatorMusicBox);
-    constexpr cUnimplementedItemHandler     ItemMusicDiscOthersideHandler                (Item::MusicDiscOtherside);
-    constexpr cUnimplementedItemHandler     ItemMusicDiscPrecipiceHandler                (Item::MusicDiscPrecipice);
-    constexpr cUnimplementedItemHandler     ItemMusicDiscRelicHandler                    (Item::MusicDiscRelic);
+    constexpr cDefaultItemHandler           ItemMusicDisc5Handler                        (Item::MusicDisc5);
+    constexpr cDefaultItemHandler           ItemMusicDiscCreatorHandler                  (Item::MusicDiscCreator);
+    constexpr cDefaultItemHandler           ItemMusicDiscCreatorMusicBoxHandler          (Item::MusicDiscCreatorMusicBox);
+    constexpr cDefaultItemHandler           ItemMusicDiscOthersideHandler                (Item::MusicDiscOtherside);
+    constexpr cDefaultItemHandler           ItemMusicDiscPrecipiceHandler                (Item::MusicDiscPrecipice);
+    constexpr cDefaultItemHandler           ItemMusicDiscRelicHandler                    (Item::MusicDiscRelic);
     constexpr cUnimplementedItemHandler     ItemNetheriteUpgradeSmithingTemplateHandler  (Item::NetheriteUpgradeSmithingTemplate);
     constexpr cUnimplementedItemHandler     ItemOakChestBoatHandler                      (Item::OakChestBoat);
     constexpr cItemSignHandler              ItemOakHangingSignHandler                    (Item::OakHangingSign);

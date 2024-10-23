@@ -53,6 +53,12 @@ public:  // tolua_export
 			case Item::MusicDiscWard:
 			case Item::MusicDisc11:
 			case Item::MusicDisc13:
+			case Item::MusicDisc5:
+			case Item::MusicDiscCreator:
+			case Item::MusicDiscCreatorMusicBox:
+			case Item::MusicDiscOtherside:
+			case Item::MusicDiscPrecipice:
+			case Item::MusicDiscRelic:
 				return true;
 			default: return false;
 		}

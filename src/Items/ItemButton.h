@@ -52,6 +52,9 @@ private:
 			case BlockType::SpruceButton:             GETBLOCKFROMPLACEMENT(SpruceButton)
 			case BlockType::StoneButton:              GETBLOCKFROMPLACEMENT(StoneButton)
 			case BlockType::WarpedButton:             GETBLOCKFROMPLACEMENT(WarpedButton)
+			case BlockType::BambooButton:             GETBLOCKFROMPLACEMENT(BambooButton)
+			case BlockType::CherryButton:             GETBLOCKFROMPLACEMENT(CherryButton)
+			case BlockType::MangroveButton:           GETBLOCKFROMPLACEMENT(MangroveButton)
 			default: return false;
 		}
 	}

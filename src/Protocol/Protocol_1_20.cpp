@@ -703,7 +703,7 @@ void cProtocol_1_20_2::SendDynamicRegistries()
 				Writer.AddString("type", "minecraft:damage_type");
 				Writer.BeginList("value", eTagType::TAG_Compound);
 				int id = 0;
-					for each (auto ds in dmgsrc)
+					for (AString ds : dmgsrc)
 					{
 						Writer.BeginCompound("");
 							Writer.BeginCompound("element");

@@ -35,6 +35,10 @@ public:
 			case BlockType::JungleLeaves:  return a_Player.PlaceBlock(a_PlacePosition, Block::JungleLeaves::JungleLeaves(LEAVES_CHECK_DISTANCE, true, IsPlacedInWater));
 			case BlockType::OakLeaves:     return a_Player.PlaceBlock(a_PlacePosition, Block::OakLeaves::OakLeaves(LEAVES_CHECK_DISTANCE, true, IsPlacedInWater));
 			case BlockType::SpruceLeaves:  return a_Player.PlaceBlock(a_PlacePosition, Block::SpruceLeaves::SpruceLeaves(LEAVES_CHECK_DISTANCE, true, IsPlacedInWater));
+			case BlockType::AzaleaLeaves:  return a_Player.PlaceBlock(a_PlacePosition, Block::AzaleaLeaves::AzaleaLeaves(LEAVES_CHECK_DISTANCE, true, IsPlacedInWater));
+			case BlockType::CherryLeaves:  return a_Player.PlaceBlock(a_PlacePosition, Block::CherryLeaves::CherryLeaves(LEAVES_CHECK_DISTANCE, true, IsPlacedInWater));
+			case BlockType::MangroveLeaves:return a_Player.PlaceBlock(a_PlacePosition, Block::MangroveLeaves::MangroveLeaves(LEAVES_CHECK_DISTANCE, true, IsPlacedInWater));
+			case BlockType::FloweringAzaleaLeaves: return a_Player.PlaceBlock(a_PlacePosition, Block::FloweringAzaleaLeaves::FloweringAzaleaLeaves(LEAVES_CHECK_DISTANCE, true, IsPlacedInWater));
 			default: return false;
 		}
 	}
