@@ -14,6 +14,35 @@ public:
 		return true;
 	}
 
+#define SET_AXIS(LogType)\
+		{\
+			auto Axis = Block::LogType::Axis::X;\
+			switch (a_ClickedBlockFace)\
+			{\
+				case BLOCK_FACE_XM:\
+				case BLOCK_FACE_XP:\
+				{\
+					Axis = Block::LogType::Axis::X;\
+					break;\
+				}\
+				case BLOCK_FACE_ZM:\
+				case BLOCK_FACE_ZP:\
+				{\
+					Axis = Block::LogType::Axis::Z;\
+					break;\
+				}\
+				case BLOCK_FACE_YM:\
+				case BLOCK_FACE_YP:\
+				{\
+					Axis = Block::LogType::Axis::Y;\
+					break;\
+				}\
+				default: UNREACHABLE("Unhandled facing");\
+			}\
+			BlockToPlace = Block::LogType::LogType(Axis);\
+			break;\
+		}\
+
 
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
@@ -188,6 +217,8 @@ public:
 				BlockToPlace = Block::SpruceLog::SpruceLog(Axis);
 				break;
 			}
+			case Item::CherryLog: SET_AXIS(CherryLog)
+			case Item::MangroveLog: SET_AXIS(MangroveLog)
 			default:
 			{
 				FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, m_ItemType);

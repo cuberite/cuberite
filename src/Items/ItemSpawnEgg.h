@@ -93,6 +93,7 @@ public:
 			case Item::ZombieSpawnEgg:         return mtZombie;
 			case Item::ZombiePigmanSpawnEgg:   return mtZombiePigman;
 			case Item::ZombieVillagerSpawnEgg: return mtZombieVillager;
+			//todo impelemnt all new eggs
 			default: return mtInvalidType;
 		}
 	}
@@ -101,34 +102,86 @@ public:
 	{
 		switch (a_Item.m_ItemType)
 		{
+			case Item::AllaySpawnEgg:
+			case Item::ArmadilloSpawnEgg:
+			case Item::AxolotlSpawnEgg:
 			case Item::BatSpawnEgg:
+			case Item::BeeSpawnEgg:
 			case Item::BlazeSpawnEgg:
+			case Item::BoggedSpawnEgg:
+			case Item::BreezeSpawnEgg:
+			case Item::CamelSpawnEgg:
+			case Item::CatSpawnEgg:
 			case Item::CaveSpiderSpawnEgg:
 			case Item::ChickenSpawnEgg:
+			case Item::CodSpawnEgg:
 			case Item::CowSpawnEgg:
 			case Item::CreeperSpawnEgg:
+			case Item::DolphinSpawnEgg:
+			case Item::DonkeySpawnEgg:
+			case Item::DrownedSpawnEgg:
+			case Item::ElderGuardianSpawnEgg:
+			case Item::EnderDragonSpawnEgg:
 			case Item::EndermanSpawnEgg:
+			case Item::EndermiteSpawnEgg:
+			case Item::EvokerSpawnEgg:
+			case Item::FoxSpawnEgg:
+			case Item::FrogSpawnEgg:
 			case Item::GhastSpawnEgg:
+			case Item::GlowSquidSpawnEgg:
+			case Item::GoatSpawnEgg:
 			case Item::GuardianSpawnEgg:
+			case Item::HoglinSpawnEgg:
 			case Item::HorseSpawnEgg:
+			case Item::HuskSpawnEgg:
+			case Item::IronGolemSpawnEgg:
+			case Item::LlamaSpawnEgg:
 			case Item::MagmaCubeSpawnEgg:
 			case Item::MooshroomSpawnEgg:
+			case Item::MuleSpawnEgg:
 			case Item::OcelotSpawnEgg:
+			case Item::PandaSpawnEgg:
+			case Item::ParrotSpawnEgg:
+			case Item::PhantomSpawnEgg:
 			case Item::PigSpawnEgg:
+			case Item::PiglinBruteSpawnEgg:
+			case Item::PiglinSpawnEgg:
+			case Item::PillagerSpawnEgg:
+			case Item::PolarBearSpawnEgg:
+			case Item::PufferfishSpawnEgg:
 			case Item::RabbitSpawnEgg:
+			case Item::RavagerSpawnEgg:
+			case Item::SalmonSpawnEgg:
 			case Item::SheepSpawnEgg:
+			case Item::ShulkerSpawnEgg:
 			case Item::SilverfishSpawnEgg:
+			case Item::SkeletonHorseSpawnEgg:
 			case Item::SkeletonSpawnEgg:
 			case Item::SlimeSpawnEgg:
+			case Item::SnifferSpawnEgg:
+			case Item::SnowGolemSpawnEgg:
 			case Item::SpiderSpawnEgg:
 			case Item::SquidSpawnEgg:
+			case Item::StraySpawnEgg:
+			case Item::StriderSpawnEgg:
+			case Item::TadpoleSpawnEgg:
+			case Item::TraderLlamaSpawnEgg:
+			case Item::TropicalFishSpawnEgg:
+			case Item::TurtleSpawnEgg:
+			case Item::VexSpawnEgg:
 			case Item::VillagerSpawnEgg:
+			case Item::VindicatorSpawnEgg:
+			case Item::WanderingTraderSpawnEgg:
+			case Item::WardenSpawnEgg:
 			case Item::WitchSpawnEgg:
 			case Item::WitherSkeletonSpawnEgg:
+			case Item::WitherSpawnEgg:
 			case Item::WolfSpawnEgg:
+			case Item::ZoglinSpawnEgg:
+			case Item::ZombieHorseSpawnEgg:
 			case Item::ZombieSpawnEgg:
-			case Item::ZombiePigmanSpawnEgg:
 			case Item::ZombieVillagerSpawnEgg:
+			case Item::ZombifiedPiglinSpawnEgg:
 				return true;
 			default: return false;
 		}

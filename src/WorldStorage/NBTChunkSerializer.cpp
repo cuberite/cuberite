@@ -1376,7 +1376,8 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 					aWriter.EndCompound();
 				}
 				aWriter.EndList();
-				
+
+
 
 				INT64* arr = new INT64[longarrsize];
 

@@ -25,6 +25,9 @@ private:
 		BlockState BlockToPlace;
 
 		bool IsPlacedInWater =a_Player.GetWorld()->GetBlock(a_PlacePosition).Type() == BlockType::Water;
+#define BLOCK_PLACE_SIGN(SignType)\
+	BlockToPlace = Block::SignType::SignType(RotationToFineFace(a_Player.GetYaw()), IsPlacedInWater); break;\
+
 		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
 		{
 			switch (a_HeldItem.m_ItemType)
@@ -37,6 +40,9 @@ private:
 				case Item::OakSign:     BlockToPlace = Block::OakSign::OakSign(RotationToFineFace(a_Player.GetYaw()), IsPlacedInWater); break;
 				case Item::SpruceSign:  BlockToPlace = Block::SpruceSign::SpruceSign(RotationToFineFace(a_Player.GetYaw()), IsPlacedInWater); break;
 				case Item::WarpedSign:  BlockToPlace = Block::WarpedSign::WarpedSign(RotationToFineFace(a_Player.GetYaw()), IsPlacedInWater); break;
+				case Item::CherrySign:  BLOCK_PLACE_SIGN(CherrySign)
+				case Item::BambooSign:  BLOCK_PLACE_SIGN(BambooSign)
+				case Item::MangroveSign: BLOCK_PLACE_SIGN(MangroveSign)
 				default: return false;
 			}
 		}
@@ -52,6 +58,9 @@ private:
 				case Item::OakSign:     BlockToPlace = Block::OakWallSign::OakWallSign(); break;
 				case Item::SpruceSign:  BlockToPlace = Block::SpruceWallSign::SpruceWallSign(); break;
 				case Item::WarpedSign:  BlockToPlace = Block::WarpedWallSign::WarpedWallSign(); break;
+				case Item::CherrySign:  BlockToPlace = Block::CherrySign::CherrySign(); break;
+				case Item::BambooSign:  BlockToPlace = Block::BambooSign::BambooSign(); break;
+				case Item::MangroveSign: BlockToPlace = Block::MangroveSign::MangroveSign(); break;
 				default: return false;
 			}
 		}

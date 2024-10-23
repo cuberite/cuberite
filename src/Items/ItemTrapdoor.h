@@ -61,6 +61,15 @@ private:
 
 		bool IsPlacedInWater = a_Player.GetWorld()->GetBlock(a_PlacePosition).Type() == BlockType::Water;
 
+#define PLACE_TRAPDOOR(BlockType) \
+			{\
+				BlockToPlace = BlockType::BlockType(\
+					DestFacing,\
+					IsBottom ? BlockType::Half::Bottom : BlockType::Half::Top,\
+					false, false, IsPlacedInWater);\
+				break;\
+			}\
+
 		using namespace Block;
 		switch (BlockItemConverter::FromItem(a_HeldItem.m_ItemType))
 		{
@@ -136,6 +145,17 @@ private:
 					false, false, IsPlacedInWater);
 				break;
 			}
+			case BlockType::BambooTrapdoor:               PLACE_TRAPDOOR(BambooTrapdoor)
+			case BlockType::CherryTrapdoor:               PLACE_TRAPDOOR(CherryTrapdoor)
+			case BlockType::MangroveTrapdoor:             PLACE_TRAPDOOR(MangroveTrapdoor)
+			case BlockType::CopperTrapdoor:               PLACE_TRAPDOOR(CopperTrapdoor)
+			case BlockType::ExposedCopperTrapdoor:        PLACE_TRAPDOOR(ExposedCopperTrapdoor)
+			case BlockType::WeatheredCopperTrapdoor:      PLACE_TRAPDOOR(WeatheredCopperTrapdoor)
+			case BlockType::OxidizedCopperTrapdoor:       PLACE_TRAPDOOR(OxidizedCopperTrapdoor)
+			case BlockType::WaxedCopperTrapdoor:          PLACE_TRAPDOOR(WaxedCopperTrapdoor)
+			case BlockType::WaxedExposedCopperTrapdoor:   PLACE_TRAPDOOR(WaxedExposedCopperTrapdoor)
+			case BlockType::WaxedWeatheredCopperTrapdoor: PLACE_TRAPDOOR(WaxedWeatheredCopperTrapdoor)
+			case BlockType::WaxedOxidizedCopperTrapdoor:  PLACE_TRAPDOOR(WaxedOxidizedCopperTrapdoor)
 			default: return false;
 		}
 

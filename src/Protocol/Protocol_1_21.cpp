@@ -40,7 +40,7 @@ UInt32 cProtocol_1_21::GetPacketID(ePacketType a_PacketType) const
 				// ServerLinksS2CPacket 0x7B
 			}
 			break;
-		default: UNREACHABLE("Invalid m_State: %d", m_State); break;
+		//default: ASSERT(false,"Invalid m_State: %d", m_State); break;
 	}
 }
 

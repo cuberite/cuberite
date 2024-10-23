@@ -85,6 +85,12 @@ protected:
 		bool IsPlacedInWater =a_Player.GetWorld()->GetBlock(a_PlacePosition).Type() == BlockType::Water;
 		using namespace Block;
 
+#define PLACE_SLAB(SlabType) \
+			{\
+				BlockToPlace = SlabType::SlabType(IsTop ? SlabType::Type::Top : SlabType::Type::Bottom, IsPlacedInWater);\
+				break;\
+			}\
+
 		switch (m_ItemType)
 		{
 			case Item::AcaciaSlab:
@@ -287,6 +293,26 @@ protected:
 				BlockToPlace = WarpedSlab::WarpedSlab(IsTop ? WarpedSlab::Type::Top : WarpedSlab::Type::Bottom, IsPlacedInWater);
 				break;
 			}
+			case Item::BambooMosaicSlab:            PLACE_SLAB(BambooMosaicSlab)
+			case Item::BambooSlab:                  PLACE_SLAB(BambooSlab)
+            case Item::CherrySlab:                  PLACE_SLAB(CherrySlab)
+			case Item::CobbledDeepslateSlab:        PLACE_SLAB(CobbledDeepslateSlab)
+			case Item::TuffSlab:                    PLACE_SLAB(TuffSlab)
+			case Item::TuffBrickSlab:               PLACE_SLAB(TuffBrickSlab)
+			case Item::PolishedTuffSlab:            PLACE_SLAB(PolishedTuffSlab)
+			case Item::MudBrickSlab:                PLACE_SLAB(MudBrickSlab)
+			case Item::MangroveSlab:                PLACE_SLAB(MangroveSlab)
+			case Item::DeepslateTileSlab:           PLACE_SLAB(DeepslateTileSlab)
+			case Item::DeepslateBrickSlab:          PLACE_SLAB(DeepslateBrickSlab)
+			case Item::PolishedDeepslateSlab:       PLACE_SLAB(PolishedDeepslateSlab)
+			case Item::CutCopperSlab:               PLACE_SLAB(CutCopperSlab)
+			case Item::ExposedCutCopperSlab:        PLACE_SLAB(ExposedCutCopperSlab)
+			case Item::WeatheredCutCopperSlab:      PLACE_SLAB(WeatheredCutCopperSlab)
+			case Item::OxidizedCutCopperSlab:       PLACE_SLAB(OxidizedCutCopperSlab)
+			case Item::WaxedCutCopperSlab:          PLACE_SLAB(WaxedCutCopperSlab)
+			case Item::WaxedExposedCutCopperSlab:        PLACE_SLAB(WaxedExposedCutCopperSlab)
+			case Item::WaxedWeatheredCutCopperSlab:      PLACE_SLAB(WaxedWeatheredCutCopperSlab)
+			case Item::WaxedOxidizedCutCopperSlab:       PLACE_SLAB(WaxedOxidizedCutCopperSlab)
 			default:
 			{
 				FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, m_ItemType);
@@ -310,7 +336,8 @@ protected:
 
 
 
-
+#define GET_DOUBLE_SLAB(SlabType) \
+	return SlabType::SlabType(SlabType::Type::Double, SlabType::Waterlogged(BlockToPlace));\
 
 	static BlockState GetDoubleSlab(BlockState BlockToPlace)
 	{
@@ -357,6 +384,26 @@ protected:
 			case BlockType::StoneBrickSlab:              return StoneBrickSlab::StoneBrickSlab(StoneBrickSlab::Type::Double, StoneBrickSlab::Waterlogged(BlockToPlace));
 			case BlockType::StoneSlab:                   return StoneSlab::StoneSlab(StoneSlab::Type::Double, StoneSlab::Waterlogged(BlockToPlace));
 			case BlockType::WarpedSlab:                  return WarpedSlab::WarpedSlab(WarpedSlab::Type::Double, WarpedSlab::Waterlogged(BlockToPlace));
+			case BlockType::BambooMosaicSlab:            GET_DOUBLE_SLAB(BambooMosaicSlab)
+			case BlockType::BambooSlab:                  GET_DOUBLE_SLAB(BambooSlab)
+            case BlockType::CherrySlab:                  GET_DOUBLE_SLAB(CherrySlab)
+			case BlockType::CobbledDeepslateSlab:        GET_DOUBLE_SLAB(CobbledDeepslateSlab)
+			case BlockType::TuffSlab:                    GET_DOUBLE_SLAB(TuffSlab)
+			case BlockType::TuffBrickSlab:               GET_DOUBLE_SLAB(TuffBrickSlab)
+			case BlockType::PolishedTuffSlab:            GET_DOUBLE_SLAB(PolishedTuffSlab)
+			case BlockType::MudBrickSlab:                GET_DOUBLE_SLAB(MudBrickSlab)
+			case BlockType::MangroveSlab:                GET_DOUBLE_SLAB(MangroveSlab)
+			case BlockType::DeepslateTileSlab:           GET_DOUBLE_SLAB(DeepslateTileSlab)
+			case BlockType::DeepslateBrickSlab:          GET_DOUBLE_SLAB(DeepslateBrickSlab)
+			case BlockType::PolishedDeepslateSlab:       GET_DOUBLE_SLAB(PolishedDeepslateSlab)
+			case BlockType::CutCopperSlab:               GET_DOUBLE_SLAB(CutCopperSlab)
+			case BlockType::ExposedCutCopperSlab:        GET_DOUBLE_SLAB(ExposedCutCopperSlab)
+			case BlockType::WeatheredCutCopperSlab:      GET_DOUBLE_SLAB(WeatheredCutCopperSlab)
+			case BlockType::OxidizedCutCopperSlab:       GET_DOUBLE_SLAB(OxidizedCutCopperSlab)
+			case BlockType::WaxedCutCopperSlab:          GET_DOUBLE_SLAB(WaxedCutCopperSlab)
+			case BlockType::WaxedExposedCutCopperSlab:        GET_DOUBLE_SLAB(WaxedExposedCutCopperSlab)
+			case BlockType::WaxedWeatheredCutCopperSlab:      GET_DOUBLE_SLAB(WaxedWeatheredCutCopperSlab)
+			case BlockType::WaxedOxidizedCutCopperSlab:       GET_DOUBLE_SLAB(WaxedOxidizedCutCopperSlab)
 			default: return Air::Air();
 		}
 	}

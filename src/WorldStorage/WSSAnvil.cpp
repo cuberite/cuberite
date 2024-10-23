@@ -475,7 +475,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				{
 					tosearch += " ";
 				}
-				for each (auto itm in strs)
+				for (auto itm : strs)
 				{
 					tosearch += itm;
 				}
