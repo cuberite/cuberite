@@ -551,6 +551,32 @@ UInt32 cProtocol_1_20_2::GetPacketID(ePacketType a_PacketType) const
 
 
 
+void cProtocol_1_20_2::SendPlayerSpawn(const cPlayer & a_Player)
+{
+
+
+	// Called to spawn another player for the client
+	cPacketizer Pkt(*this, pktSpawnOtherPlayer);
+	Pkt.WriteVarInt32(a_Player.GetUniqueID());
+	Pkt.WriteUUID(a_Player.GetUUID());
+	Pkt.WriteVarInt32(128); // TEMP FIX!!! MUST BE CHANGED TO WORK FOR EVERY VERSION
+	Vector3d LastSentPos = a_Player.GetLastSentPosition();
+	Pkt.WriteBEDouble(LastSentPos.x);
+	Pkt.WriteBEDouble(LastSentPos.y + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
+	Pkt.WriteBEDouble(LastSentPos.z);
+	Pkt.WriteByteAngle(a_Player.GetYaw());
+	Pkt.WriteByteAngle(a_Player.GetPitch());
+	Pkt.WriteByteAngle(a_Player.GetHeadYaw());
+	Pkt.WriteVarInt32(0);
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Player.GetSpeedX() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Player.GetSpeedY() * 400));
+	Pkt.WriteBEInt16(static_cast<Int16>(a_Player.GetSpeedZ() * 400));
+}
+
+
+
+
+
 void cProtocol_1_20_2::SendLoginSuccess(void)
 {
 	ASSERT(m_State == 2);  // State: login?

@@ -2031,7 +2031,7 @@ void cProtocol_1_19_3::SendPlayerListInitChat(const cPlayer & a_Player)
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktPlayerList);
-	Pkt.WriteBEInt8(static_cast<Int8>(PlayerListAction::InitalizeChat));
+	Pkt.WriteBEInt8(static_cast<Int8>(PlayerListAction::InitializeChat));
 	Pkt.WriteUUID(a_Player.GetUUID());
 
 	auto player_session_data = a_Player.GetClientHandle()->GetPlayerSessionData();
