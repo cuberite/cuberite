@@ -426,16 +426,6 @@ struct sSetBlock
 		return v1.m_RelY > this->m_RelY;
 	}
 
-	//void swap(sSetBlock& v1, sSetBlock& v2)
-	//{
-	//	std::swap(v1.m_RelX, v2.m_RelX);
-	//	std::swap(v1.m_RelY, v2.m_RelY);
-	//	std::swap(v1.m_RelZ, v2.m_RelZ);
-	//	std::swap(v1.m_ChunkX, v2.m_ChunkX);
-	//	std::swap(v1.m_ChunkZ, v2.m_ChunkZ);
-	//	std::swap(v1.m_Block, v2.m_Block);
-	//}
-
 	/** Returns the absolute X coord of the stored block. */
 	int GetX(void) const { return m_RelX + cChunkDef::Width * m_ChunkX; }
 
