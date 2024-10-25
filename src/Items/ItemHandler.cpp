@@ -2794,6 +2794,8 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 {
 	const auto & World = *a_Player.GetWorld();
 
+	// blocks have to be resent in every case in 1.19+
+
 	// Check if the block ignores build collision (water, grass etc.):
 	if (cBlockHandler::For(a_ClickedBlock.Type()).DoesIgnoreBuildCollision(World, a_HeldItem, a_ClickedPosition, a_ClickedBlock, a_ClickedBlockFace, true))
 	{
@@ -2804,6 +2806,7 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 			a_Player.GetInventory().SendEquippedSlot();
 			return;
 		}
+		a_Player.SendBlocksAround(a_ClickedPosition, 2);
 	}
 	else
 	{
@@ -2836,6 +2839,7 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 			a_Player.GetInventory().SendEquippedSlot();
 			return;
 		}
+		a_Player.SendBlocksAround(PlacePosition, 2);
 	}
 
 	// Remove the "placed" item:
