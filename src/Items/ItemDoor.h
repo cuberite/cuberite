@@ -107,91 +107,26 @@ public:
 			HingeRight = true;
 		}
 
+
+
 		using namespace Block;
 
 #define PLACE_DOOR(DoorType) \
 			{\
-				return a_Player.PlaceBlocks(\
-				{\
-					{ a_PlacePosition, DoorType::DoorType(Facing, DoorType::Half::Lower, HingeRight ? DoorType::Hinge::Right : DoorType::Hinge::Left, false, false) },\
-					{ UpperBlockPosition,    DoorType::DoorType(Facing, DoorType::Half::Upper, HingeRight ? DoorType::Hinge::Right : DoorType::Hinge::Left, false, false) }\
-				});\
+				return a_Player.PlaceBlock(a_PlacePosition,DoorType::DoorType(Facing, DoorType::Half::Lower, HingeRight ? DoorType::Hinge::Right : DoorType::Hinge::Left, false, false))&&\
+				a_Player.PlaceBlock(UpperBlockPosition, DoorType::DoorType(Facing, DoorType::Half::Upper, HingeRight ? DoorType::Hinge::Right : DoorType::Hinge::Left, false, false));\
 			}\
 
 		switch (BlockType)
 		{
-			case BlockType::AcaciaDoor:
-			{
-				return a_Player.PlaceBlocks(
-				{
-					{ a_PlacePosition, AcaciaDoor::AcaciaDoor(Facing, AcaciaDoor::Half::Lower, HingeRight ? AcaciaDoor::Hinge::Right : AcaciaDoor::Hinge::Left, false, false) },
-					{ UpperBlockPosition,    AcaciaDoor::AcaciaDoor(Facing, AcaciaDoor::Half::Upper, HingeRight ? AcaciaDoor::Hinge::Right : AcaciaDoor::Hinge::Left, false, false) }
-				});
-			}
-			case BlockType::BirchDoor:
-			{
-				return a_Player.PlaceBlocks(
-				{
-					{ a_PlacePosition, BirchDoor::BirchDoor(Facing, BirchDoor::Half::Lower, HingeRight ? BirchDoor::Hinge::Right : BirchDoor::Hinge::Left, false, false) },
-					{ UpperBlockPosition,    BirchDoor::BirchDoor(Facing, BirchDoor::Half::Upper, HingeRight ? BirchDoor::Hinge::Right : BirchDoor::Hinge::Left, false, false) }
-				});
-			}
-			case BlockType::CrimsonDoor:
-			{
-				return a_Player.PlaceBlocks(
-				{
-					{ a_PlacePosition, CrimsonDoor::CrimsonDoor(Facing, CrimsonDoor::Half::Lower, HingeRight ? CrimsonDoor::Hinge::Right : CrimsonDoor::Hinge::Left, false, false) },
-					{ UpperBlockPosition,    CrimsonDoor::CrimsonDoor(Facing, CrimsonDoor::Half::Upper, HingeRight ? CrimsonDoor::Hinge::Right : CrimsonDoor::Hinge::Left, false, false) }
-				});
-			}
-			case BlockType::DarkOakDoor:
-			{
-				return a_Player.PlaceBlocks(
-				{
-					{ a_PlacePosition, CrimsonDoor::CrimsonDoor(Facing, CrimsonDoor::Half::Lower, HingeRight ? CrimsonDoor::Hinge::Right : CrimsonDoor::Hinge::Left, false, false) },
-					{ UpperBlockPosition,    CrimsonDoor::CrimsonDoor(Facing, CrimsonDoor::Half::Upper, HingeRight ? CrimsonDoor::Hinge::Right : CrimsonDoor::Hinge::Left, false, false) }
-				});
-			}
-			case BlockType::JungleDoor:
-			{
-				return a_Player.PlaceBlocks(
-				{
-					{ a_PlacePosition, JungleDoor::JungleDoor(Facing, JungleDoor::Half::Lower, HingeRight ? JungleDoor::Hinge::Right : JungleDoor::Hinge::Left, false, false) },
-					{ UpperBlockPosition,    JungleDoor::JungleDoor(Facing, JungleDoor::Half::Upper, HingeRight ? JungleDoor::Hinge::Right : JungleDoor::Hinge::Left, false, false) }
-				});
-			}
-			case BlockType::OakDoor:
-			{
-				return a_Player.PlaceBlocks(
-				{
-					{ a_PlacePosition, OakDoor::OakDoor(Facing, OakDoor::Half::Lower, HingeRight ? OakDoor::Hinge::Right : OakDoor::Hinge::Left, false, false) },
-					{ UpperBlockPosition,    OakDoor::OakDoor(Facing, OakDoor::Half::Upper, HingeRight ? OakDoor::Hinge::Right : OakDoor::Hinge::Left, false, false) }
-				});
-			}
-			case BlockType::SpruceDoor:
-			{
-				return a_Player.PlaceBlocks(
-				{
-					{ a_PlacePosition, SpruceDoor::SpruceDoor(Facing, SpruceDoor::Half::Lower, HingeRight ? SpruceDoor::Hinge::Right : SpruceDoor::Hinge::Left, false, false) },
-					{ UpperBlockPosition,    SpruceDoor::SpruceDoor(Facing, SpruceDoor::Half::Upper, HingeRight ? SpruceDoor::Hinge::Right : SpruceDoor::Hinge::Left, false, false) }
-				});
-			}
-			case BlockType::WarpedDoor:
-			{
-				return a_Player.PlaceBlocks(
-				{
-					{ a_PlacePosition, WarpedDoor::WarpedDoor(Facing, WarpedDoor::Half::Lower, HingeRight ? WarpedDoor::Hinge::Right : WarpedDoor::Hinge::Left, false, false) },
-					{ UpperBlockPosition,    WarpedDoor::WarpedDoor(Facing, WarpedDoor::Half::Upper, HingeRight ? WarpedDoor::Hinge::Right : WarpedDoor::Hinge::Left, false, false) }
-				});
-			}
-			case BlockType::IronDoor:
-			{
-				return a_Player.PlaceBlocks(
-				{
-					{ a_PlacePosition, IronDoor::IronDoor(Facing, IronDoor::Half::Lower, HingeRight ? IronDoor::Hinge::Right : IronDoor::Hinge::Left, false, false) },
-					{ UpperBlockPosition, IronDoor::IronDoor(Facing, IronDoor::Half::Upper, HingeRight ? IronDoor::Hinge::Right : IronDoor::Hinge::Left, false, false) }
-				});
-			}
+			case BlockType::AcaciaDoor:               PLACE_DOOR(AcaciaDoor)
+			case BlockType::BirchDoor:                PLACE_DOOR(BirchDoor)
+			case BlockType::DarkOakDoor:              PLACE_DOOR(DarkOakDoor)
+			case BlockType::JungleDoor:               PLACE_DOOR(JungleDoor)
+			case BlockType::OakDoor:                  PLACE_DOOR(OakDoor)
+			case BlockType::SpruceDoor:               PLACE_DOOR(SpruceDoor)
+			case BlockType::WarpedDoor:               PLACE_DOOR(WarpedDoor)
+			case BlockType::IronDoor:                 PLACE_DOOR(IronDoor)
 			case BlockType::BambooDoor:               PLACE_DOOR(BambooDoor)
 			case BlockType::CherryDoor:               PLACE_DOOR(CherryDoor)
 			case BlockType::CopperDoor:               PLACE_DOOR(CopperDoor)

@@ -358,6 +358,7 @@ public:
 	virtual void DataReceived(cByteBuffer & a_Buffer, const char * a_Data, size_t a_Size) = 0;
 
 	// Sending stuff to clients (alphabetically sorted):
+	virtual void SendAcknowledgeBlockChange     (int a_SequenceId) = 0;
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;
 	virtual void SendBlockAction                (int a_BlockX, int a_BlockY, int a_BlockZ, char a_Byte1, char a_Byte2, BlockState a_Block) = 0;
 	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, int a_BlockX, int a_BlockY, int a_BlockZ, char a_Stage) = 0;

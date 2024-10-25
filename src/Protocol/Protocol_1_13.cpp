@@ -50,7 +50,7 @@ void cProtocol_1_13::SendBlockChange(Vector3i a_BlockPos, BlockState a_Block)
 {
 	cPacketizer Pkt(*this, pktBlockChange);
 	Pkt.WriteXYZPosition64(a_BlockPos);
-	Pkt.WriteVarInt32(Palette_1_13::From(a_Block));
+	Pkt.WriteVarInt32(GetProtocolBlockType(a_Block));
 }
 
 
@@ -70,7 +70,7 @@ void cProtocol_1_13::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 	{
 		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
 		Pkt.WriteBEInt16(Coords);
-		Pkt.WriteVarInt32(Palette_1_13::From(Change.m_Block));
+		Pkt.WriteVarInt32(GetProtocolBlockType(Change.m_Block));
 	}
 }
 
