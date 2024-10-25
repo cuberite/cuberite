@@ -218,6 +218,16 @@ bool cProtocol_1_19::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 
 
 
+void cProtocol_1_19::SendAcknowledgeBlockChange(int a_SequenceId)
+{
+	cPacketizer Pkt(*this, pktPlayerActionResponse);
+	Pkt.WriteVarInt32(a_SequenceId);
+}
+
+
+
+
+
 void cProtocol_1_19::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 {
 	// Send the Join Game packet:
@@ -400,6 +410,7 @@ void cProtocol_1_19::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 
 
 
+
 void cProtocol_1_19::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -508,6 +519,8 @@ void cProtocol_1_19::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Obj
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
 }
+
+
 
 
 
@@ -718,7 +731,7 @@ void cProtocol_1_19::SendLoginSuccess(void)
 		cPacketizer Pkt(*this, pktLoginSuccess);
 		Pkt.WriteUUID(m_Client->GetUUID());
 		Pkt.WriteString(m_Client->GetUsername());
-		Pkt.WriteVarInt32(0);  // number of Profile Properites
+		Pkt.WriteVarInt32(0);  // number of Profile Properties
 	}
 }
 
@@ -846,6 +859,7 @@ void cProtocol_1_19::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Face);
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Sequence);
 	m_Client->HandleLeftClick({BlockX, BlockY, BlockZ}, FaceIntToBlockFace(Face), Status);
+	m_Client->SendAcknowledgeBlockChange(Sequence);
 }
 
 
@@ -868,6 +882,7 @@ void cProtocol_1_19::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBool, bool, InsideBlock);
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Sequence);
 	m_Client->HandleRightClick({BlockX, BlockY, BlockZ}, FaceIntToBlockFace(Face), {FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16)}, Hand == 0);
+	m_Client->SendAcknowledgeBlockChange(Sequence);
 }
 
 

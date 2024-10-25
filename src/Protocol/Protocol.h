@@ -439,6 +439,7 @@ public:
 	virtual void DataPrepared(ContiguousByteBuffer & a_Data) = 0;
 
 	// Sending stuff to clients (alphabetically sorted):
+	virtual void SendAcknowledgeBlockChange     (int a_SequenceId) = 0;
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;
 	virtual void SendBlockAction                (Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BlockState a_Block) = 0;
 	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage) = 0;

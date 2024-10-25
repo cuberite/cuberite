@@ -206,16 +206,48 @@ void cProtocol_1_20::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	cPacketizer Pkt(*this, pktBlockChanges);
-	Pkt.WriteBEInt32(a_ChunkX);
-	Pkt.WriteBEInt32(a_ChunkZ);
-	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
+	sSetBlockVector vec_copy = sSetBlockVector(a_Changes);
 
-	for (const auto & Change : a_Changes)
+	// Splits the vector into chunk section and send each separately
+	std::vector<std::pair<int, sSetBlockVector>> YSplit;
+
+	std::sort(
+		vec_copy.begin(), vec_copy.end());
+	int OldY = std::numeric_limits<int>::max();
+	int Index = -1;
+	for (const auto & a_Change : vec_copy)
 	{
-		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 4) | (Change.m_RelX << 8));
-		UInt64 packed = Coords | (Palette_1_16::From(Change.m_Block) << 12);
-		Pkt.WriteVarInt64(packed);
+		int SectionY = a_Change.m_RelY / 16;
+		if (OldY != SectionY)
+		{
+			YSplit.emplace_back(SectionY, sSetBlockVector());
+			Index++;
+			OldY = SectionY;
+			YSplit[Index].second.push_back(a_Change);
+		}
+		else
+		{
+			YSplit[Index].second.push_back(a_Change);
+		}
+	}
+
+	for (auto& [Y, rel_changes] : YSplit)
+	{
+		cPacketizer Pkt(*this, pktBlockChanges);
+		int64_t encoded_pos =
+			((static_cast<int64_t>(a_ChunkX & 0x3FFFFF)) << 42) |
+			((static_cast<int64_t>(a_ChunkZ & 0x3FFFFF)) << 20) |
+			(Y & 0xFFFFF);
+
+		Pkt.WriteBEUInt64(encoded_pos);
+		Pkt.WriteVarInt32(static_cast<UInt32>(rel_changes.size()));
+
+		for (const auto & Change : rel_changes)
+		{
+			Int16 Coords = static_cast<Int16>(Change.m_RelY % 16 | (Change.m_RelZ << 4) | (Change.m_RelX << 8));
+			UInt64 packed = Coords | (GetProtocolBlockType(Change.m_Block) << 12);
+			Pkt.WriteVarInt64(packed);
+		}
 	}
 }
 

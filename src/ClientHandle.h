@@ -149,6 +149,7 @@ public:  // tolua_export
 
 	// The following functions send the various packets:
 	// (Please keep these alpha-sorted)
+	void SendAcknowledgeBlockChange     (int a_SequenceId);
 	void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle);
 	void SendBlockAction                (Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BlockState a_Block);
 	void SendBlockBreakAnim             (UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage);  // tolua_export
@@ -446,7 +447,7 @@ public:  // tolua_export
 	  public:
 		cPlayerSessionData() :
 			m_IsPopulated(false),
-			m_SessionId(cUUID::cUUID()),
+			m_SessionId(cUUID()),
 			m_ExpiresAt(-1),
 			m_PublicKey(),
 			m_KeySignature()

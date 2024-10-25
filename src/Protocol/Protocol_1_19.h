@@ -16,6 +16,7 @@ public:
 protected:
 	virtual UInt32	GetPacketID(ePacketType a_PacketType) const override;
 
+	virtual void    SendAcknowledgeBlockChange(int a_SequenceId) override;
 	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void    SendChatRaw(const AString & a_MessageRaw, eChatType a_Type) override;
 	virtual void    SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount) override;

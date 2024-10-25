@@ -2274,6 +2274,15 @@ void cClientHandle::ServerTick(float a_Dt)
 
 
 
+void cClientHandle::SendAcknowledgeBlockChange(int a_SequenceId)
+{
+	m_Protocol->SendAcknowledgeBlockChange(a_SequenceId);
+}
+
+
+
+
+
 void cClientHandle::SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	m_Protocol->SendAttachEntity(a_Entity, a_Vehicle);
