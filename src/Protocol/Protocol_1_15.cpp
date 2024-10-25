@@ -106,17 +106,6 @@ void cProtocol_1_15::SendBlockBreakAnim(UInt32 a_EntityID, Vector3i a_BlockPos, 
 
 
 
-void cProtocol_1_15::SendBlockChange(Vector3i a_BlockPos, BlockState a_Block)
-{
-	cPacketizer Pkt(*this, pktBlockChange);
-	Pkt.WriteXZYPosition64(a_BlockPos);
-	Pkt.WriteVarInt32(Palette_1_15::From(a_Block));
-}
-
-
-
-
-
 void cProtocol_1_15::SendRenderDistanceCenter(cChunkCoords a_chunk)
 {
 	cPacketizer Pkt(*this, pktRenderDistanceCenter);

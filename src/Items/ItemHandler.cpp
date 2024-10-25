@@ -2806,7 +2806,6 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 			a_Player.GetInventory().SendEquippedSlot();
 			return;
 		}
-		a_Player.SendBlocksAround(a_ClickedPosition, 2);
 	}
 	else
 	{
@@ -2827,7 +2826,6 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 		{
 			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it.
-			a_Player.SendBlocksAround(PlacePosition, 2);
 			a_Player.GetInventory().SendEquippedSlot();
 			return;
 		}
@@ -2839,7 +2837,6 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 			a_Player.GetInventory().SendEquippedSlot();
 			return;
 		}
-		a_Player.SendBlocksAround(PlacePosition, 2);
 	}
 
 	// Remove the "placed" item:

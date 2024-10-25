@@ -69,6 +69,17 @@ bool cBlockDoorHandler::OnUse(
 		case BlockType::SpruceDoor:
 		case BlockType::OakDoor:
 		case BlockType::WarpedDoor:
+		case BlockType::BambooDoor:
+		case BlockType::CherryDoor:
+		case BlockType::CopperDoor:
+		case BlockType::MangroveDoor:
+		case BlockType::ExposedCopperDoor:
+		case BlockType::WeatheredCopperDoor:
+		case BlockType::OxidizedCopperDoor:
+		case BlockType::WaxedCopperDoor:
+		case BlockType::WaxedExposedCopperDoor:
+		case BlockType::WaxedWeatheredCopperDoor:
+		case BlockType::WaxedOxidizedCopperDoor:
 		{
 			ChangeDoor(a_ChunkInterface, a_BlockPos);
 			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_DOOR_OPEN, a_BlockPos, 0, a_Player.GetClientHandle());
@@ -133,6 +144,8 @@ cBoundingBox cBlockDoorHandler::GetPlacementCollisionBox(BlockState a_XM, BlockS
 
 BlockState cBlockDoorHandler::RotateCCW(BlockState a_Block) const
 {
+#define ROTATE_CCW(DoorType) \
+	return DoorType::DoorType(RotateBlockFaceCCW(DoorType::Facing(a_Block)), DoorType::Half(a_Block), DoorType::Hinge(a_Block), DoorType::Open(a_Block), DoorType::Powered(a_Block));
 	using namespace Block;
 	switch (a_Block.Type())
 	{
@@ -145,6 +158,17 @@ BlockState cBlockDoorHandler::RotateCCW(BlockState a_Block) const
 		case BlockType::SpruceDoor:  return SpruceDoor::SpruceDoor  (RotateBlockFaceCCW(SpruceDoor:: Facing(a_Block)), SpruceDoor:: Half(a_Block), SpruceDoor:: Hinge(a_Block), SpruceDoor:: Open(a_Block), SpruceDoor:: Powered(a_Block));
 		case BlockType::WarpedDoor:  return WarpedDoor::WarpedDoor  (RotateBlockFaceCCW(WarpedDoor:: Facing(a_Block)), WarpedDoor:: Half(a_Block), WarpedDoor:: Hinge(a_Block), WarpedDoor:: Open(a_Block), WarpedDoor:: Powered(a_Block));
 		case BlockType::IronDoor:    return IronDoor::  IronDoor    (RotateBlockFaceCCW(IronDoor::   Facing(a_Block)), IronDoor::   Half(a_Block), IronDoor::   Hinge(a_Block), IronDoor::   Open(a_Block), IronDoor::   Powered(a_Block));
+		case BlockType::BambooDoor:               ROTATE_CCW(BambooDoor)
+		case BlockType::CherryDoor:               ROTATE_CCW(CherryDoor)
+		case BlockType::CopperDoor:               ROTATE_CCW(CopperDoor)
+		case BlockType::MangroveDoor:             ROTATE_CCW(MangroveDoor)
+		case BlockType::ExposedCopperDoor:        ROTATE_CCW(ExposedCopperDoor)
+		case BlockType::WeatheredCopperDoor:      ROTATE_CCW(WeatheredCopperDoor)
+		case BlockType::OxidizedCopperDoor:       ROTATE_CCW(OxidizedCopperDoor)
+		case BlockType::WaxedCopperDoor:          ROTATE_CCW(WaxedCopperDoor)
+		case BlockType::WaxedExposedCopperDoor:   ROTATE_CCW(WaxedExposedCopperDoor)
+		case BlockType::WaxedWeatheredCopperDoor: ROTATE_CCW(WaxedWeatheredCopperDoor)
+		case BlockType::WaxedOxidizedCopperDoor:  ROTATE_CCW(WaxedOxidizedCopperDoor)
 		default: return a_Block;
 	}
 }
@@ -155,6 +179,8 @@ BlockState cBlockDoorHandler::RotateCCW(BlockState a_Block) const
 
 BlockState cBlockDoorHandler::RotateCW(BlockState a_Block) const
 {
+#define ROTATE_CW(DoorType) \
+	return DoorType::DoorType(RotateBlockFaceCW(DoorType::Facing(a_Block)), DoorType::Half(a_Block), DoorType::Hinge(a_Block), DoorType::Open(a_Block), DoorType::Powered(a_Block));
 	using namespace Block;
 	switch (a_Block.Type())
 	{
@@ -167,6 +193,17 @@ BlockState cBlockDoorHandler::RotateCW(BlockState a_Block) const
 		case BlockType::SpruceDoor:  return SpruceDoor::SpruceDoor  (RotateBlockFaceCW(SpruceDoor:: Facing(a_Block)), SpruceDoor:: Half(a_Block), SpruceDoor:: Hinge(a_Block), SpruceDoor:: Open(a_Block), SpruceDoor:: Powered(a_Block));
 		case BlockType::WarpedDoor:  return WarpedDoor::WarpedDoor  (RotateBlockFaceCW(WarpedDoor:: Facing(a_Block)), WarpedDoor:: Half(a_Block), WarpedDoor:: Hinge(a_Block), WarpedDoor:: Open(a_Block), WarpedDoor:: Powered(a_Block));
 		case BlockType::IronDoor:    return IronDoor::  IronDoor    (RotateBlockFaceCW(IronDoor::   Facing(a_Block)), IronDoor::   Half(a_Block), IronDoor::   Hinge(a_Block), IronDoor::   Open(a_Block), IronDoor::   Powered(a_Block));
+		case BlockType::BambooDoor:               ROTATE_CW(BambooDoor)
+		case BlockType::CherryDoor:               ROTATE_CW(CherryDoor)
+		case BlockType::CopperDoor:               ROTATE_CW(CopperDoor)
+		case BlockType::MangroveDoor:             ROTATE_CW(MangroveDoor)
+		case BlockType::ExposedCopperDoor:        ROTATE_CW(ExposedCopperDoor)
+		case BlockType::WeatheredCopperDoor:      ROTATE_CW(WeatheredCopperDoor)
+		case BlockType::OxidizedCopperDoor:       ROTATE_CW(OxidizedCopperDoor)
+		case BlockType::WaxedCopperDoor:          ROTATE_CW(WaxedCopperDoor)
+		case BlockType::WaxedExposedCopperDoor:   ROTATE_CW(WaxedExposedCopperDoor)
+		case BlockType::WaxedWeatheredCopperDoor: ROTATE_CW(WaxedWeatheredCopperDoor)
+		case BlockType::WaxedOxidizedCopperDoor:  ROTATE_CW(WaxedOxidizedCopperDoor)
 		default: return a_Block;
 	}
 }
@@ -177,6 +214,8 @@ BlockState cBlockDoorHandler::RotateCW(BlockState a_Block) const
 
 BlockState cBlockDoorHandler::MirrorXY(BlockState a_Block) const
 {
+#define MIRROR_XY(DoorType) \
+	return DoorType::DoorType(MirrorBlockFaceXY(DoorType::Facing(a_Block)), DoorType::Half(a_Block), DoorType::Hinge(a_Block), DoorType::Open(a_Block), DoorType::Powered(a_Block));
 	using namespace Block;
 	switch (a_Block.Type())
 	{
@@ -189,6 +228,17 @@ BlockState cBlockDoorHandler::MirrorXY(BlockState a_Block) const
 		case BlockType::SpruceDoor:  return SpruceDoor::SpruceDoor  (MirrorBlockFaceXY(SpruceDoor:: Facing(a_Block)), SpruceDoor:: Half(a_Block), SpruceDoor:: Hinge(a_Block), SpruceDoor:: Open(a_Block), SpruceDoor:: Powered(a_Block));
 		case BlockType::WarpedDoor:  return WarpedDoor::WarpedDoor  (MirrorBlockFaceXY(WarpedDoor:: Facing(a_Block)), WarpedDoor:: Half(a_Block), WarpedDoor:: Hinge(a_Block), WarpedDoor:: Open(a_Block), WarpedDoor:: Powered(a_Block));
 		case BlockType::IronDoor:    return IronDoor::  IronDoor    (MirrorBlockFaceXY(IronDoor::   Facing(a_Block)), IronDoor::   Half(a_Block), IronDoor::   Hinge(a_Block), IronDoor::   Open(a_Block), IronDoor::   Powered(a_Block));
+		case BlockType::BambooDoor:               MIRROR_XY(BambooDoor)
+		case BlockType::CherryDoor:               MIRROR_XY(CherryDoor)
+		case BlockType::CopperDoor:               MIRROR_XY(CopperDoor)
+		case BlockType::MangroveDoor:             MIRROR_XY(MangroveDoor)
+		case BlockType::ExposedCopperDoor:        MIRROR_XY(ExposedCopperDoor)
+		case BlockType::WeatheredCopperDoor:      MIRROR_XY(WeatheredCopperDoor)
+		case BlockType::OxidizedCopperDoor:       MIRROR_XY(OxidizedCopperDoor)
+		case BlockType::WaxedCopperDoor:          MIRROR_XY(WaxedCopperDoor)
+		case BlockType::WaxedExposedCopperDoor:   MIRROR_XY(WaxedExposedCopperDoor)
+		case BlockType::WaxedWeatheredCopperDoor: MIRROR_XY(WaxedWeatheredCopperDoor)
+		case BlockType::WaxedOxidizedCopperDoor:  MIRROR_XY(WaxedOxidizedCopperDoor)
 		default: return a_Block;
 	}
 }
@@ -199,6 +249,8 @@ BlockState cBlockDoorHandler::MirrorXY(BlockState a_Block) const
 
 BlockState cBlockDoorHandler::MirrorYZ(BlockState a_Block) const
 {
+#define MIRROR_YZ(DoorType) \
+	return DoorType::DoorType(MirrorBlockFaceYZ(DoorType::Facing(a_Block)), DoorType::Half(a_Block), DoorType::Hinge(a_Block), DoorType::Open(a_Block), DoorType::Powered(a_Block));
 	using namespace Block;
 	switch (a_Block.Type())
 	{
@@ -211,6 +263,17 @@ BlockState cBlockDoorHandler::MirrorYZ(BlockState a_Block) const
 		case BlockType::SpruceDoor:  return SpruceDoor::SpruceDoor  (MirrorBlockFaceYZ(SpruceDoor:: Facing(a_Block)), SpruceDoor:: Half(a_Block), SpruceDoor:: Hinge(a_Block), SpruceDoor:: Open(a_Block), SpruceDoor:: Powered(a_Block));
 		case BlockType::WarpedDoor:  return WarpedDoor::WarpedDoor  (MirrorBlockFaceYZ(WarpedDoor:: Facing(a_Block)), WarpedDoor:: Half(a_Block), WarpedDoor:: Hinge(a_Block), WarpedDoor:: Open(a_Block), WarpedDoor:: Powered(a_Block));
 		case BlockType::IronDoor:    return IronDoor::  IronDoor    (MirrorBlockFaceYZ(IronDoor::   Facing(a_Block)), IronDoor::   Half(a_Block), IronDoor::   Hinge(a_Block), IronDoor::   Open(a_Block), IronDoor::   Powered(a_Block));
+		case BlockType::BambooDoor:               MIRROR_YZ(BambooDoor)
+		case BlockType::CherryDoor:               MIRROR_YZ(CherryDoor)
+		case BlockType::CopperDoor:               MIRROR_YZ(CopperDoor)
+		case BlockType::MangroveDoor:             MIRROR_YZ(MangroveDoor)
+		case BlockType::ExposedCopperDoor:        MIRROR_YZ(ExposedCopperDoor)
+		case BlockType::WeatheredCopperDoor:      MIRROR_YZ(WeatheredCopperDoor)
+		case BlockType::OxidizedCopperDoor:       MIRROR_YZ(OxidizedCopperDoor)
+		case BlockType::WaxedCopperDoor:          MIRROR_YZ(WaxedCopperDoor)
+		case BlockType::WaxedExposedCopperDoor:   MIRROR_YZ(WaxedExposedCopperDoor)
+		case BlockType::WaxedWeatheredCopperDoor: MIRROR_YZ(WaxedWeatheredCopperDoor)
+		case BlockType::WaxedOxidizedCopperDoor:  MIRROR_YZ(WaxedOxidizedCopperDoor)
 		default: return a_Block;
 	}
 }

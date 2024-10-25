@@ -422,7 +422,7 @@ public:
 	enum class PlayerListAction : std::uint8_t
 	{
 		AddPlayer = 1,
-		InitalizeChat = 2,
+		InitializeChat = 2,
 		UpdateGameMode = 4,
 		UpdateListed = 8,
 		UpdateLatency = 16,

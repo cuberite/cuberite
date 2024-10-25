@@ -40,6 +40,7 @@ protected:
 	virtual void    SendLoginSuccess(void) override;
 	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void    SendPluginMessage(const AString & a_Channel, const ContiguousByteBufferView a_Message) override;
+	virtual void    SendPlayerSpawn(const cPlayer & a_Player) override;
 	virtual void    SendRespawn(eDimension a_Dimension) override;
 	virtual void    SendFinishConfiguration() override;
 	virtual void    SendDynamicRegistries() override;
