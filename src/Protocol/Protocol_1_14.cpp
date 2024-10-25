@@ -86,7 +86,7 @@ void cProtocol_1_14::SendBlockChange(Vector3i a_BlockPos, BlockState a_Block)
 {
 	cPacketizer Pkt(*this, pktBlockChange);
 	Pkt.WriteXZYPosition64(a_BlockPos);
-	Pkt.WriteVarInt32(Palette_1_14::From(a_Block));
+	Pkt.WriteVarInt32(GetProtocolBlockType(a_Block));
 }
 
 
