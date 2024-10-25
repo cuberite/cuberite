@@ -114,4 +114,9 @@ private:
 		}
 		return a_Player.PlaceBlock(a_PlacePosition, BlockToPlace);
 	}
+
+	virtual bool IsPlaceable(void) const override
+	{
+		return true;
+	}
 };

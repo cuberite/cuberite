@@ -65,7 +65,7 @@ void cProtocol_1_15::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_B
 	Pkt.WriteXZYPosition64(a_BlockPos);
 	Pkt.WriteBEInt8(a_Byte1);
 	Pkt.WriteBEInt8(a_Byte2);
-	Pkt.WriteVarInt32(Palette_1_15::From(a_BlockType));
+	Pkt.WriteVarInt32(GetProtocolBlockType(a_BlockType));
 }
 
 
@@ -84,7 +84,7 @@ void cProtocol_1_15::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 	{
 		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
 		Pkt.WriteBEInt16(Coords);
-		Pkt.WriteVarInt32(Palette_1_15::From(Change.m_Block));
+		Pkt.WriteVarInt32(GetProtocolBlockType(Change.m_Block));
 	}
 }
 

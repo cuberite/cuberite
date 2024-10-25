@@ -167,6 +167,15 @@ void cProtocol_1_8_0::DataPrepared(ContiguousByteBuffer & a_Data)
 
 
 
+void cProtocol_1_8_0::SendAcknowledgeBlockChange(int a_SequenceId)
+{
+	// used in 1.19+
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	ASSERT(m_State == 3);  // In game mode?
