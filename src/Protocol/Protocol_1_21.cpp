@@ -320,3 +320,31 @@ Item cProtocol_1_21::GetItemFromProtocolID(UInt32 a_ProtocolID) const
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+//  cProtocol_1_21_2:
+
+cProtocol::Version cProtocol_1_21_2::GetProtocolVersion() const
+{
+	return Version::v1_21_2;
+}
+
+
+
+
+
+void cProtocol_1_21_2::SendSelectKnownPacks()
+{
+	{
+		cPacketizer Pkt(*this, pktSelectKnownPacks);
+		Pkt.WriteVarInt32(2);
+		Pkt.WriteString("minecraft");
+		Pkt.WriteString("core");
+		Pkt.WriteString("1.21.2");
+		Pkt.WriteString("minecraft");
+		Pkt.WriteString("core");
+		Pkt.WriteString("1.21.3");
+	}	
+}
+
+
+
