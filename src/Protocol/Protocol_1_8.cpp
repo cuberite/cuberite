@@ -253,7 +253,6 @@ void cProtocol_1_8_0::SendPlayerListInitChat(const cPlayer & a_Player)
 
 
 
-
 void cProtocol_1_8_0::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -322,6 +321,15 @@ void cProtocol_1_8_0::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_C
 
 
 void cProtocol_1_8_0::SendBossBarUpdateTitle(UInt32 a_UniqueID, const cCompositeChat & a_Title)
+{
+	// No such packet here
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendTags(void)
 {
 	// No such packet here
 }

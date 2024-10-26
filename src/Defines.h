@@ -27,7 +27,18 @@ enum
 {
 	// Open to suggestion on naming convention here :)
 	MAX_EXPERIENCE_ORB_SIZE = 2000
-} ;
+};
+
+
+
+
+
+enum class ParticleMode : std::uint8_t
+{
+	All,
+	Decreased,
+	Minimal
+};
 
 
 

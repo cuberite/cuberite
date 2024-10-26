@@ -423,7 +423,7 @@ UInt32 cProtocol_1_20_2::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktConfigurationDynamicRegistries: return 0x05;
 			//  ResourcePackSend  0x06
 			//  Features 0x07
-			//  SynchronizeTags 0x08
+		case cProtocol::pktConfigurationTags:    return 0x08;
 
 		//  Game packets
 		case cProtocol::pktSpawnObject:          return 0x01;
@@ -730,6 +730,7 @@ void cProtocol_1_20_2::HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer
 {
 	m_State = State::Configuration;
 	SendDynamicRegistries();
+	SendTags();
 	m_Client->SendFinishConfiguration();
 }
 
@@ -1180,7 +1181,7 @@ UInt32 cProtocol_1_20_3::GetPacketID(ePacketType a_PacketType) const
 			//	Resource pack remove 0x06
 			//  ResourcePackSend  0x07
 			//  Features 0x08
-			//  SynchronizeTags 0x09
+		case cProtocol::pktConfigurationTags:    return 0x09;
 
 		//  Game packets
 	    case cProtocol::pktSpawnObject:          return 0x01;
@@ -1832,7 +1833,7 @@ UInt32 cProtocol_1_20_5::GetPacketID(ePacketType a_PacketType) const
 			//	StoreCookie 0x0A
 			//  ServerTransfer 0x0B
 			//  Features 0x0C
-			//  SynchronizeTags 0x0D
+		case cProtocol::pktConfigurationTags:    return 0x0D;
 		case cProtocol::pktSelectKnownPacks:     return 0x0E;
 
 		//  Game packets
@@ -2122,6 +2123,7 @@ void cProtocol_1_20_5::HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer
 	m_State = State::Configuration;
 	SendDynamicRegistries();
 	SendSelectKnownPacks();
+	SendTags();
 	m_Client->SendFinishConfiguration();
 }
 

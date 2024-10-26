@@ -272,7 +272,10 @@ public:  // tolua_export
 	AString GetLocale(void) const { return m_Locale; }
 
 	void SetAllowListing(bool a_AllowsListing) { m_Allowslisting = a_AllowsListing; }
-	bool GetAllowListing(void) { return m_Allowslisting; }
+	bool GetAllowListing(void) const { return m_Allowslisting; }
+
+	void SetParticleMode(ParticleMode a_ParticelMode) { m_ParticleMode = a_ParticelMode; }
+	ParticleMode GetParticleMode(void) const { return m_ParticleMode; }
 
 	int GetUniqueID(void) const { return m_UniqueID; }
 
@@ -598,6 +601,8 @@ private:
 
 	/* Should the player be displayed in player tab list or sent in server status packets. Set by ClientSettings packet */
 	bool m_Allowslisting;
+
+	ParticleMode m_ParticleMode;
 
 	static int s_ClientCount;
 
