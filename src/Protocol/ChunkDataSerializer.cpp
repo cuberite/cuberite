@@ -368,7 +368,7 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 		}
 		case CacheVersion::v768:
 		{
-			Serialize764<&Palette767>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x27);
+			Serialize764<&Palette767>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x28);
 			break;
 		}
 	}
