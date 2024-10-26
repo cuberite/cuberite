@@ -1,75 +1,23 @@
 #pragma once
 #include <optional>
+#include "../Defines.h"
 #include "CommandException.h"
 #include "CommandExecutionContext.h"
 
 
 class cCommandArgument
 {
-	public:
-
-	enum class eParserType : std::int8_t
-	{
-		None = -1,
-		Bool = 0,
-		Float,
-		Double,
-		Integer,
-		Long,
-		String,
-		Entity,
-		GameProfile,
-		BlockPos,
-		ColumnPos,
-		Vector3,
-		Vector2,
-		BlockState,
-		BlockPredicate,
-		ItemStack,
-		ItemPredicate,
-		Color,
-		Component,
-		Style,
-		Message,
-		Nbt,
-		NbtTag,
-		NbtPath,
-		Objective,
-		ObjectiveCriteria,
-		Operation,
-		Particle,
-		Angle,
-		Rotation,
-		ScoreboardSlot,
-		ScoreHolder,
-		Swizzle,
-		Team,
-		ItemSlot,
-		ItemSlots,
-		ResourceLocation,
-		Function,
-		EntityAnchor,
-		IntRange,
-		FloatRange,
-		Dimension,
-		GameMode,
-		Time,
-		ResourceOrTag,
-		ResourceOrTagKey,
-		Resource,
-		ResourceKey,
-		TemplateMirror,
-		TemplateRotation,
-		HeightMap,
-		UUID
-		// TODO: actually implement these parsers
-	};
   public:
 	cCommandArgument() = default;
-	virtual void WriteParserID(cPacketizer& a_Packet) const { return; }
+	virtual eCommandParserType GetParserType() const { return eCommandParserType::None; }
 	virtual void WriteProperties(cPacketizer& a_Packet) const { return; }
 	virtual void Parse(BasicStringReader& a_ToParse, cCommandExecutionContext& ctx, const AString& a_Name) { return; }
 };
+
+
+
+
+
 class cCommandFloatArgument final : public cCommandArgument
 {
 
@@ -116,10 +64,7 @@ class cCommandFloatArgument final : public cCommandArgument
 		}
 		ctx.AddValue(a_Name, value);
 	}
-	virtual void WriteParserID(cPacketizer& a_Packet) const override
-	{
-		a_Packet.WriteVarInt32(static_cast<UInt32>(eParserType::Float));
-	}
+	virtual eCommandParserType GetParserType() const override { return eCommandParserType::Float; }
 	static float GetFloatFromCtx(cCommandExecutionContext a_Ctx, const AString& a_Name)
 	{
 		return std::any_cast<float>(a_Ctx.GetValue(a_Name));
@@ -183,10 +128,7 @@ class cCommandTimeArgument final : public cCommandArgument
 		}
 		ctx.AddValue(a_Name, static_cast<int>(value));
 	}
-	virtual void WriteParserID(cPacketizer& a_Packet) const override
-	{
-		a_Packet.WriteVarInt32(static_cast<UInt32>(eParserType::Time));
-	}
+	virtual eCommandParserType GetParserType() const override { return eCommandParserType::Time; }
 	static int GetTimeTicksFromCtx(cCommandExecutionContext a_Ctx, const AString& a_Name)
 	{
 		return std::any_cast<int>(a_Ctx.GetValue(a_Name));
@@ -194,4 +136,46 @@ class cCommandTimeArgument final : public cCommandArgument
 
 private:
 	std::optional<int> m_Min;
+};
+
+
+
+
+
+class cCommandGameModeArgument final : public cCommandArgument
+{
+public:
+	cCommandGameModeArgument() = default;
+
+	void Parse(BasicStringReader& a_ToParse, cCommandExecutionContext& ctx, const AString& a_Name) override
+	{
+		eGameMode value = eGameMode_NotSet;
+		auto str = a_ToParse.ReadStringUntilWhiteSpace();
+		if (str == "survival")
+		{
+			value = eGameMode_Survival;
+		}
+		else if (str == "creative")
+		{
+			value = eGameMode_Creative;
+		}
+		else if (str == "spectator")
+		{
+			value = eGameMode_Spectator;
+		}
+		else if (str == "adventure")
+		{
+			value = eGameMode_Adventure;
+		}
+		else
+		{
+			throw cCommandParseException("Failed to parse " + str + " as Gamemode. Expected survival, creative, spectator or adventure");
+		}
+		ctx.AddValue(a_Name, value);
+	}
+	virtual eCommandParserType GetParserType() const override { return eCommandParserType::Gamemode; }
+	static eGameMode GetGameModeFromCtx(cCommandExecutionContext a_Ctx, const AString& a_Name)
+	{
+		return std::any_cast<eGameMode>(a_Ctx.GetValue(a_Name));
+	}
 };

@@ -36,9 +36,10 @@ protected:
 	virtual void    HandlePacketBlockDig(cByteBuffer & a_ByteBuffer) override;
 	virtual void    HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer) override;
 
-	virtual UInt32    GetProtocolMobType(eMonsterType a_MobType) const override;
-	virtual int       GetProtocolParticleID(const AString & a_ParticleName) const override;
-	virtual UInt8     GetProtocolEntityType(const cEntity & a_Entity) const override;
+	virtual UInt32  GetProtocolMobType(eMonsterType a_MobType) const override;
+	virtual int     GetProtocolParticleID(const AString & a_ParticleName) const override;
+	virtual UInt8   GetProtocolEntityType(const cEntity & a_Entity) const override;
+	virtual Int32   GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const override;
 
 
 	virtual Version GetProtocolVersion() const override;
@@ -130,8 +131,9 @@ protected:
 	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void    HandlePacketPlayerSession(cByteBuffer & a_ByteBuffer) override;
 
-	virtual UInt32    GetProtocolMobType(eMonsterType a_MobType) const override;
-	virtual UInt8     GetProtocolEntityType(const cEntity & a_Entity) const override;
+	virtual UInt32  GetProtocolMobType(eMonsterType a_MobType) const override;
+	virtual UInt8   GetProtocolEntityType(const cEntity & a_Entity) const override;
+	virtual Int32   GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const override;
 
 	virtual Version GetProtocolVersion() const override;
 };

@@ -48,7 +48,7 @@ class cCommandManager
 		bool Parse(BasicStringReader& a_Command, cCommandExecutionContext& a_Ctx);
 
 		/**  Writes the current node and all its children to the given packet in the format required by the CommandTree command. The current node must be a root node*/
-		void WriteCommandTree(cPacketizer& a_Packet);
+		void WriteCommandTree(cPacketizer& a_Packet, const cProtocol & a_Protocol);
 
 	 protected:
 		cCommandNode(eNodeType a_Type, CommandNodeList a_ChildrenNodes, cCommandNode * a_RedirectNode, CmdArgPtr a_ParserArgument, AString a_Name, eCommandSuggestionType a_SuggestionType, bool a_IsExecutable, CommandExecutor a_Executioner);
@@ -67,7 +67,7 @@ class cCommandManager
 	  private:
 
 		/** Does most of the actual writing. Called recursively. */
-		void WriteCommandTreeInternal(cPacketizer& a_Packet, std::map<cCommandNode *, UInt32>& a_Map);
+		void WriteCommandTreeInternal(cPacketizer& a_Packet, std::map<cCommandNode *, UInt32>& a_Map, const cProtocol & a_Protocol);
 
 		/* Assign ids in order given by CollectChildren */
 		static std::map<cCommandNode *, UInt32> ComputeChildrenIds(cCommandNode& a_Node);

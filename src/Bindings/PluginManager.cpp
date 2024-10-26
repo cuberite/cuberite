@@ -11,9 +11,8 @@
 
 #include "../IniFile.h"
 #include "../Entities/Player.h"
-
-
-
+#include "Commands/CommandArguments.h"
+#include "Commands/CommandManager.h"
 
 
 cPluginManager * cPluginManager::Get(void)
@@ -254,11 +253,11 @@ bool cPluginManager::GenericCallHook(PluginHook a_HookName, HookFunction a_HookF
 
 
 
-bool cPluginManager::CallHookBlockSpread(cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source)
+bool cPluginManager::CallHookBlockSpread(cWorld & a_World, Vector3i a_BlockPos, eSpreadSource a_Source)
 {
 	return GenericCallHook(HOOK_BLOCK_SPREAD, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnBlockSpread(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Source);
+			return a_Plugin->OnBlockSpread(a_World, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Source);
 		}
 	);
 }
@@ -335,14 +334,14 @@ bool cPluginManager::CallHookChat(cPlayer & a_Player, AString & a_Message)
 		case crError:
 		{
 			// An error in the plugin has prevented the command from executing. Report the error to the player:
-			a_Player.SendMessageFailure(Printf("Something went wrong while executing command \"%s\"", a_Message.c_str()));
+			a_Player.SendMessageFailure(fmt::format(FMT_STRING("Something went wrong while executing command \"{}\""), a_Message));
 			return true;
 		}
 
 		case crNoPermission:
 		{
 			// The player is not allowed to execute this command
-			a_Player.SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", a_Message.c_str()));
+			a_Player.SendMessageFailure(fmt::format(FMT_STRING("Forbidden command; insufficient privileges: \"{}\""), a_Message));
 			return true;
 		}
 
@@ -358,8 +357,8 @@ bool cPluginManager::CallHookChat(cPlayer & a_Player, AString & a_Message)
 	{
 		AStringVector Split(StringSplit(a_Message, " "));
 		ASSERT(!Split.empty());  // This should not happen - we know there's at least one char in the message so the split needs to be at least one item long
-		a_Player.SendMessageInfo(Printf("Unknown command: \"%s\"", a_Message.c_str()));
-		LOGINFO("Player %s issued an unknown command: \"%s\"", a_Player.GetName().c_str(), a_Message.c_str());
+		a_Player.SendMessageInfo(fmt::format(FMT_STRING("Unknown command: \"{}\""), a_Message));
+		LOGINFO("Player %s issued an unknown command: \"%s\"", a_Player.GetName(), a_Message);
 		return true;  // Cancel sending
 	}
 
@@ -541,7 +540,7 @@ bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVec
 		if (world != nullptr)
 		{
 			worldName = world->GetName();
-			worldAge = world->GetWorldAge();
+			worldAge = world->GetWorldAge().count();
 		}
 		else
 		{
@@ -710,11 +709,11 @@ bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation
 
 
 
-bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BlockState a_Block)
+bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BlockState a_Block)
 {
 	return GenericCallHook(HOOK_PLAYER_BREAKING_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerBreakingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Block);
+			return a_Plugin->OnPlayerBreakingBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_Block);
 		}
 	);
 }
@@ -723,11 +722,11 @@ bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_Block
 
 
 
-bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BlockState a_Block)
+bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BlockState a_Block)
 {
 	return GenericCallHook(HOOK_PLAYER_BROKEN_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerBrokenBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Block);
+			return a_Plugin->OnPlayerBrokenBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_Block);
 		}
 	);
 }
@@ -775,11 +774,11 @@ bool cPluginManager::CallHookPlayerFoodLevelChange(cPlayer & a_Player, int a_New
 
 
 
-bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems & a_Reward)
+bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems & a_Reward, const int ExperienceAmount)
 {
 	return GenericCallHook(HOOK_PLAYER_FISHED, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerFished(a_Player, a_Reward);
+			return a_Plugin->OnPlayerFished(a_Player, a_Reward, ExperienceAmount);
 		}
 	);
 }
@@ -788,11 +787,11 @@ bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems & a_R
 
 
 
-bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, cItems a_Reward)
+bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, cItems & a_Reward, int & ExperienceAmount)
 {
 	return GenericCallHook(HOOK_PLAYER_FISHING, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerFishing(a_Player, a_Reward);
+			return a_Plugin->OnPlayerFishing(a_Player, a_Reward, ExperienceAmount);
 		}
 	);
 }
@@ -814,11 +813,11 @@ bool cPluginManager::CallHookPlayerJoined(cPlayer & a_Player)
 
 
 
-bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
+bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, char a_Status)
 {
 	return GenericCallHook(HOOK_PLAYER_LEFT_CLICK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerLeftClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status);
+			return a_Plugin->OnPlayerLeftClick(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_Status);
 		}
 	);
 }
@@ -892,11 +891,11 @@ bool cPluginManager::CallHookPlayerCrouched(cPlayer & a_Player)
 
 
 
-bool cPluginManager::CallHookPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginManager::CallHookPlayerRightClick(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos)
 {
 	return GenericCallHook(HOOK_PLAYER_RIGHT_CLICK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerRightClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			return a_Plugin->OnPlayerRightClick(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z);
 		}
 	);
 }
@@ -957,11 +956,11 @@ bool cPluginManager::CallHookPlayerTossingItem(cPlayer & a_Player)
 
 
 
-bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BlockState a_Block)
+bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BlockState a_Block)
 {
 	return GenericCallHook(HOOK_PLAYER_USED_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsedBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_Block);
+			return a_Plugin->OnPlayerUsedBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z, a_Block);
 		}
 	);
 }
@@ -970,11 +969,11 @@ bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos)
 {
 	return GenericCallHook(HOOK_PLAYER_USED_ITEM, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsedItem(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			return a_Plugin->OnPlayerUsedItem(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z);
 		}
 	);
 }
@@ -983,11 +982,11 @@ bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, int a_BlockX, in
 
 
 
-bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BlockState a_Block)
+bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BlockState a_Block)
 {
 	return GenericCallHook(HOOK_PLAYER_USING_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_Block);
+			return a_Plugin->OnPlayerUsingBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z, a_Block);
 		}
 	);
 }
@@ -996,11 +995,11 @@ bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, 
 
 
 
-bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos)
 {
 	return GenericCallHook(HOOK_PLAYER_USING_ITEM, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsingItem(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			return a_Plugin->OnPlayerUsingItem(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z);
 		}
 	);
 }
@@ -1071,11 +1070,11 @@ bool cPluginManager::CallHookPreCrafting(cPlayer & a_Player, cCraftingGrid & a_G
 
 
 
-bool cPluginManager::CallHookProjectileHitBlock(cProjectileEntity & a_Projectile, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Face, const Vector3d & a_BlockHitPos)
+bool cPluginManager::CallHookProjectileHitBlock(cProjectileEntity & a_Projectile, Vector3i a_BlockPos, eBlockFace a_Face, const Vector3d & a_BlockHitPos)
 {
 	return GenericCallHook(HOOK_PROJECTILE_HIT_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnProjectileHitBlock(a_Projectile, a_BlockX, a_BlockY, a_BlockZ, a_Face, a_BlockHitPos);
+			return a_Plugin->OnProjectileHitBlock(a_Projectile, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Face, a_BlockHitPos);
 		}
 	);
 }
@@ -1175,11 +1174,11 @@ bool cPluginManager::CallHookTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a
 
 
 
-bool cPluginManager::CallHookUpdatingSign(cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4, cPlayer * a_Player)
+bool cPluginManager::CallHookUpdatingSign(cWorld & a_World, Vector3i a_BlockPos, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4, cPlayer * a_Player)
 {
 	return GenericCallHook(HOOK_UPDATING_SIGN, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnUpdatingSign(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
+			return a_Plugin->OnUpdatingSign(a_World, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
 		}
 	);
 }
@@ -1188,11 +1187,11 @@ bool cPluginManager::CallHookUpdatingSign(cWorld & a_World, int a_BlockX, int a_
 
 
 
-bool cPluginManager::CallHookUpdatedSign(cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
+bool cPluginManager::CallHookUpdatedSign(cWorld & a_World, Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
 {
 	return GenericCallHook(HOOK_UPDATED_SIGN, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnUpdatedSign(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
+			return a_Plugin->OnUpdatedSign(a_World, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
 		}
 	);
 }
@@ -1255,11 +1254,24 @@ bool cPluginManager::CallHookWorldTick(cWorld & a_World, std::chrono::millisecon
 
 cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
 {
+	//to true here and in send command tree
+	if (true)
+	{
+		auto r = BasicStringReader(a_Command.substr(1));
+		auto ctx = cCommandExecutionContext(&a_Player);
+		if (!GetRootCommandNode()->Parse(r,ctx))
+		{
+			return crError;
+		}
+		return crExecuted;
+	}
 	AStringVector Split(StringSplit(a_Command, " "));
 	if (Split.empty())
 	{
 		return crUnknownCommand;
 	}
+
+	a_ShouldCheckPermissions = false;
 
 	CommandMap::iterator cmd = m_Commands.find(Split[0]);
 	if (cmd == m_Commands.end())
@@ -1718,6 +1730,60 @@ AString cPluginManager::GetPluginFolderName(const AString & a_PluginName)
 		}
 	}
 	return AString();
+}
+
+
+
+
+
+void cPluginManager::SetupNewCommands(void)
+{
+#define LITERAL(name) cCommandManager::cCommandNode::Literal(name)
+#define ARGUMENT(name, arg) cCommandManager::cCommandNode::Argument(name, std::make_shared<arg>())
+#define ARGUMENT_ARGS(name, arg, args) cCommandManager::cCommandNode::Argument(name, std::make_shared<arg>(args))
+#define EXECUTE(exe) [](const cCommandExecutionContext& a_Ctx) -> bool {exe return true;}
+	auto node = cCommandManager::cCommandNode();
+	node.Then(
+		cCommandManager::cCommandNode::Literal("testcmd")
+			.Executable([](const cCommandExecutionContext & a_Ctx) -> bool {
+				a_Ctx.SendFeedback("test cmd success");
+				return true;
+			})
+			->Then(cCommandManager::cCommandNode::Argument("test float", std::make_shared<cCommandFloatArgument>()).Executable([](const cCommandExecutionContext& a_Ctx) -> bool {
+				 a_Ctx.SendFeedback(
+					 "test cmd success2 " + std::to_string(cCommandFloatArgument::GetFloatFromCtx(a_Ctx, "test float")));
+				  	 return true; })));
+	node.Then(LITERAL("weather").Then(
+		LITERAL("rain")
+			.Executable(EXECUTE(
+				cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Rain);))
+				->Then(ARGUMENT("duration", cCommandTimeArgument)
+					   .Executable(EXECUTE(
+						   cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Rain);
+						   cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)))
+			)->Then(
+		LITERAL("clear")
+			.Executable(EXECUTE(
+				cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Sunny);))
+				->Then(ARGUMENT("duration", cCommandTimeArgument)
+					   .Executable(EXECUTE(
+						   cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Sunny);
+						   cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)))
+			)->Then(
+		LITERAL("thunder")
+			.Executable(EXECUTE(
+				cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_ThunderStorm);))
+				->Then(ARGUMENT("duration", cCommandTimeArgument)
+					   .Executable(EXECUTE(
+						   cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_ThunderStorm);
+						   cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)))
+			));
+	node.Then(LITERAL("gamemode")
+		.Then(ARGUMENT("gamemode",cCommandGameModeArgument)
+							.Executable(EXECUTE(a_Ctx.GetPlayer()->SetGameMode(
+								cCommandGameModeArgument::GetGameModeFromCtx(a_Ctx, "gamemode"));))));
+
+	m_RootCommandNode = node;
 }
 
 
