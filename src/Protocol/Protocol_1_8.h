@@ -125,6 +125,7 @@ public:
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
 	virtual void SendStatistics                 (const StatisticsManager & a_Manager) override;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results, UInt32 CompletionId) override;
+	virtual void SendTags                       (void) override;
 	virtual void SendThunderbolt                (Vector3i a_BlockPos) override;
 	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
 	virtual void SendTimeUpdate                 (cTickTimeLong a_WorldAge, cTickTimeLong a_WorldDate, bool a_DoDaylightCycle) override;

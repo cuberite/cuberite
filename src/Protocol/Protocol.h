@@ -74,6 +74,7 @@ public:
 		pktConfigurationReady,
 		pktConfigurationCustomPayload,
 		pktConfigurationDynamicRegistries,
+		pktConfigurationTags,
 		pktDestroyEntity,
 		pktDifficulty,
 		pktDisconnectDuringLogin,
@@ -524,6 +525,7 @@ public:
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) = 0;
 	virtual void SendStatistics                 (const StatisticsManager & a_Manager) = 0;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results, UInt32 CompletionId) = 0;
+	virtual void SendTags                       (void) = 0;
 	virtual void SendThunderbolt                (Vector3i a_Origin) = 0;
 	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) = 0;
 	virtual void SendTimeUpdate                 (cTickTimeLong a_WorldAge, cTickTimeLong a_WorldDate, bool a_DoDaylightCycle) = 0;
