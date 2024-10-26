@@ -865,6 +865,7 @@ void cProtocol_1_19::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 
 
 
+
 void cProtocol_1_19::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
