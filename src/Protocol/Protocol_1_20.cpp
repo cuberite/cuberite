@@ -1676,6 +1676,68 @@ void cProtocol_1_20_3::SendDisconnect(const AString & a_Reason)
 
 
 
+
+
+
+Int32 cProtocol_1_20_3::GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const
+{
+	switch (a_ParserType)
+	{
+		case eCommandParserType::Bool:              return 0;
+		case eCommandParserType::Float:             return 1;
+		case eCommandParserType::Double:            return 2;
+		case eCommandParserType::Integer:           return 3;
+		case eCommandParserType::Long:              return 4;
+		case eCommandParserType::String:            return 5;
+		case eCommandParserType::Entity:            return 6;
+		case eCommandParserType::GameProfile:       return 7;
+		case eCommandParserType::BlockPos:          return 8;
+		case eCommandParserType::ColumnPos:         return 9;
+		case eCommandParserType::Vec3:              return 10;
+		case eCommandParserType::Vec2:              return 11;
+		case eCommandParserType::BlockState:        return 12;
+		case eCommandParserType::BlockPredicate:    return 13;
+		case eCommandParserType::ItemStack:         return 14;
+		case eCommandParserType::ItemPredicate:     return 15;
+		case eCommandParserType::Color:             return 16;
+		case eCommandParserType::Component:         return 17;
+		case eCommandParserType::Style:             return 18;
+		case eCommandParserType::Message:           return 19;
+		case eCommandParserType::NbtCompoundTag:    return 20;
+		case eCommandParserType::NbtTag:            return 21;
+		case eCommandParserType::NbtPath:           return 22;
+		case eCommandParserType::Objective:         return 23;
+		case eCommandParserType::ObjectiveCriteria: return 24;
+		case eCommandParserType::Operation:         return 25;
+		case eCommandParserType::Particle:          return 26;
+		case eCommandParserType::Angle:             return 27;
+		case eCommandParserType::Rotation:          return 28;
+		case eCommandParserType::ScoreboardSlot:    return 29;
+		case eCommandParserType::ScoreHolder:       return 30;
+		case eCommandParserType::Swizzle:           return 31;
+		case eCommandParserType::Team:              return 32;
+		case eCommandParserType::ItemSlot:          return 33;
+		case eCommandParserType::ResourceLocation:  return 34;
+		case eCommandParserType::Function:          return 35;
+		case eCommandParserType::EntityAnchor:      return 36;
+		case eCommandParserType::IntRange:          return 37;
+		case eCommandParserType::FloatRange:        return 38;
+		case eCommandParserType::Dimension:         return 39;
+		case eCommandParserType::Gamemode:          return 40;
+		case eCommandParserType::Time:              return 41;
+		case eCommandParserType::ResourceOrTag:     return 42;
+		case eCommandParserType::ResourceOrTagKey:  return 43;
+		case eCommandParserType::Resource:          return 44;
+		case eCommandParserType::ResourceKey:       return 45;
+		case eCommandParserType::TemplateMirror:    return 46;
+		case eCommandParserType::TemplateRotation:  return 47;
+		case eCommandParserType::Heightmap:         return 48;
+		case eCommandParserType::Uuid:              return 49;
+		default: return -1;
+	}
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //  cProtocol_1_20_5:
 
@@ -2617,3 +2679,65 @@ UInt8 cProtocol_1_20_5::GetProtocolEntityType(const cEntity & a_Entity) const
 
 
 
+
+Int32 cProtocol_1_20_5::GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const
+{
+	switch (a_ParserType)
+	{
+		case eCommandParserType::Bool:              return 0;
+		case eCommandParserType::Float:             return 1;
+		case eCommandParserType::Double:            return 2;
+		case eCommandParserType::Integer:           return 3;
+		case eCommandParserType::Long:              return 4;
+		case eCommandParserType::String:            return 5;
+		case eCommandParserType::Entity:            return 6;
+		case eCommandParserType::GameProfile:       return 7;
+		case eCommandParserType::BlockPos:          return 8;
+		case eCommandParserType::ColumnPos:         return 9;
+		case eCommandParserType::Vec3:              return 10;
+		case eCommandParserType::Vec2:              return 11;
+		case eCommandParserType::BlockState:        return 12;
+		case eCommandParserType::BlockPredicate:    return 13;
+		case eCommandParserType::ItemStack:         return 14;
+		case eCommandParserType::ItemPredicate:     return 15;
+		case eCommandParserType::Color:             return 16;
+		case eCommandParserType::Component:         return 17;
+		case eCommandParserType::Style:             return 18;
+		case eCommandParserType::Message:           return 19;
+		case eCommandParserType::NbtCompoundTag:    return 20;
+		case eCommandParserType::NbtTag:            return 21;
+		case eCommandParserType::NbtPath:           return 22;
+		case eCommandParserType::Objective:         return 23;
+		case eCommandParserType::ObjectiveCriteria: return 24;
+		case eCommandParserType::Operation:         return 25;
+		case eCommandParserType::Particle:          return 26;
+		case eCommandParserType::Angle:             return 27;
+		case eCommandParserType::Rotation:          return 28;
+		case eCommandParserType::ScoreboardSlot:    return 29;
+		case eCommandParserType::ScoreHolder:       return 30;
+		case eCommandParserType::Swizzle:           return 31;
+		case eCommandParserType::Team:              return 32;
+		case eCommandParserType::ItemSlot:          return 33;
+		case eCommandParserType::ItemSlots:         return 34;
+		case eCommandParserType::ResourceLocation:  return 35;
+		case eCommandParserType::Function:          return 36;
+		case eCommandParserType::EntityAnchor:      return 37;
+		case eCommandParserType::IntRange:          return 38;
+		case eCommandParserType::FloatRange:        return 39;
+		case eCommandParserType::Dimension:         return 40;
+		case eCommandParserType::Gamemode:          return 41;
+		case eCommandParserType::Time:              return 42;
+		case eCommandParserType::ResourceOrTag:     return 43;
+		case eCommandParserType::ResourceOrTagKey:  return 44;
+		case eCommandParserType::Resource:          return 45;
+		case eCommandParserType::ResourceKey:       return 46;
+		case eCommandParserType::TemplateMirror:    return 47;
+		case eCommandParserType::TemplateRotation:  return 48;
+		case eCommandParserType::Heightmap:         return 49;
+		case eCommandParserType::LootTable:         return 50;
+		case eCommandParserType::LootPredicate:     return 51;
+		case eCommandParserType::LootModifier:      return 52;
+		case eCommandParserType::Uuid:              return 53;
+		default: return -1;
+	}
+}

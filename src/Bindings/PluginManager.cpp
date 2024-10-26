@@ -1255,7 +1255,7 @@ bool cPluginManager::CallHookWorldTick(cWorld & a_World, std::chrono::millisecon
 cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
 {
 	//to true here and in send command tree
-	if (false)
+	if (true)
 	{
 		auto r = BasicStringReader(a_Command.substr(1));
 		auto ctx = cCommandExecutionContext(&a_Player);
@@ -1740,7 +1740,7 @@ void cPluginManager::SetupNewCommands(void)
 {
 #define LITERAL(name) cCommandManager::cCommandNode::Literal(name)
 #define ARGUMENT(name, arg) cCommandManager::cCommandNode::Argument(name, std::make_shared<arg>())
-#define ARGUMENT_ARGS(name, arg,args) cCommandManager::cCommandNode::Argument(name, std::make_shared<arg>(args))
+#define ARGUMENT_ARGS(name, arg, args) cCommandManager::cCommandNode::Argument(name, std::make_shared<arg>(args))
 #define EXECUTE(exe) [](const cCommandExecutionContext& a_Ctx) -> bool {exe return true;}
 	auto node = cCommandManager::cCommandNode();
 	node.Then(
@@ -1777,8 +1777,11 @@ void cPluginManager::SetupNewCommands(void)
 					   .Executable(EXECUTE(
 						   cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_ThunderStorm);
 						   cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)))
-			)
-	);
+			));
+	node.Then(LITERAL("gamemode")
+		.Then(ARGUMENT("gamemode",cCommandGameModeArgument)
+							.Executable(EXECUTE(a_Ctx.GetPlayer()->SetGameMode(
+								cCommandGameModeArgument::GetGameModeFromCtx(a_Ctx, "gamemode"));))));
 
 	m_RootCommandNode = node;
 }
