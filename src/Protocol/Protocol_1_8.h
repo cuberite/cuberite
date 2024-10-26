@@ -148,7 +148,7 @@ public:
 	a_Compressed will be set to the compressed packet includes packet length and data length. */
 	static void CompressPacket(CircularBufferCompressor & a_Packet, ContiguousByteBuffer & a_Compressed);
 
-	virtual State GetCurrentState(void) { return m_State; };
+	virtual State GetCurrentState(void) const override { return m_State; }
 
   protected:
 

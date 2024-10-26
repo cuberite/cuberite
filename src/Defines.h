@@ -537,6 +537,70 @@ enum class EntityAnimation
 
 
 
+enum class eCommandParserType : std::int8_t
+{
+	None = -1,
+	Bool = 0,
+	Float,
+	Double,
+	Integer,
+	Long,
+	String,
+	Entity,
+	GameProfile,
+	BlockPos,
+	ColumnPos,
+	Vec3,
+	Vec2,
+	BlockState,
+	BlockPredicate,
+	ItemStack,
+	ItemPredicate,
+	Color,
+	Component,
+	Style,
+	Message,
+	NbtCompoundTag,
+	NbtTag,
+	NbtPath,
+	Objective,
+	ObjectiveCriteria,
+	Operation,
+	Particle,
+	Angle,
+	Rotation,
+	ScoreboardSlot,
+	ScoreHolder,
+	Swizzle,
+	Team,
+	ItemSlot,
+	ItemSlots,
+	ResourceLocation,
+	Function,
+	EntityAnchor,
+	IntRange,
+	FloatRange,
+	Dimension,
+	Gamemode,
+	Time,
+	ResourceOrTag,
+	ResourceOrTagKey,
+	Resource,
+	ResourceKey,
+	TemplateMirror,
+	TemplateRotation,
+	Heightmap,
+	LootTable,
+	LootPredicate,
+	LootModifier,
+	Uuid
+	// TODO: actually implement these parsers
+};
+
+
+
+
+
 // tolua_begin
 
 /** Returns a textual representation of the click action. */

@@ -547,7 +547,10 @@ public:
 	/** Returns the ServerID used for authentication through session.minecraft.net */
 	virtual AString GetAuthServerID(void) = 0;
 
-	virtual State GetCurrentState(void) = 0;
+	virtual State GetCurrentState(void) const = 0;
+
+	/** In case the protocol does not support the given parser it returns -1 */
+	virtual Int32 GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const { return -1;}
 
 protected:
 

@@ -126,7 +126,7 @@ bool cCommandManager::cCommandNode::Parse(BasicStringReader& a_Command, cCommand
 
 
 
-void cCommandManager::cCommandNode::WriteCommandTree(cPacketizer& a_Packet)
+void cCommandManager::cCommandNode::WriteCommandTree(cPacketizer& a_Packet, const cProtocol & a_Protocol)
 {
 	if (this->m_Type != eNodeType::Root)
 	{
@@ -136,7 +136,7 @@ void cCommandManager::cCommandNode::WriteCommandTree(cPacketizer& a_Packet)
 	list.push_back(*this);
 	auto map = ComputeChildrenIds(*this);
 	a_Packet.WriteVarInt32(static_cast<UInt32>(map.size()));
-	this->WriteCommandTreeInternal(a_Packet,map);
+	this->WriteCommandTreeInternal(a_Packet, map, a_Protocol);
 	a_Packet.WriteVarInt32(0); // root node
 }
 
@@ -175,17 +175,15 @@ cCommandManager::cCommandNode::GetLiteralCommandNode(const AString& a_NodeName)
 	return nullptr;
 }
 
-void cCommandManager::cCommandNode::WriteCommandTreeInternal(cPacketizer & a_Packet, std::map<cCommandNode *, UInt32> & a_Map)
+void cCommandManager::cCommandNode::WriteCommandTreeInternal(cPacketizer & a_Packet, std::map<cCommandNode *, UInt32> & a_Map, const cProtocol & a_Protocol)
 {
 	Byte flags = static_cast<Byte>(this->m_Type) | (this->m_IsExecutable << 2) | ((this->m_RedirectNode != nullptr) << 3) | ((this->m_SuggestionType != eCommandSuggestionType::None) << 4);
 	a_Packet.WriteBEInt8(flags);
 	a_Packet.WriteVarInt32(static_cast<UInt32>(this->m_ChildrenNodes.size()));
 
 	for (auto& var : this->m_ChildrenNodes)
-	{
-		auto ptr = &var;
-		auto towrite = a_Map[&var];
-		a_Packet.WriteVarInt32(towrite);
+	{ 
+		a_Packet.WriteVarInt32(a_Map[&var]);
 	}
 	
 	if (this->m_RedirectNode != nullptr)
@@ -197,8 +195,17 @@ void cCommandManager::cCommandNode::WriteCommandTreeInternal(cPacketizer & a_Pac
 		a_Packet.WriteString(this->m_Name);
 		if (this->m_Type == eNodeType::Argument)
 		{
-			this->m_Argument->WriteParserID(a_Packet);
-			this->m_Argument->WriteProperties(a_Packet);
+			auto id = a_Protocol.GetProtocolCommandArgumentID(this->m_Argument->GetParserType());
+			if (id == -1)
+			{
+				a_Packet.WriteVarInt32(static_cast<UInt32>(a_Protocol.GetProtocolCommandArgumentID(eCommandParserType::String)));
+				a_Packet.WriteVarInt32(2); // Greedy phrase
+			}
+			else
+			{
+				a_Packet.WriteVarInt32(static_cast<UInt32>(id));
+				this->m_Argument->WriteProperties(a_Packet);
+			}
 		}
 	}
 
@@ -212,7 +219,7 @@ void cCommandManager::cCommandNode::WriteCommandTreeInternal(cPacketizer & a_Pac
 	}
 	for (auto & command_node : this->m_ChildrenNodes)
 	{
-		command_node.WriteCommandTreeInternal(a_Packet,a_Map);
+		command_node.WriteCommandTreeInternal(a_Packet,a_Map,a_Protocol);
 	}
 }
 
