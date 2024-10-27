@@ -37,7 +37,7 @@ public:
 			case Item::StonePickaxe:   return 2;
 			case Item::IronPickaxe:    return 3;
 			case Item::DiamondPickaxe: return 4;
-
+			case Item::NetheritePickaxe: return 5;
 			default: return 0;
 		}
 	}
@@ -48,6 +48,9 @@ public:
 		switch (a_Block.Type())
 		{
 			case BlockType::Obsidian:
+			case BlockType::AncientDebris:
+			case BlockType::RespawnAnchor:
+			case BlockType::CryingObsidian:
 			{
 				return PickaxeLevel() >= 4;
 			}
@@ -59,6 +62,11 @@ public:
 			case BlockType::GoldOre:
 			case BlockType::NetherGoldOre:
 			case BlockType::RedstoneOre:
+			case BlockType::RawGoldBlock:
+			case BlockType::DeepslateDiamondOre:
+			case BlockType::DeepslateEmeraldOre:
+			case BlockType::DeepslateRedstoneOre:
+			case BlockType::DeepslateGoldOre:
 			{
 				return PickaxeLevel() >= 3;
 			}
@@ -67,6 +75,10 @@ public:
 			case BlockType::IronOre:
 			case BlockType::LapisOre:
 			case BlockType::LapisBlock:
+			case BlockType::RawCopperBlock:
+			case BlockType::RawIronBlock:
+			case BlockType::DeepslateIronOre:
+			case BlockType::DeepslateCopperOre:
 			{
 				return PickaxeLevel() >= 2;
 			}
@@ -248,6 +260,9 @@ public:
 					case Item::OakPlanks:
 					case Item::SprucePlanks:
 					case Item::WarpedPlanks:
+					case Item::BambooPlanks:
+					case Item::CherryPlanks:
+					case Item::MangrovePlanks:
 						return true;
 					default: return false;
 				}
@@ -257,6 +272,8 @@ public:
 				switch (a_Item.m_ItemType)
 				{
 					case Item::Cobblestone:
+					case Item::CobbledDeepslate:
+					case Item::Blackstone:
 						return true;
 					default: return false;
 				}
@@ -264,6 +281,7 @@ public:
 			case Item::IronPickaxe:    return (a_Item.m_ItemType == Item::IronIngot);
 			case Item::GoldenPickaxe:  return (a_Item.m_ItemType == Item::GoldIngot);
 			case Item::DiamondPickaxe: return (a_Item.m_ItemType == Item::Diamond);
+			case Item::NetheritePickaxe: return (a_Item.m_ItemType == Item::NetheriteIngot);
 			default: return false;
 		}
 	}
@@ -284,6 +302,7 @@ public:
 				case Item::IronPickaxe:    return 6.0f;
 				case Item::GoldenPickaxe:  return 12.0f;
 				case Item::DiamondPickaxe: return 8.0f;
+				case Item::NetheritePickaxe: return 9.0f;
 				default: return 0.0f;
 			}
 		}

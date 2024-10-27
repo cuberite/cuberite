@@ -44,6 +44,9 @@ public:
 					case Item::OakPlanks:
 					case Item::SprucePlanks:
 					case Item::WarpedPlanks:
+					case Item::BambooPlanks:
+					case Item::CherryPlanks:
+					case Item::MangrovePlanks:
 						return true;
 					default: return false;
 				}
@@ -53,6 +56,8 @@ public:
 				switch (a_Item.m_ItemType)
 				{
 					case Item::Cobblestone:
+					case Item::CobbledDeepslate:
+					case Item::Blackstone:
 						return true;
 					default: return false;
 				}
@@ -60,6 +65,7 @@ public:
 			case Item::IronSword:    return (a_Item.m_ItemType == Item::IronIngot);
 			case Item::GoldenSword:  return (a_Item.m_ItemType == Item::GoldIngot);
 			case Item::DiamondSword: return (a_Item.m_ItemType == Item::Diamond);
+			case Item::NetheriteSword: return (a_Item.m_ItemType == Item::NetheriteIngot);
 			default: return false;
 		}
 	}
