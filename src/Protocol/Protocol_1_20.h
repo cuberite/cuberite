@@ -72,6 +72,8 @@ protected:
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 
 	virtual void SendDisconnect(const AString & a_Reason) override;
+	virtual void SendChat(const AString & a_Message, eChatType a_Type) override;
+	virtual void SendChat(const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) override;
 	virtual void SendChatRaw(const AString & a_MessageRaw, eChatType a_Type) override;
 	virtual void SendInitialChunksComing() override;
 

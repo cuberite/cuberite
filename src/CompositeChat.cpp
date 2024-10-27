@@ -7,9 +7,7 @@
 #include "CompositeChat.h"
 #include "ClientHandle.h"
 #include "JsonUtils.h"
-
-
-
+#include "WorldStorage/FastNBT.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -372,6 +370,111 @@ AString cCompositeChat::CreateJsonString(bool a_ShouldUseChatPrefixes) const
 		// Serialize as human-readable string (pretty-printed):
 		return JsonUtils::WriteStyledString(msg);
 	#endif
+}
+
+
+
+
+
+void cCompositeChat::WriteAsNBT(cFastNBTWriter& a_Writer, bool a_ShouldUseChatPrefixes) const
+{
+	Json::Value Message;
+	a_Writer.AddString("text",cClientHandle::FormatMessageType(a_ShouldUseChatPrefixes, GetMessageType(), GetAdditionalMessageTypeData()));
+	for (const auto & Part : m_Parts)
+	{
+		std::visit(OverloadedVariantAccess
+		{
+			[this, &a_Writer](const TextPart & a_Part)
+			{
+				a_Writer.AddString("text",a_Part.Text);
+				AddChatPartStyle(a_Writer, a_Part.Style);
+			},
+			[this, &a_Writer](const ClientTranslatedPart & a_Part)
+			{
+				a_Writer.AddString("translate",a_Part.Text);
+				a_Writer.BeginList("with", eTagType::TAG_String);
+				Json::Value With;
+				for (const auto & Parameter : a_Part.Parameters)
+				{
+					a_Writer.AddString("", Parameter);
+				}
+				AddChatPartStyle(a_Writer, a_Part.Style);
+			},
+			[this, &a_Writer](const UrlPart & a_Part)
+			{
+				a_Writer.AddString("text",a_Part.Text);
+				a_Writer.BeginCompound("click_event");
+				a_Writer.AddString("action", "open_url");
+				a_Writer.AddString("value", a_Part.Url);
+				a_Writer.EndCompound();
+				AddChatPartStyle(a_Writer, a_Part.Style);
+			},
+			[this, &a_Writer](const RunCommandPart & a_Part)
+			{
+				a_Writer.AddString("text",a_Part.Text);
+				a_Writer.BeginCompound("click_event");
+				a_Writer.AddString("action", "run_command");
+				a_Writer.AddString("value", a_Part.Command);
+				a_Writer.EndCompound();
+				AddChatPartStyle(a_Writer, a_Part.Style);
+			},
+			[this, &a_Writer](const SuggestCommandPart & a_Part)
+			{
+				a_Writer.AddString("text",a_Part.Text);
+				a_Writer.BeginCompound("click_event");
+				a_Writer.AddString("action", "suggest_command");
+				a_Writer.AddString("value", a_Part.Command);
+				a_Writer.EndCompound();
+				AddChatPartStyle(a_Writer, a_Part.Style);
+			},
+			[this, &a_Writer](const ShowAchievementPart & a_Part)
+			{
+				//a_Writer.AddString("text",a_Part.Text);
+				//a_Writer.BeginCompound("click_event");
+				//a_Writer.AddString("action", "suggest_command");
+				//a_Writer.AddString("value", a_Part.Command);
+				//a_Writer.EndCompound();
+				//AddChatPartStyle(a_Writer, a_Part.Style);
+			},
+		}, Part);
+	}  // for itr - Parts[]
+	a_Writer.Finish();
+}
+
+
+
+
+
+void cCompositeChat::AddChatPartStyle(cFastNBTWriter & a_Writer, const AString & a_PartStyle) const
+{
+	size_t len = a_PartStyle.length();
+	for (size_t i = 0; i < len; i++)
+	{
+		switch (a_PartStyle[i])
+		{
+			case 'k': a_Writer.AddByte("obfuscated",true); break;
+			case 'l': a_Writer.AddByte("bold",true); break;
+			case 'm': a_Writer.AddByte("strikethrough",true); break;
+			case 'n': a_Writer.AddByte("underlined",true); break;
+			case 'o': a_Writer.AddByte("italic",true); break;
+			case '0': a_Writer.AddString("color", "black"); break;
+			case '1': a_Writer.AddString("color", "dark_blue"); break;
+			case '2': a_Writer.AddString("color", "dark_green"); break;
+			case '3': a_Writer.AddString("color", "dark_aqua"); break;
+			case '4': a_Writer.AddString("color", "dark_red"); break;
+			case '5': a_Writer.AddString("color", "dark_purple"); break;
+			case '6': a_Writer.AddString("color", "gold"); break;
+			case '7': a_Writer.AddString("color", "gray"); break;
+			case '8': a_Writer.AddString("color", "dark_gray"); break;
+			case '9': a_Writer.AddString("color", "blue"); break;
+			case 'a': a_Writer.AddString("color", "green"); break;
+			case 'b': a_Writer.AddString("color", "aqua"); break;
+			case 'c': a_Writer.AddString("color", "red"); break;
+			case 'd': a_Writer.AddString("color", "light_purple"); break;
+			case 'e': a_Writer.AddString("color", "yellow"); break;
+			case 'f': a_Writer.AddString("color", "white"); break;
+		}  // switch (Style[i])
+	}  // for i - a_PartStyle[]
 }
 
 
