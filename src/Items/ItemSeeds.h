@@ -46,6 +46,8 @@ public:
 			case Item::Potato:        Block = Potatoes::Potatoes();       break;
 			case Item::PumpkinSeeds:  Block = PumpkinStem::PumpkinStem(); break;
 			case Item::WheatSeeds:    Block = Wheat::Wheat();             break;
+			case Item::TorchflowerSeeds:Block = TorchflowerCrop::TorchflowerCrop(); break;
+			case Item::PitcherPod:    Block = PitcherPlant::PitcherPlant(); break;
 			default:                  UNREACHABLE("Unsupported seed type");
 		}
 

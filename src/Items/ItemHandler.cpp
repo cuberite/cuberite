@@ -1303,7 +1303,7 @@ namespace
     constexpr cSimplePlaceableItemHandler   ItemPinkCandleHandler                        (Item::PinkCandle);
     constexpr cSimplePlaceableItemHandler   ItemPinkPetalsHandler                        (Item::PinkPetals);
     constexpr cSimplePlaceableItemHandler   ItemPitcherPlantHandler                      (Item::PitcherPlant);
-    constexpr cUnimplementedItemHandler     ItemPitcherPodHandler                        (Item::PitcherPod);
+    constexpr cItemSimpleSeedsHandler       ItemPitcherPodHandler                        (Item::PitcherPod);
     constexpr cUnimplementedItemHandler     ItemPlentyPotterySherdHandler                (Item::PlentyPotterySherd);
     constexpr cSimplePlaceableItemHandler   ItemPointedDripstoneHandler                  (Item::PointedDripstone);
     constexpr cSimplePlaceableItemHandler   ItemPolishedDeepslateHandler                 (Item::PolishedDeepslate);
@@ -1369,7 +1369,7 @@ namespace
     constexpr cSimplePlaceableItemHandler   ItemTntHandler                               (Item::Tnt);
     constexpr cUnimplementedItemHandler     ItemTntMinecartHandler                       (Item::TntMinecart);
     constexpr cSimplePlaceableItemHandler   ItemTorchflowerHandler                       (Item::Torchflower);
-    constexpr cUnimplementedItemHandler     ItemTorchflowerSeedsHandler                  (Item::TorchflowerSeeds);
+    constexpr cItemSimpleSeedsHandler       ItemTorchflowerSeedsHandler                  (Item::TorchflowerSeeds);
     constexpr cUnimplementedItemHandler     ItemTrialKeyHandler                          (Item::TrialKey);
     constexpr cSimplePlaceableItemHandler   ItemTrialSpawnerHandler                      (Item::TrialSpawner);
     constexpr cSimplePlaceableItemHandler   ItemTuffHandler                              (Item::Tuff);
@@ -4135,6 +4135,18 @@ bool cItemHandler::CanHarvestBlock(BlockState aBlock) const
 {
 	switch (aBlock.Type())
 	{
+		case BlockType::RawCopperBlock:
+		case BlockType::RawIronBlock:
+		case BlockType::DeepslateIronOre:
+		case BlockType::DeepslateCopperOre:
+		case BlockType::RawGoldBlock:
+		case BlockType::DeepslateDiamondOre:
+		case BlockType::DeepslateEmeraldOre:
+		case BlockType::DeepslateRedstoneOre:
+		case BlockType::DeepslateGoldOre:
+		case BlockType::AncientDebris:
+		case BlockType::RespawnAnchor:
+		case BlockType::CryingObsidian:
 		case BlockType::Anvil:
 		case BlockType::ChippedAnvil:
 		case BlockType::DamagedAnvil:
