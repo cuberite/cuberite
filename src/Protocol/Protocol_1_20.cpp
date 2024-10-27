@@ -7,6 +7,7 @@
 #include "JsonUtils.h"
 #include "Root.h"
 #include "Entities/Player.h"
+#include "../CompositeChat.h"
 #include "Server.h"
 #include "../WorldStorage/FastNBT.h"
 #include "Entities/ArrowEntity.h"
@@ -1399,6 +1400,44 @@ void cProtocol_1_20_3::SendChatRaw(const AString & a_MessageRaw, eChatType a_Typ
 	Writer.AddString("text", a_MessageRaw);
 	Writer.Finish();
 	// Send the json string to the client:
+	cPacketizer Pkt(*this, pktChatRaw);
+	Pkt.WriteBuf(Writer.GetResult());
+	Pkt.WriteBool(a_Type == ctAboveActionBar);
+}
+
+
+
+
+
+void cProtocol_1_20_3::SendChat(const AString & a_Message, eChatType a_Type)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	// Prevent chat messages that might trigger CVE-2021-44228
+	if (a_Message.find("${") != std::string::npos)
+	{
+		return;
+	}
+	cFastNBTWriter Writer(true);
+	Writer.AddString("text", a_Message);
+	Writer.Finish();
+
+	cPacketizer Pkt(*this, pktChatRaw);
+	Pkt.WriteBuf(Writer.GetResult());
+	Pkt.WriteBool(a_Type == ctAboveActionBar);
+}
+
+
+
+
+
+void cProtocol_1_20_3::SendChat(const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cFastNBTWriter Writer(true);
+	a_Message.WriteAsNBT(Writer,a_ShouldUseChatPrefixes);
+
 	cPacketizer Pkt(*this, pktChatRaw);
 	Pkt.WriteBuf(Writer.GetResult());
 	Pkt.WriteBool(a_Type == ctAboveActionBar);

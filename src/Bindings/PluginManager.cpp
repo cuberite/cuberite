@@ -1257,6 +1257,14 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 	//to true here and in send command tree
 	if (true)
 	{
+		if (a_Command.empty())
+		{
+			return crUnknownCommand;
+		}
+		if (!a_Command.empty() && (a_Command[0] != '/'))
+		{
+			return crUnknownCommand;
+		}
 		auto r = BasicStringReader(a_Command.substr(1));
 		auto ctx = cCommandExecutionContext(&a_Player);
 		if (!GetRootCommandNode()->Parse(r,ctx))
