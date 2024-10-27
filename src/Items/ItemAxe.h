@@ -50,6 +50,7 @@ public:
 				case Item::IronAxe:    return 6.0f;
 				case Item::GoldenAxe:  return 12.0f;
 				case Item::DiamondAxe: return 8.0f;
+				case Item::NetheriteAxe: return 9.0f;
 				default:
 				{
 					FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, m_ItemType);

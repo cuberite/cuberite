@@ -70,6 +70,9 @@ public:
 					case Item::OakPlanks:
 					case Item::SprucePlanks:
 					case Item::WarpedPlanks:
+					case Item::BambooPlanks:
+					case Item::CherryPlanks:
+					case Item::MangrovePlanks:
 						return true;
 					default: return false;
 				}
@@ -79,6 +82,8 @@ public:
 				switch (a_Item.m_ItemType)
 				{
 					case Item::Cobblestone:
+					case Item::CobbledDeepslate:
+					case Item::Blackstone:
 						return true;
 					default: return false;
 				}
@@ -86,6 +91,7 @@ public:
 			case Item::IronShovel:    return (a_Item.m_ItemType == Item::IronIngot);
 			case Item::GoldenShovel:  return (a_Item.m_ItemType == Item::GoldIngot);
 			case Item::DiamondShovel: return (a_Item.m_ItemType == Item::Diamond);
+			case Item::NetheriteShovel: return (a_Item.m_ItemType == Item::NetheriteIngot);
 			default:
 			{
 				LOGWARNING("{}: Item type not handled {}.", __FUNCTION__, m_ItemType);
