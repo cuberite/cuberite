@@ -15,7 +15,7 @@
 #include "Palettes/Palette_1_19.h"
 #include "Palettes/Palette_1_20.h"
 #include "Palettes/Palette_1_21.h"
-
+#include "Palettes/Palette_1_21_2.h"
 namespace
 {
 	std::pair<UInt16, size_t> GetSectionBitmask(const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData)
@@ -93,6 +93,10 @@ namespace
 		return Palette_1_21::From(a_Block);
 	}
 
+	auto Palette768(const BlockState a_Block)
+	{
+		return Palette_1_21_2::From(a_Block);
+	}
 }
 
 
@@ -368,7 +372,7 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 		}
 		case CacheVersion::v768:
 		{
-			Serialize764<&Palette767>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x28);
+			Serialize764<&Palette768>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x28);
 			break;
 		}
 	}
