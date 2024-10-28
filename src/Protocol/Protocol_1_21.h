@@ -54,6 +54,10 @@ protected:
 	virtual void HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer) override;
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 
+	virtual UInt32 GetProtocolBlockType(BlockState a_Block) const override;
+	virtual UInt32 GetProtocolItemType(Item a_ItemID) const override;
+	virtual Item GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
+
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
 	virtual Version GetProtocolVersion() const override;
 };
