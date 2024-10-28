@@ -17,6 +17,7 @@ protected:
 	virtual UInt32    GetPacketID(ePacketType a_PacketType) const override;
 	virtual bool      HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void      HandlePacketClientSettings(cByteBuffer & a_ByteBuffer) override;
+	virtual void      HandlePacketWindowClick(cByteBuffer & a_ByteBuffer) override;
 
 	virtual void      SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void      SendPlayerMoveLook(const Vector3d a_Pos, const float a_Yaw, const float a_Pitch, const bool a_IsRelative) override;

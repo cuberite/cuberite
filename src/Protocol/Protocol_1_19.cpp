@@ -714,7 +714,6 @@ void cProtocol_1_19::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 
 
 
-
 void cProtocol_1_19::SendLoginSuccess(void)
 {
 	ASSERT(m_State == 2);  // State: login?
@@ -776,6 +775,7 @@ void cProtocol_1_19::SendPlayerListAddPlayer(const cPlayer & a_Player)
 
 
 
+
 void cProtocol_1_19::SendRespawn(eDimension a_Dimension)
 {
 	cPacketizer Pkt(*this, pktRespawn);
@@ -791,6 +791,7 @@ void cProtocol_1_19::SendRespawn(eDimension a_Dimension)
 	Pkt.WriteBool(true);   // keep player attributes
 	Pkt.WriteBool(false);  // optional last death pos
 }
+
 
 
 
@@ -812,6 +813,7 @@ void cProtocol_1_19::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
 
 	m_Client->HandleChat(Message);
 }
+
 
 
 
@@ -1164,6 +1166,70 @@ void cProtocol_1_19::SendSoundEffect(const AString & a_SoundName, Vector3d a_Ori
 
 
 
+
+
+void cProtocol_1_19::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  WindowID);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32,  UInt32,  StateID);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt16,  Int16,  SlotNum);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  Button);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32,  UInt32,  Mode);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32,  UInt32,  ArrLen);
+	std::vector<std::pair<Int16, cItem>> items;
+	for (int i = 0; i < ArrLen; ++i)
+	{
+		cItem Item;
+		HANDLE_READ(a_ByteBuffer, ReadBEInt16,  Int16,  CurrSlotNum);
+		ReadItem(a_ByteBuffer, Item, 1000000);	// HACK to make it work
+		items.emplace_back(CurrSlotNum, Item);
+	}
+	cItem Item;
+	ReadItem(a_ByteBuffer, Item,0);
+
+	/** The slot number that the client uses to indicate "outside the window". */
+	static const Int16 SLOT_NUM_OUTSIDE = -999;
+
+	// Convert Button, Mode, SlotNum and HeldItem into eClickAction:
+	eClickAction Action;
+	switch ((Mode << 8) | Button)
+	{
+		case 0x0000: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caLeftClick  : caLeftClickOutside;  break;
+		case 0x0001: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caRightClick : caRightClickOutside; break;
+		case 0x0100: Action = caShiftLeftClick;  break;
+		case 0x0101: Action = caShiftRightClick; break;
+		case 0x0200: Action = caNumber1;         break;
+		case 0x0201: Action = caNumber2;         break;
+		case 0x0202: Action = caNumber3;         break;
+		case 0x0203: Action = caNumber4;         break;
+		case 0x0204: Action = caNumber5;         break;
+		case 0x0205: Action = caNumber6;         break;
+		case 0x0206: Action = caNumber7;         break;
+		case 0x0207: Action = caNumber8;         break;
+		case 0x0208: Action = caNumber9;         break;
+		case 0x0302: Action = caMiddleClick;     break;
+		case 0x0400: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftClickOutsideHoldNothing  : caDropKey;     break;
+		case 0x0401: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightClickOutsideHoldNothing : caCtrlDropKey; break;
+		case 0x0500: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftPaintBegin               : caUnknown;     break;
+		case 0x0501: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caLeftPaintProgress            : caUnknown;     break;
+		case 0x0502: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftPaintEnd                 : caUnknown;     break;
+		case 0x0504: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightPaintBegin              : caUnknown;     break;
+		case 0x0505: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caRightPaintProgress           : caUnknown;     break;
+		case 0x0506: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightPaintEnd                : caUnknown;     break;
+		case 0x0508: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caMiddlePaintBegin             : caUnknown;     break;
+		case 0x0509: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caMiddlePaintProgress          : caUnknown;     break;
+		case 0x050a: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caMiddlePaintEnd               : caUnknown;     break;
+		case 0x0600: Action = caDblClick; break;
+		default:
+		{
+			LOGWARNING("Unhandled window click mode / button combination: %d (0x%x)", (Mode << 8) | Button, (Mode << 8) | Button);
+			Action = caUnknown;
+			break;
+		}
+	}
+
+	m_Client->HandleWindowClick(WindowID, SlotNum, Action, Item);
+}
 
 Int32 cProtocol_1_19::GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const
 {
