@@ -13,6 +13,7 @@
 #include "Entities/ArrowEntity.h"
 #include "Entities/Minecart.h"
 #include "Palettes/Palette_1_16.h"
+#include "UI/HorseWindow.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1431,6 +1432,7 @@ void cProtocol_1_20_3::SendChat(const AString & a_Message, eChatType a_Type)
 
 
 
+
 void cProtocol_1_20_3::SendChat(const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -1441,6 +1443,142 @@ void cProtocol_1_20_3::SendChat(const cCompositeChat & a_Message, eChatType a_Ty
 	cPacketizer Pkt(*this, pktChatRaw);
 	Pkt.WriteBuf(Writer.GetResult());
 	Pkt.WriteBool(a_Type == ctAboveActionBar);
+}
+
+
+
+
+
+void cProtocol_1_20_3::SendWindowOpen(const cWindow & a_Window)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	if (a_Window.GetWindowType() < 0)
+	{
+		// Do not send this packet for player inventory windows
+		return;
+	}
+
+	if (a_Window.GetWindowType() == cWindow::wtAnimalChest)
+	{
+		cPacketizer Pkt(*this, pktHorseWindowOpen);
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetWindowID()));
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Window.GetNumSlots()));
+
+		UInt32 HorseID = static_cast<const cHorseWindow &>(a_Window).GetHorseID();
+		Pkt.WriteBEInt32(static_cast<Int32>(HorseID));
+	}
+	else
+	{
+		cPacketizer Pkt(*this, pktWindowOpen);
+		Pkt.WriteVarInt32(static_cast<UInt8>(a_Window.GetWindowID()));
+
+		switch (a_Window.GetWindowType())
+		{
+			case cWindow::wtChest:
+			{
+				// Chests can have multiple size
+				Pkt.WriteVarInt32(static_cast<UInt32>(a_Window.GetNumNonInventorySlots() / 9 - 1));
+				break;
+			}
+			case cWindow::wtDropper:
+			case cWindow::wtDropSpenser:
+			{
+				Pkt.WriteVarInt32(6);
+				break;
+			}
+			case cWindow::wtAnvil:
+			{
+				Pkt.WriteVarInt32(8);
+				break;
+			}
+			case cWindow::wtBeacon:
+			{
+				Pkt.WriteVarInt32(9);
+				break;
+			}
+			case cWindow::wtBrewery:
+			{
+				Pkt.WriteVarInt32(11);
+				break;
+			}
+			case cWindow::wtWorkbench:
+			{
+				Pkt.WriteVarInt32(12);
+				break;
+			}
+			case cWindow::wtEnchantment:
+			{
+				Pkt.WriteVarInt32(13);
+				break;
+			}
+			case cWindow::wtFurnace:
+			{
+				Pkt.WriteVarInt32(14);
+				break;
+			}
+			/*
+			case cWindow::wtGrindstone:
+			{
+				Pkt.WriteVarInt32(15);
+				break;
+			}
+			*/
+			case cWindow::wtHopper:
+			{
+				Pkt.WriteVarInt32(16);
+				break;
+			}
+			/*
+			case cWindow::wtLectern:
+			{
+				Pkt.WriteVarInt32(17);
+				break;
+			}
+			case cWindow::wtLoom:
+			{
+				Pkt.WriteVarInt32(18);
+				break;
+			}
+			*/
+			case cWindow::wtNPCTrade:
+			{
+				Pkt.WriteVarInt32(19);
+				break;
+			}
+			/*
+			case cWindow::wtShulker:
+			{
+				Pkt.WriteVarInt32(20);
+				break;
+			}
+			case cWindow::wtSmoker:
+			{
+				Pkt.WriteVarInt32(21);
+				break;
+			}
+			case cWindow::wtCartography:
+			{
+				Pkt.WriteVarInt32(22);
+				break;
+			}
+			case cWindow::wtStonecutter:
+			{
+				Pkt.WriteVarInt32(23);
+				break;
+			}
+			*/
+			default:
+			{
+				Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetNumNonInventorySlots()));
+				break;
+			}
+		}
+		cFastNBTWriter a_Writer(true);
+		a_Writer.AddString("text",a_Window.GetWindowTitle());
+		a_Writer.Finish();
+		Pkt.WriteBuf(a_Writer.GetResult());
+	}
 }
 
 
