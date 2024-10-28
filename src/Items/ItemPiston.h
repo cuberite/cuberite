@@ -28,4 +28,11 @@ private:
 			default: return false;
 		}
 	}
+
+
+
+	virtual bool IsPlaceable(void) const override
+	{
+		return true;
+	}
 };
