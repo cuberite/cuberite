@@ -1790,6 +1790,17 @@ void cPluginManager::SetupNewCommands(void)
 		.Then(ARGUMENT("gamemode",cCommandGameModeArgument)
 							.Executable(EXECUTE(a_Ctx.GetPlayer()->SetGameMode(
 								cCommandGameModeArgument::GetGameModeFromCtx(a_Ctx, "gamemode"));))));
+	node.Then(LITERAL("time")
+		.Then(LITERAL("set")
+			.Then(ARGUMENT("time",cCommandTimeArgument)
+				.Executable(EXECUTE(
+					cRoot::Get()->GetDefaultWorld()->SetTimeOfDay(cTickTime(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "time")));
+					)))
+			->Then(LITERAL("day").Executable(EXECUTE(cRoot::Get()->GetDefaultWorld()->SetTimeOfDay(cTickTime(1000));)))
+			->Then(LITERAL("night").Executable(EXECUTE(cRoot::Get()->GetDefaultWorld()->SetTimeOfDay(cTickTime(13000));)))
+			->Then(LITERAL("noon").Executable(EXECUTE(cRoot::Get()->GetDefaultWorld()->SetTimeOfDay(cTickTime(6000));)))
+			->Then(LITERAL("midnight").Executable(EXECUTE(cRoot::Get()->GetDefaultWorld()->SetTimeOfDay(cTickTime(18000));)))));
+		
 
 	m_RootCommandNode = node;
 }
