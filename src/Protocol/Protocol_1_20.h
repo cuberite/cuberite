@@ -75,6 +75,7 @@ protected:
 	virtual void SendChat(const AString & a_Message, eChatType a_Type) override;
 	virtual void SendChat(const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) override;
 	virtual void SendChatRaw(const AString & a_MessageRaw, eChatType a_Type) override;
+	virtual void SendWindowOpen(const cWindow & a_Window) override;
 	virtual void SendInitialChunksComing() override;
 
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const override;
