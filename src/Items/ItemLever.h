@@ -7,10 +7,10 @@
 
 
 
-class cItemLeverHandler :
-	public cItemHandler
+class cItemLeverHandler final  :
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 

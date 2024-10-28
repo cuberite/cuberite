@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "SimplePlaceableItemHandler.h"
 #include "Blocks/BlockDropSpenser.h"
 
 
@@ -9,9 +10,9 @@
 
 
 class cItemDropSpenserHandler final  :
-	public cItemHandler
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 

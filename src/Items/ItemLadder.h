@@ -2,16 +2,17 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "SimplePlaceableItemHandler.h"
 #include "Blocks/BlockLadder.h"
 
 
 
 
 
-class cItemLadderHandler :
-	public cItemHandler
+class cItemLadderHandler final  :
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 

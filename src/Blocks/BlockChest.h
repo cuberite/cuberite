@@ -10,9 +10,9 @@
 
 
 class cBlockChestHandler final :
-	public cBlockHandler
+	public cBlockEntityHandler
 {
-	using Super = cBlockHandler;
+	using Super = cBlockEntityHandler;
 
 public:
 
@@ -154,9 +154,6 @@ private:
 	}
 
 */
-
-
-
 	virtual ColourID GetMapBaseColourID() const override
 	{
 		return 13;

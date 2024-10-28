@@ -26,6 +26,14 @@ private:
 
 
 
+	virtual bool IsUseable(void) const override
+	{
+		return true;
+	};
+
+
+
+
 
 	virtual ColourID GetMapBaseColourID() const override
 	{

@@ -6,7 +6,7 @@
 
 
 
-class cSimplePlaceableItemHandler final:
+class cSimplePlaceableItemHandler:
 	public cItemHandler
 {
 	using Super = cItemHandler;
