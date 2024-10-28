@@ -34,7 +34,7 @@ private:
 
 		auto & World = *a_Player.GetWorld();
 		int NeighborIdx = -1;
-		auto ChestType = BlockItemConverter::FromItem(PaletteUpgrade::FromItem(static_cast<short>(m_ItemType), 0));
+		auto ChestType = BlockItemConverter::FromItem(m_ItemType);
 
 		for (size_t i = 0; i < ARRAYCOUNT(CrossCoords); i++)
 		{
@@ -241,6 +241,11 @@ private:
 			World.FastSetBlock(a_PlacePosition + CrossCoords[NeighborIdx], Neighbour);
 		}
 
+		return true;
+	}
+
+	virtual bool IsPlaceable(void) const override
+	{
 		return true;
 	}
 };

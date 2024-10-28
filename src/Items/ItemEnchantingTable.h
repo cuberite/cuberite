@@ -22,7 +22,7 @@ private:
 
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
-		if (!Super::CommitPlacement(a_Player, a_HeldItem, a_PlacePosition, a_ClickedBlockFace, a_CursorPosition))
+		if (!a_Player.PlaceBlock(a_PlacePosition, Block::EnchantingTable::EnchantingTable()))
 		{
 			return false;
 		}
