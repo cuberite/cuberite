@@ -1231,6 +1231,10 @@ void cProtocol_1_19::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 	m_Client->HandleWindowClick(WindowID, SlotNum, Action, Item);
 }
 
+
+
+
+
 Int32 cProtocol_1_19::GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const
 {
 	switch (a_ParserType)
@@ -2093,7 +2097,7 @@ void cProtocol_1_19_3::SendSoundEffect(const AString & a_SoundName, Vector3d a_O
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktSoundEffect);
-	Pkt.WriteVarInt32(1); // sound id
+	Pkt.WriteVarInt32(GetProtocolSoundID(a_SoundName)); // sound id
 	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.x * 8.0));
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.y * 8.0));
