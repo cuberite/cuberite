@@ -10,9 +10,9 @@
 
 
 class cItemMobHeadHandler final :
-	public cItemHandler
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 
@@ -26,9 +26,9 @@ public:
 	{
 		using namespace Block;
 
-		switch (a_Player.GetEquippedItem().m_ItemDamage)
+		switch (a_Player.GetEquippedItem().m_ItemType)
 		{
-			case E_META_HEAD_SKELETON:
+			case Item::SkeletonSkull:
 			{
 				switch (a_ClickedBlockFace)
 				{
@@ -49,7 +49,7 @@ public:
 				}
 				break;
 			}
-			case E_META_HEAD_WITHER:
+			case Item::WitherSkeletonSkull:
 			{
 				switch (a_ClickedBlockFace)
 				{
@@ -70,7 +70,7 @@ public:
 				}
 				break;
 			}
-			case E_META_HEAD_ZOMBIE:
+			case Item::ZombieHead:
 			{
 				switch (a_ClickedBlockFace)
 				{
@@ -91,7 +91,7 @@ public:
 				}
 				break;
 			}
-			case E_META_HEAD_PLAYER:
+			case Item::PlayerHead:
 			{
 				switch (a_ClickedBlockFace)
 				{
@@ -112,7 +112,7 @@ public:
 				}
 				break;
 			}
-			case E_META_HEAD_CREEPER:
+			case Item::CreeperHead:
 			{
 				switch (a_ClickedBlockFace)
 				{
@@ -133,7 +133,7 @@ public:
 				}
 				break;
 			}
-			case E_META_HEAD_DRAGON:
+			case Item::DragonHead:
 			{
 				switch (a_ClickedBlockFace)
 				{
@@ -148,6 +148,27 @@ public:
 					case BLOCK_FACE_ZP:
 					{
 						a_Player.PlaceBlock(a_PlacePosition, CreeperWallHead::CreeperWallHead(RotationToBlockFace(a_Player.GetYaw()), false));
+						break;
+					}
+					default: return false;
+				}
+				break;
+			}
+			case Item::PiglinHead:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						a_Player.PlaceBlock(a_PlacePosition, PiglinHead::PiglinHead(false,RotationToFineFace(a_Player.GetYaw())));
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						a_Player.PlaceBlock(a_PlacePosition, PiglinWallHead::PiglinWallHead(RotationToBlockFace(a_Player.GetYaw()), false));
 						break;
 					}
 					default: return false;
@@ -170,10 +191,10 @@ public:
 	Adjusts the mob head entity based on the equipped item's data. */
 	void RegularHeadPlaced(const cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace) const
 	{
-		const auto HeadType = static_cast<eMobHeadType>(a_HeldItem.m_ItemDamage);
+		//const auto HeadType = static_cast<eMobHeadType>(a_HeldItem.m_ItemDamage);
 
 		// Use a callback to set the properties of the mob head block entity:
-		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_Player, HeadType, a_ClickedBlockFace](cBlockEntity & a_BlockEntity)
+		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_Player, a_HeldItem, a_ClickedBlockFace](cBlockEntity & a_BlockEntity)
 		{
 			switch (a_BlockEntity.GetBlockType())
 			{
@@ -189,6 +210,8 @@ public:
 				case BlockType::WitherSkeletonWallSkull:
 				case BlockType::ZombieHead:
 				case BlockType::ZombieWallHead:
+				case BlockType::PiglinHead:
+				case BlockType::PiglinWallHead:
 					break;
 				default: ASSERT(false); return false;
 			}
@@ -201,7 +224,7 @@ public:
 				Rotation = FloorC(a_Player.GetYaw() * 16.0f / 360.0f + 0.5f) & 0x0f;
 			}
 
-			MobHeadEntity.SetType(HeadType);
+			MobHeadEntity.SetType(a_HeldItem.m_ItemType);
 			MobHeadEntity.SetRotation(static_cast<eMobHeadRotation>(Rotation));
 			return false;
 		});

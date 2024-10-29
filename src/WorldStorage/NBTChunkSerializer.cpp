@@ -692,6 +692,8 @@ public:
 
 	void AddMobHeadEntity(cMobHeadEntity * a_MobHead)
 	{
+		//TODO: update for new versions
+		/*
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_MobHead, "Skull");
 			mWriter.AddByte  ("SkullType", a_MobHead->GetType() & 0xFF);
@@ -710,7 +712,7 @@ public:
 					mWriter.EndList();
 				mWriter.EndCompound();
 			mWriter.EndCompound();
-		mWriter.EndCompound();
+		mWriter.EndCompound();*/
 	}
 
 
