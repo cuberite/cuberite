@@ -184,15 +184,16 @@ enum eWeather
 
 
 
-enum eMobHeadType
-{
-	SKULL_TYPE_SKELETON    = 0,
-	SKULL_TYPE_WITHER      = 1,
-	SKULL_TYPE_ZOMBIE      = 2,
-	SKULL_TYPE_PLAYER      = 3,
-	SKULL_TYPE_CREEPER     = 4,
-	SKULL_TYPE_DRAGON      = 5,
-} ;
+//enum eMobHeadType
+//{
+//	SKULL_TYPE_SKELETON    = 0,
+//	SKULL_TYPE_WITHER      = 1,
+//	SKULL_TYPE_ZOMBIE      = 2,
+//	SKULL_TYPE_PLAYER      = 3,
+//	SKULL_TYPE_CREEPER     = 4,
+//	SKULL_TYPE_DRAGON      = 5,
+//	SKULL_TYPE_PIGLIN      = 6,
+//} ;
 
 
 
