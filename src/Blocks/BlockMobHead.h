@@ -30,6 +30,8 @@ public:
 			case BlockType::WitherSkeletonWallSkull:
 			case BlockType::ZombieHead:
 			case BlockType::ZombieWallHead:
+			case BlockType::PiglinHead:
+			case BlockType::PiglinWallHead:
 				return true;
 			default: return false;
 		}

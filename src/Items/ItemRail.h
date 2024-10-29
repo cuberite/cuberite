@@ -9,9 +9,9 @@
 
 
 class cItemRailHandler final :
-	public cItemHandler
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 

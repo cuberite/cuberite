@@ -16,7 +16,7 @@
 
 cMobHeadEntity::cMobHeadEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
 	Super(a_Block, a_Pos, a_World),
-	m_Type(SKULL_TYPE_SKELETON),
+	m_Type(Item::SkeletonSkull),
 	m_Rotation(SKULL_ROTATION_NORTH)
 {
 	ASSERT(cBlockMobHeadHandler::IsBlockMobHead(a_Block));
@@ -26,9 +26,9 @@ cMobHeadEntity::cMobHeadEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_Wo
 
 
 
-void cMobHeadEntity::SetType(const eMobHeadType & a_Type)
+void cMobHeadEntity::SetType(const Item & a_Type)
 {
-	if ((!m_OwnerName.empty()) && (a_Type != SKULL_TYPE_PLAYER))
+	if ((!m_OwnerName.empty()) && (a_Type != Item::PlayerHead))
 	{
 		m_OwnerName = m_OwnerTexture = m_OwnerTextureSignature = "";
 		m_OwnerUUID = cUUID{};
@@ -51,7 +51,7 @@ void cMobHeadEntity::SetRotation(eMobHeadRotation a_Rotation)
 
 void cMobHeadEntity::SetOwner(const cPlayer & a_Owner)
 {
-	if (m_Type != SKULL_TYPE_PLAYER)
+	if (m_Type != Item::PlayerHead)
 	{
 		return;
 	}
@@ -77,7 +77,7 @@ void cMobHeadEntity::SetOwner(const cPlayer & a_Owner)
 
 void cMobHeadEntity::SetOwner(const cUUID & a_OwnerUUID, const AString & a_OwnerName, const AString & a_OwnerTexture, const AString & a_OwnerTextureSignature)
 {
-	if (m_Type != SKULL_TYPE_PLAYER)
+	if (m_Type != Item::PlayerHead)
 	{
 		return;
 	}
@@ -94,17 +94,19 @@ void cMobHeadEntity::SetOwner(const cUUID & a_OwnerUUID, const AString & a_Owner
 
 cItems cMobHeadEntity::ConvertToPickups() const
 {
-	switch (m_Type)
-	{
-		case SKULL_TYPE_SKELETON: return cItems(Item::SkeletonSkull);
-		case SKULL_TYPE_WITHER:   return cItems(Item::WitherSkeletonSkull);
-		case SKULL_TYPE_ZOMBIE:   return cItems(Item::ZombieHead);
-		case SKULL_TYPE_PLAYER:   return cItems(Item::PlayerHead);  // TODO(12xx12): Proper handling of transferring the skin to the item
-		case SKULL_TYPE_CREEPER:  return cItems(Item::CreeperHead);
-		case SKULL_TYPE_DRAGON:   return cItems(Item::DragonHead);
-	}
-	UNREACHABLE("Unhandled mob head type");
-	return cItems();
+	return cItems(m_Type);
+	//switch (m_Type)
+	//{
+	//	case SKULL_TYPE_SKELETON: return cItems(Item::SkeletonSkull);
+	//	case SKULL_TYPE_WITHER:   return cItems(Item::WitherSkeletonSkull);
+	//	case SKULL_TYPE_ZOMBIE:   return cItems(Item::ZombieHead);
+	//	case SKULL_TYPE_PLAYER:   return cItems(Item::PlayerHead);  // TODO(12xx12): Proper handling of transferring the skin to the item
+	//	case SKULL_TYPE_CREEPER:  return cItems(Item::CreeperHead);
+	//	case SKULL_TYPE_DRAGON:   return cItems(Item::DragonHead);
+	//	case SKULL_TYPE_PIGLIN:   return cItems(Item::PiglinHead);
+	//}
+	//UNREACHABLE("Unhandled mob head type");
+	//return cItems();
 }
 
 

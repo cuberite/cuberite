@@ -3438,7 +3438,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 		case BlockType::ZombieWallHead:
 		{
 			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
-			a_Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
+			//a_Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF); // ignore 1.12 < is basically unsupportec
 			a_Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
 
 			// The new Block Entity format for a Mob Head. See: https://minecraft.wiki/w/Head#Block_entity

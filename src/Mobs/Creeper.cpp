@@ -9,9 +9,9 @@
 
 
 
-
+// looks like creepers no longer have ambient sounds
 cCreeper::cCreeper(void) :
-	Super("Creeper", mtCreeper, "entity.creeper.hurt", "entity.creeper.death", "entity.creeper.ambient", 0.6f, 1.7f),
+	Super("Creeper", mtCreeper, "entity.creeper.hurt", "entity.creeper.death", "", 0.6f, 1.7f),
 	m_bIsBlowing(false),
 	m_bIsCharged(false),
 	m_BurnedWithFlintAndSteel(false),

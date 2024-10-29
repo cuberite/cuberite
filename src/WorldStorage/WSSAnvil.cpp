@@ -1821,13 +1821,13 @@ OwnedBlockEntity cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_T
 	{
 		return nullptr;
 	}
-
+	//TODO: update for new versions
 	auto MobHead = std::make_unique<cMobHeadEntity>(a_Block, a_Pos, m_World);
-
+	
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "SkullType");
 	if (currentLine >= 0)
 	{
-		MobHead->SetType(static_cast<eMobHeadType>(a_NBT.GetByte(currentLine)));
+		//MobHead->SetType(static_cast<eMobHeadType>(a_NBT.GetByte(currentLine)));
 	}
 
 	currentLine = a_NBT.FindChildByName(a_TagIdx, "Rot");

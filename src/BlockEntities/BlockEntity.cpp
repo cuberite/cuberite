@@ -152,7 +152,9 @@ OwnedBlockEntity cBlockEntity::CreateByBlockType(BlockState a_Block, const Vecto
 		case BlockType::SkeletonSkull:
 		case BlockType::SkeletonWallSkull:
 		case BlockType::WitherSkeletonSkull:
-		case BlockType::WitherSkeletonWallSkull: return std::make_unique<cMobHeadEntity>(a_Block, a_Pos, a_World);
+		case BlockType::WitherSkeletonWallSkull:
+		case BlockType::PiglinHead:
+		case BlockType::PiglinWallHead:  return std::make_unique<cMobHeadEntity>(a_Block, a_Pos, a_World);
 
 		case BlockType::Hopper:          return std::make_unique<cHopperEntity>    (a_Block, a_Pos, a_World);
 		case BlockType::Jukebox:         return std::make_unique<cJukeboxEntity>   (a_Block, a_Pos, a_World);
