@@ -78,6 +78,7 @@ public:
 
 	/** Sets the m_RankMgr that is used for name-uuid notifications. Accepts nullptr to remove the binding. */
 	void SetRankManager(cRankManager * a_RankManager) { m_RankMgr = a_RankManager; }
+
 	/** Used by player session packets to verify that player public keys are signed by Mojangs key. There may be multiple mojang keys the player key has to be signed with any one of them */
 	bool VerifyUsingMojangKeys(ContiguousByteBuffer DataToVerify, ContiguousByteBuffer Signature);
 

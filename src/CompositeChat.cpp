@@ -380,8 +380,10 @@ void cCompositeChat::WriteAsNBT(cFastNBTWriter& a_Writer, bool a_ShouldUseChatPr
 {
 	Json::Value Message;
 	a_Writer.AddString("text",cClientHandle::FormatMessageType(a_ShouldUseChatPrefixes, GetMessageType(), GetAdditionalMessageTypeData()));
+	a_Writer.BeginList("extra", eTagType::TAG_Compound);
 	for (const auto & Part : m_Parts)
 	{
+		a_Writer.BeginCompound("");
 		std::visit(OverloadedVariantAccess
 		{
 			[this, &a_Writer](const TextPart & a_Part)
@@ -437,7 +439,9 @@ void cCompositeChat::WriteAsNBT(cFastNBTWriter& a_Writer, bool a_ShouldUseChatPr
 				//AddChatPartStyle(a_Writer, a_Part.Style);
 			},
 		}, Part);
+		a_Writer.EndCompound();
 	}  // for itr - Parts[]
+	a_Writer.EndList();
 	a_Writer.Finish();
 }
 
