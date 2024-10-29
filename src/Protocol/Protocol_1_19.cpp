@@ -2149,11 +2149,11 @@ void cProtocol_1_19_3::SendPlayerListInitChat(const cPlayer & a_Player)
 
 	cPacketizer Pkt(*this, pktPlayerList);
 	Pkt.WriteBEInt8(static_cast<Int8>(PlayerListAction::InitializeChat));
-	Pkt.WriteUUID(a_Player.GetUUID());
 
 	auto player_session_data = a_Player.GetClientHandle()->GetPlayerSessionData();
 
 	Pkt.WriteVarInt32(1);
+	Pkt.WriteUUID(a_Player.GetUUID());
 	Pkt.WriteBool(player_session_data.IsPopulated());
 	if (player_session_data.IsPopulated())
 	{

@@ -74,6 +74,7 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_IPString(a_IPString),
 	m_Player(nullptr),
 	m_CachedSentChunk(std::numeric_limits<decltype(m_CachedSentChunk.m_ChunkX)>::max(), std::numeric_limits<decltype(m_CachedSentChunk.m_ChunkZ)>::max()),
+	m_ProxyConnection(false),
 	m_HasSentDC(false),
 	m_LastStreamedChunkX(std::numeric_limits<decltype(m_LastStreamedChunkX)>::max()),  // bogus chunk coords to force streaming upon login
 	m_LastStreamedChunkZ(std::numeric_limits<decltype(m_LastStreamedChunkZ)>::max()),
@@ -93,7 +94,8 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_HasSentPlayerChunk(false),
 	m_Locale("en_GB"),
 	m_LastPlacedSign(s_IllegalPosition),
-	m_ProtocolVersion(0)
+	m_ProtocolVersion(0),
+	m_Allowslisting(true)
 {
 	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
@@ -149,11 +151,11 @@ AString cClientHandle::FormatChatPrefix(
 {
 	if (ShouldAppendChatPrefixes)
 	{
-		return Printf("%s[%s] %s", m_Color1.c_str(), a_ChatPrefixS.c_str(), m_Color2.c_str());
+		return fmt::format(FMT_STRING("{}[{}] {}"), m_Color1, a_ChatPrefixS, m_Color2);
 	}
 	else
 	{
-		return Printf("%s", m_Color1.c_str());
+		return m_Color1;
 	}
 }
 
@@ -178,11 +180,11 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 		{
 			if (ShouldAppendChatPrefixes)
 			{
-				return Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue, a_AdditionalData.c_str(), cChatColor::White, cChatColor::Italic);
+				return fmt::format(FMT_STRING("{}[MSG: {}] {}{}"), cChatColor::LightBlue, a_AdditionalData, cChatColor::White, cChatColor::Italic);
 			}
 			else
 			{
-				return Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue);
+				return fmt::format(FMT_STRING("{}: {}"), a_AdditionalData, cChatColor::LightBlue);
 			}
 		}
 		case mtMaxPlusOne: break;
@@ -398,22 +400,6 @@ void cClientHandle::Authenticate(AString && a_Name, const cUUID & a_UUID, Json::
 	// Send login success (if the protocol supports it):
 	m_Protocol->SendLoginSuccess();
 
-	if (m_ForgeHandshake.IsForgeClient)
-	{
-		m_ForgeHandshake.BeginForgeHandshake(*this);
-	}
-	else
-	{
-		FinishAuthenticate();
-	}
-}
-
-
-
-
-
-void cClientHandle::FinishAuthenticate()
-{
 	// Serverside spawned player (so data are loaded).
 	std::unique_ptr<cPlayer> Player;
 
@@ -429,6 +415,32 @@ void cClientHandle::FinishAuthenticate()
 	}
 
 	m_Player = Player.get();
+	m_temp_player = std::move(Player);
+
+	if (m_ProtocolVersion > static_cast<UInt32>(cProtocol::Version::v1_20))
+	{
+		//  do nothing I guess
+	}
+	else // <= 1.20
+	{
+		if (m_ForgeHandshake.IsForgeClient)
+		{
+			m_ForgeHandshake.BeginForgeHandshake(*this);
+		}
+		else
+		{
+			FinishAuthenticate();
+		}
+	}
+}
+
+
+
+
+
+void cClientHandle::FinishAuthenticate()
+{
+
 
 	/*
 	LOGD("Created a new cPlayer object at %p for client %s @ %s (%p)",
@@ -436,6 +448,7 @@ void cClientHandle::FinishAuthenticate()
 		m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this)
 	);
 	//*/
+	m_Player->SendPlayerInventoryJoin();
 
 	cWorld * World = cRoot::Get()->GetWorld(m_Player->GetLoadedWorldName());
 	if (World == nullptr)
@@ -448,8 +461,8 @@ void cClientHandle::FinishAuthenticate()
 
 	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
 	{
-		cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", m_Username.c_str()));
-		LOGINFO("Player %s has joined the game", m_Username.c_str());
+		cRoot::Get()->BroadcastChatJoin(fmt::format(FMT_STRING("{} has joined the game"), m_Username));
+		LOGINFO("Player %s has joined the game", m_Username);
 	}
 
 	// TODO: this accesses the world spawn from the authenticator thread
@@ -489,8 +502,10 @@ void cClientHandle::FinishAuthenticate()
 	cRoot::Get()->GetServer()->ClientMovedToWorld(this);
 
 	SetState(csDownloadingWorld);
-	m_Player->Initialize(std::move(Player), *World);
-
+	m_Player->Initialize(std::move(m_temp_player), *World);
+	m_Player->ResendRenderDistanceCenter();
+	m_Protocol->SendInitialChunksComing();
+	m_Protocol->SendCommandTree();
 	// LOGD("Client %s @ %s (%p) has been fully authenticated", m_Username.c_str(), m_IPString.c_str(), static_cast<void *>(this));
 }
 
@@ -731,14 +746,11 @@ void cClientHandle::HandlePing(void)
 	http://wiki.vg/Protocol#Legacy_Server_List_Ping suggests that servers SHOULD handle this packet */
 
 	// Somebody tries to retrieve information about the server
-	AString Reply;
 	const cServer & Server = *cRoot::Get()->GetServer();
 
-	Printf(Reply, "%s%s%zu%s%zu",
-		Server.GetDescription().c_str(),
-		cChatColor::Delimiter,
-		Server.GetNumPlayers(),
-		cChatColor::Delimiter,
+	auto Reply = fmt::format(FMT_STRING("{}{}{}{}{}"),
+		Server.GetDescription(), cChatColor::Delimiter,
+		Server.GetNumPlayers(),  cChatColor::Delimiter,
 		Server.GetMaxPlayers()
 	);
 	Kick(Reply);
@@ -1700,6 +1712,46 @@ void cClientHandle::HandleWindowClose(UInt8 a_WindowID)
 
 
 
+void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 a_ExpiresAt, ContiguousByteBuffer a_PublicKey, ContiguousByteBuffer a_KeySignature)
+{
+	// hash algorith mchnages somehre between 1.19.4 and 1.21 - maybe???
+
+	// TODO: tidy up and make more readable
+
+	char * tempbfr = new char[a_PublicKey.size() + 16 + 8];
+	// ORDER: player UUID (in binary form big endian format) + ExpiresAt in big endian + publickey
+	memcpy(tempbfr, GetUUID().ToRaw().data(), 16);
+	Int64 toadd = (static_cast<UInt64>(htonl(static_cast<UInt32>(a_ExpiresAt))) << 32) | (static_cast<UInt64>(htonl(static_cast<UInt32>(a_ExpiresAt >> 32))));
+	*(reinterpret_cast<Int64*>(tempbfr + 16)) = toadd;
+	ContiguousByteBuffer toverify;
+	toverify.append(reinterpret_cast<std::byte*>(tempbfr),24);
+	toverify.append(a_PublicKey);
+	delete[] tempbfr;
+	if (!cRoot::Get()->GetMojangAPI().VerifyUsingMojangKeys(toverify, a_KeySignature))
+	{
+		LOGWARN("Invalid public key sent by %s", GetUsername());
+		// TODO: add enforce secure profile somewhere in settings and kick player if the key is invalid
+		return;
+	}
+    Int64 milliseconds_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	if (milliseconds_since_epoch > a_ExpiresAt)
+	{
+		LOGWARN("Expired public key sent by %s", GetUsername());
+		// TODO: add enforce secure profile somewhere in settings and kick player if the key is invalid
+		return;
+	}
+	m_PlayerSession = cClientHandle::cPlayerSessionData(a_SessionID, a_ExpiresAt, a_PublicKey, a_KeySignature);
+	cRoot::Get()->ForEachPlayer([this](const cPlayer & a_Player)
+    {
+		a_Player.GetClientHandle()->SendPlayerListInitChat(*this->GetPlayer());
+		return false;
+    });
+}
+
+
+
+
+
 void cClientHandle::HandleWindowClick(UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem)
 {
 	LOGD("WindowClick: WinID %d, SlotNum %d, action: %s, Item %s x %d",
@@ -1982,7 +2034,7 @@ void cClientHandle::HandleUnmount(void)
 
 
 
-void cClientHandle::HandleTabCompletion(const AString & a_Text)
+void cClientHandle::HandleTabCompletion(const AString & a_Text, UInt32 CompletionId)
 {
 	AStringVector Results;
 	// Get player name completions.
@@ -2004,7 +2056,7 @@ void cClientHandle::HandleTabCompletion(const AString & a_Text)
 
 	// Sort and send results.
 	std::sort(Results.begin(), Results.end());
-	SendTabCompletionResults(Results);
+	SendTabCompletionResults(Results, CompletionId);
 }
 
 
@@ -2018,6 +2070,8 @@ void cClientHandle::SendData(const ContiguousByteBufferView a_Data)
 		// This could crash the client, because they've already unloaded the world etc., and suddenly a wild packet appears (#31)
 		return;
 	}
+
+	// LOG("len %d", a_Data.length());
 
 	cCSLock Lock(m_CSOutgoingData);
 	m_OutgoingData += a_Data;
@@ -2700,6 +2754,15 @@ void cClientHandle::SendExplosion(const Vector3f a_Position, const float a_Power
 
 
 
+void cClientHandle::SendFinishConfiguration()
+{
+	m_Protocol->SendFinishConfiguration();
+}
+
+
+
+
+
 void cClientHandle::SendGameMode(eGameMode a_GameMode)
 {
 	m_Protocol->SendGameMode(a_GameMode);
@@ -2802,6 +2865,15 @@ void cClientHandle::SendPlayerAbilities()
 void cClientHandle::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	m_Protocol->SendPlayerListAddPlayer(a_Player);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerListInitChat(const cPlayer & a_Player)
+{
+	m_Protocol->SendPlayerListInitChat(a_Player);
 }
 
 
@@ -2949,6 +3021,15 @@ void cClientHandle::SendResetTitle()
 
 
 
+void cClientHandle::SendRenderDistanceCenter(cChunkCoords a_chunk)
+{
+	m_Protocol->SendRenderDistanceCenter(a_chunk);
+}
+
+
+
+
+
 void cClientHandle::SendRespawn(const eDimension a_Dimension, const bool a_IsRespawningFromDeath)
 {
 	if (!a_IsRespawningFromDeath && (a_Dimension == m_Player->GetWorld()->GetDimension()))
@@ -2963,6 +3044,7 @@ void cClientHandle::SendRespawn(const eDimension a_Dimension, const bool a_IsRes
 	}
 
 	m_Protocol->SendRespawn(a_Dimension);
+	m_Protocol->SendInitialChunksComing();
 }
 
 
@@ -3114,9 +3196,9 @@ void cClientHandle::SendStatistics(const StatisticsManager & a_Manager)
 
 
 
-void cClientHandle::SendTabCompletionResults(const AStringVector & a_Results)
+void cClientHandle::SendTabCompletionResults(const AStringVector & a_Results, UInt32 CompletionId)
 {
-	m_Protocol->SendTabCompletionResults(a_Results);
+	m_Protocol->SendTabCompletionResults(a_Results, CompletionId);
 }
 
 
@@ -3232,6 +3314,14 @@ void cClientHandle::HandleCraftRecipe(UInt32 a_RecipeId)
 void cClientHandle::SendWeather(eWeather a_Weather)
 {
 	m_Protocol->SendWeather(a_Weather);
+}
+
+
+
+
+void cClientHandle::SendGameStateChange(eGameStateReason a_Reason, float a_Value)
+{
+	m_Protocol->SendGameStateChange(a_Reason, a_Value);
 }
 
 
@@ -3359,7 +3449,7 @@ void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
 void cClientHandle::PacketBufferFull(void)
 {
 	// Too much data in the incoming queue, the server is probably too busy, kick the client:
-	LOGERROR("Too much data in queue for client \"%s\" @ %s, kicking them.", m_Username.c_str(), m_IPString.c_str());
+	LOGERROR("Too much data in queue for client \"%s\" @ %s, kicking them.", m_Username, m_IPString);
 	SendDisconnect("The server is busy; please try again later.");
 }
 
@@ -3369,11 +3459,9 @@ void cClientHandle::PacketBufferFull(void)
 
 void cClientHandle::PacketUnknown(UInt32 a_PacketType)
 {
-	LOGERROR("Unknown packet type 0x%x from client \"%s\" @ %s", a_PacketType, m_Username.c_str(), m_IPString.c_str());
+	LOGERROR("Unknown packet type 0x%x from client \"%s\" @ %s", a_PacketType, m_Username, m_IPString);
 
-	AString Reason;
-	Printf(Reason, "Unknown [C->S] PacketType: 0x%x", a_PacketType);
-	SendDisconnect(Reason);
+	SendDisconnect(fmt::format(FMT_STRING("Unknown [C->S] PacketType: 0x{:x}"), a_PacketType));
 }
 
 
@@ -3382,7 +3470,7 @@ void cClientHandle::PacketUnknown(UInt32 a_PacketType)
 
 void cClientHandle::PacketError(UInt32 a_PacketType)
 {
-	LOGERROR("Protocol error while parsing packet type 0x%02x; disconnecting client \"%s\"", a_PacketType, m_Username.c_str());
+	LOGERROR("Protocol error while parsing packet type 0x%02x; disconnecting client \"%s\"", a_PacketType, m_Username);
 	SendDisconnect("Protocol error");
 }
 
