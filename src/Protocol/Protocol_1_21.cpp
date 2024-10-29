@@ -321,6 +321,13 @@ Item cProtocol_1_21::GetItemFromProtocolID(UInt32 a_ProtocolID) const
 
 
 
+
+
+UInt32 cProtocol_1_21::GetProtocolSoundID(const AString & a_SoundName) const
+{
+	return Palette_1_21::FromSound(a_SoundName);
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 //  cProtocol_1_21_2:
 

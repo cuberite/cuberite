@@ -552,7 +552,7 @@ public:
 	/** In case the protocol does not support the given parser it returns -1 */
 	virtual Int32 GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const { return -1;}
 
-	virtual int GetProtocolSoundID(const AString & a_ParticleName) const { return 0;}
+	virtual UInt32 GetProtocolSoundID(const AString & a_SoundName) const { return 0;}
 
 protected:
 
