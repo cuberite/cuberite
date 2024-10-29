@@ -1717,7 +1717,6 @@ void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 a_ExpiresAt, Co
 	// hash algorith mchnages somehre between 1.19.4 and 1.21 - maybe???
 
 	// TODO: tidy up and make more readable
-	// 
 
 	char * tempbfr = new char[a_PublicKey.size() + 16 + 8];
 	// ORDER: player UUID (in binary form big endian format) + ExpiresAt in big endian + publickey
@@ -1731,19 +1730,22 @@ void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 a_ExpiresAt, Co
 	if (!cRoot::Get()->GetMojangAPI().VerifyUsingMojangKeys(toverify, a_KeySignature))
 	{
 		LOGWARN("Invalid public key sent by %s", GetUsername());
-		// TODO: add enforce secure profile somewehre in settings and kick player if the key is invalid
+		// TODO: add enforce secure profile somewhere in settings and kick player if the key is invalid
 		return;
 	}
-	// LOGWARN("Good public key sent by %s", GetUsername());
     Int64 milliseconds_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	if (milliseconds_since_epoch > a_ExpiresAt)
 	{
 		LOGWARN("Expired public key sent by %s", GetUsername());
-		// TODO: add enforce secure profile somewehre in settings and kick player if the key is invalid
+		// TODO: add enforce secure profile somewhere in settings and kick player if the key is invalid
 		return;
 	}
 	m_PlayerSession = cClientHandle::cPlayerSessionData(a_SessionID, a_ExpiresAt, a_PublicKey, a_KeySignature);
-	//  TODO send InitChat to all players
+	cRoot::Get()->ForEachPlayer([this](const cPlayer & a_Player)
+    {
+		a_Player.GetClientHandle()->SendPlayerListInitChat(*this->GetPlayer());
+		return false;
+    });
 }
 
 
@@ -2863,6 +2865,15 @@ void cClientHandle::SendPlayerAbilities()
 void cClientHandle::SendPlayerListAddPlayer(const cPlayer & a_Player)
 {
 	m_Protocol->SendPlayerListAddPlayer(a_Player);
+}
+
+
+
+
+
+void cClientHandle::SendPlayerListInitChat(const cPlayer & a_Player)
+{
+	m_Protocol->SendPlayerListInitChat(a_Player);
 }
 
 
