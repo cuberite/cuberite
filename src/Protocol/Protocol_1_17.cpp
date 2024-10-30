@@ -1049,7 +1049,7 @@ cProtocol::Version cProtocol_1_17_1::GetProtocolVersion() const
 
 
 
-void cProtocol_1_17_1::SendWholeInventory(const cWindow & a_Window)
+void cProtocol_1_17_1::SendWholeInventory(const cWindow & a_Window, const cItem & a_CursorStack)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -1063,5 +1063,5 @@ void cProtocol_1_17_1::SendWholeInventory(const cWindow & a_Window)
 	{
 		WriteItem(Pkt, Slot);
 	}  // for itr - Slots[]
-	WriteItem(Pkt, cItem());
+	WriteItem(Pkt, a_CursorStack);
 }

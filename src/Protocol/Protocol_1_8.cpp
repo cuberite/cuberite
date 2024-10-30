@@ -1872,10 +1872,10 @@ void cProtocol_1_8_0::SendGameStateChange(eGameStateReason a_Reason, float a_Val
 
 
 
-void cProtocol_1_8_0::SendWholeInventory(const cWindow & a_Window)
+void cProtocol_1_8_0::SendWholeInventory(const cWindow & a_Window, const cItem & a_CursorStack)
 {
 	ASSERT(m_State == 3);  // In game mode?
-
+	UNUSED(a_CursorStack);
 	cPacketizer Pkt(*this, pktWindowItems);
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetWindowID()));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Window.GetNumSlots()));

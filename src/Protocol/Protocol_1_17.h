@@ -52,5 +52,5 @@ public:
 protected:
 
 	virtual Version GetProtocolVersion() const override;
-	virtual void SendWholeInventory(const cWindow & a_Window) override;
+	virtual void SendWholeInventory(const cWindow & a_Window, const cItem & a_CursorStack) override;
 };

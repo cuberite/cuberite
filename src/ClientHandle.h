@@ -248,7 +248,7 @@ public:  // tolua_export
 
 	void SendWeather                    (eWeather a_Weather);
 	void SendGameStateChange            (eGameStateReason a_Reason, float a_Value);
-	void SendWholeInventory             (const cWindow & a_Window);
+	void SendWholeInventory             (const cWindow & a_Window, const cItem & a_CursorStack);
 	void SendWindowClose                (const cWindow & a_Window);
 	void SendWindowOpen                 (const cWindow & a_Window);
 	void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value);
