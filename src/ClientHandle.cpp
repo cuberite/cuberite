@@ -3328,9 +3328,9 @@ void cClientHandle::SendGameStateChange(eGameStateReason a_Reason, float a_Value
 
 
 
-void cClientHandle::SendWholeInventory(const cWindow & a_Window)
+void cClientHandle::SendWholeInventory(const cWindow & a_Window, const cItem & a_CursorStack)
 {
-	m_Protocol->SendWholeInventory(a_Window);
+	m_Protocol->SendWholeInventory(a_Window, a_CursorStack);
 }
 
 

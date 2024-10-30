@@ -538,7 +538,7 @@ public:
 	virtual void SendInitialChunksComing        () = 0;
 	virtual void SendWeather                    (eWeather a_Weather) = 0;
 	virtual void SendGameStateChange            (eGameStateReason a_Reason, float a_Value) = 0;
-	virtual void SendWholeInventory             (const cWindow    & a_Window) = 0;
+	virtual void SendWholeInventory             (const cWindow    & a_Window, const cItem & a_CursorStack) = 0;
 	virtual void SendWindowClose                (const cWindow    & a_Window) = 0;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) = 0;
 	virtual void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value) = 0;

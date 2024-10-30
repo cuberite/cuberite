@@ -61,7 +61,7 @@ public:
 
 			if (Item.m_ItemCount <= 0)
 			{
-				a_Entity.GetWorld()->BroadcastCollectEntity(a_Entity, *m_Pickup, static_cast<unsigned>(CombineCount));
+				//a_Entity.GetWorld()->BroadcastCollectEntity(a_Entity, *m_Pickup, static_cast<unsigned>(CombineCount));
 				a_Entity.Destroy();
 
 				// Reset the timer
