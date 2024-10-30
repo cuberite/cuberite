@@ -36,7 +36,7 @@ void cJukeboxEntity::Destroy(void)
 
 cItems cJukeboxEntity::ConvertToPickups() const
 {
-	return IsPlayingRecord() ? cItem(PaletteUpgrade::FromItem(static_cast<short>(m_Record), 0)) : cItems();
+	return IsPlayingRecord() ? cItem(m_Record) : cItems();
 }
 
 
@@ -98,7 +98,31 @@ bool cJukeboxEntity::PlayRecord(Item a_Record)
 	}
 
 	m_Record = a_Record;
-	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), PaletteUpgrade::ToItem(m_Record).first);
+	int record_id = 0;
+	switch (a_Record)
+	{
+		case Item::MusicDiscBlocks: record_id = 2; break;
+		case Item::MusicDiscCat: record_id = 1; break;
+		case Item::MusicDiscChirp: record_id = 3; break;
+		case Item::MusicDiscFar: record_id = 4; break;
+		case Item::MusicDiscMall: record_id = 5; break;
+		case Item::MusicDiscMellohi: record_id = 6; break;
+		case Item::MusicDiscPigstep: record_id = 12; break;
+		case Item::MusicDiscStal: record_id = 7; break;
+		case Item::MusicDiscStrad: record_id = 8; break;
+		case Item::MusicDiscWait: record_id = 11; break;
+		case Item::MusicDiscWard: record_id = 9; break;
+		case Item::MusicDisc11: record_id = 10; break;
+		case Item::MusicDisc13: record_id = 0; break;
+		case Item::MusicDisc5: record_id = 14; break;
+		case Item::MusicDiscCreator: record_id = 17; break;
+		case Item::MusicDiscCreatorMusicBox: record_id = 18; break;
+		case Item::MusicDiscOtherside: record_id = 13; break;
+		case Item::MusicDiscPrecipice: record_id = 16; break;
+		case Item::MusicDiscRelic: record_id = 15; break;
+		default: break;
+	}
+	m_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_PLAY_MUSIC_DISC, GetPos(), record_id);
 	m_World->FastSetBlock(m_Pos, Block::Jukebox::Jukebox(true));
 	return true;
 }

@@ -1,6 +1,10 @@
 #include "Globals.h"
 #include "Protocol_1_21.h"
 #include "Packetizer.h"
+#include "Root.h"
+#include "Server.h"
+#include "Entities/Player.h"
+
 #include <ClientHandle.h>
 #include "WorldStorage/FastNBT.h"
 #include "Palettes/Palette_1_21.h"
@@ -270,8 +274,31 @@ void cProtocol_1_21::SendDynamicRegistries()
 			Pkt.WriteString("wind_charge"); Pkt.WriteBool(false);
 			Pkt.WriteString("wither"); Pkt.WriteBool(false);
 			Pkt.WriteString("wither_skull"); Pkt.WriteBool(false);
+		}
+		{
+			cPacketizer Pkt(*this, pktConfigurationDynamicRegistries);
+			Pkt.WriteString("minecraft:jukebox_song");
+			Pkt.WriteVarInt32(19);
+			Pkt.WriteString("13"); Pkt.WriteBool(false);
+			Pkt.WriteString("cat"); Pkt.WriteBool(false);
+			Pkt.WriteString("blocks"); Pkt.WriteBool(false);
+			Pkt.WriteString("chirp"); Pkt.WriteBool(false);
+			Pkt.WriteString("far"); Pkt.WriteBool(false);
+			Pkt.WriteString("mall"); Pkt.WriteBool(false);
+			Pkt.WriteString("mellohi"); Pkt.WriteBool(false);
+			Pkt.WriteString("stal"); Pkt.WriteBool(false);
+			Pkt.WriteString("strad"); Pkt.WriteBool(false);
+			Pkt.WriteString("ward"); Pkt.WriteBool(false);
+			Pkt.WriteString("11"); Pkt.WriteBool(false);
+			Pkt.WriteString("wait"); Pkt.WriteBool(false);
+			Pkt.WriteString("pigstep"); Pkt.WriteBool(false);
+			Pkt.WriteString("otherside"); Pkt.WriteBool(false);
+			Pkt.WriteString("5"); Pkt.WriteBool(false);
+			Pkt.WriteString("relic"); Pkt.WriteBool(false);
+			Pkt.WriteString("precipice"); Pkt.WriteBool(false);
+			Pkt.WriteString("creator"); Pkt.WriteBool(false);
+			Pkt.WriteString("creator_music_box"); Pkt.WriteBool(false);
 		}	
-
 	}
 }
 
