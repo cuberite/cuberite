@@ -10,9 +10,9 @@
 
 
 class cItemEnchantingTableHandler final:
-	public cItemHandler
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 
@@ -40,12 +40,6 @@ private:
 			return false;
 		});
 
-		return true;
-	}
-
-
-	virtual bool IsPlaceable(void) const override
-	{
 		return true;
 	}
 } ;

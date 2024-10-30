@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "SimplePlaceableItemHandler.h"
 #include "Items/ItemHandler.h"
 #include "Registries/BlockItemConverter.h"
 
@@ -9,9 +10,9 @@
 
 
 class cItemButtonHandler final  :
-	public cItemHandler
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 

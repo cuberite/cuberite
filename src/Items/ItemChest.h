@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "SimplePlaceableItemHandler.h"
 #include "Blocks/BlockChest.h"
 
 
@@ -9,9 +10,9 @@
 
 
 class cItemChestHandler final :
-	public cItemHandler
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 
@@ -241,11 +242,6 @@ private:
 			World.FastSetBlock(a_PlacePosition + CrossCoords[NeighborIdx], Neighbour);
 		}
 
-		return true;
-	}
-
-	virtual bool IsPlaceable(void) const override
-	{
 		return true;
 	}
 };

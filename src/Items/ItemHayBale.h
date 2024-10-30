@@ -3,9 +3,9 @@
 
 #include "Registries/BlockStates.h"
 
-class cItemHayBaleHandler final : public cItemHandler
+class cItemHayBaleHandler final : public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 

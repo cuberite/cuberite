@@ -2,17 +2,12 @@
 #pragma once
 
 class cItemLogHandler final :
-	public cItemHandler
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 	using Super::Super;
-
-	virtual bool IsPlaceable(void) const override
-	{
-		return true;
-	}
 
 #define SET_AXIS(LogType)\
 		{\
