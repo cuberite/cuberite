@@ -3017,7 +3017,7 @@ void cPlayer::OnAddToWorld(cWorld & a_World)
 	m_ClientHandle->SendEntityMetadata(*this);
 
 	// Send contents of the inventory window:
-	m_ClientHandle->SendWholeInventory(*m_CurrentWindow);
+	m_ClientHandle->SendWholeInventory(*m_CurrentWindow, m_DraggingItem);
 
 	// Send health (the respawn packet, which understandably resets health, is also used for world travel...):
 	m_ClientHandle->SendHealth();
