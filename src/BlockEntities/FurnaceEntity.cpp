@@ -416,6 +416,6 @@ void cFurnaceEntity::SetIsCooking(bool a_IsCooking)
 	// Only light the furnace as it is extinguished only when the fuel runs out, not when cooking stops - handled in this::Tick()
 	if (m_IsCooking)
 	{
-		m_World->FastSetBlock(GetRelPos(), Block::Furnace::Furnace(Block::Furnace::Facing(m_World->GetBlock(GetRelPos())), true));
+		m_World->FastSetBlock(GetBlockPos(), Block::Furnace::Furnace(Block::Furnace::Facing(m_World->GetBlock(GetBlockPos())), true));
 	}
 }

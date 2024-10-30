@@ -385,7 +385,7 @@ void cProtocol_1_15::SendSoundParticleEffect(const EffectID a_EffectID, Vector3i
 
 	cPacketizer Pkt(*this, pktSoundParticleEffect);
 	Pkt.WriteBEInt32(static_cast<int>(a_EffectID));
-	Pkt.WriteXYZPosition64(a_Origin);
+	Pkt.WriteXZYPosition64(a_Origin);
 	Pkt.WriteBEInt32(a_Data);
 	Pkt.WriteBool(false);
 }
