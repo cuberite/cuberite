@@ -7,10 +7,10 @@
 
 
 
-class cItemQuartzHandler :
-	public cItemHandler
+class cItemQuartzHandler final:
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 

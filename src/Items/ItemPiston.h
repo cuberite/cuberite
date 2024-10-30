@@ -9,9 +9,9 @@
 
 
 class cItemPistonHandler final:
-	public cItemHandler
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 
@@ -27,12 +27,5 @@ private:
 			case BlockType::StickyPiston: return a_Player.PlaceBlock(a_PlacePosition, Block::StickyPiston::StickyPiston(false, DisplacementYawToFacing(a_PlacePosition, a_Player.GetEyePosition(), a_Player.GetYaw())));
 			default: return false;
 		}
-	}
-
-
-
-	virtual bool IsPlaceable(void) const override
-	{
-		return true;
 	}
 };

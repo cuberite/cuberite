@@ -9,9 +9,9 @@
 
 
 class cItemFenceGateHandler final  :
-	public cItemHandler
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 
@@ -38,10 +38,5 @@ private:
 			case BlockType::MangroveFenceGate: return a_Player.PlaceBlock(a_PlacePosition, MangroveFenceGate::MangroveFenceGate(RotationToBlockFace(a_Player.GetYaw()), false, false, false));
 			default: return false;
 		}
-	}
-
-	virtual bool IsPlaceable(void) const override
-	{
-		return true;
 	}
 };

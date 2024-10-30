@@ -2,29 +2,27 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "SimplePlaceableItemHandler.h"
 #include "Blocks/BlockChest.h"
 
 
 
 
 
-class cItemChestHandler:
-	public cItemHandler
+class cItemChestHandler final :
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 
-	cItemChestHandler(Item a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 	cItemChestHandler(const cItemChestHandler &) = delete;
 
 private:
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
 		// Check that there is at most one single neighbor of the same chest type:
 		static const Vector3i CrossCoords[] =
@@ -244,11 +242,6 @@ private:
 			World.FastSetBlock(a_PlacePosition + CrossCoords[NeighborIdx], Neighbour);
 		}
 
-		return true;
-	}
-
-	virtual bool IsPlaceable(void) const override
-	{
 		return true;
 	}
 };

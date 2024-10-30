@@ -9,10 +9,10 @@
 
 
 
-class cItemEnchantingTableHandler:
-	public cItemHandler
+class cItemEnchantingTableHandler final:
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 
@@ -20,7 +20,7 @@ public:
 
 private:
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
 		if (!a_Player.PlaceBlock(a_PlacePosition, Block::EnchantingTable::EnchantingTable()))
 		{
@@ -40,12 +40,6 @@ private:
 			return false;
 		});
 
-		return true;
-	}
-
-
-	virtual bool IsPlaceable(void) override
-	{
 		return true;
 	}
 } ;
