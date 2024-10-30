@@ -44,10 +44,11 @@ public:
 			case Item::Bucket:      return ScoopUpFluid(a_World, a_Player, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace);
 			case Item::LavaBucket:  return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace, Block::Lava::Lava());
 			case Item::WaterBucket: return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace, Block::Water::Water());
+			case Item::PowderSnowBucket: return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace, Block::PowderSnow::PowderSnow()); // not really a fluid but it works
 			default:
 			{
 				FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, m_ItemType);
-				return 1.0f;
+				return false;
 			}
 		}
 	}
@@ -92,6 +93,10 @@ public:
 		else if (Block.Type() == BlockType::Lava)
 		{
 			NewItemType = Item::LavaBucket;
+		}
+		else if (Block.Type() == BlockType::PowderSnow)
+		{
+			NewItemType = Item::PowderSnowBucket;
 		}
 		else
 		{

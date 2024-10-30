@@ -8,10 +8,10 @@
 
 
 
-class cItemPumpkinHandler:
-	public cItemHandler
+class cItemPumpkinHandler final:
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 
@@ -19,13 +19,13 @@ public:
 
 private:
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
 		// First try spawning a snow golem or an iron golem:
 		if (TrySpawnGolem(a_Player, a_PlacePosition))
 		{
 			// The client thinks that they placed the pumpkin, let them know it's been replaced:
-			a_Player.SendBlocksAround(a_PlacePosition.x, a_PlacePosition.y, a_PlacePosition.z);
+			a_Player.SendBlocksAround(a_PlacePosition);
 			return true;
 		}
 
@@ -39,7 +39,7 @@ private:
 
 	/** Spawns a snow / iron golem if the shape matches the recipe, supposing that the block placed at the specified coords is a pumpkin.
 	Returns true if the golem blocks are removed (for spawning), false if the recipe is not matched. */
-	bool TrySpawnGolem(cPlayer & a_Player, const Vector3i a_PumpkinPos)
+	bool TrySpawnGolem(cPlayer & a_Player, const Vector3i a_PumpkinPos) const
 	{
 		// A golem can't form with a pumpkin below level 2 or above level 255:
 		if ((a_PumpkinPos.y < 2) || (a_PumpkinPos.y >= cChunkDef::Height))
@@ -69,7 +69,7 @@ private:
 	/** Spawns a snow golem if the shape matches the recipe, supposing that the block placed at the specified coords is a pumpkin.
 	Returns true if the golem blocks are removed (for spawning), false if the recipe is not matched.
 	Assumes that the block below the specified block has already been checked and is a snow block. */
-	bool TrySpawnSnowGolem(cWorld & a_World, cPlayer & a_Player, const Vector3i a_PumpkinPos)
+	bool TrySpawnSnowGolem(cWorld & a_World, cPlayer & a_Player, const Vector3i a_PumpkinPos) const
 	{
 		ASSERT(a_PumpkinPos.y > 1);
 		ASSERT(a_World.GetBlock(a_PumpkinPos.addedY(-1)).Type() == BlockType::SnowBlock);
@@ -106,7 +106,7 @@ private:
 	/** Spawns an iron golem if the shape matches the recipe, supposing that the block placed at the specified coords is a pumpkin.
 	Returns true if the golem blocks are removed (for spawning), false if the recipe is not matched.
 	Assumes that the block below the specified block has already been checked and is an iron block. */
-	bool TrySpawnIronGolem(cWorld & a_World, cPlayer & a_Player, const Vector3i a_PumpkinPos)
+	bool TrySpawnIronGolem(cWorld & a_World, cPlayer & a_Player, const Vector3i a_PumpkinPos) const
 	{
 		ASSERT(a_PumpkinPos.y > 1);
 		ASSERT(a_World.GetBlock(a_PumpkinPos.addedY(-1)).Type() == BlockType::IronBlock);
