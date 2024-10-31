@@ -158,6 +158,7 @@ set(FOLDERS
 	OSSupport Physics Protocol Registries Simulator
 	Simulator/IncrementalRedstoneSimulator UI WorldStorage
 	Commands
+	AllTags
 )
 
 # Add all child source directories:

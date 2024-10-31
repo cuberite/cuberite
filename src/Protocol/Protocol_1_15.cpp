@@ -117,14 +117,6 @@ void cProtocol_1_15::SendRenderDistanceCenter(cChunkCoords a_chunk)
 
 
 
-void cProtocol_1_15::SendEditSign(Vector3i a_BlockPos)
-{
-}
-
-
-
-
-
 void cProtocol_1_15::SendEntityAnimation(const cEntity & a_Entity, EntityAnimation a_Animation)
 {
 	if (a_Animation == EntityAnimation::PlayerEntersBed)

@@ -8,7 +8,7 @@
 #include "../UI/BeaconWindow.h"
 #include "../ClientHandle.h"
 
-
+#include "../AllTags/BlockTags.h"
 
 
 
@@ -53,7 +53,7 @@ char cBeaconEntity::CalculatePyramidLevel(void)
 		{
 			for (int Z = MiddleXZ - Layer; Z <= (MiddleXZ + Layer); Z++)
 			{
-				if (!IsMineralBlock(Area.GetRelBlock({X, Y, Z})))
+				if (!BlockTags::BeaconBaseBlocks(Area.GetRelBlock({X, Y, Z}).Type()))
 				{
 					return static_cast<char>(Layer - 1);
 				}

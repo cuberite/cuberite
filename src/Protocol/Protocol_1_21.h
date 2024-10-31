@@ -16,6 +16,7 @@ public:
 protected:
 	virtual void SendDynamicRegistries() override;
 	virtual void SendSelectKnownPacks() override;
+	virtual void SendUpdateBlockEntity(cBlockEntity & a_BlockEntity) override;
 
 	virtual UInt32	GetPacketID(ePacketType a_PacketType) const override;
 

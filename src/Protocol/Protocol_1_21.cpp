@@ -4,8 +4,8 @@
 #include "Root.h"
 #include "Server.h"
 #include "Entities/Player.h"
-
 #include <ClientHandle.h>
+#include "../AllTags/BlockTags.h"
 #include "WorldStorage/FastNBT.h"
 #include "Palettes/Palette_1_21.h"
 #include "Palettes/Palette_1_21_2.h"
@@ -47,6 +47,95 @@ UInt32 cProtocol_1_21::GetPacketID(ePacketType a_PacketType) const
 			break;
 		//default: ASSERT(false,"Invalid m_State: %d", m_State); break;
 	}
+}
+
+
+
+
+
+void cProtocol_1_21::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	Byte Action;
+
+	auto type = a_BlockEntity.GetBlockType();
+	if (BlockTags::Banners(type))
+	{
+		Action = 19;
+	}
+	if (BlockTags::Beds(type))
+	{
+		Action = 24;
+	}
+	if (BlockTags::AllHangingSigns(type))
+	{
+		Action = 8;
+	}
+	if (BlockTags::StandingSigns(type))
+	{
+		Action = 7;
+	}
+	//TODO: skulls
+
+	switch (a_BlockEntity.GetBlockType())
+	{
+		//case BlockType::Banner:                Action = 19;
+		case BlockType::Barrel:                Action = 26;
+		case BlockType::Beacon:                Action = 14;
+		//case BlockType::Bed:                   Action = 24;
+		case BlockType::Beehive:               Action = 33;
+		case BlockType::Bell:                  Action = 30;
+		case BlockType::BlastFurnace:          Action = 28;
+		case BlockType::BrewingStand:          Action = 11;
+		//case BlockType::BrushableBlock:        Action = 39;
+		case BlockType::CalibratedSculkSensor: Action = 35;
+		case BlockType::Campfire:              Action = 32;
+		case BlockType::Chest:                 Action = 1;
+		case BlockType::ChiseledBookshelf:     Action = 38;
+		case BlockType::CommandBlock:          Action = 22;
+		case BlockType::Comparator:            Action = 18;
+		case BlockType::Conduit:               Action = 25;
+		case BlockType::Crafter:               Action = 41;
+		case BlockType::DaylightDetector:      Action = 16;
+		case BlockType::DecoratedPot:          Action = 40;
+		case BlockType::Dispenser:             Action = 5;
+		case BlockType::Dropper:               Action = 6;
+		case BlockType::EnchantingTable:       Action = 12;
+		case BlockType::EndGateway:            Action = 21;
+		case BlockType::EndPortal:             Action = 13;
+		case BlockType::EnderChest:            Action = 3;
+		case BlockType::Furnace:               Action = 0;
+		//case BlockType::HangingSign:           Action = 8;
+		case BlockType::Hopper:                Action = 17;
+		case BlockType::Jigsaw:                Action = 31;
+		case BlockType::Jukebox:               Action = 4;
+		case BlockType::Lectern:               Action = 29;
+		case BlockType::Spawner:               Action = 9;
+		case BlockType::Piston:                Action = 10;
+		case BlockType::SculkCatalyst:         Action = 36;
+		case BlockType::SculkSensor:           Action = 34;
+		case BlockType::SculkShrieker:         Action = 37;
+		case BlockType::ShulkerBox:            Action = 23;
+		//case BlockType::Sign:                  Action = 7;
+		//case BlockType::Skull:                 Action = 15;
+		case BlockType::Smoker:                Action = 27;
+		case BlockType::StructureBlock:        Action = 20;
+		case BlockType::TrappedChest:          Action = 2;
+		case BlockType::TrialSpawner:          Action = 42;
+		case BlockType::Vault:                 Action = 43;
+
+		default: return;  // Block entities change between versions
+	}
+
+	cPacketizer Pkt(*this, pktUpdateBlockEntity);
+	Pkt.WriteXZYPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
+	Pkt.WriteBEUInt8(Action);
+
+	cFastNBTWriter Writer;
+	WriteBlockEntity(Writer, a_BlockEntity);
+	Writer.Finish();
+	Pkt.WriteBuf(Writer.GetResult());
 }
 
 
@@ -301,6 +390,7 @@ void cProtocol_1_21::SendDynamicRegistries()
 		}	
 	}
 }
+
 
 
 
