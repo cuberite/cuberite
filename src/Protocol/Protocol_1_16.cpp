@@ -390,7 +390,7 @@ void cProtocol_1_16::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type)
 		}
 		UNREACHABLE("Unsupported chat type");
 	}());
-	Pkt.WriteUUID(cUUID::cUUID());
+	Pkt.WriteUUID(cUUID());
 
 }
 
