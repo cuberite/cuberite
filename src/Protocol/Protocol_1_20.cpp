@@ -257,6 +257,42 @@ void cProtocol_1_20::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 
 
 
+void cProtocol_1_20::SendEditSign(Vector3i a_BlockPos)
+{
+	{
+		cPacketizer Pkt(*this, pktUpdateSign);
+		Pkt.WriteXZYPosition64(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
+		Pkt.WriteBool(true);
+	}
+}
+
+
+
+
+
+void cProtocol_1_20::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
+{
+	Vector3i Position;
+	if (!a_ByteBuffer.ReadXYZPosition64(Position))
+	{
+		return;
+	}
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, IsFrontText);
+
+	AString Lines[4];
+	for (int i = 0; i < 4; i++)
+	{
+		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Line);
+		Lines[i] = Line;
+	}
+
+	m_Client->HandleUpdateSign(Position, Lines[0], Lines[1], Lines[2], Lines[3]);
+}
+
+
+
+
+
 void cProtocol_1_20::SendRespawn(eDimension a_Dimension)
 {
 	cPacketizer Pkt(*this, pktRespawn);
