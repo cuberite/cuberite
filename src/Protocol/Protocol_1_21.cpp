@@ -1,6 +1,10 @@
 #include "Globals.h"
 #include "Protocol_1_21.h"
 #include "Packetizer.h"
+#include "Root.h"
+#include "Server.h"
+#include "Entities/Player.h"
+
 #include <ClientHandle.h>
 #include "WorldStorage/FastNBT.h"
 #include "Palettes/Palette_1_21.h"
