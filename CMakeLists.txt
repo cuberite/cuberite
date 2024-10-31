@@ -54,8 +54,10 @@ link_dependencies(${CMAKE_PROJECT_NAME})
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/Server")
 
-target_compile_options(Cuberite PRIVATE -Wno-address)
-target_compile_options(Cuberite PRIVATE -Wno-switch)
+if(NOT WIN32)
+	target_compile_options(Cuberite PRIVATE -Wno-address)
+	target_compile_options(Cuberite PRIVATE -Wno-switch)
+endif()
 
 # Enable PCH and jumbo builds on supporting CMake:
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
