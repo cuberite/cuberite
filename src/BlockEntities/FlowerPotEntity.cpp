@@ -98,6 +98,11 @@ bool cFlowerPotEntity::IsFlower(Item m_ItemType)
 		case Item::Peony:
 		case Item::RoseBush:
 		case Item::Sunflower:
+		case Item::CherrySapling:
+		case Item::MangrovePropagule:
+		case Item::Azalea:
+		case Item::FloweringAzalea:
+		case Item::Torchflower:
 			return true;
 		default: return false;
 	}

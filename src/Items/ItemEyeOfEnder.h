@@ -90,23 +90,27 @@ public:
 		// Directions to use for the clockwise traversal.
 		static const Vector3i Left[] =
 		{
-			{ 1, 0,  0},  // 0, South, left block is East  / XP
-			{ 0, 0,  1},  // 1, West,  left block is South / ZP
-			{-1, 0,  0},  // 2, North, left block is West  / XM
-			{ 0, 0, -1},  // 3, East,  left block is North / ZM
+			{0,0,0}, // 0
+			{0,0,0},  // 1
+			{-1, 0,  0},  // 2, North, left block is West  / XM  2
+			{ 1, 0,  0},  // 0, South, left block is East  / XP  3
+			{ 0, 0,  1},  // 1, West,  left block is South / ZP  4
+			{ 0, 0, -1},  // 3, East,  left block is North / ZM  5
 		};
 		static const Vector3i LeftForward[] =
 		{
-			{ 1, 0,  1},  // 0, South, left block is SouthEast / XP ZP
-			{-1, 0,  1},  // 1, West,  left block is SouthWest / XM ZP
-			{-1, 0, -1},  // 2, North, left block is NorthWest / XM ZM
-			{ 1, 0, -1},  // 3, East,  left block is NorthEast / XP ZM
+			{0,0,0}, // 0
+			{0,0,0},  // 1
+			{-1, 0, -1},  // 2, North, left block is NorthWest / XM ZM --- 2
+			{ 1, 0,  1},  // 0, South, left block is SouthEast / XP ZP --- 3 
+			{-1, 0,  1},  // 1, West,  left block is SouthWest / XM ZP ----4 
+			{ 1, 0, -1},  // 3, East,  left block is NorthEast / XP ZM --- 5
 		};
 
 
 		int EdgesComplete = -1;  // We start search _before_ finding the first edge
 		Vector3i NorthWestCorner;
-		int EdgeWidth[4] = { 1, 1, 1, 1 };
+		int EdgeWidth[6] = { 1, 1, 1, 1, 1, };
 		auto CurrentDirection = a_Direction;
 		Vector3i CurrentPos = a_FirstFrame;
 
@@ -157,20 +161,20 @@ public:
 			CurrentPos = NextPos;
 		}
 
-		if ((EdgeWidth[0] != EdgeWidth[2]) || (EdgeWidth[1] != EdgeWidth[3]))
+		if ((EdgeWidth[2] != EdgeWidth[3]) || (EdgeWidth[4] != EdgeWidth[5]))
 		{
 			// Mismatched Portal Dimensions.
 			return false;
 		}
-		if ((EdgeWidth[0] < MIN_PORTAL_WIDTH) || (EdgeWidth[1] < MIN_PORTAL_WIDTH))
+		if ((EdgeWidth[2] < MIN_PORTAL_WIDTH) || (EdgeWidth[4] < MIN_PORTAL_WIDTH))
 		{
 			// Portal too small.
 			return false;
 		}
 
-		for (int i = 0; i < EdgeWidth[0]; i++)
+		for (int i = 0; i < EdgeWidth[2]; i++)
 		{
-			for (int j = 0; j < EdgeWidth[1]; j++)
+			for (int j = 0; j < EdgeWidth[4]; j++)
 			{
 				a_ChunkInterface.SetBlock(NorthWestCorner.addedXZ(i, j), Block::EndPortal::EndPortal());
 			}

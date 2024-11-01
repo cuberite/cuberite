@@ -154,7 +154,7 @@ void cNoteEntity::MakeSound(void)
 
 		{
 			Instrument = E_INST_DOUBLE_BASS;
-			SampleName = "block.note.bass";
+			SampleName = "block.note_block.bass";
 			break;
 		}
 
@@ -163,7 +163,7 @@ void cNoteEntity::MakeSound(void)
 		case BlockType::SoulSand:
 		{
 			Instrument = E_INST_SNARE_DRUM;
-			SampleName = "block.note.snare";
+			SampleName = "block.note_block.snare";
 			break;
 		}
 		case BlockType::Beacon:
@@ -205,7 +205,7 @@ void cNoteEntity::MakeSound(void)
 		case BlockType::YellowStainedGlassPane:
 		{
 			Instrument = E_INST_CLICKS;
-			SampleName = "block.note.hat";
+			SampleName = "block.note_block.hat";
 			break;
 		}
 
@@ -285,21 +285,21 @@ void cNoteEntity::MakeSound(void)
 		case BlockType::YellowShulkerBox:
 		{
 			Instrument = E_INST_BASS_DRUM;
-			SampleName = "block.note.basedrum";
+			SampleName = "block.note_block.basedrum";
 			break;
 		}
 
 		case BlockType::Clay:
 		{
 			Instrument = E_INST_FLUTE;
-			SampleName = "block.note.flute";
+			SampleName = "block.note_block.flute";
 			break;
 		}
 
 		case BlockType::GoldBlock:
 		{
 			Instrument = E_INST_BELL;
-			SampleName = "block.note.bell";
+			SampleName = "block.note_block.bell";
 			break;
 		}
 
@@ -321,28 +321,28 @@ void cNoteEntity::MakeSound(void)
 		case BlockType::YellowWool:
 		{
 			Instrument = E_INST_GUITAR;
-			SampleName = "block.note.guitar";
+			SampleName = "block.note_block.guitar";
 			break;
 		}
 
 		case BlockType::PackedIce:
 		{
 			Instrument = E_INST_CHIME;
-			SampleName = "block.note.chime";
+			SampleName = "block.note_block.chime";
 			break;
 		}
 
 		case BlockType::BoneBlock:
 		{
 			Instrument = E_INST_XYLOPHONE;
-			SampleName = "block.note.xylophone";
+			SampleName = "block.note_block.xylophone";
 			break;
 		}
 
 		default:
 		{
 			Instrument = E_INST_HARP_PIANO;
-			SampleName = "block.note.harp";
+			SampleName = "block.note_block.harp";
 			break;
 		}
 	}

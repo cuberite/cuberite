@@ -861,6 +861,7 @@ void cProtocol_1_19::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Face);
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Sequence);
 	m_Client->HandleLeftClick({BlockX, BlockY, BlockZ}, FaceIntToBlockFace(Face), Status);
+	m_Client->GetPlayer()->GetWorld()->FlushPendingBlockChanges();
 	m_Client->SendAcknowledgeBlockChange(Sequence);
 }
 
@@ -885,7 +886,30 @@ void cProtocol_1_19::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBool, bool, InsideBlock);
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Sequence);
 	m_Client->HandleRightClick({BlockX, BlockY, BlockZ}, FaceIntToBlockFace(Face), {FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16)}, Hand == 0);
+	m_Client->GetPlayer()->GetWorld()->FlushPendingBlockChanges();
 	m_Client->SendAcknowledgeBlockChange(Sequence);
+}
+
+
+
+
+
+void cProtocol_1_19::HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer)
+{
+	UInt32 ToSetEff1 = 0,ToSetEff2 = 0;
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, HasEffect1);
+	if (HasEffect1)
+	{
+		HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, Effect1);
+		ToSetEff1 = Effect1;
+	}
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, HasEffect2);
+	if (HasEffect2)
+	{
+		HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, Effect2);
+		ToSetEff2 = Effect2;
+	}
+	m_Client->HandleBeaconSelection(ToSetEff1, ToSetEff2);
 }
 
 

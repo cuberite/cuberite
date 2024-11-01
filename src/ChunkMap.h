@@ -83,6 +83,8 @@ public:
 	/** Wakes up simulators for the specified block */
 	void WakeUpSimulators(Vector3i a_Block);
 
+	void FlushPendingBlockChanges();
+
 	// DEPRECATED, use the vector-parametered version instead.
 	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
 	{

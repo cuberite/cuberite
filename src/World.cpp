@@ -789,6 +789,15 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 
 
 
+void cWorld::FlushPendingBlockChanges()
+{
+	m_ChunkMap.FlushPendingBlockChanges();
+};
+
+
+
+
+
 bool cWorld::CanSpawnAt(int a_X, int & a_Y, int a_Z)
 {
 	// All this blocks can only be found above ground.
