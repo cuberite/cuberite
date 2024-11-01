@@ -1,6 +1,6 @@
 
 #pragma once
-
+#include "Registries/Items.h"
 
 
 
@@ -27,14 +27,25 @@ enum
 {
 	// Open to suggestion on naming convention here :)
 	MAX_EXPERIENCE_ORB_SIZE = 2000
-} ;
+};
+
+
+
+
+
+enum class ParticleMode : std::uint8_t
+{
+	All,
+	Decreased,
+	Minimal
+};
 
 
 
 
 
 /** Block face constants, used in PlayerDigging and PlayerBlockPlacement packets and bbox collision calc */
-enum eBlockFace
+enum eBlockFace : char
 {
 	BLOCK_FACE_NONE = -1,  // Interacting with no block face - swinging the item in the air
 	BLOCK_FACE_XM   =  4,  // Interacting with the X- face of the block
@@ -173,15 +184,16 @@ enum eWeather
 
 
 
-enum eMobHeadType
-{
-	SKULL_TYPE_SKELETON    = 0,
-	SKULL_TYPE_WITHER      = 1,
-	SKULL_TYPE_ZOMBIE      = 2,
-	SKULL_TYPE_PLAYER      = 3,
-	SKULL_TYPE_CREEPER     = 4,
-	SKULL_TYPE_DRAGON      = 5,
-} ;
+//enum eMobHeadType
+//{
+//	SKULL_TYPE_SKELETON    = 0,
+//	SKULL_TYPE_WITHER      = 1,
+//	SKULL_TYPE_ZOMBIE      = 2,
+//	SKULL_TYPE_PLAYER      = 3,
+//	SKULL_TYPE_CREEPER     = 4,
+//	SKULL_TYPE_DRAGON      = 5,
+//	SKULL_TYPE_PIGLIN      = 6,
+//} ;
 
 
 
@@ -448,6 +460,28 @@ enum class BossBarDivisionType
 	TwentyNotches
 };
 
+
+
+
+
+enum class eGameStateReason
+{
+	NoRespawnBlock,
+	RainStarted,
+	RainStopped,
+	GamemodeChanged,
+	WinGame,
+	DemoMessageShown,
+	ProjectileHitPlayer,
+	RainGradientChanged,
+	ThunderGradientChanged,
+	PufferfishString,
+	ElderGuardianEffect,
+	ImmediateRespawn,
+	LimitedCraftingToggled,
+	InitialChunksComing
+};
+
 // tolua_end
 
 
@@ -527,6 +561,70 @@ enum class EntityAnimation
 
 
 
+enum class eCommandParserType : std::int8_t
+{
+	None = -1,
+	Bool = 0,
+	Float,
+	Double,
+	Integer,
+	Long,
+	String,
+	Entity,
+	GameProfile,
+	BlockPos,
+	ColumnPos,
+	Vec3,
+	Vec2,
+	BlockState,
+	BlockPredicate,
+	ItemStack,
+	ItemPredicate,
+	Color,
+	Component,
+	Style,
+	Message,
+	NbtCompoundTag,
+	NbtTag,
+	NbtPath,
+	Objective,
+	ObjectiveCriteria,
+	Operation,
+	Particle,
+	Angle,
+	Rotation,
+	ScoreboardSlot,
+	ScoreHolder,
+	Swizzle,
+	Team,
+	ItemSlot,
+	ItemSlots,
+	ResourceLocation,
+	Function,
+	EntityAnchor,
+	IntRange,
+	FloatRange,
+	Dimension,
+	Gamemode,
+	Time,
+	ResourceOrTag,
+	ResourceOrTagKey,
+	Resource,
+	ResourceKey,
+	TemplateMirror,
+	TemplateRotation,
+	Heightmap,
+	LootTable,
+	LootPredicate,
+	LootModifier,
+	Uuid
+	// TODO: actually implement these parsers
+};
+
+
+
+
+
 // tolua_begin
 
 /** Returns a textual representation of the click action. */
@@ -534,6 +632,12 @@ const char * ClickActionToString(int a_ClickAction);
 
 /** Returns a blockface mirrored around the Y axis (doesn't change up / down). */
 eBlockFace MirrorBlockFaceY(eBlockFace a_BlockFace);
+
+/** Returns a blockface mirrored around the XY plane. */
+eBlockFace MirrorBlockFaceXY(eBlockFace a_BlockFace);
+
+/** Returns a blockface mirrored around the YZ plane. */
+eBlockFace MirrorBlockFaceYZ(eBlockFace a_BlockFace);
 
 /** Returns a blockface rotated around the Y axis counter-clockwise. */
 eBlockFace RotateBlockFaceCCW(eBlockFace a_BlockFace);
@@ -547,11 +651,11 @@ eBlockFace ReverseBlockFace(eBlockFace  a_BlockFace);
 /** Returns the textual representation of the BlockFace constant. */
 AString BlockFaceToString(eBlockFace a_BlockFace);
 
-/** Returns true if the specified block type is valid (known). */
-bool IsValidBlock(int a_BlockType);
+eBlockFace RotationToBlockFace(double a_Rotation, bool a_Inverse = false);
 
-/** Returns true if the specified item type is valid (known). */
-bool IsValidItem(int a_ItemType);
+unsigned char RotationToFineFace(double a_Rotation);
+
+eBlockFace DisplacementYawToFacing(Vector3d a_Rotation, Vector3d a_EyePos, double a_Yaw);
 
 /** Translates a dimension string to dimension enum. Takes either a number or a dimension alias (built-in). Returns dimOverworld on failure */
 extern eDimension StringToDimension(const AString & a_DimensionString);
@@ -642,33 +746,33 @@ inline double NormalizeAngleDegrees(const double a_Degrees)
 
 namespace ItemCategory
 {
-	bool IsPickaxe(short a_ItemType);
+	bool IsPickaxe(Item a_ItemType);
 
-	bool IsAxe(short a_ItemType);
+	bool IsAxe(Item a_ItemType);
 
-	bool IsSword(short a_ItemType);
+	bool IsSword(Item a_ItemType);
 
-	bool IsHoe(short a_ItemType);
+	bool IsHoe(Item a_ItemType);
 
-	bool IsShovel(short a_ItemType);
+	bool IsShovel(Item a_ItemType);
 
-	bool IsTool(short a_ItemType);
+	bool IsTool(Item a_ItemType);
 
-	bool IsHelmet(short a_ItemType);
+	bool IsHelmet(Item a_ItemType);
 
-	bool IsChestPlate(short a_ItemType);
+	bool IsChestPlate(Item a_ItemType);
 
-	bool IsLeggings(short a_ItemType);
+	bool IsLeggings(Item a_ItemType);
 
-	bool IsBoots(short a_ItemType);
+	bool IsBoots(Item a_ItemType);
 
-	bool IsMinecart(short a_ItemType);
+	bool IsMinecart(Item a_ItemType);
 
-	bool IsArmor(short a_ItemType);
+	bool IsArmor(Item a_ItemType);
 
-	bool IsHorseArmor(short a_ItemType);
+	bool IsHorseArmor(Item a_ItemType);
 
-	bool IsVillagerFood(short a_ItemType);
+	bool IsVillagerFood(Item a_ItemType);
 }
 
 // tolua_end

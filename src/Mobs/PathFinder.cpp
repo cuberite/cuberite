@@ -177,8 +177,6 @@ void cPathFinder::ResetPathFinding(cChunk &a_Chunk)
 bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 {
 	cChunk * Chunk = a_Chunk.GetNeighborChunk(FloorC(a_Vector.x), FloorC(a_Vector.z));
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
 
 	if ((Chunk == nullptr) || !Chunk->IsValid())
 	{
@@ -195,9 +193,8 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 
 	}
 	auto BelowRel = cChunkDef::AbsoluteToRelative(Below);
-
-	Chunk->GetBlockTypeMeta(BelowRel, BlockType, BlockMeta);
-	if (!(IsWaterOrSolid(BlockType)))
+	auto BlockToCheck = Chunk->GetBlock(BelowRel);
+	if (!(IsWaterOrSolid(BlockToCheck)))
 	{
 		constexpr std::array<Vector3i, 8> Offsets =
 		{
@@ -224,8 +221,8 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 				return false;
 			}
 			auto InspectRel = cChunkDef::AbsoluteToRelative(InspectPos);
-			Chunk->GetBlockTypeMeta(InspectRel, BlockType, BlockMeta);
-			if (IsWaterOrSolid((BlockType)))
+			BlockToCheck = Chunk->GetBlock(InspectRel);
+			if (IsWaterOrSolid((BlockToCheck)))
 			{
 				BelowRel = InspectRel;
 				InTheAir = false;
@@ -238,8 +235,8 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 		{
 			while (cChunkDef::IsValidHeight(BelowRel.addedY(-1)))
 			{
-				Chunk->GetBlockTypeMeta(BelowRel.addedY(-1), BlockType, BlockMeta);
-				if (IsWaterOrSolid(BlockType))
+				BlockToCheck = Chunk->GetBlock(BelowRel.addedY(-1));
+				if (IsWaterOrSolid(BlockToCheck))
 				{
 					break;
 				}
@@ -251,8 +248,8 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 	// If destination in water or solid, go up to the first air block.
 	while (BelowRel.y < cChunkDef::Height)
 	{
-		Chunk->GetBlockTypeMeta(BelowRel, BlockType, BlockMeta);
-		if (!IsWaterOrSolid(BlockType))
+		BlockToCheck = Chunk->GetBlock(BelowRel);
+		if (!IsWaterOrSolid(BlockToCheck))
 		{
 			break;
 		}
@@ -266,9 +263,9 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 
 
 
-bool cPathFinder::IsWaterOrSolid(BLOCKTYPE a_BlockType)
+bool cPathFinder::IsWaterOrSolid(BlockState a_Block)
 {
-	return ((a_BlockType == E_BLOCK_STATIONARY_WATER) || cBlockInfo::IsSolid(a_BlockType));
+	return ((a_Block.Type() == BlockType::Water) || cBlockInfo::IsSolid(a_Block));
 }
 
 

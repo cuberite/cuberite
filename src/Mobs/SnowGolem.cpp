@@ -23,7 +23,7 @@ cSnowGolem::cSnowGolem(void) :
 void cSnowGolem::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	UNUSED(a_Killer);
-	AddRandomDropItem(a_Drops, 0, 15, E_ITEM_SNOWBALL);
+	AddRandomDropItem(a_Drops, 0, 15, Item::Snowball);
 }
 
 
@@ -51,9 +51,9 @@ void cSnowGolem::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 	else if (const auto Below = Rel.addedY(-1); Below.y >= 0)
 	{
-		if ((Chunk->GetBlock(Rel) == E_BLOCK_AIR) && cBlockInfo::IsSolid(Chunk->GetBlock(Below)))
+		if (IsBlockAir(Chunk->GetBlock(Rel)) && cBlockInfo::IsSolid(Chunk->GetBlock(Below)))
 		{
-			Chunk->SetBlock(Rel, E_BLOCK_SNOW, 0);
+			Chunk->SetBlock(Rel, Block::Snow::Snow(1));
 		}
 	}
 }

@@ -27,39 +27,25 @@ public:
 
 	bool DoWithChunkAt(Vector3i a_BlockPos, cFunctionRef<bool(cChunk &)> a_Callback);
 
-	BLOCKTYPE GetBlock(Vector3i a_Pos);
-	NIBBLETYPE GetBlockMeta(Vector3i a_Pos);
-
-	bool GetBlockTypeMeta(Vector3i a_Pos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
+	BlockState GetBlock(Vector3i a_Pos);
+	BlockType GetType(Vector3i a_Pos) { return GetBlock(a_Pos).Type(); }
 
 	/** Sets the block at the specified coords to the specified value.
 	Full processing, incl. updating neighbors, is performed. */
-	void SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void SetBlock(Vector3i a_BlockPos, BlockState a_Block);
 
 	/** OBSOLETE, use the Vector3i-based overload instead.
 	Sets the block at the specified coords to the specified value.
 	Full processing, incl. updating neighbors, is performed. */
-	void SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	void SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BlockState a_Block)
 	{
-		return SetBlock({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_BlockMeta);
-	}
-
-	/** Sets the meta for the specified block, while keeping the blocktype.
-	Ignored if the chunk is invalid. */
-	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData);
-
-	/** OBSOLETE, Use the Vector3-based overload instead.
-	Sets the meta for the specified block, while keeping the blocktype.
-	Ignored if the chunk is invalid. */
-	void SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData)
-	{
-		return SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, a_MetaData);
+		return SetBlock({a_BlockX, a_BlockY, a_BlockZ}, a_Block);
 	}
 
 	/** Sets the block at the specified coords to the specified value.
 	The replacement doesn't trigger block updates.
 	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block). */
-	void FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void FastSetBlock(Vector3i a_BlockPos, BlockState a_Block);
 
 	/** Use block entity on coordinate.
 	returns true if the use was successful, return false to use the block as a "normal" block */

@@ -14,7 +14,7 @@ class cItemRottenFleshHandler final:
 
 public:
 
-	constexpr cItemRottenFleshHandler(int a_ItemType):
+	constexpr cItemRottenFleshHandler(Item a_ItemType):
 		Super(a_ItemType, FoodInfo(4, 0.8))
 	{
 	}

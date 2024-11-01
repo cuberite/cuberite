@@ -64,8 +64,8 @@ public:
 		for (int len = 27; len < 60; len += 12)
 		{
 			cBlockArea BA;
-			BA.Create(len, 1, 3, cBlockArea::baTypes | cBlockArea::baMetas);
-			BA.Fill(cBlockArea::baTypes | cBlockArea::baMetas, E_BLOCK_GRAVEL, 0);
+			BA.Create(len, 1, 3, cBlockArea::baBlocks);
+			BA.Fill(cBlockArea::baBlocks, Block::Gravel::Gravel());
 			cPrefab * RoadPiece = new cPrefab(BA, 1);
 			RoadPiece->AddConnector(0,       0, 1, cPiece::cConnector::dirXM, -2);
 			RoadPiece->AddConnector(len - 1, 0, 1, cPiece::cConnector::dirXP, -2);
@@ -229,22 +229,20 @@ protected:
 		int MaxX = std::min(RoadCoords.p2.x - a_Chunk.GetChunkX() * cChunkDef::Width, cChunkDef::Width - 1);
 		int MinZ = std::max(RoadCoords.p1.z - a_Chunk.GetChunkZ() * cChunkDef::Width, 0);
 		int MaxZ = std::min(RoadCoords.p2.z - a_Chunk.GetChunkZ() * cChunkDef::Width, cChunkDef::Width - 1);
-		auto WaterRoadBlockType = m_Prefabs.GetVillageWaterRoadBlockType();
-		auto WaterRoadBlockMeta = m_Prefabs.GetVillageWaterRoadBlockMeta();
-		auto RoadBlockType = m_Prefabs.GetVillageRoadBlockType();
-		auto RoadBlockMeta = m_Prefabs.GetVillageRoadBlockMeta();
+		auto WaterRoadBlock = m_Prefabs.GetVillageWaterRoadBlock();
+		auto RoadBlock = m_Prefabs.GetVillageRoadBlock();
 		for (int z = MinZ; z <= MaxZ; z++)
 		{
 			for (int x = MinX; x <= MaxX; x++)
 			{
 				auto height = cChunkDef::GetHeight(a_HeightMap, x, z);
-				if (IsBlockWater(a_Chunk.GetBlockType(x, height, z)))
+				if (a_Chunk.GetBlock({x, height, z}).Type() == BlockType::Water)
 				{
-					a_Chunk.SetBlockTypeMeta(x, height, z, WaterRoadBlockType, WaterRoadBlockMeta);
+					a_Chunk.SetBlock({x, height, z}, WaterRoadBlock);
 				}
 				else
 				{
-					a_Chunk.SetBlockTypeMeta(x, height, z, RoadBlockType, RoadBlockMeta);
+					a_Chunk.SetBlock({x, height, z}, RoadBlock);
 				}
 			}
 		}
@@ -384,13 +382,12 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_GridX, int a_Gr
 	// Get a list of pools that support each biome within the chunk:
 	// If just one column's biome is not allowed, the pool is not used because it's likely that an unfriendly biome is too close
 	auto availablePools = m_Pools;
-	for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
+	for (const auto & Biome : Biomes)
 	{
-		auto biome = Biomes[i];
 		availablePools.erase(std::remove_if(availablePools.begin(), availablePools.end(),
-			[biome](std::shared_ptr<cVillagePiecePool> & a_Pool)
+			[Biome](std::shared_ptr<cVillagePiecePool> & a_Pool)
 			{
-				return !a_Pool->IsBiomeAllowed(biome);
+				return !a_Pool->IsBiomeAllowed(Biome);
 			}),
 			availablePools.end()
 		);

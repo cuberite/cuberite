@@ -59,9 +59,9 @@ public:
 
 	// Set slot by coords or slot number; Logs warning and doesn't set on invalid coords / slotnum
 	void SetSlot(int a_X, int a_Y, const cItem & a_Item);
-	void SetSlot(int a_X, int a_Y, short a_ItemType, char a_ItemCount, short a_ItemDamage);
+	void SetSlot(int a_X, int a_Y, Item a_Item, char a_ItemCount, short a_ItemDamage);
 	void SetSlot(int a_SlotNum, const cItem & a_Item);
-	void SetSlot(int a_SlotNum, short a_ItemType, char a_ItemCount, short a_ItemDamage);
+	void SetSlot(int a_SlotNum, Item a_Item, char a_ItemCount, short a_ItemDamage);
 
 	// Empty the specified slot; Logs warning and doesn't set on invalid coords / slotnum
 	void EmptySlot(int a_X, int a_Y);

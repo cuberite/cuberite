@@ -1,8 +1,9 @@
 
 #pragma once
 
+#include "../Blocks/BlockAnvil.h"
 #include "ItemHandler.h"
-
+#include "../Protocol/Palettes/Upgrade.h"
 
 
 class cItemPickaxeHandler final:
@@ -12,13 +13,7 @@ class cItemPickaxeHandler final:
 
 public:
 
-	constexpr cItemPickaxeHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-
-	}
-
-
+	using Super::Super;
 
 	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) const override
 	{
@@ -37,141 +32,264 @@ public:
 	{
 		switch (m_ItemType)
 		{
-			case E_ITEM_WOODEN_PICKAXE:  return 1;
-			case E_ITEM_GOLD_PICKAXE:    return 1;
-			case E_ITEM_STONE_PICKAXE:   return 2;
-			case E_ITEM_IRON_PICKAXE:    return 3;
-			case E_ITEM_DIAMOND_PICKAXE: return 4;
-
+			case Item::WoodenPickaxe:  return 1;
+			case Item::GoldenPickaxe:  return 1;
+			case Item::StonePickaxe:   return 2;
+			case Item::IronPickaxe:    return 3;
+			case Item::DiamondPickaxe: return 4;
+			case Item::NetheritePickaxe: return 5;
 			default: return 0;
 		}
 	}
 
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) const override
+	virtual bool CanHarvestBlock(BlockState a_Block) const override
 	{
 		// NOTICE: Make sure to update cItemHandler::CanHarvestBlock() if adding new blocks here!
-		switch (a_BlockType)
+		switch (a_Block.Type())
 		{
-			case E_BLOCK_OBSIDIAN:
+			case BlockType::Obsidian:
+			case BlockType::AncientDebris:
+			case BlockType::RespawnAnchor:
+			case BlockType::CryingObsidian:
 			{
 				return PickaxeLevel() >= 4;
 			}
 
-			case E_BLOCK_DIAMOND_BLOCK:
-			case E_BLOCK_DIAMOND_ORE:
-			case E_BLOCK_EMERALD_ORE:
-			case E_BLOCK_GOLD_BLOCK:
-			case E_BLOCK_GOLD_ORE:
-			case E_BLOCK_REDSTONE_ORE:
-			case E_BLOCK_REDSTONE_ORE_GLOWING:
+			case BlockType::DiamondBlock:
+			case BlockType::DiamondOre:
+			case BlockType::EmeraldOre:
+			case BlockType::GoldBlock:
+			case BlockType::GoldOre:
+			case BlockType::NetherGoldOre:
+			case BlockType::RedstoneOre:
+			case BlockType::RawGoldBlock:
+			case BlockType::DeepslateDiamondOre:
+			case BlockType::DeepslateEmeraldOre:
+			case BlockType::DeepslateRedstoneOre:
+			case BlockType::DeepslateGoldOre:
 			{
 				return PickaxeLevel() >= 3;
 			}
 
-			case E_BLOCK_IRON_BLOCK:
-			case E_BLOCK_IRON_ORE:
-			case E_BLOCK_LAPIS_ORE:
-			case E_BLOCK_LAPIS_BLOCK:
+			case BlockType::IronBlock:
+			case BlockType::IronOre:
+			case BlockType::LapisOre:
+			case BlockType::LapisBlock:
+			case BlockType::RawCopperBlock:
+			case BlockType::RawIronBlock:
+			case BlockType::DeepslateIronOre:
+			case BlockType::DeepslateCopperOre:
 			{
 				return PickaxeLevel() >= 2;
 			}
 
-			case E_BLOCK_ANVIL:
-			case E_BLOCK_BLACK_GLAZED_TERRACOTTA:
-			case E_BLOCK_BLOCK_OF_COAL:
-			case E_BLOCK_BLOCK_OF_REDSTONE:
-			case E_BLOCK_BLUE_GLAZED_TERRACOTTA:
-			case E_BLOCK_BONE_BLOCK:
-			case E_BLOCK_BREWING_STAND:
-			case E_BLOCK_BRICK:
-			case E_BLOCK_BRICK_STAIRS:
-			case E_BLOCK_BROWN_GLAZED_TERRACOTTA:
-			case E_BLOCK_CAULDRON:
-			case E_BLOCK_COAL_ORE:
-			case E_BLOCK_COBBLESTONE:
-			case E_BLOCK_COBBLESTONE_STAIRS:
-			case E_BLOCK_COBBLESTONE_WALL:
-			case E_BLOCK_CONCRETE:
-			case E_BLOCK_CYAN_GLAZED_TERRACOTTA:
-			case E_BLOCK_DISPENSER:
-			case E_BLOCK_DROPPER:
-			case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB:
-			case E_BLOCK_DOUBLE_STONE_SLAB:
-			case E_BLOCK_ENCHANTMENT_TABLE:
-			case E_BLOCK_END_BRICKS:
-			case E_BLOCK_END_STONE:
-			case E_BLOCK_FURNACE:
-			case E_BLOCK_GRAY_GLAZED_TERRACOTTA:
-			case E_BLOCK_GREEN_GLAZED_TERRACOTTA:
-			case E_BLOCK_HARDENED_CLAY:
-			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-			case E_BLOCK_HOPPER:
-			case E_BLOCK_IRON_BARS:
-			case E_BLOCK_IRON_DOOR:
-			case E_BLOCK_IRON_TRAPDOOR:
-			case E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA:
-			case E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA:
-			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-			case E_BLOCK_LIT_FURNACE:
-			case E_BLOCK_LIME_GLAZED_TERRACOTTA:
-			case E_BLOCK_MAGENTA_GLAZED_TERRACOTTA:
-			case E_BLOCK_MOB_SPAWNER:
-			case E_BLOCK_MOSSY_COBBLESTONE:
-			case E_BLOCK_MAGMA:
-			case E_BLOCK_NETHER_BRICK:
-			case E_BLOCK_NETHER_BRICK_STAIRS:
-			case E_BLOCK_NETHER_BRICK_FENCE:
-			case E_BLOCK_NETHER_QUARTZ_ORE:
-			case E_BLOCK_NETHERRACK:
-			case E_BLOCK_OBSERVER:
-			case E_BLOCK_ORANGE_GLAZED_TERRACOTTA:
-			case E_BLOCK_PRISMARINE_BLOCK:
-			case E_BLOCK_PINK_GLAZED_TERRACOTTA:
-			case E_BLOCK_PURPLE_GLAZED_TERRACOTTA:
-			case E_BLOCK_PURPUR_BLOCK:
-			case E_BLOCK_PURPUR_DOUBLE_SLAB:
-			case E_BLOCK_PURPUR_PILLAR:
-			case E_BLOCK_PURPUR_SLAB:
-			case E_BLOCK_PURPUR_STAIRS:
-			case E_BLOCK_QUARTZ_BLOCK:
-			case E_BLOCK_QUARTZ_STAIRS:
-			case E_BLOCK_RED_GLAZED_TERRACOTTA:
-			case E_BLOCK_RED_NETHER_BRICK:
-			case E_BLOCK_RED_SANDSTONE:
-			case E_BLOCK_RED_SANDSTONE_STAIRS:
-			case E_BLOCK_SANDSTONE:
-			case E_BLOCK_SANDSTONE_STAIRS:
-			case E_BLOCK_STONE:
-			case E_BLOCK_STONE_BRICKS:
-			case E_BLOCK_STONE_BRICK_STAIRS:
-			case E_BLOCK_STONE_PRESSURE_PLATE:
-			case E_BLOCK_STONE_SLAB:
-			case E_BLOCK_WHITE_GLAZED_TERRACOTTA:
-			case E_BLOCK_YELLOW_GLAZED_TERRACOTTA:
+			case BlockType::Anvil:
+			case BlockType::ChippedAnvil:
+			case BlockType::DamagedAnvil:
+			case BlockType::BlackGlazedTerracotta:
+			case BlockType::CoalBlock:
+			case BlockType::RedstoneBlock:
+			case BlockType::BlueGlazedTerracotta:
+			case BlockType::BoneBlock:
+			case BlockType::BrewingStand:
+			case BlockType::Bricks:
+			case BlockType::BrownGlazedTerracotta:
+			case BlockType::Cauldron:
+			case BlockType::CoalOre:
+			case BlockType::Cobblestone:
+			case BlockType::CobblestoneWall:
+			case BlockType::CyanGlazedTerracotta:
+			case BlockType::Dispenser:
+			case BlockType::Dropper:
+			case BlockType::EnchantingTable:
+			case BlockType::EndStoneBricks:
+			case BlockType::EndStone:
+			case BlockType::Furnace:
+			case BlockType::GrayGlazedTerracotta:
+			case BlockType::GreenGlazedTerracotta:
+			case BlockType::HeavyWeightedPressurePlate:
+			case BlockType::Hopper:
+			case BlockType::IronBars:
+			case BlockType::IronDoor:
+			case BlockType::IronTrapdoor:
+			case BlockType::LightBlueGlazedTerracotta:
+			case BlockType::LightGrayGlazedTerracotta:
+			case BlockType::LightWeightedPressurePlate:
+			case BlockType::LimeGlazedTerracotta:
+			case BlockType::MagentaGlazedTerracotta:
+			case BlockType::Spawner:
+			case BlockType::MossyCobblestone:
+			case BlockType::MagmaBlock:
+			case BlockType::NetherBricks:
+			case BlockType::NetherBrickFence:
+			case BlockType::NetherQuartzOre:
+			case BlockType::Netherrack:
+			case BlockType::Observer:
+			case BlockType::OrangeGlazedTerracotta:
+			case BlockType::Prismarine:
+			case BlockType::PinkGlazedTerracotta:
+			case BlockType::PurpleGlazedTerracotta:
+			case BlockType::PurpurBlock:
+			case BlockType::PurpurPillar:
+			case BlockType::QuartzBlock:
+			case BlockType::RedGlazedTerracotta:
+			case BlockType::RedNetherBricks:
+			case BlockType::RedSandstone:
+			case BlockType::Sandstone:
+			case BlockType::Stone:
+			case BlockType::StoneBricks:
+			case BlockType::StonePressurePlate:
+			case BlockType::WhiteGlazedTerracotta:
+			case BlockType::YellowGlazedTerracotta:
+
+				// Concrete
+			case BlockType::BlackConcrete:
+			case BlockType::BlueConcrete:
+			case BlockType::BrownConcrete:
+			case BlockType::CyanConcrete:
+			case BlockType::GrayConcrete:
+			case BlockType::GreenConcrete:
+			case BlockType::LightBlueConcrete:
+			case BlockType::LightGrayConcrete:
+			case BlockType::LimeConcrete:
+			case BlockType::MagentaConcrete:
+			case BlockType::OrangeConcrete:
+			case BlockType::PinkConcrete:
+			case BlockType::PurpleConcrete:
+			case BlockType::RedConcrete:
+			case BlockType::WhiteConcrete:
+			case BlockType::YellowConcrete:
+				// Slabs
+			case BlockType::AcaciaSlab:
+			case BlockType::AndesiteSlab:
+			case BlockType::BirchSlab:
+			case BlockType::BlackstoneSlab:
+			case BlockType::BrickSlab:
+			case BlockType::CobblestoneSlab:
+			case BlockType::CrimsonSlab:
+			case BlockType::CutRedSandstoneSlab:
+			case BlockType::CutSandstoneSlab:
+			case BlockType::DarkOakSlab:
+			case BlockType::DarkPrismarineSlab:
+			case BlockType::DioriteSlab:
+			case BlockType::EndStoneBrickSlab:
+			case BlockType::GraniteSlab:
+			case BlockType::JungleSlab:
+			case BlockType::MossyCobblestoneSlab:
+			case BlockType::MossyStoneBrickSlab:
+			case BlockType::NetherBrickSlab:
+			case BlockType::OakSlab:
+			case BlockType::PetrifiedOakSlab:
+			case BlockType::PolishedAndesiteSlab:
+			case BlockType::PolishedBlackstoneBrickSlab:
+			case BlockType::PolishedBlackstoneSlab:
+			case BlockType::PolishedDioriteSlab:
+			case BlockType::PolishedGraniteSlab:
+			case BlockType::PrismarineBrickSlab:
+			case BlockType::PrismarineSlab:
+			case BlockType::PurpurSlab:
+			case BlockType::QuartzSlab:
+			case BlockType::RedNetherBrickSlab:
+			case BlockType::RedSandstoneSlab:
+			case BlockType::SandstoneSlab:
+			case BlockType::SmoothQuartzSlab:
+			case BlockType::SmoothRedSandstoneSlab:
+			case BlockType::SmoothSandstoneSlab:
+			case BlockType::SmoothStoneSlab:
+			case BlockType::SpruceSlab:
+			case BlockType::StoneBrickSlab:
+			case BlockType::StoneSlab:
+			case BlockType::WarpedSlab:
+				// Stairs
+			case BlockType::AcaciaStairs:
+			case BlockType::AndesiteStairs:
+			case BlockType::BirchStairs:
+			case BlockType::BlackstoneStairs:
+			case BlockType::BrickStairs:
+			case BlockType::CobblestoneStairs:
+			case BlockType::CrimsonStairs:
+			case BlockType::DarkOakStairs:
+			case BlockType::DarkPrismarineStairs:
+			case BlockType::DioriteStairs:
+			case BlockType::EndStoneBrickStairs:
+			case BlockType::GraniteStairs:
+			case BlockType::JungleStairs:
+			case BlockType::MossyCobblestoneStairs:
+			case BlockType::MossyStoneBrickStairs:
+			case BlockType::NetherBrickStairs:
+			case BlockType::OakStairs:
+			case BlockType::PolishedAndesiteStairs:
+			case BlockType::PolishedBlackstoneBrickStairs:
+			case BlockType::PolishedBlackstoneStairs:
+			case BlockType::PolishedDioriteStairs:
+			case BlockType::PolishedGraniteStairs:
+			case BlockType::PrismarineBrickStairs:
+			case BlockType::PrismarineStairs:
+			case BlockType::QuartzStairs:
+			case BlockType::PurpurStairs:
+			case BlockType::RedNetherBrickStairs:
+			case BlockType::RedSandstoneStairs:
+			case BlockType::SandstoneStairs:
+			case BlockType::SmoothQuartzStairs:
+			case BlockType::SmoothRedSandstoneStairs:
+			case BlockType::SmoothSandstoneStairs:
+			case BlockType::SpruceStairs:
+			case BlockType::StoneBrickStairs:
+			case BlockType::StoneStairs:
+			case BlockType::WarpedStairs:
 			{
 				return PickaxeLevel() >= 1;
 			}
+			default: return Super::CanHarvestBlock(a_Block);
 		}
-		return Super::CanHarvestBlock(a_BlockType);
 	}
 
-	virtual bool CanRepairWithRawMaterial(short a_ItemType) const override
+	virtual bool CanRepairWithRawMaterial(const cItem & a_Item) const override
 	{
 		switch (m_ItemType)
 		{
-			case E_ITEM_WOODEN_PICKAXE:  return (a_ItemType == E_BLOCK_PLANKS);
-			case E_ITEM_STONE_PICKAXE:   return (a_ItemType == E_BLOCK_COBBLESTONE);
-			case E_ITEM_IRON_PICKAXE:    return (a_ItemType == E_ITEM_IRON);
-			case E_ITEM_GOLD_PICKAXE:    return (a_ItemType == E_ITEM_GOLD);
-			case E_ITEM_DIAMOND_PICKAXE: return (a_ItemType == E_ITEM_DIAMOND);
+			case Item::WoodenPickaxe:
+			{
+				switch (a_Item.m_ItemType)
+				{
+					case Item::AcaciaPlanks:
+					case Item::BirchPlanks:
+					case Item::CrimsonPlanks:
+					case Item::DarkOakPlanks:
+					case Item::JunglePlanks:
+					case Item::OakPlanks:
+					case Item::SprucePlanks:
+					case Item::WarpedPlanks:
+					case Item::BambooPlanks:
+					case Item::CherryPlanks:
+					case Item::MangrovePlanks:
+						return true;
+					default: return false;
+				}
+			}
+			case Item::StonePickaxe:
+			{
+				switch (a_Item.m_ItemType)
+				{
+					case Item::Cobblestone:
+					case Item::CobbledDeepslate:
+					case Item::Blackstone:
+						return true;
+					default: return false;
+				}
+			}
+			case Item::IronPickaxe:    return (a_Item.m_ItemType == Item::IronIngot);
+			case Item::GoldenPickaxe:  return (a_Item.m_ItemType == Item::GoldIngot);
+			case Item::DiamondPickaxe: return (a_Item.m_ItemType == Item::Diamond);
+			case Item::NetheritePickaxe: return (a_Item.m_ItemType == Item::NetheriteIngot);
+			default: return false;
 		}
-		return false;
 	}
 
 
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) const override
+	virtual float GetBlockBreakingStrength(BlockState a_Block) const override
 	{
-		if (!IsBlockMaterialIron(a_Block) && (a_Block != E_BLOCK_ANVIL) && !IsBlockMaterialRock(a_Block))
+		if (!IsBlockMaterialIron(a_Block) && (IsBlockAnvil(a_Block)) && !IsBlockMaterialRock(a_Block))
 		{
 			return Super::GetBlockBreakingStrength(a_Block);
 		}
@@ -179,11 +297,13 @@ public:
 		{
 			switch (m_ItemType)
 			{
-				case E_ITEM_WOODEN_PICKAXE:  return 2.0f;
-				case E_ITEM_STONE_PICKAXE:   return 4.0f;
-				case E_ITEM_IRON_PICKAXE:    return 6.0f;
-				case E_ITEM_GOLD_PICKAXE:    return 12.0f;
-				case E_ITEM_DIAMOND_PICKAXE: return 8.0f;
+				case Item::WoodenPickaxe:  return 2.0f;
+				case Item::StonePickaxe:   return 4.0f;
+				case Item::IronPickaxe:    return 6.0f;
+				case Item::GoldenPickaxe:  return 12.0f;
+				case Item::DiamondPickaxe: return 8.0f;
+				case Item::NetheritePickaxe: return 9.0f;
+				default: return 0.0f;
 			}
 		}
 		ASSERT(!"Something is wrong here... Maybe they are pickaxes out of a new material?");

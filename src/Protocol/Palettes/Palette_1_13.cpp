@@ -10,6 +10,7 @@ namespace Palette_1_13
 
 		switch (Block.ID)
 		{
+			/*
 			case AcaciaButton::AcaciaButton(AcaciaButton::Face::Floor, eBlockFace::BLOCK_FACE_ZM, true).ID: return 5399;
 			case AcaciaButton::AcaciaButton(AcaciaButton::Face::Floor, eBlockFace::BLOCK_FACE_ZM, false).ID: return 5400;
 			case AcaciaButton::AcaciaButton(AcaciaButton::Face::Floor, eBlockFace::BLOCK_FACE_ZP, true).ID: return 5401;
@@ -7061,7 +7062,7 @@ namespace Palette_1_13
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_ZM).ID: return 5487;
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_ZP).ID: return 5488;
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XM).ID: return 5489;
-			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XP).ID: return 5490;
+			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XP).ID: return 5490;*/
 			default: return 0;
 		}
 	}
@@ -7709,7 +7710,7 @@ namespace Palette_1_13
 			case Item::Sandstone: return 68;
 			case Item::SandstoneSlab: return 119;
 			case Item::SandstoneStairs: return 229;
-			case Item::Scute: return 466;
+			case Item::TurtleScute: return 466;
 			case Item::SeaLantern: return 349;
 			case Item::SeaPickle: return 80;
 			case Item::Seagrass: return 79;
@@ -8562,7 +8563,7 @@ namespace Palette_1_13
 			case 68: return Item::Sandstone;
 			case 119: return Item::SandstoneSlab;
 			case 229: return Item::SandstoneStairs;
-			case 466: return Item::Scute;
+			case 466: return Item::TurtleScute;
 			case 349: return Item::SeaLantern;
 			case 80: return Item::SeaPickle;
 			case 79: return Item::Seagrass;
