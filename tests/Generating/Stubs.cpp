@@ -339,7 +339,7 @@ bool cFireSimulator::DoesBurnForever(BLOCKTYPE a_BlockType)
 
 
 
-void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, size_t a_CountLootProbabs, int a_NumSlots, int a_Seed)
+void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, size_t a_CountLootProbabs, std::size_t a_NumSlots, int a_Seed)
 {
 }
 
