@@ -404,7 +404,7 @@ Vector3i AddFaceDirection(const Vector3i a_Position, const eBlockFace a_BlockFac
 		case BLOCK_FACE_NONE: break;
 	}
 
-	UNREACHABLE("Unsupported block face");
+	return a_Position;
 }
 
 
