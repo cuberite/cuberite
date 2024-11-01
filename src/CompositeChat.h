@@ -98,6 +98,9 @@ public:
 
 
 
+	// Creates a chat message without any parsing
+	static cCompositeChat FromText(const AString & a_Text);
+
 	/** Creates a new empty chat message.
 	Exported manually due to the other overload needing a manual export. */
 	cCompositeChat(void);

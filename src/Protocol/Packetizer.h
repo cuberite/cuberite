@@ -12,12 +12,11 @@
 
 #include "Protocol.h"
 
-
-
 class cByteBuffer;
 
 
 // fwd:
+class cCompisteChat;
 class cUUID;
 
 
@@ -148,6 +147,9 @@ public:
 	{
 		VERIFY(m_Out.WriteVarUTF8String(a_Value));
 	}
+
+
+	void WriteChat(const cCompositeChat & a_Value);
 
 
 	inline void WriteBuf(const ContiguousByteBufferView a_Data)
