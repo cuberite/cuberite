@@ -39,7 +39,7 @@ bool cItemFrame::DoTakeDamage(TakeDamageInfo & a_TDI)
 		const auto FlyOutSpeed = AddFaceDirection(Vector3i(), ProtocolFaceToBlockFace(m_Facing)) * 2;
 
 		// Spawn the frame's held item:
-		GetWorld()->SpawnItemPickup(SpawnPosition, m_Item, FlyOutSpeed);
+		GetWorld()->SpawnItemPickup(SpawnPosition, std::move(m_Item), FlyOutSpeed);
 	}
 
 	// In any case we have a held item and were hit by a player, so clear it:
