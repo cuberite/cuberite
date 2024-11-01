@@ -383,6 +383,9 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			return false;
 		}
 
+		// load the section poi data
+		LoadPoiFromNBT(Data.PoiData.Data().at(Y), a_NBT, a_NBT.FindChildByName(Child, "PoiData"));
+
 		const auto
 			BlockData = GetSectionData(a_NBT, Child, "Blocks", ChunkBlockData::SectionBlockCount),
 			MetaData = GetSectionData(a_NBT, Child, "Data", ChunkBlockData::SectionMetaCount),
@@ -457,6 +460,50 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 
 	m_World->QueueSetChunkData(std::move(Data));
 	return true;
+}
+
+
+
+
+
+bool cWSSAnvil::LoadPoiFromNBT(cChunkPoiData::PoiArray & a_Poies, const cParsedNBT & a_NBT, int a_TagIdx)
+{
+	if (a_TagIdx < 0)  // this section does not have pois yet
+	{
+		return true;
+	}
+
+	for (int Poi = a_NBT.GetFirstChild(a_TagIdx); Poi >= 0; Poi = a_NBT.GetNextSibling(Poi))
+	{
+		int Type = a_NBT.FindChildByName(Poi, "type");
+		int Pos = a_NBT.FindChildByName(Poi, "pos");
+		int FreeTickets = a_NBT.FindChildByName(Poi, "free_tickets");
+
+		if ((Type >= 0) && (Pos >= 0) && (FreeTickets >= 0))
+		{
+			auto PoiType = NamespaceSerializer::ToPoiType(a_NBT.GetString(Type));
+			if (PoiType != ePoiType::poiNone)
+			{
+				const auto * const PositionData = a_NBT.GetData(Pos);
+				Vector3i Position;
+				std::memcpy(reinterpret_cast<void*>(&Position), PositionData, 3 * sizeof(int));
+				a_Poies.push_back(
+					{
+						Position,
+						PoiType,
+						a_NBT.GetInt(FreeTickets)
+					}
+				);
+			}
+		}
+		else
+		{
+			// ChunkLoadFailed(a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, "Missing chunk poidata data", a_RawChunkData);
+			return false;
+		}
+	}
+
+	return false;
 }
 
 
