@@ -68,7 +68,7 @@ void cNetherPortalScanner::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 		{
 			for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 			{
-				const auto Blocks = a_BlockData.GetSection(Y);
+				const auto & Blocks = a_BlockData.GetSection(Y);
 				if (Blocks == nullptr)
 				{
 					continue;
