@@ -1416,7 +1416,7 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 		m_IsTeleporting = true;
 
 		Detach();
-		SetPosition({a_PosX, a_PosY, a_PosZ});
+		cPawn::TeleportToCoords(a_PosX, a_PosY, a_PosZ);
 		FreezeInternal(GetPosition(), false);
 
 		m_ClientHandle->SendPlayerMoveLook();
@@ -2540,6 +2540,7 @@ void cPlayer::FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen)
 	SetPosition(a_Location);
 	m_IsFrozen = true;
 	m_IsManuallyFrozen = a_ManuallyFrozen;
+	m_LastGroundHeight = GetPosY();
 
 	double NormalMaxSpeed = GetNormalMaxSpeed();
 	double SprintMaxSpeed = GetSprintingMaxSpeed();
