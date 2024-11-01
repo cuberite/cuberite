@@ -1334,6 +1334,18 @@ void cChunkMap::Tick(std::chrono::milliseconds a_Dt)
 
 
 
+void cChunkMap::FlushPendingBlockChanges()
+{
+	for (auto & Chunk : m_Chunks)
+	{
+		Chunk.second.BroadcastPendingChanges();
+	}
+}
+
+
+
+
+
 void cChunkMap::TickBlock(const Vector3i a_BlockPos)
 {
 	auto ChunkPos = cChunkDef::BlockToChunk(a_BlockPos);
