@@ -456,7 +456,10 @@ protected:
 			}
 			HasHadWater = true;
 		}  // for y
-		a_ChunkDesc.SetBlockType(a_RelX, 0, a_RelZ, E_BLOCK_BEDROCK);
+		if (a_ShapeColumn[0] > 0)
+		{
+			a_ChunkDesc.SetBlockType(a_RelX, 0, a_RelZ, E_BLOCK_BEDROCK);
+		}
 	}
 
 
