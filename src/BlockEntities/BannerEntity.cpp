@@ -10,7 +10,7 @@
 #include "../ClientHandle.h"
 #include "../Chunk.h"
 #include "../Registries/BlockItemConverter.h"
-#include "../Blocks/BlockBanner.h"
+#include "../Blocks/BlockStandingBanner.h"
 
 
 
@@ -29,7 +29,7 @@ cBannerEntity::cBannerEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_Worl
 	Super(a_Block, a_Pos, a_World),
 	m_BaseColor(a_BaseColor)
 {
-	ASSERT(cBlockBannerHandler::IsBlockBanner(a_Block));
+	ASSERT(cBlockStandingBannerHandler::IsBlockBanner(a_Block));
 }
 
 

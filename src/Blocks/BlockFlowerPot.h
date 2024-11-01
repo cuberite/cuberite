@@ -47,6 +47,13 @@ public:
 			case BlockType::PottedWhiteTulip:
 			case BlockType::PottedWitherRose:
 			case BlockType::PottedAllium:
+			case BlockType::FlowerPot:
+			case BlockType::PottedAzaleaBush:
+			case BlockType::PottedCherrySapling:
+			case BlockType::PottedFloweringAzaleaBush:
+			case BlockType::PottedMangrovePropagule:
+			case BlockType::PottedPaleOakSapling:
+			case BlockType::PottedTorchflower:
 				return true;
 			default: return false;
 		}

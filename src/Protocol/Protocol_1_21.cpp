@@ -64,75 +64,82 @@ void cProtocol_1_21::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	{
 		Action = 19;
 	}
-	if (BlockTags::Beds(type))
+	else if (BlockTags::Beds(type))
 	{
 		Action = 24;
 	}
-	if (BlockTags::AllHangingSigns(type))
+	else if (BlockTags::AllHangingSigns(type))
 	{
 		Action = 8;
 	}
-	if (BlockTags::StandingSigns(type))
+	else if (BlockTags::StandingSigns(type))
 	{
 		Action = 7;
 	}
-	//TODO: skulls
-
-	switch (a_BlockEntity.GetBlockType())
+	else if (BlockTags::FlowerPots(type))
 	{
-		//case BlockType::Banner:                Action = 19;
-		case BlockType::Barrel:                Action = 26;
-		case BlockType::Beacon:                Action = 14;
-		//case BlockType::Bed:                   Action = 24;
-		case BlockType::Beehive:               Action = 33;
-		case BlockType::Bell:                  Action = 30;
-		case BlockType::BlastFurnace:          Action = 28;
-		case BlockType::BrewingStand:          Action = 11;
-		//case BlockType::BrushableBlock:        Action = 39;
-		case BlockType::CalibratedSculkSensor: Action = 35;
-		case BlockType::Campfire:              Action = 32;
-		case BlockType::Chest:                 Action = 1;
-		case BlockType::ChiseledBookshelf:     Action = 38;
-		case BlockType::CommandBlock:          Action = 22;
-		case BlockType::Comparator:            Action = 18;
-		case BlockType::Conduit:               Action = 25;
-		case BlockType::Crafter:               Action = 41;
-		case BlockType::DaylightDetector:      Action = 16;
-		case BlockType::DecoratedPot:          Action = 40;
-		case BlockType::Dispenser:             Action = 5;
-		case BlockType::Dropper:               Action = 6;
-		case BlockType::EnchantingTable:       Action = 12;
-		case BlockType::EndGateway:            Action = 21;
-		case BlockType::EndPortal:             Action = 13;
-		case BlockType::EnderChest:            Action = 3;
-		case BlockType::Furnace:               Action = 0;
-		//case BlockType::HangingSign:           Action = 8;
-		case BlockType::Hopper:                Action = 17;
-		case BlockType::Jigsaw:                Action = 31;
-		case BlockType::Jukebox:               Action = 4;
-		case BlockType::Lectern:               Action = 29;
-		case BlockType::Spawner:               Action = 9;
-		case BlockType::Piston:                Action = 10;
-		case BlockType::SculkCatalyst:         Action = 36;
-		case BlockType::SculkSensor:           Action = 34;
-		case BlockType::SculkShrieker:         Action = 37;
-		case BlockType::ShulkerBox:            Action = 23;
-		//case BlockType::Sign:                  Action = 7;
-		//case BlockType::Skull:                 Action = 15;
-		case BlockType::Smoker:                Action = 27;
-		case BlockType::StructureBlock:        Action = 20;
-		case BlockType::TrappedChest:          Action = 2;
-		case BlockType::TrialSpawner:          Action = 42;
-		case BlockType::Vault:                 Action = 43;
-
-		default: return;  // Block entities change between versions
+		return; // temp fix
 	}
+	else 	//TODO: skulls
+	{
+		switch (a_BlockEntity.GetBlockType())
+		{
+			//case BlockType::Banner:                Action = 19; break;
+			case BlockType::Barrel:                Action = 26; break;
+			case BlockType::Beacon:                Action = 14; break;
+			//case BlockType::Bed:                   Action = 24; break;
+			case BlockType::Beehive:               Action = 33; break;
+			case BlockType::Bell:                  Action = 30; break;
+			case BlockType::BlastFurnace:          Action = 28; break;
+			case BlockType::BrewingStand:          Action = 11; break;
+			//case BlockType::BrushableBlock:        Action = 39; break;
+			case BlockType::CalibratedSculkSensor: Action = 35; break;
+			case BlockType::Campfire:              Action = 32; break;
+			case BlockType::Chest:                 Action = 1; break;
+			case BlockType::ChiseledBookshelf:     Action = 38; break;
+			case BlockType::CommandBlock:          Action = 22; break;
+			case BlockType::Comparator:            Action = 18; break;
+			case BlockType::Conduit:               Action = 25; break;
+			case BlockType::Crafter:               Action = 41; break;
+			case BlockType::DaylightDetector:      Action = 16; break;
+			case BlockType::DecoratedPot:          Action = 40; break;
+			case BlockType::Dispenser:             Action = 5; break;
+			case BlockType::Dropper:               Action = 6; break;
+			case BlockType::EnchantingTable:       Action = 12; break;
+			case BlockType::EndGateway:            Action = 21; break;
+			case BlockType::EndPortal:             Action = 13; break;
+			case BlockType::EnderChest:            Action = 3; break;
+			case BlockType::Furnace:               Action = 0; break;
+			//case BlockType::HangingSign:           Action = 8; break;
+			case BlockType::Hopper:                Action = 17; break;
+			case BlockType::Jigsaw:                Action = 31; break;
+			case BlockType::Jukebox:               Action = 4; break;
+			case BlockType::Lectern:               Action = 29; break;
+			case BlockType::Spawner:               Action = 9; break;
+			case BlockType::Piston:                Action = 10; break;
+			case BlockType::SculkCatalyst:         Action = 36; break;
+			case BlockType::SculkSensor:           Action = 34; break;
+			case BlockType::SculkShrieker:         Action = 37; break;
+			case BlockType::ShulkerBox:            Action = 23; break;
+			//case BlockType::Sign:                  Action = 7; break;
+			//case BlockType::Skull:                 Action = 15; break;
+			case BlockType::Smoker:                Action = 27; break;
+			case BlockType::StructureBlock:        Action = 20; break;
+			case BlockType::TrappedChest:          Action = 2; break;
+			case BlockType::TrialSpawner:          Action = 42; break;
+			case BlockType::Vault:                 Action = 43; break;
+
+			default: UNREACHABLE("Unknown block entity");  // Block entities change between versions
+		}
+		
+	}
+
 
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
 	Pkt.WriteXZYPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
-	Pkt.WriteBEUInt8(Action);
+	Pkt.WriteVarInt32(Action);
 
-	cFastNBTWriter Writer;
+	cFastNBTWriter Writer(true);
 	WriteBlockEntity(Writer, a_BlockEntity);
 	Writer.Finish();
 	Pkt.WriteBuf(Writer.GetResult());

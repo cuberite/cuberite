@@ -33,6 +33,12 @@ bool cCommandBlockEntity::UsedBy(cPlayer * a_Player)
 {
 	// Nothing to do
 	UNUSED(a_Player);
+
+	auto empty = [](cBlockEntity & a_BlockEntity)
+	{
+		return false;
+	};
+	m_World->DoWithBlockEntityAt(m_Pos, empty); // necessary to make sure an update block entity packet is sent
 	return true;
 }
 
