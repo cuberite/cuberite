@@ -7,7 +7,6 @@
 #include "BlockPluginInterface.h"
 #include "BlockAir.h"
 #include "BlockAnvil.h"
-#include "BlockBanner.h"
 #include "BlockBed.h"
 #include "BlockBigFlower.h"
 #include "BlockBookShelf.h"
@@ -91,6 +90,7 @@
 #include "BlockSnow.h"
 #include "BlockSponge.h"
 #include "BlockStairs.h"
+#include "BlockStandingBanner.h"
 #include "BlockStems.h"
 #include "BlockStone.h"
 #include "BlockSugarCane.h"
@@ -101,6 +101,7 @@
 #include "BlockTripwire.h"
 #include "BlockTripwireHook.h"
 #include "BlockVines.h"
+#include "BlockWallBanner.h"
 #include "BlockWallSign.h"
 #include "BlockCraftingTable.h"
 

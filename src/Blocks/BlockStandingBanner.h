@@ -1,11 +1,17 @@
 
+// BlockStandingBanner.h
+
 #pragma once
 
 #include "BlockHandler.h"
 #include "../BlockInfo.h"
 #include "BlockEntity.h"
 
-class cBlockBannerHandler final :
+
+
+
+
+class cBlockStandingBannerHandler final :
 	public cBlockEntityHandler
 {
 

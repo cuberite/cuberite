@@ -734,20 +734,26 @@ void cCubicNoise::Generate2D(
 
 	// Calculate query values using Cell:
 	int FromY = 0;
-	for (int y = 0; y < NumSameY; y++)
+	for (int y = 0; y < NumSameY;)
 	{
 		int ToY = FromY + SameY[y];
 		int FromX = 0;
 		int CurFloorY = FloorY[FromY];
-		for (int x = 0; x < NumSameX; x++)
+		for (int x = 0; x < NumSameX;)
 		{
 			int ToX = FromX + SameX[x];
 			Cell.Generate(FromX, ToX, FromY, ToY);
-			Cell.Move(FloorX[ToX], CurFloorY);
-			FromX = ToX;
+			if (++x < NumSameX)  // Call Move() every time except for the last loop iteration
+			{
+				Cell.Move(FloorX[ToX], CurFloorY);
+				FromX = ToX;
+			}
 		}
-		Cell.Move(FloorX[0], FloorY[ToY]);
-		FromY = ToY;
+		if (++y < NumSameY)  // Call Move() every time except for the last loop iteration
+		{
+			Cell.Move(FloorX[0], FloorY[ToY]);
+			FromY = ToY;
+		}
 	}
 }
 
@@ -795,28 +801,37 @@ void cCubicNoise::Generate3D(
 
 	// Calculate query values using Cell:
 	int FromZ = 0;
-	for (int z = 0; z < NumSameZ; z++)
+	for (int z = 0; z < NumSameZ;)
 	{
 		int ToZ = FromZ + SameZ[z];
 		int CurFloorZ = FloorZ[FromZ];
 		int FromY = 0;
-		for (int y = 0; y < NumSameY; y++)
+		for (int y = 0; y < NumSameY;)
 		{
 			int ToY = FromY + SameY[y];
 			int CurFloorY = FloorY[FromY];
 			int FromX = 0;
-			for (int x = 0; x < NumSameX; x++)
+			for (int x = 0; x < NumSameX;)
 			{
 				int ToX = FromX + SameX[x];
 				Cell.Generate(FromX, ToX, FromY, ToY, FromZ, ToZ);
-				Cell.Move(FloorX[ToX], CurFloorY, CurFloorZ);
-				FromX = ToX;
+				if (++x < NumSameX)  // Call Move() every time except for the last loop iteration
+				{
+					Cell.Move(FloorX[ToX], CurFloorY, CurFloorZ);
+					FromX = ToX;
+				}
 			}
-			Cell.Move(FloorX[0], FloorY[ToY], CurFloorZ);
-			FromY = ToY;
+			if (++y < NumSameY)  // Call Move() every time except for the last loop iteration
+			{
+				Cell.Move(FloorX[0], FloorY[ToY], CurFloorZ);
+				FromY = ToY;
+			}
 		}  // for y
-		Cell.Move(FloorX[0], FloorY[0], FloorZ[ToZ]);
-		FromZ = ToZ;
+		if (++z < NumSameZ)  // Call Move() every time except for the last loop iteration
+		{
+			Cell.Move(FloorX[0], FloorY[0], FloorZ[ToZ]);
+			FromZ = ToZ;
+		}
 	}  // for z
 }
 

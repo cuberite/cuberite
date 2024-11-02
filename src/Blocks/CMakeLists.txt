@@ -9,7 +9,6 @@ target_sources(
 
 	BlockAir.h
 	BlockAnvil.h
-	BlockBanner.h
 	BlockBed.h
 	BlockBigFlower.h
 	BlockBookShelf.h
@@ -97,6 +96,7 @@ target_sources(
 	BlockSnow.h
 	BlockSponge.h
 	BlockStairs.h
+	BlockStandingBanner.h
 	BlockStems.h
 	BlockStone.h
 	BlockSugarCane.h
@@ -107,6 +107,7 @@ target_sources(
 	BlockTripwire.h
 	BlockTripwireHook.h
 	BlockVines.h
+	BlockWallBanner.h
 	BlockWallSign.h
 	BlockWool.h
 	BroadcastInterface.h

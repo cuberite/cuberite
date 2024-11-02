@@ -185,6 +185,8 @@ private:
 	int m_CenterX;
 	int m_CenterZ;
 
+	bool m_Dirty;
+
 	/** Column-major array of colours */
 	cColorList m_Data;
 
@@ -196,6 +198,7 @@ private:
 
 	AString m_Name;
 
+	friend class cMapManager;
 	friend class cMapSerializer;
 
 };  // tolua_export
