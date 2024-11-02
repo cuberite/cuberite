@@ -9,23 +9,26 @@
 
 
 
-class cItemDoorHandler final:
-	public cItemHandler
+class cItemDoorHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
-	constexpr cItemDoorHandler(int a_ItemType):
+  public:
+	constexpr cItemDoorHandler(int a_ItemType) :
 		Super(a_ItemType)
 	{
-
 	}
 
 
 
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
+	virtual bool CommitPlacement(
+		cPlayer & a_Player,
+		const cItem & a_HeldItem,
+		const Vector3i a_PlacePosition,
+		const eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPosition
+	) const override
 	{
 		// Vanilla only allows door placement while clicking on the top face of the block below the door:
 		if (a_ClickedBlockFace != BLOCK_FACE_TOP)
@@ -37,14 +40,14 @@ public:
 		BLOCKTYPE BlockType;
 		switch (m_ItemType)
 		{
-			case E_ITEM_WOODEN_DOOR:   BlockType = E_BLOCK_OAK_DOOR;      break;
-			case E_ITEM_IRON_DOOR:     BlockType = E_BLOCK_IRON_DOOR;     break;
-			case E_ITEM_SPRUCE_DOOR:   BlockType = E_BLOCK_SPRUCE_DOOR;   break;
-			case E_ITEM_BIRCH_DOOR:    BlockType = E_BLOCK_BIRCH_DOOR;    break;
-			case E_ITEM_JUNGLE_DOOR:   BlockType = E_BLOCK_JUNGLE_DOOR;   break;
+			case E_ITEM_WOODEN_DOOR:   BlockType = E_BLOCK_OAK_DOOR; break;
+			case E_ITEM_IRON_DOOR:     BlockType = E_BLOCK_IRON_DOOR; break;
+			case E_ITEM_SPRUCE_DOOR:   BlockType = E_BLOCK_SPRUCE_DOOR; break;
+			case E_ITEM_BIRCH_DOOR:    BlockType = E_BLOCK_BIRCH_DOOR; break;
+			case E_ITEM_JUNGLE_DOOR:   BlockType = E_BLOCK_JUNGLE_DOOR; break;
 			case E_ITEM_DARK_OAK_DOOR: BlockType = E_BLOCK_DARK_OAK_DOOR; break;
-			case E_ITEM_ACACIA_DOOR:   BlockType = E_BLOCK_ACACIA_DOOR;   break;
-			default: UNREACHABLE("Unhandled door type");
+			case E_ITEM_ACACIA_DOOR:   BlockType = E_BLOCK_ACACIA_DOOR; break;
+			default:                   UNREACHABLE("Unhandled door type");
 		}
 
 		const auto & World = *a_Player.GetWorld();
@@ -56,7 +59,14 @@ public:
 			NIBBLETYPE TopMeta;
 			World.GetBlockTypeMeta(UpperBlockPosition, TopType, TopMeta);
 
-			if (!cBlockHandler::For(TopType).DoesIgnoreBuildCollision(World, a_HeldItem, UpperBlockPosition, TopMeta, a_ClickedBlockFace, false))
+			if (!cBlockHandler::For(TopType).DoesIgnoreBuildCollision(
+					World,
+					a_HeldItem,
+					UpperBlockPosition,
+					TopMeta,
+					a_ClickedBlockFace,
+					false
+				))
 			{
 				return false;
 			}
@@ -81,18 +91,16 @@ public:
 		// DEBUG:
 		FLOGD("Door being placed at {0}", a_PlacePosition);
 		FLOGD("RelDirToOutside: {0}", RelDirToOutside);
-		FLOGD("Left neighbor at {0}: {1} ({2})", LeftNeighborPos, LeftNeighborBlock, ItemTypeToString(LeftNeighborBlock));
-		FLOGD("Right neighbor at {0}: {1} ({2})", RightNeighborPos, RightNeighborBlock, ItemTypeToString(RightNeighborBlock));
+		FLOGD("Left neighbor at {0}: {1} ({2})", LeftNeighborPos, LeftNeighborBlock,
+		ItemTypeToString(LeftNeighborBlock)); FLOGD("Right neighbor at {0}: {1} ({2})", RightNeighborPos,
+		RightNeighborBlock, ItemTypeToString(RightNeighborBlock));
 		*/
 
-		if (
-			cBlockDoorHandler::IsDoorBlockType(LeftNeighborBlock) ||   // The block to the left is a door block
-			(
-				!cBlockInfo::IsSolid(LeftNeighborBlock) &&               // Prioritize hinge on the left side
-				cBlockInfo::IsSolid(RightNeighborBlock) &&               // The block to the right is solid...
-				!cBlockDoorHandler::IsDoorBlockType(RightNeighborBlock)  // ... but not a door
-			)
-		)
+		if (cBlockDoorHandler::IsDoorBlockType(LeftNeighborBlock) ||  // The block to the left is a door block
+			(!cBlockInfo::IsSolid(LeftNeighborBlock) &&  // Prioritize hinge on the left side
+			 cBlockInfo::IsSolid(RightNeighborBlock) &&  // The block to the right is solid...
+			 !cBlockDoorHandler::IsDoorBlockType(RightNeighborBlock)  // ... but not a door
+			))
 		{
 			// DEBUG: LOGD("Setting hinge to right side");
 			UpperBlockMeta = 0x09;  // Upper block | hinge on right
@@ -100,17 +108,12 @@ public:
 
 		// Set the blocks:
 		return a_Player.PlaceBlocks(
-		{
-			{ a_PlacePosition, BlockType, LowerBlockMeta },
-			{ UpperBlockPosition, BlockType, UpperBlockMeta }
-		});
+			{{a_PlacePosition, BlockType, LowerBlockMeta}, {UpperBlockPosition, BlockType, UpperBlockMeta}}
+		);
 	}
 
 
 
 
-	virtual bool IsPlaceable(void) const override
-	{
-		return true;
-	}
-} ;
+	virtual bool IsPlaceable(void) const override { return true; }
+};

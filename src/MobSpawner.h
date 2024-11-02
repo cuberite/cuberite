@@ -14,7 +14,7 @@ but it also has dynamic part depending on the world.ini settings.
 */
 class cMobSpawner
 {
-public :
+  public:
 	/** Constructor
 	a_MobFamily is the Family of mobs that this spawner will spawn
 	a_AllowedTypes is the set of types allowed for mobs it will spawn. Empty set would result in no spawn at all
@@ -37,20 +37,22 @@ public :
 	// return true if there is at least one allowed type
 	bool CanSpawnAnything(void);
 
-	std::vector<std::unique_ptr<cMonster>> & getSpawned(void)
-	{
-		return m_Spawned;
-	}
+	std::vector<std::unique_ptr<cMonster>> & getSpawned(void) { return m_Spawned; }
 
 	/** Returns true if specified type of mob can spawn on specified block */
-	static bool CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType a_MobType, EMCSBiome a_Biome, bool a_DisableSolidBelowCheck = false);
+	static bool CanSpawnHere(
+		cChunk * a_Chunk,
+		Vector3i a_RelPos,
+		eMonsterType a_MobType,
+		EMCSBiome a_Biome,
+		bool a_DisableSolidBelowCheck = false
+	);
 
 	/** Returns all mob types that can spawn that biome */
 	static std::set<eMonsterType> GetAllowedMobTypes(EMCSBiome a_Biome);
 
 
-protected :
-
+  protected:
 	/** Returns a random type that can spawn in the specified biome.
 	Returns mtInvalidType if none is possible. */
 	eMonsterType ChooseMobType(EMCSBiome a_Biome);
@@ -60,8 +62,4 @@ protected :
 	bool m_NewPack;
 	eMonsterType m_MobType;
 	std::vector<std::unique_ptr<cMonster>> m_Spawned;
-} ;
-
-
-
-
+};

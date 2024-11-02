@@ -2,7 +2,8 @@
 // DropSpenserEntity.cpp
 
 // Declares the cDropSpenserEntity class representing a common ancestor to the cDispenserEntity and cDropperEntity
-// The dropper and dispenser only needs to override the DropSpenseFromSlot() function to provide the specific item behavior
+// The dropper and dispenser only needs to override the DropSpenseFromSlot() function to provide the specific item
+// behavior
 
 #include "Globals.h"
 #include "DropSpenserEntity.h"
@@ -16,9 +17,13 @@
 
 
 
-cDropSpenserEntity::cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
-	m_ShouldDropSpense(false)
+cDropSpenserEntity::cDropSpenserEntity(
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta,
+	Vector3i a_Pos,
+	cWorld * a_World
+) :
+	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World), m_ShouldDropSpense(false)
 {
 }
 
@@ -82,7 +87,9 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 	int SmokeDir = 0;
 	switch (Meta & E_META_DROPSPENSER_FACING_MASK)
 	{
-		case E_META_DROPSPENSER_FACING_YP: SmokeDir = static_cast<int>(SmokeDirection::CENTRE); break;  // YP & YM don't have associated smoke dirs, just do 4 (centre of block)
+		case E_META_DROPSPENSER_FACING_YP:
+			SmokeDir = static_cast<int>(SmokeDirection::CENTRE);
+			break;  // YP & YM don't have associated smoke dirs, just do 4 (centre of block)
 		case E_META_DROPSPENSER_FACING_YM: SmokeDir = static_cast<int>(SmokeDirection::CENTRE); break;
 		case E_META_DROPSPENSER_FACING_XM: SmokeDir = static_cast<int>(SmokeDirection::EAST); break;
 		case E_META_DROPSPENSER_FACING_XP: SmokeDir = static_cast<int>(SmokeDirection::WEST); break;
@@ -204,12 +211,12 @@ void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
 	int PickupSpeedX = 0, PickupSpeedY = 0, PickupSpeedZ = 0;
 	switch (Meta & E_META_DROPSPENSER_FACING_MASK)
 	{
-		case E_META_DROPSPENSER_FACING_YP: PickupSpeedY =  PickupSpeed; break;
+		case E_META_DROPSPENSER_FACING_YP: PickupSpeedY = PickupSpeed; break;
 		case E_META_DROPSPENSER_FACING_YM: PickupSpeedY = -PickupSpeed; break;
 		case E_META_DROPSPENSER_FACING_XM: PickupSpeedX = -PickupSpeed; break;
-		case E_META_DROPSPENSER_FACING_XP: PickupSpeedX =  PickupSpeed; break;
+		case E_META_DROPSPENSER_FACING_XP: PickupSpeedX = PickupSpeed; break;
 		case E_META_DROPSPENSER_FACING_ZM: PickupSpeedZ = -PickupSpeed; break;
-		case E_META_DROPSPENSER_FACING_ZP: PickupSpeedZ =  PickupSpeed; break;
+		case E_META_DROPSPENSER_FACING_ZP: PickupSpeedZ = PickupSpeed; break;
 	}
 
 	double MicroX, MicroY, MicroZ;
@@ -220,7 +227,3 @@ void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 	m_World->SpawnItemPickups(Pickups, MicroX, MicroY, MicroZ, PickupSpeedX, PickupSpeedY, PickupSpeedZ);
 }
-
-
-
-

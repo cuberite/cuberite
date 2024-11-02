@@ -7,17 +7,14 @@
 
 
 
-class cBlockDaylightSensorHandler final :
-	public cBlockHandler
+class cBlockDaylightSensorHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
@@ -43,12 +40,9 @@ private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Always drop the regular daylight sensor:
-		return { E_BLOCK_DAYLIGHT_SENSOR };
+		return {E_BLOCK_DAYLIGHT_SENSOR};
 	}
 
 
-	virtual bool IsUseable(void) const override
-	{
-		return true;
-	}
+	virtual bool IsUseable(void) const override { return true; }
 };

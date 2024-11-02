@@ -7,22 +7,19 @@
 
 
 
-class cItemRawFishHandler final:
-	public cItemFoodHandler
+class cItemRawFishHandler final : public cItemFoodHandler
 {
 	using Super = cItemFoodHandler;
 
-public:
-
-	constexpr cItemRawFishHandler(int a_ItemType):
+  public:
+	constexpr cItemRawFishHandler(int a_ItemType) :
 		Super(a_ItemType, FoodInfo(0, 0))
 	{
 	}
 
 	virtual FoodInfo GetFoodInfo(const cItem * a_Item) const override
 	{
-		static const FoodInfo RawFishInfos[] =
-		{
+		static const FoodInfo RawFishInfos[] = {
 			FoodInfo(2, 0.4),  // Raw fish
 			FoodInfo(2, 0.2),  // Raw salmon
 			FoodInfo(1, 0.2),  // Clownfish
@@ -54,5 +51,4 @@ public:
 
 		return true;
 	}
-
 };

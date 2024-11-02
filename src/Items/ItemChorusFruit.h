@@ -8,13 +8,11 @@
 
 
 
-class cItemChorusFruitHandler final:
-	public cItemFoodHandler
+class cItemChorusFruitHandler final : public cItemFoodHandler
 {
 	using Super = cItemFoodHandler;
 
-public:
-
+  public:
 	constexpr cItemChorusFruitHandler(int a_ItemType) :
 		Super(a_ItemType, FoodInfo(4, 2.4))
 	{
@@ -40,5 +38,4 @@ public:
 		}
 		return true;
 	}
-
 };

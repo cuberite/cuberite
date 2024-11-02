@@ -92,14 +92,22 @@ void cBrewingRecipes::AddRecipeFromLine(AString a_Line, unsigned int a_LineNum)
 
 	if (!StringToInteger<short>(InputAndIngredient[0], Recipe->Input.m_ItemDamage))
 	{
-		LOGWARNING("brewing.txt: line %d: Cannot parse the damage value for the input item\"%s\".", a_LineNum, InputAndIngredient[0].c_str());
+		LOGWARNING(
+			"brewing.txt: line %d: Cannot parse the damage value for the input item\"%s\".",
+			a_LineNum,
+			InputAndIngredient[0].c_str()
+		);
 		LOGINFO("Offending line: \"%s\"", a_Line.c_str());
 		return;
 	}
 
 	if (!StringToInteger<short>(IngredientAndOutput[1], Recipe->Output.m_ItemDamage))
 	{
-		LOGWARNING("brewing.txt: line %d: Cannot parse the damage value for the output item\"%s\".", a_LineNum, IngredientAndOutput[1].c_str());
+		LOGWARNING(
+			"brewing.txt: line %d: Cannot parse the damage value for the output item\"%s\".",
+			a_LineNum,
+			IngredientAndOutput[1].c_str()
+		);
 		LOGINFO("Offending line: \"%s\"", a_Line.c_str());
 		return;
 	}
@@ -164,13 +172,16 @@ const cBrewingRecipes::cRecipe * cBrewingRecipes::GetRecipeFrom(const cItem & a_
 		// Search for the drinkable potion, the ingredients are the same
 		short SplashItemDamage = a_Input.m_ItemDamage - 8192;
 
-		auto FoundRecipe = std::find_if(m_Recipes.cbegin(), m_Recipes.cend(), [&](const std::unique_ptr<cRecipe>& a_Recipe)
-		{
-			return (
-				(a_Recipe->Input.m_ItemDamage == SplashItemDamage) &&
-				(a_Recipe->Ingredient.IsEqual(a_Ingredient))
-			);
-		});
+		auto FoundRecipe = std::find_if(
+			m_Recipes.cbegin(),
+			m_Recipes.cend(),
+			[&](const std::unique_ptr<cRecipe> & a_Recipe)
+			{
+				return (
+					(a_Recipe->Input.m_ItemDamage == SplashItemDamage) && (a_Recipe->Ingredient.IsEqual(a_Ingredient))
+				);
+			}
+		);
 
 		if (FoundRecipe == m_Recipes.cend())
 		{
@@ -230,7 +241,3 @@ bool cBrewingRecipes::IsFuel(const cItem & a_Item) const
 {
 	return (a_Item.m_ItemType == E_ITEM_BLAZE_POWDER);
 }
-
-
-
-

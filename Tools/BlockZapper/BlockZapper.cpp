@@ -15,8 +15,8 @@
 
 
 #ifdef _MSC_VER
-	// Under MSVC, link to WinSock2 (needed by FastNBT's byteswapping)
-	#pragma comment(lib, "ws2_32.lib")
+// Under MSVC, link to WinSock2 (needed by FastNBT's byteswapping)
+#pragma comment(lib, "ws2_32.lib")
 #endif
 
 
@@ -62,13 +62,8 @@ int main(int argc, char * argv[])
 			}
 			i++;
 		}
-		else if (
-			(strcmp(argv[i], "help") == 0) ||
-			(strcmp(argv[i], "-?") == 0) ||
-			(strcmp(argv[i], "/?") == 0) ||
-			(strcmp(argv[i], "-h") == 0) ||
-			(strcmp(argv[i], "--help") == 0)
-		)
+		else if ((strcmp(argv[i], "help") == 0) || (strcmp(argv[i], "-?") == 0) || (strcmp(argv[i], "/?") == 0) ||
+				 (strcmp(argv[i], "-h") == 0) || (strcmp(argv[i], "--help") == 0))
 		{
 			ShowHelp(argv[0]);
 			return 0;
@@ -90,4 +85,4 @@ int main(int argc, char * argv[])
 
 	LOGINFO("Done");
 	return 0;
-} ;
+};

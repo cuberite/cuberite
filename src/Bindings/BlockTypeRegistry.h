@@ -23,8 +23,7 @@ class BlockState;
 The BlockTypeRegistry uses this structure to store the registered information. */
 class BlockInfo
 {
-public:
-
+  public:
 	/** Callback is used to query block hints dynamically, based on the current BlockState.
 	Useful for example for redstone lamps that can be turned on or off. */
 	using HintCallback = std::function<AString(const AString & aTypeName, const BlockState & aBlockState)>;
@@ -44,10 +43,7 @@ public:
 	/** Retrieves the value associated with the specified hint for this specific BlockTypeName and BlockState.
 	Queries hint callbacks first, then static hints if a callback doesn't exist.
 	Returns an empty string if hint not found at all. */
-	AString hintValue(
-		const AString & aHintName,
-		const BlockState & aBlockState
-	);
+	AString hintValue(const AString & aHintName, const BlockState & aBlockState);
 
 	// Simple getters:
 	const AString & pluginName() const { return m_PluginName; }
@@ -55,8 +51,8 @@ public:
 	std::shared_ptr<cBlockHandler> handler() const { return m_Handler; }
 
 	/** Sets (creates or updates) a static hint.
-	Hints provided by callbacks are unaffected by this - callbacks are "higher priority", they overwrite anything set here.
-	Logs an info message if the hint is already provided by a hint callback. */
+	Hints provided by callbacks are unaffected by this - callbacks are "higher priority", they overwrite anything set
+	here. Logs an info message if the hint is already provided by a hint callback. */
 	void setHint(const AString & aHintKey, const AString & aHintValue);
 
 	/** Removes a hint.
@@ -64,8 +60,7 @@ public:
 	void removeHint(const AString & aHintKey);
 
 
-private:
-
+  private:
 	/** The name of the plugin that registered the block. */
 	AString m_PluginName;
 
@@ -76,11 +71,13 @@ private:
 	std::shared_ptr<cBlockHandler> m_Handler;
 
 	/** Optional static hints for any subsystem to use, such as "IsSnowable" -> "1".
-	Hint callbacks are of higher priority than m_Hints - if a hint is provided by a m_HintCallback, its value in m_Hints is ignored. */
+	Hint callbacks are of higher priority than m_Hints - if a hint is provided by a m_HintCallback, its value in m_Hints
+	is ignored. */
 	std::map<AString, AString> m_Hints;
 
 	/** The callbacks for dynamic evaluation of hints, such as "LightValue" -> function(BlockTypeName, BlockState).
-	Hint callbacks are of higher priority than m_Hints - if a hint is provided by a m_HintCallback, its value in m_Hints is ignored. */
+	Hint callbacks are of higher priority than m_Hints - if a hint is provided by a m_HintCallback, its value in m_Hints
+	is ignored. */
 	std::map<AString, HintCallback> m_HintCallbacks;
 };
 
@@ -96,7 +93,7 @@ Stores the name of the plugin that registered the type, for better plugin error 
 and so that we can unload and reload plugins. */
 class BlockTypeRegistry
 {
-public:
+  public:
 	// fwd:
 	class AlreadyRegisteredException;
 	class NotRegisteredException;
@@ -125,23 +122,15 @@ public:
 
 	/** Sets (adds or overwrites) a single Hint value for a BlockType.
 	Throws NotRegisteredException if the BlockTypeName is not registered. */
-	void setBlockTypeHint(
-		const AString & aBlockTypeName,
-		const AString & aHintKey,
-		const AString & aHintValue
-	);
+	void setBlockTypeHint(const AString & aBlockTypeName, const AString & aHintKey, const AString & aHintValue);
 
 	/** Removes a previously registered single Hint value for a BlockType.
 	Throws NotRegisteredException if the BlockTypeName is not registered.
 	Silently ignored if the Hint hasn't been previously set. */
-	void removeBlockTypeHint(
-		const AString & aBlockTypeName,
-		const AString & aHintKey
-	);
+	void removeBlockTypeHint(const AString & aBlockTypeName, const AString & aHintKey);
 
 
-private:
-
+  private:
 	/** The actual block type registry.
 	Maps the BlockTypeName to the BlockInfo instance. */
 	std::map<AString, std::shared_ptr<BlockInfo>> m_Registry;
@@ -154,15 +143,15 @@ private:
 
 
 
-/** The exception thrown from BlockTypeRegistry::registerBlockType() if the same block type is being registered from a different plugin. */
-class BlockTypeRegistry::AlreadyRegisteredException: public std::runtime_error
+/** The exception thrown from BlockTypeRegistry::registerBlockType() if the same block type is being registered from a
+ * different plugin. */
+class BlockTypeRegistry::AlreadyRegisteredException : public std::runtime_error
 {
 	using Super = std::runtime_error;
 
-public:
-
-	/** Creates a new instance of the exception that provides info on both the original registration and the newly attempted
-	registration that caused the failure. */
+  public:
+	/** Creates a new instance of the exception that provides info on both the original registration and the newly
+	attempted registration that caused the failure. */
 	AlreadyRegisteredException(
 		const std::shared_ptr<BlockInfo> & aPreviousRegistration,
 		const std::shared_ptr<BlockInfo> & aNewRegistration
@@ -170,11 +159,10 @@ public:
 
 	// Simple getters:
 	std::shared_ptr<BlockInfo> previousRegistration() const { return m_PreviousRegistration; }
-	std::shared_ptr<BlockInfo> newRegistration()      const { return m_NewRegistration; }
+	std::shared_ptr<BlockInfo> newRegistration() const { return m_NewRegistration; }
 
 
-private:
-
+  private:
 	std::shared_ptr<BlockInfo> m_PreviousRegistration;
 	std::shared_ptr<BlockInfo> m_NewRegistration;
 
@@ -192,25 +180,19 @@ private:
 
 
 /** The exception thrown from BlockTypeRegistry::setBlockTypeHint() if the block type has not been registered before. */
-class BlockTypeRegistry::NotRegisteredException: public std::runtime_error
+class BlockTypeRegistry::NotRegisteredException : public std::runtime_error
 {
 	using Super = std::runtime_error;
 
-public:
-
-	/** Creates a new instance of the exception that provides info on both the original registration and the newly attempted
-	registration that caused the failure. */
-	NotRegisteredException(
-		const AString & aBlockTypeName,
-		const AString & aHintKey,
-		const AString & aHintValue
-	);
+  public:
+	/** Creates a new instance of the exception that provides info on both the original registration and the newly
+	attempted registration that caused the failure. */
+	NotRegisteredException(const AString & aBlockTypeName, const AString & aHintKey, const AString & aHintValue);
 
 	// Simple getters:
 	const AString & blockTypeName() const { return m_BlockTypeName; }
 
 
-private:
-
+  private:
 	const AString m_BlockTypeName;
 };

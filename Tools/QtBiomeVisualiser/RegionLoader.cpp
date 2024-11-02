@@ -14,10 +14,7 @@ volatile bool RegionLoader::m_IsShuttingDown = false;
 
 
 RegionLoader::RegionLoader(int a_RegionX, int a_RegionZ, RegionPtr a_Region, ChunkSourcePtr a_ChunkSource) :
-	m_RegionX(a_RegionX),
-	m_RegionZ(a_RegionZ),
-	m_Region(a_Region),
-	m_ChunkSource(a_ChunkSource)
+	m_RegionX(a_RegionX), m_RegionZ(a_RegionZ), m_Region(a_Region), m_ChunkSource(a_ChunkSource)
 {
 }
 
@@ -43,7 +40,3 @@ void RegionLoader::run()
 
 	emit loaded(m_RegionX, m_RegionZ);
 }
-
-
-
-

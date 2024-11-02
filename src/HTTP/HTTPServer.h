@@ -1,7 +1,8 @@
 
 // HTTPServer.h
 
-// Declares the cHTTPServer class representing a HTTP webserver that uses cListenThread and cSocketThreads for processing
+// Declares the cHTTPServer class representing a HTTP webserver that uses cListenThread and cSocketThreads for
+// processing
 
 
 
@@ -29,10 +30,10 @@ class cSslConfig;
 
 class cHTTPServer
 {
-public:
+  public:
 	class cCallbacks
 	{
-	public:
+	  public:
 		virtual ~cCallbacks() {}
 
 		/** Called when a new request arrives over a connection and all its headers have been parsed.
@@ -41,11 +42,16 @@ public:
 
 		/** Called when another part of request body has arrived.
 		May be called multiple times for a single request. */
-		virtual void OnRequestBody(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request, const char * a_Data, size_t a_Size) = 0;
+		virtual void OnRequestBody(
+			cHTTPServerConnection & a_Connection,
+			cHTTPIncomingRequest & a_Request,
+			const char * a_Data,
+			size_t a_Size
+		) = 0;
 
 		/** Called when the request body has been fully received in previous calls to OnRequestBody() */
 		virtual void OnRequestFinished(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request) = 0;
-	} ;
+	};
 
 	cHTTPServer(void);
 	virtual ~cHTTPServer();
@@ -59,7 +65,7 @@ public:
 	/** Stops the server, drops all current connections */
 	void Stop(void);
 
-protected:
+  protected:
 	friend class cHTTPServerConnection;
 	friend class cSslHTTPServerConnection;
 	friend class cHTTPServerListenCallbacks;
@@ -83,13 +89,14 @@ protected:
 
 	/** Called by cHTTPConenction when it receives more data for the request body.
 	May be called multiple times for a single request. */
-	void RequestBody(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request, const void * a_Data, size_t a_Size);
+	void RequestBody(
+		cHTTPServerConnection & a_Connection,
+		cHTTPIncomingRequest & a_Request,
+		const void * a_Data,
+		size_t a_Size
+	);
 
-	/** Called by cHTTPServerConnection when it detects that the request has finished (all of its body has been received) */
+	/** Called by cHTTPServerConnection when it detects that the request has finished (all of its body has been
+	 * received) */
 	void RequestFinished(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request);
-} ;
-
-
-
-
-
+};

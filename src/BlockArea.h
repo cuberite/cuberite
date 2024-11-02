@@ -1,11 +1,13 @@
 
 // BlockArea.h
 
-// Interfaces to the cBlockArea object representing an area of block data that can be queried from cWorld and then accessed again without further queries
-// The object also supports writing the blockdata back into cWorld, even into other coords
+// Interfaces to the cBlockArea object representing an area of block data that can be queried from cWorld and then
+// accessed again without further queries The object also supports writing the blockdata back into cWorld, even into
+// other coords
 
 // NOTE: All Nibble values (meta, blocklight, skylight) are stored one-nibble-per-byte for faster access / editting!
-// NOTE: Lua bindings for this object explicitly check parameter values. C++ code is expected to pass in valid params, so the functions ASSERT on invalid params.
+// NOTE: Lua bindings for this object explicitly check parameter values. C++ code is expected to pass in valid params,
+// so the functions ASSERT on invalid params.
 //    This includes the datatypes (must be present / valid combination), coords and sizes.
 
 
@@ -40,18 +42,17 @@ class cBlockArea
 	DISALLOW_COPY_AND_ASSIGN(cBlockArea);
 	// tolua_begin
 
-public:
-
+  public:
 	/** What data is to be queried (bit-mask) */
 	enum
 	{
-		baTypes         =  1,
-		baMetas         =  2,
-		baLight         =  4,
-		baSkyLight      =  8,
+		baTypes = 1,
+		baMetas = 2,
+		baLight = 4,
+		baSkyLight = 8,
 		// baEntities   = 16,  // Not supported yet
 		baBlockEntities = 32,
-	} ;
+	};
 
 	/** The per-block strategy to use when merging another block area into this object.
 	See the Merge function for the description of these */
@@ -65,7 +66,7 @@ public:
 		msDifference,
 		msSimpleCompare,
 		msMask,
-	} ;
+	};
 
 	cBlockArea(void);
 
@@ -111,35 +112,60 @@ public:
 	// tolua_end
 
 	/** Reads an area of blocks specified. Returns true if successful. All coords are inclusive. */
-	bool Read(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes = baTypes | baMetas | baBlockEntities);
+	bool Read(
+		cForEachChunkProvider & a_ForEachChunkProvider,
+		int a_MinBlockX,
+		int a_MaxBlockX,
+		int a_MinBlockY,
+		int a_MaxBlockY,
+		int a_MinBlockZ,
+		int a_MaxBlockZ,
+		int a_DataTypes = baTypes | baMetas | baBlockEntities
+	);
 
 	/** Reads an area of blocks specified. Returns true if successful. The bounds are included in the read area. */
-	bool Read(cForEachChunkProvider & a_ForEachChunkProvider, const cCuboid & a_Bounds, int a_DataTypes = baTypes | baMetas | baBlockEntities);
+	bool Read(
+		cForEachChunkProvider & a_ForEachChunkProvider,
+		const cCuboid & a_Bounds,
+		int a_DataTypes = baTypes | baMetas | baBlockEntities
+	);
 
 	/** Reads an area of blocks specified. Returns true if successful. The bounds are included in the read area. */
-	bool Read(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_Point1, const Vector3i & a_Point2, int a_DataTypes = baTypes | baMetas | baBlockEntities);
+	bool Read(
+		cForEachChunkProvider & a_ForEachChunkProvider,
+		const Vector3i & a_Point1,
+		const Vector3i & a_Point2,
+		int a_DataTypes = baTypes | baMetas | baBlockEntities
+	);
 
-	// TODO: Write() is not too good an interface: if it fails, there's no way to repeat only for the parts that didn't write
-	// A better way may be to return a list of cBlockAreas for each part that didn't succeed writing, so that the caller may try again
+	// TODO: Write() is not too good an interface: if it fails, there's no way to repeat only for the parts that didn't
+	// write A better way may be to return a list of cBlockAreas for each part that didn't succeed writing, so that the
+	// caller may try again
 
-	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
-	Doesn't wake up the simulators. */
-	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
+	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if
+	only partially / not at all. Doesn't wake up the simulators. */
+	bool Write(
+		cForEachChunkProvider & a_ForEachChunkProvider,
+		int a_MinBlockX,
+		int a_MinBlockY,
+		int a_MinBlockZ,
+		int a_DataTypes
+	);
 
-	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
-	Doesn't wake up the simulators. */
+	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if
+	only partially / not at all. Doesn't wake up the simulators. */
 	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ)
 	{
 		// Write all available data
 		return Write(a_ForEachChunkProvider, a_MinBlockX, a_MinBlockY, a_MinBlockZ, GetDataTypes());
 	}
 
-	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
-	Doesn't wake up the simulators. */
+	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if
+	only partially / not at all. Doesn't wake up the simulators. */
 	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_MinCoords, int a_DataTypes);
 
-	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if only partially / not at all.
-	Doesn't wake up the simulators. */
+	/** Writes the area back into cWorld at the coords specified. Returns true if successful in all chunks, false if
+	only partially / not at all. Doesn't wake up the simulators. */
 	bool Write(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_MinCoords)
 	{
 		// Write all available data
@@ -166,10 +192,10 @@ public:
 	/** Merges another block area into this one, using the specified block combinating strategy
 	This function combines another BlockArea into the current object.
 	The a_RelX, a_RelY and a_RelZ parameters specify the coords of this BA where a_Src should be copied.
-	If both areas contain baBlockEntities, the BEs are merged (with preference of keeping this' ones) (MergeBlockEntities()).
-	If only this contains BEs, but a_Src doesn't, the BEs are checked after merge to remove the overwritten ones and create
-	the missing ones (UpdateBlockEntities()).
-	The strategy parameter specifies how individual blocks are combined together, using the table below.
+	If both areas contain baBlockEntities, the BEs are merged (with preference of keeping this' ones)
+	(MergeBlockEntities()). If only this contains BEs, but a_Src doesn't, the BEs are checked after merge to remove the
+	overwritten ones and create the missing ones (UpdateBlockEntities()). The strategy parameter specifies how
+	individual blocks are combined together, using the table below.
 
 	| area block |                 result              |
 	| this | Src | msOverwrite | msFillAir | msImprint |
@@ -218,9 +244,8 @@ public:
 	| A    | non-A | A      |  Differring blocks are kept from "this"
 
 	msSimpleCompare:
-	Used to determine the differences between two areas. Blocks that differ are replaced with stone, same blocks are replaced with air
-	|  area block  |        |
-	| this | Src   | result |
+	Used to determine the differences between two areas. Blocks that differ are replaced with stone, same blocks are
+	replaced with air |  area block  |        | | this | Src   | result |
 	+------+-------+--------+
 	| A    | A     | air    |  Same blocks are replaced with air
 	| A    | non-A | stone  |  Differring blocks are replaced with stone
@@ -241,32 +266,67 @@ public:
 	void Merge(const cBlockArea & a_Src, const Vector3i & a_RelMinCoords, eMergeStrategy a_Strategy);
 
 	/** Fills the entire block area with the specified data */
-	void Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0, NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f);
+	void Fill(
+		int a_DataTypes,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta = 0,
+		NIBBLETYPE a_BlockLight = 0,
+		NIBBLETYPE a_BlockSkyLight = 0x0f
+	);
 
 	// tolua_end
 
 	/** Fills a cuboid inside the block area with the specified data */
-	void FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ,
-		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0,
-		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
+	void FillRelCuboid(
+		int a_MinRelX,
+		int a_MaxRelX,
+		int a_MinRelY,
+		int a_MaxRelY,
+		int a_MinRelZ,
+		int a_MaxRelZ,
+		int a_DataTypes,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta = 0,
+		NIBBLETYPE a_BlockLight = 0,
+		NIBBLETYPE a_BlockSkyLight = 0x0f
 	);
 
 	/** Fills a cuboid inside the block area with the specified data. a_Cuboid must be sorted. */
-	void FillRelCuboid(const cCuboid & a_RelCuboid,
-		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0,
-		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
+	void FillRelCuboid(
+		const cCuboid & a_RelCuboid,
+		int a_DataTypes,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta = 0,
+		NIBBLETYPE a_BlockLight = 0,
+		NIBBLETYPE a_BlockSkyLight = 0x0f
 	);
 
-	/** Draws a line between two points with the specified data. The line endpoints needn't be valid coords inside the area. */
-	void RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int a_RelY2, int a_RelZ2,
-		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0,
-		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
+	/** Draws a line between two points with the specified data. The line endpoints needn't be valid coords inside the
+	 * area. */
+	void RelLine(
+		int a_RelX1,
+		int a_RelY1,
+		int a_RelZ1,
+		int a_RelX2,
+		int a_RelY2,
+		int a_RelZ2,
+		int a_DataTypes,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta = 0,
+		NIBBLETYPE a_BlockLight = 0,
+		NIBBLETYPE a_BlockSkyLight = 0x0f
 	);
 
-	/** Draws a line between two points with the specified data. The line endpoints needn't be valid coords inside the area. */
-	void RelLine(const Vector3i & a_Point1, const Vector3i & a_Point2,
-		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta = 0,
-		NIBBLETYPE a_BlockLight = 0, NIBBLETYPE a_BlockSkyLight = 0x0f
+	/** Draws a line between two points with the specified data. The line endpoints needn't be valid coords inside the
+	 * area. */
+	void RelLine(
+		const Vector3i & a_Point1,
+		const Vector3i & a_Point2,
+		int a_DataTypes,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta = 0,
+		NIBBLETYPE a_BlockLight = 0,
+		NIBBLETYPE a_BlockSkyLight = 0x0f
 	);
 
 	// tolua_begin
@@ -304,38 +364,40 @@ public:
 	// tolua_end
 
 	// Setters:
-	void SetRelBlockType    (int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE  a_BlockType);
-	void SetBlockType       (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE  a_BlockType);
-	void SetRelBlockMeta    (int a_RelX,   int a_RelY,   int a_RelZ,   NIBBLETYPE a_BlockMeta);
-	void SetBlockMeta       (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta);
-	void SetRelBlockLight   (int a_RelX,   int a_RelY,   int a_RelZ,   NIBBLETYPE a_BlockLight);
-	void SetBlockLight      (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockLight);
-	void SetRelBlockSkyLight(int a_RelX,   int a_RelY,   int a_RelZ,   NIBBLETYPE a_BlockSkyLight);
-	void SetBlockSkyLight   (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockSkyLight);
+	void SetRelBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType);
+	void SetBlockType(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType);
+	void SetRelBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_BlockMeta);
+	void SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockMeta);
+	void SetRelBlockLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_BlockLight);
+	void SetBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockLight);
+	void SetRelBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_BlockSkyLight);
+	void SetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_BlockSkyLight);
 
 	// tolua_begin
 
-	void SetWEOffset (int a_OffsetX, int a_OffsetY, int a_OffsetZ);
-	void SetWEOffset (const Vector3i & a_Offset);
-	const Vector3i & GetWEOffset  (void) const {return m_WEOffset;}
+	void SetWEOffset(int a_OffsetX, int a_OffsetY, int a_OffsetZ);
+	void SetWEOffset(const Vector3i & a_Offset);
+	const Vector3i & GetWEOffset(void) const { return m_WEOffset; }
 
 	// tolua_end
 
 	// Getters:
-	BLOCKTYPE  GetRelBlockType    (int a_RelX,   int a_RelY,   int a_RelZ)   const;
-	BLOCKTYPE  GetBlockType       (int a_BlockX, int a_BlockY, int a_BlockZ) const;
-	NIBBLETYPE GetRelBlockMeta    (int a_RelX,   int a_RelY,   int a_RelZ)   const;
-	NIBBLETYPE GetBlockMeta       (int a_BlockX, int a_BlockY, int a_BlockZ) const;
-	NIBBLETYPE GetRelBlockLight   (int a_RelX,   int a_RelY,   int a_RelZ)   const;
-	NIBBLETYPE GetBlockLight      (int a_BlockX, int a_BlockY, int a_BlockZ) const;
-	NIBBLETYPE GetRelBlockSkyLight(int a_RelX,   int a_RelY,   int a_RelZ)   const;
-	NIBBLETYPE GetBlockSkyLight   (int a_BlockX, int a_BlockY, int a_BlockZ) const;
+	BLOCKTYPE GetRelBlockType(int a_RelX, int a_RelY, int a_RelZ) const;
+	BLOCKTYPE GetBlockType(int a_BlockX, int a_BlockY, int a_BlockZ) const;
+	NIBBLETYPE GetRelBlockMeta(int a_RelX, int a_RelY, int a_RelZ) const;
+	NIBBLETYPE GetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ) const;
+	NIBBLETYPE GetRelBlockLight(int a_RelX, int a_RelY, int a_RelZ) const;
+	NIBBLETYPE GetBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ) const;
+	NIBBLETYPE GetRelBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ) const;
+	NIBBLETYPE GetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ) const;
 
-	void SetBlockTypeMeta   (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType,   NIBBLETYPE a_BlockMeta);
-	void SetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE a_BlockType,   NIBBLETYPE a_BlockMeta);
+	void SetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void SetRelBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
-	void GetBlockTypeMeta   (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
-	void GetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
+	void GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+		const;
+	void GetRelBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+		const;
 
 	const Vector3i & GetSize(void) const { return m_Size; }
 	const Vector3i & GetOrigin(void) const { return m_Origin; }
@@ -358,14 +420,15 @@ public:
 	/** Returns the datatypes that are stored in the object (bitmask of baXXX values) */
 	int GetDataTypes(void) const;
 
-	bool HasBlockTypes    (void) const { return (m_BlockTypes    != nullptr); }
-	bool HasBlockMetas    (void) const { return (m_BlockMetas    != nullptr); }
-	bool HasBlockLights   (void) const { return (m_BlockLight    != nullptr); }
+	bool HasBlockTypes(void) const { return (m_BlockTypes != nullptr); }
+	bool HasBlockMetas(void) const { return (m_BlockMetas != nullptr); }
+	bool HasBlockLights(void) const { return (m_BlockLight != nullptr); }
 	bool HasBlockSkyLights(void) const { return (m_BlockSkyLight != nullptr); }
-	bool HasBlockEntities (void) const { return (m_BlockEntities != nullptr); }
+	bool HasBlockEntities(void) const { return (m_BlockEntities != nullptr); }
 
 	/** Returns the count of blocks that are not air.
-	Returns 0 if blocktypes not available. Block metas are ignored (if present, air with any meta is still considered air). */
+	Returns 0 if blocktypes not available. Block metas are ignored (if present, air with any meta is still considered
+	air). */
 	size_t CountNonAirBlocks(void) const;
 
 	/** Returns how many times the specified block is contained in the area.
@@ -380,30 +443,35 @@ public:
 	// tolua_end
 
 	/** Returns the minimum and maximum coords in each direction for the first non-ignored block in each direction.
-	If there are no non-ignored blocks within the area, or blocktypes are not present, the returned values are reverse-ranges (MinX <- m_RangeX, MaxX <- 0 etc.)
-	Exported to Lua in ManualBindings.cpp. */
-	void GetNonAirCropRelCoords(int & a_MinRelX, int & a_MinRelY, int & a_MinRelZ, int & a_MaxRelX, int & a_MaxRelY, int & a_MaxRelZ, BLOCKTYPE a_IgnoreBlockType = E_BLOCK_AIR);
+	If there are no non-ignored blocks within the area, or blocktypes are not present, the returned values are
+	reverse-ranges (MinX <- m_RangeX, MaxX <- 0 etc.) Exported to Lua in ManualBindings.cpp. */
+	void GetNonAirCropRelCoords(
+		int & a_MinRelX,
+		int & a_MinRelY,
+		int & a_MinRelZ,
+		int & a_MaxRelX,
+		int & a_MaxRelY,
+		int & a_MaxRelZ,
+		BLOCKTYPE a_IgnoreBlockType = E_BLOCK_AIR
+	);
 
 	// Clients can use these for faster access to all blocktypes. Be careful though!
 	/** Returns the internal pointer to the block types */
-	BLOCKTYPE *  GetBlockTypes   (void) const { return m_BlockTypes.get();    }
-	NIBBLETYPE * GetBlockMetas   (void) const { return m_BlockMetas.get();    }  // NOTE: one byte per block!
-	NIBBLETYPE * GetBlockLight   (void) const { return m_BlockLight.get();    }  // NOTE: one byte per block!
+	BLOCKTYPE * GetBlockTypes(void) const { return m_BlockTypes.get(); }
+	NIBBLETYPE * GetBlockMetas(void) const { return m_BlockMetas.get(); }  // NOTE: one byte per block!
+	NIBBLETYPE * GetBlockLight(void) const { return m_BlockLight.get(); }  // NOTE: one byte per block!
 	NIBBLETYPE * GetBlockSkyLight(void) const { return m_BlockSkyLight.get(); }  // NOTE: one byte per block!
-	size_t       GetBlockCount(void) const { return static_cast<size_t>(m_Size.x * m_Size.y * m_Size.z); }
+	size_t GetBlockCount(void) const { return static_cast<size_t>(m_Size.x * m_Size.y * m_Size.z); }
 	static size_t MakeIndexForSize(Vector3i a_RelPos, Vector3i a_Size);
 
 	/** Returns the index into the internal arrays for the specified coords */
-	size_t MakeIndex(Vector3i a_RelPos) const
-	{
-		return MakeIndexForSize(a_RelPos, m_Size);
-	}
+	size_t MakeIndex(Vector3i a_RelPos) const { return MakeIndexForSize(a_RelPos, m_Size); }
 
 	/** OBSOLETE, use the Vector3i-based overload instead.
 	Returns the index into the internal arrays for the specified coords */
 	size_t MakeIndex(int a_RelX, int a_RelY, int a_RelZ) const
 	{
-		return MakeIndexForSize({ a_RelX, a_RelY, a_RelZ }, m_Size);
+		return MakeIndexForSize({a_RelX, a_RelY, a_RelZ}, m_Size);
 	}
 
 	/** Calls the callback for the block entity at the specified coords.
@@ -414,31 +482,34 @@ public:
 	/** Calls the callback for the block entity at the specified coords.
 	Returns false if there is no block entity at those coords.
 	Returns the value that the callback has returned if there is a block entity. */
-	bool DoWithBlockEntityAt   (int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback);
+	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback);
 
 	/** Calls the callback for all the block entities.
 	If the callback returns true, aborts the enumeration and returns false.
 	If the callback returns true, continues with the next BE.
-	Returns true if all block entities have been enumerated (including the case when there is none or the area is without baBlockEntities). */
+	Returns true if all block entities have been enumerated (including the case when there is none or the area is
+	without baBlockEntities). */
 	bool ForEachBlockEntity(cBlockEntityCallback a_Callback);
 
 	/** Direct read-only access to block entities. */
-	const cBlockEntities & GetBlockEntities(void) const { ASSERT(HasBlockEntities()); return *m_BlockEntities; }
+	const cBlockEntities & GetBlockEntities(void) const
+	{
+		ASSERT(HasBlockEntities());
+		return *m_BlockEntities;
+	}
 
 
 
-protected:
-
+  protected:
 	friend class cChunkDesc;
 	friend class cSchematicFileSerializer;
 
-	class cChunkReader:
-		public cChunkDataCallback
+	class cChunkReader : public cChunkDataCallback
 	{
-	public:
+	  public:
 		cChunkReader(cBlockArea & a_Area);
 
-	protected:
+	  protected:
 		cBlockArea & m_Area;
 		cCuboid m_AreaBounds;  ///< Bounds of the whole area being read, in world coords
 		Vector3i m_Origin;
@@ -451,7 +522,7 @@ protected:
 		virtual bool Coords(int a_ChunkX, int a_ChunkZ) override;
 		virtual void ChunkData(const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData) override;
 		virtual void BlockEntity(cBlockEntity * a_BlockEntity) override;
-	} ;
+	};
 
 	using NIBBLEARRAY = std::unique_ptr<NIBBLETYPE[]>;
 	using BLOCKARRAY = std::unique_ptr<BLOCKTYPE[]>;
@@ -464,9 +535,9 @@ protected:
 	cBlockArea doesn't use this value in any way. */
 	Vector3i m_WEOffset;
 
-	BLOCKARRAY  m_BlockTypes;
-	NIBBLEARRAY m_BlockMetas;     // Each meta is stored as a separate byte for faster access
-	NIBBLEARRAY m_BlockLight;     // Each light value is stored as a separate byte for faster access
+	BLOCKARRAY m_BlockTypes;
+	NIBBLEARRAY m_BlockMetas;  // Each meta is stored as a separate byte for faster access
+	NIBBLEARRAY m_BlockLight;  // Each light value is stored as a separate byte for faster access
 	NIBBLEARRAY m_BlockSkyLight;  // Each light value is stored as a separate byte for faster access
 
 	/** The block entities contained within the area.
@@ -478,38 +549,69 @@ protected:
 	bool SetSize(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes);
 
 	// Basic Setters:
-	void SetRelNibble(int a_RelX,   int a_RelY,   int a_RelZ,   NIBBLETYPE a_Value, NIBBLETYPE * a_Array);
-	void SetNibble   (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Value, NIBBLETYPE * a_Array);
+	void SetRelNibble(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Value, NIBBLETYPE * a_Array);
+	void SetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_Value, NIBBLETYPE * a_Array);
 
 	// Basic Getters:
-	NIBBLETYPE GetRelNibble(int a_RelX,   int a_RelY,   int a_RelZ,   NIBBLETYPE * a_Array) const;
-	NIBBLETYPE GetNibble   (int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE * a_Array) const;
+	NIBBLETYPE GetRelNibble(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE * a_Array) const;
+	NIBBLETYPE GetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE * a_Array) const;
 
 	// Crop helpers:
 	void CropBlockTypes(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ);
-	void CropNibbles   (NIBBLEARRAY & a_Array, int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ);
+	void CropNibbles(
+		NIBBLEARRAY & a_Array,
+		int a_AddMinX,
+		int a_SubMaxX,
+		int a_AddMinY,
+		int a_SubMaxY,
+		int a_AddMinZ,
+		int a_SubMaxZ
+	);
 
 	// Expand helpers:
 	void ExpandBlockTypes(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
-	void ExpandNibbles   (NIBBLEARRAY & a_Array, int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
+	void ExpandNibbles(
+		NIBBLEARRAY & a_Array,
+		int a_SubMinX,
+		int a_AddMaxX,
+		int a_SubMinY,
+		int a_AddMaxY,
+		int a_SubMinZ,
+		int a_AddMaxZ
+	);
 
 	/** Sets the specified datatypes at the specified location.
 	If the coords are not valid, ignores the call (so that RelLine() can work simply). */
 	void RelSetData(
-		int a_RelX, int a_RelY, int a_RelZ,
-		int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
-		NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
+		int a_RelX,
+		int a_RelY,
+		int a_RelZ,
+		int a_DataTypes,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta,
+		NIBBLETYPE a_BlockLight,
+		NIBBLETYPE a_BlockSkyLight
 	);
 
 	template <bool MetasValid>
-	void MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy, const NIBBLETYPE * SrcMetas, NIBBLETYPE * DstMetas);
+	void MergeByStrategy(
+		const cBlockArea & a_Src,
+		int a_RelX,
+		int a_RelY,
+		int a_RelZ,
+		eMergeStrategy a_Strategy,
+		const NIBBLETYPE * SrcMetas,
+		NIBBLETYPE * DstMetas
+	);
 
-	/** Updates m_BlockEntities to remove BEs that no longer match the blocktype at their coords, and clones from a_Src the BEs that are missing.
-	a_RelX, a_RelY and a_RelZ are relative coords that should be added to all BEs from a_Src before checking them.
-	If a block should have a BE but one cannot be found in either this or a_Src, a new one is created. */
+	/** Updates m_BlockEntities to remove BEs that no longer match the blocktype at their coords, and clones from a_Src
+	the BEs that are missing. a_RelX, a_RelY and a_RelZ are relative coords that should be added to all BEs from a_Src
+	before checking them. If a block should have a BE but one cannot be found in either this or a_Src, a new one is
+	created. */
 	void MergeBlockEntities(int a_RelX, int a_RelY, int a_RelZ, const cBlockArea & a_Src);
 
-	/** Updates m_BlockEntities to remove BEs that no longer match the blocktype at their coords, and add new BEs that are missing. */
+	/** Updates m_BlockEntities to remove BEs that no longer match the blocktype at their coords, and add new BEs that
+	 * are missing. */
 	void RescanBlockEntities(void);
 
 	/** Removes from m_BlockEntities those BEs that no longer match the blocktype at their coords. */
@@ -519,9 +621,5 @@ protected:
 	cBlockEntity * GetBlockEntityRel(Vector3i a_RelPos);
 
 	// tolua_begin
-} ;
+};
 // tolua_end
-
-
-
-

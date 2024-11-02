@@ -18,14 +18,11 @@
 class cEntropyContext
 {
 	friend class cCtrDrbgContext;
-public:
+
+  public:
 	cEntropyContext(void);
 	~cEntropyContext();
 
-protected:
+  protected:
 	mbedtls_entropy_context m_Entropy;
-} ;
-
-
-
-
+};

@@ -1,7 +1,8 @@
 
 // BlockPluginInterface.h
 
-// Declares the cBlockPluginInterface class representing an interface that the blockhandlers and itemhandlers use for calling plugins
+// Declares the cBlockPluginInterface class representing an interface that the blockhandlers and itemhandlers use for
+// calling plugins
 
 
 
@@ -26,14 +27,22 @@ the caller provides.
 */
 class cBlockPluginInterface
 {
-public:
+  public:
 	virtual ~cBlockPluginInterface() {}
 
 	virtual bool CallHookBlockSpread(Vector3i a_BlockPos, eSpreadSource a_Source) = 0;
-	virtual bool CallHookPlayerBreakingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
-	virtual bool CallHookPlayerBrokenBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
+	virtual bool CallHookPlayerBreakingBlock(
+		cPlayer & a_Player,
+		Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta
+	) = 0;
+	virtual bool CallHookPlayerBrokenBlock(
+		cPlayer & a_Player,
+		Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta
+	) = 0;
 };
-
-
-
-

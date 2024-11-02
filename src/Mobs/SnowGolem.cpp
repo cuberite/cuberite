@@ -67,12 +67,17 @@ bool cSnowGolem::Attack(std::chrono::milliseconds a_Dt)
 	UNUSED(a_Dt);
 
 	// Comment inherited from skeletons
-	StopMovingToPosition();  // Todo handle this in a better way, the snowman does some uneeded recalcs due to inStateChasing
+	StopMovingToPosition(
+	);  // Todo handle this in a better way, the snowman does some uneeded recalcs due to inStateChasing
 
 	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0))
 	{
 		auto & Random = GetRandomProvider();
-		Vector3d Inaccuracy = Vector3d(Random.RandReal<double>(-0.75, 0.75), Random.RandReal<double>(-0.75, 0.75), Random.RandReal<double>(-0.75, 0.75));
+		Vector3d Inaccuracy = Vector3d(
+			Random.RandReal<double>(-0.75, 0.75),
+			Random.RandReal<double>(-0.75, 0.75),
+			Random.RandReal<double>(-0.75, 0.75)
+		);
 
 		// The projectile is launched from the head
 		const auto HeadPos = GetPosition().addedY(1.5);

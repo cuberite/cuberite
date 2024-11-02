@@ -15,21 +15,26 @@ class cPlayer;
 
 
 // tolua_begin
-class cPickup :
-	public cEntity
+class cPickup : public cEntity
 {
 	// tolua_end
 
 	using Super = cEntity;
 
-public:  // tolua_export
-
+  public:  // tolua_export
 	CLASS_PROTODEF(cPickup)
 
-	cPickup(Vector3d a_Pos, const cItem & a_Item, bool IsPlayerCreated, Vector3f a_Speed = Vector3f(), int a_LifetimeTicks = 6000, bool a_CanCombine = true);
+	cPickup(
+		Vector3d a_Pos,
+		const cItem & a_Item,
+		bool IsPlayerCreated,
+		Vector3f a_Speed = Vector3f(),
+		int a_LifetimeTicks = 6000,
+		bool a_CanCombine = true
+	);
 
-	cItem &       GetItem(void)       {return m_Item; }  // tolua_export
-	const cItem & GetItem(void) const {return m_Item; }
+	cItem & GetItem(void) { return m_Item; }  // tolua_export
+	const cItem & GetItem(void) const { return m_Item; }
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
@@ -48,7 +53,7 @@ public:  // tolua_export
 	void SetCanCombine(bool a_CanCombine) { m_bCanCombine = a_CanCombine; }  // tolua_export
 
 	/** Returns the number of ticks that this entity has existed */
-	int GetAge(void) const { return std::chrono::duration_cast<cTickTime>(m_Timer).count(); }     // tolua_export
+	int GetAge(void) const { return std::chrono::duration_cast<cTickTime>(m_Timer).count(); }  // tolua_export
 
 	/** Set the number of ticks that this entity has existed */
 	void SetAge(int a_Age) { m_Timer = cTickTime(a_Age); }  // tolua_export
@@ -65,8 +70,7 @@ public:  // tolua_export
 	/** Returns true if created by player (i.e. vomiting), used for determining picking-up delay time */
 	bool IsPlayerCreated(void) const { return m_bIsPlayerCreated; }  // tolua_export
 
-private:
-
+  private:
 	/** The number of ticks that the entity has existed / timer between collect and destroy; in msec */
 	std::chrono::milliseconds m_Timer;
 

@@ -14,7 +14,7 @@
 #include "mbedTLS++/AesCfb128Encryptor.h"
 
 #ifndef _WIN32
-	typedef int SOCKET;
+typedef int SOCKET;
 #endif
 
 
@@ -42,13 +42,17 @@ class cConnection
 	SOCKET m_ClientSocket;
 	SOCKET m_ServerSocket;
 
-	std::chrono::steady_clock::time_point m_BeginTick;  // Tick when the relative time was first retrieved (used for GetRelativeTime())
+	std::chrono::steady_clock::time_point
+		m_BeginTick;  // Tick when the relative time was first retrieved (used for GetRelativeTime())
 
 	enum eConnectionState
 	{
-		csUnencrypted,           // The connection is not encrypted. Packets must be decoded in order to be able to start decryption.
-		csEncryptedUnderstood,   // The communication is encrypted and so far all packets have been understood, so they can be still decoded
-		csEncryptedUnknown,      // The communication is encrypted, but an unknown packet has been received, so packets cannot be decoded anymore
+		csUnencrypted,  // The connection is not encrypted. Packets must be decoded in order to be able to start
+						// decryption.
+		csEncryptedUnderstood,  // The communication is encrypted and so far all packets have been understood, so they
+								// can be still decoded
+		csEncryptedUnknown,  // The communication is encrypted, but an unknown packet has been received, so packets
+							 // cannot be decoded anymore
 		csWaitingForEncryption,  // The communication is waiting for the other line to establish encryption
 	};
 
@@ -57,7 +61,7 @@ class cConnection
 
 	int m_Nonce;
 
-public:
+  public:
 	cConnection(SOCKET a_ClientSocket, cServer & a_Server);
 	~cConnection();
 
@@ -65,8 +69,7 @@ public:
 
 	void vLog(const char * a_Format, fmt::printf_args a_ArgList);
 
-	template <typename... Args>
-	void Log(const char * a_Format, const Args & ... a_Args)
+	template <typename... Args> void Log(const char * a_Format, const Args &... a_Args)
 	{
 		vLog(a_Format, fmt::make_printf_args(a_Args...));
 	}
@@ -74,22 +77,22 @@ public:
 	void vDataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::printf_args a_ArgList);
 
 	template <typename... Args>
-	void DataLog(const void * a_Data, size_t a_Size, const char * a_Format, const Args & ... a_Args)
+	void DataLog(const void * a_Data, size_t a_Size, const char * a_Format, const Args &... a_Args)
 	{
 		vDataLog(a_Data, a_Size, a_Format, fmt::make_printf_args(a_Args...));
 	}
 
 	void LogFlush(void);
 
-protected:
-
+  protected:
 	cByteBuffer m_ClientBuffer;
 	cByteBuffer m_ServerBuffer;
 
 	cAesCfb128Decryptor m_ServerDecryptor;
 	cAesCfb128Encryptor m_ServerEncryptor;
 
-	ContiguousByteBuffer m_ServerEncryptionBuffer;  // Buffer for the data to be sent to the server once encryption is established
+	ContiguousByteBuffer
+		m_ServerEncryptionBuffer;  // Buffer for the data to be sent to the server once encryption is established
 
 	/** Set to true when PACKET_PING is received from the client; will cause special parsing for server kick */
 	bool m_HasClientPinged;
@@ -101,10 +104,12 @@ protected:
 	2: login
 	3: game
 	*/
-	/** State the to-server protocol is in (as defined by the initial handshake / login), -1 if no initial handshake received yet */
+	/** State the to-server protocol is in (as defined by the initial handshake / login), -1 if no initial handshake
+	 * received yet */
 	int m_ServerProtocolState;
 
-	/** State the to-client protocol is in (as defined by the initial handshake / login), -1 if no initial handshake received yet */
+	/** State the to-client protocol is in (as defined by the initial handshake / login), -1 if no initial handshake
+	 * received yet */
 	int m_ClientProtocolState;
 
 	/** True if the server connection has provided encryption keys */
@@ -128,16 +133,30 @@ protected:
 	/** Sends data to the specified socket. If sending fails, prints a fail message using a_Peer and returns false. */
 	bool SendData(SOCKET a_Socket, cByteBuffer & a_Data, const char * a_Peer);
 
-	/** Sends data to the specfied socket, after encrypting it using a_Encryptor. If sending fails, prints a fail message using a_Peer and returns false */
-	bool SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, ContiguousByteBuffer & a_Data, const char * a_Peer);
+	/** Sends data to the specfied socket, after encrypting it using a_Encryptor. If sending fails, prints a fail
+	 * message using a_Peer and returns false */
+	bool SendEncryptedData(
+		SOCKET a_Socket,
+		cAesCfb128Encryptor & a_Encryptor,
+		ContiguousByteBuffer & a_Data,
+		const char * a_Peer
+	);
 
-	/** Sends data to the specfied socket, after encrypting it using a_Encryptor. If sending fails, prints a fail message using a_Peer and returns false */
-	bool SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer);
+	/** Sends data to the specfied socket, after encrypting it using a_Encryptor. If sending fails, prints a fail
+	 * message using a_Peer and returns false */
+	bool SendEncryptedData(
+		SOCKET a_Socket,
+		cAesCfb128Encryptor & a_Encryptor,
+		cByteBuffer & a_Data,
+		const char * a_Peer
+	);
 
-	/** Decodes packets coming from the client, sends appropriate counterparts to the server; returns false if the connection is to be dropped */
+	/** Decodes packets coming from the client, sends appropriate counterparts to the server; returns false if the
+	 * connection is to be dropped */
 	bool DecodeClientsPackets(const char * a_Data, int a_Size);
 
-	/** Decodes packets coming from the server, sends appropriate counterparts to the client; returns false if the connection is to be dropped */
+	/** Decodes packets coming from the server, sends appropriate counterparts to the client; returns false if the
+	 * connection is to be dropped */
 	bool DecodeServersPackets(const char * a_Data, int a_Size);
 
 	// Packet handling, client-side, initial:
@@ -247,10 +266,12 @@ protected:
 	/** Parses the slot data in a_Buffer into item description; returns true if successful, false if not enough data */
 	bool ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc);
 
-	/** Parses the metadata in a_Buffer into raw metadata in an AString; returns true if successful, false if not enough data */
+	/** Parses the metadata in a_Buffer into raw metadata in an AString; returns true if successful, false if not enough
+	 * data */
 	bool ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata);
 
-	/** Logs the contents of the metadata in the AString, using Log(). Assumes a_Metadata is valid (parsed by ParseMetadata()). The log is indented by a_IndentCount spaces */
+	/** Logs the contents of the metadata in the AString, using Log(). Assumes a_Metadata is valid (parsed by
+	 * ParseMetadata()). The log is indented by a_IndentCount spaces */
 	void LogMetadata(const AString & a_Metadata, size_t a_IndentCount);
 
 	/** Send EKResp to the server: */
@@ -258,4 +279,4 @@ protected:
 
 	/** Starts client encryption based on the parameters received */
 	void StartClientEncryption(const AString & a_EncryptedSecret, const AString & a_EncryptedNonce);
-} ;
+};

@@ -21,7 +21,3 @@ int cMobFamilyCollecter::GetNumberOfCollectedMobs(cMonster::eFamily a_Family)
 {
 	return static_cast<int>(m_Mobs[a_Family].size());
 }
-
-
-
-

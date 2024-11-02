@@ -7,17 +7,14 @@
 
 
 
-class cBlockLilypadHandler final :
-	public cClearMetaOnDrop<cBlockHandler>
+class cBlockLilypadHandler final : public cClearMetaOnDrop<cBlockHandler>
 {
 	using Super = cClearMetaOnDrop<cBlockHandler>;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
@@ -39,12 +36,10 @@ private:
 		NIBBLETYPE UnderMeta;
 		a_Chunk.GetBlockTypeMeta(UnderPos, UnderType, UnderMeta);
 		return (
-			(((UnderType == E_BLOCK_STATIONARY_WATER) || (UnderType == E_BLOCK_WATER)) && (UnderMeta == 0)) ||  // A water source is below
-			(UnderType == E_BLOCK_ICE) || (UnderType == E_BLOCK_FROSTED_ICE)                                    // Or (frosted) ice
+			(((UnderType == E_BLOCK_STATIONARY_WATER) || (UnderType == E_BLOCK_WATER)) && (UnderMeta == 0)
+			) ||  // A water source is below
+			(UnderType == E_BLOCK_ICE) ||
+			(UnderType == E_BLOCK_FROSTED_ICE)  // Or (frosted) ice
 		);
 	}
 };
-
-
-
-

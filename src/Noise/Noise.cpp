@@ -112,7 +112,14 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // Globals:
 
-void Debug3DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY, size_t a_SizeZ, const AString & a_FileNameBase, NOISE_DATATYPE a_Coeff)
+void Debug3DNoise(
+	const NOISE_DATATYPE * a_Noise,
+	size_t a_SizeX,
+	size_t a_SizeY,
+	size_t a_SizeZ,
+	const AString & a_FileNameBase,
+	NOISE_DATATYPE a_Coeff
+)
 {
 	const int BUF_SIZE = 512;
 	ASSERT(a_SizeX <= BUF_SIZE);  // Just stretch it, if needed
@@ -129,7 +136,8 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY
 				unsigned char buf[BUF_SIZE];
 				for (size_t x = 0; x < a_SizeX; x++)
 				{
-					buf[x] = static_cast<unsigned char>(Clamp(static_cast<int>(128 + a_Coeff * a_Noise[idx++]), 0, 255));
+					buf[x] =
+						static_cast<unsigned char>(Clamp(static_cast<int>(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 				}
 				f1.Write(buf, a_SizeX);
 			}  // for y
@@ -150,7 +158,8 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY
 				unsigned char buf[BUF_SIZE];
 				for (size_t x = 0; x < a_SizeX; x++)
 				{
-					buf[x] = static_cast<unsigned char>(Clamp(static_cast<int>(128 + a_Coeff * a_Noise[idx++]), 0, 255));
+					buf[x] =
+						static_cast<unsigned char>(Clamp(static_cast<int>(128 + a_Coeff * a_Noise[idx++]), 0, 255));
 				}
 				f2.Write(buf, a_SizeX);
 			}  // for z
@@ -165,7 +174,13 @@ void Debug3DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY
 
 
 
-void Debug2DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY, const AString & a_FileNameBase, NOISE_DATATYPE a_Coeff)
+void Debug2DNoise(
+	const NOISE_DATATYPE * a_Noise,
+	size_t a_SizeX,
+	size_t a_SizeY,
+	const AString & a_FileNameBase,
+	NOISE_DATATYPE a_Coeff
+)
 {
 	const int BUF_SIZE = 512;
 	ASSERT(a_SizeX <= BUF_SIZE);  // Just stretch it, if needed
@@ -195,20 +210,18 @@ void Debug2DNoise(const NOISE_DATATYPE * a_Noise, size_t a_SizeX, size_t a_SizeY
 
 class cCubicCell2D
 {
-public:
+  public:
 	cCubicCell2D(
-		const cNoise & a_Noise,    ///< Noise to use for generating the random values
+		const cNoise & a_Noise,  ///< Noise to use for generating the random values
 		NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
-		int a_SizeX, int a_SizeY,  ///< Count of the array, in each direction
+		int a_SizeX,
+		int a_SizeY,  ///< Count of the array, in each direction
 		const NOISE_DATATYPE * a_FracX,  ///< Pointer to the array that stores the X fractional values
-		const NOISE_DATATYPE * a_FracY   ///< Pointer to the attay that stores the Y fractional values
+		const NOISE_DATATYPE * a_FracY  ///< Pointer to the attay that stores the Y fractional values
 	);
 
 	/** Uses current m_WorkRnds[] to generate part of the array */
-	void Generate(
-		int a_FromX, int a_ToX,
-		int a_FromY, int a_ToY
-	);
+	void Generate(int a_FromX, int a_ToX, int a_FromY, int a_ToY);
 
 	/** Initializes m_WorkRnds[] with the specified Floor values */
 	void InitWorkRnds(int a_FloorX, int a_FloorY);
@@ -216,12 +229,13 @@ public:
 	/** Updates m_WorkRnds[] for the new Floor values. */
 	void Move(int a_NewFloorX, int a_NewFloorY);
 
-protected:
+  protected:
 	typedef NOISE_DATATYPE Workspace[4][4];
 
 	const cNoise & m_Noise;
 
-	Workspace * m_WorkRnds;  ///< The current random values; points to either m_Workspace1 or m_Workspace2 (doublebuffering)
+	Workspace *
+		m_WorkRnds;  ///< The current random values; points to either m_Workspace1 or m_Workspace2 (doublebuffering)
 	Workspace m_Workspace1;  ///< Buffer 1 for workspace doublebuffering, used in Move()
 	Workspace m_Workspace2;  ///< Buffer 2 for workspace doublebuffering, used in Move()
 	int m_CurFloorX;
@@ -231,18 +245,19 @@ protected:
 	int m_SizeX, m_SizeY;
 	const NOISE_DATATYPE * m_FracX;
 	const NOISE_DATATYPE * m_FracY;
-} ;
+};
 
 
 
 
 
 cCubicCell2D::cCubicCell2D(
-	const cNoise & a_Noise,    ///< Noise to use for generating the random values
+	const cNoise & a_Noise,  ///< Noise to use for generating the random values
 	NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
-	int a_SizeX, int a_SizeY,  ///< Count of the array, in each direction
+	int a_SizeX,
+	int a_SizeY,  ///< Count of the array, in each direction
 	const NOISE_DATATYPE * a_FracX,  ///< Pointer to the array that stores the X fractional values
-	const NOISE_DATATYPE * a_FracY   ///< Pointer to the attay that stores the Y fractional values
+	const NOISE_DATATYPE * a_FracY  ///< Pointer to the attay that stores the Y fractional values
 ) :
 	m_Noise(a_Noise),
 	m_WorkRnds(&m_Workspace1),
@@ -260,19 +275,40 @@ cCubicCell2D::cCubicCell2D(
 
 
 
-void cCubicCell2D::Generate(
-	int a_FromX, int a_ToX,
-	int a_FromY, int a_ToY
-)
+void cCubicCell2D::Generate(int a_FromX, int a_ToX, int a_FromY, int a_ToY)
 {
 	for (int y = a_FromY; y < a_ToY; y++)
 	{
 		NOISE_DATATYPE Interp[4];
 		NOISE_DATATYPE FracY = m_FracY[y];
-		Interp[0] = cNoise::CubicInterpolate((*m_WorkRnds)[0][0], (*m_WorkRnds)[0][1], (*m_WorkRnds)[0][2], (*m_WorkRnds)[0][3], FracY);
-		Interp[1] = cNoise::CubicInterpolate((*m_WorkRnds)[1][0], (*m_WorkRnds)[1][1], (*m_WorkRnds)[1][2], (*m_WorkRnds)[1][3], FracY);
-		Interp[2] = cNoise::CubicInterpolate((*m_WorkRnds)[2][0], (*m_WorkRnds)[2][1], (*m_WorkRnds)[2][2], (*m_WorkRnds)[2][3], FracY);
-		Interp[3] = cNoise::CubicInterpolate((*m_WorkRnds)[3][0], (*m_WorkRnds)[3][1], (*m_WorkRnds)[3][2], (*m_WorkRnds)[3][3], FracY);
+		Interp[0] = cNoise::CubicInterpolate(
+			(*m_WorkRnds)[0][0],
+			(*m_WorkRnds)[0][1],
+			(*m_WorkRnds)[0][2],
+			(*m_WorkRnds)[0][3],
+			FracY
+		);
+		Interp[1] = cNoise::CubicInterpolate(
+			(*m_WorkRnds)[1][0],
+			(*m_WorkRnds)[1][1],
+			(*m_WorkRnds)[1][2],
+			(*m_WorkRnds)[1][3],
+			FracY
+		);
+		Interp[2] = cNoise::CubicInterpolate(
+			(*m_WorkRnds)[2][0],
+			(*m_WorkRnds)[2][1],
+			(*m_WorkRnds)[2][2],
+			(*m_WorkRnds)[2][3],
+			FracY
+		);
+		Interp[3] = cNoise::CubicInterpolate(
+			(*m_WorkRnds)[3][0],
+			(*m_WorkRnds)[3][1],
+			(*m_WorkRnds)[3][2],
+			(*m_WorkRnds)[3][3],
+			FracY
+		);
 		int idx = y * m_SizeX + a_FromX;
 		for (int x = a_FromX; x < a_ToX; x++)
 		{
@@ -346,22 +382,20 @@ void cCubicCell2D::Move(int a_NewFloorX, int a_NewFloorY)
 
 class cCubicCell3D
 {
-public:
+  public:
 	cCubicCell3D(
-		const cNoise & a_Noise,                 ///< Noise to use for generating the random values
-		NOISE_DATATYPE * a_Array,               ///< Array to generate into [x + a_SizeX * y]
-		int a_SizeX, int a_SizeY, int a_SizeZ,  ///< Count of the array, in each direction
-		const NOISE_DATATYPE * a_FracX,         ///< Pointer to the array that stores the X fractional values
-		const NOISE_DATATYPE * a_FracY,         ///< Pointer to the attay that stores the Y fractional values
-		const NOISE_DATATYPE * a_FracZ          ///< Pointer to the array that stores the Z fractional values
+		const cNoise & a_Noise,  ///< Noise to use for generating the random values
+		NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
+		int a_SizeX,
+		int a_SizeY,
+		int a_SizeZ,  ///< Count of the array, in each direction
+		const NOISE_DATATYPE * a_FracX,  ///< Pointer to the array that stores the X fractional values
+		const NOISE_DATATYPE * a_FracY,  ///< Pointer to the attay that stores the Y fractional values
+		const NOISE_DATATYPE * a_FracZ  ///< Pointer to the array that stores the Z fractional values
 	);
 
 	/** Uses current m_WorkRnds[] to generate part of the array */
-	void Generate(
-		int a_FromX, int a_ToX,
-		int a_FromY, int a_ToY,
-		int a_FromZ, int a_ToZ
-	);
+	void Generate(int a_FromX, int a_ToX, int a_FromY, int a_ToY, int a_FromZ, int a_ToZ);
 
 	/** Initializes m_WorkRnds[] with the specified Floor values */
 	void InitWorkRnds(int a_FloorX, int a_FloorY, int a_FloorZ);
@@ -369,12 +403,13 @@ public:
 	/** Updates m_WorkRnds[] for the new Floor values. */
 	void Move(int a_NewFloorX, int a_NewFloorY, int a_NewFloorZ);
 
-protected:
+  protected:
 	typedef NOISE_DATATYPE Workspace[4][4][4];
 
 	const cNoise & m_Noise;
 
-	Workspace * m_WorkRnds;  ///< The current random values; points to either m_Workspace1 or m_Workspace2 (doublebuffering)
+	Workspace *
+		m_WorkRnds;  ///< The current random values; points to either m_Workspace1 or m_Workspace2 (doublebuffering)
 	Workspace m_Workspace1;  ///< Buffer 1 for workspace doublebuffering, used in Move()
 	Workspace m_Workspace2;  ///< Buffer 2 for workspace doublebuffering, used in Move()
 	int m_CurFloorX;
@@ -386,19 +421,21 @@ protected:
 	const NOISE_DATATYPE * m_FracX;
 	const NOISE_DATATYPE * m_FracY;
 	const NOISE_DATATYPE * m_FracZ;
-} ;
+};
 
 
 
 
 
 cCubicCell3D::cCubicCell3D(
-	const cNoise & a_Noise,                 ///< Noise to use for generating the random values
-	NOISE_DATATYPE * a_Array,               ///< Array to generate into [x + a_SizeX * y]
-	int a_SizeX, int a_SizeY, int a_SizeZ,  ///< Count of the array, in each direction
-	const NOISE_DATATYPE * a_FracX,         ///< Pointer to the array that stores the X fractional values
-	const NOISE_DATATYPE * a_FracY,         ///< Pointer to the attay that stores the Y fractional values
-	const NOISE_DATATYPE * a_FracZ          ///< Pointer to the array that stores the Z fractional values
+	const cNoise & a_Noise,  ///< Noise to use for generating the random values
+	NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
+	int a_SizeX,
+	int a_SizeY,
+	int a_SizeZ,  ///< Count of the array, in each direction
+	const NOISE_DATATYPE * a_FracX,  ///< Pointer to the array that stores the X fractional values
+	const NOISE_DATATYPE * a_FracY,  ///< Pointer to the attay that stores the Y fractional values
+	const NOISE_DATATYPE * a_FracZ  ///< Pointer to the array that stores the Z fractional values
 ) :
 	m_Noise(a_Noise),
 	m_WorkRnds(&m_Workspace1),
@@ -419,11 +456,7 @@ cCubicCell3D::cCubicCell3D(
 
 
 
-void cCubicCell3D::Generate(
-	int a_FromX, int a_ToX,
-	int a_FromY, int a_ToY,
-	int a_FromZ, int a_ToZ
-)
+void cCubicCell3D::Generate(int a_FromX, int a_ToX, int a_FromY, int a_ToY, int a_FromZ, int a_ToZ)
 {
 	for (int z = a_FromZ; z < a_ToZ; z++)
 	{
@@ -434,7 +467,13 @@ void cCubicCell3D::Generate(
 		{
 			for (int y = 0; y < 4; y++)
 			{
-				Interp2[x][y] = cNoise::CubicInterpolate((*m_WorkRnds)[x][y][0], (*m_WorkRnds)[x][y][1], (*m_WorkRnds)[x][y][2], (*m_WorkRnds)[x][y][3], FracZ);
+				Interp2[x][y] = cNoise::CubicInterpolate(
+					(*m_WorkRnds)[x][y][0],
+					(*m_WorkRnds)[x][y][1],
+					(*m_WorkRnds)[x][y][2],
+					(*m_WorkRnds)[x][y][3],
+					FracZ
+				);
 			}
 		}
 		for (int y = a_FromY; y < a_ToY; y++)
@@ -574,7 +613,13 @@ NOISE_DATATYPE cNoise::CubicNoise1D(NOISE_DATATYPE a_X) const
 {
 	int BaseX = FAST_FLOOR(a_X);
 	NOISE_DATATYPE FracX = a_X - BaseX;
-	return CubicInterpolate(IntNoise1D(BaseX - 1), IntNoise1D(BaseX), IntNoise1D(BaseX + 1), IntNoise1D(BaseX + 2), FracX);
+	return CubicInterpolate(
+		IntNoise1D(BaseX - 1),
+		IntNoise1D(BaseX),
+		IntNoise1D(BaseX + 1),
+		IntNoise1D(BaseX + 2),
+		FracX
+	);
 }
 
 
@@ -595,12 +640,31 @@ NOISE_DATATYPE cNoise::CubicNoise2D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y) cons
 	const int BaseX = FAST_FLOOR(a_X);
 	const int BaseY = FAST_FLOOR(a_Y);
 
-	const NOISE_DATATYPE points[4][4] =
-	{
-		{ IntNoise2D(BaseX - 1, BaseY - 1), IntNoise2D(BaseX, BaseY - 1), IntNoise2D(BaseX + 1, BaseY - 1), IntNoise2D(BaseX + 2, BaseY - 1), },
-		{ IntNoise2D(BaseX - 1, BaseY),     IntNoise2D(BaseX, BaseY),     IntNoise2D(BaseX + 1, BaseY),     IntNoise2D(BaseX + 2, BaseY),     },
-		{ IntNoise2D(BaseX - 1, BaseY + 1), IntNoise2D(BaseX, BaseY + 1), IntNoise2D(BaseX + 1, BaseY + 1), IntNoise2D(BaseX + 2, BaseY + 1), },
-		{ IntNoise2D(BaseX - 1, BaseY + 2), IntNoise2D(BaseX, BaseY + 2), IntNoise2D(BaseX + 1, BaseY + 2), IntNoise2D(BaseX + 2, BaseY + 2), },
+	const NOISE_DATATYPE points[4][4] = {
+		{
+			IntNoise2D(BaseX - 1, BaseY - 1),
+			IntNoise2D(BaseX, BaseY - 1),
+			IntNoise2D(BaseX + 1, BaseY - 1),
+			IntNoise2D(BaseX + 2, BaseY - 1),
+		},
+		{
+			IntNoise2D(BaseX - 1, BaseY),
+			IntNoise2D(BaseX, BaseY),
+			IntNoise2D(BaseX + 1, BaseY),
+			IntNoise2D(BaseX + 2, BaseY),
+		},
+		{
+			IntNoise2D(BaseX - 1, BaseY + 1),
+			IntNoise2D(BaseX, BaseY + 1),
+			IntNoise2D(BaseX + 1, BaseY + 1),
+			IntNoise2D(BaseX + 2, BaseY + 1),
+		},
+		{
+			IntNoise2D(BaseX - 1, BaseY + 2),
+			IntNoise2D(BaseX, BaseY + 2),
+			IntNoise2D(BaseX + 1, BaseY + 2),
+			IntNoise2D(BaseX + 2, BaseY + 2),
+		},
 	};
 
 	const NOISE_DATATYPE FracX = a_X - BaseX;
@@ -624,66 +688,158 @@ NOISE_DATATYPE cNoise::CubicNoise3D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOIS
 	const int BaseY = FAST_FLOOR(a_Y);
 	const int BaseZ = FAST_FLOOR(a_Z);
 
-	const NOISE_DATATYPE points1[4][4] =
-	{
-		{ IntNoise3D(BaseX - 1, BaseY - 1, BaseZ - 1), IntNoise3D(BaseX, BaseY - 1, BaseZ - 1), IntNoise3D(BaseX + 1, BaseY - 1, BaseZ - 1), IntNoise3D(BaseX + 2, BaseY - 1, BaseZ - 1), },
-		{ IntNoise3D(BaseX - 1, BaseY,     BaseZ - 1), IntNoise3D(BaseX, BaseY,     BaseZ - 1), IntNoise3D(BaseX + 1, BaseY,     BaseZ - 1), IntNoise3D(BaseX + 2, BaseY,     BaseZ - 1), },
-		{ IntNoise3D(BaseX - 1, BaseY + 1, BaseZ - 1), IntNoise3D(BaseX, BaseY + 1, BaseZ - 1), IntNoise3D(BaseX + 1, BaseY + 1, BaseZ - 1), IntNoise3D(BaseX + 2, BaseY + 1, BaseZ - 1), },
-		{ IntNoise3D(BaseX - 1, BaseY + 2, BaseZ - 1), IntNoise3D(BaseX, BaseY + 2, BaseZ - 1), IntNoise3D(BaseX + 1, BaseY + 2, BaseZ - 1), IntNoise3D(BaseX + 2, BaseY + 2, BaseZ - 1), },
+	const NOISE_DATATYPE points1[4][4] = {
+		{
+			IntNoise3D(BaseX - 1, BaseY - 1, BaseZ - 1),
+			IntNoise3D(BaseX, BaseY - 1, BaseZ - 1),
+			IntNoise3D(BaseX + 1, BaseY - 1, BaseZ - 1),
+			IntNoise3D(BaseX + 2, BaseY - 1, BaseZ - 1),
+		},
+		{
+			IntNoise3D(BaseX - 1, BaseY, BaseZ - 1),
+			IntNoise3D(BaseX, BaseY, BaseZ - 1),
+			IntNoise3D(BaseX + 1, BaseY, BaseZ - 1),
+			IntNoise3D(BaseX + 2, BaseY, BaseZ - 1),
+		},
+		{
+			IntNoise3D(BaseX - 1, BaseY + 1, BaseZ - 1),
+			IntNoise3D(BaseX, BaseY + 1, BaseZ - 1),
+			IntNoise3D(BaseX + 1, BaseY + 1, BaseZ - 1),
+			IntNoise3D(BaseX + 2, BaseY + 1, BaseZ - 1),
+		},
+		{
+			IntNoise3D(BaseX - 1, BaseY + 2, BaseZ - 1),
+			IntNoise3D(BaseX, BaseY + 2, BaseZ - 1),
+			IntNoise3D(BaseX + 1, BaseY + 2, BaseZ - 1),
+			IntNoise3D(BaseX + 2, BaseY + 2, BaseZ - 1),
+		},
 	};
 
-	const NOISE_DATATYPE FracX = (a_X) - BaseX;
-	const NOISE_DATATYPE x1interp1 = CubicInterpolate(points1[0][0], points1[0][1], points1[0][2], points1[0][3], FracX);
-	const NOISE_DATATYPE x1interp2 = CubicInterpolate(points1[1][0], points1[1][1], points1[1][2], points1[1][3], FracX);
-	const NOISE_DATATYPE x1interp3 = CubicInterpolate(points1[2][0], points1[2][1], points1[2][2], points1[2][3], FracX);
-	const NOISE_DATATYPE x1interp4 = CubicInterpolate(points1[3][0], points1[3][1], points1[3][2], points1[3][3], FracX);
+	const NOISE_DATATYPE FracX = (a_X) -BaseX;
+	const NOISE_DATATYPE x1interp1 =
+		CubicInterpolate(points1[0][0], points1[0][1], points1[0][2], points1[0][3], FracX);
+	const NOISE_DATATYPE x1interp2 =
+		CubicInterpolate(points1[1][0], points1[1][1], points1[1][2], points1[1][3], FracX);
+	const NOISE_DATATYPE x1interp3 =
+		CubicInterpolate(points1[2][0], points1[2][1], points1[2][2], points1[2][3], FracX);
+	const NOISE_DATATYPE x1interp4 =
+		CubicInterpolate(points1[3][0], points1[3][1], points1[3][2], points1[3][3], FracX);
 
-	const NOISE_DATATYPE points2[4][4] =
-	{
-		{ IntNoise3D(BaseX - 1, BaseY - 1, BaseZ), IntNoise3D(BaseX, BaseY - 1, BaseZ), IntNoise3D(BaseX + 1, BaseY - 1, BaseZ), IntNoise3D(BaseX + 2, BaseY - 1, BaseZ), },
-		{ IntNoise3D(BaseX - 1, BaseY,     BaseZ), IntNoise3D(BaseX, BaseY,     BaseZ), IntNoise3D(BaseX + 1, BaseY,     BaseZ), IntNoise3D(BaseX + 2, BaseY,     BaseZ), },
-		{ IntNoise3D(BaseX - 1, BaseY + 1, BaseZ), IntNoise3D(BaseX, BaseY + 1, BaseZ), IntNoise3D(BaseX + 1, BaseY + 1, BaseZ), IntNoise3D(BaseX + 2, BaseY + 1, BaseZ), },
-		{ IntNoise3D(BaseX - 1, BaseY + 2, BaseZ), IntNoise3D(BaseX, BaseY + 2, BaseZ), IntNoise3D(BaseX + 1, BaseY + 2, BaseZ), IntNoise3D(BaseX + 2, BaseY + 2, BaseZ), },
+	const NOISE_DATATYPE points2[4][4] = {
+		{
+			IntNoise3D(BaseX - 1, BaseY - 1, BaseZ),
+			IntNoise3D(BaseX, BaseY - 1, BaseZ),
+			IntNoise3D(BaseX + 1, BaseY - 1, BaseZ),
+			IntNoise3D(BaseX + 2, BaseY - 1, BaseZ),
+		},
+		{
+			IntNoise3D(BaseX - 1, BaseY, BaseZ),
+			IntNoise3D(BaseX, BaseY, BaseZ),
+			IntNoise3D(BaseX + 1, BaseY, BaseZ),
+			IntNoise3D(BaseX + 2, BaseY, BaseZ),
+		},
+		{
+			IntNoise3D(BaseX - 1, BaseY + 1, BaseZ),
+			IntNoise3D(BaseX, BaseY + 1, BaseZ),
+			IntNoise3D(BaseX + 1, BaseY + 1, BaseZ),
+			IntNoise3D(BaseX + 2, BaseY + 1, BaseZ),
+		},
+		{
+			IntNoise3D(BaseX - 1, BaseY + 2, BaseZ),
+			IntNoise3D(BaseX, BaseY + 2, BaseZ),
+			IntNoise3D(BaseX + 1, BaseY + 2, BaseZ),
+			IntNoise3D(BaseX + 2, BaseY + 2, BaseZ),
+		},
 	};
 
-	const NOISE_DATATYPE x2interp1 = CubicInterpolate(points2[0][0], points2[0][1], points2[0][2], points2[0][3], FracX);
-	const NOISE_DATATYPE x2interp2 = CubicInterpolate(points2[1][0], points2[1][1], points2[1][2], points2[1][3], FracX);
-	const NOISE_DATATYPE x2interp3 = CubicInterpolate(points2[2][0], points2[2][1], points2[2][2], points2[2][3], FracX);
-	const NOISE_DATATYPE x2interp4 = CubicInterpolate(points2[3][0], points2[3][1], points2[3][2], points2[3][3], FracX);
+	const NOISE_DATATYPE x2interp1 =
+		CubicInterpolate(points2[0][0], points2[0][1], points2[0][2], points2[0][3], FracX);
+	const NOISE_DATATYPE x2interp2 =
+		CubicInterpolate(points2[1][0], points2[1][1], points2[1][2], points2[1][3], FracX);
+	const NOISE_DATATYPE x2interp3 =
+		CubicInterpolate(points2[2][0], points2[2][1], points2[2][2], points2[2][3], FracX);
+	const NOISE_DATATYPE x2interp4 =
+		CubicInterpolate(points2[3][0], points2[3][1], points2[3][2], points2[3][3], FracX);
 
-	const NOISE_DATATYPE points3[4][4] =
-	{
-		{ IntNoise3D(BaseX - 1, BaseY - 1, BaseZ + 1), IntNoise3D(BaseX, BaseY - 1, BaseZ + 1), IntNoise3D(BaseX + 1, BaseY - 1, BaseZ + 1), IntNoise3D(BaseX + 2, BaseY - 1, BaseZ + 1), },
-		{ IntNoise3D(BaseX - 1, BaseY,	   BaseZ + 1), IntNoise3D(BaseX, BaseY,     BaseZ + 1), IntNoise3D(BaseX + 1, BaseY,     BaseZ + 1), IntNoise3D(BaseX + 2, BaseY,     BaseZ + 1), },
-		{ IntNoise3D(BaseX - 1, BaseY + 1, BaseZ + 1), IntNoise3D(BaseX, BaseY + 1, BaseZ + 1), IntNoise3D(BaseX + 1, BaseY + 1, BaseZ + 1), IntNoise3D(BaseX + 2, BaseY + 1, BaseZ + 1), },
-		{ IntNoise3D(BaseX - 1, BaseY + 2, BaseZ + 1), IntNoise3D(BaseX, BaseY + 2, BaseZ + 1), IntNoise3D(BaseX + 1, BaseY + 2, BaseZ + 1), IntNoise3D(BaseX + 2, BaseY + 2, BaseZ + 1), },
+	const NOISE_DATATYPE points3[4][4] = {
+		{
+			IntNoise3D(BaseX - 1, BaseY - 1, BaseZ + 1),
+			IntNoise3D(BaseX, BaseY - 1, BaseZ + 1),
+			IntNoise3D(BaseX + 1, BaseY - 1, BaseZ + 1),
+			IntNoise3D(BaseX + 2, BaseY - 1, BaseZ + 1),
+		},
+		{
+			IntNoise3D(BaseX - 1, BaseY, BaseZ + 1),
+			IntNoise3D(BaseX, BaseY, BaseZ + 1),
+			IntNoise3D(BaseX + 1, BaseY, BaseZ + 1),
+			IntNoise3D(BaseX + 2, BaseY, BaseZ + 1),
+		},
+		{
+			IntNoise3D(BaseX - 1, BaseY + 1, BaseZ + 1),
+			IntNoise3D(BaseX, BaseY + 1, BaseZ + 1),
+			IntNoise3D(BaseX + 1, BaseY + 1, BaseZ + 1),
+			IntNoise3D(BaseX + 2, BaseY + 1, BaseZ + 1),
+		},
+		{
+			IntNoise3D(BaseX - 1, BaseY + 2, BaseZ + 1),
+			IntNoise3D(BaseX, BaseY + 2, BaseZ + 1),
+			IntNoise3D(BaseX + 1, BaseY + 2, BaseZ + 1),
+			IntNoise3D(BaseX + 2, BaseY + 2, BaseZ + 1),
+		},
 	};
 
-	const NOISE_DATATYPE x3interp1 = CubicInterpolate(points3[0][0], points3[0][1], points3[0][2], points3[0][3], FracX);
-	const NOISE_DATATYPE x3interp2 = CubicInterpolate(points3[1][0], points3[1][1], points3[1][2], points3[1][3], FracX);
-	const NOISE_DATATYPE x3interp3 = CubicInterpolate(points3[2][0], points3[2][1], points3[2][2], points3[2][3], FracX);
-	const NOISE_DATATYPE x3interp4 = CubicInterpolate(points3[3][0], points3[3][1], points3[3][2], points3[3][3], FracX);
+	const NOISE_DATATYPE x3interp1 =
+		CubicInterpolate(points3[0][0], points3[0][1], points3[0][2], points3[0][3], FracX);
+	const NOISE_DATATYPE x3interp2 =
+		CubicInterpolate(points3[1][0], points3[1][1], points3[1][2], points3[1][3], FracX);
+	const NOISE_DATATYPE x3interp3 =
+		CubicInterpolate(points3[2][0], points3[2][1], points3[2][2], points3[2][3], FracX);
+	const NOISE_DATATYPE x3interp4 =
+		CubicInterpolate(points3[3][0], points3[3][1], points3[3][2], points3[3][3], FracX);
 
-	const NOISE_DATATYPE points4[4][4] =
-	{
-		{ IntNoise3D(BaseX - 1, BaseY - 1, BaseZ + 2), IntNoise3D(BaseX, BaseY - 1, BaseZ + 2), IntNoise3D(BaseX + 1, BaseY - 1, BaseZ + 2), IntNoise3D(BaseX + 2, BaseY - 1, BaseZ + 2), },
-		{ IntNoise3D(BaseX - 1, BaseY,	   BaseZ + 2), IntNoise3D(BaseX, BaseY,     BaseZ + 2), IntNoise3D(BaseX + 1, BaseY,     BaseZ + 2), IntNoise3D(BaseX + 2, BaseY,     BaseZ + 2), },
-		{ IntNoise3D(BaseX - 1, BaseY + 1, BaseZ + 2), IntNoise3D(BaseX, BaseY + 1, BaseZ + 2), IntNoise3D(BaseX + 1, BaseY + 1, BaseZ + 2), IntNoise3D(BaseX + 2, BaseY + 1, BaseZ + 2), },
-		{ IntNoise3D(BaseX - 1, BaseY + 2, BaseZ + 2), IntNoise3D(BaseX, BaseY + 2, BaseZ + 2), IntNoise3D(BaseX + 1, BaseY + 2, BaseZ + 2), IntNoise3D(BaseX + 2, BaseY + 2, BaseZ + 2), },
+	const NOISE_DATATYPE points4[4][4] = {
+		{
+			IntNoise3D(BaseX - 1, BaseY - 1, BaseZ + 2),
+			IntNoise3D(BaseX, BaseY - 1, BaseZ + 2),
+			IntNoise3D(BaseX + 1, BaseY - 1, BaseZ + 2),
+			IntNoise3D(BaseX + 2, BaseY - 1, BaseZ + 2),
+		},
+		{
+			IntNoise3D(BaseX - 1, BaseY, BaseZ + 2),
+			IntNoise3D(BaseX, BaseY, BaseZ + 2),
+			IntNoise3D(BaseX + 1, BaseY, BaseZ + 2),
+			IntNoise3D(BaseX + 2, BaseY, BaseZ + 2),
+		},
+		{
+			IntNoise3D(BaseX - 1, BaseY + 1, BaseZ + 2),
+			IntNoise3D(BaseX, BaseY + 1, BaseZ + 2),
+			IntNoise3D(BaseX + 1, BaseY + 1, BaseZ + 2),
+			IntNoise3D(BaseX + 2, BaseY + 1, BaseZ + 2),
+		},
+		{
+			IntNoise3D(BaseX - 1, BaseY + 2, BaseZ + 2),
+			IntNoise3D(BaseX, BaseY + 2, BaseZ + 2),
+			IntNoise3D(BaseX + 1, BaseY + 2, BaseZ + 2),
+			IntNoise3D(BaseX + 2, BaseY + 2, BaseZ + 2),
+		},
 	};
 
-	const NOISE_DATATYPE x4interp1 = CubicInterpolate(points4[0][0], points4[0][1], points4[0][2], points4[0][3], FracX);
-	const NOISE_DATATYPE x4interp2 = CubicInterpolate(points4[1][0], points4[1][1], points4[1][2], points4[1][3], FracX);
-	const NOISE_DATATYPE x4interp3 = CubicInterpolate(points4[2][0], points4[2][1], points4[2][2], points4[2][3], FracX);
-	const NOISE_DATATYPE x4interp4 = CubicInterpolate(points4[3][0], points4[3][1], points4[3][2], points4[3][3], FracX);
+	const NOISE_DATATYPE x4interp1 =
+		CubicInterpolate(points4[0][0], points4[0][1], points4[0][2], points4[0][3], FracX);
+	const NOISE_DATATYPE x4interp2 =
+		CubicInterpolate(points4[1][0], points4[1][1], points4[1][2], points4[1][3], FracX);
+	const NOISE_DATATYPE x4interp3 =
+		CubicInterpolate(points4[2][0], points4[2][1], points4[2][2], points4[2][3], FracX);
+	const NOISE_DATATYPE x4interp4 =
+		CubicInterpolate(points4[3][0], points4[3][1], points4[3][2], points4[3][3], FracX);
 
-	const NOISE_DATATYPE FracY = (a_Y) - BaseY;
+	const NOISE_DATATYPE FracY = (a_Y) -BaseY;
 	const NOISE_DATATYPE yinterp1 = CubicInterpolate(x1interp1, x1interp2, x1interp3, x1interp4, FracY);
 	const NOISE_DATATYPE yinterp2 = CubicInterpolate(x2interp1, x2interp2, x2interp3, x2interp4, FracY);
 	const NOISE_DATATYPE yinterp3 = CubicInterpolate(x3interp1, x3interp2, x3interp3, x3interp4, FracY);
 	const NOISE_DATATYPE yinterp4 = CubicInterpolate(x4interp1, x4interp2, x4interp3, x4interp4, FracY);
 
-	const NOISE_DATATYPE FracZ = (a_Z) - BaseZ;
+	const NOISE_DATATYPE FracZ = (a_Z) -BaseZ;
 	return CubicInterpolate(yinterp1, yinterp2, yinterp3, yinterp4, FracZ);
 }
 
@@ -704,10 +860,13 @@ cCubicNoise::cCubicNoise(int a_Seed) :
 
 
 void cCubicNoise::Generate2D(
-	NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
-	int a_SizeX, int a_SizeY,                        ///< Size of the array (num doubles), in each direction
-	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY   ///< Noise-space coords of the array in the Y direction
+	NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
+	int a_SizeX,
+	int a_SizeY,  ///< Size of the array (num doubles), in each direction
+	NOISE_DATATYPE a_StartX,
+	NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+	NOISE_DATATYPE a_StartY,
+	NOISE_DATATYPE a_EndY  ///< Noise-space coords of the array in the Y direction
 ) const
 {
 	ASSERT(a_SizeX > 0);
@@ -762,11 +921,16 @@ void cCubicNoise::Generate2D(
 
 
 void cCubicNoise::Generate3D(
-	NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
-	int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Size of the array (num doubles), in each direction
-	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-	NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ   ///< Noise-space coords of the array in the Y direction
+	NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
+	int a_SizeX,
+	int a_SizeY,
+	int a_SizeZ,  ///< Size of the array (num doubles), in each direction
+	NOISE_DATATYPE a_StartX,
+	NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+	NOISE_DATATYPE a_StartY,
+	NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+	NOISE_DATATYPE a_StartZ,
+	NOISE_DATATYPE a_EndZ  ///< Noise-space coords of the array in the Y direction
 ) const
 {
 	ASSERT(a_SizeX < MAX_SIZE);
@@ -791,11 +955,7 @@ void cCubicNoise::Generate3D(
 	CalcFloorFrac(a_SizeY, a_StartY, a_EndY, FloorY, FracY, SameY, NumSameY);
 	CalcFloorFrac(a_SizeZ, a_StartZ, a_EndZ, FloorZ, FracZ, SameZ, NumSameZ);
 
-	cCubicCell3D Cell(
-		m_Noise, a_Array,
-		a_SizeX, a_SizeY, a_SizeZ,
-		FracX, FracY, FracZ
-	);
+	cCubicCell3D Cell(m_Noise, a_Array, a_SizeX, a_SizeY, a_SizeZ, FracX, FracY, FracZ);
 
 	Cell.InitWorkRnds(FloorX[0], FloorY[0], FloorZ[0]);
 
@@ -841,9 +1001,12 @@ void cCubicNoise::Generate3D(
 
 void cCubicNoise::CalcFloorFrac(
 	int a_Size,
-	NOISE_DATATYPE a_Start, NOISE_DATATYPE a_End,
-	int * a_Floor, NOISE_DATATYPE * a_Frac,
-	int * a_Same, int & a_NumSame
+	NOISE_DATATYPE a_Start,
+	NOISE_DATATYPE a_End,
+	int * a_Floor,
+	NOISE_DATATYPE * a_Frac,
+	int * a_Same,
+	int & a_NumSame
 ) const
 {
 	ASSERT(a_Size > 0);
@@ -914,9 +1077,12 @@ cImprovedNoise::cImprovedNoise(int a_Seed)
 
 void cImprovedNoise::Generate2D(
 	NOISE_DATATYPE * a_Array,
-	int a_SizeX, int a_SizeY,
-	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,
-	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY
+	int a_SizeX,
+	int a_SizeY,
+	NOISE_DATATYPE a_StartX,
+	NOISE_DATATYPE a_EndX,
+	NOISE_DATATYPE a_StartY,
+	NOISE_DATATYPE a_EndY
 ) const
 {
 	size_t idx = 0;
@@ -938,17 +1104,25 @@ void cImprovedNoise::Generate2D(
 			NOISE_DATATYPE fadeX = Fade(noiseXFrac);
 
 			// Hash the coordinates:
-			int A  = m_Perm[xCoord] + yCoord;
+			int A = m_Perm[xCoord] + yCoord;
 			int AA = m_Perm[A];
 			int AB = m_Perm[A + 1];
-			int B  = m_Perm[xCoord + 1] + yCoord;
+			int B = m_Perm[xCoord + 1] + yCoord;
 			int BA = m_Perm[B];
 			int BB = m_Perm[B + 1];
 
 			// Lerp the gradients:
 			a_Array[idx++] = Lerp(
-				Lerp(Grad(m_Perm[AA], noiseXFrac, noiseYFrac,     0), Grad(m_Perm[BA], noiseXFrac - 1, noiseYFrac,     0), fadeX),
-				Lerp(Grad(m_Perm[AB], noiseXFrac, noiseYFrac - 1, 0), Grad(m_Perm[BB], noiseXFrac - 1, noiseYFrac - 1, 0), fadeX),
+				Lerp(
+					Grad(m_Perm[AA], noiseXFrac, noiseYFrac, 0),
+					Grad(m_Perm[BA], noiseXFrac - 1, noiseYFrac, 0),
+					fadeX
+				),
+				Lerp(
+					Grad(m_Perm[AB], noiseXFrac, noiseYFrac - 1, 0),
+					Grad(m_Perm[BB], noiseXFrac - 1, noiseYFrac - 1, 0),
+					fadeX
+				),
 				fadeY
 			);
 		}  // for x
@@ -961,10 +1135,15 @@ void cImprovedNoise::Generate2D(
 
 void cImprovedNoise::Generate3D(
 	NOISE_DATATYPE * a_Array,
-	int a_SizeX, int a_SizeY, int a_SizeZ,
-	NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,
-	NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,
-	NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ
+	int a_SizeX,
+	int a_SizeY,
+	int a_SizeZ,
+	NOISE_DATATYPE a_StartX,
+	NOISE_DATATYPE a_EndX,
+	NOISE_DATATYPE a_StartY,
+	NOISE_DATATYPE a_EndY,
+	NOISE_DATATYPE a_StartZ,
+	NOISE_DATATYPE a_EndZ
 ) const
 {
 	size_t idx = 0;
@@ -994,10 +1173,10 @@ void cImprovedNoise::Generate3D(
 				NOISE_DATATYPE fadeX = Fade(noiseXFrac);
 
 				// Hash the coordinates:
-				int A  = m_Perm[xCoord] + yCoord;
+				int A = m_Perm[xCoord] + yCoord;
 				int AA = m_Perm[A] + zCoord;
 				int AB = m_Perm[A + 1] + zCoord;
-				int B  = m_Perm[xCoord + 1] + yCoord;
+				int B = m_Perm[xCoord + 1] + yCoord;
 				int BA = m_Perm[B] + zCoord;
 				int BB = m_Perm[B + 1] + zCoord;
 
@@ -1005,13 +1184,29 @@ void cImprovedNoise::Generate3D(
 				// TODO: This may be optimized by swapping the coords and recalculating most lerps only "once every x"
 				a_Array[idx++] = Lerp(
 					Lerp(
-						Lerp(Grad(m_Perm[AA], noiseXFrac, noiseYFrac,     noiseZFrac), Grad(m_Perm[BA], noiseXFrac - 1, noiseYFrac,     noiseZFrac), fadeX),
-						Lerp(Grad(m_Perm[AB], noiseXFrac, noiseYFrac - 1, noiseZFrac), Grad(m_Perm[BB], noiseXFrac - 1, noiseYFrac - 1, noiseZFrac), fadeX),
+						Lerp(
+							Grad(m_Perm[AA], noiseXFrac, noiseYFrac, noiseZFrac),
+							Grad(m_Perm[BA], noiseXFrac - 1, noiseYFrac, noiseZFrac),
+							fadeX
+						),
+						Lerp(
+							Grad(m_Perm[AB], noiseXFrac, noiseYFrac - 1, noiseZFrac),
+							Grad(m_Perm[BB], noiseXFrac - 1, noiseYFrac - 1, noiseZFrac),
+							fadeX
+						),
 						fadeY
 					),
 					Lerp(
-						Lerp(Grad(m_Perm[AA + 1], noiseXFrac, noiseYFrac,     noiseZFrac - 1), Grad(m_Perm[BA + 1], noiseXFrac - 1, noiseYFrac,     noiseZFrac - 1), fadeX),
-						Lerp(Grad(m_Perm[AB + 1], noiseXFrac, noiseYFrac - 1, noiseZFrac - 1), Grad(m_Perm[BB + 1], noiseXFrac - 1, noiseYFrac - 1, noiseZFrac - 1), fadeX),
+						Lerp(
+							Grad(m_Perm[AA + 1], noiseXFrac, noiseYFrac, noiseZFrac - 1),
+							Grad(m_Perm[BA + 1], noiseXFrac - 1, noiseYFrac, noiseZFrac - 1),
+							fadeX
+						),
+						Lerp(
+							Grad(m_Perm[AB + 1], noiseXFrac, noiseYFrac - 1, noiseZFrac - 1),
+							Grad(m_Perm[BB + 1], noiseXFrac - 1, noiseYFrac - 1, noiseZFrac - 1),
+							fadeX
+						),
 						fadeY
 					),
 					fadeZ
@@ -1031,13 +1226,8 @@ NOISE_DATATYPE cImprovedNoise::GetValueAt(int a_X, int a_Y, int a_Z)
 	a_X = a_X & 255;
 	a_Y = a_Y & 255;
 	a_Z = a_Z & 255;
-	int A  = m_Perm[a_X] + a_Y;
+	int A = m_Perm[a_X] + a_Y;
 	int AA = m_Perm[A] + a_Z;
 
 	return Grad(m_Perm[AA], 1, 1, 1);
 }
-
-
-
-
-

@@ -1,7 +1,8 @@
 
 // PrefabStructure.cpp
 
-// Implements the cPrefabStructure class representing a cGridStructGen::cStructure descendant based on placed cPrefab instances
+// Implements the cPrefabStructure class representing a cGridStructGen::cStructure descendant based on placed cPrefab
+// instances
 
 #include "Globals.h"
 #include "PrefabStructure.h"
@@ -12,14 +13,14 @@
 
 
 cPrefabStructure::cPrefabStructure(
-	int a_GridX, int a_GridZ,
-	int a_OriginX, int a_OriginZ,
+	int a_GridX,
+	int a_GridZ,
+	int a_OriginX,
+	int a_OriginZ,
 	cPlacedPieces && a_Pieces,
 	cTerrainHeightGen & a_HeightGen
-):
-	Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
-	m_Pieces(std::move(a_Pieces)),
-	m_HeightGen(a_HeightGen)
+) :
+	Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ), m_Pieces(std::move(a_Pieces)), m_HeightGen(a_HeightGen)
 {
 }
 

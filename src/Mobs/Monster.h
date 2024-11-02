@@ -13,8 +13,7 @@ class cClientHandle;
 
 
 // tolua_begin
-class cMonster:
-	public cPawn
+class cMonster : public cPawn
 {
 
 	// tolua_end
@@ -23,29 +22,47 @@ class cMonster:
 
 	// tolua_begin
 
-public:
-
+  public:
 	enum eFamily
 	{
-		mfHostile  = 0,  // Spider, Zombies ...
-		mfPassive  = 1,  // Cows, Pigs
-		mfAmbient  = 2,  // Bats
-		mfWater    = 3,  // Squid, Guardian
+		mfHostile = 0,  // Spider, Zombies ...
+		mfPassive = 1,  // Cows, Pigs
+		mfAmbient = 2,  // Bats
+		mfWater = 3,  // Squid, Guardian
 
 		mfNoSpawn
-	} ;
+	};
 
 	// tolua_end
 
-	enum MState{ATTACKING, IDLE, CHASING, ESCAPING} m_EMState;
-	enum MPersonality{PASSIVE, AGGRESSIVE, COWARDLY} m_EMPersonality;
+	enum MState
+	{
+		ATTACKING,
+		IDLE,
+		CHASING,
+		ESCAPING
+	} m_EMState;
+	enum MPersonality
+	{
+		PASSIVE,
+		AGGRESSIVE,
+		COWARDLY
+	} m_EMPersonality;
 
 	/** Creates the mob object.
 	If a_ConfigName is not empty, the configuration is loaded using GetMonsterConfig()
 	a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs 2012_12_22))
 	a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
 	*/
-	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height);
+	cMonster(
+		const AString & a_ConfigName,
+		eMonsterType a_MobType,
+		const AString & a_SoundHurt,
+		const AString & a_SoundDeath,
+		const AString & a_SoundAmbient,
+		float a_Width,
+		float a_Height
+	);
 
 	CLASS_PROTODEF(cMonster)
 
@@ -118,8 +135,8 @@ public:
 	virtual void EventLosePlayer(void);
 	virtual void CheckEventLostPlayer(std::chrono::milliseconds a_Dt);
 
-	virtual void InStateIdle    (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
-	virtual void InStateChasing (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
+	virtual void InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
+	virtual void InStateChasing(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual void InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 
 	double GetAttackRate() { return m_AttackRate; }
@@ -149,13 +166,13 @@ public:
 	void SetRelativeWalkSpeed(double a_WalkSpeed) { m_RelativeWalkSpeed = a_WalkSpeed; }  // tolua_export
 
 	// Overridables to handle ageable mobs
-	virtual bool IsTame    (void) const { return false; }
-	virtual bool IsSitting (void) const { return false; }
+	virtual bool IsTame(void) const { return false; }
+	virtual bool IsSitting(void) const { return false; }
 
 	// tolua_begin
-	bool IsBaby (void) const { return m_Age < 0; }
-	int GetAge (void) const { return m_Age; }
-	void SetAge(int a_Age)  { m_Age = a_Age; }
+	bool IsBaby(void) const { return m_Age < 0; }
+	int GetAge(void) const { return m_Age; }
+	void SetAge(int a_Age) { m_Age = a_Age; }
 	// tolua_end
 
 
@@ -199,7 +216,7 @@ public:
 	static AString MobTypeToVanillaNBT(eMonsterType a_MobType);
 
 	/** Sets the target that this mob will chase. Pass a nullptr to unset. */
-	void SetTarget (cPawn * a_NewTarget);
+	void SetTarget(cPawn * a_NewTarget);
 
 	/** Unset the target without notifying the target entity. Do not use this, use SetTarget(nullptr) instead.
 	This is only used by cPawn internally. */
@@ -220,24 +237,28 @@ public:
 	/* the breeding processing */
 
 	/** Returns the items that the animal of this class follows when a player holds it in hand. */
-	virtual void GetFollowedItems(cItems & a_Items) { }
+	virtual void GetFollowedItems(cItems & a_Items) {}
 
-	/** Returns the items that make the animal breed - this is usually the same as the ones that make the animal follow, but not necessarily. */
+	/** Returns the items that make the animal breed - this is usually the same as the ones that make the animal follow,
+	 * but not necessarily. */
 	virtual void GetBreedingItems(cItems & a_Items) { GetFollowedItems(a_Items); }
 
 	/** Called after the baby is born, allows the baby to inherit the parents' properties (color, etc.) */
-	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2) { }
+	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2) {}
 
 	/** Returns the partner which the monster is currently mating with. */
 	cMonster * GetPartner(void) const { return m_LovePartner; }
 
-	/** Start the mating process. Causes the monster to keep bumping into the partner until m_MatingTimer reaches zero. */
+	/** Start the mating process. Causes the monster to keep bumping into the partner until m_MatingTimer reaches zero.
+	 */
 	void EngageLoveMode(cMonster * a_Partner);
 
-	/** Finish the mating process. Called after a baby is born. Resets all breeding related timers and sets m_LoveCooldown to 20 minutes. */
+	/** Finish the mating process. Called after a baby is born. Resets all breeding related timers and sets
+	 * m_LoveCooldown to 20 minutes. */
 	void ResetLoveMode();
 
-	/** Returns whether the monster has just been fed and is ready to mate. If this is "true" and GetPartner isn't "nullptr", then the monster is mating. */
+	/** Returns whether the monster has just been fed and is ready to mate. If this is "true" and GetPartner isn't
+	 * "nullptr", then the monster is mating. */
 	bool IsInLove() const { return (m_LoveTimer > 0); }
 
 	/** Returns whether the monster is tired of breeding and is in the cooldown state. */
@@ -249,12 +270,12 @@ public:
 	/** Right click call to process feeding */
 	void RightClickFeed(cPlayer & a_Player);
 
-protected:
-
+  protected:
 	/** The pathfinder instance handles pathfinding for this monster. */
 	cPathFinder m_PathFinder;
 
-	/** Stores if pathfinder is being used - set when final destination is set, and unset when stopped moving to final destination */
+	/** Stores if pathfinder is being used - set when final destination is set, and unset when stopped moving to final
+	 * destination */
 	bool m_PathfinderActivated;
 
 	/** Coordinates of the next position that should be reached */
@@ -270,7 +291,10 @@ protected:
 	int FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ);
 
 	/** Returns if the ultimate, final destination has been reached. */
-	bool ReachedFinalDestination(void) { return ((m_FinalDestination - GetPosition()).SqrLength() < WAYPOINT_RADIUS * WAYPOINT_RADIUS); }
+	bool ReachedFinalDestination(void)
+	{
+		return ((m_FinalDestination - GetPosition()).SqrLength() < WAYPOINT_RADIUS * WAYPOINT_RADIUS);
+	}
 
 	/** Returns whether or not the target is close enough for attack. */
 	bool TargetIsInRange(void)
@@ -337,7 +361,8 @@ protected:
 	/** Entity leashed to */
 	cEntity * m_LeashedTo;
 
-	/** Entity pos where this mob was leashed to. Used when deserializing the chunk in order to make the mob find the leash knot. */
+	/** Entity pos where this mob was leashed to. Used when deserializing the chunk in order to make the mob find the
+	 * leash knot. */
 	std::unique_ptr<Vector3d> m_LeashToPos;
 
 	/** Mob has ben leashed or unleashed in current player action. Avoids double actions on horses. */
@@ -347,18 +372,27 @@ protected:
 	bool m_CanBeLeashed;
 
 	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops */
-	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
+	void AddRandomDropItem(
+		cItems & a_Drops,
+		unsigned int a_Min,
+		unsigned int a_Max,
+		short a_Item,
+		short a_ItemHealth = 0
+	);
 
 	/** Adds a item a_Item with the chance of a_Chance (in percent) to itemdrops a_Drops */
 	void AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth = 0);
 
-	/** Adds one rare item out of the list of rare items a_Items modified by the looting level a_LootingLevel(I-III or custom) to the itemdrop a_Drops */
+	/** Adds one rare item out of the list of rare items a_Items modified by the looting level a_LootingLevel(I-III or
+	 * custom) to the itemdrop a_Drops */
 	void AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, unsigned int a_LootingLevel);
 
-	/** Adds armor that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if picked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop */
+	/** Adds armor that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if picked up
+	 * or 0.085 + (0.01 per LootingLevel) if born with) to the drop */
 	void AddRandomArmorDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
 
-	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if picked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop */
+	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if picked up
+	 * or 0.085 + (0.01 per LootingLevel) if born with) to the drop */
 	void AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
 
 	/* The breeding processing */
@@ -369,16 +403,19 @@ protected:
 	/** Remembers the player is was last fed by for statistics tracking */
 	cUUID m_Feeder;
 
-	/** If above 0, the monster is in love mode, and will breed if a nearby monster is also in love mode. Decrements by 1 per tick till reaching zero. */
+	/** If above 0, the monster is in love mode, and will breed if a nearby monster is also in love mode. Decrements by
+	 * 1 per tick till reaching zero. */
 	int m_LoveTimer;
 
-	/** If above 0, the monster is in cooldown mode and will refuse to breed. Decrements by 1 per tick till reaching zero. */
+	/** If above 0, the monster is in cooldown mode and will refuse to breed. Decrements by 1 per tick till reaching
+	 * zero. */
 	int m_LoveCooldown;
 
-	/** The monster is engaged in mating, once this reaches zero, a baby will be born. Decrements by 1 per tick till reaching zero, then a baby is made and ResetLoveMode() is called. */
+	/** The monster is engaged in mating, once this reaches zero, a baby will be born. Decrements by 1 per tick till
+	 * reaching zero, then a baby is made and ResetLoveMode() is called. */
 	int m_MatingTimer;
 
-private:
+  private:
 	/** A pointer to the entity this mobile is aiming to reach.
 	The validity of this pointer SHALL be guaranteed by the pointee;
 	it MUST be reset when the pointee changes worlds or is destroyed. */
@@ -387,4 +424,4 @@ private:
 	/** Leash calculations inside Tick function */
 	void CalcLeashActions(std::chrono::milliseconds a_Dt);
 
-} ;  // tolua_export
+};  // tolua_export

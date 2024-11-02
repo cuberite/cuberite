@@ -15,18 +15,15 @@ The data value associated with each coord is used as the number of msec that the
 it progresses to the next step (blockmeta++). This value is updated if a neighbor is changed.
 The simulator reads its parameters from the ini file given to the constructor.
 */
-class cFireSimulator :
-	public cSimulator
+class cFireSimulator : public cSimulator
 {
-public:
-
+  public:
 	cFireSimulator(cWorld & a_World, cIniFile & a_IniFile);
 
-	static bool IsFuel   (BLOCKTYPE a_BlockType);
+	static bool IsFuel(BLOCKTYPE a_BlockType);
 	static bool DoesBurnForever(BLOCKTYPE a_BlockType);
 
-private:
-
+  private:
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
 
 	static bool IsAllowedBlock(BLOCKTYPE a_BlockType);
@@ -59,11 +56,12 @@ private:
 	Note that a_NearChunk may be a chunk neighbor to the block specified!
 	The coords are relative to a_NearChunk but not necessarily in it. */
 	bool CanStartFireInBlock(cChunk * a_NearChunk, Vector3i a_RelPos);
-} ;
+};
 
 
 
 
 
-/** Stores individual fire blocks in the chunk; the int data is used as the time [msec] the fire takes to step to another stage (blockmeta++) */
+/** Stores individual fire blocks in the chunk; the int data is used as the time [msec] the fire takes to step to
+ * another stage (blockmeta++) */
 typedef cCoordWithIntList cFireSimulatorChunkData;

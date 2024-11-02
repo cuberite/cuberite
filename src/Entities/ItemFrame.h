@@ -8,15 +8,13 @@
 
 
 // tolua_begin
-class cItemFrame :
-	public cHangingEntity
+class cItemFrame : public cHangingEntity
 {
 	// tolua_end
 
 	using Super = cHangingEntity;
 
-public:  // tolua_export
-
+  public:  // tolua_export
 	CLASS_PROTODEF(cItemFrame)
 
 	cItemFrame(eBlockFace a_BlockFace, Vector3d a_Pos);
@@ -37,8 +35,7 @@ public:  // tolua_export
 
 	// tolua_end
 
-private:
-
+  private:
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void GetDrops(cItems & a_Items, cEntity * a_Killer) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;

@@ -22,8 +22,7 @@
 /** Decrypts data using the AES / CFB 128 algorithm */
 class cAesCfb128Decryptor
 {
-public:
-
+  public:
 	cAesCfb128Decryptor(void);
 	~cAesCfb128Decryptor();
 
@@ -36,8 +35,7 @@ public:
 	/** Returns true if the object has been initialized with the Key / IV */
 	bool IsValid(void) const { return m_IsValid; }
 
-protected:
-
+  protected:
 #if PLATFORM_CRYPTOGRAPHY && defined(_WIN32)
 	HCRYPTPROV m_Aes;
 	HCRYPTKEY m_Key;
@@ -50,4 +48,4 @@ protected:
 
 	/** Indicates whether the object has been initialized with the Key / IV */
 	bool m_IsValid;
-} ;
+};

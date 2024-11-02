@@ -8,7 +8,15 @@
 
 
 cIronGolem::cIronGolem(void) :
-	Super("IronGolem", mtIronGolem, "entity.irongolem.hurt", "entity.irongolem.death", "entity.irongolem.ambient", 1.4f, 2.7f)
+	Super(
+		"IronGolem",
+		mtIronGolem,
+		"entity.irongolem.hurt",
+		"entity.irongolem.death",
+		"entity.irongolem.ambient",
+		1.4f,
+		2.7f
+	)
 {
 }
 
@@ -22,7 +30,3 @@ void cIronGolem::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	AddRandomDropItem(a_Drops, 0, 5, E_ITEM_IRON);
 	AddRandomDropItem(a_Drops, 0, 2, E_BLOCK_FLOWER);
 }
-
-
-
-

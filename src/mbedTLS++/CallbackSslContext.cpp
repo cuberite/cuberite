@@ -1,7 +1,8 @@
 
 // CallbackSslContext.cpp
 
-// Declares the cCallbackSslContext class representing a SSL context wrapper that uses callbacks to read and write SSL peer data
+// Declares the cCallbackSslContext class representing a SSL context wrapper that uses callbacks to read and write SSL
+// peer data
 
 #include "Globals.h"
 #include "CallbackSslContext.h"
@@ -52,8 +53,3 @@ int cCallbackSslContext::SendEncrypted(const unsigned char * a_Buffer, size_t a_
 	}
 	return m_Callbacks->SendEncrypted(a_Buffer, a_NumBytes);
 }
-
-
-
-
-

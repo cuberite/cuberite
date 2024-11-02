@@ -9,8 +9,7 @@
 
 
 
-static const QString s_GeneratorNames[] =
-{
+static const QString s_GeneratorNames[] = {
 	QString("Checkerboard"),
 	QString("Constant"),
 	QString("DistortedVoronoi"),
@@ -26,8 +25,7 @@ static const QString s_GeneratorNames[] =
 
 
 GeneratorSetup::GeneratorSetup(const AString & a_IniFileName, QWidget * a_Parent) :
-	super(a_Parent),
-	m_IniFile(new cIniFile())
+	super(a_Parent), m_IniFile(new cIniFile())
 {
 	// The seed and generator name is in a separate form layout at the top, always present:
 	m_eSeed = new QLineEdit();
@@ -67,7 +65,7 @@ GeneratorSetup::GeneratorSetup(const AString & a_IniFileName, QWidget * a_Parent
 
 	// Connect the change events only after the data has been loaded:
 	connect(m_cbGenerator, SIGNAL(currentIndexChanged(QString)), this, SLOT(generatorChanged(QString)));
-	connect(m_eSeed,       SIGNAL(textChanged(QString)),         this, SLOT(editChanged(QString)));
+	connect(m_eSeed, SIGNAL(textChanged(QString)), this, SLOT(editChanged(QString)));
 }
 
 
@@ -109,7 +107,7 @@ void GeneratorSetup::generatorChanged(const QString & a_NewName)
 void GeneratorSetup::editChanged(const QString & a_NewValue)
 {
 	QString sectionName = sender()->property("INI.SectionName").toString();
-	QString itemName    = sender()->property("INI.ItemName").toString();
+	QString itemName = sender()->property("INI.ItemName").toString();
 	m_IniFile->SetValue(sectionName.toStdString(), itemName.toStdString(), a_NewValue.toStdString());
 	emit generatorUpdated();
 }
@@ -139,7 +137,7 @@ void GeneratorSetup::updateFromIni()
 	int numItems = m_IniFile->GetNumValues(keyID);
 	for (int i = 0; i < numItems; i++)
 	{
-		AString itemName  = m_IniFile->GetValueName(keyID, i);
+		AString itemName = m_IniFile->GetValueName(keyID, i);
 		if ((itemName == "Generator") || (itemName == "BiomeGen"))
 		{
 			// These special cases are not to be added
@@ -162,7 +160,3 @@ void GeneratorSetup::updateFromIni()
 		m_FormLayout->addRow(new QLabel(QString::fromStdString(itemName)), edit);
 	}  // for i - INI values[]
 }
-
-
-
-

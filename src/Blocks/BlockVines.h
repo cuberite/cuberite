@@ -6,17 +6,14 @@
 
 
 
-class cBlockVinesHandler final :
-	public cBlockHandler
+class cBlockVinesHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	static const NIBBLETYPE VINE_LOST_SUPPORT = 16;
 	static const NIBBLETYPE VINE_UNCHANGED = 17;
 
@@ -95,24 +92,21 @@ private:
 		{
 			int x, z;
 			NIBBLETYPE Bit;
-		} Coords[] =
-		{
-			{ 0,  1, 1},  // south, ZP
-			{-1,  0, 2},  // west,  XM
-			{ 0, -1, 4},  // north, ZM
-			{ 1,  0, 8},  // east,  XP
-		} ;
+		} Coords[] = {
+			{0, 1, 1},  // south, ZP
+			{-1, 0, 2},  // west,  XM
+			{0, -1, 4},  // north, ZM
+			{1, 0, 8},  // east,  XP
+		};
 
 		NIBBLETYPE MaxMeta = 0;
 		for (auto & Coord : Coords)
 		{
-			BLOCKTYPE  BlockType;
+			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;
 			auto checkPos = a_Position.addedXZ(Coord.x, Coord.z);
-			if (
-				a_Chunk.UnboundedRelGetBlock(checkPos.x, checkPos.y, checkPos.z, BlockType, BlockMeta) &&
-				IsBlockAttachable(BlockType)
-			)
+			if (a_Chunk.UnboundedRelGetBlock(checkPos.x, checkPos.y, checkPos.z, BlockType, BlockMeta) &&
+				IsBlockAttachable(BlockType))
 			{
 				MaxMeta |= Coord.Bit;
 			}
@@ -127,7 +121,8 @@ private:
 		NIBBLETYPE Common = a_CurrentMeta & MaxMeta;  // Neighbors that we have and are legal.
 		if (Common != a_CurrentMeta)
 		{
-			bool HasTop = (a_Position.y < (cChunkDef::Height - 1)) && IsBlockAttachable(a_Chunk.GetBlock(a_Position.addedY(1)));
+			bool HasTop =
+				(a_Position.y < (cChunkDef::Height - 1)) && IsBlockAttachable(a_Chunk.GetBlock(a_Position.addedY(1)));
 			if ((Common == 0) && !HasTop)  // Meta equals 0 also means top. Make a last-ditch attempt to save the vine.
 			{
 				return VINE_LOST_SUPPORT;
@@ -143,41 +138,51 @@ private:
 
 
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor)
+		const override
 	{
-		a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk)
-		{
+		a_ChunkInterface.DoWithChunkAt(
+			a_BlockPos,
+			[&](cChunk & a_Chunk)
+			{
+				const auto Position = cChunkDef::AbsoluteToRelative(a_BlockPos);
+				const auto MaxMeta = GetMaxMeta(a_Chunk, Position, a_Chunk.GetMeta(Position));
 
-		const auto Position = cChunkDef::AbsoluteToRelative(a_BlockPos);
-		const auto MaxMeta = GetMaxMeta(a_Chunk, Position, a_Chunk.GetMeta(Position));
+				if (MaxMeta == VINE_UNCHANGED)
+				{
+					return false;
+				}
 
-		if (MaxMeta == VINE_UNCHANGED)
-		{
-			return false;
-		}
+				// There is a neighbor missing, need to update the meta or even destroy the block.
 
-		// There is a neighbor missing, need to update the meta or even destroy the block.
+				if (MaxMeta == VINE_LOST_SUPPORT)
+				{
+					// The vine just lost all its support, destroy the block:
+					a_Chunk.SetBlock(Position, E_BLOCK_AIR, 0);
+				}
+				else
+				{
+					// It lost some of its support, set it to what remains (SetBlock to notify neighbors):
+					a_Chunk.SetBlock(Position, E_BLOCK_VINES, MaxMeta);
+				}
 
-		if (MaxMeta == VINE_LOST_SUPPORT)
-		{
-			// The vine just lost all its support, destroy the block:
-			a_Chunk.SetBlock(Position, E_BLOCK_AIR, 0);
-		}
-		else
-		{
-			// It lost some of its support, set it to what remains (SetBlock to notify neighbors):
-			a_Chunk.SetBlock(Position, E_BLOCK_VINES, MaxMeta);
-		}
-
-		return false;
-		});
+				return false;
+			}
+		);
 	}
 
 
 
 
 
-	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
+	virtual bool DoesIgnoreBuildCollision(
+		const cWorld & a_World,
+		const cItem & a_HeldItem,
+		const Vector3i a_Position,
+		const NIBBLETYPE a_Meta,
+		const eBlockFace a_ClickedBlockFace,
+		const bool a_ClickedDirectly
+	) const override
 	{
 		return !a_ClickedDirectly || (a_HeldItem.m_ItemType != m_BlockType);
 	}
@@ -264,8 +269,4 @@ private:
 		UNUSED(a_Meta);
 		return 7;
 	}
-} ;
-
-
-
-
+};

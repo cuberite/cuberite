@@ -19,13 +19,11 @@ class cWorldInterface;
 
 
 
-class cBlockBedHandler final :
-	public cYawRotator<cBlockEntityHandler, 0x03, 0x02, 0x03, 0x00, 0x01>
+class cBlockBedHandler final : public cYawRotator<cBlockEntityHandler, 0x03, 0x02, 0x03, 0x00, 0x01>
 {
 	using Super = cYawRotator<cBlockEntityHandler, 0x03, 0x02, 0x03, 0x00, 0x01>;
 
-public:
-
+  public:
 	using Super::Super;
 
 	static Vector3i MetaDataToDirection(NIBBLETYPE a_MetaData)
@@ -76,18 +74,21 @@ public:
 		a_Player.SetIsInBed(false);
 	}
 
-private:
-
+  private:
 	// Overrides:
 	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
 		const Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BLOCKTYPE a_OldBlockType,
+		NIBBLETYPE a_OldBlockMeta,
 		const cEntity * a_Digger
 	) const override;
 
 	virtual bool OnUse(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace,
 		const Vector3i a_CursorPos
@@ -104,4 +105,4 @@ private:
 		UNUSED(a_Meta);
 		return 28;
 	}
-} ;
+};

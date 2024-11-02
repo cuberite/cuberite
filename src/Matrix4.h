@@ -15,29 +15,22 @@ template <typename T>
 class Matrix4
 {
 
-	TOLUA_TEMPLATE_BIND((T, float, double))
+	TOLUA_TEMPLATE_BIND((T, float, double) )
 
 	// tolua_end
 
-public:
-
+  public:
 	T cell[16];
 
 	// tolua_begin
 
-	inline Matrix4(void)
-	{
-		Identity();
-	}
+	inline Matrix4(void) { Identity(); }
 
-	inline Matrix4(const Matrix4 & a_Rhs)
-	{
-		*this = a_Rhs;
-	}
+	inline Matrix4(const Matrix4 & a_Rhs) { *this = a_Rhs; }
 
 	// tolua_end
 
-	inline Matrix4 & operator = (const Matrix4 & a_Rhs)
+	inline Matrix4 & operator=(const Matrix4 & a_Rhs)
 	{
 		for (unsigned int i = 0; i < 16; ++i)
 		{
@@ -48,7 +41,7 @@ public:
 
 	// tolua_begin
 
-	inline T & operator [] (int a_N)
+	inline T & operator[](int a_N)
 	{
 		ASSERT(a_N < 16);
 		return cell[a_N];
@@ -56,8 +49,8 @@ public:
 
 	inline void Identity()
 	{
-		cell[1]  = cell[2]  = cell[3]  = cell[4]  = 0;
-		cell[6]  = cell[7]  = cell[8]  = cell[9]  = 0;
+		cell[1] = cell[2] = cell[3] = cell[4] = 0;
+		cell[6] = cell[7] = cell[8] = cell[9] = 0;
 		cell[11] = cell[12] = cell[13] = cell[14] = 0;
 
 		cell[0] = cell[5] = cell[10] = cell[15] = 1;
@@ -81,8 +74,10 @@ public:
 
 		Identity();
 
-		cell[5] = cx;  cell[6]  = sx;
-		cell[9] = -sx; cell[10] = cx;
+		cell[5] = cx;
+		cell[6] = sx;
+		cell[9] = -sx;
+		cell[10] = cx;
 	}
 
 	inline void RotateY(T a_RY)
@@ -92,8 +87,10 @@ public:
 
 		Identity();
 
-		cell[0] = cy; cell[2] = -sy;
-		cell[8] = sy; cell[10] = cy;
+		cell[0] = cy;
+		cell[2] = -sy;
+		cell[8] = sy;
+		cell[10] = cy;
 	}
 
 	inline void RotateZ(T a_RZ)
@@ -103,21 +100,23 @@ public:
 
 		Identity();
 
-		cell[0] = cz;  cell[1] = sz;
-		cell[4] = -sz; cell[5] = cz;
+		cell[0] = cz;
+		cell[1] = sz;
+		cell[4] = -sz;
+		cell[5] = cz;
 	}
 
 	inline void Translate(const Vector3<T> & a_Pos)
 	{
-		cell[3]  += a_Pos.x;
-		cell[7]  += a_Pos.y;
+		cell[3] += a_Pos.x;
+		cell[7] += a_Pos.y;
 		cell[11] += a_Pos.z;
 	}
 
 	inline void SetTranslation(const Vector3<T> & a_Pos)
 	{
-		cell[3]  = a_Pos.x;
-		cell[7]  = a_Pos.y;
+		cell[3] = a_Pos.x;
+		cell[7] = a_Pos.y;
 		cell[11] = a_Pos.z;
 	}
 
@@ -129,12 +128,9 @@ public:
 		{
 			for (unsigned int r = 0; r < 4; ++r)
 			{
-				res.cell[r * 4 + c] = (
-					cell[r * 4 + 0] * m2.cell[c + 0] +
-					cell[r * 4 + 1] * m2.cell[c + 4] +
-					cell[r * 4 + 2] * m2.cell[c + 8] +
-					cell[r * 4 + 3] * m2.cell[c + 12]
-				);
+				res.cell[r * 4 + c] =
+					(cell[r * 4 + 0] * m2.cell[c + 0] + cell[r * 4 + 1] * m2.cell[c + 4] +
+					 cell[r * 4 + 2] * m2.cell[c + 8] + cell[r * 4 + 3] * m2.cell[c + 12]);
 			}
 		}
 
@@ -143,9 +139,9 @@ public:
 
 	inline Vector3<T> Transform(const Vector3<T> & v) const
 	{
-		T x  = cell[0] * v.x + cell[1] * v.y + cell[2]  * v.z + cell[3];
-		T y  = cell[4] * v.x + cell[5] * v.y + cell[6]  * v.z + cell[7];
-		T z  = cell[8] * v.x + cell[9] * v.y + cell[10] * v.z + cell[11];
+		T x = cell[0] * v.x + cell[1] * v.y + cell[2] * v.z + cell[3];
+		T y = cell[4] * v.x + cell[5] * v.y + cell[6] * v.z + cell[7];
+		T z = cell[8] * v.x + cell[9] * v.y + cell[10] * v.z + cell[11];
 
 		return Vector3<T>(x, y, z);
 	}
@@ -171,25 +167,16 @@ public:
 			cell[i] = t.cell[i];
 		}
 
-		cell[3]  = tx * cell[0] + ty * cell[1] + tz * cell[2];
-		cell[7]  = tx * cell[4] + ty * cell[5] + tz * cell[6];
+		cell[3] = tx * cell[0] + ty * cell[1] + tz * cell[2];
+		cell[7] = tx * cell[4] + ty * cell[5] + tz * cell[6];
 		cell[11] = tx * cell[8] + ty * cell[9] + tz * cell[10];
 	}
 
-	inline Vector3<T> GetXColumn(void) const
-	{
-		return Vector3<T>(cell[0], cell[1], cell[2]);
-	}
+	inline Vector3<T> GetXColumn(void) const { return Vector3<T>(cell[0], cell[1], cell[2]); }
 
-	inline Vector3<T> GetYColumn(void) const
-	{
-		return Vector3<T>(cell[4], cell[5], cell[6]);
-	}
+	inline Vector3<T> GetYColumn(void) const { return Vector3<T>(cell[4], cell[5], cell[6]); }
 
-	inline Vector3<T> GetZColumn(void) const
-	{
-		return Vector3<T>(cell[8], cell[9], cell[10]);
-	}
+	inline Vector3<T> GetZColumn(void) const { return Vector3<T>(cell[8], cell[9], cell[10]); }
 
 	inline void SetXColumn(const Vector3<T> & a_X)
 	{
@@ -207,8 +194,8 @@ public:
 
 	inline void SetZColumn(const Vector3<T> & a_Z)
 	{
-		cell[8]  = a_Z.x;
-		cell[9]  = a_Z.y;
+		cell[8] = a_Z.x;
+		cell[9] = a_Z.y;
 		cell[10] = a_Z.z;
 	}
 };
@@ -219,10 +206,5 @@ public:
 
 // tolua_begin
 typedef Matrix4<double> Matrix4d;
-typedef Matrix4<float>  Matrix4f;
+typedef Matrix4<float> Matrix4f;
 // tolua_end
-
-
-
-
-

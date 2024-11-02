@@ -135,46 +135,37 @@ bool cEntityEffect::IsPotionDrinkable(short a_ItemDamage)
 
 
 
-cEntityEffect::cEntityEffect():
-	m_Ticks(0),
-	m_Duration(0),
-	m_Intensity(0),
-	m_DistanceModifier(1)
+cEntityEffect::cEntityEffect() :
+	m_Ticks(0), m_Duration(0), m_Intensity(0), m_DistanceModifier(1)
 {
-
 }
 
 
 
 
 
-cEntityEffect::cEntityEffect(int a_Duration, short a_Intensity, double a_DistanceModifier):
-	m_Ticks(0),
-	m_Duration(a_Duration),
-	m_Intensity(a_Intensity),
-	m_DistanceModifier(a_DistanceModifier)
+cEntityEffect::cEntityEffect(int a_Duration, short a_Intensity, double a_DistanceModifier) :
+	m_Ticks(0), m_Duration(a_Duration), m_Intensity(a_Intensity), m_DistanceModifier(a_DistanceModifier)
 {
-
 }
 
 
 
 
 
-cEntityEffect::cEntityEffect(const cEntityEffect & a_OtherEffect):
+cEntityEffect::cEntityEffect(const cEntityEffect & a_OtherEffect) :
 	m_Ticks(a_OtherEffect.m_Ticks),
 	m_Duration(a_OtherEffect.m_Duration),
 	m_Intensity(a_OtherEffect.m_Intensity),
 	m_DistanceModifier(a_OtherEffect.m_DistanceModifier)
 {
-
 }
 
 
 
 
 
-cEntityEffect & cEntityEffect::operator =(cEntityEffect a_OtherEffect)
+cEntityEffect & cEntityEffect::operator=(cEntityEffect a_OtherEffect)
 {
 	std::swap(m_Ticks, a_OtherEffect.m_Ticks);
 	std::swap(m_Duration, a_OtherEffect.m_Duration);
@@ -187,35 +178,64 @@ cEntityEffect & cEntityEffect::operator =(cEntityEffect a_OtherEffect)
 
 
 
-std::unique_ptr<cEntityEffect> cEntityEffect::CreateEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, double a_DistanceModifier)
+std::unique_ptr<cEntityEffect> cEntityEffect::CreateEntityEffect(
+	cEntityEffect::eType a_EffectType,
+	int a_Duration,
+	short a_Intensity,
+	double a_DistanceModifier
+)
 {
 	switch (a_EffectType)
 	{
-		case cEntityEffect::effNoEffect:       return std::make_unique<cEntityEffect              >(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effNoEffect:
+			return std::make_unique<cEntityEffect>(a_Duration, a_Intensity, a_DistanceModifier);
 
-		case cEntityEffect::effAbsorption:     return std::make_unique<cEntityEffectAbsorption    >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effBlindness:      return std::make_unique<cEntityEffectBlindness     >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effFireResistance: return std::make_unique<cEntityEffectFireResistance>(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effHaste:          return std::make_unique<cEntityEffectHaste         >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effHealthBoost:    return std::make_unique<cEntityEffectHealthBoost   >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effHunger:         return std::make_unique<cEntityEffectHunger        >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effInstantDamage:  return std::make_unique<cEntityEffectInstantDamage >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effInstantHealth:  return std::make_unique<cEntityEffectInstantHealth >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effInvisibility:   return std::make_unique<cEntityEffectInvisibility  >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effJumpBoost:      return std::make_unique<cEntityEffectJumpBoost     >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effMiningFatigue:  return std::make_unique<cEntityEffectMiningFatigue >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effNausea:         return std::make_unique<cEntityEffectNausea        >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effNightVision:    return std::make_unique<cEntityEffectNightVision   >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effPoison:         return std::make_unique<cEntityEffectPoison        >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effRegeneration:   return std::make_unique<cEntityEffectRegeneration  >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effResistance:     return std::make_unique<cEntityEffectResistance    >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effSaturation:     return std::make_unique<cEntityEffectSaturation    >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effSlowness:       return std::make_unique<cEntityEffectSlowness      >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effSpeed:          return std::make_unique<cEntityEffectSpeed         >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effStrength:       return std::make_unique<cEntityEffectStrength      >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effWaterBreathing: return std::make_unique<cEntityEffectWaterBreathing>(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effWeakness:       return std::make_unique<cEntityEffectWeakness      >(a_Duration, a_Intensity, a_DistanceModifier);
-		case cEntityEffect::effWither:         return std::make_unique<cEntityEffectWither        >(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effAbsorption:
+			return std::make_unique<cEntityEffectAbsorption>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effBlindness:
+			return std::make_unique<cEntityEffectBlindness>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effFireResistance:
+			return std::make_unique<cEntityEffectFireResistance>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effHaste:
+			return std::make_unique<cEntityEffectHaste>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effHealthBoost:
+			return std::make_unique<cEntityEffectHealthBoost>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effHunger:
+			return std::make_unique<cEntityEffectHunger>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effInstantDamage:
+			return std::make_unique<cEntityEffectInstantDamage>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effInstantHealth:
+			return std::make_unique<cEntityEffectInstantHealth>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effInvisibility:
+			return std::make_unique<cEntityEffectInvisibility>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effJumpBoost:
+			return std::make_unique<cEntityEffectJumpBoost>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effMiningFatigue:
+			return std::make_unique<cEntityEffectMiningFatigue>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effNausea:
+			return std::make_unique<cEntityEffectNausea>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effNightVision:
+			return std::make_unique<cEntityEffectNightVision>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effPoison:
+			return std::make_unique<cEntityEffectPoison>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effRegeneration:
+			return std::make_unique<cEntityEffectRegeneration>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effResistance:
+			return std::make_unique<cEntityEffectResistance>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effSaturation:
+			return std::make_unique<cEntityEffectSaturation>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effSlowness:
+			return std::make_unique<cEntityEffectSlowness>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effSpeed:
+			return std::make_unique<cEntityEffectSpeed>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effStrength:
+			return std::make_unique<cEntityEffectStrength>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effWaterBreathing:
+			return std::make_unique<cEntityEffectWaterBreathing>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effWeakness:
+			return std::make_unique<cEntityEffectWeakness>(a_Duration, a_Intensity, a_DistanceModifier);
+		case cEntityEffect::effWither:
+			return std::make_unique<cEntityEffectWither>(a_Duration, a_Intensity, a_DistanceModifier);
 	}
 	UNREACHABLE("Unsupported entity effect");
 }
@@ -241,12 +261,12 @@ void cEntityEffectSpeed::OnActivate(cPawn & a_Target)
 {
 	if (a_Target.IsMob())
 	{
-		cMonster * Mob = static_cast<cMonster*>(&a_Target);
+		cMonster * Mob = static_cast<cMonster *>(&a_Target);
 		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() + 0.2 * m_Intensity);
 	}
 	else if (a_Target.IsPlayer())
 	{
-		cPlayer * Player = static_cast<cPlayer*>(&a_Target);
+		cPlayer * Player = static_cast<cPlayer *>(&a_Target);
 		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() + 0.2 * m_Intensity);
 		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() + 0.26 * m_Intensity);
 		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() + 0.2 * m_Intensity);
@@ -261,12 +281,12 @@ void cEntityEffectSpeed::OnDeactivate(cPawn & a_Target)
 {
 	if (a_Target.IsMob())
 	{
-		cMonster * Mob = static_cast<cMonster*>(&a_Target);
+		cMonster * Mob = static_cast<cMonster *>(&a_Target);
 		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() - 0.2 * m_Intensity);
 	}
 	else if (a_Target.IsPlayer())
 	{
-		cPlayer * Player = static_cast<cPlayer*>(&a_Target);
+		cPlayer * Player = static_cast<cPlayer *>(&a_Target);
 		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() - 0.2 * m_Intensity);
 		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() - 0.26 * m_Intensity);
 		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() - 0.2 * m_Intensity);
@@ -284,12 +304,12 @@ void cEntityEffectSlowness::OnActivate(cPawn & a_Target)
 {
 	if (a_Target.IsMob())
 	{
-		cMonster * Mob = static_cast<cMonster*>(&a_Target);
+		cMonster * Mob = static_cast<cMonster *>(&a_Target);
 		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() - 0.15 * m_Intensity);
 	}
 	else if (a_Target.IsPlayer())
 	{
-		cPlayer * Player = static_cast<cPlayer*>(&a_Target);
+		cPlayer * Player = static_cast<cPlayer *>(&a_Target);
 		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() - 0.15 * m_Intensity);
 		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() - 0.195 * m_Intensity);
 		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() - 0.15 * m_Intensity);
@@ -304,12 +324,12 @@ void cEntityEffectSlowness::OnDeactivate(cPawn & a_Target)
 {
 	if (a_Target.IsMob())
 	{
-		cMonster * Mob = static_cast<cMonster*>(&a_Target);
+		cMonster * Mob = static_cast<cMonster *>(&a_Target);
 		Mob->SetRelativeWalkSpeed(Mob->GetRelativeWalkSpeed() + 0.15 * m_Intensity);
 	}
 	else if (a_Target.IsPlayer())
 	{
-		cPlayer * Player = static_cast<cPlayer*>(&a_Target);
+		cPlayer * Player = static_cast<cPlayer *>(&a_Target);
 		Player->SetNormalMaxSpeed(Player->GetNormalMaxSpeed() + 0.15 * m_Intensity);
 		Player->SetSprintingMaxSpeed(Player->GetSprintingMaxSpeed() + 0.195 * m_Intensity);
 		Player->SetFlyingMaxSpeed(Player->GetFlyingMaxSpeed() + 0.15 * m_Intensity);
@@ -330,7 +350,12 @@ void cEntityEffectInstantHealth::OnActivate(cPawn & a_Target)
 
 	if (a_Target.IsMob() && static_cast<cMonster &>(a_Target).IsUndead())
 	{
-		a_Target.TakeDamage(dtPotionOfHarming, nullptr, amount, 0);  // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
+		a_Target.TakeDamage(
+			dtPotionOfHarming,
+			nullptr,
+			amount,
+			0
+		);  // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
 		return;
 	}
 	a_Target.Heal(amount);
@@ -353,7 +378,12 @@ void cEntityEffectInstantDamage::OnActivate(cPawn & a_Target)
 		a_Target.Heal(amount);
 		return;
 	}
-	a_Target.TakeDamage(dtPotionOfHarming, nullptr, amount, 0);  // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
+	a_Target.TakeDamage(
+		dtPotionOfHarming,
+		nullptr,
+		amount,
+		0
+	);  // TODO: Store attacker in a pointer-safe way, pass to TakeDamage
 }
 
 
@@ -397,7 +427,9 @@ void cEntityEffectHunger::OnTick(cPawn & a_Target)
 	if (a_Target.IsPlayer())
 	{
 		cPlayer & Target = static_cast<cPlayer &>(a_Target);
-		Target.AddFoodExhaustion(0.025 * (static_cast<double>(GetIntensity()) + 1.0));  // 0.5 per second = 0.025 per tick
+		Target.AddFoodExhaustion(
+			0.025 * (static_cast<double>(GetIntensity()) + 1.0)
+		);  // 0.5 per second = 0.025 per tick
 	}
 }
 
@@ -451,11 +483,7 @@ void cEntityEffectPoison::OnTick(cPawn & a_Target)
 		cMonster & Target = static_cast<cMonster &>(a_Target);
 
 		// Doesn't effect undead mobs, spiders
-		if (
-			Target.IsUndead() ||
-			(Target.GetMobType() == mtSpider) ||
-			(Target.GetMobType() == mtCaveSpider)
-		)
+		if (Target.IsUndead() || (Target.GetMobType() == mtSpider) || (Target.GetMobType() == mtCaveSpider))
 		{
 			return;
 		}
@@ -506,6 +534,8 @@ void cEntityEffectSaturation::OnTick(cPawn & a_Target)
 	if (a_Target.IsPlayer())
 	{
 		cPlayer & Target = static_cast<cPlayer &>(a_Target);
-		Target.SetFoodSaturationLevel(Target.GetFoodSaturationLevel() + (1 + m_Intensity));  // Increase saturation 1 per tick, adds 1 for every increase in level
+		Target.SetFoodSaturationLevel(
+			Target.GetFoodSaturationLevel() + (1 + m_Intensity)
+		);  // Increase saturation 1 per tick, adds 1 for every increase in level
 	}
 }

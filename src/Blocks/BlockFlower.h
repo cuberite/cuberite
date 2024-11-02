@@ -7,17 +7,14 @@
 
 
 
-class cBlockFlowerHandler final :
-	public cBlockHandler
+class cBlockFlowerHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		NIBBLETYPE meta = a_BlockMeta & 0x7;
@@ -42,8 +39,4 @@ private:
 		UNUSED(a_Meta);
 		return 7;
 	}
-} ;
-
-
-
-
+};

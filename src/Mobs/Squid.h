@@ -7,13 +7,11 @@
 
 
 
-class cSquid:
-	public cPassiveMonster
+class cSquid : public cPassiveMonster
 {
 	using Super = cPassiveMonster;
 
-public:
-
+  public:
 	cSquid();
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
@@ -24,8 +22,4 @@ public:
 
 	// Squids do not drown (or float)
 	virtual void HandleAir(void) override {}
-} ;
-
-
-
-
+};

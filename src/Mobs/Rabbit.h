@@ -9,12 +9,12 @@
 
 enum class eRabbitType : UInt8
 {
-	Brown          = 0,
-	White          = 1,
-	Black          = 2,
-	BlackAndWhite  = 3,
-	Gold           = 4,
-	SaltAndPepper  = 5,
+	Brown = 0,
+	White = 1,
+	Black = 2,
+	BlackAndWhite = 3,
+	Gold = 4,
+	SaltAndPepper = 5,
 	TheKillerBunny = 99
 };
 
@@ -22,13 +22,11 @@ enum class eRabbitType : UInt8
 
 
 
-class cRabbit:
-	public cPassiveMonster
+class cRabbit : public cPassiveMonster
 {
 	using Super = cPassiveMonster;
 
-public:
-
+  public:
 	cRabbit();
 	cRabbit(eRabbitType Type, int MoreCarrotTicks = 0);
 
@@ -42,11 +40,10 @@ public:
 		a_Items.Add(E_BLOCK_DANDELION);
 	}
 
-	eRabbitType GetRabbitType()         const { return m_Type; }
-	int         GetMoreCarrotTicks()    const { return m_MoreCarrotTicks; }
+	eRabbitType GetRabbitType() const { return m_Type; }
+	int GetMoreCarrotTicks() const { return m_MoreCarrotTicks; }
 
-private:
-
+  private:
 	eRabbitType m_Type;
 	int m_MoreCarrotTicks;  // Ticks until the Rabbit eat planted Carrots
-} ;
+};

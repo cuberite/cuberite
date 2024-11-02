@@ -13,7 +13,15 @@
 
 
 cSilverfish::cSilverfish() :
-	Super("Silverfish", mtSilverfish, "entity.silverfish.hurt", "entity.silverfish.death", "entity.silverfish.ambient", 0.4f, 0.3f)
+	Super(
+		"Silverfish",
+		mtSilverfish,
+		"entity.silverfish.hurt",
+		"entity.silverfish.death",
+		"entity.silverfish.ambient",
+		0.4f,
+		0.3f
+	)
 {
 }
 
@@ -21,7 +29,7 @@ cSilverfish::cSilverfish() :
 
 
 
-bool cSilverfish::DoTakeDamage(TakeDamageInfo &a_TDI)
+bool cSilverfish::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	// Call on our brethren to attack!
 	// TODO: stop this if /gamerule mobGriefing is set to false
@@ -76,7 +84,7 @@ bool cSilverfish::DoTakeDamage(TakeDamageInfo &a_TDI)
 		{
 			for (int OffsetZ = -HalfSide; OffsetZ <= HalfSide; OffsetZ++)
 			{
-				if (CheckInfested({ OffsetX, +HalfSide, OffsetZ }) || CheckInfested({ OffsetX, -HalfSide, OffsetZ }))
+				if (CheckInfested({OffsetX, +HalfSide, OffsetZ}) || CheckInfested({OffsetX, -HalfSide, OffsetZ}))
 				{
 					return true;
 				}
@@ -87,7 +95,7 @@ bool cSilverfish::DoTakeDamage(TakeDamageInfo &a_TDI)
 		{
 			for (int OffsetY = -HalfSide + 1; OffsetY <= HalfSide - 1; OffsetY++)
 			{
-				if (CheckInfested({ OffsetX, OffsetY, +HalfSide }) || CheckInfested({ OffsetX, OffsetY, -HalfSide }))
+				if (CheckInfested({OffsetX, OffsetY, +HalfSide}) || CheckInfested({OffsetX, OffsetY, -HalfSide}))
 				{
 					return true;
 				}
@@ -98,7 +106,7 @@ bool cSilverfish::DoTakeDamage(TakeDamageInfo &a_TDI)
 		{
 			for (int OffsetY = -HalfSide + 1; OffsetY <= HalfSide - 1; OffsetY++)
 			{
-				if (CheckInfested({ +HalfSide, OffsetY, OffsetZ }) || CheckInfested({ -HalfSide, OffsetY, OffsetZ }))
+				if (CheckInfested({+HalfSide, OffsetY, OffsetZ}) || CheckInfested({-HalfSide, OffsetY, OffsetZ}))
 				{
 					return true;
 				}

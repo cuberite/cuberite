@@ -6,9 +6,7 @@
 
 
 
-Region::Region()
-{
-}
+Region::Region() {}
 
 
 
@@ -16,12 +14,12 @@ Region::Region()
 
 Chunk & Region::getRelChunk(int a_RelChunkX, int a_RelChunkZ)
 {
-		ASSERT(a_RelChunkX >= 0);
-		ASSERT(a_RelChunkZ >= 0);
-		ASSERT(a_RelChunkX < 32);
-		ASSERT(a_RelChunkZ < 32);
+	ASSERT(a_RelChunkX >= 0);
+	ASSERT(a_RelChunkZ >= 0);
+	ASSERT(a_RelChunkX < 32);
+	ASSERT(a_RelChunkZ < 32);
 
-		return m_Chunks[a_RelChunkX + a_RelChunkZ * 32];
+	return m_Chunks[a_RelChunkX + a_RelChunkZ * 32];
 }
 
 
@@ -66,7 +64,3 @@ void Region::chunkToRegion(int a_ChunkX, int a_ChunkZ, int & a_RegionX, int & a_
 	a_RegionX = static_cast<int>(std::floor(static_cast<float>(a_ChunkX) / 32));
 	a_RegionZ = static_cast<int>(std::floor(static_cast<float>(a_ChunkZ) / 32));
 }
-
-
-
-

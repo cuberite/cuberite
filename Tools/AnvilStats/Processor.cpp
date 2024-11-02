@@ -24,9 +24,7 @@ const int CHUNK_INFLATE_MAX = 1 MiB;
 // cProcessor::cThread:
 
 cProcessor::cThread::cThread(cCallback & a_Callback, cProcessor & a_ParentProcessor) :
-	super("cProcessor::cThread"),
-	m_Callback(a_Callback),
-	m_ParentProcessor(a_ParentProcessor)
+	super("cProcessor::cThread"), m_Callback(a_Callback), m_ParentProcessor(a_ParentProcessor)
 {
 	LOG("Created a new thread: %p", this);
 	super::Start();
@@ -119,7 +117,7 @@ void cProcessor::cThread::ProcessFile(const AString & a_FileName)
 void cProcessor::cThread::ProcessFileData(const char * a_FileData, size_t a_Size, int a_ChunkBaseX, int a_ChunkBaseZ)
 {
 	int Header[2048];
-	int * HeaderPtr = (int *)a_FileData;
+	int * HeaderPtr = (int *) a_FileData;
 	for (int i = 0; i < ARRAYCOUNT(Header); i++)
 	{
 		Header[i] = ntohl(HeaderPtr[i]);
@@ -129,11 +127,10 @@ void cProcessor::cThread::ProcessFileData(const char * a_FileData, size_t a_Size
 	{
 		unsigned Location = Header[i];
 		unsigned Timestamp = Header[i + 1024];
-		if (
-			((Location == 0) && (Timestamp == 0)) ||  // Official docs' "not present"
-			(Location >> 8 < 2)                   ||  // Logical - no chunk can start inside the header
-			((Location & 0xff) == 0)              ||  // Logical - no chunk can be zero bytes
-			((Location >> 8) * 4096 > a_Size)         // Logical - no chunk can start at beyond the file end
+		if (((Location == 0) && (Timestamp == 0)) ||  // Official docs' "not present"
+			(Location >> 8 < 2) ||  // Logical - no chunk can start inside the header
+			((Location & 0xff) == 0) ||  // Logical - no chunk can be zero bytes
+			((Location >> 8) * 4096 > a_Size)  // Logical - no chunk can start at beyond the file end
 		)
 		{
 			// Chunk not present in the file
@@ -153,7 +150,14 @@ void cProcessor::cThread::ProcessFileData(const char * a_FileData, size_t a_Size
 
 
 
-void cProcessor::cThread::ProcessChunk(const char * a_FileData, int a_ChunkX, int a_ChunkZ, unsigned a_SectorStart, unsigned a_SectorSize, unsigned a_TimeStamp)
+void cProcessor::cThread::ProcessChunk(
+	const char * a_FileData,
+	int a_ChunkX,
+	int a_ChunkZ,
+	unsigned a_SectorStart,
+	unsigned a_SectorSize,
+	unsigned a_TimeStamp
+)
 {
 	if (m_Callback.OnHeader(a_SectorStart * 4096, a_SectorSize, a_TimeStamp))
 	{
@@ -161,7 +165,7 @@ void cProcessor::cThread::ProcessChunk(const char * a_FileData, int a_ChunkX, in
 	}
 
 	const char * ChunkStart = a_FileData + a_SectorStart * 4096;
-	int ByteSize = ntohl(*(int *)ChunkStart);
+	int ByteSize = ntohl(*(int *) ChunkStart);
 	char CompressionMethod = ChunkStart[4];
 
 	if (m_Callback.OnCompressedDataSizePos(ByteSize, a_SectorStart * 4096 + 5, CompressionMethod))
@@ -176,18 +180,23 @@ void cProcessor::cThread::ProcessChunk(const char * a_FileData, int a_ChunkX, in
 
 
 
-void cProcessor::cThread::ProcessCompressedChunkData(int a_ChunkX, int a_ChunkZ, const char * a_CompressedData, int a_CompressedSize)
+void cProcessor::cThread::ProcessCompressedChunkData(
+	int a_ChunkX,
+	int a_ChunkZ,
+	const char * a_CompressedData,
+	int a_CompressedSize
+)
 {
 	char Decompressed[CHUNK_INFLATE_MAX];
 	z_stream strm;
-	strm.zalloc = (alloc_func)NULL;
-	strm.zfree = (free_func)NULL;
+	strm.zalloc = (alloc_func) NULL;
+	strm.zfree = (free_func) NULL;
 	strm.opaque = NULL;
 	inflateInit(&strm);
-	strm.next_out  = (Bytef *)Decompressed;
+	strm.next_out = (Bytef *) Decompressed;
 	strm.avail_out = sizeof(Decompressed);
-	strm.next_in   = (Bytef *)a_CompressedData;
-	strm.avail_in  = a_CompressedSize;
+	strm.next_in = (Bytef *) a_CompressedData;
+	strm.avail_in = a_CompressedSize;
 	int res = inflate(&strm, Z_FINISH);
 	inflateEnd(&strm);
 	if (res != Z_STREAM_END)
@@ -255,7 +264,7 @@ void cProcessor::cThread::ProcessParsedChunkData(int a_ChunkX, int a_ChunkZ, cPa
 	int BiomesTag = a_NBT.FindChildByName(LevelTag, "Biomes");
 	if (BiomesTag > 0)
 	{
-		if (m_Callback.OnBiomes((const unsigned char *)(a_NBT.GetData(BiomesTag))))
+		if (m_Callback.OnBiomes((const unsigned char *) (a_NBT.GetData(BiomesTag))))
 		{
 			return;
 		}
@@ -264,7 +273,7 @@ void cProcessor::cThread::ProcessParsedChunkData(int a_ChunkX, int a_ChunkZ, cPa
 	int HeightMapTag = a_NBT.FindChildByName(LevelTag, "HeightMap");
 	if (HeightMapTag > 0)
 	{
-		if (m_Callback.OnHeightMap((const int *)(a_NBT.GetData(HeightMapTag))))
+		if (m_Callback.OnHeightMap((const int *) (a_NBT.GetData(HeightMapTag))))
 		{
 			return;
 		}
@@ -307,12 +316,12 @@ bool cProcessor::cThread::ProcessChunkSections(int a_ChunkX, int a_ChunkZ, cPars
 	memset(SectionProcessed, 0, sizeof(SectionProcessed));
 	for (int Tag = a_NBT.GetFirstChild(Sections); Tag > 0; Tag = a_NBT.GetNextSibling(Tag))
 	{
-		int YTag          = a_NBT.FindChildByName(Tag, "Y");
-		int BlocksTag     = a_NBT.FindChildByName(Tag, "Blocks");
-		int AddTag        = a_NBT.FindChildByName(Tag, "Add");
-		int DataTag       = a_NBT.FindChildByName(Tag, "Data");
+		int YTag = a_NBT.FindChildByName(Tag, "Y");
+		int BlocksTag = a_NBT.FindChildByName(Tag, "Blocks");
+		int AddTag = a_NBT.FindChildByName(Tag, "Add");
+		int DataTag = a_NBT.FindChildByName(Tag, "Data");
 		int BlockLightTag = a_NBT.FindChildByName(Tag, "BlockLightTag");
-		int SkyLightTag   = a_NBT.FindChildByName(Tag, "SkyLight");
+		int SkyLightTag = a_NBT.FindChildByName(Tag, "SkyLight");
 
 		if ((YTag < 0) || (BlocksTag < 0) || (DataTag < 0))
 		{
@@ -326,13 +335,13 @@ bool cProcessor::cThread::ProcessChunkSections(int a_ChunkX, int a_ChunkZ, cPars
 			continue;
 		}
 		if (m_Callback.OnSection(
-			SectionY,
-			(const BLOCKTYPE *) (a_NBT.GetData(BlocksTag)),
-			(AddTag > 0) ? (const NIBBLETYPE *)(a_NBT.GetData(AddTag)) : NULL,
-			(const NIBBLETYPE *)(a_NBT.GetData(DataTag)),
-			(BlockLightTag > 0) ? (const NIBBLETYPE *)(a_NBT.GetData(BlockLightTag)) : NULL,
-			(BlockLightTag > 0) ? (const NIBBLETYPE *)(a_NBT.GetData(BlockLightTag)) : NULL
-		))
+				SectionY,
+				(const BLOCKTYPE *) (a_NBT.GetData(BlocksTag)),
+				(AddTag > 0) ? (const NIBBLETYPE *) (a_NBT.GetData(AddTag)) : NULL,
+				(const NIBBLETYPE *) (a_NBT.GetData(DataTag)),
+				(BlockLightTag > 0) ? (const NIBBLETYPE *) (a_NBT.GetData(BlockLightTag)) : NULL,
+				(BlockLightTag > 0) ? (const NIBBLETYPE *) (a_NBT.GetData(BlockLightTag)) : NULL
+			))
 		{
 			return true;
 		}
@@ -405,16 +414,22 @@ bool cProcessor::cThread::ProcessChunkEntities(int a_ChunkX, int a_ChunkZ, cPars
 		}
 
 		if (m_Callback.OnEntity(
-			a_NBT.GetString(a_NBT.FindChildByName(EntityTag, "id")),
-			Pos[0], Pos[1], Pos[2],
-			Speed[0], Speed[1], Speed[2],
-			Rot[0], Rot[1],
-			a_NBT.GetFloat(a_NBT.FindChildByName(EntityTag, "FallDistance")),
-			a_NBT.GetShort(a_NBT.FindChildByName(EntityTag, "Fire")),
-			a_NBT.GetShort(a_NBT.FindChildByName(EntityTag, "Air")),
-			a_NBT.GetByte(a_NBT.FindChildByName(EntityTag, "OnGround")),
-			a_NBT, EntityTag
-		))
+				a_NBT.GetString(a_NBT.FindChildByName(EntityTag, "id")),
+				Pos[0],
+				Pos[1],
+				Pos[2],
+				Speed[0],
+				Speed[1],
+				Speed[2],
+				Rot[0],
+				Rot[1],
+				a_NBT.GetFloat(a_NBT.FindChildByName(EntityTag, "FallDistance")),
+				a_NBT.GetShort(a_NBT.FindChildByName(EntityTag, "Fire")),
+				a_NBT.GetShort(a_NBT.FindChildByName(EntityTag, "Air")),
+				a_NBT.GetByte(a_NBT.FindChildByName(EntityTag, "OnGround")),
+				a_NBT,
+				EntityTag
+			))
 		{
 			return true;
 		}
@@ -434,15 +449,17 @@ bool cProcessor::cThread::ProcessChunkTileEntities(int a_ChunkX, int a_ChunkZ, c
 		return false;
 	}
 
-	for (int TileEntityTag = a_NBT.GetFirstChild(TileEntitiesTag); TileEntityTag > 0; TileEntityTag = a_NBT.GetNextSibling(TileEntityTag))
+	for (int TileEntityTag = a_NBT.GetFirstChild(TileEntitiesTag); TileEntityTag > 0;
+		 TileEntityTag = a_NBT.GetNextSibling(TileEntityTag))
 	{
 		if (m_Callback.OnTileEntity(
-			a_NBT.GetString(a_NBT.FindChildByName(TileEntityTag, "id")),
-			a_NBT.GetInt(a_NBT.FindChildByName(TileEntityTag, "x")),
-			a_NBT.GetInt(a_NBT.FindChildByName(TileEntityTag, "y")),
-			a_NBT.GetInt(a_NBT.FindChildByName(TileEntityTag, "z")),
-			a_NBT, TileEntityTag
-		))
+				a_NBT.GetString(a_NBT.FindChildByName(TileEntityTag, "id")),
+				a_NBT.GetInt(a_NBT.FindChildByName(TileEntityTag, "x")),
+				a_NBT.GetInt(a_NBT.FindChildByName(TileEntityTag, "y")),
+				a_NBT.GetInt(a_NBT.FindChildByName(TileEntityTag, "z")),
+				a_NBT,
+				TileEntityTag
+			))
 		{
 			return true;
 		}
@@ -462,7 +479,8 @@ bool cProcessor::cThread::ProcessChunkTileTicks(int a_ChunkX, int a_ChunkZ, cPar
 		return false;
 	}
 
-	for (int TileTickTag = a_NBT.GetFirstChild(TileTicksTag); TileTickTag > 0; TileTickTag = a_NBT.GetNextSibling(TileTickTag))
+	for (int TileTickTag = a_NBT.GetFirstChild(TileTicksTag); TileTickTag > 0;
+		 TileTickTag = a_NBT.GetNextSibling(TileTickTag))
 	{
 		int iTag = a_NBT.FindChildByName(TileTicksTag, "i");
 		int tTag = a_NBT.FindChildByName(TileTicksTag, "t");
@@ -474,12 +492,12 @@ bool cProcessor::cThread::ProcessChunkTileTicks(int a_ChunkX, int a_ChunkZ, cPar
 			continue;
 		}
 		if (m_Callback.OnTileTick(
-			a_NBT.GetInt(iTag),
-			a_NBT.GetInt(iTag),
-			a_NBT.GetInt(iTag),
-			a_NBT.GetInt(iTag),
-			a_NBT.GetInt(iTag)
-		))
+				a_NBT.GetInt(iTag),
+				a_NBT.GetInt(iTag),
+				a_NBT.GetInt(iTag),
+				a_NBT.GetInt(iTag),
+				a_NBT.GetInt(iTag)
+			))
 		{
 			return true;
 		}
@@ -503,9 +521,7 @@ cProcessor::cProcessor(void) :
 
 
 
-cProcessor::~cProcessor()
-{
-}
+cProcessor::~cProcessor() {}
 
 
 

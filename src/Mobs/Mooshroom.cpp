@@ -48,7 +48,8 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 			{
 				a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_MILK));
 			}
-		} break;
+		}
+		break;
 		case E_ITEM_BOWL:
 		{
 			// Soup the cow.
@@ -56,7 +57,8 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 			{
 				a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_MUSHROOM_SOUP));
 			}
-		} break;
+		}
+		break;
 		case E_ITEM_SHEARS:
 		{
 			if (!a_Player.IsGameModeCreative())
@@ -69,6 +71,7 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 			m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 			m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtCow, false);
 			Destroy();
-		} break;
+		}
+		break;
 	}
 }

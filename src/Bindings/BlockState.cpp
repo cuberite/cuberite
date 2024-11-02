@@ -5,7 +5,7 @@
 
 
 
-BlockState::BlockState():
+BlockState::BlockState() :
 	mChecksum(initializeChecksum())
 {
 	// Nothing needed yet
@@ -15,9 +15,8 @@ BlockState::BlockState():
 
 
 
-BlockState::BlockState(const AString & aKey, const AString & aValue):
-	mState({{aKey, aValue}}),
-	mChecksum(initializeChecksum())
+BlockState::BlockState(const AString & aKey, const AString & aValue) :
+	mState({{aKey, aValue}}), mChecksum(initializeChecksum())
 {
 }
 
@@ -25,9 +24,8 @@ BlockState::BlockState(const AString & aKey, const AString & aValue):
 
 
 
-BlockState::BlockState(std::initializer_list<std::pair<const AString, AString>> aKeysAndValues):
-	mState(aKeysAndValues),
-	mChecksum(initializeChecksum())
+BlockState::BlockState(std::initializer_list<std::pair<const AString, AString>> aKeysAndValues) :
+	mState(aKeysAndValues), mChecksum(initializeChecksum())
 {
 }
 
@@ -35,9 +33,8 @@ BlockState::BlockState(std::initializer_list<std::pair<const AString, AString>> 
 
 
 
-BlockState::BlockState(const std::map<AString, AString> & aKeysAndValues):
-	mState(aKeysAndValues),
-	mChecksum(initializeChecksum())
+BlockState::BlockState(const std::map<AString, AString> & aKeysAndValues) :
+	mState(aKeysAndValues), mChecksum(initializeChecksum())
 {
 }
 
@@ -45,9 +42,8 @@ BlockState::BlockState(const std::map<AString, AString> & aKeysAndValues):
 
 
 
-BlockState::BlockState(std::map<AString, AString> && aKeysAndValues):
-	mState(std::move(aKeysAndValues)),
-	mChecksum(initializeChecksum())
+BlockState::BlockState(std::map<AString, AString> && aKeysAndValues) :
+	mState(std::move(aKeysAndValues)), mChecksum(initializeChecksum())
 {
 }
 
@@ -55,10 +51,13 @@ BlockState::BlockState(std::map<AString, AString> && aKeysAndValues):
 
 
 
-BlockState::BlockState(const BlockState & aCopyFrom, std::initializer_list<std::pair<const AString, AString>> aAdditionalKeysAndValues):
+BlockState::BlockState(
+	const BlockState & aCopyFrom,
+	std::initializer_list<std::pair<const AString, AString>> aAdditionalKeysAndValues
+) :
 	mState(aCopyFrom.mState)
 {
-	for (const auto & kav: aAdditionalKeysAndValues)
+	for (const auto & kav : aAdditionalKeysAndValues)
 	{
 		mState[kav.first] = kav.second;
 	}
@@ -69,10 +68,10 @@ BlockState::BlockState(const BlockState & aCopyFrom, std::initializer_list<std::
 
 
 
-BlockState::BlockState(const BlockState & aCopyFrom, const std::map<AString, AString> & aAdditionalKeysAndValues):
+BlockState::BlockState(const BlockState & aCopyFrom, const std::map<AString, AString> & aAdditionalKeysAndValues) :
 	mState(aCopyFrom.mState)
 {
-	for (const auto & kav: aAdditionalKeysAndValues)
+	for (const auto & kav : aAdditionalKeysAndValues)
 	{
 		mState[kav.first] = kav.second;
 	}
@@ -83,7 +82,7 @@ BlockState::BlockState(const BlockState & aCopyFrom, const std::map<AString, ASt
 
 
 
-bool BlockState::operator <(const BlockState & aOther) const
+bool BlockState::operator<(const BlockState & aOther) const
 {
 	// Fast-return this using checksum
 	if (mChecksum != aOther.mChecksum)
@@ -129,7 +128,7 @@ bool BlockState::operator <(const BlockState & aOther) const
 
 
 
-bool BlockState::operator ==(const BlockState & aOther) const
+bool BlockState::operator==(const BlockState & aOther) const
 {
 	// Fast-fail if the checksums differ or differrent counts:
 	if ((mChecksum != aOther.mChecksum) || (mState.size() != aOther.mState.size()))
@@ -167,7 +166,7 @@ UInt32 BlockState::initializeChecksum()
 	// Calculate the checksum as a XOR of all mState keys' and values' checksums
 	// This way we don't depend on the std::map's ordering
 	UInt32 res = 0;
-	for (const auto & kv: mState)
+	for (const auto & kv : mState)
 	{
 		auto partial = partialChecksum(kv.first) ^ partialChecksum(kv.second);
 		res = res ^ partial;
@@ -202,7 +201,7 @@ UInt32 BlockState::partialChecksum(const AString & aString)
 {
 	UInt32 shift = 0;
 	UInt32 res = 0;
-	for (auto ch: aString)
+	for (auto ch : aString)
 	{
 		UInt32 v = static_cast<UInt8>(ch);
 		v = v << shift;

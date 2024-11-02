@@ -15,8 +15,7 @@ class cClientHandle;
 
 
 // tolua_begin
-class cFurnaceEntity :
-	public cBlockEntityWithItems
+class cFurnaceEntity : public cBlockEntityWithItems
 {
 	// tolua_end
 
@@ -24,15 +23,14 @@ class cFurnaceEntity :
 
 	// tolua_begin
 
-public:
-
+  public:
 	enum
 	{
-		fsInput  = 0,  // Input slot number
-		fsFuel   = 1,  // Fuel slot number
+		fsInput = 0,  // Input slot number
+		fsFuel = 1,  // Fuel slot number
 		fsOutput = 2,  // Output slot number
 
-		ContentsWidth  = 3,
+		ContentsWidth = 3,
 		ContentsHeight = 1,
 	};
 
@@ -49,8 +47,8 @@ public:
 	virtual bool UsedBy(cPlayer * a_Player) override;
 
 	/** Restarts cooking
-	Used after the furnace is loaded from storage to set up the internal variables so that cooking continues, if it was active
-	Returns true if cooking */
+	Used after the furnace is loaded from storage to set up the internal variables so that cooking continues, if it was
+	active Returns true if cooking */
 	bool ContinueCooking(void);
 
 	// tolua_begin
@@ -102,14 +100,10 @@ public:
 		m_TimeCooked = a_TimeCooked;
 	}
 
-	void SetLoading(bool a_IsLoading)
-	{
-		m_IsLoading = a_IsLoading;
-	}
+	void SetLoading(bool a_IsLoading) { m_IsLoading = a_IsLoading; }
 
 
-protected:
-
+  protected:
 	/** The recipe for the current input slot */
 	const cFurnaceRecipe::cRecipe * m_CurrentRecipe;
 
@@ -167,4 +161,4 @@ protected:
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 
-} ;  // tolua_export
+};  // tolua_export

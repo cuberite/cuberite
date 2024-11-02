@@ -7,21 +7,17 @@
 
 
 
-class cBlockFluidHandler :
-	public cBlockHandler
+class cBlockFluidHandler : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-protected:
-
+  protected:
 	~cBlockFluidHandler() = default;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// No pickups
@@ -32,27 +28,31 @@ private:
 
 
 
-	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
+	virtual bool DoesIgnoreBuildCollision(
+		const cWorld & a_World,
+		const cItem & a_HeldItem,
+		const Vector3i a_Position,
+		const NIBBLETYPE a_Meta,
+		const eBlockFace a_ClickedBlockFace,
+		const bool a_ClickedDirectly
+	) const override
 	{
 		return true;
 	}
-} ;
+};
 
 
 
 
 
-class cBlockLavaHandler final :
-	public cBlockFluidHandler
+class cBlockLavaHandler final : public cBlockFluidHandler
 {
 	using Super = cBlockFluidHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual void OnUpdate(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
@@ -80,40 +80,33 @@ private:
 	{
 		// Pick a random block next to this lava block:
 		int rnd = a_Chunk.GetWorld()->GetTickRandomNumber(cChunkDef::NumBlocks * 8) / 7;
-		int x = (rnd % 3) - 1;         // -1 .. 1
-		int y = ((rnd / 4) % 4) - 1;   // -1 .. 2
+		int x = (rnd % 3) - 1;  // -1 .. 1
+		int y = ((rnd / 4) % 4) - 1;  // -1 .. 2
 		int z = ((rnd / 16) % 3) - 1;  // -1 .. 1
 		auto Pos = a_RelPos + Vector3i(x, y, z);
 
 		// Check if it's fuel:
 		BLOCKTYPE BlockType;
-		if (
-			!cChunkDef::IsValidHeight(Pos) ||
-			!a_Chunk.UnboundedRelGetBlockType(Pos, BlockType) ||
-			!cFireSimulator::IsFuel(BlockType)
-		)
+		if (!cChunkDef::IsValidHeight(Pos) || !a_Chunk.UnboundedRelGetBlockType(Pos, BlockType) ||
+			!cFireSimulator::IsFuel(BlockType))
 		{
 			return false;
 		}
 
 		// Try to set it on fire:
-		static Vector3i CrossCoords[] =
-		{
-			{-1,  0,  0},
-			{ 1,  0,  0},
-			{ 0, -1,  0},
-			{ 0,  1,  0},
-			{ 0,  0, -1},
-			{ 0,  0,  1},
-		} ;
+		static Vector3i CrossCoords[] = {
+			{-1, 0, 0},
+			{1, 0, 0},
+			{0, -1, 0},
+			{0, 1, 0},
+			{0, 0, -1},
+			{0, 0, 1},
+		};
 		for (size_t i = 0; i < ARRAYCOUNT(CrossCoords); i++)
 		{
 			auto NeighborPos = Pos + CrossCoords[i];
-			if (
-				cChunkDef::IsValidHeight(NeighborPos) &&
-				a_Chunk.UnboundedRelGetBlockType(NeighborPos, BlockType) &&
-				(BlockType == E_BLOCK_AIR)
-			)
+			if (cChunkDef::IsValidHeight(NeighborPos) && a_Chunk.UnboundedRelGetBlockType(NeighborPos, BlockType) &&
+				(BlockType == E_BLOCK_AIR))
 			{
 				// This is an air block next to a fuel next to lava, light the fuel block up:
 				a_Chunk.UnboundedRelSetBlock(NeighborPos, E_BLOCK_FIRE, 0);
@@ -137,25 +130,19 @@ private:
 
 
 
-	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const override
-	{
-		return false;
-	}
-} ;
+	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const override { return false; }
+};
 
 
 
 
 
-class cBlockWaterHandler final :
-	public cBlockFluidHandler
+class cBlockWaterHandler final : public cBlockFluidHandler
 {
-public:
-
+  public:
 	using cBlockFluidHandler::cBlockFluidHandler;
 
-private:
-
+  private:
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
@@ -170,12 +157,8 @@ private:
 	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const override
 	{
 		return (
-			(a_Plant == E_BLOCK_BEETROOTS) ||
-			(a_Plant == E_BLOCK_CROPS) ||
-			(a_Plant == E_BLOCK_CARROTS) ||
-			(a_Plant == E_BLOCK_POTATOES) ||
-			(a_Plant == E_BLOCK_MELON_STEM) ||
-			(a_Plant == E_BLOCK_PUMPKIN_STEM)
+			(a_Plant == E_BLOCK_BEETROOTS) || (a_Plant == E_BLOCK_CROPS) || (a_Plant == E_BLOCK_CARROTS) ||
+			(a_Plant == E_BLOCK_POTATOES) || (a_Plant == E_BLOCK_MELON_STEM) || (a_Plant == E_BLOCK_PUMPKIN_STEM)
 		);
 	}
 };

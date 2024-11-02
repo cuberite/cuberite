@@ -14,87 +14,87 @@
 
 
 #if !defined(NDEBUG) && defined(ENABLE_SSL_DEBUG_MSG)
-	#include "mbedtls/debug.h"
+#include "mbedtls/debug.h"
 
 
-	namespace
+namespace
+{
+void SSLDebugMessage(void * a_UserParam, int a_Level, const char * a_Filename, int a_LineNo, const char * a_Text)
+{
+	if (a_Level > 3)
 	{
-		void SSLDebugMessage(void * a_UserParam, int a_Level, const char * a_Filename, int a_LineNo, const char * a_Text)
-		{
-			if (a_Level > 3)
-			{
-				// Don't want the trace messages
-				return;
-			}
-
-			// Remove the terminating LF:
-			size_t len = strlen(a_Text) - 1;
-			while ((len > 0) && (a_Text[len] <= 32))
-			{
-				len--;
-			}
-			AString Text(a_Text, len + 1);
-
-			LOGD("SSL (%d): %s", a_Level, Text.c_str());
-		}
-
-
-
-
-
-		int SSLVerifyCert(void * a_This, mbedtls_x509_crt * a_Crt, int a_Depth, uint32_t * a_Flags)
-		{
-			char buf[1024];
-			UNUSED(a_This);
-
-			LOG("Verify requested for (Depth %d):", a_Depth);
-			mbedtls_x509_crt_info(buf, sizeof(buf) - 1, "", a_Crt);
-			LOG("%s", buf);
-
-			uint32_t Flags = *a_Flags;
-			if ((Flags & MBEDTLS_X509_BADCERT_EXPIRED) != 0)
-			{
-				LOG(" ! server certificate has expired");
-			}
-
-			if ((Flags & MBEDTLS_X509_BADCERT_REVOKED) != 0)
-			{
-				LOG(" ! server certificate has been revoked");
-			}
-
-			if ((Flags & MBEDTLS_X509_BADCERT_CN_MISMATCH) != 0)
-			{
-				LOG(" ! CN mismatch");
-			}
-
-			if ((Flags & MBEDTLS_X509_BADCERT_NOT_TRUSTED) != 0)
-			{
-				LOG(" ! self-signed or not signed by a trusted CA");
-			}
-
-			if ((Flags & MBEDTLS_X509_BADCRL_NOT_TRUSTED) != 0)
-			{
-				LOG(" ! CRL not trusted");
-			}
-
-			if ((Flags & MBEDTLS_X509_BADCRL_EXPIRED) != 0)
-			{
-				LOG(" ! CRL expired");
-			}
-
-			if ((Flags & MBEDTLS_X509_BADCERT_OTHER) != 0)
-			{
-				LOG(" ! other (unknown) flag");
-			}
-
-			if (Flags == 0)
-			{
-				LOG(" This certificate has no flags");
-			}
-
-			return 0;
-		}
+		// Don't want the trace messages
+		return;
 	}
+
+	// Remove the terminating LF:
+	size_t len = strlen(a_Text) - 1;
+	while ((len > 0) && (a_Text[len] <= 32))
+	{
+		len--;
+	}
+	AString Text(a_Text, len + 1);
+
+	LOGD("SSL (%d): %s", a_Level, Text.c_str());
+}
+
+
+
+
+
+int SSLVerifyCert(void * a_This, mbedtls_x509_crt * a_Crt, int a_Depth, uint32_t * a_Flags)
+{
+	char buf[1024];
+	UNUSED(a_This);
+
+	LOG("Verify requested for (Depth %d):", a_Depth);
+	mbedtls_x509_crt_info(buf, sizeof(buf) - 1, "", a_Crt);
+	LOG("%s", buf);
+
+	uint32_t Flags = *a_Flags;
+	if ((Flags & MBEDTLS_X509_BADCERT_EXPIRED) != 0)
+	{
+		LOG(" ! server certificate has expired");
+	}
+
+	if ((Flags & MBEDTLS_X509_BADCERT_REVOKED) != 0)
+	{
+		LOG(" ! server certificate has been revoked");
+	}
+
+	if ((Flags & MBEDTLS_X509_BADCERT_CN_MISMATCH) != 0)
+	{
+		LOG(" ! CN mismatch");
+	}
+
+	if ((Flags & MBEDTLS_X509_BADCERT_NOT_TRUSTED) != 0)
+	{
+		LOG(" ! self-signed or not signed by a trusted CA");
+	}
+
+	if ((Flags & MBEDTLS_X509_BADCRL_NOT_TRUSTED) != 0)
+	{
+		LOG(" ! CRL not trusted");
+	}
+
+	if ((Flags & MBEDTLS_X509_BADCRL_EXPIRED) != 0)
+	{
+		LOG(" ! CRL expired");
+	}
+
+	if ((Flags & MBEDTLS_X509_BADCERT_OTHER) != 0)
+	{
+		LOG(" ! other (unknown) flag");
+	}
+
+	if (Flags == 0)
+	{
+		LOG(" This certificate has no flags");
+	}
+
+	return 0;
+}
+}  // namespace
 #endif  // !defined(NDEBUG) && defined(ENABLE_SSL_DEBUG_MSG)
 
 
@@ -238,24 +238,24 @@ std::shared_ptr<cSslConfig> cSslConfig::MakeDefaultConfig(bool a_IsClient)
 	// By default we have no root CAs, so no cert verification can be done:
 	Ret->SetAuthMode(eSslAuthMode::None);
 
-	#ifndef NDEBUG
-		#ifdef ENABLE_SSL_DEBUG_MSG
-			Ret->SetDebugCallback(&SSLDebugMessage, nullptr);
-			Ret->SetVerifyCallback(SSLVerifyCert, nullptr);
-			mbedtls_debug_set_threshold(2);
-		#endif
+#ifndef NDEBUG
+#ifdef ENABLE_SSL_DEBUG_MSG
+	Ret->SetDebugCallback(&SSLDebugMessage, nullptr);
+	Ret->SetVerifyCallback(SSLVerifyCert, nullptr);
+	mbedtls_debug_set_threshold(2);
+#endif
 
-		/*
-		// Set ciphersuite to the easiest one to decode, so that the connection can be wireshark-decoded:
-		Ret->SetCipherSuites(
-			{
-				MBEDTLS_TLS_RSA_WITH_RC4_128_MD5,
-				MBEDTLS_TLS_RSA_WITH_RC4_128_SHA,
-				MBEDTLS_TLS_RSA_WITH_AES_128_CBC_SHA
-			}
-		);
-		*/
-	#endif
+	/*
+	// Set ciphersuite to the easiest one to decode, so that the connection can be wireshark-decoded:
+	Ret->SetCipherSuites(
+		{
+			MBEDTLS_TLS_RSA_WITH_RC4_128_MD5,
+			MBEDTLS_TLS_RSA_WITH_RC4_128_SHA,
+			MBEDTLS_TLS_RSA_WITH_AES_128_CBC_SHA
+		}
+	);
+	*/
+#endif
 
 	return Ret;
 }
@@ -279,7 +279,3 @@ std::shared_ptr<const cSslConfig> cSslConfig::GetDefaultServerConfig()
 	static const std::shared_ptr<const cSslConfig> ServerConfig = MakeDefaultConfig(false);
 	return ServerConfig;
 }
-
-
-
-

@@ -6,13 +6,11 @@
 
 
 
-class cChicken:
-	public cPassiveMonster
+class cChicken : public cPassiveMonster
 {
 	using Super = cPassiveMonster;
 
-public:
-
+  public:
 	cChicken();
 
 	CLASS_PROTODEF(cChicken)
@@ -30,10 +28,6 @@ public:
 
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 
-private:
-
+  private:
 	int m_EggDropTimer;
-} ;
-
-
-
+};

@@ -16,8 +16,7 @@
 
 class cBoatCollisionCallback
 {
-public:
-
+  public:
 	cBoatCollisionCallback(cBoat & a_Boat, cEntity * a_Attachee) :
 		m_Boat(a_Boat), m_Attachee(a_Attachee)
 	{
@@ -36,8 +35,7 @@ public:
 		return false;
 	}
 
-protected:
-
+  protected:
 	cBoat & m_Boat;
 	cEntity * m_Attachee;
 };
@@ -48,9 +46,12 @@ protected:
 
 cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
 	Super(etBoat, a_Pos, 1.375f, 0.5625f),
-	m_LastDamage(0), m_ForwardDirection(0),
-	m_DamageTaken(0.0f), m_Material(a_Material),
-	m_RightPaddleUsed(false), m_LeftPaddleUsed(false)
+	m_LastDamage(0),
+	m_ForwardDirection(0),
+	m_DamageTaken(0.0f),
+	m_Material(a_Material),
+	m_RightPaddleUsed(false),
+	m_LeftPaddleUsed(false)
 {
 	SetMass(20.0f);
 	SetGravity(-16.0f);
@@ -210,7 +211,7 @@ void cBoat::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
 		return;
 	}
 
-	Vector3d ToAddSpeed = m_Attachee->GetLookVector() * (a_Sideways * 0.4) ;
+	Vector3d ToAddSpeed = m_Attachee->GetLookVector() * (a_Sideways * 0.4);
 	ToAddSpeed.y = 0;
 
 	AddSpeed(ToAddSpeed);
@@ -353,8 +354,7 @@ void cBoat::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// Calculate boat's bounding box, run collision callback on all entities in said box
 	cBoatCollisionCallback BoatCollisionCallback(*this, m_Attachee);
 	Vector3d BoatPosition = GetPosition();
-	cBoundingBox bbBoat(
-		Vector3d(BoatPosition.x, floor(BoatPosition.y), BoatPosition.z), GetWidth() / 2, GetHeight());
+	cBoundingBox bbBoat(Vector3d(BoatPosition.x, floor(BoatPosition.y), BoatPosition.z), GetWidth() / 2, GetHeight());
 	m_World->ForEachEntityInBox(bbBoat, BoatCollisionCallback);
 
 	// Return to calculating physics normally

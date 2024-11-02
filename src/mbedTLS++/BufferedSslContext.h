@@ -16,13 +16,11 @@
 
 
 
-class cBufferedSslContext:
-	public cSslContext
+class cBufferedSslContext : public cSslContext
 {
 	using Super = cSslContext;
 
-public:
-
+  public:
 	/** Creates a new context with the buffers of specified size for the encrypted / decrypted data. */
 	cBufferedSslContext(size_t a_BufferSize = 64000);
 
@@ -36,7 +34,7 @@ public:
 	Returns the number of bytes actually retrieved. */
 	size_t ReadOutgoing(void * a_Data, size_t a_DataMaxSize);
 
-protected:
+  protected:
 	/** Buffer for the data that has been encrypted into the SSL stream and should be sent out. */
 	cByteBuffer m_OutgoingData;
 
@@ -47,8 +45,4 @@ protected:
 	// cSslContext overrides:
 	virtual int ReceiveEncrypted(unsigned char * a_Buffer, size_t a_NumBytes) override;
 	virtual int SendEncrypted(const unsigned char * a_Buffer, size_t a_NumBytes) override;
-} ;
-
-
-
-
+};

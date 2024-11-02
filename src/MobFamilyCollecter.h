@@ -8,10 +8,10 @@
 
 
 /** This class is used to collect the list of mobs for each family
-*/
+ */
 class cMobFamilyCollecter
 {
-public :
+  public:
 	typedef const std::set<cMonster::eFamily> tMobFamilyList;
 
 	// collect a mob
@@ -20,11 +20,6 @@ public :
 	// return the number of mobs for this family
 	int GetNumberOfCollectedMobs(cMonster::eFamily a_Family);
 
-protected :
-	std::map<cMonster::eFamily, std::set<cMonster *> > m_Mobs;
-
-} ;
-
-
-
-
+  protected:
+	std::map<cMonster::eFamily, std::set<cMonster *>> m_Mobs;
+};

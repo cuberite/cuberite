@@ -20,14 +20,15 @@
 
 
 
-#define DEF_NETHER_WATER_SPRINGS    "0, 1; 255, 1"
-#define DEF_NETHER_LAVA_SPRINGS     "0, 0; 30, 0; 31, 50; 120, 50; 127, 0"
-#define DEF_OVERWORLD_WATER_SPRINGS "0, 0; 10, 10; 11, 75; 16, 83; 20, 83; 24, 78; 32, 62; 40, 40; 44, 15; 48, 7; 56, 2; 64, 1; 255, 0"
-#define DEF_OVERWORLD_LAVA_SPRINGS  "0, 0; 10, 5; 11, 45; 48, 2; 64, 1; 255, 0"
-#define DEF_END_WATER_SPRINGS       "0, 1; 255, 1"
-#define DEF_END_LAVA_SPRINGS        "0, 1; 255, 1"
-#define DEF_ANIMAL_SPAWN_PERCENT    10
-#define DEF_NO_ANIMALS              0
+#define DEF_NETHER_WATER_SPRINGS "0, 1; 255, 1"
+#define DEF_NETHER_LAVA_SPRINGS "0, 0; 30, 0; 31, 50; 120, 50; 127, 0"
+#define DEF_OVERWORLD_WATER_SPRINGS \
+	"0, 0; 10, 10; 11, 75; 16, 83; 20, 83; 24, 78; 32, 62; 40, 40; 44, 15; 48, 7; 56, 2; 64, 1; 255, 0"
+#define DEF_OVERWORLD_LAVA_SPRINGS "0, 0; 10, 5; 11, 45; 48, 2; 64, 1; 255, 0"
+#define DEF_END_WATER_SPRINGS "0, 1; 255, 1"
+#define DEF_END_LAVA_SPRINGS "0, 1; 255, 1"
+#define DEF_ANIMAL_SPAWN_PERCENT 10
+#define DEF_NO_ANIMALS 0
 
 
 
@@ -89,7 +90,13 @@ void cFinishGenNetherClumpFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block)
+void cFinishGenNetherClumpFoliage::TryPlaceClump(
+	cChunkDesc & a_ChunkDesc,
+	int a_RelX,
+	int a_RelY,
+	int a_RelZ,
+	BLOCKTYPE a_Block
+)
 {
 	bool IsFireBlock = a_Block == E_BLOCK_FIRE;
 
@@ -137,11 +144,8 @@ void cFinishGenNetherClumpFoliage::TryPlaceClump(cChunkDesc & a_ChunkDesc, int a
 			int zz = a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z;
 			for (int y = MinY; y < MaxY; y++)
 			{
-				if (
-					((x < 0) || (x >= cChunkDef::Width)) ||
-					((y < 0) || (y >= cChunkDef::Height)) ||
-					((z < 0) || (z >= cChunkDef::Width))
-					)
+				if (((x < 0) || (x >= cChunkDef::Width)) || ((y < 0) || (y >= cChunkDef::Height)) ||
+					((z < 0) || (z >= cChunkDef::Width)))
 				{
 					continue;
 				}
@@ -228,7 +232,14 @@ void cFinishGenClumpTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 			Weight -= Block.m_Weight;
 			if (Weight < 0)
 			{
-				TryPlaceFoliageClump(a_ChunkDesc, PosX, PosZ, Block.m_BlockType, Block.m_BlockMeta, Block.m_BlockType == E_BLOCK_BIG_FLOWER);
+				TryPlaceFoliageClump(
+					a_ChunkDesc,
+					PosX,
+					PosZ,
+					Block.m_BlockType,
+					Block.m_BlockMeta,
+					Block.m_BlockType == E_BLOCK_BIG_FLOWER
+				);
 				break;
 			}
 		}
@@ -239,12 +250,21 @@ void cFinishGenClumpTopBlock::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-void cFinishGenClumpTopBlock::TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int a_CenterX, int a_CenterZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_IsDoubleTall)
+void cFinishGenClumpTopBlock::TryPlaceFoliageClump(
+	cChunkDesc & a_ChunkDesc,
+	int a_CenterX,
+	int a_CenterZ,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta,
+	bool a_IsDoubleTall
+)
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
 
-	int NumBlocks = m_Noise.IntNoise2DInt(a_CenterX + ChunkX * 16, a_CenterZ + ChunkZ * 16) % (MAX_NUM_FOLIAGE - MIN_NUM_FOLIAGE) + MIN_NUM_FOLIAGE + 1;
+	int NumBlocks =
+		m_Noise.IntNoise2DInt(a_CenterX + ChunkX * 16, a_CenterZ + ChunkZ * 16) % (MAX_NUM_FOLIAGE - MIN_NUM_FOLIAGE) +
+		MIN_NUM_FOLIAGE + 1;
 	for (int i = 1; i < NumBlocks; i++)
 	{
 		int Rnd = m_Noise.IntNoise2DInt(ChunkX + ChunkZ + i, ChunkX - ChunkZ - i) / 59;
@@ -259,11 +279,9 @@ void cFinishGenClumpTopBlock::TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int
 		}
 
 		auto GroundBlockType = a_ChunkDesc.GetBlockType(x, Top, z);
-		if (
-			(GroundBlockType == E_BLOCK_GRASS) || (
-				(GroundBlockType == E_BLOCK_MYCELIUM) && ((a_BlockType == E_BLOCK_RED_MUSHROOM) || (a_BlockType == E_BLOCK_BROWN_MUSHROOM))
-			)
-		)
+		if ((GroundBlockType == E_BLOCK_GRASS) ||
+			((GroundBlockType == E_BLOCK_MYCELIUM) &&
+			 ((a_BlockType == E_BLOCK_RED_MUSHROOM) || (a_BlockType == E_BLOCK_BROWN_MUSHROOM))))
 		{
 			a_ChunkDesc.SetBlockTypeMeta(x, Top + 1, z, a_BlockType, a_BlockMeta);
 			if (a_IsDoubleTall)
@@ -277,14 +295,16 @@ void cFinishGenClumpTopBlock::TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int
 			}
 		}
 	}
-
 }
 
 
 
 
 
-void cFinishGenClumpTopBlock::ParseConfigurationString(const AString & a_RawClumpInfo, std::vector<BiomeInfo> & a_Output)
+void cFinishGenClumpTopBlock::ParseConfigurationString(
+	const AString & a_RawClumpInfo,
+	std::vector<BiomeInfo> & a_Output
+)
 {
 	// Initialize the vector for all biomes.
 	for (int i = static_cast<int>(a_Output.size()); i <= static_cast<int>(biMaxVariantBiome); i++)
@@ -298,7 +318,10 @@ void cFinishGenClumpTopBlock::ParseConfigurationString(const AString & a_RawClum
 	// Information about a clump is divided in 2 parts. The biomes they can be in and the blocks that can be placed.
 	if (ClumpInfo.size() != 2)
 	{
-		LOGWARNING("OverworldClumpFoliage: Data missing for \"%s\". Please divide biome and blocks with a semi colon", a_RawClumpInfo.c_str());
+		LOGWARNING(
+			"OverworldClumpFoliage: Data missing for \"%s\". Please divide biome and blocks with a semi colon",
+			a_RawClumpInfo.c_str()
+		);
 		return;
 	}
 
@@ -325,13 +348,19 @@ void cFinishGenClumpTopBlock::ParseConfigurationString(const AString & a_RawClum
 			int MinNumClump = 1;
 			if (!StringToInteger(BiomeInfo[1], MinNumClump))
 			{
-				LOGWARNING("OverworldClumpFoliage: Invalid data in \"%s\". Second parameter is either not existing or a number", RawBiomeInfo.c_str());
+				LOGWARNING(
+					"OverworldClumpFoliage: Invalid data in \"%s\". Second parameter is either not existing or a "
+					"number",
+					RawBiomeInfo.c_str()
+				);
 				continue;
 			}
 			a_Output[BiomeIndex].m_MinNumClumpsPerChunk = MinNumClump;
 
-			// In case the minimum number is higher than the current maximum value we change the max to the minimum value.
-			a_Output[BiomeIndex].m_MaxNumClumpsPerChunk = std::max(MinNumClump, a_Output[BiomeIndex].m_MaxNumClumpsPerChunk);
+			// In case the minimum number is higher than the current maximum value we change the max to the minimum
+			// value.
+			a_Output[BiomeIndex].m_MaxNumClumpsPerChunk =
+				std::max(MinNumClump, a_Output[BiomeIndex].m_MaxNumClumpsPerChunk);
 		}
 		else if (BiomeInfo.size() == 3)
 		{
@@ -339,7 +368,10 @@ void cFinishGenClumpTopBlock::ParseConfigurationString(const AString & a_RawClum
 			int MinNumClumps = 0, MaxNumClumps = 1;
 			if (!StringToInteger(BiomeInfo[1], MinNumClumps) || !StringToInteger(BiomeInfo[2], MaxNumClumps))
 			{
-				LOGWARNING("Invalid data in \"%s\". Second parameter is either not existing or a number", RawBiomeInfo.c_str());
+				LOGWARNING(
+					"Invalid data in \"%s\". Second parameter is either not existing or a number",
+					RawBiomeInfo.c_str()
+				);
 				continue;
 			}
 
@@ -359,7 +391,9 @@ void cFinishGenClumpTopBlock::ParseConfigurationString(const AString & a_RawClum
 
 			// Construct the FoliageInfo:
 			a_Output[BiomeIndex].m_Blocks.emplace_back(
-				static_cast<BLOCKTYPE>(Block.m_ItemType), static_cast<NIBBLETYPE>(Block.m_ItemDamage), 100
+				static_cast<BLOCKTYPE>(Block.m_ItemType),
+				static_cast<NIBBLETYPE>(Block.m_ItemDamage),
+				100
 			);
 		}
 	}
@@ -369,7 +403,10 @@ void cFinishGenClumpTopBlock::ParseConfigurationString(const AString & a_RawClum
 
 
 
-std::vector<cFinishGenClumpTopBlock::BiomeInfo> cFinishGenClumpTopBlock::ParseIniFile(cIniFile & a_IniFile, const AString & a_ClumpPrefix)
+std::vector<cFinishGenClumpTopBlock::BiomeInfo> cFinishGenClumpTopBlock::ParseIniFile(
+	cIniFile & a_IniFile,
+	const AString & a_ClumpPrefix
+)
 {
 	std::vector<cFinishGenClumpTopBlock::BiomeInfo> Foliage;
 	int NumGeneratorValues = a_IniFile.GetNumValues("Generator");
@@ -386,14 +423,64 @@ std::vector<cFinishGenClumpTopBlock::BiomeInfo> cFinishGenClumpTopBlock::ParseIn
 
 	if (Foliage.empty())
 	{
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-1", "Forest, -2, 2; ForestHills, -3, 2; FlowerForest = yellowflower; redflower; lilac; rosebush"), Foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-2", "Plains, -2, 1; SunflowerPlains = yellowflower; redflower; azurebluet; redtulip; orangetulip; whitetulip; pinktulip; oxeyedaisy"), Foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-3", "SunflowerPlains, 1, 2 = sunflower"), Foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-4", "FlowerForest, 2, 5 = allium; redtulip; orangetulip; whitetulip; pinktulip; oxeyedaisy"), Foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-5", "Swampland; SwamplandM = brownmushroom; redmushroom; blueorchid"), Foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-6", "MushroomIsland; MushroomShore; MegaTaiga; MegaTaigaHills; MegaSpruceTaiga; MegaSpruceTaigaHills = brownmushroom; redmushroom"), Foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-7", "RoofedForest, 1, 5; RoofedForestM, 1, 5 = rosebush; peony; lilac; grass"), Foliage);
-		cFinishGenClumpTopBlock::ParseConfigurationString(a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-8", "MegaTaiga; MegaTaigaHills = deadbush"), Foliage);
+		cFinishGenClumpTopBlock::ParseConfigurationString(
+			a_IniFile.GetValueSet(
+				"Generator",
+				a_ClumpPrefix + "-1",
+				"Forest, -2, 2; ForestHills, -3, 2; FlowerForest = yellowflower; redflower; lilac; rosebush"
+			),
+			Foliage
+		);
+		cFinishGenClumpTopBlock::ParseConfigurationString(
+			a_IniFile.GetValueSet(
+				"Generator",
+				a_ClumpPrefix + "-2",
+				"Plains, -2, 1; SunflowerPlains = yellowflower; redflower; azurebluet; redtulip; orangetulip; "
+				"whitetulip; pinktulip; oxeyedaisy"
+			),
+			Foliage
+		);
+		cFinishGenClumpTopBlock::ParseConfigurationString(
+			a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-3", "SunflowerPlains, 1, 2 = sunflower"),
+			Foliage
+		);
+		cFinishGenClumpTopBlock::ParseConfigurationString(
+			a_IniFile.GetValueSet(
+				"Generator",
+				a_ClumpPrefix + "-4",
+				"FlowerForest, 2, 5 = allium; redtulip; orangetulip; whitetulip; pinktulip; oxeyedaisy"
+			),
+			Foliage
+		);
+		cFinishGenClumpTopBlock::ParseConfigurationString(
+			a_IniFile.GetValueSet(
+				"Generator",
+				a_ClumpPrefix + "-5",
+				"Swampland; SwamplandM = brownmushroom; redmushroom; blueorchid"
+			),
+			Foliage
+		);
+		cFinishGenClumpTopBlock::ParseConfigurationString(
+			a_IniFile.GetValueSet(
+				"Generator",
+				a_ClumpPrefix + "-6",
+				"MushroomIsland; MushroomShore; MegaTaiga; MegaTaigaHills; MegaSpruceTaiga; MegaSpruceTaigaHills = "
+				"brownmushroom; redmushroom"
+			),
+			Foliage
+		);
+		cFinishGenClumpTopBlock::ParseConfigurationString(
+			a_IniFile.GetValueSet(
+				"Generator",
+				a_ClumpPrefix + "-7",
+				"RoofedForest, 1, 5; RoofedForestM, 1, 5 = rosebush; peony; lilac; grass"
+			),
+			Foliage
+		);
+		cFinishGenClumpTopBlock::ParseConfigurationString(
+			a_IniFile.GetValueSet("Generator", a_ClumpPrefix + "-8", "MegaTaiga; MegaTaigaHills = deadbush"),
+			Foliage
+		);
 	}
 
 	return Foliage;
@@ -411,7 +498,8 @@ void cFinishGenGlowStone::GenFinish(cChunkDesc & a_ChunkDesc)
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
 
-	// Change the number of attempts to create a vein depending on the maximum height of the chunk. A standard Nether could have 5 veins at most.
+	// Change the number of attempts to create a vein depending on the maximum height of the chunk. A standard Nether
+	// could have 5 veins at most.
 	int NumGlowStone = m_Noise.IntNoise2DInt(ChunkX, ChunkZ) % a_ChunkDesc.GetMaxHeight() / 23;
 
 	for (int i = 1; i <= NumGlowStone; i++)
@@ -421,7 +509,7 @@ void cFinishGenGlowStone::GenFinish(cChunkDesc & a_ChunkDesc)
 
 		// Generate X / Z coordinates.
 		int X = Size + (m_Noise.IntNoise2DInt(i, Size) % (cChunkDef::Width - Size * 2));
-		int Z = Size + (m_Noise.IntNoise2DInt(X, i)    % (cChunkDef::Width - Size * 2));
+		int Z = Size + (m_Noise.IntNoise2DInt(X, i) % (cChunkDef::Width - Size * 2));
 
 		int Height = a_ChunkDesc.GetHeight(X, Z);
 		for (int y = Height; y > Size; y--)
@@ -454,22 +542,32 @@ void cFinishGenGlowStone::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-void cFinishGenGlowStone::TryPlaceGlowstone(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, int a_Size, int a_NumStrings)
+void cFinishGenGlowStone::TryPlaceGlowstone(
+	cChunkDesc & a_ChunkDesc,
+	int a_RelX,
+	int a_RelY,
+	int a_RelZ,
+	int a_Size,
+	int a_NumStrings
+)
 {
 	// The starting point of every glowstone string
 	Vector3i StartPoint = Vector3i(a_RelX, a_RelY, a_RelZ);
 
 	// Array with possible directions for a string of glowstone to go to.
-	const Vector3i AvailableDirections[] =
-	{
-		{ -1,  0,  0 }, { 1, 0, 0 },
-		{  0, -1,  0 },  // Don't let the glowstone go up
-		{  0,  0, -1 }, { 0, 0, 1 },
+	const Vector3i AvailableDirections[] = {
+		{-1, 0, 0},
+		{1, 0, 0},
+		{0, -1, 0},  // Don't let the glowstone go up
+		{0, 0, -1},
+		{0, 0, 1},
 
 		// Diagonal direction. Only X or Z with Y.
 		// If all were changed the glowstone string looks awkward
-		{ 0, -1,  1 }, {  1, -1, 0 },
-		{ 0, -1, -1 }, { -1, -1, 0 },
+		{0, -1, 1},
+		{1, -1, 0},
+		{0, -1, -1},
+		{-1, -1, 0},
 
 	};
 
@@ -484,13 +582,18 @@ void cFinishGenGlowStone::TryPlaceGlowstone(cChunkDesc & a_ChunkDesc, int a_RelX
 
 		for (int j = 0; j < a_Size; j++)
 		{
-			Vector3i Direction = AvailableDirections[static_cast<size_t>(m_Noise.IntNoise3DInt(CurrentPos.x, CurrentPos.y * i, CurrentPos.z)) % ARRAYCOUNT(AvailableDirections)];
+			Vector3i Direction = AvailableDirections
+				[static_cast<size_t>(m_Noise.IntNoise3DInt(CurrentPos.x, CurrentPos.y * i, CurrentPos.z)) %
+				 ARRAYCOUNT(AvailableDirections)];
 			int Attempts = 2;  // multiply by 1 would make no difference, so multiply by 2 instead
 
 			while (Direction.Equals(PreviousDirection))
 			{
 				// To make the glowstone branches look better we want to make the direction change every time.
-				Direction = AvailableDirections[static_cast<size_t>(m_Noise.IntNoise3DInt(CurrentPos.x, CurrentPos.y * i * Attempts, CurrentPos.z)) % ARRAYCOUNT(AvailableDirections)];
+				Direction = AvailableDirections
+					[static_cast<size_t>(m_Noise.IntNoise3DInt(CurrentPos.x, CurrentPos.y * i * Attempts, CurrentPos.z)
+					 ) %
+					 ARRAYCOUNT(AvailableDirections)];
 				Attempts++;
 			}
 
@@ -499,7 +602,8 @@ void cFinishGenGlowStone::TryPlaceGlowstone(cChunkDesc & a_ChunkDesc, int a_RelX
 
 			// Update the position of the glowstone string
 			CurrentPos += Direction;
-			if (cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(CurrentPos.x, CurrentPos.y, CurrentPos.z)) && (a_ChunkDesc.GetBlockType(CurrentPos.x, CurrentPos.y, CurrentPos.z) != E_BLOCK_GLOWSTONE))
+			if (cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(CurrentPos.x, CurrentPos.y, CurrentPos.z)) &&
+				(a_ChunkDesc.GetBlockType(CurrentPos.x, CurrentPos.y, CurrentPos.z) != E_BLOCK_GLOWSTONE))
 			{
 				// The glowstone hit something solid, and it wasn't glowstone. Stop the string.
 				break;
@@ -529,7 +633,8 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			int BiomeDensity = GetBiomeDensity(a_ChunkDesc.GetBiome(x, z));
 
 			// Choose if we want to place long grass here. If not then bail out:
-			if ((m_Noise.IntNoise2DInt(xx + m_Noise.IntNoise1DInt(xx), zz + m_Noise.IntNoise1DInt(zz)) / 7 % 100) > BiomeDensity)
+			if ((m_Noise.IntNoise2DInt(xx + m_Noise.IntNoise1DInt(xx), zz + m_Noise.IntNoise1DInt(zz)) / 7 % 100) >
+				BiomeDensity)
 			{
 				continue;
 			}
@@ -546,13 +651,8 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			auto BlockBelow = a_ChunkDesc.GetBlockType(x, y - 1, z);
 			bool failed = false;  // marker if the search for a valid position was successful
 
-			while (
-				(BlockBelow == E_BLOCK_LEAVES) ||
-				(BlockBelow == E_BLOCK_NEW_LEAVES) ||
-				(BlockBelow == E_BLOCK_LOG) ||
-				(BlockBelow == E_BLOCK_NEW_LOG) ||
-				(BlockBelow == E_BLOCK_AIR)
-			)
+			while ((BlockBelow == E_BLOCK_LEAVES) || (BlockBelow == E_BLOCK_NEW_LEAVES) ||
+				   (BlockBelow == E_BLOCK_LOG) || (BlockBelow == E_BLOCK_NEW_LOG) || (BlockBelow == E_BLOCK_AIR))
 			{
 				y--;
 				if (!cChunkDef::IsValidHeight({x, y - 1, z}))
@@ -569,11 +669,11 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 			}
 
 			// Check if long grass can be placed:
-			if (
-				(a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR) ||
-				((a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_GRASS) && (a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_DIRT))
+			if ((a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_AIR) ||
+				((a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_GRASS) &&
+				 (a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_DIRT))
 
-				)
+			)
 			{
 				continue;
 			}
@@ -596,7 +696,9 @@ void cFinishGenTallGrass::GenFinish(cChunkDesc & a_ChunkDesc)
 					NIBBLETYPE Meta;
 					if (CanGrassGrow(a_ChunkDesc.GetBiome(x, z)))
 					{
-						Meta = (m_Noise.IntNoise2DInt(xx * 100, zz * 100) / 7 % 100) > 25 ? E_META_BIG_FLOWER_DOUBLE_TALL_GRASS : E_META_BIG_FLOWER_LARGE_FERN;
+						Meta = (m_Noise.IntNoise2DInt(xx * 100, zz * 100) / 7 % 100) > 25
+							? E_META_BIG_FLOWER_DOUBLE_TALL_GRASS
+							: E_META_BIG_FLOWER_LARGE_FERN;
 					}
 					else
 					{
@@ -849,10 +951,7 @@ bool cFinishGenSprinkleFoliage::TryAddCactus(cChunkDesc & a_ChunkDesc, int a_Rel
 	}
 
 	// We'll be doing comparison to neighbors, so require the coords to be 1 block away from the chunk edges:
-	if (
-		(a_RelX < 1) || (a_RelX >= cChunkDef::Width - 1) ||
-		(a_RelZ < 1) || (a_RelZ >= cChunkDef::Width - 1)
-	)
+	if ((a_RelX < 1) || (a_RelX >= cChunkDef::Width - 1) || (a_RelZ < 1) || (a_RelZ >= cChunkDef::Width - 1))
 	{
 		return false;
 	}
@@ -862,12 +961,10 @@ bool cFinishGenSprinkleFoliage::TryAddCactus(cChunkDesc & a_ChunkDesc, int a_Rel
 		const bool cactusExists = i != 0;
 
 		const int y = a_RelY + 1;
-		if (
-			cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX + 1, y, a_RelZ)) 	 ||
-			cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX - 1, y, a_RelZ)) 	 ||
-			cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX, 	 y, a_RelZ + 1)) ||
-			cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX, 	 y, a_RelZ - 1))
-		)
+		if (cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX + 1, y, a_RelZ)) ||
+			cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX - 1, y, a_RelZ)) ||
+			cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX, y, a_RelZ + 1)) ||
+			cBlockInfo::IsSolid(a_ChunkDesc.GetBlockType(a_RelX, y, a_RelZ - 1)))
 		{
 			return cactusExists;
 		}
@@ -909,22 +1006,17 @@ bool cFinishGenSprinkleFoliage::TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_
 	}
 
 	// We'll be doing comparison to neighbors, so require the coords to be 1 block away from the chunk edges:
-	if (
-		(a_RelX < 1) || (a_RelX >= cChunkDef::Width  - 1) ||
-		(a_RelZ < 1) || (a_RelZ >= cChunkDef::Width  - 1)
-	)
+	if ((a_RelX < 1) || (a_RelX >= cChunkDef::Width - 1) || (a_RelZ < 1) || (a_RelZ >= cChunkDef::Width - 1))
 	{
 		return false;
 	}
 
 	// Water is required next to the block below the sugarcane (if the block below isn't sugarcane already)
-	if (
-		!IsWater(a_ChunkDesc.GetBlockType(a_RelX - 1, a_RelY, a_RelZ)) &&
+	if (!IsWater(a_ChunkDesc.GetBlockType(a_RelX - 1, a_RelY, a_RelZ)) &&
 		!IsWater(a_ChunkDesc.GetBlockType(a_RelX + 1, a_RelY, a_RelZ)) &&
-		!IsWater(a_ChunkDesc.GetBlockType(a_RelX,     a_RelY, a_RelZ - 1)) &&
-		!IsWater(a_ChunkDesc.GetBlockType(a_RelX,     a_RelY, a_RelZ + 1)) &&
-		a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ) != E_BLOCK_SUGARCANE
-	)
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ - 1)) &&
+		!IsWater(a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ + 1)) &&
+		a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ) != E_BLOCK_SUGARCANE)
 	{
 		return false;
 	}
@@ -972,7 +1064,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 			}
 
 			const float xx = static_cast<float>(BlockX);
-			float val1 = m_Noise.CubicNoise2D(xx * 0.1f,  zz * 0.1f);
+			float val1 = m_Noise.CubicNoise2D(xx * 0.1f, zz * 0.1f);
 			float val2 = m_Noise.CubicNoise2D(xx * 0.01f, zz * 0.01f);
 			switch (a_ChunkDesc.GetBlockType(x, Top, z))
 			{
@@ -1017,12 +1109,7 @@ void cFinishGenSprinkleFoliage::GenFinish(cChunkDesc & a_ChunkDesc)
 
 bool cFinishGenSprinkleFoliage::IsDesertVariant(EMCSBiome a_Biome)
 {
-	return
-	(
-		(a_Biome == biDesertHills) ||
-		(a_Biome == biDesert) ||
-		(a_Biome == biDesertM)
-	);
+	return ((a_Biome == biDesertHills) || (a_Biome == biDesert) || (a_Biome == biDesertM));
 }
 
 
@@ -1055,12 +1142,10 @@ void cFinishGenSoulsandRims::GenFinish(cChunkDesc & a_ChunkDesc)
 					continue;
 				}
 
-				if (
-					((a_ChunkDesc.GetBlockType(x, y + 1, z) != E_BLOCK_AIR) &&
-					( a_ChunkDesc.GetBlockType(x, y + 2, z) != E_BLOCK_AIR)) ||
+				if (((a_ChunkDesc.GetBlockType(x, y + 1, z) != E_BLOCK_AIR) &&
+					 (a_ChunkDesc.GetBlockType(x, y + 2, z) != E_BLOCK_AIR)) ||
 					((a_ChunkDesc.GetBlockType(x, y - 1, z) != E_BLOCK_AIR) &&
-					( a_ChunkDesc.GetBlockType(x, y - 2, z) != E_BLOCK_AIR))
-				)
+					 (a_ChunkDesc.GetBlockType(x, y - 2, z) != E_BLOCK_AIR)))
 				{
 					continue;
 				}
@@ -1225,14 +1310,15 @@ void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
 	cChunkDef::BlockTypes & BlockTypes = a_ChunkDesc.GetBlockTypes();
 	for (int y = m_Level; y > 0; y--)
 	{
-		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
-		{
-			const auto Index = cChunkDef::MakeIndex(x, y, z);
-			if (BlockTypes[Index] == E_BLOCK_AIR)
+		for (int z = 0; z < cChunkDef::Width; z++)
+			for (int x = 0; x < cChunkDef::Width; x++)
 			{
-				BlockTypes[Index] = E_BLOCK_STATIONARY_LAVA;
-			}
-		}  // for x, for z
+				const auto Index = cChunkDef::MakeIndex(x, y, z);
+				if (BlockTypes[Index] == E_BLOCK_AIR)
+				{
+					BlockTypes[Index] = E_BLOCK_STATIONARY_LAVA;
+				}
+			}  // for x, for z
 	}  // for y
 }
 
@@ -1243,7 +1329,11 @@ void cFinishGenBottomLava::GenFinish(cChunkDesc & a_ChunkDesc)
 ////////////////////////////////////////////////////////////////////////////////
 // cFinishGenPreSimulator:
 
-cFinishGenPreSimulator::cFinishGenPreSimulator(bool a_PreSimulateFallingBlocks, bool a_PreSimulateWater, bool a_PreSimulateLava) :
+cFinishGenPreSimulator::cFinishGenPreSimulator(
+	bool a_PreSimulateFallingBlocks,
+	bool a_PreSimulateWater,
+	bool a_PreSimulateLava
+) :
 	m_PreSimulateFallingBlocks(a_PreSimulateFallingBlocks),
 	m_PreSimulateWater(a_PreSimulateWater),
 	m_PreSimulateLava(a_PreSimulateLava)
@@ -1264,12 +1354,22 @@ void cFinishGenPreSimulator::GenFinish(cChunkDesc & a_ChunkDesc)
 
 	if (m_PreSimulateWater)
 	{
-		StationarizeFluid(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap(), E_BLOCK_WATER, E_BLOCK_STATIONARY_WATER);
+		StationarizeFluid(
+			a_ChunkDesc.GetBlockTypes(),
+			a_ChunkDesc.GetHeightMap(),
+			E_BLOCK_WATER,
+			E_BLOCK_STATIONARY_WATER
+		);
 	}
 
 	if (m_PreSimulateLava)
 	{
-		StationarizeFluid(a_ChunkDesc.GetBlockTypes(), a_ChunkDesc.GetHeightMap(), E_BLOCK_LAVA, E_BLOCK_STATIONARY_LAVA);
+		StationarizeFluid(
+			a_ChunkDesc.GetBlockTypes(),
+			a_ChunkDesc.GetHeightMap(),
+			E_BLOCK_LAVA,
+			E_BLOCK_STATIONARY_LAVA
+		);
 	}
 	// TODO: other operations
 }
@@ -1341,8 +1441,8 @@ void cFinishGenPreSimulator::CollapseSandGravel(cChunkDesc & a_ChunkDesc)
 
 
 void cFinishGenPreSimulator::StationarizeFluid(
-	cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-	cChunkDef::HeightMap & a_HeightMap,      // Height map to read
+	cChunkDef::BlockTypes & a_BlockTypes,  // Block types to read and change
+	cChunkDef::HeightMap & a_HeightMap,  // Height map to read
 	BLOCKTYPE a_Fluid,
 	BLOCKTYPE a_StationaryFluid
 )
@@ -1362,14 +1462,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 				static const struct
 				{
 					int x, y, z;
-				} Coords[] =
-				{
-					{1, 0, 0},
-					{-1, 0, 0},
-					{0, 0, 1},
-					{0, 0, -1},
-					{0, -1, 0}
-				} ;
+				} Coords[] = {{1, 0, 0}, {-1, 0, 0}, {0, 0, 1}, {0, 0, -1}, {0, -1, 0}};
 				BLOCKTYPE BlockToSet = a_StationaryFluid;  // By default, don't simulate this block
 				for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 				{
@@ -1377,7 +1470,8 @@ void cFinishGenPreSimulator::StationarizeFluid(
 					{
 						continue;
 					}
-					BLOCKTYPE Neighbor = cChunkDef::GetBlock(a_BlockTypes, x + Coords[i].x, y + Coords[i].y, z + Coords[i].z);
+					BLOCKTYPE Neighbor =
+						cChunkDef::GetBlock(a_BlockTypes, x + Coords[i].x, y + Coords[i].y, z + Coords[i].z);
 					if ((Neighbor == E_BLOCK_AIR) || cFluidSimulator::CanWashAway(Neighbor))
 					{
 						// There is an air / washable neighbor, simulate this block
@@ -1422,8 +1516,15 @@ void cFinishGenPreSimulator::StationarizeFluid(
 ////////////////////////////////////////////////////////////////////////////////
 // cFinishGenFluidSprings:
 
-cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, eDimension a_Dimension) :
-	m_Noise(a_Seed + a_Fluid * 100),  // Need to take fluid into account, otherwise water and lava springs generate next to each other
+cFinishGenFluidSprings::cFinishGenFluidSprings(
+	int a_Seed,
+	BLOCKTYPE a_Fluid,
+	cIniFile & a_IniFile,
+	eDimension a_Dimension
+) :
+	m_Noise(
+		a_Seed + a_Fluid * 100
+	),  // Need to take fluid into account, otherwise water and lava springs generate next to each other
 	m_HeightDistribution(cChunkDef::Height - 1),
 	m_Fluid(a_Fluid)
 {
@@ -1460,7 +1561,8 @@ cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cI
 	AString HeightDistribution = a_IniFile.GetValueSet(SectionName, "HeightDistribution", DefaultHeightDistribution);
 	if (!m_HeightDistribution.SetDefString(HeightDistribution) || (m_HeightDistribution.GetSum() <= 0))
 	{
-		LOGWARNING("[%sSprings]: HeightDistribution is invalid, using the default of \"%s\".",
+		LOGWARNING(
+			"[%sSprings]: HeightDistribution is invalid, using the default of \"%s\".",
 			(a_Fluid == E_BLOCK_WATER) ? "Water" : "Lava",
 			DefaultHeightDistribution.c_str()
 		);
@@ -1475,7 +1577,8 @@ cFinishGenFluidSprings::cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cI
 
 void cFinishGenFluidSprings::GenFinish(cChunkDesc & a_ChunkDesc)
 {
-	int ChanceRnd = (m_Noise.IntNoise3DInt(128 * a_ChunkDesc.GetChunkX(), 512, 256 * a_ChunkDesc.GetChunkZ()) / 13) % 100;
+	int ChanceRnd =
+		(m_Noise.IntNoise3DInt(128 * a_ChunkDesc.GetChunkX(), 512, 256 * a_ChunkDesc.GetChunkZ()) / 13) % 100;
 	if (ChanceRnd > m_Chance)
 	{
 		// Not in this chunk
@@ -1528,14 +1631,13 @@ bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int
 	static const struct
 	{
 		int x, y, z;
-	} Coords[] =
-	{
-		{-1,  0,  0},
-		{ 1,  0,  0},
-		{ 0, -1,  0},
-		{ 0,  0, -1},
-		{ 0,  0,  1},
-	} ;
+	} Coords[] = {
+		{-1, 0, 0},
+		{1, 0, 0},
+		{0, -1, 0},
+		{0, 0, -1},
+		{0, 0, 1},
+	};
 	int NumAirNeighbors = 0;
 	for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 	{
@@ -1593,10 +1695,14 @@ cFinishGenPassiveMobs::cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, e
 			break;
 		}
 	}  // switch (dimension)
-	m_AnimalProbability = a_IniFile.GetValueSetI(SectionName, "AnimalSpawnChunkPercentage", DefaultAnimalSpawnChunkPercentage);
+	m_AnimalProbability =
+		a_IniFile.GetValueSetI(SectionName, "AnimalSpawnChunkPercentage", DefaultAnimalSpawnChunkPercentage);
 	if ((m_AnimalProbability < 0) || (m_AnimalProbability > 100))
 	{
-		LOGWARNING("[Animals]: AnimalSpawnChunkPercentage is invalid, using the default of \"%d\".", DefaultAnimalSpawnChunkPercentage);
+		LOGWARNING(
+			"[Animals]: AnimalSpawnChunkPercentage is invalid, using the default of \"%d\".",
+			DefaultAnimalSpawnChunkPercentage
+		);
 		m_AnimalProbability = DefaultAnimalSpawnChunkPercentage;
 	}
 }
@@ -1627,7 +1733,13 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 	{
 		int PackCenterX = (m_Noise.IntNoise2DInt(chunkX + chunkZ, Tries) / 7) % cChunkDef::Width;
 		int PackCenterZ = (m_Noise.IntNoise2DInt(chunkX, chunkZ + Tries) / 7) % cChunkDef::Width;
-		if (TrySpawnAnimals(a_ChunkDesc, PackCenterX, a_ChunkDesc.GetHeight(PackCenterX, PackCenterZ), PackCenterZ, RandomMob))
+		if (TrySpawnAnimals(
+				a_ChunkDesc,
+				PackCenterX,
+				a_ChunkDesc.GetHeight(PackCenterX, PackCenterZ),
+				PackCenterZ,
+				RandomMob
+			))
 		{
 			for (int i = 0; i < 3; i++)
 			{
@@ -1645,15 +1757,21 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, eMonsterType AnimalToSpawn)
+bool cFinishGenPassiveMobs::TrySpawnAnimals(
+	cChunkDesc & a_ChunkDesc,
+	int a_RelX,
+	int a_RelY,
+	int a_RelZ,
+	eMonsterType AnimalToSpawn
+)
 {
 	if ((a_RelY >= cChunkDef::Height - 1) || (a_RelY <= 0))
 	{
 		return false;
 	}
 
-	BLOCKTYPE BlockAtHead    = a_ChunkDesc.GetBlockType(a_RelX, a_RelY + 1, a_RelZ);
-	BLOCKTYPE BlockAtFeet    = a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ);
+	BLOCKTYPE BlockAtHead = a_ChunkDesc.GetBlockType(a_RelX, a_RelY + 1, a_RelZ);
+	BLOCKTYPE BlockAtFeet = a_ChunkDesc.GetBlockType(a_RelX, a_RelY, a_RelZ);
 	BLOCKTYPE BlockUnderFeet = a_ChunkDesc.GetBlockType(a_RelX, a_RelY - 1, a_RelZ);
 
 	// Check block below (opaque, grass, water), and above (air)
@@ -1661,19 +1779,14 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int a_RelX
 	{
 		return false;
 	}
-	if (
-		(AnimalToSpawn != mtSquid) &&
-		(BlockAtHead != E_BLOCK_AIR) &&
-		(BlockAtFeet != E_BLOCK_AIR) &&
-		(!cBlockInfo::IsTransparent(BlockUnderFeet))
-	)
+	if ((AnimalToSpawn != mtSquid) && (BlockAtHead != E_BLOCK_AIR) && (BlockAtFeet != E_BLOCK_AIR) &&
+		(!cBlockInfo::IsTransparent(BlockUnderFeet)))
 	{
 		return false;
 	}
-	if (
-		(BlockUnderFeet != E_BLOCK_GRASS) &&
-		((AnimalToSpawn == mtWolf) || (AnimalToSpawn == mtRabbit) || (AnimalToSpawn == mtCow) || (AnimalToSpawn == mtSheep) || (AnimalToSpawn == mtChicken) || (AnimalToSpawn == mtPig))
-	)
+	if ((BlockUnderFeet != E_BLOCK_GRASS) &&
+		((AnimalToSpawn == mtWolf) || (AnimalToSpawn == mtRabbit) || (AnimalToSpawn == mtCow) ||
+		 (AnimalToSpawn == mtSheep) || (AnimalToSpawn == mtChicken) || (AnimalToSpawn == mtPig)))
 	{
 		return false;
 	}
@@ -1720,7 +1833,8 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 		return mtInvalidType;
 	}
 
-	auto RandMob = (static_cast<size_t>(m_Noise.IntNoise2DInt(chunkX - chunkZ + 2, chunkX + 5) / 7) % ListOfSpawnables.size());
+	auto RandMob =
+		(static_cast<size_t>(m_Noise.IntNoise2DInt(chunkX - chunkZ + 2, chunkX + 5) / 7) % ListOfSpawnables.size());
 	return ListOfSpawnables[RandMob];
 }
 
@@ -1736,12 +1850,15 @@ void cFinishGenOres::GenFinish(cChunkDesc & a_ChunkDesc)
 	int seq = 1;
 
 	// Generate the ores from the ore list.
-	for (const auto & ore: m_OreInfos)
+	for (const auto & ore : m_OreInfos)
 	{
 		GenerateOre(
 			a_ChunkDesc,
-			ore.m_BlockType, ore.m_BlockMeta,
-			ore.m_MaxHeight, ore.m_NumNests, ore.m_NestSize,
+			ore.m_BlockType,
+			ore.m_BlockMeta,
+			ore.m_MaxHeight,
+			ore.m_NumNests,
+			ore.m_NestSize,
 			seq
 		);
 		seq++;
@@ -1754,17 +1871,16 @@ void cFinishGenOres::GenFinish(cChunkDesc & a_ChunkDesc)
 
 const cFinishGenOres::OreInfos & cFinishGenOres::DefaultOverworldOres(void)
 {
-	static OreInfos res
-	{
+	static OreInfos res {
 		// OreType,              OreMeta, MaxHeight, NumNests, NestSize
-		{E_BLOCK_COAL_ORE,       0,       127,       20,       16},
-		{E_BLOCK_IRON_ORE,       0,        64,       20,        8},
-		{E_BLOCK_GOLD_ORE,       0,        32,        2,        8},
-		{E_BLOCK_REDSTONE_ORE,   0,        16,        8,        7},
-		{E_BLOCK_DIAMOND_ORE,    0,        15,        1,        7},
-		{E_BLOCK_LAPIS_ORE,      0,        30,        1,        6},
-		{E_BLOCK_EMERALD_ORE,    0,        32,       11,        1},
-		{E_BLOCK_SILVERFISH_EGG, 0,        64,        7,        9},
+		{E_BLOCK_COAL_ORE, 0, 127, 20, 16},
+		{E_BLOCK_IRON_ORE, 0, 64, 20, 8},
+		{E_BLOCK_GOLD_ORE, 0, 32, 2, 8},
+		{E_BLOCK_REDSTONE_ORE, 0, 16, 8, 7},
+		{E_BLOCK_DIAMOND_ORE, 0, 15, 1, 7},
+		{E_BLOCK_LAPIS_ORE, 0, 30, 1, 6},
+		{E_BLOCK_EMERALD_ORE, 0, 32, 11, 1},
+		{E_BLOCK_SILVERFISH_EGG, 0, 64, 7, 9},
 	};
 	return res;
 }
@@ -1775,10 +1891,9 @@ const cFinishGenOres::OreInfos & cFinishGenOres::DefaultOverworldOres(void)
 
 const cFinishGenOres::OreInfos & cFinishGenOres::DefaultNetherOres(void)
 {
-	static OreInfos res
-	{
+	static OreInfos res {
 		// OreType,                 OreMeta, MaxHeight, NumNests, NestSize
-		{E_BLOCK_NETHER_QUARTZ_ORE, 0,       127,       20,       8},
+		{E_BLOCK_NETHER_QUARTZ_ORE, 0, 127, 20, 8},
 	};
 	return res;
 }
@@ -1789,14 +1904,13 @@ const cFinishGenOres::OreInfos & cFinishGenOres::DefaultNetherOres(void)
 
 const cFinishGenOres::OreInfos & cFinishGenOres::DefaultNaturalPatches(void)
 {
-	static OreInfos res
-	{
+	static OreInfos res {
 		// OreType,      OreMeta,               MaxHeight, NumNests, NestSize
-		{E_BLOCK_DIRT,   0,                     127,       20,       32},
-		{E_BLOCK_GRAVEL, 0,                     127,       10,       32},
-		{E_BLOCK_STONE,  E_META_STONE_GRANITE,  127,       20,       32},
-		{E_BLOCK_STONE,  E_META_STONE_DIORITE,  127,       20,       32},
-		{E_BLOCK_STONE,  E_META_STONE_ANDESITE, 127,       20,       32},
+		{E_BLOCK_DIRT, 0, 127, 20, 32},
+		{E_BLOCK_GRAVEL, 0, 127, 10, 32},
+		{E_BLOCK_STONE, E_META_STONE_GRANITE, 127, 20, 32},
+		{E_BLOCK_STONE, E_META_STONE_DIORITE, 127, 20, 32},
+		{E_BLOCK_STONE, E_META_STONE_ANDESITE, 127, 20, 32},
 	};
 	return res;
 }
@@ -1812,13 +1926,16 @@ cFinishGenOres::OreInfos cFinishGenOres::OreInfosFromString(const AString & a_Or
 
 	OreInfos res;
 	auto ores = StringSplitAndTrim(a_OreInfosString, "|");
-	for (const auto & ore: ores)
+	for (const auto & ore : ores)
 	{
 		auto parts = StringSplitAndTrim(ore, ":");
 		if (parts.size() != 5)
 		{
-			LOGWARNING("Cannot parse ore information from string, not enough OreInfo members (exp 5, got %d). Offending item: \"%s\".",
-				static_cast<unsigned>(parts.size()), ore.c_str()
+			LOGWARNING(
+				"Cannot parse ore information from string, not enough OreInfo members (exp 5, got %d). Offending item: "
+				"\"%s\".",
+				static_cast<unsigned>(parts.size()),
+				ore.c_str()
 			);
 			continue;
 		}
@@ -1830,12 +1947,8 @@ cFinishGenOres::OreInfos cFinishGenOres::OreInfosFromString(const AString & a_Or
 		}
 		NIBBLETYPE oreMeta;
 		int maxHeight, numNests, nestSize;
-		if (
-			!StringToInteger(parts[1], oreMeta) ||
-			!StringToInteger(parts[2], maxHeight) ||
-			!StringToInteger(parts[3], numNests) ||
-			!StringToInteger(parts[4], nestSize)
-		)
+		if (!StringToInteger(parts[1], oreMeta) || !StringToInteger(parts[2], maxHeight) ||
+			!StringToInteger(parts[3], numNests) || !StringToInteger(parts[4], nestSize))
 		{
 			LOGWARNING("Cannot parse ore information from string, invalid number in OreInfo \"%s\".", ore.c_str());
 			continue;
@@ -1852,15 +1965,19 @@ cFinishGenOres::OreInfos cFinishGenOres::OreInfosFromString(const AString & a_Or
 AString cFinishGenOres::OreInfosToString(const cFinishGenOres::OreInfos & a_OreInfos)
 {
 	AString res;
-	for (const auto & ore: a_OreInfos)
+	for (const auto & ore : a_OreInfos)
 	{
 		if (!res.empty())
 		{
 			res.append(" | ");
 		}
-		res.append(fmt::format(FMT_STRING("{}:{}:{}:{}:{}"),
-			ItemTypeToString(ore.m_BlockType), ore.m_BlockMeta,
-			ore.m_MaxHeight, ore.m_NumNests, ore.m_NestSize
+		res.append(fmt::format(
+			FMT_STRING("{}:{}:{}:{}:{}"),
+			ItemTypeToString(ore.m_BlockType),
+			ore.m_BlockMeta,
+			ore.m_MaxHeight,
+			ore.m_NumNests,
+			ore.m_NestSize
 		));
 	}  // for ore - a_OreInfos[]
 	return res;
@@ -1884,30 +2001,30 @@ void cFinishGenOres::SetSeed(int a_Seed)
 
 void cFinishGenOreNests::GenerateOre(
 	cChunkDesc & a_ChunkDesc,
-	BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
-	int a_MaxHeight, int a_NumNests, int a_NestSize,
+	BLOCKTYPE a_OreType,
+	NIBBLETYPE a_OreMeta,
+	int a_MaxHeight,
+	int a_NumNests,
+	int a_NestSize,
 	int a_Seq
 )
 {
-	// This function generates several "nests" of ore, each nest consisting of number of ore blocks relatively adjacent to each other.
-	// It does so by making a random XYZ walk and adding ore along the way in cuboids of different (random) sizes
-	// Only "terraformable" blocks get replaced with ore, all other blocks stay (so the nest can actually be smaller than specified).
+	// This function generates several "nests" of ore, each nest consisting of number of ore blocks relatively adjacent
+	// to each other. It does so by making a random XYZ walk and adding ore along the way in cuboids of different
+	// (random) sizes Only "terraformable" blocks get replaced with ore, all other blocks stay (so the nest can actually
+	// be smaller than specified).
 
 	// If there is an attempt to generate Emerald ores in a chunk with no mountains biome abort
 	// There are just four points sampled to avoid searching all 16 * 16 blocks:
 	if (a_OreType == E_BLOCK_EMERALD_ORE)
 	{
-		const auto BiomeSampleOne =   a_ChunkDesc.GetBiome( 4,  4);
-		const auto BiomeSampleTwo =   a_ChunkDesc.GetBiome( 4, 12);
-		const auto BiomeSampleThree = a_ChunkDesc.GetBiome(12,  4);
-		const auto BiomeSampleFour =  a_ChunkDesc.GetBiome(12, 12);
+		const auto BiomeSampleOne = a_ChunkDesc.GetBiome(4, 4);
+		const auto BiomeSampleTwo = a_ChunkDesc.GetBiome(4, 12);
+		const auto BiomeSampleThree = a_ChunkDesc.GetBiome(12, 4);
+		const auto BiomeSampleFour = a_ChunkDesc.GetBiome(12, 12);
 
-		if (
-			!IsBiomeMountain(BiomeSampleOne) &&
-			!IsBiomeMountain(BiomeSampleTwo) &&
-			!IsBiomeMountain(BiomeSampleThree) &&
-			!IsBiomeMountain(BiomeSampleFour)
-		)
+		if (!IsBiomeMountain(BiomeSampleOne) && !IsBiomeMountain(BiomeSampleTwo) &&
+			!IsBiomeMountain(BiomeSampleThree) && !IsBiomeMountain(BiomeSampleFour))
 		{
 			return;
 		}
@@ -1917,17 +2034,13 @@ void cFinishGenOreNests::GenerateOre(
 	// https://minecraft.wiki/w/Gold_Ore
 	if (a_OreType == E_BLOCK_GOLD_ORE)
 	{
-		const auto BiomeSampleOne =   a_ChunkDesc.GetBiome( 4,  4);
-		const auto BiomeSampleTwo =   a_ChunkDesc.GetBiome( 4, 12);
-		const auto BiomeSampleThree = a_ChunkDesc.GetBiome(12,  4);
-		const auto BiomeSampleFour =  a_ChunkDesc.GetBiome(12, 12);
+		const auto BiomeSampleOne = a_ChunkDesc.GetBiome(4, 4);
+		const auto BiomeSampleTwo = a_ChunkDesc.GetBiome(4, 12);
+		const auto BiomeSampleThree = a_ChunkDesc.GetBiome(12, 4);
+		const auto BiomeSampleFour = a_ChunkDesc.GetBiome(12, 12);
 
-		if (
-			IsBiomeMesa(BiomeSampleOne) ||
-			IsBiomeMesa(BiomeSampleTwo) ||
-			IsBiomeMesa(BiomeSampleThree) ||
-			IsBiomeMesa(BiomeSampleFour)
-		)
+		if (IsBiomeMesa(BiomeSampleOne) || IsBiomeMesa(BiomeSampleTwo) || IsBiomeMesa(BiomeSampleThree) ||
+			IsBiomeMesa(BiomeSampleFour))
 		{
 			a_MaxHeight = 76;
 			a_NumNests = 22;  // 2 times default + 20 times mesa bonus
@@ -1936,17 +2049,13 @@ void cFinishGenOreNests::GenerateOre(
 
 	if (a_OreType == E_BLOCK_SILVERFISH_EGG)
 	{
-		const auto BiomeSampleOne =   a_ChunkDesc.GetBiome( 4,  4);
-		const auto BiomeSampleTwo =   a_ChunkDesc.GetBiome( 4, 12);
-		const auto BiomeSampleThree = a_ChunkDesc.GetBiome(12,  4);
-		const auto BiomeSampleFour =  a_ChunkDesc.GetBiome(12, 12);
+		const auto BiomeSampleOne = a_ChunkDesc.GetBiome(4, 4);
+		const auto BiomeSampleTwo = a_ChunkDesc.GetBiome(4, 12);
+		const auto BiomeSampleThree = a_ChunkDesc.GetBiome(12, 4);
+		const auto BiomeSampleFour = a_ChunkDesc.GetBiome(12, 12);
 
-		if (
-			!IsBiomeMountain(BiomeSampleOne) &&
-			!IsBiomeMountain(BiomeSampleTwo) &&
-			!IsBiomeMountain(BiomeSampleThree) &&
-			!IsBiomeMountain(BiomeSampleFour)
-		)
+		if (!IsBiomeMountain(BiomeSampleOne) && !IsBiomeMountain(BiomeSampleTwo) &&
+			!IsBiomeMountain(BiomeSampleThree) && !IsBiomeMountain(BiomeSampleFour))
 		{
 			return;
 		}
@@ -1965,7 +2074,8 @@ void cFinishGenOreNests::GenerateOre(
 		nestRnd /= cChunkDef::Width;
 		int BaseY = nestRnd % a_MaxHeight;
 		nestRnd /= a_MaxHeight;
-		int NestSize = a_NestSize + (nestRnd % (std::max(a_NestSize, 4) / 4));  // The actual nest size may be up to 1 / 4 larger
+		int NestSize =
+			a_NestSize + (nestRnd % (std::max(a_NestSize, 4) / 4));  // The actual nest size may be up to 1 / 4 larger
 		int Num = 0;
 		while (Num < NestSize)
 		{
@@ -2065,21 +2175,65 @@ void cFinishGenOrePockets::Initialize(cIniFile & a_IniFile, const AString & a_Ge
 
 void cFinishGenOrePockets::GenerateOre(
 	cChunkDesc & a_ChunkDesc,
-	BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
-	int a_MaxHeight, int a_NumNests, int a_NestSize,
+	BLOCKTYPE a_OreType,
+	NIBBLETYPE a_OreMeta,
+	int a_MaxHeight,
+	int a_NumNests,
+	int a_NestSize,
 	int a_Seq
 )
 {
 	// This function generates several "pockets" of the specified ore
 	// Each chunk can contain only pockets that are generated for that chunk, or for its XM / ZM neighbors.
 
-	// Generate for the 3 neighbors in the XP / ZP direction as well, so that pockets crossing the boundaries are accounted for as well:
+	// Generate for the 3 neighbors in the XP / ZP direction as well, so that pockets crossing the boundaries are
+	// accounted for as well:
 	int chunkZ = a_ChunkDesc.GetChunkZ();
 	int chunkX = a_ChunkDesc.GetChunkX();
-	imprintChunkOrePockets(chunkX - 1, chunkZ - 1, a_ChunkDesc, a_OreType, a_OreMeta, a_MaxHeight, a_NumNests, a_NestSize, a_Seq);
-	imprintChunkOrePockets(chunkX - 1, chunkZ,     a_ChunkDesc, a_OreType, a_OreMeta, a_MaxHeight, a_NumNests, a_NestSize, a_Seq);
-	imprintChunkOrePockets(chunkX,     chunkZ - 1, a_ChunkDesc, a_OreType, a_OreMeta, a_MaxHeight, a_NumNests, a_NestSize, a_Seq);
-	imprintChunkOrePockets(chunkX,     chunkZ,     a_ChunkDesc, a_OreType, a_OreMeta, a_MaxHeight, a_NumNests, a_NestSize, a_Seq);
+	imprintChunkOrePockets(
+		chunkX - 1,
+		chunkZ - 1,
+		a_ChunkDesc,
+		a_OreType,
+		a_OreMeta,
+		a_MaxHeight,
+		a_NumNests,
+		a_NestSize,
+		a_Seq
+	);
+	imprintChunkOrePockets(
+		chunkX - 1,
+		chunkZ,
+		a_ChunkDesc,
+		a_OreType,
+		a_OreMeta,
+		a_MaxHeight,
+		a_NumNests,
+		a_NestSize,
+		a_Seq
+	);
+	imprintChunkOrePockets(
+		chunkX,
+		chunkZ - 1,
+		a_ChunkDesc,
+		a_OreType,
+		a_OreMeta,
+		a_MaxHeight,
+		a_NumNests,
+		a_NestSize,
+		a_Seq
+	);
+	imprintChunkOrePockets(
+		chunkX,
+		chunkZ,
+		a_ChunkDesc,
+		a_OreType,
+		a_OreMeta,
+		a_MaxHeight,
+		a_NumNests,
+		a_NestSize,
+		a_Seq
+	);
 }
 
 
@@ -2087,10 +2241,14 @@ void cFinishGenOrePockets::GenerateOre(
 
 
 void cFinishGenOrePockets::imprintChunkOrePockets(
-	int a_ChunkX, int a_ChunkZ,
+	int a_ChunkX,
+	int a_ChunkZ,
 	cChunkDesc & a_ChunkDesc,
-	BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
-	int a_MaxHeight, int a_NumNests, int a_NestSize,
+	BLOCKTYPE a_OreType,
+	NIBBLETYPE a_OreMeta,
+	int a_MaxHeight,
+	int a_NumNests,
+	int a_NestSize,
 	int a_Seq
 )
 {
@@ -2106,12 +2264,7 @@ void cFinishGenOrePockets::imprintChunkOrePockets(
 		nestRnd /= cChunkDef::Width;
 		int baseY = nestRnd % a_MaxHeight;
 		nestRnd /= a_MaxHeight;
-		imprintPocket(
-			a_ChunkDesc,
-			baseX, baseY, baseZ,
-			a_NestSize, i + 200 * a_Seq,
-			a_OreType, a_OreMeta
-		);
+		imprintPocket(a_ChunkDesc, baseX, baseY, baseZ, a_NestSize, i + 200 * a_Seq, a_OreType, a_OreMeta);
 	}  // for i - NumNests
 }
 
@@ -2121,16 +2274,20 @@ void cFinishGenOrePockets::imprintChunkOrePockets(
 
 void cFinishGenOrePockets::imprintPocket(
 	cChunkDesc & a_ChunkDesc,
-	int a_MinPocketX, int a_PocketY, int a_MinPocketZ,
-	int a_NestSize, int a_Seq,
-	BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta
+	int a_MinPocketX,
+	int a_PocketY,
+	int a_MinPocketZ,
+	int a_NestSize,
+	int a_Seq,
+	BLOCKTYPE a_OreType,
+	NIBBLETYPE a_OreMeta
 )
 {
 	// A line segment in a random direction is chosen. Then, several spheres are formed along this line segment,
 	// with their diameters diminishing towards the line ends (one half of a sinusoid)
 
 	double x1 = static_cast<double>(a_MinPocketX) + 0.5;
-	double y1 = static_cast<double>(a_PocketY)    + 0.5;
+	double y1 = static_cast<double>(a_PocketY) + 0.5;
 	double z1 = static_cast<double>(a_MinPocketZ) + 0.5;
 	int rnd = m_Noise.IntNoise2DInt(a_MinPocketX + 7 * a_Seq, a_MinPocketZ + a_PocketY * 11) / 7;
 	double angle = static_cast<double>(rnd % 256) / (256.0 * M_PI / 2.0);  // range [0 .. pi / 2]
@@ -2163,8 +2320,12 @@ void cFinishGenOrePockets::imprintPocket(
 
 void cFinishGenOrePockets::imprintSphere(
 	cChunkDesc & a_ChunkDesc,
-	double a_SphereX, double a_SphereY, double a_SphereZ, double a_Radius,
-	BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta
+	double a_SphereX,
+	double a_SphereY,
+	double a_SphereZ,
+	double a_Radius,
+	BLOCKTYPE a_OreType,
+	NIBBLETYPE a_OreMeta
 )
 {
 	// Get the sphere's bounding box, unioned with the chunk's bounding box (possibly empty):
@@ -2239,7 +2400,8 @@ void cFinishGenOrePockets::imprintSphere(
 
 
 
-cFinishGenForestRocks::cFinishGenForestRocks(int a_Seed, cIniFile & a_IniFile) : m_Noise(a_Seed)
+cFinishGenForestRocks::cFinishGenForestRocks(int a_Seed, cIniFile & a_IniFile) :
+	m_Noise(a_Seed)
 {
 }
 
@@ -2254,7 +2416,7 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 		m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % cChunkDef::Width,
 		0,
 		m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % cChunkDef::Width
-		);
+	);
 	Pos.y = a_ChunkDesc.GetHeight(Pos.x, Pos.z) % cChunkDef::Height;
 
 	auto Biome = a_ChunkDesc.GetBiome(Pos.x, Pos.z);
@@ -2294,7 +2456,8 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 	Pos.y -= Radius - 1;
-	// Pos.y = Clamp(Pos.y - m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % Radius + 1, 0, cChunkDef::Height);
+	// Pos.y = Clamp(Pos.y - m_Noise.IntNoise2DInt(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ()) % Radius + 1, 0,
+	// cChunkDef::Height);
 
 	for (int x = -Radius; x <= Radius; x++)
 	{
@@ -2302,7 +2465,7 @@ void cFinishGenForestRocks::GenFinish(cChunkDesc & a_ChunkDesc)
 		{
 			for (int z = -Radius; z <= Radius; z++)
 			{
-				if (!cChunkDef::IsValidRelPos({ Pos.x + x, Pos.y + y, Pos.z + z }))
+				if (!cChunkDef::IsValidRelPos({Pos.x + x, Pos.y + y, Pos.z + z}))
 				{
 					continue;
 				}

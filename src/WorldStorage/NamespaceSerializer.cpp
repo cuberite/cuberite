@@ -144,76 +144,76 @@ std::string_view NamespaceSerializer::From(const eMonsterType a_ID)
 {
 	switch (a_ID)
 	{
-		case mtBat:            return "bat";
-		case mtBlaze:          return "blaze";
-		case mtCat:            return "cat";
-		case mtCaveSpider:     return "cave_spider";
-		case mtChicken:        return "chicken";
-		case mtCod:            return "cod";
-		case mtCow:            return "cow";
-		case mtCreeper:        return "creeper";
-		case mtDolphin:        return "dolphin";
-		case mtDonkey:         return "donkey";
-		case mtDrowned:        return "drowned";
-		case mtElderGuardian:  return "elder_guardian";
-		case mtEnderDragon:    return "ender_dragon";
-		case mtEnderman:       return "enderman";
-		case mtEndermite:      return "endermite";
-		case mtEvoker:         return "evoker";
-		case mtFox:            return "fox";
-		case mtGhast:          return "ghast";
-		case mtGiant:          return "giant";
-		case mtGuardian:       return "guardian";
-		case mtHorse:          return "horse";
-		case mtHoglin:         return "hoglin";
-		case mtHusk:           return "husk";
-		case mtIllusioner:     return "illusioner";
-		case mtIronGolem:      return "iron_golem";
-		case mtLlama:          return "llama";
-		case mtMagmaCube:      return "magma_cube";
-		case mtMooshroom:      return "mooshroom";
-		case mtMule:           return "mule";
-		case mtOcelot:         return "ocelot";
-		case mtPanda:          return "panda";
-		case mtParrot:         return "parrot";
-		case mtPhantom:        return "phantom";
-		case mtPig:            return "pig";
-		case mtPiglin:         return "piglin";
-		case mtPiglinBrute:    return "piglin_brute";
-		case mtPillager:       return "pillager";
-		case mtPolarBear:      return "polar_bear";
-		case mtPufferfish:     return "pufferfish";
-		case mtRabbit:         return "rabbit";
-		case mtRavager:        return "ravager";
-		case mtSalmon:         return "salmon";
-		case mtSheep:          return "sheep";
-		case mtShulker:        return "shulker";
-		case mtSilverfish:     return "silverfish";
-		case mtSkeleton:       return "skeleton";
-		case mtSkeletonHorse:  return "skeleton_horse";
-		case mtSlime:          return "slime";
-		case mtSnowGolem:      return "snow_golem";
-		case mtSpider:         return "spider";
-		case mtSquid:          return "squid";
-		case mtStray:          return "stray";
-		case mtStrider:        return "strider";
-		case mtTraderLlama:    return "trader_llama";
-		case mtTropicalFish:   return "tropical_fish";
-		case mtTurtle:         return "turtle";
-		case mtVex:            return "vex";
-		case mtVillager:       return "villager";
-		case mtVindicator:     return "vindicator";
-		case mtWanderingTrader:return "wandering_trader";
-		case mtWitch:          return "witch";
-		case mtWither:         return "wither";
-		case mtWitherSkeleton: return "wither_skeleton";
-		case mtWolf:           return "wolf";
-		case mtZoglin:         return "zoglin";
-		case mtZombie:         return "zombie";
-		case mtZombieHorse:    return "zombie_horse";
-		case mtZombiePigman:   return "zombified_piglin";
-		case mtZombieVillager: return "zombie_villager";
-		case mtInvalidType:    break;
+		case mtBat:             return "bat";
+		case mtBlaze:           return "blaze";
+		case mtCat:             return "cat";
+		case mtCaveSpider:      return "cave_spider";
+		case mtChicken:         return "chicken";
+		case mtCod:             return "cod";
+		case mtCow:             return "cow";
+		case mtCreeper:         return "creeper";
+		case mtDolphin:         return "dolphin";
+		case mtDonkey:          return "donkey";
+		case mtDrowned:         return "drowned";
+		case mtElderGuardian:   return "elder_guardian";
+		case mtEnderDragon:     return "ender_dragon";
+		case mtEnderman:        return "enderman";
+		case mtEndermite:       return "endermite";
+		case mtEvoker:          return "evoker";
+		case mtFox:             return "fox";
+		case mtGhast:           return "ghast";
+		case mtGiant:           return "giant";
+		case mtGuardian:        return "guardian";
+		case mtHorse:           return "horse";
+		case mtHoglin:          return "hoglin";
+		case mtHusk:            return "husk";
+		case mtIllusioner:      return "illusioner";
+		case mtIronGolem:       return "iron_golem";
+		case mtLlama:           return "llama";
+		case mtMagmaCube:       return "magma_cube";
+		case mtMooshroom:       return "mooshroom";
+		case mtMule:            return "mule";
+		case mtOcelot:          return "ocelot";
+		case mtPanda:           return "panda";
+		case mtParrot:          return "parrot";
+		case mtPhantom:         return "phantom";
+		case mtPig:             return "pig";
+		case mtPiglin:          return "piglin";
+		case mtPiglinBrute:     return "piglin_brute";
+		case mtPillager:        return "pillager";
+		case mtPolarBear:       return "polar_bear";
+		case mtPufferfish:      return "pufferfish";
+		case mtRabbit:          return "rabbit";
+		case mtRavager:         return "ravager";
+		case mtSalmon:          return "salmon";
+		case mtSheep:           return "sheep";
+		case mtShulker:         return "shulker";
+		case mtSilverfish:      return "silverfish";
+		case mtSkeleton:        return "skeleton";
+		case mtSkeletonHorse:   return "skeleton_horse";
+		case mtSlime:           return "slime";
+		case mtSnowGolem:       return "snow_golem";
+		case mtSpider:          return "spider";
+		case mtSquid:           return "squid";
+		case mtStray:           return "stray";
+		case mtStrider:         return "strider";
+		case mtTraderLlama:     return "trader_llama";
+		case mtTropicalFish:    return "tropical_fish";
+		case mtTurtle:          return "turtle";
+		case mtVex:             return "vex";
+		case mtVillager:        return "villager";
+		case mtVindicator:      return "vindicator";
+		case mtWanderingTrader: return "wandering_trader";
+		case mtWitch:           return "witch";
+		case mtWither:          return "wither";
+		case mtWitherSkeleton:  return "wither_skeleton";
+		case mtWolf:            return "wolf";
+		case mtZoglin:          return "zoglin";
+		case mtZombie:          return "zombie";
+		case mtZombieHorse:     return "zombie_horse";
+		case mtZombiePigman:    return "zombified_piglin";
+		case mtZombieVillager:  return "zombie_villager";
+		case mtInvalidType:     break;
 	}
 	UNREACHABLE("Tried to save unknown monster type");
 }
@@ -226,46 +226,46 @@ std::string_view NamespaceSerializer::From(const BannerPattern a_Pattern)
 {
 	switch (a_Pattern)
 	{
-		case BannerPattern::BottomStripe: return "bs";
-		case BannerPattern::TopStripe: return "ts";
-		case BannerPattern::LeftStripe: return "ls";
-		case BannerPattern::RightStripe: return "rs";
-		case BannerPattern::CenterStripeVertical: return "cs";
-		case BannerPattern::MiddleStripeHorizontal: return "ms";
-		case BannerPattern::DownRightStripe: return "drs";
-		case BannerPattern::DownLeftStripe: return "dls";
-		case BannerPattern::SmallVerticalStripes: return "ss";
-		case BannerPattern::DiagonalCross: return "cr";
-		case BannerPattern::SquareCross: return "sc";
-		case BannerPattern::LeftOfDiagonal: return "ld";
+		case BannerPattern::BottomStripe:              return "bs";
+		case BannerPattern::TopStripe:                 return "ts";
+		case BannerPattern::LeftStripe:                return "ls";
+		case BannerPattern::RightStripe:               return "rs";
+		case BannerPattern::CenterStripeVertical:      return "cs";
+		case BannerPattern::MiddleStripeHorizontal:    return "ms";
+		case BannerPattern::DownRightStripe:           return "drs";
+		case BannerPattern::DownLeftStripe:            return "dls";
+		case BannerPattern::SmallVerticalStripes:      return "ss";
+		case BannerPattern::DiagonalCross:             return "cr";
+		case BannerPattern::SquareCross:               return "sc";
+		case BannerPattern::LeftOfDiagonal:            return "ld";
 		case BannerPattern::RightOfUpsideDownDiagonal: return "rud";
-		case BannerPattern::LeftOfUpsideDownDiagonal: return "lud";
-		case BannerPattern::RightOfDiagonal: return "rd";
-		case BannerPattern::VerticalHalfLeft: return "vh";
-		case BannerPattern::VerticalHalfRight: return "vhr";
-		case BannerPattern::HorizontalHalfTop: return "hh";
-		case BannerPattern::HorizontalHalfBottom: return "hhb";
-		case BannerPattern::BottomLeftCorner: return "bl";
-		case BannerPattern::BottomRightCorner: return "br";
-		case BannerPattern::TopLeftCorner: return "tl";
-		case BannerPattern::TopRightCorner: return "tr";
-		case BannerPattern::BottomTriangle: return "bt";
-		case BannerPattern::TopTriangle: return "tt";
-		case BannerPattern::BottomTriangleSawtooth: return "bts";
-		case BannerPattern::TopTriangleSawtooth: return "tts";
-		case BannerPattern::MiddleCircle: return "mc";
-		case BannerPattern::MiddleRhombus: return "mr";
-		case BannerPattern::Border: return "bo";
-		case BannerPattern::CurlyBorder: return "cbo";
-		case BannerPattern::Brick: return "bri";
-		case BannerPattern::Gradient: return "gra";
-		case BannerPattern::GradientUpsideDown: return "gru";
-		case BannerPattern::Creeper: return "cre";
-		case BannerPattern::Skull: return "sku";
-		case BannerPattern::Flower: return "flo";
-		case BannerPattern::Mojang: return "moj";
-		case BannerPattern::Globe: return "glb";
-		case BannerPattern::Piglin: return "pig";
+		case BannerPattern::LeftOfUpsideDownDiagonal:  return "lud";
+		case BannerPattern::RightOfDiagonal:           return "rd";
+		case BannerPattern::VerticalHalfLeft:          return "vh";
+		case BannerPattern::VerticalHalfRight:         return "vhr";
+		case BannerPattern::HorizontalHalfTop:         return "hh";
+		case BannerPattern::HorizontalHalfBottom:      return "hhb";
+		case BannerPattern::BottomLeftCorner:          return "bl";
+		case BannerPattern::BottomRightCorner:         return "br";
+		case BannerPattern::TopLeftCorner:             return "tl";
+		case BannerPattern::TopRightCorner:            return "tr";
+		case BannerPattern::BottomTriangle:            return "bt";
+		case BannerPattern::TopTriangle:               return "tt";
+		case BannerPattern::BottomTriangleSawtooth:    return "bts";
+		case BannerPattern::TopTriangleSawtooth:       return "tts";
+		case BannerPattern::MiddleCircle:              return "mc";
+		case BannerPattern::MiddleRhombus:             return "mr";
+		case BannerPattern::Border:                    return "bo";
+		case BannerPattern::CurlyBorder:               return "cbo";
+		case BannerPattern::Brick:                     return "bri";
+		case BannerPattern::Gradient:                  return "gra";
+		case BannerPattern::GradientUpsideDown:        return "gru";
+		case BannerPattern::Creeper:                   return "cre";
+		case BannerPattern::Skull:                     return "sku";
+		case BannerPattern::Flower:                    return "flo";
+		case BannerPattern::Mojang:                    return "moj";
+		case BannerPattern::Globe:                     return "glb";
+		case BannerPattern::Piglin:                    return "pig";
 	}
 	UNREACHABLE("Unsupported banner pattern");
 }
@@ -276,121 +276,120 @@ std::string_view NamespaceSerializer::From(const BannerPattern a_Pattern)
 
 CustomStatistic NamespaceSerializer::ToCustomStatistic(const std::string_view ID)
 {
-	static const std::unordered_map<std::string_view, CustomStatistic> CustomStatistics
-	{
-		{ "animals_bred",                            CustomStatistic::AnimalsBred },
-		{ "aviate_one_cm",                           CustomStatistic::AviateOneCm },
-		{ "bell_ring",                               CustomStatistic::BellRing },
-		{ "boat_one_cm",                             CustomStatistic::BoatOneCm },
-		{ "clean_armor",                             CustomStatistic::CleanArmor },
-		{ "clean_banner",                            CustomStatistic::CleanBanner },
-		{ "clean_shulker_box",                       CustomStatistic::CleanShulkerBox },
-		{ "climb_one_cm",                            CustomStatistic::ClimbOneCm },
-		{ "crouch_one_cm",                           CustomStatistic::CrouchOneCm },
-		{ "damage_absorbed",                         CustomStatistic::DamageAbsorbed },
-		{ "damage_blocked_by_shield",                CustomStatistic::DamageBlockedByShield },
-		{ "damage_dealt",                            CustomStatistic::DamageDealt },
-		{ "damage_dealt_absorbed",                   CustomStatistic::DamageDealtAbsorbed },
-		{ "damage_dealt_resisted",                   CustomStatistic::DamageDealtResisted },
-		{ "damage_resisted",                         CustomStatistic::DamageResisted },
-		{ "damage_taken",                            CustomStatistic::DamageTaken },
-		{ "deaths",                                  CustomStatistic::Deaths },
-		{ "drop",                                    CustomStatistic::Drop },
-		{ "eat_cake_slice",                          CustomStatistic::EatCakeSlice },
-		{ "enchant_item",                            CustomStatistic::EnchantItem },
-		{ "fall_one_cm",                             CustomStatistic::FallOneCm },
-		{ "fill_cauldron",                           CustomStatistic::FillCauldron },
-		{ "fish_caught",                             CustomStatistic::FishCaught },
-		{ "fly_one_cm",                              CustomStatistic::FlyOneCm },
-		{ "horse_one_cm",                            CustomStatistic::HorseOneCm },
-		{ "inspect_dispenser",                       CustomStatistic::InspectDispenser },
-		{ "inspect_dropper",                         CustomStatistic::InspectDropper },
-		{ "inspect_hopper",                          CustomStatistic::InspectHopper },
-		{ "interact_with_anvil",                     CustomStatistic::InteractWithAnvil },
-		{ "interact_with_beacon",                    CustomStatistic::InteractWithBeacon },
-		{ "interact_with_blast_furnace",             CustomStatistic::InteractWithBlastFurnace },
-		{ "interact_with_brewingstand",              CustomStatistic::InteractWithBrewingstand },
-		{ "interact_with_campfire",                  CustomStatistic::InteractWithCampfire },
-		{ "interact_with_cartography_table",         CustomStatistic::InteractWithCartographyTable },
-		{ "interact_with_crafting_table",            CustomStatistic::InteractWithCraftingTable },
-		{ "interact_with_furnace",                   CustomStatistic::InteractWithFurnace },
-		{ "interact_with_grindstone",                CustomStatistic::InteractWithGrindstone },
-		{ "interact_with_lectern",                   CustomStatistic::InteractWithLectern },
-		{ "interact_with_loom",                      CustomStatistic::InteractWithLoom },
-		{ "interact_with_smithing_table",            CustomStatistic::InteractWithSmithingTable },
-		{ "interact_with_smoker",                    CustomStatistic::InteractWithSmoker },
-		{ "interact_with_stonecutter",               CustomStatistic::InteractWithStonecutter },
-		{ "jump",                                    CustomStatistic::Jump },
-		{ "leave_game",                              CustomStatistic::LeaveGame },
-		{ "minecart_one_cm",                         CustomStatistic::MinecartOneCm },
-		{ "mob_kills",                               CustomStatistic::MobKills },
-		{ "open_barrel",                             CustomStatistic::OpenBarrel },
-		{ "open_chest",                              CustomStatistic::OpenChest },
-		{ "open_enderchest",                         CustomStatistic::OpenEnderchest },
-		{ "open_shulker_box",                        CustomStatistic::OpenShulkerBox },
-		{ "pig_one_cm",                              CustomStatistic::PigOneCm },
-		{ "play_noteblock",                          CustomStatistic::PlayNoteblock },
-		{ "play_one_minute",                         CustomStatistic::PlayOneMinute },
-		{ "play_record",                             CustomStatistic::PlayRecord },
-		{ "player_kills",                            CustomStatistic::PlayerKills },
-		{ "pot_flower",                              CustomStatistic::PotFlower },
-		{ "raid_trigger",                            CustomStatistic::RaidTrigger },
-		{ "raid_win",                                CustomStatistic::RaidWin },
-		{ "sleep_in_bed",                            CustomStatistic::SleepInBed },
-		{ "sneak_time",                              CustomStatistic::SneakTime },
-		{ "sprint_one_cm",                           CustomStatistic::SprintOneCm },
-		{ "strider_one_cm",                          CustomStatistic::StriderOneCm },
-		{ "swim_one_cm",                             CustomStatistic::SwimOneCm },
-		{ "talked_to_villager",                      CustomStatistic::TalkedToVillager },
-		{ "target_hit",                              CustomStatistic::TargetHit },
-		{ "time_since_death",                        CustomStatistic::TimeSinceDeath },
-		{ "time_since_rest",                         CustomStatistic::TimeSinceRest },
-		{ "traded_with_villager",                    CustomStatistic::TradedWithVillager },
-		{ "trigger_trapped_chest",                   CustomStatistic::TriggerTrappedChest },
-		{ "tune_noteblock",                          CustomStatistic::TuneNoteblock },
-		{ "use_cauldron",                            CustomStatistic::UseCauldron },
-		{ "walk_on_water_one_cm",                    CustomStatistic::WalkOnWaterOneCm },
-		{ "walk_one_cm",                             CustomStatistic::WalkOneCm },
-		{ "walk_under_water_one_cm",                 CustomStatistic::WalkUnderWaterOneCm },
+	static const std::unordered_map<std::string_view, CustomStatistic> CustomStatistics {
+		{"animals_bred", CustomStatistic::AnimalsBred},
+		{"aviate_one_cm", CustomStatistic::AviateOneCm},
+		{"bell_ring", CustomStatistic::BellRing},
+		{"boat_one_cm", CustomStatistic::BoatOneCm},
+		{"clean_armor", CustomStatistic::CleanArmor},
+		{"clean_banner", CustomStatistic::CleanBanner},
+		{"clean_shulker_box", CustomStatistic::CleanShulkerBox},
+		{"climb_one_cm", CustomStatistic::ClimbOneCm},
+		{"crouch_one_cm", CustomStatistic::CrouchOneCm},
+		{"damage_absorbed", CustomStatistic::DamageAbsorbed},
+		{"damage_blocked_by_shield", CustomStatistic::DamageBlockedByShield},
+		{"damage_dealt", CustomStatistic::DamageDealt},
+		{"damage_dealt_absorbed", CustomStatistic::DamageDealtAbsorbed},
+		{"damage_dealt_resisted", CustomStatistic::DamageDealtResisted},
+		{"damage_resisted", CustomStatistic::DamageResisted},
+		{"damage_taken", CustomStatistic::DamageTaken},
+		{"deaths", CustomStatistic::Deaths},
+		{"drop", CustomStatistic::Drop},
+		{"eat_cake_slice", CustomStatistic::EatCakeSlice},
+		{"enchant_item", CustomStatistic::EnchantItem},
+		{"fall_one_cm", CustomStatistic::FallOneCm},
+		{"fill_cauldron", CustomStatistic::FillCauldron},
+		{"fish_caught", CustomStatistic::FishCaught},
+		{"fly_one_cm", CustomStatistic::FlyOneCm},
+		{"horse_one_cm", CustomStatistic::HorseOneCm},
+		{"inspect_dispenser", CustomStatistic::InspectDispenser},
+		{"inspect_dropper", CustomStatistic::InspectDropper},
+		{"inspect_hopper", CustomStatistic::InspectHopper},
+		{"interact_with_anvil", CustomStatistic::InteractWithAnvil},
+		{"interact_with_beacon", CustomStatistic::InteractWithBeacon},
+		{"interact_with_blast_furnace", CustomStatistic::InteractWithBlastFurnace},
+		{"interact_with_brewingstand", CustomStatistic::InteractWithBrewingstand},
+		{"interact_with_campfire", CustomStatistic::InteractWithCampfire},
+		{"interact_with_cartography_table", CustomStatistic::InteractWithCartographyTable},
+		{"interact_with_crafting_table", CustomStatistic::InteractWithCraftingTable},
+		{"interact_with_furnace", CustomStatistic::InteractWithFurnace},
+		{"interact_with_grindstone", CustomStatistic::InteractWithGrindstone},
+		{"interact_with_lectern", CustomStatistic::InteractWithLectern},
+		{"interact_with_loom", CustomStatistic::InteractWithLoom},
+		{"interact_with_smithing_table", CustomStatistic::InteractWithSmithingTable},
+		{"interact_with_smoker", CustomStatistic::InteractWithSmoker},
+		{"interact_with_stonecutter", CustomStatistic::InteractWithStonecutter},
+		{"jump", CustomStatistic::Jump},
+		{"leave_game", CustomStatistic::LeaveGame},
+		{"minecart_one_cm", CustomStatistic::MinecartOneCm},
+		{"mob_kills", CustomStatistic::MobKills},
+		{"open_barrel", CustomStatistic::OpenBarrel},
+		{"open_chest", CustomStatistic::OpenChest},
+		{"open_enderchest", CustomStatistic::OpenEnderchest},
+		{"open_shulker_box", CustomStatistic::OpenShulkerBox},
+		{"pig_one_cm", CustomStatistic::PigOneCm},
+		{"play_noteblock", CustomStatistic::PlayNoteblock},
+		{"play_one_minute", CustomStatistic::PlayOneMinute},
+		{"play_record", CustomStatistic::PlayRecord},
+		{"player_kills", CustomStatistic::PlayerKills},
+		{"pot_flower", CustomStatistic::PotFlower},
+		{"raid_trigger", CustomStatistic::RaidTrigger},
+		{"raid_win", CustomStatistic::RaidWin},
+		{"sleep_in_bed", CustomStatistic::SleepInBed},
+		{"sneak_time", CustomStatistic::SneakTime},
+		{"sprint_one_cm", CustomStatistic::SprintOneCm},
+		{"strider_one_cm", CustomStatistic::StriderOneCm},
+		{"swim_one_cm", CustomStatistic::SwimOneCm},
+		{"talked_to_villager", CustomStatistic::TalkedToVillager},
+		{"target_hit", CustomStatistic::TargetHit},
+		{"time_since_death", CustomStatistic::TimeSinceDeath},
+		{"time_since_rest", CustomStatistic::TimeSinceRest},
+		{"traded_with_villager", CustomStatistic::TradedWithVillager},
+		{"trigger_trapped_chest", CustomStatistic::TriggerTrappedChest},
+		{"tune_noteblock", CustomStatistic::TuneNoteblock},
+		{"use_cauldron", CustomStatistic::UseCauldron},
+		{"walk_on_water_one_cm", CustomStatistic::WalkOnWaterOneCm},
+		{"walk_one_cm", CustomStatistic::WalkOneCm},
+		{"walk_under_water_one_cm", CustomStatistic::WalkUnderWaterOneCm},
 
 		// Old ones just for compatibility
-		{ "junk_fished",                             CustomStatistic::JunkFished },
-		{ "treasure_fished",                         CustomStatistic::TreasureFished },
+		{"junk_fished", CustomStatistic::JunkFished},
+		{"treasure_fished", CustomStatistic::TreasureFished},
 
 		// The old advancements
-		{ "cuberite:achievement.openInventory",      CustomStatistic::AchOpenInventory },
-		{ "cuberite:achievement.mineWood",           CustomStatistic::AchMineWood },
-		{ "cuberite:achievement.buildWorkBench",     CustomStatistic::AchBuildWorkBench },
-		{ "cuberite:achievement.buildPickaxe",       CustomStatistic::AchBuildPickaxe },
-		{ "cuberite:achievement.buildFurnace",       CustomStatistic::AchBuildFurnace },
-		{ "cuberite:achievement.acquireIron",        CustomStatistic::AchAcquireIron },
-		{ "cuberite:achievement.buildHoe",           CustomStatistic::AchBuildHoe },
-		{ "cuberite:achievement.makeBread",          CustomStatistic::AchMakeBread },
-		{ "cuberite:achievement.bakeCake",           CustomStatistic::AchBakeCake },
-		{ "cuberite:achievement.buildBetterPickaxe", CustomStatistic::AchBuildBetterPickaxe },
-		{ "cuberite:achievement.cookFish",           CustomStatistic::AchCookFish },
-		{ "cuberite:achievement.onARail",            CustomStatistic::AchOnARail },
-		{ "cuberite:achievement.buildSword",         CustomStatistic::AchBuildSword },
-		{ "cuberite:achievement.killEnemy",          CustomStatistic::AchKillEnemy },
-		{ "cuberite:achievement.killCow",            CustomStatistic::AchKillCow },
-		{ "cuberite:achievement.flyPig",             CustomStatistic::AchFlyPig },
-		{ "cuberite:achievement.snipeSkeleton",      CustomStatistic::AchSnipeSkeleton },
-		{ "cuberite:achievement.diamonds",           CustomStatistic::AchDiamonds },
-		{ "cuberite:achievement.portal",             CustomStatistic::AchPortal },
-		{ "cuberite:achievement.ghast",              CustomStatistic::AchGhast },
-		{ "cuberite:achievement.blazeRod",           CustomStatistic::AchBlazeRod },
-		{ "cuberite:achievement.potion",             CustomStatistic::AchPotion },
-		{ "cuberite:achievement.theEnd",             CustomStatistic::AchTheEnd },
-		{ "cuberite:achievement.theEnd2",            CustomStatistic::AchTheEnd2 },
-		{ "cuberite:achievement.enchantments",       CustomStatistic::AchEnchantments },
-		{ "cuberite:achievement.overkill",           CustomStatistic::AchOverkill },
-		{ "cuberite:achievement.bookcase",           CustomStatistic::AchBookcase },
-		{ "cuberite:achievement.exploreAllBiomes",   CustomStatistic::AchExploreAllBiomes },
-		{ "cuberite:achievement.spawnWither",        CustomStatistic::AchSpawnWither },
-		{ "cuberite:achievement.killWither",         CustomStatistic::AchKillWither },
-		{ "cuberite:achievement.fullBeacon",         CustomStatistic::AchFullBeacon },
-		{ "cuberite:achievement.breedCow",           CustomStatistic::AchBreedCow },
-		{ "cuberite:achievement.diamondsToYou",      CustomStatistic::AchDiamondsToYou}
+		{"cuberite:achievement.openInventory", CustomStatistic::AchOpenInventory},
+		{"cuberite:achievement.mineWood", CustomStatistic::AchMineWood},
+		{"cuberite:achievement.buildWorkBench", CustomStatistic::AchBuildWorkBench},
+		{"cuberite:achievement.buildPickaxe", CustomStatistic::AchBuildPickaxe},
+		{"cuberite:achievement.buildFurnace", CustomStatistic::AchBuildFurnace},
+		{"cuberite:achievement.acquireIron", CustomStatistic::AchAcquireIron},
+		{"cuberite:achievement.buildHoe", CustomStatistic::AchBuildHoe},
+		{"cuberite:achievement.makeBread", CustomStatistic::AchMakeBread},
+		{"cuberite:achievement.bakeCake", CustomStatistic::AchBakeCake},
+		{"cuberite:achievement.buildBetterPickaxe", CustomStatistic::AchBuildBetterPickaxe},
+		{"cuberite:achievement.cookFish", CustomStatistic::AchCookFish},
+		{"cuberite:achievement.onARail", CustomStatistic::AchOnARail},
+		{"cuberite:achievement.buildSword", CustomStatistic::AchBuildSword},
+		{"cuberite:achievement.killEnemy", CustomStatistic::AchKillEnemy},
+		{"cuberite:achievement.killCow", CustomStatistic::AchKillCow},
+		{"cuberite:achievement.flyPig", CustomStatistic::AchFlyPig},
+		{"cuberite:achievement.snipeSkeleton", CustomStatistic::AchSnipeSkeleton},
+		{"cuberite:achievement.diamonds", CustomStatistic::AchDiamonds},
+		{"cuberite:achievement.portal", CustomStatistic::AchPortal},
+		{"cuberite:achievement.ghast", CustomStatistic::AchGhast},
+		{"cuberite:achievement.blazeRod", CustomStatistic::AchBlazeRod},
+		{"cuberite:achievement.potion", CustomStatistic::AchPotion},
+		{"cuberite:achievement.theEnd", CustomStatistic::AchTheEnd},
+		{"cuberite:achievement.theEnd2", CustomStatistic::AchTheEnd2},
+		{"cuberite:achievement.enchantments", CustomStatistic::AchEnchantments},
+		{"cuberite:achievement.overkill", CustomStatistic::AchOverkill},
+		{"cuberite:achievement.bookcase", CustomStatistic::AchBookcase},
+		{"cuberite:achievement.exploreAllBiomes", CustomStatistic::AchExploreAllBiomes},
+		{"cuberite:achievement.spawnWither", CustomStatistic::AchSpawnWither},
+		{"cuberite:achievement.killWither", CustomStatistic::AchKillWither},
+		{"cuberite:achievement.fullBeacon", CustomStatistic::AchFullBeacon},
+		{"cuberite:achievement.breedCow", CustomStatistic::AchBreedCow},
+		{"cuberite:achievement.diamondsToYou", CustomStatistic::AchDiamondsToYou}
 	};
 
 	return CustomStatistics.at(ID);
@@ -400,13 +399,15 @@ CustomStatistic NamespaceSerializer::ToCustomStatistic(const std::string_view ID
 
 
 
-std::pair<NamespaceSerializer::Namespace, std::string_view> NamespaceSerializer::SplitNamespacedID(const std::string_view ID)
+std::pair<NamespaceSerializer::Namespace, std::string_view> NamespaceSerializer::SplitNamespacedID(
+	const std::string_view ID
+)
 {
 	const auto NamespaceIndex = ID.find(':');
 	if (NamespaceIndex == std::string_view::npos)
 	{
 		// No explicit namespace defaults to the Minecraft namespace:
-		return { Namespace::Minecraft, ID };
+		return {Namespace::Minecraft, ID};
 	}
 
 	const auto Namespace = ID.substr(0, NamespaceIndex);
@@ -415,15 +416,15 @@ std::pair<NamespaceSerializer::Namespace, std::string_view> NamespaceSerializer:
 		// An unprefixed ID in the vanilla Minecraft namespace.
 		const auto Value = ID.substr(NamespaceIndex + 1);
 
-		return { Namespace::Minecraft, Value };
+		return {Namespace::Minecraft, Value};
 	}
 
 	if (Namespace == "cuberite")
 	{
-		return { Namespace::Cuberite, ID };
+		return {Namespace::Cuberite, ID};
 	}
 
-	return { Namespace::Unknown, ID };
+	return {Namespace::Unknown, ID};
 }
 
 
@@ -432,116 +433,115 @@ std::pair<NamespaceSerializer::Namespace, std::string_view> NamespaceSerializer:
 
 eMonsterType NamespaceSerializer::ToMonsterType(const std::string_view a_ID)
 {
-	static const std::unordered_map<std::string_view, eMonsterType> MonsterTypes
-	{
-		{ "bat",              mtBat },
-		{ "blaze",            mtBlaze },
-		{ "cat",              mtCat },
-		{ "cave_spider",      mtCaveSpider },
-		{ "chicken",          mtChicken },
-		{ "cod",              mtCod },
-		{ "cow",              mtCow },
-		{ "creeper",          mtCreeper },
-		{ "dolphin",          mtDolphin },
-		{ "donkey",           mtDonkey },
-		{ "drowned",          mtDrowned },
-		{ "elder_guardian",   mtElderGuardian },
-		{ "ender_dragon",     mtEnderDragon },
-		{ "enderman",         mtEnderman },
-		{ "endermite",        mtEndermite },
-		{ "evoker",           mtEvoker },
-		{ "fox",              mtFox },
-		{ "ghast",            mtGhast },
-		{ "giant",            mtGiant },
-		{ "guardian",         mtGuardian },
-		{ "horse",            mtHorse },
-		{ "hoglin",           mtHoglin },
-		{ "husk",             mtHusk },
-		{ "illusioner",       mtIllusioner },
-		{ "iron_golem",       mtIronGolem },
-		{ "llama",            mtLlama },
-		{ "magma_cube",       mtMagmaCube },
-		{ "mooshroom",        mtMooshroom },
-		{ "mule",             mtMule },
-		{ "ocelot",           mtOcelot },
-		{ "panda",            mtPanda },
-		{ "parrot",           mtParrot },
-		{ "phantom",          mtPhantom },
-		{ "pig",              mtPig },
-		{ "piglin",           mtPiglin },
-		{ "piglin_brute",     mtPiglinBrute },
-		{ "pillager",         mtPillager },
-		{ "polar_bear",       mtPolarBear },
-		{ "pufferfish",       mtPufferfish },
-		{ "rabbit",           mtRabbit },
-		{ "ravager",          mtRavager },
-		{ "salmon",           mtSalmon },
-		{ "sheep",            mtSheep },
-		{ "shulker",          mtShulker },
-		{ "silverfish",       mtSilverfish },
-		{ "skeleton",         mtSkeleton },
-		{ "skeleton_horse",   mtSkeletonHorse },
-		{ "slime",            mtSlime },
-		{ "snow_golem",       mtSnowGolem },
-		{ "spider",           mtSpider },
-		{ "squid",            mtSquid },
-		{ "stray",            mtStray },
-		{ "strider",          mtStrider },
-		{ "trader_llama",     mtTraderLlama },
-		{ "tropical_fish",    mtTropicalFish },
-		{ "turtle",           mtTurtle },
-		{ "vex",              mtVex },
-		{ "villager",         mtVillager },
-		{ "vindicator",       mtVindicator },
-		{ "wandering_trader", mtWanderingTrader },
-		{ "witch",            mtWitch },
-		{ "wither",           mtWither },
-		{ "wither_skeleton",  mtWitherSkeleton },
-		{ "wolf",             mtWolf },
-		{ "zoglin",           mtZoglin },
-		{ "zombie",           mtZombie },
-		{ "zombie_horse",     mtZombieHorse },
-		{ "zombified_piglin", mtZombiePigman },
-		{ "zombie_villager",  mtZombieVillager },
+	static const std::unordered_map<std::string_view, eMonsterType> MonsterTypes {
+		{"bat", mtBat},
+		{"blaze", mtBlaze},
+		{"cat", mtCat},
+		{"cave_spider", mtCaveSpider},
+		{"chicken", mtChicken},
+		{"cod", mtCod},
+		{"cow", mtCow},
+		{"creeper", mtCreeper},
+		{"dolphin", mtDolphin},
+		{"donkey", mtDonkey},
+		{"drowned", mtDrowned},
+		{"elder_guardian", mtElderGuardian},
+		{"ender_dragon", mtEnderDragon},
+		{"enderman", mtEnderman},
+		{"endermite", mtEndermite},
+		{"evoker", mtEvoker},
+		{"fox", mtFox},
+		{"ghast", mtGhast},
+		{"giant", mtGiant},
+		{"guardian", mtGuardian},
+		{"horse", mtHorse},
+		{"hoglin", mtHoglin},
+		{"husk", mtHusk},
+		{"illusioner", mtIllusioner},
+		{"iron_golem", mtIronGolem},
+		{"llama", mtLlama},
+		{"magma_cube", mtMagmaCube},
+		{"mooshroom", mtMooshroom},
+		{"mule", mtMule},
+		{"ocelot", mtOcelot},
+		{"panda", mtPanda},
+		{"parrot", mtParrot},
+		{"phantom", mtPhantom},
+		{"pig", mtPig},
+		{"piglin", mtPiglin},
+		{"piglin_brute", mtPiglinBrute},
+		{"pillager", mtPillager},
+		{"polar_bear", mtPolarBear},
+		{"pufferfish", mtPufferfish},
+		{"rabbit", mtRabbit},
+		{"ravager", mtRavager},
+		{"salmon", mtSalmon},
+		{"sheep", mtSheep},
+		{"shulker", mtShulker},
+		{"silverfish", mtSilverfish},
+		{"skeleton", mtSkeleton},
+		{"skeleton_horse", mtSkeletonHorse},
+		{"slime", mtSlime},
+		{"snow_golem", mtSnowGolem},
+		{"spider", mtSpider},
+		{"squid", mtSquid},
+		{"stray", mtStray},
+		{"strider", mtStrider},
+		{"trader_llama", mtTraderLlama},
+		{"tropical_fish", mtTropicalFish},
+		{"turtle", mtTurtle},
+		{"vex", mtVex},
+		{"villager", mtVillager},
+		{"vindicator", mtVindicator},
+		{"wandering_trader", mtWanderingTrader},
+		{"witch", mtWitch},
+		{"wither", mtWither},
+		{"wither_skeleton", mtWitherSkeleton},
+		{"wolf", mtWolf},
+		{"zoglin", mtZoglin},
+		{"zombie", mtZombie},
+		{"zombie_horse", mtZombieHorse},
+		{"zombified_piglin", mtZombiePigman},
+		{"zombie_villager", mtZombieVillager},
 
-		{ "snowman",          mtSnowGolem },
-		{ "villager_golem",   mtIronGolem },
-		{ "zombie_pigman",    mtZombiePigman },
+		{"snowman", mtSnowGolem},
+		{"villager_golem", mtIronGolem},
+		{"zombie_pigman", mtZombiePigman},
 
 		// Old names:
-		{ "Bat",            mtBat },
-		{ "Blaze",          mtBlaze },
-		{ "CaveSpider",     mtCaveSpider },
-		{ "Chicken",        mtChicken },
-		{ "Cow",            mtCow },
-		{ "Creeper",        mtCreeper },
-		{ "EnderDragon",    mtEnderDragon },
-		{ "Enderman",       mtEnderman },
-		{ "Ghast",          mtGhast },
-		{ "Giant",          mtGiant },
-		{ "Guardian",       mtGuardian },
-		{ "Horse",          mtHorse },
-		{ "VillagerGolem",  mtIronGolem },
-		{ "LavaSlime",      mtMagmaCube },
-		{ "MushroomCow",    mtMooshroom },
-		{ "Ozelot",         mtOcelot },
-		{ "Pig",            mtPig },
-		{ "Rabbit",         mtRabbit },
-		{ "Sheep",          mtSheep },
-		{ "Silverfish",     mtSilverfish },
-		{ "Skeleton",       mtSkeleton },
-		{ "Slime",          mtSlime },
-		{ "SnowMan",        mtSnowGolem },
-		{ "Spider",         mtSpider },
-		{ "Squid",          mtSquid },
-		{ "Villager",       mtVillager },
-		{ "Witch",          mtWitch },
-		{ "WitherBoss",     mtWither },
-		{ "WitherSkeleton", mtWitherSkeleton },
-		{ "Wolf",           mtWolf },
-		{ "Zombie",         mtZombie },
-		{ "PigZombie",      mtZombiePigman },
-		{ "ZombieVillager", mtZombieVillager }
+		{"Bat", mtBat},
+		{"Blaze", mtBlaze},
+		{"CaveSpider", mtCaveSpider},
+		{"Chicken", mtChicken},
+		{"Cow", mtCow},
+		{"Creeper", mtCreeper},
+		{"EnderDragon", mtEnderDragon},
+		{"Enderman", mtEnderman},
+		{"Ghast", mtGhast},
+		{"Giant", mtGiant},
+		{"Guardian", mtGuardian},
+		{"Horse", mtHorse},
+		{"VillagerGolem", mtIronGolem},
+		{"LavaSlime", mtMagmaCube},
+		{"MushroomCow", mtMooshroom},
+		{"Ozelot", mtOcelot},
+		{"Pig", mtPig},
+		{"Rabbit", mtRabbit},
+		{"Sheep", mtSheep},
+		{"Silverfish", mtSilverfish},
+		{"Skeleton", mtSkeleton},
+		{"Slime", mtSlime},
+		{"SnowMan", mtSnowGolem},
+		{"Spider", mtSpider},
+		{"Squid", mtSquid},
+		{"Villager", mtVillager},
+		{"Witch", mtWitch},
+		{"WitherBoss", mtWither},
+		{"WitherSkeleton", mtWitherSkeleton},
+		{"Wolf", mtWolf},
+		{"Zombie", mtZombie},
+		{"PigZombie", mtZombiePigman},
+		{"ZombieVillager", mtZombieVillager}
 	};
 
 	return MonsterTypes.at(a_ID);
@@ -555,19 +555,23 @@ AString NamespaceSerializer::Prettify(AString a_ID)
 {
 
 	bool NextLetterCapitalized = true;
-	std::for_each(a_ID.begin(), a_ID.end(), [&](char & a_Letter)
-	{
-		if (NextLetterCapitalized)
+	std::for_each(
+		a_ID.begin(),
+		a_ID.end(),
+		[&](char & a_Letter)
 		{
-			a_Letter = static_cast<char>(std::toupper(a_Letter));
-			NextLetterCapitalized = false;
+			if (NextLetterCapitalized)
+			{
+				a_Letter = static_cast<char>(std::toupper(a_Letter));
+				NextLetterCapitalized = false;
+			}
+			else if (a_Letter == '_')
+			{
+				a_Letter = ' ';
+				NextLetterCapitalized = true;
+			}
 		}
-		else if (a_Letter == '_')
-		{
-			a_Letter = ' ';
-			NextLetterCapitalized = true;
-		}
-	});
+	);
 	return a_ID;
 }
 

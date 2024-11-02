@@ -9,7 +9,3 @@
 
 /** Prints the stacktrace for the current thread. */
 extern void PrintStackTrace(void);
-
-
-
-

@@ -12,15 +12,19 @@
 
 // tolua_begin
 
-class cBedEntity :
-	public cBlockEntity
+class cBedEntity : public cBlockEntity
 {
 	// tolua_end
 	using Super = cBlockEntity;
 
-public:  // tolua_export
-
-	cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, short a_Color = E_META_WOOL_RED);
+  public:  // tolua_export
+	cBedEntity(
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta,
+		Vector3i a_Pos,
+		cWorld * a_World,
+		short a_Color = E_META_WOOL_RED
+	);
 
 	// tolua_begin
 
@@ -41,7 +45,6 @@ public:  // tolua_export
 	virtual bool UsedBy(cPlayer * a_Player) override { return false; }
 	virtual void SendTo(cClientHandle & a_Client) override;
 
-private:
-
+  private:
 	short m_Color;
 };  // tolua_export

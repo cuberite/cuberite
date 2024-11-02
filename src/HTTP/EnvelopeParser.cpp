@@ -1,7 +1,8 @@
 
 // EnvelopeParser.cpp
 
-// Implements the cEnvelopeParser class representing a parser for RFC-822 envelope headers, used both in HTTP and in MIME
+// Implements the cEnvelopeParser class representing a parser for RFC-822 envelope headers, used both in HTTP and in
+// MIME
 
 #include "Globals.h"
 #include "EnvelopeParser.h"
@@ -11,8 +12,7 @@
 
 
 cEnvelopeParser::cEnvelopeParser(cCallbacks & a_Callbacks) :
-	m_Callbacks(a_Callbacks),
-	m_IsInHeaders(true)
+	m_Callbacks(a_Callbacks), m_IsInHeaders(true)
 {
 }
 
@@ -59,7 +59,8 @@ size_t cEnvelopeParser::Parse(const char * a_Data, size_t a_Size)
 		}
 		Last = idxCRLF + 2;
 		idxCRLF = m_IncomingData.find("\r\n", idxCRLF + 2);
-	} while (idxCRLF != AString::npos);
+	}
+	while (idxCRLF != AString::npos);
 	m_IncomingData.erase(0, Last);
 
 	// Parsed all lines and still expecting more
@@ -133,7 +134,3 @@ bool cEnvelopeParser::ParseLine(const char * a_Data, size_t a_Size)
 	// No colon was found, key-less header??
 	return false;
 }
-
-
-
-

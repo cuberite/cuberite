@@ -46,7 +46,7 @@ bool StatisticsManager::SatisfiesPrerequisite(const CustomStatistic a_Stat) cons
 		case CustomStatistic::AchKillWither:         return IsStatisticPresent(CustomStatistic::AchSpawnWither);
 		case CustomStatistic::AchFullBeacon:         return IsStatisticPresent(CustomStatistic::AchKillWither);
 		case CustomStatistic::AchDiamondsToYou:      return IsStatisticPresent(CustomStatistic::AchDiamonds);
-		default: UNREACHABLE("Unsupported achievement type");
+		default:                                     UNREACHABLE("Unsupported achievement type");
 	}
 }
 

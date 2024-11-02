@@ -12,8 +12,7 @@
 // tolua_begin
 class cColor
 {
-public:
-
+  public:
 	enum eColorLimits : unsigned int
 	{
 		COLOR_MIN = 0,
@@ -21,7 +20,7 @@ public:
 		COLOR_LIMIT = 256,
 		COLOR_NONE = 0xFFFFFFFF,
 	};
-	cColor() { m_Color = static_cast<unsigned int>(COLOR_NONE);}
+	cColor() { m_Color = static_cast<unsigned int>(COLOR_NONE); }
 	cColor(unsigned char a_Red, unsigned char a_Green, unsigned char a_Blue) { SetColor(a_Red, a_Green, a_Blue); }
 
 	/** Returns whether the color is a valid color */

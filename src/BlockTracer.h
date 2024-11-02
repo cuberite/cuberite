@@ -28,22 +28,27 @@ class cWorld;
 
 class cBlockTracer abstract
 {
-public:
+  public:
 	/** The callback class is used to notify the caller of individual events that are being traced.
-	*/
+	 */
 	class cCallbacks abstract
 	{
-	public:
+	  public:
 		// Force a virtual destructor in descendants:
 		virtual ~cCallbacks() {}
 
 		/** Called on each block encountered along the path, including the first block (path start)
 		When this callback returns true, the tracing is aborted.
 		*/
-		virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) = 0;
+		virtual bool OnNextBlock(
+			Vector3i a_BlockPos,
+			BLOCKTYPE a_BlockType,
+			NIBBLETYPE a_BlockMeta,
+			eBlockFace a_EntryFace
+		) = 0;
 
-		/** Called on each block encountered along the path, including the first block (path start), if chunk data is not loaded
-		When this callback returns true, the tracing is aborted.
+		/** Called on each block encountered along the path, including the first block (path start), if chunk data is
+		not loaded When this callback returns true, the tracing is aborted.
 		*/
 		virtual bool OnNextBlockNoData(Vector3i a_BlockPos, eBlockFace a_EntryFace)
 		{
@@ -52,11 +57,10 @@ public:
 			return false;
 		}
 
-		/** Called when the path goes out of world, either below (a_BlockPos.y < 0) or above (a_BlockPos.y >= cChunkDef::Height)
-		The coords specify the exact point at which the path exited the world.
-		If this callback returns true, the tracing is aborted.
-		Note that some paths can go out of the world and come back again (parabola),
-		in such a case this callback is followed by OnIntoWorld() and further OnNextBlock() calls
+		/** Called when the path goes out of world, either below (a_BlockPos.y < 0) or above (a_BlockPos.y >=
+		cChunkDef::Height) The coords specify the exact point at which the path exited the world. If this callback
+		returns true, the tracing is aborted. Note that some paths can go out of the world and come back again
+		(parabola), in such a case this callback is followed by OnIntoWorld() and further OnNextBlock() calls
 		*/
 		virtual bool OnOutOfWorld(Vector3d a_BlockPos)
 		{
@@ -64,11 +68,10 @@ public:
 			return false;
 		}
 
-		/** Called when the path goes into the world, from either below (a_BlockPos.y < 0) or above (a_BlockPos.y >= cChunkDef::Height)
-		The coords specify the exact point at which the path entered the world.
-		If this callback returns true, the tracing is aborted.
-		Note that some paths can go out of the world and come back again (parabola),
-		in such a case this callback is followed by further OnNextBlock() calls
+		/** Called when the path goes into the world, from either below (a_BlockPos.y < 0) or above (a_BlockPos.y >=
+		cChunkDef::Height) The coords specify the exact point at which the path entered the world. If this callback
+		returns true, the tracing is aborted. Note that some paths can go out of the world and come back again
+		(parabola), in such a case this callback is followed by further OnNextBlock() calls
 		*/
 		virtual bool OnIntoWorld(Vector3d a_BlockPos)
 		{
@@ -85,13 +88,12 @@ public:
 		This usually means that the tracing is aborted.
 		*/
 		virtual void OnNoChunk(void) {}
-	} ;
+	};
 
 
 	/** Creates the BlockTracer parent with the specified callbacks */
 	cBlockTracer(cWorld & a_World, cCallbacks & a_Callbacks) :
-		m_World(&a_World),
-		m_Callbacks(&a_Callbacks)
+		m_World(&a_World), m_Callbacks(&a_Callbacks)
 	{
 	}
 
@@ -113,14 +115,10 @@ public:
 		return Old;
 	}
 
-protected:
+  protected:
 	/** The world upon which to operate */
 	cWorld * m_World;
 
 	/** The callback to use for reporting */
 	cCallbacks * m_Callbacks;
-} ;
-
-
-
-
+};

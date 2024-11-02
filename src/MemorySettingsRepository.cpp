@@ -32,7 +32,7 @@ bool cMemorySettingsRepository::HasValue(const AString & a_KeyName, const AStrin
 
 int cMemorySettingsRepository::AddKeyName(const AString & a_keyname)
 {
-	m_Map.emplace(a_keyname, std::unordered_multimap<AString, sValue>{});
+	m_Map.emplace(a_keyname, std::unordered_multimap<AString, sValue> {});
 	return 0;
 }
 
@@ -67,7 +67,11 @@ bool cMemorySettingsRepository::DeleteKeyComment(const AString & keyname, const 
 
 
 
-void cMemorySettingsRepository::AddValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value)
+void cMemorySettingsRepository::AddValue(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const AString & a_Value
+)
 {
 	if (m_Writable)
 	{
@@ -79,7 +83,7 @@ void cMemorySettingsRepository::AddValue (const AString & a_KeyName, const AStri
 
 
 
-void cMemorySettingsRepository::AddValue (const AString & a_KeyName, const AString & a_ValueName, Int64 a_Value)
+void cMemorySettingsRepository::AddValue(const AString & a_KeyName, const AString & a_ValueName, Int64 a_Value)
 {
 	if (m_Writable)
 	{
@@ -91,7 +95,7 @@ void cMemorySettingsRepository::AddValue (const AString & a_KeyName, const AStri
 
 
 
-void cMemorySettingsRepository::AddValue (const AString & a_KeyName, const AString & a_ValueName, bool a_Value)
+void cMemorySettingsRepository::AddValue(const AString & a_KeyName, const AString & a_ValueName, bool a_Value)
 {
 	if (m_Writable)
 	{
@@ -117,7 +121,11 @@ std::vector<std::pair<AString, AString>> cMemorySettingsRepository::GetValues(AS
 
 
 
-AString cMemorySettingsRepository::GetValue (const AString & a_KeyName, const AString & a_ValueName, const AString & defValue)    const
+AString cMemorySettingsRepository::GetValue(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const AString & defValue
+) const
 {
 	auto outerIter = m_Map.find(a_KeyName);
 	if (outerIter == m_Map.end())
@@ -136,7 +144,11 @@ AString cMemorySettingsRepository::GetValue (const AString & a_KeyName, const AS
 
 
 
-AString cMemorySettingsRepository::GetValueSet (const AString & a_KeyName, const AString & a_ValueName, const AString & defValue)
+AString cMemorySettingsRepository::GetValueSet(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const AString & defValue
+)
 {
 	auto outerIter = m_Map.find(a_KeyName);
 	if (outerIter == m_Map.end())
@@ -178,7 +190,11 @@ int cMemorySettingsRepository::GetValueSetI(const AString & a_KeyName, const ASt
 
 
 
-Int64 cMemorySettingsRepository::GetValueSetI(const AString & a_KeyName, const AString & a_ValueName, const Int64 defValue)
+Int64 cMemorySettingsRepository::GetValueSetI(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const Int64 defValue
+)
 {
 	auto outerIter = m_Map.find(a_KeyName);
 	if (outerIter == m_Map.end())
@@ -199,7 +215,11 @@ Int64 cMemorySettingsRepository::GetValueSetI(const AString & a_KeyName, const A
 
 
 
-bool cMemorySettingsRepository::GetValueSetB(const AString & a_KeyName, const AString & a_ValueName, const bool defValue)
+bool cMemorySettingsRepository::GetValueSetB(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const bool defValue
+)
 {
 	auto outerIter = m_Map.find(a_KeyName);
 	if (outerIter == m_Map.end())
@@ -220,7 +240,12 @@ bool cMemorySettingsRepository::GetValueSetB(const AString & a_KeyName, const AS
 
 
 
-bool cMemorySettingsRepository::SetValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value, const bool a_CreateIfNotExists)
+bool cMemorySettingsRepository::SetValue(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const AString & a_Value,
+	const bool a_CreateIfNotExists
+)
 {
 	if (!m_Writable)
 	{
@@ -252,7 +277,12 @@ bool cMemorySettingsRepository::SetValue (const AString & a_KeyName, const AStri
 
 
 
-bool cMemorySettingsRepository::SetValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value, const bool a_CreateIfNotExists)
+bool cMemorySettingsRepository::SetValueI(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const int a_Value,
+	const bool a_CreateIfNotExists
+)
 {
 	if (!m_Writable)
 	{
@@ -312,4 +342,3 @@ bool cMemorySettingsRepository::Flush()
 {
 	return true;
 }
-

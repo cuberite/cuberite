@@ -11,8 +11,7 @@
 
 
 cProbabDistrib::cProbabDistrib(int a_MaxValue) :
-	m_MaxValue(a_MaxValue),
-	m_Sum(-1)
+	m_MaxValue(a_MaxValue), m_Sum(-1)
 {
 }
 
@@ -75,11 +74,8 @@ bool cProbabDistrib::SetDefString(const AString & a_DefString)
 			return false;
 		}
 		int Value = atoi(Split[0].c_str());
-		int Prob  = atoi(Split[1].c_str());
-		if (
-			((Value == 0) && (Split[0] != "0")) ||
-			((Prob  == 0) && (Split[1] != "0"))
-		)
+		int Prob = atoi(Split[1].c_str());
+		if (((Value == 0) && (Split[0] != "0")) || ((Prob == 0) && (Split[1] != "0")))
 		{
 			// Number parse error
 			return false;
@@ -128,12 +124,8 @@ int cProbabDistrib::MapValue(int a_OrigValue) const
 	ASSERT(Hi - Lo == 1);
 
 	// Linearly interpolate between Lo and Hi:
-	int ProbDif  = m_Cumulative[Hi].m_Probability - m_Cumulative[Lo].m_Probability;
+	int ProbDif = m_Cumulative[Hi].m_Probability - m_Cumulative[Lo].m_Probability;
 	ProbDif = (ProbDif != 0) ? ProbDif : 1;
 	int ValueDif = m_Cumulative[Hi].m_Value - m_Cumulative[Lo].m_Value;
 	return m_Cumulative[Lo].m_Value + (a_OrigValue - m_Cumulative[Lo].m_Probability) * ValueDif / ProbDif;
 }
-
-
-
-

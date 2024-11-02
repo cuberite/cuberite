@@ -16,15 +16,14 @@
 
 
 
-class cLuaNameLookup:
-	public cNetwork::cResolveNameCallbacks
+class cLuaNameLookup : public cNetwork::cResolveNameCallbacks
 {
-public:
+  public:
 	/** Creates a new instance of the lookup callbacks for the specified query,
 	using the callbacks that are in the specified table. */
 	cLuaNameLookup(const AString & a_Query, cLuaState::cTableRefPtr && a_Callbacks);
 
-protected:
+  protected:
 	/** The Lua table that holds the callbacks to be invoked. */
 	cLuaState::cTableRefPtr m_Callbacks;
 
@@ -37,7 +36,3 @@ protected:
 	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override;
 	virtual void OnFinished(void) override;
 };
-
-
-
-

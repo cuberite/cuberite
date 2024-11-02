@@ -23,10 +23,9 @@ class cLuaState;
 
 
 
-class cPrefabPiecePool :
-	public cPiecePool
+class cPrefabPiecePool : public cPiecePool
 {
-public:
+  public:
 	/** Creates an empty instance. Prefabs can be added by calling AddPieceDefs() and AddStartingPieceDefs(). */
 	cPrefabPiecePool(void);
 
@@ -39,8 +38,10 @@ public:
 	If a_DefaultStartingPieceHeight is non-negative, it is applied to each starting piece as its fixed
 	height (for the GetStartingPieceHeight() call). */
 	cPrefabPiecePool(
-		const cPrefab::sDef * a_PieceDefs,         size_t a_NumPieceDefs,
-		const cPrefab::sDef * a_StartingPieceDefs, size_t a_NumStartingPieceDefs,
+		const cPrefab::sDef * a_PieceDefs,
+		size_t a_NumPieceDefs,
+		const cPrefab::sDef * a_StartingPieceDefs,
+		size_t a_NumStartingPieceDefs,
 		int a_DefaultStartingPieceHeight = -1
 	);
 
@@ -92,9 +93,9 @@ public:
 	const AString & GetIntendedUse(void) const { return m_IntendedUse; }
 	int GetMinDensity(void) const { return m_MinDensity; }
 	int GetMaxDensity(void) const { return m_MaxDensity; }
-	BLOCKTYPE  GetVillageRoadBlockType     (void) const { return m_VillageRoadBlockType; }
-	NIBBLETYPE GetVillageRoadBlockMeta     (void) const { return m_VillageRoadBlockMeta; }
-	BLOCKTYPE  GetVillageWaterRoadBlockType(void) const { return m_VillageWaterRoadBlockType; }
+	BLOCKTYPE GetVillageRoadBlockType(void) const { return m_VillageRoadBlockType; }
+	NIBBLETYPE GetVillageRoadBlockMeta(void) const { return m_VillageRoadBlockMeta; }
+	BLOCKTYPE GetVillageWaterRoadBlockType(void) const { return m_VillageWaterRoadBlockType; }
 	NIBBLETYPE GetVillageWaterRoadBlockMeta(void) const { return m_VillageWaterRoadBlockMeta; }
 
 	/** Returns true if a_Biome is among the accepted biomes in the m_AcceptedBiomes metadata member. */
@@ -113,13 +114,16 @@ public:
 	// cPiecePool overrides:
 	virtual cPieces GetPiecesWithConnector(int a_ConnectorType) override;
 	virtual cPieces GetStartingPieces(void) override;
-	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) override;
+	virtual int GetPieceWeight(
+		const cPlacedPiece & a_PlacedPiece,
+		const cPiece::cConnector & a_ExistingConnector,
+		const cPiece & a_NewPiece
+	) override;
 	virtual int GetStartingPieceWeight(const cPiece & a_NewPiece) override;
 	virtual void PiecePlaced(const cPiece & a_Piece) override;
 	virtual void Reset(void) override;
 
-protected:
-
+  protected:
 	/** The type used to map a connector type to the list of pieces with that connector */
 	typedef std::map<int, cPieces> cPiecesMap;
 
@@ -197,9 +201,9 @@ protected:
 	Returns true on success, false on failure.
 	The connectors are added into the a_Prefab object.
 	No Connectors table is considered a failure, empty Connectors table is considered a success.
-	If any of the connectors are malformed, it is considered a failure, although the rest of the connectors will still load.
-	a_PieceName is the identification of the piece, used for logging only.
-	If a_LogWarnings is true, logs a warning to console when loading fails. */
+	If any of the connectors are malformed, it is considered a failure, although the rest of the connectors will still
+	load. a_PieceName is the identification of the piece, used for logging only. If a_LogWarnings is true, logs a
+	warning to console when loading fails. */
 	bool ReadConnectorsCubesetVer1(
 		const AString & a_FileName,
 		cLuaState & a_LuaState,
@@ -225,20 +229,9 @@ protected:
 	/** Reads the metadata for the entire pool from the cubeset file, stores it in the m_Metadata map.
 	Returns true on success, false on failure.
 	If a_LogWarnings is true, logs a warning to console when loading fails. */
-	bool ReadPoolMetadataCubesetVer1(
-		const AString & a_FileName,
-		cLuaState & a_LuaState,
-		bool a_LogWarnings
-	);
+	bool ReadPoolMetadataCubesetVer1(const AString & a_FileName, cLuaState & a_LuaState, bool a_LogWarnings);
 
 	/** Applies the base known metadata from the m_Metadata map into this pool.
 	If a_LogWarnings is true, logs a warning to console when loading fails. */
-	void ApplyBaseMetadataCubesetVer1(
-		const AString & a_FileName,
-		bool a_LogWarnings
-	);
-} ;
-
-
-
-
+	void ApplyBaseMetadataCubesetVer1(const AString & a_FileName, bool a_LogWarnings);
+};

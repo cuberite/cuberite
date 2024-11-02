@@ -10,8 +10,7 @@
 // tolua_begin
 class cBlockInfo
 {
-public:
-
+  public:
 	/** How much light do the blocks emit on their own? */
 	static NIBBLETYPE GetLightValue(BLOCKTYPE Block);
 

@@ -11,9 +11,9 @@
 #include "../../src/Logger.h"
 
 #ifdef _WIN32
-	#include <direct.h>  // For _mkdir()
+#include <direct.h>  // For _mkdir()
 #else
-	#include <sys/stat.h>   // for mkdir
+#include <sys/stat.h>  // for mkdir
 #endif
 
 
@@ -27,9 +27,9 @@
 
 
 #if defined(_DEBUG) && defined(SLEEP_AFTER_PACKET)
-	#define DebugSleep Sleep
+#define DebugSleep Sleep
 #else
-	#define DebugSleep(X)
+#define DebugSleep(X)
 #endif  // else _DEBUG
 
 
@@ -37,101 +37,117 @@
 
 
 #define HANDLE_CLIENT_PACKET_READ(Proc, Type, Var) \
-	Type Var; \
-	do { \
-		if (!m_ClientBuffer.Proc(Var)) \
-		{ \
-			return false; \
-		} \
-	} while (false)
+	Type Var;                                      \
+	do                                             \
+	{                                              \
+		if (!m_ClientBuffer.Proc(Var))             \
+		{                                          \
+			return false;                          \
+		}                                          \
+	}                                              \
+	while (false)
 
 #define HANDLE_SERVER_PACKET_READ(Proc, Type, Var) \
-	Type Var; \
-	do { \
-		if (!m_ServerBuffer.Proc(Var)) \
-		{ \
-			return false; \
-		} \
-	} while (false)
+	Type Var;                                      \
+	do                                             \
+	{                                              \
+		if (!m_ServerBuffer.Proc(Var))             \
+		{                                          \
+			return false;                          \
+		}                                          \
+	}                                              \
+	while (false)
 
 #define CLIENTSEND(...) SendData(m_ClientSocket, __VA_ARGS__, "Client")
 #define SERVERSEND(...) SendData(m_ServerSocket, __VA_ARGS__, "Server")
 #define CLIENTENCRYPTSEND(...) SendData(m_ClientSocket, __VA_ARGS__, "Client")  // The client conn is always unencrypted
 #define SERVERENCRYPTSEND(...) SendEncryptedData(m_ServerSocket, m_ServerEncryptor, __VA_ARGS__, "Server")
 
-#define COPY_TO_SERVER() \
-	do { \
-		ContiguousByteBuffer ToServer; \
-		m_ClientBuffer.ReadAgain(ToServer); \
-		switch (m_ServerState) \
-		{ \
-			case csUnencrypted: \
-			{ \
-				SERVERSEND(ToServer); \
-				break; \
-			} \
-			case csEncryptedUnderstood: \
-			case csEncryptedUnknown: \
-			{ \
-				SERVERENCRYPTSEND(ToServer); \
-				break; \
-			} \
-			case csWaitingForEncryption: \
-			{ \
+#define COPY_TO_SERVER()                                                                \
+	do                                                                                  \
+	{                                                                                   \
+		ContiguousByteBuffer ToServer;                                                  \
+		m_ClientBuffer.ReadAgain(ToServer);                                             \
+		switch (m_ServerState)                                                          \
+		{                                                                               \
+			case csUnencrypted:                                                         \
+			{                                                                           \
+				SERVERSEND(ToServer);                                                   \
+				break;                                                                  \
+			}                                                                           \
+			case csEncryptedUnderstood:                                                 \
+			case csEncryptedUnknown:                                                    \
+			{                                                                           \
+				SERVERENCRYPTSEND(ToServer);                                            \
+				break;                                                                  \
+			}                                                                           \
+			case csWaitingForEncryption:                                                \
+			{                                                                           \
 				Log("Waiting for server encryption, queued %u bytes", ToServer.size()); \
-				m_ServerEncryptionBuffer += ToServer; \
-				break; \
-			} \
-		} \
-		DebugSleep(50); \
-	} while (false)
+				m_ServerEncryptionBuffer += ToServer;                                   \
+				break;                                                                  \
+			}                                                                           \
+		}                                                                               \
+		DebugSleep(50);                                                                 \
+	}                                                                                   \
+	while (false)
 
-#define COPY_TO_CLIENT() \
-	do { \
-		ContiguousByteBuffer ToClient; \
-		m_ServerBuffer.ReadAgain(ToClient); \
-		switch (m_ClientState) \
-		{ \
-			case csUnencrypted: \
-			{ \
-				CLIENTSEND(ToClient); \
-				break; \
-			} \
-			case csEncryptedUnderstood: \
-			case csEncryptedUnknown: \
-			{ \
+#define COPY_TO_CLIENT()                     \
+	do                                       \
+	{                                        \
+		ContiguousByteBuffer ToClient;       \
+		m_ServerBuffer.ReadAgain(ToClient);  \
+		switch (m_ClientState)               \
+		{                                    \
+			case csUnencrypted:              \
+			{                                \
+				CLIENTSEND(ToClient);        \
+				break;                       \
+			}                                \
+			case csEncryptedUnderstood:      \
+			case csEncryptedUnknown:         \
+			{                                \
 				CLIENTENCRYPTSEND(ToClient); \
-				break; \
-			} \
-			case csWaitingForEncryption: \
-			{ \
-				break; \
-			} \
-			\
-		} \
-		DebugSleep(50); \
-	} while (false)
+				break;                       \
+			}                                \
+			case csWaitingForEncryption:     \
+			{                                \
+				break;                       \
+			}                                \
+		}                                    \
+		DebugSleep(50);                      \
+	}                                        \
+	while (false)
 
-#define HANDLE_CLIENT_READ(Proc) \
-	do { \
-		if (!Proc) \
-		{ \
-			ContiguousByteBuffer Leftover; \
-			m_ClientBuffer.ReadAgain(Leftover); \
-			DataLog(Leftover.data(), Leftover.size(), "Leftover data after client packet parsing, %d bytes:", Leftover.size()); \
-			m_ClientBuffer.ResetRead(); \
-			return true; \
-		} \
-	} while (false)
+#define HANDLE_CLIENT_READ(Proc)                                        \
+	do                                                                  \
+	{                                                                   \
+		if (!Proc)                                                      \
+		{                                                               \
+			ContiguousByteBuffer Leftover;                              \
+			m_ClientBuffer.ReadAgain(Leftover);                         \
+			DataLog(                                                    \
+				Leftover.data(),                                        \
+				Leftover.size(),                                        \
+				"Leftover data after client packet parsing, %d bytes:", \
+				Leftover.size()                                         \
+			);                                                          \
+			m_ClientBuffer.ResetRead();                                 \
+			return true;                                                \
+		}                                                               \
+	}                                                                   \
+	while (false)
 
-#define HANDLE_SERVER_READ(Proc) \
-	do { \
-		if (!Proc) \
-		{ \
+#define HANDLE_SERVER_READ(Proc)        \
+	do                                  \
+	{                                   \
+		if (!Proc)                      \
+		{                               \
 			m_ServerBuffer.ResetRead(); \
-			return true; \
-		} \
-	} while (false)
+			return true;                \
+		}                               \
+	}                                   \
+	while (false)
 
 
 
@@ -153,8 +169,12 @@ AString PrintableAbsIntTriplet(int a_X, int a_Y, int a_Z, double a_Divisor)
 {
 	return fmt::format(
 		FMT_STRING("<{}, {}, {}> ~ {{{}, {}, {}}}"),
-		a_X, a_Y, a_Z,
-		static_cast<double>(a_X) / a_Divisor, static_cast<double>(a_Y) / a_Divisor, static_cast<double>(a_Z) / a_Divisor
+		a_X,
+		a_Y,
+		a_Z,
+		static_cast<double>(a_X) / a_Divisor,
+		static_cast<double>(a_Y) / a_Divisor,
+		static_cast<double>(a_Z) / a_Divisor
 	);
 }
 
@@ -166,8 +186,11 @@ struct sCoords
 {
 	int x, y, z;
 
-	sCoords(int a_X, int a_Y, int a_Z) : x(a_X), y(a_Y), z(a_Z) {}
-} ;
+	sCoords(int a_X, int a_Y, int a_Z) :
+		x(a_X), y(a_Y), z(a_Z)
+	{
+	}
+};
 
 
 
@@ -182,7 +205,7 @@ struct sChunkMeta
 		m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ), m_PrimaryBitmap(a_PrimaryBitmap), m_AddBitmap(a_AddBitmap)
 	{
 	}
-} ;
+};
 
 
 
@@ -208,21 +231,21 @@ cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 	m_ClientProtocolState(-1),
 	m_IsServerEncrypted(false)
 {
-	// Create the Logs subfolder, if not already created:
-	#if defined(_WIN32)
-		_mkdir("Logs");
-	#else
-		mkdir("Logs", 0777);
-	#endif
+// Create the Logs subfolder, if not already created:
+#if defined(_WIN32)
+	_mkdir("Logs");
+#else
+	mkdir("Logs", 0777);
+#endif
 
 	m_LogNameBase = fmt::format(FMT_STRING("Logs/Log_{}_{}"), time(nullptr), a_ClientSocket);
 	AString fnam(m_LogNameBase);
 	fnam.append(".log");
-	#ifdef _WIN32
-		fopen_s(&m_LogFile, fnam.c_str(), "w");
-	#else
-		m_LogFile = fopen(fnam.c_str(), "w");
-	#endif
+#ifdef _WIN32
+	fopen_s(&m_LogFile, fnam.c_str(), "w");
+#else
+	m_LogFile = fopen(fnam.c_str(), "w");
+#endif
 	Log("Log file created");
 	fmt::print(FMT_STRING("Connection is logged to file \"{}\"\n"), fnam);
 }
@@ -292,9 +315,9 @@ void cConnection::vLog(const char * a_Format, fmt::printf_args a_ArgList)
 	fmt::fprintf(m_LogFile, "[%5.3f] ", GetRelativeTime());
 	fmt::vfprintf(m_LogFile, a_Format, a_ArgList);
 	fmt::fprintf(m_LogFile, "\n");
-	#ifdef _DEBUG
-		fflush(m_LogFile);
-	#endif  // _DEBUG
+#ifdef _DEBUG
+	fflush(m_LogFile);
+#endif  // _DEBUG
 
 	// Log to screen:
 	// std::cout << FullMsg;
@@ -359,7 +382,8 @@ bool cConnection::ConnectToServer(void)
 bool cConnection::RelayFromServer(void)
 {
 	char Buffer[64 KiB];
-	int res = static_cast<int>(recv(m_ServerSocket, Buffer, sizeof(Buffer), 0));  // recv returns int on windows, ssize_t on linux
+	int res = static_cast<int>(recv(m_ServerSocket, Buffer, sizeof(Buffer), 0)
+	);  // recv returns int on windows, ssize_t on linux
 	if (res <= 0)
 	{
 		Log("Server closed the socket: %d; %d; aborting connection", res, SocketError);
@@ -385,7 +409,7 @@ bool cConnection::RelayFromServer(void)
 		{
 			m_ServerDecryptor.ProcessData(reinterpret_cast<std::byte *>(Buffer), static_cast<size_t>(res));
 			DataLog(Buffer, static_cast<size_t>(res), "Decrypted %d bytes from the SERVER", res);
-			return CLIENTSEND({ reinterpret_cast<const std::byte *>(Buffer), static_cast<size_t>(res) });
+			return CLIENTSEND({reinterpret_cast<const std::byte *>(Buffer), static_cast<size_t>(res)});
 		}
 	}
 	ASSERT(!"Unhandled server state while relaying from server");
@@ -399,7 +423,8 @@ bool cConnection::RelayFromServer(void)
 bool cConnection::RelayFromClient(void)
 {
 	char Buffer[64 KiB];
-	int res = static_cast<int>(recv(m_ClientSocket, Buffer, sizeof(Buffer), 0));  // recv returns int on Windows, ssize_t on Linux
+	int res = static_cast<int>(recv(m_ClientSocket, Buffer, sizeof(Buffer), 0)
+	);  // recv returns int on Windows, ssize_t on Linux
 	if (res <= 0)
 	{
 		Log("Client closed the socket: %d; %d; aborting connection", res, SocketError);
@@ -423,7 +448,7 @@ bool cConnection::RelayFromClient(void)
 		{
 			DataLog(Buffer, static_cast<size_t>(res), "Decrypted %d bytes from the CLIENT", res);
 			m_ServerEncryptor.ProcessData(reinterpret_cast<std::byte *>(Buffer), static_cast<size_t>(res));
-			return SERVERSEND({ reinterpret_cast<const std::byte *>(Buffer), static_cast<size_t>(res) });
+			return SERVERSEND({reinterpret_cast<const std::byte *>(Buffer), static_cast<size_t>(res)});
 		}
 	}
 	ASSERT(!"Unhandled server state while relaying from client");
@@ -436,7 +461,8 @@ bool cConnection::RelayFromClient(void)
 
 double cConnection::GetRelativeTime(void)
 {
-	Int64 msec = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_BeginTick).count();
+	Int64 msec =
+		std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_BeginTick).count();
 	return static_cast<double>(msec) / 1000;
 }
 
@@ -448,7 +474,9 @@ bool cConnection::SendData(SOCKET a_Socket, const ContiguousByteBufferView a_Dat
 {
 	DataLog(a_Data.data(), a_Data.size(), "Sending data to %s, %zu bytes", a_Peer, a_Data.size());
 
-	int res = static_cast<int>(send(a_Socket, reinterpret_cast<const char *>(a_Data.data()), a_Data.size(), 0));  // Windows uses int for a_Size, Linux uses size_t; but Windows doesn't complain. Return type is int on Windows and ssize_t on Linux
+	int res = static_cast<int>(send(a_Socket, reinterpret_cast<const char *>(a_Data.data()), a_Data.size(), 0)
+	);  // Windows uses int for a_Size, Linux uses size_t; but Windows doesn't complain. Return type is int on Windows
+		// and ssize_t on Linux
 	if (res <= 0)
 	{
 		Log("%s closed the socket: %d, %d; aborting connection", a_Peer, res, SocketError);
@@ -473,7 +501,12 @@ bool cConnection::SendData(SOCKET a_Socket, cByteBuffer & a_Data, const char * a
 
 
 
-bool cConnection::SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, ContiguousByteBuffer & a_Data, const char * a_Peer)
+bool cConnection::SendEncryptedData(
+	SOCKET a_Socket,
+	cAesCfb128Encryptor & a_Encryptor,
+	ContiguousByteBuffer & a_Data,
+	const char * a_Peer
+)
 {
 	DataLog(a_Data.data(), a_Data.size(), "Encrypting %zu bytes to %s", a_Data.size(), a_Peer);
 
@@ -485,7 +518,12 @@ bool cConnection::SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Enc
 
 
 
-bool cConnection::SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer)
+bool cConnection::SendEncryptedData(
+	SOCKET a_Socket,
+	cAesCfb128Encryptor & a_Encryptor,
+	cByteBuffer & a_Data,
+	const char * a_Peer
+)
 {
 	ContiguousByteBuffer All;
 	a_Data.ReadAll(All);
@@ -508,10 +546,7 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 	while (m_ClientBuffer.CanReadBytes(1))
 	{
 		UInt32 PacketLen;
-		if (
-			!m_ClientBuffer.ReadVarInt(PacketLen) ||
-			!m_ClientBuffer.CanReadBytes(PacketLen)
-		)
+		if (!m_ClientBuffer.ReadVarInt(PacketLen) || !m_ClientBuffer.CanReadBytes(PacketLen))
 		{
 			// Not a complete packet yet
 			break;
@@ -521,8 +556,9 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 		VERIFY(m_ClientBuffer.ReadVarInt(PacketType));
 		PacketReadSoFar -= m_ClientBuffer.GetReadableSpace();
 		Log("Decoding client's packets, there are now %u bytes in the queue; next packet is 0x%02x, %u bytes long",
-			static_cast<unsigned>(m_ClientBuffer.GetReadableSpace()), PacketType, PacketLen
-		);
+			static_cast<unsigned>(m_ClientBuffer.GetReadableSpace()),
+			PacketType,
+			PacketLen);
 		switch (m_ClientProtocolState)
 		{
 			case -1:
@@ -531,7 +567,9 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 				switch (PacketType)
 				{
 					case 0x00: HANDLE_CLIENT_READ(HandleClientHandshake()); break;
-					default:   HANDLE_CLIENT_READ(HandleClientUnknownPacket(PacketType, PacketLen, PacketReadSoFar)); break;
+					default:
+						HANDLE_CLIENT_READ(HandleClientUnknownPacket(PacketType, PacketLen, PacketReadSoFar));
+						break;
 				}
 				break;
 			}  // case -1
@@ -543,7 +581,9 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 				{
 					case 0x00: HANDLE_CLIENT_READ(HandleClientStatusRequest()); break;
 					case 0x01: HANDLE_CLIENT_READ(HandleClientStatusPing()); break;
-					default:   HANDLE_CLIENT_READ(HandleClientUnknownPacket(PacketType, PacketLen, PacketReadSoFar)); break;
+					default:
+						HANDLE_CLIENT_READ(HandleClientUnknownPacket(PacketType, PacketLen, PacketReadSoFar));
+						break;
 				}
 				break;
 			}
@@ -555,7 +595,9 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 				{
 					case 0x00: HANDLE_CLIENT_READ(HandleClientLoginStart()); break;
 					case 0x01: HANDLE_CLIENT_READ(HandleClientLoginEncryptionKeyResponse()); break;
-					default:   HANDLE_CLIENT_READ(HandleClientUnknownPacket(PacketType, PacketLen, PacketReadSoFar)); break;
+					default:
+						HANDLE_CLIENT_READ(HandleClientUnknownPacket(PacketType, PacketLen, PacketReadSoFar));
+						break;
 				}
 				break;
 			}
@@ -586,7 +628,9 @@ bool cConnection::DecodeClientsPackets(const char * a_Data, int a_Size)
 					case 0x15: HANDLE_CLIENT_READ(HandleClientLocaleAndView()); break;
 					case 0x16: HANDLE_CLIENT_READ(HandleClientClientStatuses()); break;
 					case 0x17: HANDLE_CLIENT_READ(HandleClientPluginMessage()); break;
-					default:   HANDLE_CLIENT_READ(HandleClientUnknownPacket(PacketType, PacketLen, PacketReadSoFar)); break;
+					default:
+						HANDLE_CLIENT_READ(HandleClientUnknownPacket(PacketType, PacketLen, PacketReadSoFar));
+						break;
 				}
 				break;
 			}  // case 3 - Game
@@ -615,10 +659,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 		return false;
 	}
 
-	if (
-		(m_ServerState == csEncryptedUnderstood) &&
-		(m_ClientState == csUnencrypted)
-	)
+	if ((m_ServerState == csEncryptedUnderstood) && (m_ClientState == csUnencrypted))
 	{
 		// Client hasn't finished encryption handshake yet, don't send them any data yet
 	}
@@ -626,10 +667,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 	while (true)
 	{
 		UInt32 PacketLen;
-		if (
-			!m_ServerBuffer.ReadVarInt(PacketLen) ||
-			!m_ServerBuffer.CanReadBytes(PacketLen)
-		)
+		if (!m_ServerBuffer.ReadVarInt(PacketLen) || !m_ServerBuffer.CanReadBytes(PacketLen))
 		{
 			// Not a complete packet yet
 			m_ServerBuffer.ResetRead();
@@ -648,7 +686,10 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 		PacketReadSoFar = static_cast<UInt32>(m_ServerBuffer.GetReadableSpace());
 		VERIFY(m_ServerBuffer.ReadVarInt(PacketType));
 		PacketReadSoFar -= m_ServerBuffer.GetReadableSpace();
-		Log("Decoding server's packets, there are now %d bytes in the queue; next packet is 0x%0x, %u bytes long", m_ServerBuffer.GetReadableSpace(), PacketType, PacketLen);
+		Log("Decoding server's packets, there are now %d bytes in the queue; next packet is 0x%0x, %u bytes long",
+			m_ServerBuffer.GetReadableSpace(),
+			PacketType,
+			PacketLen);
 		LogFlush();
 		switch (m_ServerProtocolState)
 		{
@@ -665,8 +706,10 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 				switch (PacketType)
 				{
 					case 0x00: HANDLE_SERVER_READ(HandleServerStatusResponse()); break;
-					case 0x01: HANDLE_SERVER_READ(HandleServerStatusPing());     break;
-					default:   HANDLE_SERVER_READ(HandleServerUnknownPacket(PacketType, PacketLen, PacketReadSoFar)); break;
+					case 0x01: HANDLE_SERVER_READ(HandleServerStatusPing()); break;
+					default:
+						HANDLE_SERVER_READ(HandleServerUnknownPacket(PacketType, PacketLen, PacketReadSoFar));
+						break;
 				}
 				break;
 			}
@@ -679,7 +722,9 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 					case 0x00: HANDLE_SERVER_READ(HandleServerLoginDisconnect()); break;
 					case 0x01: HANDLE_SERVER_READ(HandleServerLoginEncryptionKeyRequest()); break;
 					case 0x02: HANDLE_SERVER_READ(HandleServerLoginSuccess()); break;
-					default:   HANDLE_SERVER_READ(HandleServerUnknownPacket(PacketType, PacketLen, PacketReadSoFar)); break;
+					default:
+						HANDLE_SERVER_READ(HandleServerUnknownPacket(PacketType, PacketLen, PacketReadSoFar));
+						break;
 				}
 				break;
 			}
@@ -741,7 +786,9 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 					case 0x3a: HANDLE_SERVER_READ(HandleServerTabCompletion()); break;
 					case 0x3f: HANDLE_SERVER_READ(HandleServerPluginMessage()); break;
 					case 0x40: HANDLE_SERVER_READ(HandleServerKick()); break;
-					default:   HANDLE_SERVER_READ(HandleServerUnknownPacket(PacketType, PacketLen, PacketReadSoFar)); break;
+					default:
+						HANDLE_SERVER_READ(HandleServerUnknownPacket(PacketType, PacketLen, PacketReadSoFar));
+						break;
 				}  // switch (PacketType)
 				break;
 			}  // case 3 - Game
@@ -770,10 +817,10 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 bool cConnection::HandleClientHandshake(void)
 {
 	// Read the packet from the client:
-	HANDLE_CLIENT_PACKET_READ(ReadVarInt,        UInt32,  ProtocolVersion);
+	HANDLE_CLIENT_PACKET_READ(ReadVarInt, UInt32, ProtocolVersion);
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, ServerHost);
-	HANDLE_CLIENT_PACKET_READ(ReadBEUInt16,      UInt16,  ServerPort);
-	HANDLE_CLIENT_PACKET_READ(ReadVarInt,        UInt32,  NextState);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt16, UInt16, ServerPort);
+	HANDLE_CLIENT_PACKET_READ(ReadVarInt, UInt32, NextState);
 	m_ClientBuffer.CommitRead();
 
 	Log("Received an initial handshake packet from the client:");
@@ -838,7 +885,7 @@ bool cConnection::HandleClientLoginStart(void)
 bool cConnection::HandleClientAnimation(void)
 {
 	HANDLE_CLIENT_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt8,   Int8,   Animation);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt8, Int8, Animation);
 	Log("Received a PACKET_ANIMATION from the client:");
 	Log("  EntityID: %u", EntityID);
 	Log("  Animation: %d", Animation);
@@ -987,11 +1034,11 @@ bool cConnection::HandleClientKeepAlive(void)
 bool cConnection::HandleClientLocaleAndView(void)
 {
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Locale);
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt8,        Int8,    ViewDistance);
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt8,        Int8,    ChatFlags);
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt8,        Int8,    Unused);
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt8,        Int8,    Difficulty);
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt8,        Int8,    ShowCape);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt8, Int8, ViewDistance);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt8, Int8, ChatFlags);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt8, Int8, Unused);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt8, Int8, Difficulty);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt8, Int8, ShowCape);
 	Log("Received a PACKET_LOCALE_AND_VIEW from the client");
 	COPY_TO_SERVER();
 	return true;
@@ -1063,7 +1110,7 @@ bool cConnection::HandleClientPlayerPosition(void)
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosY);
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, Stance);
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosZ);
-	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8,  UInt8,  IsOnGround);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, IsOnGround);
 	Log("Received a PACKET_PLAYER_POSITION from the client");
 
 	// TODO: list packet contents
@@ -1082,9 +1129,9 @@ bool cConnection::HandleClientPlayerPositionLook(void)
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosY);
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, Stance);
 	HANDLE_CLIENT_PACKET_READ(ReadBEDouble, double, PosZ);
-	HANDLE_CLIENT_PACKET_READ(ReadBEFloat,  float,  Yaw);
-	HANDLE_CLIENT_PACKET_READ(ReadBEFloat,  float,  Pitch);
-	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8,  UInt8,  IsOnGround);
+	HANDLE_CLIENT_PACKET_READ(ReadBEFloat, float, Yaw);
+	HANDLE_CLIENT_PACKET_READ(ReadBEFloat, float, Pitch);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, IsOnGround);
 	Log("Received a PACKET_PLAYER_POSITION_LOOK from the client");
 	Log("  Pos = {%.03f, %.03f, %.03f}", PosX, PosY, PosZ);
 	Log("  Stance = %.03f", Stance);
@@ -1102,7 +1149,7 @@ bool cConnection::HandleClientPlayerPositionLook(void)
 bool cConnection::HandleClientPluginMessage(void)
 {
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, ChannelName);
-	HANDLE_CLIENT_PACKET_READ(ReadBEUInt16,      UInt16,  Length);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt16, UInt16, Length);
 	ContiguousByteBuffer Data;
 	if (!m_ClientBuffer.ReadSome(Data, Length))
 	{
@@ -1171,9 +1218,9 @@ bool cConnection::HandleClientTabCompletion(void)
 
 bool cConnection::HandleClientUpdateSign(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt32,       Int32,   BlockX);
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt16,       Int16,   BlockY);
-	HANDLE_CLIENT_PACKET_READ(ReadBEInt32,       Int32,   BlockZ);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt32, Int32, BlockX);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt16, Int16, BlockY);
+	HANDLE_CLIENT_PACKET_READ(ReadBEInt32, Int32, BlockZ);
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Line1);
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Line2);
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, Line3);
@@ -1192,7 +1239,7 @@ bool cConnection::HandleClientUpdateSign(void)
 bool cConnection::HandleClientUseEntity(void)
 {
 	HANDLE_CLIENT_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
-	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8,  UInt8,  MouseButton);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, MouseButton);
 	Log("Received a PACKET_USE_ENTITY from the client:");
 	Log("  EntityID = %d", EntityID);
 	Log("  MouseButton = %u", MouseButton);
@@ -1206,11 +1253,11 @@ bool cConnection::HandleClientUseEntity(void)
 
 bool cConnection::HandleClientWindowClick(void)
 {
-	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8,  UInt8,  WindowID);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, WindowID);
 	HANDLE_CLIENT_PACKET_READ(ReadBEUInt16, UInt16, SlotNum);
-	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8,  UInt8,  Button);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, Button);
 	HANDLE_CLIENT_PACKET_READ(ReadBEUInt16, UInt16, TransactionID);
-	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8,  UInt8,  Mode);
+	HANDLE_CLIENT_PACKET_READ(ReadBEUInt8, UInt8, Mode);
 	AString Item;
 	if (!ParseSlot(m_ClientBuffer, Item))
 	{
@@ -1250,7 +1297,12 @@ bool cConnection::HandleClientUnknownPacket(UInt32 a_PacketType, UInt32 a_Packet
 	{
 		return false;
 	}
-	DataLog(Data.data(), Data.size(), "****************** Unknown packet 0x%x from the client; relaying and ignoring", a_PacketType);
+	DataLog(
+		Data.data(),
+		Data.size(),
+		"****************** Unknown packet 0x%x from the client; relaying and ignoring",
+		a_PacketType
+	);
 	COPY_TO_SERVER();
 	return true;
 }
@@ -1279,7 +1331,7 @@ bool cConnection::HandleServerLoginEncryptionKeyRequest(void)
 {
 	// Read the packet from the server:
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, ServerID);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt16,      UInt16,  PublicKeyLength);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, PublicKeyLength);
 	ContiguousByteBuffer PublicKey;
 	if (!m_ServerBuffer.ReadSome(PublicKey, PublicKeyLength))
 	{
@@ -1296,7 +1348,10 @@ bool cConnection::HandleServerLoginEncryptionKeyRequest(void)
 	DataLog(PublicKey.data(), PublicKey.size(), "  Public key (%u bytes)", static_cast<unsigned>(PublicKey.size()));
 
 	// Reply to the server:
-	SendEncryptionKeyResponse({ reinterpret_cast<const char *>(PublicKey.data()), PublicKey.size() }, { reinterpret_cast<const char *>(Nonce.data()), Nonce.size() });
+	SendEncryptionKeyResponse(
+		{reinterpret_cast<const char *>(PublicKey.data()), PublicKey.size()},
+		{reinterpret_cast<const char *>(Nonce.data()), Nonce.size()}
+	);
 
 	// Do not send to client - we want the client connection open
 	return true;
@@ -1321,7 +1376,12 @@ bool cConnection::HandleServerLoginSuccess(void)
 	{
 		Log("Server communication is now encrypted");
 		m_ServerState = csEncryptedUnderstood;
-		DataLog(m_ServerEncryptionBuffer.data(), m_ServerEncryptionBuffer.size(), "Sending the queued data to server (%u bytes):", m_ServerEncryptionBuffer.size());
+		DataLog(
+			m_ServerEncryptionBuffer.data(),
+			m_ServerEncryptionBuffer.size(),
+			"Sending the queued data to server (%u bytes):",
+			m_ServerEncryptionBuffer.size()
+		);
 		SERVERENCRYPTSEND(m_ServerEncryptionBuffer);
 		m_ServerEncryptionBuffer.clear();
 	}
@@ -1340,9 +1400,9 @@ bool cConnection::HandleServerLoginSuccess(void)
 
 bool cConnection::HandleServerAttachEntity(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32,  EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32,  VehicleID);
-	HANDLE_SERVER_PACKET_READ(ReadBool,     bool,    IsOnLeash);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, VehicleID);
+	HANDLE_SERVER_PACKET_READ(ReadBool, bool, IsOnLeash);
 	Log("Received a PACKET_ATTACH_ENTITY from the server:");
 	Log("  EntityID = %u (0x%x)", EntityID, EntityID);
 	Log("  VehicleID = %u (0x%x)", VehicleID, VehicleID);
@@ -1357,12 +1417,12 @@ bool cConnection::HandleServerAttachEntity(void)
 
 bool cConnection::HandleServerBlockAction(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32,  BlockX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16,  BlockY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32,  BlockZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,  Byte1);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,  Byte2);
-	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, BlockID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, BlockX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, BlockY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Byte1);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Byte2);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt, UInt32, BlockID);
 	Log("Received a PACKET_BLOCK_ACTION from the server:");
 	Log("  Pos = {%d, %d, %d}", BlockX, BlockY, BlockZ);
 	Log("  Bytes = (%u, %u) == (0x%x, 0x%x)", Byte1, Byte2, Byte1, Byte2);
@@ -1377,11 +1437,11 @@ bool cConnection::HandleServerBlockAction(void)
 
 bool cConnection::HandleServerBlockChange(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32,  BlockX);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,  BlockY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32,  BlockZ);
-	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, BlockType);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,  BlockMeta);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, BlockX);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, BlockY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt, UInt32, BlockType);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, BlockMeta);
 	Log("Received a PACKET_BLOCK_CHANGE from the server");
 	Log("  Pos = {%d, %u, %d}", BlockX, BlockY, BlockZ);
 	Log("  BlockType = %u (0x%x", BlockType, BlockType);
@@ -1396,7 +1456,7 @@ bool cConnection::HandleServerBlockChange(void)
 
 bool cConnection::HandleServerChangeGameState(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,  Reason);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Reason);
 	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, Data);
 	Log("Received a PACKET_CHANGE_GAME_STATE from the server:");
 	Log("  Reason = %u", Reason);
@@ -1506,7 +1566,7 @@ bool cConnection::HandleServerEntityEquipment(void)
 bool cConnection::HandleServerEntityHeadLook(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  HeadYaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, HeadYaw);
 	Log("Received a PACKET_ENTITY_HEAD_LOOK from the server:");
 	Log("  EntityID = %u", EntityID);
 	Log("  HeadYaw = %u", HeadYaw);
@@ -1520,9 +1580,9 @@ bool cConnection::HandleServerEntityHeadLook(void)
 
 bool cConnection::HandleServerEntityLook(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32,  EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,   Yaw);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,   Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Pitch);
 	Log("Received a PACKET_ENTITY_LOOK from the server:");
 	Log("  EntityID = %u", EntityID);
 	Log("  Yaw = %u", Yaw);
@@ -1569,15 +1629,15 @@ bool cConnection::HandleServerEntityProperties(void)
 	for (UInt32 i = 0; i < Count; i++)
 	{
 		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Key);
-		HANDLE_SERVER_PACKET_READ(ReadBEDouble,      double,  Value);
-		HANDLE_SERVER_PACKET_READ(ReadBEUInt16,      UInt16, ListLength);
+		HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, Value);
+		HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, ListLength);
 		Log(" \"%s\" = %f; %u modifiers", Key.c_str(), Value, ListLength);
 		for (UInt16 j = 0; j < ListLength; j++)
 		{
 			HANDLE_SERVER_PACKET_READ(ReadBEUInt64, UInt64, UUIDHi);
 			HANDLE_SERVER_PACKET_READ(ReadBEUInt64, UInt64, UUIDLo);
 			HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, DblVal);
-			HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  ByteVal);
+			HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, ByteVal);
 			Log("  [%d] = {0x%08llx%08llx, %f, %u}", j, UUIDHi, UUIDLo, DblVal, ByteVal);
 		}
 	}  // for i
@@ -1592,9 +1652,9 @@ bool cConnection::HandleServerEntityProperties(void)
 bool cConnection::HandleServerEntityRelativeMove(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt8,   Int8,   dx);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt8,   Int8,   dy);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt8,   Int8,   dz);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt8, Int8, dx);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt8, Int8, dy);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt8, Int8, dz);
 	Log("Received a PACKET_ENTITY_RELATIVE_MOVE from the server:");
 	Log("  EntityID = %u", EntityID);
 	Log("  RelMove = %s", PrintableAbsIntTriplet(dx, dy, dz).c_str());
@@ -1609,11 +1669,11 @@ bool cConnection::HandleServerEntityRelativeMove(void)
 bool cConnection::HandleServerEntityRelativeMoveLook(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt8,   Int8,   dx);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt8,   Int8,   dy);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt8,   Int8,   dz);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Yaw);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt8, Int8, dx);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt8, Int8, dy);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt8, Int8, dz);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Pitch);
 	Log("Received a PACKET_ENTITY_RELATIVE_MOVE_LOOK from the server:");
 	Log("  EntityID = %u", EntityID);
 	Log("  RelMove = %s", PrintableAbsIntTriplet(dx, dy, dz).c_str());
@@ -1630,7 +1690,7 @@ bool cConnection::HandleServerEntityRelativeMoveLook(void)
 bool cConnection::HandleServerEntityStatus(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Status);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Status);
 	Log("Received a PACKET_ENTITY_STATUS from the server:");
 	Log("  EntityID = %u", EntityID);
 	Log("  Status = %u (0x%02x)", Status, Status);
@@ -1644,12 +1704,12 @@ bool cConnection::HandleServerEntityStatus(void)
 
 bool cConnection::HandleServerEntityTeleport(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32,  EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,   AbsX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,   AbsY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,   AbsZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,   Yaw);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,   Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, AbsX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, AbsY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, AbsZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Pitch);
 	Log("Received a PACKET_ENTITY_TELEPORT from the server:");
 	Log("  EntityID = %u", EntityID);
 	Log("  Pos = %s", PrintableAbsIntTriplet(AbsX, AbsY, AbsZ).c_str());
@@ -1666,9 +1726,9 @@ bool cConnection::HandleServerEntityTeleport(void)
 bool cConnection::HandleServerEntityVelocity(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt16,  Int16,  VelocityX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt16,  Int16,  VelocityY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt16,  Int16,  VelocityZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, VelocityX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, VelocityY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, VelocityZ);
 	Log("Received a PACKET_ENTITY_VELOCITY from the server:");
 	Log("  EntityID = %u", EntityID);
 	Log("  Velocity = %s", PrintableAbsIntTriplet(VelocityX, VelocityY, VelocityZ, 8000).c_str());
@@ -1682,10 +1742,10 @@ bool cConnection::HandleServerEntityVelocity(void)
 
 bool cConnection::HandleServerExplosion(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEFloat,  float,  PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEFloat,  float,  PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEFloat,  float,  PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEFloat,  float,  Force);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, Force);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, NumRecords);
 	std::vector<sCoords> Records;
 	Records.reserve(NumRecords);
@@ -1721,7 +1781,7 @@ bool cConnection::HandleServerIncrementStatistic(void)
 {
 	// 0xc8
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, StatisticID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  Amount);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, Amount);
 	Log("Received a PACKET_INCREMENT_STATISTIC from the server:");
 	Log("  StatisticID = %u (0x%x)", StatisticID, StatisticID);
 	Log("  Amount = %d", Amount);
@@ -1735,18 +1795,18 @@ bool cConnection::HandleServerIncrementStatistic(void)
 
 bool cConnection::HandleServerJoinGame(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt32,      UInt32,  EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   GameMode);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   Dimension);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   Difficulty);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   MaxPlayers);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, GameMode);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Dimension);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Difficulty);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, MaxPlayers);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, LevelType);
 	Log("Received a PACKET_LOGIN from the server:");
-	Log("  EntityID = %u",      EntityID);
-	Log("  GameMode = %u",      GameMode);
-	Log("  Dimension = %u",     Dimension);
-	Log("  Difficulty = %u",    Difficulty);
-	Log("  MaxPlayers = %u",    MaxPlayers);
+	Log("  EntityID = %u", EntityID);
+	Log("  GameMode = %u", GameMode);
+	Log("  Dimension = %u", Dimension);
+	Log("  Difficulty = %u", Difficulty);
+	Log("  MaxPlayers = %u", MaxPlayers);
 	Log("  LevelType = \"%s\"", LevelType.c_str());
 	COPY_TO_CLIENT();
 	return true;
@@ -1819,8 +1879,8 @@ bool cConnection::HandleServerKick(void)
 			AString PacketStart("\xff");
 			PacketStart.push_back(static_cast<char>(ReasonBE16.size() / 256));
 			PacketStart.push_back(static_cast<char>(ReasonBE16.size() % 256));
-			CLIENTSEND({ reinterpret_cast<const std::byte *>(PacketStart.data()), PacketStart.size() });
-			CLIENTSEND({ reinterpret_cast<const std::byte *>(ReasonBE16.data()), ReasonBE16.size() * sizeof(char16_t) });
+			CLIENTSEND({reinterpret_cast<const std::byte *>(PacketStart.data()), PacketStart.size()});
+			CLIENTSEND({reinterpret_cast<const std::byte *>(ReasonBE16.data()), ReasonBE16.size() * sizeof(char16_t)});
 			return true;
 		}
 		else
@@ -1842,9 +1902,9 @@ bool cConnection::HandleServerKick(void)
 
 bool cConnection::HandleServerMapChunk(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  ChunkX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  ChunkZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  IsContiguous);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, ChunkX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, ChunkZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, IsContiguous);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, PrimaryBitmap);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, AdditionalBitmap);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, CompressedSize);
@@ -1871,7 +1931,7 @@ bool cConnection::HandleServerMapChunkBulk(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, ChunkCount);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, CompressedSize);
-	HANDLE_SERVER_PACKET_READ(ReadBool,     bool,   IsSkyLightSent);
+	HANDLE_SERVER_PACKET_READ(ReadBool, bool, IsSkyLightSent);
 	ContiguousByteBuffer CompressedData;
 	if (!m_ServerBuffer.ReadSome(CompressedData, CompressedSize))
 	{
@@ -1902,8 +1962,11 @@ bool cConnection::HandleServerMapChunkBulk(void)
 	for (sChunkMetas::iterator itr = ChunkMetas.begin(), end = ChunkMetas.end(); itr != end; ++itr, ++idx)
 	{
 		Log("  [%d]: [%d, %d], primary bitmap 0x%02x, add bitmap 0x%02x",
-			idx, itr->m_ChunkX, itr->m_ChunkZ, itr->m_PrimaryBitmap, itr->m_AddBitmap
-		);
+			idx,
+			itr->m_ChunkX,
+			itr->m_ChunkZ,
+			itr->m_PrimaryBitmap,
+			itr->m_AddBitmap);
 	}  // for itr - ChunkMetas[]
 
 	// TODO: Save the compressed data into a file for later analysis
@@ -1918,8 +1981,8 @@ bool cConnection::HandleServerMapChunkBulk(void)
 
 bool cConnection::HandleServerMultiBlockChange(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  ChunkX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  ChunkZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, ChunkX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, ChunkZ);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, NumBlocks);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, DataSize);
 	ContiguousByteBuffer BlockChangeData;
@@ -1941,11 +2004,11 @@ bool cConnection::HandleServerMultiBlockChange(void)
 bool cConnection::HandleServerNamedSoundEffect(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, SoundName);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEFloat,       float,   Volume);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, Volume);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Pitch);
 	Log("Received a PACKET_NAMED_SOUND_EFFECT from the server:");
 	Log("  SoundName = \"%s\"", SoundName.c_str());
 	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ, 8).c_str());
@@ -1978,8 +2041,8 @@ bool cConnection::HandleServerPlayerAbilities(void)
 
 bool cConnection::HandleServerPlayerAnimation(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, PlayerID);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,  AnimationID);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt, UInt32, PlayerID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, AnimationID);
 	Log("Received a PACKET_PLAYER_ANIMATION from the server:");
 	Log("  PlayerID: %u (0x%x)", PlayerID, PlayerID);
 	Log("  Animation: %u", AnimationID);
@@ -1994,8 +2057,8 @@ bool cConnection::HandleServerPlayerAnimation(void)
 bool cConnection::HandleServerPlayerListItem(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, PlayerName);
-	HANDLE_SERVER_PACKET_READ(ReadBool,          bool,    IsOnline);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt16,      UInt16,  Ping);
+	HANDLE_SERVER_PACKET_READ(ReadBool, bool, IsOnline);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, Ping);
 	Log("Received a PACKET_PLAYERLIST_ITEM from the server:");
 	Log("  PlayerName = \"%s\" (%s)", PlayerName.c_str(), IsOnline ? "online" : "offline");
 	Log("  Ping = %d", Ping);
@@ -2012,9 +2075,9 @@ bool cConnection::HandleServerPlayerPositionLook(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosX);
 	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosY);
 	HANDLE_SERVER_PACKET_READ(ReadBEDouble, double, PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEFloat,  float,  Yaw);
-	HANDLE_SERVER_PACKET_READ(ReadBEFloat,  float,  Pitch);
-	HANDLE_SERVER_PACKET_READ(ReadBool,     bool,   IsOnGround);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBool, bool, IsOnGround);
 	Log("Received a PACKET_PLAYER_POSITION_LOOK from the server");
 
 	// TODO: list packet contents
@@ -2030,7 +2093,7 @@ bool cConnection::HandleServerPlayerPositionLook(void)
 bool cConnection::HandleServerPluginMessage(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, ChannelName);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt16,      UInt16,  Length);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, Length);
 	ContiguousByteBuffer Data;
 	if (!m_ServerBuffer.ReadSome(Data, Length))
 	{
@@ -2049,9 +2112,9 @@ bool cConnection::HandleServerPluginMessage(void)
 
 bool cConnection::HandleServerRespawn(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,     Dimension);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,    Difficulty);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,    GameMode);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, Dimension);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Difficulty);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, GameMode);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, LevelType);
 	Log("Received a respawn packet from the server:");
 	Log("  Dimension = %d", Dimension);
@@ -2068,7 +2131,7 @@ bool cConnection::HandleServerRespawn(void)
 
 bool cConnection::HandleServerSetExperience(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEFloat,  float,  ExperienceBar);
+	HANDLE_SERVER_PACKET_READ(ReadBEFloat, float, ExperienceBar);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, Level);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, TotalExperience);
 	Log("Received a PACKET_SET_EXPERIENCE from the server:");
@@ -2085,7 +2148,7 @@ bool cConnection::HandleServerSetExperience(void)
 
 bool cConnection::HandleServerSetSlot(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  WindowID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, WindowID);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, SlotNum);
 	AString Item;
 	if (!ParseSlot(m_ServerBuffer, Item))
@@ -2124,7 +2187,7 @@ bool cConnection::HandleServerSoundEffect(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, PosY);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosZ);
 	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, Data);
-	HANDLE_SERVER_PACKET_READ(ReadBool,    bool,  NoVolumeDecrease);
+	HANDLE_SERVER_PACKET_READ(ReadBool, bool, NoVolumeDecrease);
 	Log("Received a PACKET_SOUND_EFFECT from the server:");
 	Log("  EffectID = %d", EffectID);
 	Log("  Pos = {%d, %d, %d}", PosX, PosY, PosZ);
@@ -2140,10 +2203,10 @@ bool cConnection::HandleServerSoundEffect(void)
 
 bool cConnection::HandleServerSpawnExperienceOrbs(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadVarInt,   UInt32, EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt, UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosZ);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, Count);
 	Log("Received a SPAWN_EXPERIENCE_ORBS packet from the server:");
 	Log("  EntityID = %u (0x%x)", EntityID, EntityID);
@@ -2159,17 +2222,17 @@ bool cConnection::HandleServerSpawnExperienceOrbs(void)
 
 bool cConnection::HandleServerSpawnMob(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadVarInt,  UInt32, EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,   MobType);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32,    PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32,    PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32,    PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,   Yaw);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,   Pitch);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8,   HeadYaw);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16,  VelocityX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16,  VelocityY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16,  VelocityZ);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt, UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, MobType);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, HeadYaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, VelocityX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, VelocityY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, VelocityZ);
 	AString Metadata;
 	if (!ParseMetadata(m_ServerBuffer, Metadata))
 	{
@@ -2200,9 +2263,7 @@ struct sSpawnData
 	AString m_Value;
 	AString m_Signature;
 	sSpawnData(const AString & a_Name, const AString & a_Value, const AString & a_Signature) :
-		m_Name(a_Name),
-		m_Value(a_Value),
-		m_Signature(a_Signature)
+		m_Name(a_Name), m_Value(a_Value), m_Signature(a_Signature)
 	{
 	}
 };
@@ -2215,10 +2276,10 @@ typedef std::vector<sSpawnData> sSpawnDatas;
 
 bool cConnection::HandleServerSpawnNamedEntity(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadVarInt,        UInt32,  EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt, UInt32, EntityID);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, EntityUUID);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, EntityName);
-	HANDLE_SERVER_PACKET_READ(ReadVarInt,        UInt32,  DataCount);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt, UInt32, DataCount);
 	sSpawnDatas Data;
 	for (UInt32 i = 0; i < DataCount; i++)
 	{
@@ -2227,11 +2288,11 @@ bool cConnection::HandleServerSpawnNamedEntity(void)
 		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Signature);
 		Data.push_back(sSpawnData(Name, Value, Signature));
 	}
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Yaw);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Pitch);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, SelectedItem);
 	AString Metadata;
 	if (!ParseMetadata(m_ServerBuffer, Metadata))
@@ -2248,8 +2309,9 @@ bool cConnection::HandleServerSpawnNamedEntity(void)
 	for (sSpawnDatas::const_iterator itr = Data.begin(), end = Data.end(); itr != end; ++itr)
 	{
 		Log("    Name = \"%s\", Value = \"%s\", Signature = \"%s\"",
-			itr->m_Name.c_str(), itr->m_Value.c_str(), itr->m_Signature.c_str()
-		);
+			itr->m_Name.c_str(),
+			itr->m_Value.c_str(),
+			itr->m_Signature.c_str());
 	}  // for itr - Data[]
 	Log("  Pos = %s", PrintableAbsIntTriplet(PosX, PosY, PosZ).c_str());
 	Log("  Rotation = <yaw %u, pitch %u>", Yaw, Pitch);
@@ -2267,7 +2329,7 @@ bool cConnection::HandleServerSpawnNamedEntity(void)
 
 bool cConnection::HandleServerSpawnObjectVehicle(void)
 {
-	#ifdef _DEBUG
+#ifdef _DEBUG
 	// DEBUG:
 	// This packet is still troublesome when DataIndicator != 0
 	ContiguousByteBuffer Buffer;
@@ -2282,16 +2344,21 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 		// Only log up to 128 bytes
 		Buffer.erase(128, AString::npos);
 	}
-	DataLog(Buffer.data(), Buffer.size(), "Buffer while parsing the PACKET_SPAWN_OBJECT_VEHICLE packet (%u bytes):", static_cast<unsigned>(Buffer.size()));
-	#endif  // _DEBUG
+	DataLog(
+		Buffer.data(),
+		Buffer.size(),
+		"Buffer while parsing the PACKET_SPAWN_OBJECT_VEHICLE packet (%u bytes):",
+		static_cast<unsigned>(Buffer.size())
+	);
+#endif  // _DEBUG
 
-	HANDLE_SERVER_PACKET_READ(ReadVarInt,   UInt32, EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  ObjType);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Pitch);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Yaw);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt, UInt32, EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, ObjType);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Pitch);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Yaw);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, DataIndicator);
 	AString ExtraData;
 	Int16 VelocityX = 0;
@@ -2302,7 +2369,9 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 		HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, SpeedX);
 		HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, SpeedY);
 		HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, SpeedZ);
-		VelocityX = SpeedX; VelocityY = SpeedY; VelocityZ = SpeedZ;  // Speed vars are local to this scope, but we need them available later
+		VelocityX = SpeedX;
+		VelocityY = SpeedY;
+		VelocityZ = SpeedZ;  // Speed vars are local to this scope, but we need them available later
 		/*
 		// This doesn't seem to work - for a falling block I'm getting no extra data at all
 		int ExtraLen = 0;
@@ -2347,12 +2416,12 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 
 bool cConnection::HandleServerSpawnPainting(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadVarInt,        UInt32,  EntityID);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt, UInt32, EntityID);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, ImageName);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   PosX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   PosY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   PosZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   Direction);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, PosZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, Direction);
 	Log("Received a PACKET_SPAWN_PAINTING from the server:");
 	Log("  EntityID = %u", EntityID);
 	Log("  ImageName = \"%s\"", ImageName.c_str());
@@ -2399,7 +2468,7 @@ bool cConnection::HandleServerStatistics(void)
 	for (UInt32 i = 0; i < NumEntries; i++)
 	{
 		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, StatName);
-		HANDLE_SERVER_PACKET_READ(ReadVarInt,        UInt32,  StatValue);
+		HANDLE_SERVER_PACKET_READ(ReadVarInt, UInt32, StatValue);
 	}
 	COPY_TO_CLIENT();
 	return true;
@@ -2433,7 +2502,10 @@ bool cConnection::HandleServerStatusResponse(void)
 	size_t idx = Response.find(DescSearch);
 	if (idx != AString::npos)
 	{
-		Response.assign(Response.substr(0, idx + sizeof(DescSearch) - 1) + "ProtoProxy: " + Response.substr(idx + sizeof(DescSearch) - 1));
+		Response.assign(
+			Response.substr(0, idx + sizeof(DescSearch) - 1) +
+			"ProtoProxy: " + Response.substr(idx + sizeof(DescSearch) - 1)
+		);
 	}
 	else
 	{
@@ -2457,7 +2529,7 @@ bool cConnection::HandleServerStatusResponse(void)
 
 bool cConnection::HandleServerTabCompletion(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadVarInt,        UInt32,  NumResults);
+	HANDLE_SERVER_PACKET_READ(ReadVarInt, UInt32, NumResults);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Results);
 	Log("Received a PACKET_TAB_COMPLETION from the server, results given:");
 
@@ -2513,9 +2585,9 @@ bool cConnection::HandleServerUpdateHealth(void)
 
 bool cConnection::HandleServerUpdateSign(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   BlockX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt16,       Int16,   BlockY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,       Int32,   BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, BlockX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, BlockY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, BlockZ);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Line1);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Line2);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Line3);
@@ -2533,10 +2605,10 @@ bool cConnection::HandleServerUpdateSign(void)
 
 bool cConnection::HandleServerUpdateTileEntity(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  BlockX);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt16,  Int16,  BlockY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  BlockZ);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Action);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, BlockX);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt16, Int16, BlockY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, BlockZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, Action);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, DataLength);
 
 	ContiguousByteBuffer Data;
@@ -2570,9 +2642,9 @@ bool cConnection::HandleServerUpdateTileEntity(void)
 bool cConnection::HandleServerUseBed(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, EntityID);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  BedX);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  BedY);
-	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  BedZ);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, BedX);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, BedY);
+	HANDLE_SERVER_PACKET_READ(ReadBEInt32, Int32, BedZ);
 	Log("Received a use bed packet from the server:");
 	Log("  EntityID = %u", EntityID);
 	Log("  Bed = {%d, %u, %d}", BedX, BedY, BedZ);
@@ -2599,7 +2671,7 @@ bool cConnection::HandleServerWindowClose(void)
 
 bool cConnection::HandleServerWindowContents(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  WindowID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, WindowID);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, NumSlots);
 	Log("Received a PACKET_WINDOW_CONTENTS from the server:");
 	Log("  WindowID = %u", WindowID);
@@ -2625,11 +2697,11 @@ bool cConnection::HandleServerWindowContents(void)
 
 bool cConnection::HandleServerWindowOpen(void)
 {
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   WindowID);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   WindowType);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, WindowID);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, WindowType);
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Title);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   NumSlots);
-	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,       UInt8,   UseProvidedTitle);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, NumSlots);
+	HANDLE_SERVER_PACKET_READ(ReadBEUInt8, UInt8, UseProvidedTitle);
 	UInt32 HorseEntityID = 0;
 	if (WindowType == 11)  // Horse / Donkey / Mule
 	{
@@ -2661,7 +2733,12 @@ bool cConnection::HandleServerUnknownPacket(UInt32 a_PacketType, UInt32 a_Packet
 	{
 		return false;
 	}
-	DataLog(Data.data(), Data.size(), "****************** Unknown packet 0x%x from the server; relaying and ignoring", a_PacketType);
+	DataLog(
+		Data.data(),
+		Data.size(),
+		"****************** Unknown packet 0x%x from the server; relaying and ignoring",
+		a_PacketType
+	);
 	COPY_TO_CLIENT();
 	return true;
 }
@@ -2735,7 +2812,7 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 	while (x != 0x7f)
 	{
 		// int Index = static_cast<unsigned>(x) & 0x1f;  // Lower 5 bits = index
-		int Type  = static_cast<unsigned>(x) >> 5;    // Upper 3 bits = type
+		int Type = static_cast<unsigned>(x) >> 5;  // Upper 3 bits = type
 
 		// Get the length of the data for this item:
 		UInt32 Length = 0;
@@ -2758,7 +2835,7 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 				LenBuf.WriteVarInt32(Len);
 				ContiguousByteBuffer VarLen;
 				LenBuf.ReadAll(VarLen);
-				a_Metadata += { reinterpret_cast<const char *>(VarLen.data()), VarLen.size() };
+				a_Metadata += {reinterpret_cast<const char *>(VarLen.data()), VarLen.size()};
 				Length = Len;
 				break;
 			}
@@ -2791,7 +2868,7 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 		{
 			return false;
 		}
-		a_Metadata += { reinterpret_cast<const char *>(data.data()), data.size() };
+		a_Metadata += {reinterpret_cast<const char *>(data.data()), data.size()};
 		if (!a_Buffer.ReadBEUInt8(x))
 		{
 			return false;
@@ -2811,8 +2888,9 @@ void cConnection::LogMetadata(const AString & a_Metadata, size_t a_IndentCount)
 	size_t pos = 0;
 	while (a_Metadata[pos] != 0x7f)
 	{
-		unsigned Index = static_cast<unsigned>(static_cast<unsigned char>(a_Metadata[pos])) & 0x1f;  // Lower 5 bits = index
-		unsigned Type  = static_cast<unsigned>(static_cast<unsigned char>(a_Metadata[pos])) >> 5;    // Upper 3 bits = type
+		unsigned Index =
+			static_cast<unsigned>(static_cast<unsigned char>(a_Metadata[pos])) & 0x1f;  // Lower 5 bits = index
+		unsigned Type = static_cast<unsigned>(static_cast<unsigned char>(a_Metadata[pos])) >> 5;  // Upper 3 bits = type
 		// int Length = 0;
 		switch (Type)
 		{
@@ -2830,13 +2908,21 @@ void cConnection::LogMetadata(const AString & a_Metadata, size_t a_IndentCount)
 			}
 			case 2:
 			{
-				Log("%sint[%u] = %d", Indent.c_str(), Index, (a_Metadata[pos + 1] << 24) | (a_Metadata[pos + 2] << 16) | (a_Metadata[pos + 3] << 8) | a_Metadata[pos + 4]);
+				Log("%sint[%u] = %d",
+					Indent.c_str(),
+					Index,
+					(a_Metadata[pos + 1] << 24) | (a_Metadata[pos + 2] << 16) | (a_Metadata[pos + 3] << 8) |
+						a_Metadata[pos + 4]);
 				pos += 4;
 				break;
 			}
 			case 3:
 			{
-				Log("%sfloat[%u] = 0x%x", Indent.c_str(), Index, (a_Metadata[pos + 1] << 24) | (a_Metadata[pos + 2] << 16) | (a_Metadata[pos + 3] << 8) | a_Metadata[pos + 4]);
+				Log("%sfloat[%u] = 0x%x",
+					Indent.c_str(),
+					Index,
+					(a_Metadata[pos + 1] << 24) | (a_Metadata[pos + 2] << 16) | (a_Metadata[pos + 3] << 8) |
+						a_Metadata[pos + 4]);
 				pos += 4;
 				break;
 			}
@@ -2853,7 +2939,8 @@ void cConnection::LogMetadata(const AString & a_Metadata, size_t a_IndentCount)
 				size_t rs = bb.GetReadableSpace();
 				if (!bb.ReadVarInt(Length))
 				{
-					Log("Invalid metadata value, was supposed to be a varint-prefixed string, but cannot read the varint");
+					Log("Invalid metadata value, was supposed to be a varint-prefixed string, but cannot read the "
+						"varint");
 					break;
 				}
 				rs = rs - bb.GetReadableSpace();
@@ -2875,17 +2962,25 @@ void cConnection::LogMetadata(const AString & a_Metadata, size_t a_IndentCount)
 				// size_t After = bb.GetReadableSpace();
 				size_t BytesConsumed = BytesLeft - bb.GetReadableSpace();
 
-				Log("%sslot[%u] = %s (%u bytes)", Indent.c_str(), Index, ItemDesc.c_str(), static_cast<unsigned>(BytesConsumed));
+				Log("%sslot[%u] = %s (%u bytes)",
+					Indent.c_str(),
+					Index,
+					ItemDesc.c_str(),
+					static_cast<unsigned>(BytesConsumed));
 				pos += BytesConsumed;
 				break;
 			}
 			case 6:
 			{
-				Log("%spos[%u] = <%d, %d, %d>", Indent.c_str(), Index,
-					(a_Metadata[pos + 1] << 24) | (a_Metadata[pos + 2]  << 16) | (a_Metadata[pos + 3]  << 8) | a_Metadata[pos + 4],
-					(a_Metadata[pos + 5] << 24) | (a_Metadata[pos + 6]  << 16) | (a_Metadata[pos + 7]  << 8) | a_Metadata[pos + 8],
-					(a_Metadata[pos + 9] << 24) | (a_Metadata[pos + 10] << 16) | (a_Metadata[pos + 11] << 8) | a_Metadata[pos + 12]
-				);
+				Log("%spos[%u] = <%d, %d, %d>",
+					Indent.c_str(),
+					Index,
+					(a_Metadata[pos + 1] << 24) | (a_Metadata[pos + 2] << 16) | (a_Metadata[pos + 3] << 8) |
+						a_Metadata[pos + 4],
+					(a_Metadata[pos + 5] << 24) | (a_Metadata[pos + 6] << 16) | (a_Metadata[pos + 7] << 8) |
+						a_Metadata[pos + 8],
+					(a_Metadata[pos + 9] << 24) | (a_Metadata[pos + 10] << 16) | (a_Metadata[pos + 11] << 8) |
+						a_Metadata[pos + 12]);
 				pos += 12;
 				break;
 			}
@@ -2922,7 +3017,12 @@ void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, c
 
 	// Encrypt the nonce:
 	Byte EncryptedNonce[128];
-	res = PubKey.Encrypt(reinterpret_cast<const Byte *>(a_Nonce.data()), a_Nonce.size(), EncryptedNonce, sizeof(EncryptedNonce));
+	res = PubKey.Encrypt(
+		reinterpret_cast<const Byte *>(a_Nonce.data()),
+		a_Nonce.size(),
+		EncryptedNonce,
+		sizeof(EncryptedNonce)
+	);
 	if (res < 0)
 	{
 		Log("Nonce encryption failed: %d (0x%x)", res, res);
@@ -2937,8 +3037,18 @@ void cConnection::SendEncryptionKeyResponse(const AString & a_ServerPublicKey, c
 	ToServer.WriteBuf(EncryptedSecret, sizeof(EncryptedSecret));
 	ToServer.WriteBEUInt16(static_cast<UInt16>(sizeof(EncryptedNonce)));
 	ToServer.WriteBuf(EncryptedNonce, sizeof(EncryptedNonce));
-	DataLog(EncryptedSecret, sizeof(EncryptedSecret), "Encrypted secret (%u bytes)", static_cast<unsigned>(sizeof(EncryptedSecret)));
-	DataLog(EncryptedNonce,  sizeof(EncryptedNonce),  "Encrypted nonce (%u bytes)",  static_cast<unsigned>(sizeof(EncryptedNonce)));
+	DataLog(
+		EncryptedSecret,
+		sizeof(EncryptedSecret),
+		"Encrypted secret (%u bytes)",
+		static_cast<unsigned>(sizeof(EncryptedSecret))
+	);
+	DataLog(
+		EncryptedNonce,
+		sizeof(EncryptedNonce),
+		"Encrypted nonce (%u bytes)",
+		static_cast<unsigned>(sizeof(EncryptedNonce))
+	);
 	cByteBuffer Len(5);
 	Len.WriteVarInt32(static_cast<UInt32>(ToServer.GetReadableSpace()));
 	SERVERSEND(Len);

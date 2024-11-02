@@ -132,7 +132,3 @@ void RegionCache::queueRegionRender(int a_RegionX, int a_RegionZ, RegionPtr & a_
 
 	QThreadPool::globalInstance()->start(loader);
 }
-
-
-
-

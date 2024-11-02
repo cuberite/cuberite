@@ -11,8 +11,7 @@
 
 
 cSimulatorManager::cSimulatorManager(cWorld & a_World) :
-	m_World(a_World),
-	m_Ticks(0)
+	m_World(a_World), m_Ticks(0)
 {
 }
 
@@ -20,9 +19,7 @@ cSimulatorManager::cSimulatorManager(cWorld & a_World) :
 
 
 
-cSimulatorManager::~cSimulatorManager()
-{
-}
+cSimulatorManager::~cSimulatorManager() {}
 
 
 
@@ -117,31 +114,35 @@ void cSimulatorManager::WakeUp(const cCuboid & a_Area)
 	{
 		for (int cx = ChunkStart.m_ChunkX; cx <= ChunkEnd.m_ChunkX; ++cx)
 		{
-			m_World.DoWithChunk(cx, cz, [this, &area](cChunk & a_CBChunk)
-			{
-				int startX = std::max(area.p1.x, a_CBChunk.GetPosX() * cChunkDef::Width);
-				int startZ = std::max(area.p1.z, a_CBChunk.GetPosZ() * cChunkDef::Width);
-				int endX = std::min(area.p2.x, a_CBChunk.GetPosX() * cChunkDef::Width + cChunkDef::Width - 1);
-				int endZ = std::min(area.p2.z, a_CBChunk.GetPosZ() * cChunkDef::Width + cChunkDef::Width - 1);
-
-				for (const auto & Item : m_Simulators)
+			m_World.DoWithChunk(
+				cx,
+				cz,
+				[this, &area](cChunk & a_CBChunk)
 				{
-					const auto Simulator = Item.first;
+					int startX = std::max(area.p1.x, a_CBChunk.GetPosX() * cChunkDef::Width);
+					int startZ = std::max(area.p1.z, a_CBChunk.GetPosZ() * cChunkDef::Width);
+					int endX = std::min(area.p2.x, a_CBChunk.GetPosX() * cChunkDef::Width + cChunkDef::Width - 1);
+					int endZ = std::min(area.p2.z, a_CBChunk.GetPosZ() * cChunkDef::Width + cChunkDef::Width - 1);
 
-					for (int y = area.p1.y; y <= area.p2.y; ++y)
+					for (const auto & Item : m_Simulators)
 					{
-						for (int z = startZ; z <= endZ; ++z)
+						const auto Simulator = Item.first;
+
+						for (int y = area.p1.y; y <= area.p2.y; ++y)
 						{
-							for (int x = startX; x <= endX; ++x)
+							for (int z = startZ; z <= endZ; ++z)
 							{
-								const auto Position = cChunkDef::AbsoluteToRelative({ x, y, z });
-								Simulator->WakeUp(a_CBChunk, Position, a_CBChunk.GetBlock(Position));
-							}  // for x
-						}  // for z
-					}  // for y
+								for (int x = startX; x <= endX; ++x)
+								{
+									const auto Position = cChunkDef::AbsoluteToRelative({x, y, z});
+									Simulator->WakeUp(a_CBChunk, Position, a_CBChunk.GetBlock(Position));
+								}  // for x
+							}  // for z
+						}  // for y
+					}
+					return true;
 				}
-				return true;
-			});
+			);
 		}  // for cx
 	}  // for cz
 }

@@ -9,15 +9,12 @@
 
 
 
-class cBlockCobWebHandler final :
-	public cBlockHandler
+class cBlockCobWebHandler final : public cBlockHandler
 {
-public:
-
+  public:
 	using cBlockHandler::cBlockHandler;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Silk touch gives cobweb, anything else gives just string:
@@ -40,8 +37,4 @@ private:
 		UNUSED(a_Meta);
 		return 3;
 	}
-} ;
-
-
-
-
+};

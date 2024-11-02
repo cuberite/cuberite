@@ -8,9 +8,9 @@
 #include "Entities/Minecart.h"
 
 #ifdef __APPLE__
-	#define LUA_USE_MACOSX
+#define LUA_USE_MACOSX
 #else
-	#define LUA_USE_POSIX
+#define LUA_USE_POSIX
 #endif
 
 #include "PluginLua.h"
@@ -22,7 +22,7 @@
 
 extern "C"
 {
-	#include "lua/src/lauxlib.h"
+#include "lua/src/lauxlib.h"
 }
 
 #undef TOLUA_TEMPLATE_BIND
@@ -95,11 +95,11 @@ bool cPluginLua::Load(void)
 
 		// Add the plugin's folder to the package.path and package.cpath variables (#693):
 		m_LuaState.AddPackagePath("path", GetLocalFolder() + "/?.lua");
-		#ifdef _WIN32
-			m_LuaState.AddPackagePath("cpath", GetLocalFolder() + "\\?.dll");
-		#else
-			m_LuaState.AddPackagePath("cpath", GetLocalFolder() + "/?.so");
-		#endif
+#ifdef _WIN32
+		m_LuaState.AddPackagePath("cpath", GetLocalFolder() + "\\?.dll");
+#else
+		m_LuaState.AddPackagePath("cpath", GetLocalFolder() + "/?.so");
+#endif
 
 		tolua_pushusertype(m_LuaState, this, "cPluginLua");
 		lua_setglobal(m_LuaState, "g_Plugin");
@@ -164,7 +164,10 @@ bool cPluginLua::Load(void)
 	if (!m_LuaState.Call("Initialize", this, cLuaState::Return, res))
 	{
 		SetLoadError("Cannot call the Initialize() function.");
-		LOGWARNING("Error in plugin %s: Cannot call the Initialize() function. Plugin is temporarily disabled.", GetName().c_str());
+		LOGWARNING(
+			"Error in plugin %s: Cannot call the Initialize() function. Plugin is temporarily disabled.",
+			GetName().c_str()
+		);
 		Close();
 		return false;
 	}
@@ -230,20 +233,26 @@ bool cPluginLua::OnBlockSpread(cWorld & a_World, int a_BlockX, int a_BlockY, int
 bool cPluginLua::OnBlockToPickups(
 	cWorld & a_World,
 	Vector3i a_BlockPos,
-	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta,
 	const cBlockEntity * a_BlockEntity,
 	const cEntity * a_Digger,
 	const cItem * a_Tool,
 	cItems & a_Pickups
 )
 {
-	// TODO: Change the hook signature to reflect the real parameters to this function, once we are allowed to make breaking API changes
+	// TODO: Change the hook signature to reflect the real parameters to this function, once we are allowed to make
+	// breaking API changes
 	return CallSimpleHooks(
 		cPluginManager::HOOK_BLOCK_TO_PICKUPS,
 		&a_World,
 		a_Digger,
-		a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
-		a_BlockType, a_BlockMeta, &a_Pickups
+		a_BlockPos.x,
+		a_BlockPos.y,
+		a_BlockPos.z,
+		a_BlockType,
+		a_BlockMeta,
+		&a_Pickups
 	);
 }
 
@@ -278,7 +287,7 @@ bool cPluginLua::OnChat(cPlayer & a_Player, AString & a_Message)
 	}
 	bool res = false;
 	auto & hooks = m_HookMap[cPluginManager::HOOK_CHAT];
-	for (auto & hook: hooks)
+	for (auto & hook : hooks)
 	{
 		hook->Call(&a_Player, a_Message, cLuaState::Return, res, a_Message);
 		if (res)
@@ -365,9 +374,22 @@ bool cPluginLua::OnDisconnect(cClientHandle & a_Client, const AString & a_Reason
 
 
 
-bool cPluginLua::OnEntityAddEffect(cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier)
+bool cPluginLua::OnEntityAddEffect(
+	cEntity & a_Entity,
+	int a_EffectType,
+	int a_EffectDurationTicks,
+	int a_EffectIntensity,
+	double a_DistanceModifier
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_ENTITY_ADD_EFFECT, &a_Entity, a_EffectType, a_EffectDurationTicks, a_EffectIntensity, a_DistanceModifier);
+	return CallSimpleHooks(
+		cPluginManager::HOOK_ENTITY_ADD_EFFECT,
+		&a_Entity,
+		a_EffectType,
+		a_EffectDurationTicks,
+		a_EffectIntensity,
+		a_DistanceModifier
+	);
 }
 
 
@@ -392,7 +414,12 @@ bool cPluginLua::OnEntityChangedWorld(cEntity & a_Entity, cWorld & a_World)
 
 
 
-bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, cPluginManager::CommandResult & a_Result)
+bool cPluginLua::OnExecuteCommand(
+	cPlayer * a_Player,
+	const AStringVector & a_Split,
+	const AString & a_EntireCommand,
+	cPluginManager::CommandResult & a_Result
+)
 {
 	cOperation op(*this);
 	if (!op().IsValid())
@@ -401,7 +428,7 @@ bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Sp
 	}
 	bool res = false;
 	auto & hooks = m_HookMap[cPluginManager::HOOK_EXECUTE_COMMAND];
-	for (auto & hook: hooks)
+	for (auto & hook : hooks)
 	{
 		hook->Call(a_Player, a_Split, a_EntireCommand, cLuaState::Return, res, a_Result);
 		if (res)
@@ -416,7 +443,16 @@ bool cPluginLua::OnExecuteCommand(cPlayer * a_Player, const AStringVector & a_Sp
 
 
 
-bool cPluginLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData)
+bool cPluginLua::OnExploded(
+	cWorld & a_World,
+	double a_ExplosionSize,
+	bool a_CanCauseFire,
+	double a_X,
+	double a_Y,
+	double a_Z,
+	eExplosionSource a_Source,
+	void * a_SourceData
+)
 {
 	cOperation op(*this);
 	if (!op().IsValid())
@@ -425,20 +461,128 @@ bool cPluginLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a_Can
 	}
 	bool res = false;
 	auto & hooks = m_HookMap[cPluginManager::HOOK_EXPLODED];
-	for (auto & hook: hooks)
+	for (auto & hook : hooks)
 	{
 		switch (a_Source)
 		{
-			case esBed:           hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<Vector3i *>            (a_SourceData), cLuaState::Return, res); break;
-			case esEnderCrystal:  hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cEntity *>             (a_SourceData), cLuaState::Return, res); break;
-			case esGhastFireball: hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cGhastFireballEntity *>(a_SourceData), cLuaState::Return, res); break;
-			case esMonster:       hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
-			case esOther:         hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, cLuaState::Return, res); break;
-			case esPlugin:        hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, cLuaState::Return, res); break;
-			case esPrimedTNT:     hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res); break;
-			case esTNTMinecart:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMinecartWithTNT *>    (a_SourceData), cLuaState::Return, res); break;
-			case esWitherBirth:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
-			case esWitherSkull:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res); break;
+			case esBed:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<Vector3i *>(a_SourceData),
+					cLuaState::Return,
+					res
+				);
+				break;
+			case esEnderCrystal:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<cEntity *>(a_SourceData),
+					cLuaState::Return,
+					res
+				);
+				break;
+			case esGhastFireball:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<cGhastFireballEntity *>(a_SourceData),
+					cLuaState::Return,
+					res
+				);
+				break;
+			case esMonster:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<cMonster *>(a_SourceData),
+					cLuaState::Return,
+					res
+				);
+				break;
+			case esOther:
+				hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, cLuaState::Return, res);
+				break;
+			case esPlugin:
+				hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, cLuaState::Return, res);
+				break;
+			case esPrimedTNT:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<cTNTEntity *>(a_SourceData),
+					cLuaState::Return,
+					res
+				);
+				break;
+			case esTNTMinecart:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<cMinecartWithTNT *>(a_SourceData),
+					cLuaState::Return,
+					res
+				);
+				break;
+			case esWitherBirth:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<cMonster *>(a_SourceData),
+					cLuaState::Return,
+					res
+				);
+				break;
+			case esWitherSkull:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<cWitherSkullEntity *>(a_SourceData),
+					cLuaState::Return,
+					res
+				);
+				break;
 			case esMax:
 			{
 				ASSERT(!"Invalid explosion source");
@@ -457,7 +601,16 @@ bool cPluginLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a_Can
 
 
 
-bool cPluginLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData)
+bool cPluginLua::OnExploding(
+	cWorld & a_World,
+	double & a_ExplosionSize,
+	bool & a_CanCauseFire,
+	double a_X,
+	double a_Y,
+	double a_Z,
+	eExplosionSource a_Source,
+	void * a_SourceData
+)
 {
 	cOperation op(*this);
 	if (!op().IsValid())
@@ -466,20 +619,168 @@ bool cPluginLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, bool & 
 	}
 	bool res = false;
 	auto & hooks = m_HookMap[cPluginManager::HOOK_EXPLODING];
-	for (auto & hook: hooks)
+	for (auto & hook : hooks)
 	{
 		switch (a_Source)
 		{
-			case esBed:           hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<Vector3i *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esEnderCrystal:  hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cEntity *>             (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esGhastFireball: hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cGhastFireballEntity *>(a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esMonster:       hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esOther:         hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source,                                                         cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esPlugin:        hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source,                                                         cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esPrimedTNT:     hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esTNTMinecart:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMinecartWithTNT *>    (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esWitherBirth:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
-			case esWitherSkull:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esBed:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<Vector3i *>(a_SourceData),
+					cLuaState::Return,
+					res,
+					a_CanCauseFire,
+					a_ExplosionSize
+				);
+				break;
+			case esEnderCrystal:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<cEntity *>(a_SourceData),
+					cLuaState::Return,
+					res,
+					a_CanCauseFire,
+					a_ExplosionSize
+				);
+				break;
+			case esGhastFireball:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<cGhastFireballEntity *>(a_SourceData),
+					cLuaState::Return,
+					res,
+					a_CanCauseFire,
+					a_ExplosionSize
+				);
+				break;
+			case esMonster:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<cMonster *>(a_SourceData),
+					cLuaState::Return,
+					res,
+					a_CanCauseFire,
+					a_ExplosionSize
+				);
+				break;
+			case esOther:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					cLuaState::Return,
+					res,
+					a_CanCauseFire,
+					a_ExplosionSize
+				);
+				break;
+			case esPlugin:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					cLuaState::Return,
+					res,
+					a_CanCauseFire,
+					a_ExplosionSize
+				);
+				break;
+			case esPrimedTNT:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<cTNTEntity *>(a_SourceData),
+					cLuaState::Return,
+					res,
+					a_CanCauseFire,
+					a_ExplosionSize
+				);
+				break;
+			case esTNTMinecart:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<cMinecartWithTNT *>(a_SourceData),
+					cLuaState::Return,
+					res,
+					a_CanCauseFire,
+					a_ExplosionSize
+				);
+				break;
+			case esWitherBirth:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<cMonster *>(a_SourceData),
+					cLuaState::Return,
+					res,
+					a_CanCauseFire,
+					a_ExplosionSize
+				);
+				break;
+			case esWitherSkull:
+				hook->Call(
+					&a_World,
+					a_ExplosionSize,
+					a_CanCauseFire,
+					a_X,
+					a_Y,
+					a_Z,
+					a_Source,
+					static_cast<cWitherSkullEntity *>(a_SourceData),
+					cLuaState::Return,
+					res,
+					a_CanCauseFire,
+					a_ExplosionSize
+				);
+				break;
 			case esMax:
 			{
 				ASSERT(!"Invalid explosion source");
@@ -507,18 +808,44 @@ bool cPluginLua::OnHandshake(cClientHandle & a_Client, const AString & a_Usernam
 
 
 
-bool cPluginLua::OnHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum)
+bool cPluginLua::OnHopperPullingItem(
+	cWorld & a_World,
+	cHopperEntity & a_Hopper,
+	int a_DstSlotNum,
+	cBlockEntityWithItems & a_SrcEntity,
+	int a_SrcSlotNum
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_HOPPER_PULLING_ITEM, &a_World, &a_Hopper, a_DstSlotNum, &a_SrcEntity, a_SrcSlotNum);
+	return CallSimpleHooks(
+		cPluginManager::HOOK_HOPPER_PULLING_ITEM,
+		&a_World,
+		&a_Hopper,
+		a_DstSlotNum,
+		&a_SrcEntity,
+		a_SrcSlotNum
+	);
 }
 
 
 
 
 
-bool cPluginLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum)
+bool cPluginLua::OnHopperPushingItem(
+	cWorld & a_World,
+	cHopperEntity & a_Hopper,
+	int a_SrcSlotNum,
+	cBlockEntityWithItems & a_DstEntity,
+	int a_DstSlotNum
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_HOPPER_PUSHING_ITEM, &a_World, &a_Hopper, a_SrcSlotNum, &a_DstEntity, a_DstSlotNum);
+	return CallSimpleHooks(
+		cPluginManager::HOOK_HOPPER_PUSHING_ITEM,
+		&a_World,
+		&a_Hopper,
+		a_SrcSlotNum,
+		&a_DstEntity,
+		a_DstSlotNum
+	);
 }
 
 
@@ -543,7 +870,7 @@ bool cPluginLua::OnKilled(cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & 
 	}
 	bool res = false;
 	auto & hooks = m_HookMap[cPluginManager::HOOK_KILLED];
-	for (auto & hook: hooks)
+	for (auto & hook : hooks)
 	{
 		hook->Call(&a_Victim, &a_TDI, a_DeathMessage, cLuaState::Return, res, a_DeathMessage);
 		if (res)
@@ -594,18 +921,52 @@ bool cPluginLua::OnPlayerAnimation(cPlayer & a_Player, int a_Animation)
 
 
 
-bool cPluginLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerBreakingBlock(
+	cPlayer & a_Player,
+	int a_BlockX,
+	int a_BlockY,
+	int a_BlockZ,
+	eBlockFace a_BlockFace,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_BREAKING_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta);
+	return CallSimpleHooks(
+		cPluginManager::HOOK_PLAYER_BREAKING_BLOCK,
+		&a_Player,
+		a_BlockX,
+		a_BlockY,
+		a_BlockZ,
+		a_BlockFace,
+		a_BlockType,
+		a_BlockMeta
+	);
 }
 
 
 
 
 
-bool cPluginLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerBrokenBlock(
+	cPlayer & a_Player,
+	int a_BlockX,
+	int a_BlockY,
+	int a_BlockZ,
+	eBlockFace a_BlockFace,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_BROKEN_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta);
+	return CallSimpleHooks(
+		cPluginManager::HOOK_PLAYER_BROKEN_BLOCK,
+		&a_Player,
+		a_BlockX,
+		a_BlockY,
+		a_BlockZ,
+		a_BlockFace,
+		a_BlockType,
+		a_BlockMeta
+	);
 }
 
 
@@ -667,18 +1028,44 @@ bool cPluginLua::OnPlayerJoined(cPlayer & a_Player)
 
 
 
-bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, char a_Status)
+bool cPluginLua::OnPlayerLeftClick(
+	cPlayer & a_Player,
+	int a_BlockX,
+	int a_BlockY,
+	int a_BlockZ,
+	eBlockFace a_BlockFace,
+	char a_Status
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_LEFT_CLICK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status);
+	return CallSimpleHooks(
+		cPluginManager::HOOK_PLAYER_LEFT_CLICK,
+		&a_Player,
+		a_BlockX,
+		a_BlockY,
+		a_BlockZ,
+		a_BlockFace,
+		a_Status
+	);
 }
 
 
 
 
 
-bool cPluginLua::OnPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition, bool a_PreviousIsOnGround)
+bool cPluginLua::OnPlayerMoving(
+	cPlayer & a_Player,
+	const Vector3d & a_OldPosition,
+	const Vector3d & a_NewPosition,
+	bool a_PreviousIsOnGround
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_MOVING, &a_Player, a_OldPosition, a_NewPosition, a_PreviousIsOnGround);
+	return CallSimpleHooks(
+		cPluginManager::HOOK_PLAYER_MOVING,
+		&a_Player,
+		a_OldPosition,
+		a_NewPosition,
+		a_PreviousIsOnGround
+	);
 }
 
 
@@ -705,10 +1092,14 @@ bool cPluginLua::OnPlayerOpeningWindow(cPlayer & a_Player, cWindow & a_Window)
 
 bool cPluginLua::OnPlayerPlacedBlock(cPlayer & a_Player, const sSetBlock & a_BlockChange)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_PLACED_BLOCK,
+	return CallSimpleHooks(
+		cPluginManager::HOOK_PLAYER_PLACED_BLOCK,
 		&a_Player,
-		a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(),
-		a_BlockChange.m_BlockType, a_BlockChange.m_BlockMeta
+		a_BlockChange.GetX(),
+		a_BlockChange.GetY(),
+		a_BlockChange.GetZ(),
+		a_BlockChange.m_BlockType,
+		a_BlockChange.m_BlockMeta
 	);
 }
 
@@ -718,10 +1109,14 @@ bool cPluginLua::OnPlayerPlacedBlock(cPlayer & a_Player, const sSetBlock & a_Blo
 
 bool cPluginLua::OnPlayerPlacingBlock(cPlayer & a_Player, const sSetBlock & a_BlockChange)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_PLACING_BLOCK,
+	return CallSimpleHooks(
+		cPluginManager::HOOK_PLAYER_PLACING_BLOCK,
 		&a_Player,
-		a_BlockChange.GetX(), a_BlockChange.GetY(), a_BlockChange.GetZ(),
-		a_BlockChange.m_BlockType, a_BlockChange.m_BlockMeta
+		a_BlockChange.GetX(),
+		a_BlockChange.GetY(),
+		a_BlockChange.GetZ(),
+		a_BlockChange.m_BlockType,
+		a_BlockChange.m_BlockMeta
 	);
 }
 
@@ -731,17 +1126,35 @@ bool cPluginLua::OnPlayerPlacingBlock(cPlayer & a_Player, const sSetBlock & a_Bl
 
 bool cPluginLua::OnPlayerCrouched(cPlayer & a_Player)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_CROUCHED,
-		&a_Player);
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_CROUCHED, &a_Player);
 }
 
 
 
 
 
-bool cPluginLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginLua::OnPlayerRightClick(
+	cPlayer & a_Player,
+	int a_BlockX,
+	int a_BlockY,
+	int a_BlockZ,
+	eBlockFace a_BlockFace,
+	int a_CursorX,
+	int a_CursorY,
+	int a_CursorZ
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_RIGHT_CLICK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+	return CallSimpleHooks(
+		cPluginManager::HOOK_PLAYER_RIGHT_CLICK,
+		&a_Player,
+		a_BlockX,
+		a_BlockY,
+		a_BlockZ,
+		a_BlockFace,
+		a_CursorX,
+		a_CursorY,
+		a_CursorZ
+	);
 }
 
 
@@ -784,43 +1197,131 @@ bool cPluginLua::OnPlayerTossingItem(cPlayer & a_Player)
 
 
 
-bool cPluginLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerUsedBlock(
+	cPlayer & a_Player,
+	int a_BlockX,
+	int a_BlockY,
+	int a_BlockZ,
+	eBlockFace a_BlockFace,
+	int a_CursorX,
+	int a_CursorY,
+	int a_CursorZ,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_USED_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta);
+	return CallSimpleHooks(
+		cPluginManager::HOOK_PLAYER_USED_BLOCK,
+		&a_Player,
+		a_BlockX,
+		a_BlockY,
+		a_BlockZ,
+		a_BlockFace,
+		a_CursorX,
+		a_CursorY,
+		a_CursorZ,
+		a_BlockType,
+		a_BlockMeta
+	);
 }
 
 
 
 
 
-bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginLua::OnPlayerUsedItem(
+	cPlayer & a_Player,
+	int a_BlockX,
+	int a_BlockY,
+	int a_BlockZ,
+	eBlockFace a_BlockFace,
+	int a_CursorX,
+	int a_CursorY,
+	int a_CursorZ
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_USED_ITEM, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+	return CallSimpleHooks(
+		cPluginManager::HOOK_PLAYER_USED_ITEM,
+		&a_Player,
+		a_BlockX,
+		a_BlockY,
+		a_BlockZ,
+		a_BlockFace,
+		a_CursorX,
+		a_CursorY,
+		a_CursorZ
+	);
 }
 
 
 
 
 
-bool cPluginLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerUsingBlock(
+	cPlayer & a_Player,
+	int a_BlockX,
+	int a_BlockY,
+	int a_BlockZ,
+	eBlockFace a_BlockFace,
+	int a_CursorX,
+	int a_CursorY,
+	int a_CursorZ,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_USING_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta);
+	return CallSimpleHooks(
+		cPluginManager::HOOK_PLAYER_USING_BLOCK,
+		&a_Player,
+		a_BlockX,
+		a_BlockY,
+		a_BlockZ,
+		a_BlockFace,
+		a_CursorX,
+		a_CursorY,
+		a_CursorZ,
+		a_BlockType,
+		a_BlockMeta
+	);
 }
 
 
 
 
 
-bool cPluginLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginLua::OnPlayerUsingItem(
+	cPlayer & a_Player,
+	int a_BlockX,
+	int a_BlockY,
+	int a_BlockZ,
+	eBlockFace a_BlockFace,
+	int a_CursorX,
+	int a_CursorY,
+	int a_CursorZ
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_USING_ITEM, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+	return CallSimpleHooks(
+		cPluginManager::HOOK_PLAYER_USING_ITEM,
+		&a_Player,
+		a_BlockX,
+		a_BlockY,
+		a_BlockZ,
+		a_BlockFace,
+		a_CursorX,
+		a_CursorY,
+		a_CursorZ
+	);
 }
 
 
 
 
 
-bool cPluginLua::OnPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const ContiguousByteBufferView a_Message)
+bool cPluginLua::OnPluginMessage(
+	cClientHandle & a_Client,
+	const AString & a_Channel,
+	const ContiguousByteBufferView a_Message
+)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLUGIN_MESSAGE, &a_Client, a_Channel, a_Message);
 }
@@ -838,7 +1339,7 @@ bool cPluginLua::OnPluginsLoaded(void)
 	}
 	bool res = false;
 	auto & hooks = m_HookMap[cPluginManager::HOOK_PLUGINS_LOADED];
-	for (auto & hook: hooks)
+	for (auto & hook : hooks)
 	{
 		bool ret = false;
 		hook->Call(cLuaState::Return, ret);
@@ -869,9 +1370,24 @@ bool cPluginLua::OnPreCrafting(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraf
 
 
 
-bool cPluginLua::OnProjectileHitBlock(cProjectileEntity & a_Projectile, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Face, const Vector3d & a_BlockHitPos)
+bool cPluginLua::OnProjectileHitBlock(
+	cProjectileEntity & a_Projectile,
+	int a_BlockX,
+	int a_BlockY,
+	int a_BlockZ,
+	eBlockFace a_Face,
+	const Vector3d & a_BlockHitPos
+)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PROJECTILE_HIT_BLOCK, &a_Projectile, a_BlockX, a_BlockY, a_BlockZ, a_Face, a_BlockHitPos);
+	return CallSimpleHooks(
+		cPluginManager::HOOK_PROJECTILE_HIT_BLOCK,
+		&a_Projectile,
+		a_BlockX,
+		a_BlockY,
+		a_BlockZ,
+		a_Face,
+		a_BlockHitPos
+	);
 }
 
 
@@ -887,7 +1403,13 @@ bool cPluginLua::OnProjectileHitEntity(cProjectileEntity & a_Projectile, cEntity
 
 
 
-bool cPluginLua::OnServerPing(cClientHandle & a_ClientHandle, AString & a_ServerDescription, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon)
+bool cPluginLua::OnServerPing(
+	cClientHandle & a_ClientHandle,
+	AString & a_ServerDescription,
+	int & a_OnlinePlayersCount,
+	int & a_MaxPlayersCount,
+	AString & a_Favicon
+)
 {
 	cOperation op(*this);
 	if (!op().IsValid())
@@ -896,9 +1418,21 @@ bool cPluginLua::OnServerPing(cClientHandle & a_ClientHandle, AString & a_Server
 	}
 	bool res = false;
 	auto & hooks = m_HookMap[cPluginManager::HOOK_SERVER_PING];
-	for (auto & hook: hooks)
+	for (auto & hook : hooks)
 	{
-		hook->Call(&a_ClientHandle, a_ServerDescription, a_OnlinePlayersCount, a_MaxPlayersCount, a_Favicon, cLuaState::Return, res, a_ServerDescription, a_OnlinePlayersCount, a_MaxPlayersCount, a_Favicon);
+		hook->Call(
+			&a_ClientHandle,
+			a_ServerDescription,
+			a_OnlinePlayersCount,
+			a_MaxPlayersCount,
+			a_Favicon,
+			cLuaState::Return,
+			res,
+			a_ServerDescription,
+			a_OnlinePlayersCount,
+			a_MaxPlayersCount,
+			a_Favicon
+		);
 		if (res)
 		{
 			return true;
@@ -958,12 +1492,28 @@ bool cPluginLua::OnTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI)
 
 bool cPluginLua::OnUpdatedSign(
 	cWorld & a_World,
-	int a_BlockX, int a_BlockY, int a_BlockZ,
-	const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4,
+	int a_BlockX,
+	int a_BlockY,
+	int a_BlockZ,
+	const AString & a_Line1,
+	const AString & a_Line2,
+	const AString & a_Line3,
+	const AString & a_Line4,
 	cPlayer * a_Player
 )
 {
-	return CallSimpleHooks(cPluginManager::HOOK_UPDATED_SIGN, &a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
+	return CallSimpleHooks(
+		cPluginManager::HOOK_UPDATED_SIGN,
+		&a_World,
+		a_BlockX,
+		a_BlockY,
+		a_BlockZ,
+		a_Line1,
+		a_Line2,
+		a_Line3,
+		a_Line4,
+		a_Player
+	);
 }
 
 
@@ -972,8 +1522,13 @@ bool cPluginLua::OnUpdatedSign(
 
 bool cPluginLua::OnUpdatingSign(
 	cWorld & a_World,
-	int a_BlockX, int a_BlockY, int a_BlockZ,
-	AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4,
+	int a_BlockX,
+	int a_BlockY,
+	int a_BlockZ,
+	AString & a_Line1,
+	AString & a_Line2,
+	AString & a_Line3,
+	AString & a_Line4,
 	cPlayer * a_Player
 )
 {
@@ -984,9 +1539,25 @@ bool cPluginLua::OnUpdatingSign(
 	}
 	bool res = false;
 	auto & hooks = m_HookMap[cPluginManager::HOOK_UPDATING_SIGN];
-	for (auto & hook: hooks)
+	for (auto & hook : hooks)
 	{
-		hook->Call(&a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player, cLuaState::Return, res, a_Line1, a_Line2, a_Line3, a_Line4);
+		hook->Call(
+			&a_World,
+			a_BlockX,
+			a_BlockY,
+			a_BlockZ,
+			a_Line1,
+			a_Line2,
+			a_Line3,
+			a_Line4,
+			a_Player,
+			cLuaState::Return,
+			res,
+			a_Line1,
+			a_Line2,
+			a_Line3,
+			a_Line4
+		);
 		if (res)
 		{
 			return true;
@@ -1017,7 +1588,7 @@ bool cPluginLua::OnWeatherChanging(cWorld & a_World, eWeather & a_NewWeather)
 	}
 	bool res = false;
 	auto & hooks = m_HookMap[cPluginManager::HOOK_WEATHER_CHANGING];
-	for (auto & hook: hooks)
+	for (auto & hook : hooks)
 	{
 		hook->Call(&a_World, a_NewWeather, cLuaState::Return, res, a_NewWeather);
 		if (res)
@@ -1041,7 +1612,11 @@ bool cPluginLua::OnWorldStarted(cWorld & a_World)
 
 
 
-bool cPluginLua::OnWorldTick(cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec)
+bool cPluginLua::OnWorldTick(
+	cWorld & a_World,
+	std::chrono::milliseconds a_Dt,
+	std::chrono::milliseconds a_LastTickDurationMSec
+)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_WORLD_TICK, &a_World, a_Dt, a_LastTickDurationMSec);
 }
@@ -1056,8 +1631,10 @@ bool cPluginLua::CanAddOldStyleHook(int a_HookType)
 	if (FnName == nullptr)
 	{
 		// Unknown hook ID
-		LOGWARNING("Plugin %s wants to add an unknown hook ID (%d). The plugin need not work properly.",
-			GetName().c_str(), a_HookType
+		LOGWARNING(
+			"Plugin %s wants to add an unknown hook ID (%d). The plugin need not work properly.",
+			GetName().c_str(),
+			a_HookType
 		);
 		m_LuaState.LogStackTrace();
 		return false;
@@ -1069,8 +1646,12 @@ bool cPluginLua::CanAddOldStyleHook(int a_HookType)
 		return true;
 	}
 
-	LOGWARNING("Plugin %s wants to add a hook (%d), but it doesn't provide the callback function \"%s\" for it. The plugin need not work properly.",
-		GetName().c_str(), a_HookType, FnName
+	LOGWARNING(
+		"Plugin %s wants to add a hook (%d), but it doesn't provide the callback function \"%s\" for it. The plugin "
+		"need not work properly.",
+		GetName().c_str(),
+		a_HookType,
+		FnName
 	);
 	m_LuaState.LogStackTrace();
 	return false;
@@ -1114,7 +1695,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 		case cPluginManager::HOOK_PLAYER_OPENING_WINDOW:        return "OnPlayerOpeningWindow";
 		case cPluginManager::HOOK_PLAYER_PLACED_BLOCK:          return "OnPlayerPlacedBlock";
 		case cPluginManager::HOOK_PLAYER_PLACING_BLOCK:         return "OnPlayerPlacingBlock";
-		case cPluginManager::HOOK_PLAYER_CROUCHED:        		return "OnPlayerCrouched";
+		case cPluginManager::HOOK_PLAYER_CROUCHED:              return "OnPlayerCrouched";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICK:           return "OnPlayerRightClick";
 		case cPluginManager::HOOK_PLAYER_RIGHT_CLICKING_ENTITY: return "OnPlayerRightClickingEntity";
 		case cPluginManager::HOOK_PLAYER_SHOOTING:              return "OnPlayerShooting";
@@ -1180,7 +1761,8 @@ int cPluginLua::CallFunctionFromForeignState(
 	int NumReturns = op().CallFunctionWithForeignParams(a_FunctionName, a_ForeignState, a_ParamStart, a_ParamEnd);
 	if (NumReturns < 0)
 	{
-		// The call has failed, an error has already been output to the log, so just silently bail out with the same error
+		// The call has failed, an error has already been output to the log, so just silently bail out with the same
+		// error
 		return NumReturns;
 	}
 
@@ -1209,7 +1791,3 @@ void cPluginLua::ClearWebTabs(void)
 		webAdmin->RemoveAllPluginWebTabs(m_Name);
 	}
 }
-
-
-
-

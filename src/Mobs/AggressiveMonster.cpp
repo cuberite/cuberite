@@ -11,7 +11,15 @@
 
 
 
-cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height) :
+cAggressiveMonster::cAggressiveMonster(
+	const AString & a_ConfigName,
+	eMonsterType a_MobType,
+	const AString & a_SoundHurt,
+	const AString & a_SoundDeath,
+	const AString & a_SoundAmbient,
+	float a_Width,
+	float a_Height
+) :
 	Super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_SoundAmbient, a_Width, a_Height)
 {
 	m_EMPersonality = AGGRESSIVE;
@@ -54,8 +62,9 @@ cMonster * cAggressiveMonster::GetMonsterOfTypeInSight(eMonsterType a_MobType, u
 
 	class cCallback : public cBlockTracer::cCallbacks
 	{
-		public:
-		bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	  public:
+		bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace)
+			override
 		{
 			return a_BlockType != E_BLOCK_AIR;
 		}
@@ -81,18 +90,18 @@ cMonster * cAggressiveMonster::GetMonsterOfTypeInSight(eMonsterType a_MobType, u
 		Vector3d TargetPosition = Other.GetPosition().addedY(Other.GetHeight());
 		double TargetDistance = (MyHeadPosition - TargetPosition).SqrLength();
 
-		if (
-			(MinimumDistance > TargetDistance) &&
-			(TargetDistance < (a_SightDistance * a_SightDistance))
-		)
+		if ((MinimumDistance > TargetDistance) && (TargetDistance < (a_SightDistance * a_SightDistance)))
 		{
-			FoundTarget = & Other;
+			FoundTarget = &Other;
 			return true;
 		}
 		return false;
 	};
 
-	cBoundingBox CheckZone(GetPosition().addedXZ(-a_SightDistance, -a_SightDistance), GetPosition().addedXZ(a_SightDistance, a_SightDistance));
+	cBoundingBox CheckZone(
+		GetPosition().addedXZ(-a_SightDistance, -a_SightDistance),
+		GetPosition().addedXZ(a_SightDistance, a_SightDistance)
+	);
 	m_World->ForEachEntityInBox(CheckZone, Callback);
 	return FoundTarget;
 }
@@ -120,19 +129,17 @@ void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		CheckEventSeePlayer(a_Chunk);
 	}
 
-	if (
-		(GetTarget() != nullptr) &&
-		TargetIsInRange() &&
+	if ((GetTarget() != nullptr) && TargetIsInRange() &&
 		cLineBlockTracer::LineOfSightTrace(
 			*GetWorld(),
 			GetPosition().addedY(GetHeight()),
 			GetTarget()->GetPosition().addedY(GetTarget()->GetHeight()),
 			(IsNetherNative() ? cLineBlockTracer::losAirWaterLava : cLineBlockTracer::losAirWater)
 		) &&
-		(GetHealth() > 0.0)
-	)
+		(GetHealth() > 0.0))
 	{
-		// Attack if reached destination, target isn't null, and have a clear line of sight to target (so won't attack through walls)
+		// Attack if reached destination, target isn't null, and have a clear line of sight to target (so won't attack
+		// through walls)
 		Attack(a_Dt);
 	}
 }

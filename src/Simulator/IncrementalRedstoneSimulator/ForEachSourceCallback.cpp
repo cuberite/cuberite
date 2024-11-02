@@ -12,11 +12,12 @@
 
 
 
-ForEachSourceCallback::ForEachSourceCallback(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE CurrentBlock) :
-	Power(0),
-	m_Chunk(Chunk),
-	m_Position(Position),
-	m_CurrentBlock(CurrentBlock)
+ForEachSourceCallback::ForEachSourceCallback(
+	const cChunk & Chunk,
+	const Vector3i Position,
+	const BLOCKTYPE CurrentBlock
+) :
+	Power(0), m_Chunk(Chunk), m_Position(Position), m_CurrentBlock(CurrentBlock)
 {
 }
 
@@ -38,19 +39,27 @@ void ForEachSourceCallback::operator()(Vector3i Location)
 	}
 
 	const auto PotentialSourceBlock = NeighbourChunk->GetBlock(Location);
-	const auto NeighbourRelativeQueryPosition = cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(m_Chunk, *NeighbourChunk, m_Position);
+	const auto NeighbourRelativeQueryPosition =
+		cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(m_Chunk, *NeighbourChunk, m_Position);
 
 	if (!cBlockInfo::IsTransparent(PotentialSourceBlock))
 	{
-		Power = std::max(Power, QueryLinkedPower(*NeighbourChunk, NeighbourRelativeQueryPosition, m_CurrentBlock, Location));
+		Power = std::max(
+			Power,
+			QueryLinkedPower(*NeighbourChunk, NeighbourRelativeQueryPosition, m_CurrentBlock, Location)
+		);
 	}
 	else
 	{
 		Power = std::max(
 			Power,
 			RedstoneHandler::GetPowerDeliveredToPosition(
-				*NeighbourChunk, Location, PotentialSourceBlock,
-				NeighbourRelativeQueryPosition, m_CurrentBlock, false
+				*NeighbourChunk,
+				Location,
+				PotentialSourceBlock,
+				NeighbourRelativeQueryPosition,
+				m_CurrentBlock,
+				false
 			)
 		);
 	}
@@ -88,7 +97,12 @@ void ForEachSourceCallback::CheckIndirectPower()
 
 
 
-PowerLevel ForEachSourceCallback::QueryLinkedPower(const cChunk & Chunk, const Vector3i QueryPosition, const BLOCKTYPE QueryBlock, const Vector3i SolidBlockPosition)
+PowerLevel ForEachSourceCallback::QueryLinkedPower(
+	const cChunk & Chunk,
+	const Vector3i QueryPosition,
+	const BLOCKTYPE QueryBlock,
+	const Vector3i SolidBlockPosition
+)
 {
 	PowerLevel Power = 0;
 
@@ -108,14 +122,19 @@ PowerLevel ForEachSourceCallback::QueryLinkedPower(const cChunk & Chunk, const V
 		}
 
 		// Conduit block's position, relative to NeighbourChunk.
-		const auto NeighbourRelativeSolidBlockPosition = cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(Chunk, *NeighbourChunk, SolidBlockPosition);
+		const auto NeighbourRelativeSolidBlockPosition =
+			cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(Chunk, *NeighbourChunk, SolidBlockPosition);
 
 		// Do a standard power query, but the requester's position is actually the solid block that will conduct power:
 		Power = std::max(
 			Power,
 			RedstoneHandler::GetPowerDeliveredToPosition(
-				*NeighbourChunk, SourcePosition, NeighbourChunk->GetBlock(SourcePosition),
-				NeighbourRelativeSolidBlockPosition, QueryBlock, true
+				*NeighbourChunk,
+				SourcePosition,
+				NeighbourChunk->GetBlock(SourcePosition),
+				NeighbourRelativeSolidBlockPosition,
+				QueryBlock,
+				true
 			)
 		);
 	}

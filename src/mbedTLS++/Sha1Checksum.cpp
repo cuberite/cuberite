@@ -144,7 +144,3 @@ void cSha1Checksum::Restart(void)
 	mbedtls_sha1_starts(&m_Sha1);
 	m_DoesAcceptInput = true;
 }
-
-
-
-

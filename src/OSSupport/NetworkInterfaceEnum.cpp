@@ -8,13 +8,13 @@
 #include "event2/util.h"
 
 #if defined(_WIN32)
-	#include <IPHlpApi.h>
-	#pragma comment(lib, "IPHLPAPI.lib")
+#include <IPHlpApi.h>
+#pragma comment(lib, "IPHLPAPI.lib")
 #elif !defined(ANDROID)  // _WIN32
-	#include <sys/types.h>
-	#include <ifaddrs.h>
-	#include <netinet/in.h>
-	#include <arpa/inet.h>
+#include <sys/types.h>
+#include <ifaddrs.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #endif  // else _WIN32
 
 
@@ -92,72 +92,70 @@ AStringVector cNetwork::EnumLocalIPAddresses(void)
 {
 	AStringVector res;
 
-	#if defined(_WIN32)
+#if defined(_WIN32)
 
-		// Query the OS for all adapters' addresses:
-		char buffer[64 KiB];  // A buffer backing the address list
-		PIP_ADAPTER_ADDRESSES pAddresses = reinterpret_cast<PIP_ADAPTER_ADDRESSES>(&buffer);
-		ULONG outBufLen = sizeof(buffer);
-		DWORD dwRetVal = GetAdaptersAddresses(
-			AF_UNSPEC,
-			GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER | GAA_FLAG_SKIP_FRIENDLY_NAME, nullptr,
-			pAddresses, &outBufLen
-		);
-		if (dwRetVal != ERROR_SUCCESS)
+	// Query the OS for all adapters' addresses:
+	char buffer[64 KiB];  // A buffer backing the address list
+	PIP_ADAPTER_ADDRESSES pAddresses = reinterpret_cast<PIP_ADAPTER_ADDRESSES>(&buffer);
+	ULONG outBufLen = sizeof(buffer);
+	DWORD dwRetVal = GetAdaptersAddresses(
+		AF_UNSPEC,
+		GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST | GAA_FLAG_SKIP_DNS_SERVER | GAA_FLAG_SKIP_FRIENDLY_NAME,
+		nullptr,
+		pAddresses,
+		&outBufLen
+	);
+	if (dwRetVal != ERROR_SUCCESS)
+	{
+		LOG("GetAdaptersAddresses() failed: %u", dwRetVal);
+		return res;
+	}
+
+	// Enumerate all active adapters
+	for (auto pCurrAddresses = pAddresses; pCurrAddresses != nullptr; pCurrAddresses = pCurrAddresses->Next)
+	{
+		if (pCurrAddresses->OperStatus != IfOperStatusUp)
 		{
-			LOG("GetAdaptersAddresses() failed: %u", dwRetVal);
-			return res;
+			// Adapter not active, skip it:
+			continue;
 		}
 
-		// Enumerate all active adapters
-		for (auto pCurrAddresses = pAddresses; pCurrAddresses != nullptr; pCurrAddresses = pCurrAddresses->Next)
+		// Collect all IP addresses on this adapter:
+		for (auto pUnicast = pCurrAddresses->FirstUnicastAddress; pUnicast != nullptr; pUnicast = pUnicast->Next)
 		{
-			if (pCurrAddresses->OperStatus != IfOperStatusUp)
-			{
-				// Adapter not active, skip it:
-				continue;
-			}
-
-			// Collect all IP addresses on this adapter:
-			for (auto pUnicast = pCurrAddresses->FirstUnicastAddress; pUnicast != nullptr; pUnicast = pUnicast->Next)
-			{
-				auto Address = PrintAddress(pUnicast->Address);
-				if (!Address.empty())
-				{
-					res.push_back(Address);
-				}
-			}  // for pUnicast
-		}  // for pCurrAddresses
-
-	#elif !defined(ANDROID)  // _WIN32
-
-		struct ifaddrs * ifAddrStruct = nullptr;
-		getifaddrs(&ifAddrStruct);
-
-		for (auto ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next)
-		{
-			if (ifa->ifa_addr == nullptr)
-			{
-				continue;
-			}
-
-			auto Address = PrintAddress(ifa);
+			auto Address = PrintAddress(pUnicast->Address);
 			if (!Address.empty())
 			{
-				res.emplace_back(Address);
+				res.push_back(Address);
 			}
-		}
+		}  // for pUnicast
+	}  // for pCurrAddresses
 
-		if (ifAddrStruct != nullptr)
+#elif !defined(ANDROID)  // _WIN32
+
+	struct ifaddrs * ifAddrStruct = nullptr;
+	getifaddrs(&ifAddrStruct);
+
+	for (auto ifa = ifAddrStruct; ifa != nullptr; ifa = ifa->ifa_next)
+	{
+		if (ifa->ifa_addr == nullptr)
 		{
-			freeifaddrs(ifAddrStruct);
+			continue;
 		}
 
-	#endif  // else _WIN32
+		auto Address = PrintAddress(ifa);
+		if (!Address.empty())
+		{
+			res.emplace_back(Address);
+		}
+	}
+
+	if (ifAddrStruct != nullptr)
+	{
+		freeifaddrs(ifAddrStruct);
+	}
+
+#endif  // else _WIN32
 
 	return res;
 }
-
-
-
-

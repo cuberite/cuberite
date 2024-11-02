@@ -15,19 +15,18 @@
 
 
 
-class cHopperWindow:
-	public cWindow
+class cHopperWindow : public cWindow
 {
 	using Super = cWindow;
 
-public:
-
+  public:
 	cHopperWindow(cHopperEntity * a_Hopper);
 
-	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
-
+	virtual void DistributeStack(
+		cItem & a_ItemStack,
+		int a_Slot,
+		cPlayer & a_Player,
+		cSlotArea * a_ClickedArea,
+		bool a_ShouldApply
+	) override;
 };
-
-
-
-

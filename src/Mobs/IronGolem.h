@@ -7,13 +7,11 @@
 
 
 
-class cIronGolem:
-	public cPassiveAggressiveMonster
+class cIronGolem : public cPassiveAggressiveMonster
 {
 	using Super = cPassiveAggressiveMonster;
 
-public:
-
+  public:
 	cIronGolem();
 
 	CLASS_PROTODEF(cIronGolem)
@@ -23,8 +21,4 @@ public:
 	// Iron golems do not drown nor float
 	virtual void HandleAir(void) override {}
 	virtual void SetSwimState(cChunk & a_Chunk) override {}
-} ;
-
-
-
-
+};

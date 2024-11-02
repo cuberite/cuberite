@@ -34,7 +34,7 @@ data comes into the system:
 */
 class cSslContext abstract
 {
-public:
+  public:
 	/** Creates a new uninitialized context */
 	cSslContext(void);
 
@@ -88,8 +88,7 @@ public:
 	Returns 0 on success, mbedTLS error code on failure. */
 	int NotifyClose(void);
 
-protected:
-
+  protected:
 	/** Configuration of the SSL context. */
 	std::shared_ptr<const cSslConfig> m_Config;
 
@@ -119,8 +118,4 @@ protected:
 
 	/** Called when mbedTLS wants to write encrypted data. */
 	virtual int SendEncrypted(const unsigned char * a_Buffer, size_t a_NumBytes) = 0;
-} ;
-
-
-
-
+};

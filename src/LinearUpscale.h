@@ -39,10 +39,11 @@ Works in-place (input is already present at the correct output coords)
 Uses templates to make it possible for the compiler to further optimizer the loops
 */
 template <
-	int SizeX, int SizeY,  // Dimensions of the array
-	int AnchorStepX, int AnchorStepY,
-	typename TYPE
->
+	int SizeX,
+	int SizeY,  // Dimensions of the array
+	int AnchorStepX,
+	int AnchorStepY,
+	typename TYPE>
 void LinearUpscale2DArrayInPlace(TYPE * a_Array)
 {
 	// First interpolate columns where the anchor points are:
@@ -53,7 +54,7 @@ void LinearUpscale2DArrayInPlace(TYPE * a_Array)
 		for (int x = 0; x < SizeX; x += AnchorStepX)
 		{
 			TYPE StartValue = a_Array[Idx];
-			TYPE EndValue   = a_Array[Idx + SizeX * AnchorStepY];
+			TYPE EndValue = a_Array[Idx + SizeX * AnchorStepY];
 			TYPE Diff = EndValue - StartValue;
 			for (int CellY = 1; CellY < AnchorStepY; CellY++)
 			{
@@ -71,7 +72,7 @@ void LinearUpscale2DArrayInPlace(TYPE * a_Array)
 		for (int x = 0; x < LastXCell; x += AnchorStepX)
 		{
 			TYPE StartValue = a_Array[Idx];
-			TYPE EndValue   = a_Array[Idx + AnchorStepX];
+			TYPE EndValue = a_Array[Idx + AnchorStepX];
 			TYPE Diff = EndValue - StartValue;
 			for (int CellX = 1; CellX < AnchorStepX; CellX++)
 			{
@@ -90,11 +91,14 @@ void LinearUpscale2DArrayInPlace(TYPE * a_Array)
 Linearly interpolates values in the array between the equidistant anchor points (upscales).
 Works on two arrays, input is packed and output is to be completely constructed.
 */
-template <typename TYPE> void LinearUpscale2DArray(
-	TYPE * a_Src,                    ///< Source array of size a_SrcSizeX x a_SrcSizeY
-	int a_SrcSizeX, int a_SrcSizeY,  ///< Dimensions of the src array
-	TYPE * a_Dst,                    ///< Dest array, of size (a_SrcSizeX * a_UpscaleX + 1) x (a_SrcSizeY * a_UpscaleY + 1)
-	int a_UpscaleX, int a_UpscaleY   ///< Upscale factor for each direction
+template <typename TYPE>
+void LinearUpscale2DArray(
+	TYPE * a_Src,  ///< Source array of size a_SrcSizeX x a_SrcSizeY
+	int a_SrcSizeX,
+	int a_SrcSizeY,  ///< Dimensions of the src array
+	TYPE * a_Dst,  ///< Dest array, of size (a_SrcSizeX * a_UpscaleX + 1) x (a_SrcSizeY * a_UpscaleY + 1)
+	int a_UpscaleX,
+	int a_UpscaleY  ///< Upscale factor for each direction
 )
 {
 	// For optimization reasons, we're storing the upscaling ratios in a fixed-size arrays of these sizes
@@ -161,11 +165,17 @@ template <typename TYPE> void LinearUpscale2DArray(
 Linearly interpolates values in the array between the equidistant anchor points (upscales).
 Works on two arrays, input is packed and output is to be completely constructed.
 */
-template <typename TYPE> void LinearUpscale3DArray(
-	TYPE * a_Src,                                    ///< Source array of size a_SrcSizeX x a_SrcSizeY x a_SrcSizeZ
-	int a_SrcSizeX, int a_SrcSizeY, int a_SrcSizeZ,  ///< Dimensions of the src array
-	TYPE * a_Dst,                                    ///< Dest array, of size (a_SrcSizeX * a_UpscaleX + 1) x (a_SrcSizeY * a_UpscaleY + 1) x (a_SrcSizeZ * a_UpscaleZ + 1)
-	int a_UpscaleX, int a_UpscaleY, int a_UpscaleZ   ///< Upscale factor for each direction
+template <typename TYPE>
+void LinearUpscale3DArray(
+	TYPE * a_Src,  ///< Source array of size a_SrcSizeX x a_SrcSizeY x a_SrcSizeZ
+	int a_SrcSizeX,
+	int a_SrcSizeY,
+	int a_SrcSizeZ,  ///< Dimensions of the src array
+	TYPE * a_Dst,  ///< Dest array, of size (a_SrcSizeX * a_UpscaleX + 1) x (a_SrcSizeY * a_UpscaleY + 1) x (a_SrcSizeZ
+				   ///< * a_UpscaleZ + 1)
+	int a_UpscaleX,
+	int a_UpscaleY,
+	int a_UpscaleZ  ///< Upscale factor for each direction
 )
 {
 	// For optimization reasons, we're storing the upscaling ratios in a fixed-size arrays of these sizes
@@ -248,8 +258,3 @@ template <typename TYPE> void LinearUpscale3DArray(
 		}  // for y
 	}  // for z
 }
-
-
-
-
-

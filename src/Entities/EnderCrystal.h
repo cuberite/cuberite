@@ -8,14 +8,12 @@
 
 
 // tolua_begin
-class cEnderCrystal :
-	public cEntity
+class cEnderCrystal : public cEntity
 {
 	// tolua_end
 	using Super = cEntity;
 
-public:
-
+  public:
 	CLASS_PROTODEF(cEnderCrystal)
 
 	cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom);
@@ -35,8 +33,7 @@ public:
 
 	// tolua_end
 
-private:
-
+  private:
 	Vector3i m_BeamTarget;
 	bool m_DisplayBeam;
 
@@ -49,7 +46,3 @@ private:
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
 };  // tolua_export
-
-
-
-

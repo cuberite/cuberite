@@ -14,7 +14,7 @@ BlockInfo::BlockInfo(
 	std::shared_ptr<cBlockHandler> aHandler,
 	const std::map<AString, AString> & aHints,
 	const std::map<AString, BlockInfo::HintCallback> & aHintCallbacks
-):
+) :
 	m_PluginName(aPluginName),
 	m_BlockTypeName(aBlockTypeName),
 	m_Handler(std::move(aHandler)),
@@ -27,10 +27,7 @@ BlockInfo::BlockInfo(
 
 
 
-AString BlockInfo::hintValue(
-	const AString & aHintName,
-	const BlockState & aBlockState
-)
+AString BlockInfo::hintValue(const AString & aHintName, const BlockState & aBlockState)
 {
 	// Search the hint callbacks first:
 	auto itrC = m_HintCallbacks.find(aHintName);
@@ -64,8 +61,11 @@ void BlockInfo::setHint(const AString & aHintKey, const AString & aHintValue)
 	auto itrC = m_HintCallbacks.find(aHintKey);
 	if (itrC != m_HintCallbacks.end())
 	{
-		LOGINFO("Setting a static hint %s for block type %s, but there's already a callback for that hint. The static hint will be ignored.",
-			aHintKey.c_str(), m_BlockTypeName.c_str()
+		LOGINFO(
+			"Setting a static hint %s for block type %s, but there's already a callback for that hint. The static hint "
+			"will be ignored.",
+			aHintKey.c_str(),
+			m_BlockTypeName.c_str()
 		);
 	}
 }
@@ -94,9 +94,8 @@ void BlockTypeRegistry::registerBlockType(
 	const std::map<AString, BlockInfo::HintCallback> & aHintCallbacks
 )
 {
-	auto blockInfo = std::make_shared<BlockInfo>(
-		aPluginName, aBlockTypeName, std::move(aHandler), aHints, aHintCallbacks
-	);
+	auto blockInfo =
+		std::make_shared<BlockInfo>(aPluginName, aBlockTypeName, std::move(aHandler), aHints, aHintCallbacks);
 
 	// Check previous registrations:
 	cCSLock lock(m_CSRegistry);
@@ -171,10 +170,7 @@ void BlockTypeRegistry::setBlockTypeHint(
 
 
 
-void BlockTypeRegistry::removeBlockTypeHint(
-	const AString & aBlockTypeName,
-	const AString & aHintKey
-)
+void BlockTypeRegistry::removeBlockTypeHint(const AString & aBlockTypeName, const AString & aHintKey)
 {
 	cCSLock lock(m_CSRegistry);
 	auto blockInfo = m_Registry.find(aBlockTypeName);
@@ -212,7 +208,8 @@ AString BlockTypeRegistry::AlreadyRegisteredException::message(
 )
 {
 	return fmt::format(
-		FMT_STRING("Attempting to register BlockTypeName {} from plugin {}, while it is already registered in plugin {}"),
+		FMT_STRING("Attempting to register BlockTypeName {} from plugin {}, while it is already registered in plugin {}"
+		),
 		aNewRegistration->blockTypeName(),
 		aNewRegistration->pluginName(),
 		aPreviousRegistration->pluginName()
@@ -230,9 +227,10 @@ BlockTypeRegistry::NotRegisteredException::NotRegisteredException(
 	const AString & aBlockTypeName,
 	const AString & aHintKey,
 	const AString & aHintValue
-):
+) :
 	Super(fmt::format(
-		FMT_STRING("Attempting to set a hint of nonexistent BlockTypeName.\n\tBlockTypeName = {}\n\tHintKey = {}\n\tHintValue = {}"),
+		FMT_STRING("Attempting to set a hint of nonexistent BlockTypeName.\n\tBlockTypeName = {}\n\tHintKey = "
+				   "{}\n\tHintValue = {}"),
 		aBlockTypeName,
 		aHintKey,
 		aHintValue

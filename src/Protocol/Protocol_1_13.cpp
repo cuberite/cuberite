@@ -94,7 +94,14 @@ void cProtocol_1_13::SendPaintingSpawn(const cPainting & a_Painting)
 
 
 
-void cProtocol_1_13::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
+void cProtocol_1_13::SendParticleEffect(
+	const AString & a_ParticleName,
+	Vector3f a_Src,
+	Vector3f a_Offset,
+	float a_ParticleData,
+	int a_ParticleAmount,
+	std::array<int, 2> a_Data
+)
 {
 	// This packet is unchanged since 1.8
 	// However we are hardcoding a string-to-id mapping inside there
@@ -183,20 +190,27 @@ void cProtocol_1_13::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 			break;
 		}
 
-		case E_BLOCK_MOB_SPAWNER:       Action = 1;  break;  // Update mob spawner spinny mob thing
-		case E_BLOCK_COMMAND_BLOCK:     Action = 2;  break;  // Update command block text
-		case E_BLOCK_BEACON:            Action = 3;  break;  // Update beacon entity
-		case E_BLOCK_HEAD:              Action = 4;  break;  // Update Mobhead entity
+		case E_BLOCK_MOB_SPAWNER:   Action = 1; break;  // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK: Action = 2; break;  // Update command block text
+		case E_BLOCK_BEACON:        Action = 3; break;  // Update beacon entity
+		case E_BLOCK_HEAD:
+			Action = 4;
+			break;  // Update Mobhead entity
 		// case E_BLOCK_CONDUIT:        Action = 5;  break;  // Update Conduit entity
 		case E_BLOCK_STANDING_BANNER:
-		case E_BLOCK_WALL_BANNER:       Action = 6;  break;  // Update banner entity
+		case E_BLOCK_WALL_BANNER:
+			Action = 6;
+			break;  // Update banner entity
 		// case Structure Block:        Action = 7;  break;  // Update Structure tile entity
-		case E_BLOCK_END_GATEWAY:       Action = 8;  break;  // Update destination for a end gateway entity
-		case E_BLOCK_SIGN_POST:         Action = 9;  break;  // Update sign entity
-		// case E_BLOCK_SHULKER_BOX:    Action = 10; break;  // sets shulker box - not used just here if anyone is confused from reading the protocol wiki
-		case E_BLOCK_BED:               Action = 11; break;  // Update bed color
+		case E_BLOCK_END_GATEWAY: Action = 8; break;  // Update destination for a end gateway entity
+		case E_BLOCK_SIGN_POST:
+			Action = 9;
+			break;  // Update sign entity
+		// case E_BLOCK_SHULKER_BOX:    Action = 10; break;  // sets shulker box - not used just here if anyone is
+		// confused from reading the protocol wiki
+		case E_BLOCK_BED: Action = 11; break;  // Update bed color
 
-		default: return;  // Block entities change between versions
+		default:          return;  // Block entities change between versions
 	}
 
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
@@ -337,10 +351,9 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadata a_Metadata) const
 		case EntityMetadata::EntityPose:
 		case EntityMetadata::AreaEffectCloudParticleParameter1:
 		case EntityMetadata::AreaEffectCloudParticleParameter2:
-		case EntityMetadata::ZombieUnusedWasType: break;
+		case EntityMetadata::ZombieUnusedWasType:                   break;
 
-		default:
-			break;
+		default:                                                    break;
 	}
 	UNREACHABLE("Retrieved invalid metadata for protocol");
 }
@@ -447,7 +460,7 @@ UInt32 cProtocol_1_13::GetPacketID(ePacketType a_PacketType) const
 		case pktWindowItems:            return 0x15;
 		case pktWindowOpen:             return 0x14;
 		case pktWindowProperty:         return 0x16;
-		default: return Super::GetPacketID(a_PacketType);
+		default:                        return Super::GetPacketID(a_PacketType);
 	}
 }
 
@@ -469,7 +482,7 @@ signed char cProtocol_1_13::GetProtocolEntityStatus(const EntityAnimation a_Anim
 	switch (a_Animation)
 	{
 		case EntityAnimation::DolphinShowsHappiness: return 38;
-		default: return Super::GetProtocolEntityStatus(a_Animation);
+		default:                                     return Super::GetProtocolEntityStatus(a_Animation);
 	}
 }
 
@@ -491,66 +504,66 @@ UInt32 cProtocol_1_13::GetProtocolMobType(eMonsterType a_MobType) const
 	switch (a_MobType)
 	{
 		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
-		case mtInvalidType:           return 27;
-		case mtBat:                   return 3;
-		case mtCat:                   return 48;
-		case mtBlaze:                 return 4;
-		case mtCaveSpider:            return 6;
-		case mtChicken:               return 7;
-		case mtCod:                   return 8;
-		case mtCow:                   return 9;
-		case mtCreeper:               return 10;
-		case mtDonkey:                return 11;
-		case mtDolphin:               return 12;
-		case mtDrowned:               return 14;
-		case mtElderGuardian:         return 15;
-		case mtEnderDragon:           return 17;
-		case mtEnderman:              return 18;
-		case mtEndermite:             return 19;
-		case mtEvoker:                return 21;
-		case mtGhast:                 return 26;
-		case mtGiant:                 return 27;
-		case mtGuardian:              return 28;
-		case mtHorse:                 return 29;
-		case mtHusk:                  return 30;
-		case mtIllusioner:            return 31;
-		case mtIronGolem:             return 80;
-		case mtLlama:                 return 36;
-		case mtMagmaCube:             return 38;
-		case mtMule:                  return 46;
-		case mtMooshroom:             return 47;
-		case mtOcelot:                return 48;
-		case mtParrot:                return 50;
-		case mtPhantom:               return 90;
-		case mtPig:                   return 51;
-		case mtPufferfish:            return 52;
-		case mtPolarBear:             return 54;
-		case mtRabbit:                return 56;
-		case mtSalmon:                return 57;
-		case mtSheep:                 return 58;
-		case mtShulker:               return 59;
-		case mtSilverfish:            return 61;
-		case mtSkeleton:              return 62;
-		case mtSkeletonHorse:         return 63;
-		case mtSlime:                 return 64;
-		case mtSnowGolem:             return 66;
-		case mtSpider:                return 69;
-		case mtSquid:                 return 70;
-		case mtStray:                 return 71;
-		case mtTropicalFish:          return 72;
-		case mtTurtle:                return 73;
-		case mtVex:                   return 78;
-		case mtVillager:              return 79;
-		case mtVindicator:            return 81;
-		case mtWitch:                 return 82;
-		case mtWither:                return 83;
-		case mtWitherSkeleton:        return 84;
-		case mtWolf:                  return 86;
-		case mtZombie:                return 87;
-		case mtZombiePigman:          return 53;
-		case mtZombieHorse:           return 88;
-		case mtZombieVillager:        return 89;
-		default:                      return 0;
+		case mtInvalidType:    return 27;
+		case mtBat:            return 3;
+		case mtCat:            return 48;
+		case mtBlaze:          return 4;
+		case mtCaveSpider:     return 6;
+		case mtChicken:        return 7;
+		case mtCod:            return 8;
+		case mtCow:            return 9;
+		case mtCreeper:        return 10;
+		case mtDonkey:         return 11;
+		case mtDolphin:        return 12;
+		case mtDrowned:        return 14;
+		case mtElderGuardian:  return 15;
+		case mtEnderDragon:    return 17;
+		case mtEnderman:       return 18;
+		case mtEndermite:      return 19;
+		case mtEvoker:         return 21;
+		case mtGhast:          return 26;
+		case mtGiant:          return 27;
+		case mtGuardian:       return 28;
+		case mtHorse:          return 29;
+		case mtHusk:           return 30;
+		case mtIllusioner:     return 31;
+		case mtIronGolem:      return 80;
+		case mtLlama:          return 36;
+		case mtMagmaCube:      return 38;
+		case mtMule:           return 46;
+		case mtMooshroom:      return 47;
+		case mtOcelot:         return 48;
+		case mtParrot:         return 50;
+		case mtPhantom:        return 90;
+		case mtPig:            return 51;
+		case mtPufferfish:     return 52;
+		case mtPolarBear:      return 54;
+		case mtRabbit:         return 56;
+		case mtSalmon:         return 57;
+		case mtSheep:          return 58;
+		case mtShulker:        return 59;
+		case mtSilverfish:     return 61;
+		case mtSkeleton:       return 62;
+		case mtSkeletonHorse:  return 63;
+		case mtSlime:          return 64;
+		case mtSnowGolem:      return 66;
+		case mtSpider:         return 69;
+		case mtSquid:          return 70;
+		case mtStray:          return 71;
+		case mtTropicalFish:   return 72;
+		case mtTurtle:         return 73;
+		case mtVex:            return 78;
+		case mtVillager:       return 79;
+		case mtVindicator:     return 81;
+		case mtWitch:          return 82;
+		case mtWither:         return 83;
+		case mtWitherSkeleton: return 84;
+		case mtWolf:           return 86;
+		case mtZombie:         return 87;
+		case mtZombiePigman:   return 53;
+		case mtZombieHorse:    return 88;
+		case mtZombieVillager: return 89;
+		default:               return 0;
 	}
 }
 
@@ -684,7 +697,11 @@ void cProtocol_1_13::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, cons
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Brand);
 
 		m_Client->SetClientBrand(Brand);
-		m_Client->SendPluginMessage("brand", "\x08""Cuberite");  // Send back our brand, including the length.
+		m_Client->SendPluginMessage(
+			"brand",
+			"\x08"
+			"Cuberite"
+		);  // Send back our brand, including the length.
 	}
 }
 
@@ -714,7 +731,8 @@ bool cProtocol_1_13::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t
 	}
 
 	ContiguousByteBuffer Metadata;
-	if (!a_ByteBuffer.ReadSome(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes) || Metadata.empty() || (Metadata[0] == std::byte(0)))
+	if (!a_ByteBuffer.ReadSome(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes) || Metadata.empty() ||
+		(Metadata[0] == std::byte(0)))
 	{
 		// No metadata
 		return true;
@@ -728,7 +746,11 @@ bool cProtocol_1_13::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t
 
 
 
-void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const
+void cProtocol_1_13::WriteEntityMetadata(
+	cPacketizer & a_Pkt,
+	const EntityMetadata a_Metadata,
+	const EntityMetadataType a_FieldType
+) const
 {
 	a_Pkt.WriteBEUInt8(GetEntityMetadataID(a_Metadata));  // Index
 	a_Pkt.WriteBEUInt8(GetEntityMetadataID(a_FieldType));  // Type
@@ -1371,7 +1393,16 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_13_1:
 
-void cProtocol_1_13_1::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+void cProtocol_1_13_1::SendBossBarAdd(
+	UInt32 a_UniqueID,
+	const cCompositeChat & a_Title,
+	float a_FractionFilled,
+	BossBarColor a_Color,
+	BossBarDivisionType a_DivisionType,
+	bool a_DarkenSky,
+	bool a_PlayEndMusic,
+	bool a_CreateFog
+)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -1382,32 +1413,36 @@ void cProtocol_1_13_1::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & 
 	Pkt.WriteVarInt32(0);  // Add
 	Pkt.WriteString(a_Title.CreateJsonString());
 	Pkt.WriteBEFloat(a_FractionFilled);
-	Pkt.WriteVarInt32([a_Color]
-	{
-		switch (a_Color)
+	Pkt.WriteVarInt32(
+		[a_Color]
 		{
-			case BossBarColor::Pink: return 0U;
-			case BossBarColor::Blue: return 1U;
-			case BossBarColor::Red: return 2U;
-			case BossBarColor::Green: return 3U;
-			case BossBarColor::Yellow: return 4U;
-			case BossBarColor::Purple: return 5U;
-			case BossBarColor::White: return 6U;
-		}
-		UNREACHABLE("Unsupported boss bar property");
-	}());
-	Pkt.WriteVarInt32([a_DivisionType]
-	{
-		switch (a_DivisionType)
+			switch (a_Color)
+			{
+				case BossBarColor::Pink:   return 0U;
+				case BossBarColor::Blue:   return 1U;
+				case BossBarColor::Red:    return 2U;
+				case BossBarColor::Green:  return 3U;
+				case BossBarColor::Yellow: return 4U;
+				case BossBarColor::Purple: return 5U;
+				case BossBarColor::White:  return 6U;
+			}
+			UNREACHABLE("Unsupported boss bar property");
+		}()
+	);
+	Pkt.WriteVarInt32(
+		[a_DivisionType]
 		{
-			case BossBarDivisionType::None: return 0U;
-			case BossBarDivisionType::SixNotches: return 1U;
-			case BossBarDivisionType::TenNotches: return 2U;
-			case BossBarDivisionType::TwelveNotches: return 3U;
-			case BossBarDivisionType::TwentyNotches: return 4U;
-		}
-		UNREACHABLE("Unsupported boss bar property");
-	}());
+			switch (a_DivisionType)
+			{
+				case BossBarDivisionType::None:          return 0U;
+				case BossBarDivisionType::SixNotches:    return 1U;
+				case BossBarDivisionType::TenNotches:    return 2U;
+				case BossBarDivisionType::TwelveNotches: return 3U;
+				case BossBarDivisionType::TwentyNotches: return 4U;
+			}
+			UNREACHABLE("Unsupported boss bar property");
+		}()
+	);
 	{
 		UInt8 Flags = 0x00;
 		if (a_DarkenSky)
@@ -1430,7 +1465,12 @@ void cProtocol_1_13_1::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & 
 
 
 
-void cProtocol_1_13_1::SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+void cProtocol_1_13_1::SendBossBarUpdateFlags(
+	UInt32 a_UniqueID,
+	bool a_DarkenSky,
+	bool a_PlayEndMusic,
+	bool a_CreateFog
+)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -1541,7 +1581,8 @@ bool cProtocol_1_13_2::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size
 	}
 
 	ContiguousByteBuffer Metadata;
-	if (!a_ByteBuffer.ReadSome(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes) || Metadata.empty() || (Metadata[0] == std::byte(0)))
+	if (!a_ByteBuffer.ReadSome(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes) || Metadata.empty() ||
+		(Metadata[0] == std::byte(0)))
 	{
 		// No metadata
 		return true;

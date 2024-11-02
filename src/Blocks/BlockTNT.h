@@ -7,17 +7,14 @@
 
 
 
-class cBlockTNTHandler final :
-	public cBlockHandler
+class cBlockTNTHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual void OnCancelRightClick(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
@@ -39,7 +36,3 @@ private:
 		return 4;
 	}
 };
-
-
-
-

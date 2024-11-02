@@ -24,8 +24,7 @@ class cItems;
 
 class cBlockHandler
 {
-public:
-
+  public:
 	constexpr cBlockHandler(BLOCKTYPE a_BlockType) :
 		m_BlockType(a_BlockType)
 	{
@@ -44,31 +43,47 @@ public:
 	/** Returns the relative bounding box that must be entity-free in
 	order for the block to be placed. a_XM, a_XP, etc. stand for the
 	blocktype of the minus-X neighbor, the positive-X neighbor, etc. */
-	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) const;
+	virtual cBoundingBox GetPlacementCollisionBox(
+		BLOCKTYPE a_XM,
+		BLOCKTYPE a_XP,
+		BLOCKTYPE a_YM,
+		BLOCKTYPE a_YP,
+		BLOCKTYPE a_ZM,
+		BLOCKTYPE a_ZP
+	) const;
 
 	/** Called by cWorld::SetBlock() after the block has been set */
 	virtual void OnPlaced(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) const {}
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta
+	) const
+	{
+	}
 
 	/** Called after a block gets broken (replaced with air), by natural means.
-	The block is already dug up in the world, the original block type and meta is passed in a_OldBlockType and a_OldBlockMeta.
-	By default notifies all direct neighbors via their OnNeighborChanged() callbacks.
-	You can determine what kind of entity broke the block (e.g. player) by checking a_Digger! */
+	The block is already dug up in the world, the original block type and meta is passed in a_OldBlockType and
+	a_OldBlockMeta. By default notifies all direct neighbors via their OnNeighborChanged() callbacks. You can determine
+	what kind of entity broke the block (e.g. player) by checking a_Digger! */
 	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BLOCKTYPE a_OldBlockType,
+		NIBBLETYPE a_OldBlockMeta,
 		const cEntity * a_Digger
-	) const {}
+	) const
+	{
+	}
 
 	/** Called when a direct neighbor of this block has been changed.
 	The position is the block's own position, NOT the changed neighbor's position.
-	a_WhichNeighbor indicates which neighbor has changed. For example, BLOCK_FACE_YP meant the neighbor above has changed.
-	BLOCK_FACE_NONE means that it is a neighbor not directly adjacent (diagonal, etc.) */
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const;
+	a_WhichNeighbor indicates which neighbor has changed. For example, BLOCK_FACE_YP meant the neighbor above has
+	changed. BLOCK_FACE_NONE means that it is a neighbor not directly adjacent (diagonal, etc.) */
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor)
+		const;
 
 	/** Notifies the specified neighbor that the current block has changed.
 	a_NeighborPos are the coords of the neighbor to be notified
@@ -103,7 +118,8 @@ public:
 	}
 
 	/** Called when a right click to this block is cancelled.
-	Descendants should force the server to send the real state of a block to the client to prevent client assuming the operation was successfull. */
+	Descendants should force the server to send the real state of a block to the client to prevent client assuming the
+	operation was successfull. */
 	virtual void OnCancelRightClick(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
@@ -136,22 +152,31 @@ public:
 	@param a_Pos Position of the block
 	@param a_Player Player trying to build on the block
 	@param a_Meta Meta value of the block currently at a_Pos */
-	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, Vector3i a_Position, NIBBLETYPE a_Meta, eBlockFace a_ClickedBlockFace, bool a_ClickedDirectly) const;
+	virtual bool DoesIgnoreBuildCollision(
+		const cWorld & a_World,
+		const cItem & a_HeldItem,
+		Vector3i a_Position,
+		NIBBLETYPE a_Meta,
+		eBlockFace a_ClickedBlockFace,
+		bool a_ClickedDirectly
+	) const;
 
 	/** Tests if a_RelPosition is inside the block, where a_RelPosition is relative to the origin of the block.
 	Coords in a_RelPosition are guaranteed to be in the [0..1] range. */
 	virtual bool IsInsideBlock(const Vector3d a_RelPosition, const NIBBLETYPE a_BlockMeta) const;
 
 	/** Called when one of the neighbors gets set; equivalent to MC block update.
-	By default drops (DropBlockAsPickup() / SetBlock()) if the position is no longer suitable (CanBeAt(), DoesDropOnUnsuitable()),
-	otherwise wakes up all simulators on the block. */
+	By default drops (DropBlockAsPickup() / SetBlock()) if the position is no longer suitable (CanBeAt(),
+	DoesDropOnUnsuitable()), otherwise wakes up all simulators on the block. */
 	void Check(
-		cChunkInterface & ChunkInterface, cBlockPluginInterface & a_PluginInterface,
+		cChunkInterface & ChunkInterface,
+		cBlockPluginInterface & a_PluginInterface,
 		Vector3i a_RelPos,
 		cChunk & a_Chunk
 	) const;
 
-	/** Returns the base colour ID of the block, as will be represented on a map, as per documentation: https://minecraft.wiki/w/Map_item_format */
+	/** Returns the base colour ID of the block, as will be represented on a map, as per documentation:
+	 * https://minecraft.wiki/w/Map_item_format */
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const;
 
 	/** Rotates a given block meta counter-clockwise. Default: no change
@@ -198,8 +223,7 @@ public:
 	// Gets the blockhandler for the given block type.
 	static const cBlockHandler & For(BLOCKTYPE a_BlockType);
 
-protected:
-
+  protected:
 	~cBlockHandler() = default;
 
 	const BLOCKTYPE m_BlockType;

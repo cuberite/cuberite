@@ -18,25 +18,25 @@
 // tolua_begin
 class cItemGrid
 {
-public:
+  public:
 	// tolua_end
 
 	/** This class is used as a callback for when a slot changes */
 	class cListener
 	{
-	public:
+	  public:
 		virtual ~cListener() {}
 
 		/** Called whenever a slot changes */
 		virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) = 0;
-	} ;
+	};
 	typedef std::vector<cListener *> cListeners;
 
 	cItemGrid(int a_Width, int a_Height);
 
 	// tolua_begin
-	int GetWidth   (void) const { return m_Width; }
-	int GetHeight  (void) const { return m_Height; }
+	int GetWidth(void) const { return m_Width; }
+	int GetHeight(void) const { return m_Height; }
 	int GetNumSlots(void) const { return m_Slots.size(); }
 
 	/** Converts XY coords into slot number; returns -1 on invalid coords */
@@ -82,9 +82,9 @@ public:
 	/** Adds as many items out of a_ItemStack as can fit.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;
 	If a_AllowNewStacks is set to true, empty slots can be used for the rest.
-	If a_PrioritySlot is set to a positive value, then the corresponding slot will be used  first (if empty or compatible with added items).
-	If a_PrioritySlot is set to -1, regular order applies.
-	Returns the number of items that fit.
+	If a_PrioritySlot is set to a positive value, then the corresponding slot will be used  first (if empty or
+	compatible with added items). If a_PrioritySlot is set to -1, regular order applies. Returns the number of items
+	that fit.
 	*/
 	char AddItem(cItem & a_ItemStack, bool a_AllowNewStacks = true, int a_PrioritySlot = -1);
 
@@ -92,9 +92,9 @@ public:
 	The a_ItemStackList is modified to reflect the leftover items.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;
 	If a_AllowNewStacks is set to true, empty slots can be used for the rest.
-	If a_PrioritySlot is set to a positive value, then the corresponding slot will be used first (if empty or compatible with added items).
-	If a_PrioritySlot is set to -1, regular order applies.
-	Returns the total number of items that fit.
+	If a_PrioritySlot is set to a positive value, then the corresponding slot will be used first (if empty or compatible
+	with added items). If a_PrioritySlot is set to -1, regular order applies. Returns the total number of items that
+	fit.
 	*/
 	char AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks = true, int a_PrioritySlot = -1);
 
@@ -171,11 +171,18 @@ public:
 
 	/** Generates random loot from the specified loot probability table, with a chance of enchanted books added.
 	A total of a_NumSlots are taken by the loot.
-	Cannot export to Lua due to raw array a_LootProbabs. TODO: Make this exportable / export through ManualBindings.cpp with a Lua table as LootProbabs
+	Cannot export to Lua due to raw array a_LootProbabs. TODO: Make this exportable / export through ManualBindings.cpp
+	with a Lua table as LootProbabs
 	*/
-	void GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, size_t a_CountLootProbabs, int a_NumSlots, int a_Seed);
+	void GenerateRandomLootWithBooks(
+		const cLootProbab * a_LootProbabs,
+		size_t a_CountLootProbabs,
+		int a_NumSlots,
+		int a_Seed
+	);
 
-	/** Adds a callback that gets called whenever a slot changes. Must not be called from within the listener callback! */
+	/** Adds a callback that gets called whenever a slot changes. Must not be called from within the listener callback!
+	 */
 	void AddListener(cListener & a_Listener);
 
 	/** Removes a slot-change-callback. Must not be called from within the listener callback! */
@@ -183,14 +190,16 @@ public:
 
 	// tolua_begin
 
-protected:
-	int     m_Width;
-	int     m_Height;
+  protected:
+	int m_Width;
+	int m_Height;
 	cLazyArray<cItem> m_Slots;
 
-	cListeners       m_Listeners;    ///< Listeners which should be notified on slot changes; the pointers are not owned by this object
+	cListeners
+		m_Listeners;  ///< Listeners which should be notified on slot changes; the pointers are not owned by this object
 	cCriticalSection m_CSListeners;  ///< CS that guards the m_Listeners against multi-thread access
-	bool             m_IsInTriggerListeners;  ///< Set to true while TriggerListeners is running, to detect attempts to manipulate listener list while triggerring
+	bool m_IsInTriggerListeners;  ///< Set to true while TriggerListeners is running, to detect attempts to manipulate
+								  ///< listener list while triggerring
 
 	/** Calls all m_Listeners for the specified slot number */
 	void TriggerListeners(int a_SlotNum);
@@ -199,5 +208,5 @@ protected:
 	Returns the number of items that did fit.
 	*/
 	char AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, int a_MaxStack);
-} ;
+};
 // tolua_end

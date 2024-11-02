@@ -7,16 +7,14 @@
 
 
 // tolua_begin
-class cTNTEntity:
-	public cEntity
+class cTNTEntity : public cEntity
 {
 
 	// tolua_end
 
 	using Super = cEntity;
 
-public:  // tolua_export
-
+  public:  // tolua_export
 	CLASS_PROTODEF(cTNTEntity)
 
 	cTNTEntity(Vector3d a_Pos, unsigned a_FuseTicks = 80);
@@ -38,6 +36,6 @@ public:  // tolua_export
 
 	// tolua_end
 
-protected:
-	unsigned m_FuseTicks;      ///< How much ticks is left, while the tnt will explode
+  protected:
+	unsigned m_FuseTicks;  ///< How much ticks is left, while the tnt will explode
 };  // tolua_export

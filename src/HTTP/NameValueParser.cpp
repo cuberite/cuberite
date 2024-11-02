@@ -72,8 +72,7 @@ public:
 // cNameValueParser:
 
 cNameValueParser::cNameValueParser(bool a_AllowsKeyOnly) :
-	m_State(psKeySpace),
-	m_AllowsKeyOnly(a_AllowsKeyOnly)
+	m_State(psKeySpace), m_AllowsKeyOnly(a_AllowsKeyOnly)
 {
 }
 
@@ -82,8 +81,7 @@ cNameValueParser::cNameValueParser(bool a_AllowsKeyOnly) :
 
 
 cNameValueParser::cNameValueParser(const char * a_Data, size_t a_Size, bool a_AllowsKeyOnly) :
-	m_State(psKeySpace),
-	m_AllowsKeyOnly(a_AllowsKeyOnly)
+	m_State(psKeySpace), m_AllowsKeyOnly(a_AllowsKeyOnly)
 {
 	Parse(a_Data, a_Size);
 }
@@ -405,7 +403,3 @@ bool cNameValueParser::Finish(void)
 	}
 	UNREACHABLE("Unsupported name value parser state");
 }
-
-
-
-

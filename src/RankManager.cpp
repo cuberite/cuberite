@@ -1,7 +1,8 @@
 
 // RankManager.cpp
 
-// Implements the cRankManager class that represents the rank manager responsible for assigning permissions and message visuals to players
+// Implements the cRankManager class that represents the rank manager responsible for assigning permissions and message
+// visuals to players
 
 #include "Globals.h"
 #include "RankManager.h"
@@ -16,8 +17,7 @@
 // cRankManager:
 
 cRankManager::cRankManager(void) :
-	m_DB("Ranks.sqlite", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE),
-	m_IsInitialized(false)
+	m_DB("Ranks.sqlite", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE), m_IsInitialized(false)
 {
 }
 
@@ -25,9 +25,7 @@ cRankManager::cRankManager(void) :
 
 
 
-cRankManager::~cRankManager()
-{
-}
+cRankManager::~cRankManager() {}
 
 
 
@@ -38,7 +36,9 @@ void cRankManager::Initialize(cMojangAPI & a_MojangAPI)
 	ASSERT(!m_IsInitialized);  // Calling Initialize for the second time?
 
 	// Create the DB tables, if they don't exist:
-	m_DB.exec("CREATE TABLE IF NOT EXISTS Rank (RankID INTEGER PRIMARY KEY, Name, MsgPrefix, MsgSuffix, MsgNameColorCode)");
+	m_DB.exec(
+		"CREATE TABLE IF NOT EXISTS Rank (RankID INTEGER PRIMARY KEY, Name, MsgPrefix, MsgSuffix, MsgNameColorCode)"
+	);
 	m_DB.exec("CREATE TABLE IF NOT EXISTS PlayerRank (PlayerUUID, PlayerName, RankID INTEGER)");
 	m_DB.exec("CREATE TABLE IF NOT EXISTS PermGroup (PermGroupID INTEGER PRIMARY KEY, Name)");
 	m_DB.exec("CREATE TABLE IF NOT EXISTS RankPermGroup (RankID INTEGER, PermGroupID INTEGER)");
@@ -61,7 +61,8 @@ void cRankManager::Initialize(cMojangAPI & a_MojangAPI)
 	// Load the default rank:
 	try
 	{
-		SQLite::Statement stmt(m_DB,
+		SQLite::Statement stmt(
+			m_DB,
 			"SELECT Rank.Name FROM Rank "
 			"LEFT JOIN DefaultRank ON Rank.RankID = DefaultRank.RankID"
 		);
@@ -94,7 +95,11 @@ AString cRankManager::GetPlayerRankName(const cUUID & a_PlayerUUID)
 
 	try
 	{
-		SQLite::Statement stmt(m_DB, "SELECT Rank.Name FROM Rank LEFT JOIN PlayerRank ON Rank.RankID = PlayerRank.RankID WHERE PlayerRank.PlayerUUID = ?");
+		SQLite::Statement stmt(
+			m_DB,
+			"SELECT Rank.Name FROM Rank LEFT JOIN PlayerRank ON Rank.RankID = PlayerRank.RankID WHERE "
+			"PlayerRank.PlayerUUID = ?"
+		);
 		stmt.bind(1, a_PlayerUUID.ToShortString());
 		// executeStep returns false on no data
 		if (!stmt.executeStep())
@@ -151,10 +156,11 @@ AStringVector cRankManager::GetPlayerGroups(const cUUID & a_PlayerUUID)
 	try
 	{
 		// Prepare the DB statement:
-		SQLite::Statement stmt(m_DB,
+		SQLite::Statement stmt(
+			m_DB,
 			"SELECT PermGroup.Name FROM PermGroup "
-				"LEFT JOIN RankPermGroup ON PermGroup.PermGroupID = RankPermGroup.PermGroupID "
-				"LEFT JOIN PlayerRank ON PlayerRank.RankID = RankPermGroup.RankID "
+			"LEFT JOIN RankPermGroup ON PermGroup.PermGroupID = RankPermGroup.PermGroupID "
+			"LEFT JOIN PlayerRank ON PlayerRank.RankID = RankPermGroup.RankID "
 			"WHERE PlayerRank.PlayerUUID = ?"
 		);
 		stmt.bind(1, a_PlayerUUID.ToShortString());
@@ -212,10 +218,11 @@ AStringVector cRankManager::GetRankGroups(const AString & a_RankName)
 	AStringVector res;
 	try
 	{
-		SQLite::Statement stmt(m_DB,
+		SQLite::Statement stmt(
+			m_DB,
 			"SELECT PermGroup.Name FROM PermGroup "
-				"LEFT JOIN RankPermGroup ON RankPermGroup.PermGroupID = PermGroup.PermGroupID "
-				"LEFT JOIN Rank ON Rank.RankID = RankPermGroup.RankID "
+			"LEFT JOIN RankPermGroup ON RankPermGroup.PermGroupID = PermGroup.PermGroupID "
+			"LEFT JOIN Rank ON Rank.RankID = RankPermGroup.RankID "
 			"WHERE Rank.Name = ?"
 		);
 		stmt.bind(1, a_RankName);
@@ -243,9 +250,10 @@ AStringVector cRankManager::GetGroupPermissions(const AString & a_GroupName)
 	AStringVector res;
 	try
 	{
-		SQLite::Statement stmt(m_DB,
+		SQLite::Statement stmt(
+			m_DB,
 			"SELECT PermissionItem.Permission FROM PermissionItem "
-				"LEFT JOIN PermGroup ON PermGroup.PermGroupID = PermissionItem.PermGroupID "
+			"LEFT JOIN PermGroup ON PermGroup.PermGroupID = PermissionItem.PermGroupID "
 			"WHERE PermGroup.Name = ?"
 		);
 		stmt.bind(1, a_GroupName);
@@ -273,9 +281,10 @@ AStringVector cRankManager::GetGroupRestrictions(const AString & a_GroupName)
 	AStringVector res;
 	try
 	{
-		SQLite::Statement stmt(m_DB,
+		SQLite::Statement stmt(
+			m_DB,
 			"SELECT RestrictionItem.Permission FROM RestrictionItem "
-				"LEFT JOIN PermGroup ON PermGroup.PermGroupID = RestrictionItem.PermGroupID "
+			"LEFT JOIN PermGroup ON PermGroup.PermGroupID = RestrictionItem.PermGroupID "
 			"WHERE PermGroup.Name = ?"
 		);
 		stmt.bind(1, a_GroupName);
@@ -303,10 +312,11 @@ AStringVector cRankManager::GetRankPermissions(const AString & a_RankName)
 	AStringVector res;
 	try
 	{
-		SQLite::Statement stmt(m_DB,
+		SQLite::Statement stmt(
+			m_DB,
 			"SELECT PermissionItem.Permission FROM PermissionItem "
-				"LEFT JOIN RankPermGroup ON RankPermGroup.PermGroupID = PermissionItem.PermGroupID "
-				"LEFT JOIN Rank ON Rank.RankID = RankPermGroup.RankID "
+			"LEFT JOIN RankPermGroup ON RankPermGroup.PermGroupID = PermissionItem.PermGroupID "
+			"LEFT JOIN Rank ON Rank.RankID = RankPermGroup.RankID "
 			"WHERE Rank.Name = ?"
 		);
 		stmt.bind(1, a_RankName);
@@ -334,10 +344,11 @@ AStringVector cRankManager::GetRankRestrictions(const AString & a_RankName)
 	AStringVector res;
 	try
 	{
-		SQLite::Statement stmt(m_DB,
+		SQLite::Statement stmt(
+			m_DB,
 			"SELECT RestrictionItem.Permission FROM RestrictionItem "
-				"LEFT JOIN RankPermGroup ON RankPermGroup.PermGroupID = RestrictionItem.PermGroupID "
-				"LEFT JOIN Rank ON Rank.RankID = RankPermGroup.RankID "
+			"LEFT JOIN RankPermGroup ON RankPermGroup.PermGroupID = RestrictionItem.PermGroupID "
+			"LEFT JOIN Rank ON Rank.RankID = RankPermGroup.RankID "
 			"WHERE Rank.Name = ?"
 		);
 		stmt.bind(1, a_RankName);
@@ -492,7 +503,7 @@ AStringVector cRankManager::GetAllPermissionsRestrictions(void)
 {
 	AStringVector Permissions = GetAllPermissions();
 	AStringVector Restrictions = GetAllRestrictions();
-	for (auto & restriction: Restrictions)
+	for (auto & restriction : Restrictions)
 	{
 		Permissions.push_back(restriction);
 	}
@@ -553,7 +564,10 @@ void cRankManager::AddRank(
 		}
 
 		// Insert a new rank:
-		SQLite::Statement stmt(m_DB, "INSERT INTO Rank (Name, MsgPrefix, MsgSuffix, MsgNameColorCode) VALUES (?, ?, ?, ?)");
+		SQLite::Statement stmt(
+			m_DB,
+			"INSERT INTO Rank (Name, MsgPrefix, MsgSuffix, MsgNameColorCode) VALUES (?, ?, ?, ?)"
+		);
 		stmt.bind(1, a_RankName);
 		stmt.bind(2, a_MsgPrefix);
 		stmt.bind(3, a_MsgSuffix);
@@ -697,13 +711,21 @@ bool cRankManager::AddGroupToRank(const AString & a_GroupName, const AString & a
 			stmt.bind(2, GroupID);
 			if (!stmt.executeStep())
 			{
-				LOGWARNING("%s: Failed to check binding between rank %s and group %s, aborting.", __FUNCTION__, a_RankName.c_str(), a_GroupName.c_str());
+				LOGWARNING(
+					"%s: Failed to check binding between rank %s and group %s, aborting.",
+					__FUNCTION__,
+					a_RankName.c_str(),
+					a_GroupName.c_str()
+				);
 				return false;
 			}
 			if (stmt.getColumn(0).getInt() > 0)
 			{
-				LOGD("%s: Group %s already present in rank %s, skipping and returning success.",
-					__FUNCTION__, a_GroupName.c_str(), a_RankName.c_str()
+				LOGD(
+					"%s: Group %s already present in rank %s, skipping and returning success.",
+					__FUNCTION__,
+					a_GroupName.c_str(),
+					a_RankName.c_str()
 				);
 				return true;
 			}
@@ -716,7 +738,12 @@ bool cRankManager::AddGroupToRank(const AString & a_GroupName, const AString & a
 			stmt.bind(2, GroupID);
 			if (stmt.exec() <= 0)
 			{
-				LOGWARNING("%s: Failed to add group %s to rank %s, aborting.", __FUNCTION__, a_GroupName.c_str(), a_RankName.c_str());
+				LOGWARNING(
+					"%s: Failed to add group %s to rank %s, aborting.",
+					__FUNCTION__,
+					a_GroupName.c_str(),
+					a_RankName.c_str()
+				);
 				return false;
 			}
 		}
@@ -726,7 +753,13 @@ bool cRankManager::AddGroupToRank(const AString & a_GroupName, const AString & a
 	}
 	catch (const SQLite::Exception & ex)
 	{
-		LOGWARNING("%s: Failed to add group %s to rank %s: %s", __FUNCTION__, a_GroupName.c_str(), a_RankName.c_str(), ex.what());
+		LOGWARNING(
+			"%s: Failed to add group %s to rank %s: %s",
+			__FUNCTION__,
+			a_GroupName.c_str(),
+			a_RankName.c_str(),
+			ex.what()
+		);
 	}
 	return false;
 }
@@ -757,18 +790,29 @@ bool cRankManager::AddPermissionToGroup(const AString & a_Permission, const AStr
 
 		// Check if the permission is already present:
 		{
-			SQLite::Statement stmt(m_DB, "SELECT COUNT(*) FROM PermissionItem WHERE PermGroupID = ? AND Permission = ?");
+			SQLite::Statement stmt(
+				m_DB,
+				"SELECT COUNT(*) FROM PermissionItem WHERE PermGroupID = ? AND Permission = ?"
+			);
 			stmt.bind(1, GroupID);
 			stmt.bind(2, a_Permission);
 			if (!stmt.executeStep())
 			{
-				LOGWARNING("%s: Failed to check binding between permission %s and group %s, aborting.", __FUNCTION__, a_Permission.c_str(), a_GroupName.c_str());
+				LOGWARNING(
+					"%s: Failed to check binding between permission %s and group %s, aborting.",
+					__FUNCTION__,
+					a_Permission.c_str(),
+					a_GroupName.c_str()
+				);
 				return false;
 			}
 			if (stmt.getColumn(0).getInt() > 0)
 			{
-				LOGD("%s: Permission %s is already present in group %s, skipping and returning success.",
-					__FUNCTION__, a_Permission.c_str(), a_GroupName.c_str()
+				LOGD(
+					"%s: Permission %s is already present in group %s, skipping and returning success.",
+					__FUNCTION__,
+					a_Permission.c_str(),
+					a_GroupName.c_str()
 				);
 				return true;
 			}
@@ -781,7 +825,12 @@ bool cRankManager::AddPermissionToGroup(const AString & a_Permission, const AStr
 			stmt.bind(2, GroupID);
 			if (stmt.exec() <= 0)
 			{
-				LOGWARNING("%s: Failed to add permission %s to group %s, aborting.", __FUNCTION__, a_Permission.c_str(), a_GroupName.c_str());
+				LOGWARNING(
+					"%s: Failed to add permission %s to group %s, aborting.",
+					__FUNCTION__,
+					a_Permission.c_str(),
+					a_GroupName.c_str()
+				);
 				return false;
 			}
 		}
@@ -791,8 +840,12 @@ bool cRankManager::AddPermissionToGroup(const AString & a_Permission, const AStr
 	}
 	catch (const SQLite::Exception & ex)
 	{
-		LOGWARNING("%s: Failed to add permission %s to group %s: %s",
-			__FUNCTION__, a_Permission.c_str(), a_GroupName.c_str(), ex.what()
+		LOGWARNING(
+			"%s: Failed to add permission %s to group %s: %s",
+			__FUNCTION__,
+			a_Permission.c_str(),
+			a_GroupName.c_str(),
+			ex.what()
 		);
 	}
 	return false;
@@ -824,18 +877,29 @@ bool cRankManager::AddRestrictionToGroup(const AString & a_Restriction, const AS
 
 		// Check if the restriction is already present:
 		{
-			SQLite::Statement stmt(m_DB, "SELECT COUNT(*) FROM RestrictionItem WHERE PermGroupID = ? AND Permission = ?");
+			SQLite::Statement stmt(
+				m_DB,
+				"SELECT COUNT(*) FROM RestrictionItem WHERE PermGroupID = ? AND Permission = ?"
+			);
 			stmt.bind(1, GroupID);
 			stmt.bind(2, a_Restriction);
 			if (!stmt.executeStep())
 			{
-				LOGWARNING("%s: Failed to check binding between restriction %s and group %s, aborting.", __FUNCTION__, a_Restriction.c_str(), a_GroupName.c_str());
+				LOGWARNING(
+					"%s: Failed to check binding between restriction %s and group %s, aborting.",
+					__FUNCTION__,
+					a_Restriction.c_str(),
+					a_GroupName.c_str()
+				);
 				return false;
 			}
 			if (stmt.getColumn(0).getInt() > 0)
 			{
-				LOGD("%s: Restriction %s is already present in group %s, skipping and returning success.",
-					__FUNCTION__, a_Restriction.c_str(), a_GroupName.c_str()
+				LOGD(
+					"%s: Restriction %s is already present in group %s, skipping and returning success.",
+					__FUNCTION__,
+					a_Restriction.c_str(),
+					a_GroupName.c_str()
 				);
 				return true;
 			}
@@ -848,7 +912,12 @@ bool cRankManager::AddRestrictionToGroup(const AString & a_Restriction, const AS
 			stmt.bind(2, GroupID);
 			if (stmt.exec() <= 0)
 			{
-				LOGWARNING("%s: Failed to add restriction %s to group %s, aborting.", __FUNCTION__, a_Restriction.c_str(), a_GroupName.c_str());
+				LOGWARNING(
+					"%s: Failed to add restriction %s to group %s, aborting.",
+					__FUNCTION__,
+					a_Restriction.c_str(),
+					a_GroupName.c_str()
+				);
 				return false;
 			}
 		}
@@ -858,8 +927,12 @@ bool cRankManager::AddRestrictionToGroup(const AString & a_Restriction, const AS
 	}
 	catch (const SQLite::Exception & ex)
 	{
-		LOGWARNING("%s: Failed to add restriction %s to group %s: %s",
-			__FUNCTION__, a_Restriction.c_str(), a_GroupName.c_str(), ex.what()
+		LOGWARNING(
+			"%s: Failed to add restriction %s to group %s: %s",
+			__FUNCTION__,
+			a_Restriction.c_str(),
+			a_GroupName.c_str(),
+			ex.what()
 		);
 	}
 	return false;
@@ -893,18 +966,29 @@ bool cRankManager::AddPermissionsToGroup(const AStringVector & a_Permissions, co
 		{
 			// Check if the permission is already present:
 			{
-				SQLite::Statement stmt(m_DB, "SELECT COUNT(*) FROM PermissionItem WHERE PermGroupID = ? AND Permission = ?");
+				SQLite::Statement stmt(
+					m_DB,
+					"SELECT COUNT(*) FROM PermissionItem WHERE PermGroupID = ? AND Permission = ?"
+				);
 				stmt.bind(1, GroupID);
 				stmt.bind(2, *itr);
 				if (!stmt.executeStep())
 				{
-					LOGWARNING("%s: Failed to check binding between permission %s and group %s, aborting.", __FUNCTION__, itr->c_str(), a_GroupName.c_str());
+					LOGWARNING(
+						"%s: Failed to check binding between permission %s and group %s, aborting.",
+						__FUNCTION__,
+						itr->c_str(),
+						a_GroupName.c_str()
+					);
 					return false;
 				}
 				if (stmt.getColumn(0).getInt() > 0)
 				{
-					LOGD("%s: Permission %s is already present in group %s, skipping and returning success.",
-						__FUNCTION__, itr->c_str(), a_GroupName.c_str()
+					LOGD(
+						"%s: Permission %s is already present in group %s, skipping and returning success.",
+						__FUNCTION__,
+						itr->c_str(),
+						a_GroupName.c_str()
 					);
 					continue;
 				}
@@ -917,7 +1001,12 @@ bool cRankManager::AddPermissionsToGroup(const AStringVector & a_Permissions, co
 				stmt.bind(2, GroupID);
 				if (stmt.exec() <= 0)
 				{
-					LOGWARNING("%s: Failed to add permission %s to group %s, skipping.", __FUNCTION__, itr->c_str(), a_GroupName.c_str());
+					LOGWARNING(
+						"%s: Failed to add permission %s to group %s, skipping.",
+						__FUNCTION__,
+						itr->c_str(),
+						a_GroupName.c_str()
+					);
 					continue;
 				}
 			}
@@ -928,9 +1017,7 @@ bool cRankManager::AddPermissionsToGroup(const AStringVector & a_Permissions, co
 	}
 	catch (const SQLite::Exception & ex)
 	{
-		LOGWARNING("%s: Failed to add permissions to group %s: %s",
-			__FUNCTION__, a_GroupName.c_str(), ex.what()
-		);
+		LOGWARNING("%s: Failed to add permissions to group %s: %s", __FUNCTION__, a_GroupName.c_str(), ex.what());
 	}
 	return false;
 }
@@ -963,18 +1050,29 @@ bool cRankManager::AddRestrictionsToGroup(const AStringVector & a_Restrictions, 
 		{
 			// Check if the restriction is already present:
 			{
-				SQLite::Statement stmt(m_DB, "SELECT COUNT(*) FROM RestrictionItem WHERE PermGroupID = ? AND Permission = ?");
+				SQLite::Statement stmt(
+					m_DB,
+					"SELECT COUNT(*) FROM RestrictionItem WHERE PermGroupID = ? AND Permission = ?"
+				);
 				stmt.bind(1, GroupID);
 				stmt.bind(2, *itr);
 				if (!stmt.executeStep())
 				{
-					LOGWARNING("%s: Failed to check binding between restriction %s and group %s, aborting.", __FUNCTION__, itr->c_str(), a_GroupName.c_str());
+					LOGWARNING(
+						"%s: Failed to check binding between restriction %s and group %s, aborting.",
+						__FUNCTION__,
+						itr->c_str(),
+						a_GroupName.c_str()
+					);
 					return false;
 				}
 				if (stmt.getColumn(0).getInt() > 0)
 				{
-					LOGD("%s: Restriction %s is already present in group %s, skipping and returning success.",
-						__FUNCTION__, itr->c_str(), a_GroupName.c_str()
+					LOGD(
+						"%s: Restriction %s is already present in group %s, skipping and returning success.",
+						__FUNCTION__,
+						itr->c_str(),
+						a_GroupName.c_str()
 					);
 					continue;
 				}
@@ -987,7 +1085,12 @@ bool cRankManager::AddRestrictionsToGroup(const AStringVector & a_Restrictions, 
 				stmt.bind(2, GroupID);
 				if (stmt.exec() <= 0)
 				{
-					LOGWARNING("%s: Failed to add restriction %s to group %s, skipping.", __FUNCTION__, itr->c_str(), a_GroupName.c_str());
+					LOGWARNING(
+						"%s: Failed to add restriction %s to group %s, skipping.",
+						__FUNCTION__,
+						itr->c_str(),
+						a_GroupName.c_str()
+					);
 					continue;
 				}
 			}
@@ -998,9 +1101,7 @@ bool cRankManager::AddRestrictionsToGroup(const AStringVector & a_Restrictions, 
 	}
 	catch (const SQLite::Exception & ex)
 	{
-		LOGWARNING("%s: Failed to add restrictions to group %s: %s",
-			__FUNCTION__, a_GroupName.c_str(), ex.what()
-		);
+		LOGWARNING("%s: Failed to add restrictions to group %s: %s", __FUNCTION__, a_GroupName.c_str(), ex.what());
 	}
 	return false;
 }
@@ -1017,7 +1118,11 @@ void cRankManager::RemoveRank(const AString & a_RankName, const AString & a_Repl
 	// Check if the default rank is being removed with a proper replacement:
 	if ((a_RankName == m_DefaultRank) && !RankExists(a_ReplacementRankName))
 	{
-		LOGWARNING("%s: Cannot remove rank %s, it is the default rank and the replacement rank doesn't exist.", __FUNCTION__, a_RankName.c_str());
+		LOGWARNING(
+			"%s: Cannot remove rank %s, it is the default rank and the replacement rank doesn't exist.",
+			__FUNCTION__,
+			a_RankName.c_str()
+		);
 		return;
 	}
 
@@ -1156,17 +1261,23 @@ void cRankManager::RemoveGroupFromRank(const AString & a_GroupName, const AStrin
 		// Get the IDs of the group and the rank:
 		int GroupID, RankID;
 		{
-			SQLite::Statement stmt(m_DB,
+			SQLite::Statement stmt(
+				m_DB,
 				"SELECT PermGroup.PermGroupID, Rank.RankID FROM PermGroup "
-					"LEFT JOIN RankPermGroup ON RankPermGroup.PermGroupID = PermGroup.PermGroupID "
-					"LEFT JOIN Rank ON Rank.RankID = RankPermGroup.RankID "
+				"LEFT JOIN RankPermGroup ON RankPermGroup.PermGroupID = PermGroup.PermGroupID "
+				"LEFT JOIN Rank ON Rank.RankID = RankPermGroup.RankID "
 				"WHERE PermGroup.Name = ? AND Rank.Name = ?"
 			);
 			stmt.bind(1, a_GroupName);
 			stmt.bind(2, a_RankName);
 			if (!stmt.executeStep())
 			{
-				LOGINFO("%s: Group %s was not found in rank %s, skipping.", __FUNCTION__, a_GroupName.c_str(), a_RankName.c_str());
+				LOGINFO(
+					"%s: Group %s was not found in rank %s, skipping.",
+					__FUNCTION__,
+					a_GroupName.c_str(),
+					a_RankName.c_str()
+				);
 				return;
 			}
 			GroupID = stmt.getColumn(0).getInt();
@@ -1190,7 +1301,13 @@ void cRankManager::RemoveGroupFromRank(const AString & a_GroupName, const AStrin
 	}
 	catch (const SQLite::Exception & ex)
 	{
-		LOGWARNING("%s: Failed to remove group %s from rank %s in the DB: %s", __FUNCTION__, a_GroupName.c_str(), a_RankName.c_str(), ex.what());
+		LOGWARNING(
+			"%s: Failed to remove group %s from rank %s in the DB: %s",
+			__FUNCTION__,
+			a_GroupName.c_str(),
+			a_RankName.c_str(),
+			ex.what()
+		);
 	}
 }
 
@@ -1228,8 +1345,12 @@ void cRankManager::RemovePermissionFromGroup(const AString & a_Permission, const
 	}
 	catch (const SQLite::Exception & ex)
 	{
-		LOGWARNING("%s: Failed to remove permission %s from group %s in DB: %s",
-			__FUNCTION__, a_Permission.c_str(), a_GroupName.c_str(), ex.what()
+		LOGWARNING(
+			"%s: Failed to remove permission %s from group %s in DB: %s",
+			__FUNCTION__,
+			a_Permission.c_str(),
+			a_GroupName.c_str(),
+			ex.what()
 		);
 	}
 }
@@ -1268,8 +1389,12 @@ void cRankManager::RemoveRestrictionFromGroup(const AString & a_Restriction, con
 	}
 	catch (const SQLite::Exception & ex)
 	{
-		LOGWARNING("%s: Failed to remove restriction %s from group %s in DB: %s",
-			__FUNCTION__, a_Restriction.c_str(), a_GroupName.c_str(), ex.what()
+		LOGWARNING(
+			"%s: Failed to remove restriction %s from group %s in DB: %s",
+			__FUNCTION__,
+			a_Restriction.c_str(),
+			a_GroupName.c_str(),
+			ex.what()
 		);
 	}
 }
@@ -1291,7 +1416,12 @@ bool cRankManager::RenameRank(const AString & a_OldName, const AString & a_NewNa
 			stmt.bind(1, a_NewName);
 			if (stmt.executeStep())
 			{
-				LOGINFO("%s: Rank %s is already present, cannot rename %s", __FUNCTION__, a_NewName.c_str(), a_OldName.c_str());
+				LOGINFO(
+					"%s: Rank %s is already present, cannot rename %s",
+					__FUNCTION__,
+					a_NewName.c_str(),
+					a_OldName.c_str()
+				);
 				return false;
 			}
 		}
@@ -1303,7 +1433,12 @@ bool cRankManager::RenameRank(const AString & a_OldName, const AString & a_NewNa
 			stmt.bind(2, a_OldName);
 			if (stmt.exec() <= 0)
 			{
-				LOGINFO("%s: There is no rank %s, cannot rename to %s.", __FUNCTION__, a_OldName.c_str(), a_NewName.c_str());
+				LOGINFO(
+					"%s: There is no rank %s, cannot rename to %s.",
+					__FUNCTION__,
+					a_OldName.c_str(),
+					a_NewName.c_str()
+				);
 				return false;
 			}
 		}
@@ -1318,8 +1453,13 @@ bool cRankManager::RenameRank(const AString & a_OldName, const AString & a_NewNa
 	}
 	catch (const SQLite::Exception & ex)
 	{
-		LOGWARNING("%s: Failed to rename rank %s to %s in DB: %s",
-			__FUNCTION__, a_OldName.c_str(), a_NewName.c_str(), ex.what());
+		LOGWARNING(
+			"%s: Failed to rename rank %s to %s in DB: %s",
+			__FUNCTION__,
+			a_OldName.c_str(),
+			a_NewName.c_str(),
+			ex.what()
+		);
 	}
 	return false;
 }
@@ -1341,7 +1481,12 @@ bool cRankManager::RenameGroup(const AString & a_OldName, const AString & a_NewN
 			stmt.bind(1, a_NewName);
 			if (stmt.executeStep())
 			{
-				LOGD("%s: Group %s is already present, cannot rename %s", __FUNCTION__, a_NewName.c_str(), a_OldName.c_str());
+				LOGD(
+					"%s: Group %s is already present, cannot rename %s",
+					__FUNCTION__,
+					a_NewName.c_str(),
+					a_OldName.c_str()
+				);
 				return false;
 			}
 		}
@@ -1359,8 +1504,13 @@ bool cRankManager::RenameGroup(const AString & a_OldName, const AString & a_NewN
 	}
 	catch (const SQLite::Exception & ex)
 	{
-		LOGWARNING("%s: Failed to rename group %s to %s in DB: %s",
-			__FUNCTION__, a_OldName.c_str(), a_NewName.c_str(), ex.what());
+		LOGWARNING(
+			"%s: Failed to rename group %s to %s in DB: %s",
+			__FUNCTION__,
+			a_OldName.c_str(),
+			a_NewName.c_str(),
+			ex.what()
+		);
 	}
 	return false;
 }
@@ -1415,14 +1565,16 @@ void cRankManager::SetPlayerRank(const cUUID & a_PlayerUUID, const AString & a_P
 			return;
 		}
 
-		LOGWARNING("%s: Failed to set player UUID %s to rank %s.",
-			__FUNCTION__, StrUUID.c_str(), a_RankName.c_str()
-		);
+		LOGWARNING("%s: Failed to set player UUID %s to rank %s.", __FUNCTION__, StrUUID.c_str(), a_RankName.c_str());
 	}
 	catch (const SQLite::Exception & ex)
 	{
-		LOGWARNING("%s: Failed to set player UUID %s to rank %s: %s",
-			__FUNCTION__, StrUUID.c_str(), a_RankName.c_str(), ex.what()
+		LOGWARNING(
+			"%s: Failed to set player UUID %s to rank %s: %s",
+			__FUNCTION__,
+			StrUUID.c_str(),
+			a_RankName.c_str(),
+			ex.what()
 		);
 	}
 }
@@ -1446,9 +1598,7 @@ void cRankManager::RemovePlayerRank(const cUUID & a_PlayerUUID)
 	}
 	catch (const SQLite::Exception & ex)
 	{
-		LOGWARNING("%s: Failed to remove rank from player UUID %s: %s",
-			__FUNCTION__, StrUUID.c_str(), ex.what()
-		);
+		LOGWARNING("%s: Failed to remove rank from player UUID %s: %s", __FUNCTION__, StrUUID.c_str(), ex.what());
 	}
 }
 
@@ -1468,7 +1618,10 @@ void cRankManager::SetRankVisuals(
 
 	try
 	{
-		SQLite::Statement stmt(m_DB, "UPDATE Rank SET MsgPrefix = ?, MsgSuffix = ?, MsgNameColorCode = ? WHERE Name = ?");
+		SQLite::Statement stmt(
+			m_DB,
+			"UPDATE Rank SET MsgPrefix = ?, MsgSuffix = ?, MsgNameColorCode = ? WHERE Name = ?"
+		);
 		stmt.bind(1, a_MsgPrefix);
 		stmt.bind(2, a_MsgSuffix);
 		stmt.bind(3, a_MsgNameColorCode);
@@ -1610,10 +1763,11 @@ bool cRankManager::IsGroupInRank(const AString & a_GroupName, const AString & a_
 
 	try
 	{
-		SQLite::Statement stmt(m_DB,
+		SQLite::Statement stmt(
+			m_DB,
 			"SELECT * FROM Rank "
-				"LEFT JOIN RankPermGroup ON Rank.RankID = RankPermGroup.RankID "
-				"LEFT JOIN PermGroup ON PermGroup.PermGroupID = RankPermGroup.PermGroupID "
+			"LEFT JOIN RankPermGroup ON Rank.RankID = RankPermGroup.RankID "
+			"LEFT JOIN PermGroup ON PermGroup.PermGroupID = RankPermGroup.PermGroupID "
 			"WHERE Rank.Name = ? AND PermGroup.Name = ?"
 		);
 		stmt.bind(1, a_RankName);
@@ -1642,9 +1796,10 @@ bool cRankManager::IsPermissionInGroup(const AString & a_Permission, const AStri
 
 	try
 	{
-		SQLite::Statement stmt(m_DB,
+		SQLite::Statement stmt(
+			m_DB,
 			"SELECT * FROM PermissionItem "
-				"LEFT JOIN PermGroup ON PermGroup.PermGroupID = PermissionItem.PermGroupID "
+			"LEFT JOIN PermGroup ON PermGroup.PermGroupID = PermissionItem.PermGroupID "
 			"WHERE PermissionItem.Permission = ? AND PermGroup.Name = ?"
 		);
 		stmt.bind(1, a_Permission);
@@ -1673,9 +1828,10 @@ bool cRankManager::IsRestrictionInGroup(const AString & a_Restriction, const ASt
 
 	try
 	{
-		SQLite::Statement stmt(m_DB,
+		SQLite::Statement stmt(
+			m_DB,
 			"SELECT * FROM RestrictionItem "
-				"LEFT JOIN PermGroup ON PermGroup.PermGroupID = RestrictionItem.PermGroupID "
+			"LEFT JOIN PermGroup ON PermGroup.PermGroupID = RestrictionItem.PermGroupID "
 			"WHERE RestrictionItem.Permission = ? AND PermGroup.Name = ?"
 		);
 		stmt.bind(1, a_Restriction);
@@ -1822,12 +1978,8 @@ bool cRankManager::UpdatePlayerName(const cUUID & a_PlayerUUID, const AString & 
 bool cRankManager::AreDBTablesEmpty(void)
 {
 	return (
-		IsDBTableEmpty("Rank") &&
-		IsDBTableEmpty("PlayerRank") &&
-		IsDBTableEmpty("PermGroup") &&
-		IsDBTableEmpty("RankPermGroup") &&
-		IsDBTableEmpty("PermissionItem") &&
-		IsDBTableEmpty("DefaultRank")
+		IsDBTableEmpty("Rank") && IsDBTableEmpty("PlayerRank") && IsDBTableEmpty("PermGroup") &&
+		IsDBTableEmpty("RankPermGroup") && IsDBTableEmpty("PermissionItem") && IsDBTableEmpty("DefaultRank")
 	);
 }
 
@@ -1859,10 +2011,10 @@ void cRankManager::CreateDefaults(void)
 	cMassChangeLock Lock(*this);
 
 	// Create ranks:
-	AddRank("Default",  "", "", "");
-	AddRank("VIP",      "", "", "");
+	AddRank("Default", "", "", "");
+	AddRank("VIP", "", "", "");
 	AddRank("Operator", "", "", "");
-	AddRank("Admin",    "", "", "");
+	AddRank("Admin", "", "", "");
 
 	// Create groups:
 	AddGroup("Default");
@@ -1871,18 +2023,18 @@ void cRankManager::CreateDefaults(void)
 	AddGroup("Everything");
 
 	// Add groups to ranks:
-	AddGroupToRank("Default",    "Default");
-	AddGroupToRank("Teleport",   "VIP");
-	AddGroupToRank("Teleport",   "Operator");
-	AddGroupToRank("Kick",       "Operator");
+	AddGroupToRank("Default", "Default");
+	AddGroupToRank("Teleport", "VIP");
+	AddGroupToRank("Teleport", "Operator");
+	AddGroupToRank("Kick", "Operator");
 	AddGroupToRank("Everything", "Admin");
 
 	// Add permissions to groups:
-	AddPermissionToGroup("core.help",     "Default");
-	AddPermissionToGroup("core.build",    "Default");
+	AddPermissionToGroup("core.help", "Default");
+	AddPermissionToGroup("core.build", "Default");
 	AddPermissionToGroup("core.teleport", "Teleport");
-	AddPermissionToGroup("core.kick",     "Kick");
-	AddPermissionToGroup("*",             "Everything");
+	AddPermissionToGroup("core.kick", "Kick");
+	AddPermissionToGroup("*", "Everything");
 
 	// Set the default rank:
 	SetDefaultRank("Default");
@@ -1925,7 +2077,11 @@ bool cRankManager::DoesColumnExist(const char * a_TableName, const char * a_Colu
 
 
 
-void cRankManager::CreateColumnIfNotExists(const char * a_TableName, const char * a_ColumnName, const char * a_ColumnType)
+void cRankManager::CreateColumnIfNotExists(
+	const char * a_TableName,
+	const char * a_ColumnName,
+	const char * a_ColumnType
+)
 {
 	// If the column already exists, bail out:
 	if (DoesColumnExist(a_TableName, a_ColumnName))
@@ -1943,7 +2099,3 @@ void cRankManager::CreateColumnIfNotExists(const char * a_TableName, const char 
 		LOGWARNING("%s: Failed to query DB: %s", __FUNCTION__, exc.what());
 	}
 }
-
-
-
-

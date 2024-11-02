@@ -8,17 +8,14 @@
 
 
 
-class cBlockSaplingHandler final :
-	public cBlockHandler
+class cBlockSaplingHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// The low 3 bits store the sapling type; bit 0x08 is the growth timer (not used in pickups)
@@ -47,14 +44,16 @@ private:
 	) const override
 	{
 		auto Meta = a_Chunk.GetMeta(a_RelPos);
-		auto Light = std::max(a_Chunk.GetBlockLight(a_RelPos), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelPos)));
+		auto Light =
+			std::max(a_Chunk.GetBlockLight(a_RelPos), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelPos)));
 
 		// Only grow if we have the right amount of light
 		if (Light > 8)
 		{
 			auto & random = GetRandomProvider();
 			// Only grow if we are in the right growth stage and have the right amount of space around them.
-			if (((Meta & 0x08) != 0) && random.RandBool(0.45) && CanGrowAt(a_Chunk, a_RelPos.x, a_RelPos.y, a_RelPos.z, Meta))
+			if (((Meta & 0x08) != 0) && random.RandBool(0.45) &&
+				CanGrowAt(a_Chunk, a_RelPos.x, a_RelPos.y, a_RelPos.z, Meta))
 			{
 				auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
 				a_Chunk.GetWorld()->GrowTree(WorldPos);
@@ -236,8 +235,4 @@ private:
 
 		return LargeTree;
 	}
-} ;
-
-
-
-
+};

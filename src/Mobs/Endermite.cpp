@@ -13,7 +13,15 @@
 
 
 cEndermite::cEndermite() :
-	Super("Endermite", mtEndermite, "entity.endermite.hurt", "entity.endermite.death", "entity.endermite.ambient", 0.4f, 0.3f),
+	Super(
+		"Endermite",
+		mtEndermite,
+		"entity.endermite.hurt",
+		"entity.endermite.death",
+		"entity.endermite.ambient",
+		0.4f,
+		0.3f
+	),
 	m_Timer(0),
 	m_Lifetime(2 * 1000 * 60)  // 2 minutes (2 * 1000 (mili to sec) * 60 (sec to min) * 2 because tick = 0.5 sec)
 {
@@ -36,6 +44,5 @@ void cEndermite::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			Destroy();
 		}
-
 	}
 }

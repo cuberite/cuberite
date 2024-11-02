@@ -13,8 +13,7 @@
 
 
 cHTTPServerConnection::cHTTPServerConnection(cHTTPServer & a_HTTPServer) :
-	m_HTTPServer(a_HTTPServer),
-	m_Parser(*this)
+	m_HTTPServer(a_HTTPServer), m_Parser(*this)
 {
 }
 
@@ -43,7 +42,10 @@ void cHTTPServerConnection::SendStatusAndReason(int a_StatusCode, const AString 
 
 void cHTTPServerConnection::SendNeedAuth(const AString & a_Realm)
 {
-	SendData(fmt::format(FMT_STRING("HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm=\"{}\"\r\nContent-Length: 0\r\n\r\n"), a_Realm));
+	SendData(fmt::format(
+		FMT_STRING("HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm=\"{}\"\r\nContent-Length: 0\r\n\r\n"),
+		a_Realm
+	));
 	m_CurrentRequest.reset();
 	m_Parser.Reset();
 }

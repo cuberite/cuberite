@@ -7,12 +7,11 @@
 
 
 
-class cBlockGlazedTerracottaHandler final :
-	public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>
+class cBlockGlazedTerracottaHandler final
+	: public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>
 {
 	using Super = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>;
 
-public:
-
+  public:
 	using Super::Super;
 };

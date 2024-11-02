@@ -15,13 +15,12 @@ class cWorld;
 
 
 
-class cBlockPistonHandler final :
-	public cClearMetaOnDrop<cDisplacementYawRotator<cBlockHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>>
+class cBlockPistonHandler final
+	: public cClearMetaOnDrop<cDisplacementYawRotator<cBlockHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>>
 {
 	using Super = cClearMetaOnDrop<cDisplacementYawRotator<cBlockHandler, 0x07, 0x03, 0x04, 0x02, 0x05, 0x01, 0x00>>;
 
-public:
-
+  public:
 	using Super::Super;
 
 	static eBlockFace MetaDataToDirection(NIBBLETYPE a_MetaData)
@@ -42,7 +41,8 @@ public:
 		}
 	}
 
-	/** Converts piston block's metadata into a unit vector representing the direction in which the piston will extend. */
+	/** Converts piston block's metadata into a unit vector representing the direction in which the piston will extend.
+	 */
 	static Vector3i MetadataToOffset(NIBBLETYPE a_PistonMeta);
 
 	static void ExtendPiston(Vector3i a_BlockPos, cWorld & a_World);
@@ -51,8 +51,7 @@ public:
 	/** Returns true if the piston (with the specified meta) is extended */
 	static inline bool IsExtended(NIBBLETYPE a_PistonMeta) { return ((a_PistonMeta & 0x8) != 0x0); }
 
-private:
-
+  private:
 	typedef std::unordered_set<Vector3i, VectorHasher<int>> Vector3iSet;
 
 	/** Piston extension block action */
@@ -115,8 +114,11 @@ private:
 
 	/** Tries to push a block and increases the pushed blocks variable. Returns true if the block is pushable */
 	static bool CanPushBlock(
-		const Vector3i & a_BlockPos, cWorld & a_World, bool a_RequirePushable,
-		Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
+		const Vector3i & a_BlockPos,
+		cWorld & a_World,
+		bool a_RequirePushable,
+		Vector3iSet & a_BlocksPushed,
+		const Vector3i & a_PushDir
 	);
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
@@ -126,40 +128,40 @@ private:
 	}
 
 	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BLOCKTYPE a_OldBlockType,
+		NIBBLETYPE a_OldBlockMeta,
 		const cEntity * a_Digger
 	) const override;
 
 	/** Moves a list of blocks in a specific direction */
-	static void PushBlocks(const Vector3iSet & a_BlocksToPush,
-		cWorld & a_World, const Vector3i & a_PushDir
-	);
-} ;
+	static void PushBlocks(const Vector3iSet & a_BlocksToPush, cWorld & a_World, const Vector3i & a_PushDir);
+};
 
 
 
 
 
-class cBlockPistonHeadHandler final :
-	public cBlockHandler
+class cBlockPistonHeadHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	constexpr cBlockPistonHeadHandler(void) :
 		Super(E_BLOCK_PISTON_EXTENSION)
 	{
 	}
 
 	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BLOCKTYPE a_OldBlockType,
+		NIBBLETYPE a_OldBlockMeta,
 		const cEntity * a_Digger
 	) const override;
 
 	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, const cItem * a_Tool) const override;
-} ;
+};

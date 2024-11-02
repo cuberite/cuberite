@@ -32,7 +32,7 @@ If the protocol version doesn't support all the features, it degrades gracefully
 */
 class cCompositeChat
 {
-public:
+  public:
 	// tolua_end
 
 
@@ -41,60 +41,53 @@ public:
 		AString Text;
 		AString Style;
 		AString AdditionalStyleData;
-	} ;
+	};
 
 
 
-	struct TextPart:
-		public BasePart
+	struct TextPart : public BasePart
 	{
-	} ;
+	};
 
 
 
-	struct ClientTranslatedPart:
-		public BasePart
+	struct ClientTranslatedPart : public BasePart
 	{
 		AStringVector Parameters;
-	} ;
+	};
 
 
 
-	struct UrlPart:
-		public BasePart
+	struct UrlPart : public BasePart
 	{
 		AString Url;
-	} ;
+	};
 
 
 
-	struct CommandPart:
-		public BasePart
+	struct CommandPart : public BasePart
 	{
 		AString Command;
-	} ;
+	};
 
 
 
-	struct RunCommandPart:
-		public CommandPart
+	struct RunCommandPart : public CommandPart
 	{
-	} ;
+	};
 
 
 
-	struct SuggestCommandPart:
-		public CommandPart
+	struct SuggestCommandPart : public CommandPart
 	{
-	} ;
+	};
 
 
 
-	struct ShowAchievementPart:
-		public BasePart
+	struct ShowAchievementPart : public BasePart
 	{
 		AString PlayerName;
-	} ;
+	};
 
 
 
@@ -118,7 +111,11 @@ public:
 	void AddTextPart(const AString & a_Message, const AString & a_Style = "");
 
 	/** Adds a part that is translated client-side, with the formatting parameters and optional style. */
-	void AddClientTranslatedPart(const AString & a_TranslationID, const AStringVector & a_Parameters, const AString & a_Style = "");
+	void AddClientTranslatedPart(
+		const AString & a_TranslationID,
+		const AStringVector & a_Parameters,
+		const AString & a_Style = ""
+	);
 
 	/** Adds a part that opens an URL when clicked.
 	The default style is underlined light blue text. */
@@ -130,12 +127,20 @@ public:
 
 	/** Adds a part that suggests a command (enters it into the chat message area, but doesn't send) when clicked.
 	The default style is underlined yellow text. */
-	void AddSuggestCommandPart(const AString & a_Text, const AString & a_SuggestedCommand, const AString & a_Style = "nb");
+	void AddSuggestCommandPart(
+		const AString & a_Text,
+		const AString & a_SuggestedCommand,
+		const AString & a_Style = "nb"
+	);
 
 	/** Adds a part that fully formats a specified achievement using client translatable strings
 	Takes achievement name and player awarded to. Displays as {player} has earned the achievement {achievement_name}.
 	*/
-	void AddShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style = "");
+	void AddShowAchievementPart(
+		const AString & a_PlayerName,
+		const AString & a_Achievement,
+		const AString & a_Style = ""
+	);
 
 	/** Parses text into various parts, adds those.
 	Recognizes "http:" and "https:" URLs and &color-codes. */
@@ -145,8 +150,8 @@ public:
 	void UnderlineUrls(void);
 
 	/** Sets the message type, which is indicated by prefixes added to the message when serializing
-	Takes optional AdditionalMessageTypeData to set m_AdditionalMessageTypeData. See said variable for more documentation.
-	Exported manually, because ToLua++ would generate extra return values. */
+	Takes optional AdditionalMessageTypeData to set m_AdditionalMessageTypeData. See said variable for more
+	documentation. Exported manually, because ToLua++ would generate extra return values. */
 	void SetMessageType(eMessageType a_MessageType, const AString & a_AdditionalMessageTypeData = "");
 
 	// tolua_begin
@@ -175,10 +180,11 @@ public:
 	/** Adds the chat part's style (represented by the part's stylestring) into the Json object. */
 	void AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle) const;
 
-protected:
-
+  protected:
 	/** All the parts that */
-	std::vector<std::variant<TextPart, ClientTranslatedPart, UrlPart, RunCommandPart, SuggestCommandPart, ShowAchievementPart>> m_Parts;
+	std::vector<
+		std::variant<TextPart, ClientTranslatedPart, UrlPart, RunCommandPart, SuggestCommandPart, ShowAchievementPart>>
+		m_Parts;
 
 	/** The message type, as indicated by prefixes. */
 	eMessageType m_MessageType;
@@ -186,4 +192,4 @@ protected:
 	/** Additional data pertaining to message type, for example, the name of a mtPrivateMsg sender */
 	AString m_AdditionalMessageTypeData;
 
-} ;  // tolua_export
+};  // tolua_export

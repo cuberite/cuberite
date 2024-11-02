@@ -17,7 +17,7 @@
 
 class cVoronoiMap
 {
-public:
+  public:
 	cVoronoiMap(int a_Seed, int a_CellSize = 128, int a_JitterSize = 128);
 
 	/** Sets both the cell size and jitter size used for generating the Voronoi seeds. */
@@ -41,19 +41,24 @@ public:
 	/** Returns the value in the cell into which the specified point lies,
 	and the distances to the 2 nearest Voronoi seeds. Uses a cache. */
 	int GetValueAt(
-		int a_X, int a_Y,                            // Coords to query
-		int & a_NearestSeedX, int & a_NearestSeedY,  // Coords of the closest cell's seed
-		int & a_MinDist2                             // Distance to the second closest cell's seed
+		int a_X,
+		int a_Y,  // Coords to query
+		int & a_NearestSeedX,
+		int & a_NearestSeedY,  // Coords of the closest cell's seed
+		int & a_MinDist2  // Distance to the second closest cell's seed
 	);
 
 	/** Finds the nearest and second nearest seeds, returns their coords. */
 	void FindNearestSeeds(
-		int a_X, int a_Y,
-		int & a_NearestSeedX, int & a_NearestSeedY,
-		int & a_SecondNearestSeedX, int & a_SecondNearestSeedY
+		int a_X,
+		int a_Y,
+		int & a_NearestSeedX,
+		int & a_NearestSeedY,
+		int & a_SecondNearestSeedX,
+		int & a_SecondNearestSeedY
 	);
 
-protected:
+  protected:
 	/** The noise used for generating Voronoi seeds */
 	cNoise m_Noise1;
 	cNoise m_Noise2;
@@ -87,8 +92,4 @@ protected:
 	/** Updates the cached cell seeds to match the specified cell. Noop if cell pos already matches.
 	Updates m_SeedX and m_SeedZ. */
 	void UpdateCell(int a_CellX, int a_CellZ);
-} ;
-
-
-
-
+};

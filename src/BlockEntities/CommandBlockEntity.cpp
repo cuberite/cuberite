@@ -17,10 +17,13 @@
 
 
 
-cCommandBlockEntity::cCommandBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
-	m_ShouldExecute(false),
-	m_Result(0)
+cCommandBlockEntity::cCommandBlockEntity(
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta,
+	Vector3i a_Pos,
+	cWorld * a_World
+) :
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World), m_ShouldExecute(false), m_Result(0)
 {
 	ASSERT(a_BlockType == E_BLOCK_COMMAND_BLOCK);
 }
@@ -158,18 +161,28 @@ void cCommandBlockEntity::Execute()
 		return;
 	}
 
-	class CommandBlockOutCb :
-		public cLogCommandDeleteSelfOutputCallback
+	class CommandBlockOutCb : public cLogCommandDeleteSelfOutputCallback
 	{
 		cCommandBlockEntity * m_CmdBlock;
 
-	public:
-		CommandBlockOutCb(cCommandBlockEntity * a_CmdBlock) : m_CmdBlock(a_CmdBlock) {}
+	  public:
+		CommandBlockOutCb(cCommandBlockEntity * a_CmdBlock) :
+			m_CmdBlock(a_CmdBlock)
+		{
+		}
 
 		virtual void Out(const AString & a_Text) override
 		{
 			// Overwrite field
-			m_CmdBlock->SetLastOutput(cClientHandle::FormatChatPrefix(m_CmdBlock->GetWorld()->ShouldUseChatPrefixes(), "SUCCESS", cChatColor::Green, cChatColor::White) + a_Text);
+			m_CmdBlock->SetLastOutput(
+				cClientHandle::FormatChatPrefix(
+					m_CmdBlock->GetWorld()->ShouldUseChatPrefixes(),
+					"SUCCESS",
+					cChatColor::Green,
+					cChatColor::White
+				) +
+				a_Text
+			);
 		}
 	};
 
@@ -182,13 +195,8 @@ void cCommandBlockEntity::Execute()
 	}
 
 	// Administrator commands are not executable by command blocks:
-	if (
-		(RealCommand != "stop") &&
-		(RealCommand != "restart") &&
-		(RealCommand != "kick") &&
-		(RealCommand != "ban") &&
-		(RealCommand != "ipban")
-	)
+	if ((RealCommand != "stop") && (RealCommand != "restart") && (RealCommand != "kick") && (RealCommand != "ban") &&
+		(RealCommand != "ipban"))
 	{
 		cServer * Server = cRoot::Get()->GetServer();
 		LOGD("cCommandBlockEntity: Executing command %s", m_Command.c_str());
@@ -196,14 +204,18 @@ void cCommandBlockEntity::Execute()
 	}
 	else
 	{
-		SetLastOutput(cClientHandle::FormatChatPrefix(GetWorld()->ShouldUseChatPrefixes(), "FAILURE", cChatColor::Rose, cChatColor::White) + "Adminstration commands can not be executed");
+		SetLastOutput(
+			cClientHandle::FormatChatPrefix(
+				GetWorld()->ShouldUseChatPrefixes(),
+				"FAILURE",
+				cChatColor::Rose,
+				cChatColor::White
+			) +
+			"Adminstration commands can not be executed"
+		);
 		LOGD("cCommandBlockEntity: Prevented execution of administration command %s", m_Command.c_str());
 	}
 
 	// TODO 2014-01-18 xdot: Update the signal strength.
 	m_Result = 0;
 }
-
-
-
-

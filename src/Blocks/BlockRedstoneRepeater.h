@@ -13,34 +13,29 @@
 
 
 
-class cBlockRedstoneRepeaterHandler final :
-	public cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>
+class cBlockRedstoneRepeaterHandler final : public cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>
 {
 	using Super = cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>;
 
-public:
-
+  public:
 	using Super::Super;
 
-	inline static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta)
-	{
-		return -GetRearCoordinateOffset(a_Meta);
-	}
+	inline static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta) { return -GetRearCoordinateOffset(a_Meta); }
 
 	inline static Vector3i GetLeftCoordinateOffset(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
 		{
-			case E_META_REDSTONE_REPEATER_FACING_ZM: return { -1, 0, 0 };
-			case E_META_REDSTONE_REPEATER_FACING_XP: return { 0, 0, -1 };
-			case E_META_REDSTONE_REPEATER_FACING_ZP: return { 1, 0, 0 };
-			case E_META_REDSTONE_REPEATER_FACING_XM: return { 0, 0, 1 };
+			case E_META_REDSTONE_REPEATER_FACING_ZM: return {-1, 0, 0};
+			case E_META_REDSTONE_REPEATER_FACING_XP: return {0, 0, -1};
+			case E_META_REDSTONE_REPEATER_FACING_ZP: return {1, 0, 0};
+			case E_META_REDSTONE_REPEATER_FACING_XM: return {0, 0, 1};
 
 			default:
 			{
 				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
 				ASSERT(!"Unknown metadata while determining orientation of repeater!");
-				return { 0, 0, 0 };
+				return {0, 0, 0};
 			}
 		}
 	}
@@ -49,21 +44,20 @@ public:
 	{
 		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
 		{
-			case E_META_REDSTONE_REPEATER_FACING_ZM: return { 0, 0, 1 };
-			case E_META_REDSTONE_REPEATER_FACING_XP: return { -1, 0, 0 };
-			case E_META_REDSTONE_REPEATER_FACING_ZP: return { 0, 0, -1 };
-			case E_META_REDSTONE_REPEATER_FACING_XM: return { 1, 0, 0 };
+			case E_META_REDSTONE_REPEATER_FACING_ZM: return {0, 0, 1};
+			case E_META_REDSTONE_REPEATER_FACING_XP: return {-1, 0, 0};
+			case E_META_REDSTONE_REPEATER_FACING_ZP: return {0, 0, -1};
+			case E_META_REDSTONE_REPEATER_FACING_XM: return {1, 0, 0};
 			default:
 			{
 				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
 				ASSERT(!"Unknown metadata while determining orientation of repeater!");
-				return { 0, 0, 0 };
+				return {0, 0, 0};
 			}
 		}
 	}
 
-private:
-
+  private:
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
@@ -98,10 +92,7 @@ private:
 
 
 
-	virtual bool IsUseable(void) const override
-	{
-		return true;
-	}
+	virtual bool IsUseable(void) const override { return true; }
 
 
 
@@ -156,8 +147,4 @@ private:
 		UNUSED(a_Meta);
 		return 11;
 	}
-} ;
-
-
-
-
+};

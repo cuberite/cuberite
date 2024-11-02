@@ -7,19 +7,16 @@
 
 
 
-class cBlaze:
-	public cAggressiveMonster
+class cBlaze : public cAggressiveMonster
 {
 	using Super = cAggressiveMonster;
 
-public:
-
+  public:
 	cBlaze();
 
 	CLASS_PROTODEF(cBlaze)
 
-private:
-
+  private:
 	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual bool IsNetherNative(void) override { return true; }
@@ -31,4 +28,4 @@ private:
 	/** Number of ticks since the blaze started charging.
 	Used to create 3 successive projectiles. */
 	int m_ChargeTimer;
-} ;
+};

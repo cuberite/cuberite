@@ -17,7 +17,8 @@ cVoronoiMap::cVoronoiMap(int a_Seed, int a_CellSize, int a_JitterSize) :
 	m_CellSize(std::max(a_CellSize, 2)),
 	m_JitterSize(Clamp(a_JitterSize, 1, a_CellSize)),
 	m_OddRowOffset(0),
-	m_CurrentCellX(9999999),  // Cell coords that are definitely out of the range for normal generator, so that the first query will overwrite them
+	m_CurrentCellX(9999999),  // Cell coords that are definitely out of the range for normal generator, so that the
+							  // first query will overwrite them
 	m_CurrentCellZ(9999999)
 {
 }
@@ -80,8 +81,10 @@ int cVoronoiMap::GetValueAt(int a_X, int a_Y, int & a_MinDist)
 
 
 int cVoronoiMap::GetValueAt(
-	int a_X, int a_Y,  // Coords to query
-	int & a_NearestSeedX, int & a_NearestSeedY,  // Coords of the closest cell
+	int a_X,
+	int a_Y,  // Coords to query
+	int & a_NearestSeedX,
+	int & a_NearestSeedY,  // Coords of the closest cell
 	int & a_MinDist2  // Distance to the second closest cell
 )
 {
@@ -129,9 +132,12 @@ int cVoronoiMap::GetValueAt(
 
 
 void cVoronoiMap::FindNearestSeeds(
-	int a_X, int a_Y,
-	int & a_NearestSeedX, int & a_NearestSeedY,
-	int & a_SecondNearestSeedX, int & a_SecondNearestSeedY
+	int a_X,
+	int a_Y,
+	int & a_NearestSeedX,
+	int & a_NearestSeedY,
+	int & a_SecondNearestSeedX,
+	int & a_SecondNearestSeedY
 )
 {
 	int CellX = a_X / m_CellSize;
@@ -206,7 +212,3 @@ void cVoronoiMap::UpdateCell(int a_CellX, int a_CellZ)
 	m_CurrentCellX = a_CellX;
 	m_CurrentCellZ = a_CellZ;
 }
-
-
-
-

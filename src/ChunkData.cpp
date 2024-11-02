@@ -13,46 +13,46 @@
 
 namespace
 {
-	struct SectionIndices
-	{
-		size_t Section = 0;  // Index into m_Sections
-		size_t Index = 0;    // Index into a single sChunkSection
+struct SectionIndices
+{
+	size_t Section = 0;  // Index into m_Sections
+	size_t Index = 0;  // Index into a single sChunkSection
+};
+
+inline SectionIndices IndicesFromRelPos(const Vector3i a_RelPos)
+{
+	ASSERT(cChunkDef::IsValidRelPos(a_RelPos));
+
+	return {
+		static_cast<size_t>(a_RelPos.y / cChunkDef::SectionHeight),
+		cChunkDef::MakeIndex(a_RelPos.x, a_RelPos.y % cChunkDef::SectionHeight, a_RelPos.z)
 	};
+}
 
-	inline SectionIndices IndicesFromRelPos(const Vector3i a_RelPos)
+bool IsCompressed(const size_t ElementCount)
+{
+	return ElementCount != ChunkBlockData::SectionBlockCount;
+}
+
+template <size_t ElementCount, typename ValueType> ValueType UnpackDefaultValue(const ValueType DefaultValue)
+{
+	if (IsCompressed(ElementCount))
 	{
-		ASSERT(cChunkDef::IsValidRelPos(a_RelPos));
-
-		return
-		{
-			static_cast<size_t>(a_RelPos.y / cChunkDef::SectionHeight),
-			cChunkDef::MakeIndex(a_RelPos.x, a_RelPos.y % cChunkDef::SectionHeight, a_RelPos.z)
-		};
+		return DefaultValue & 0xF;
 	}
 
-	bool IsCompressed(const size_t ElementCount)
-	{
-		return ElementCount != ChunkBlockData::SectionBlockCount;
-	}
-
-	template <size_t ElementCount, typename ValueType>
-	ValueType UnpackDefaultValue(const ValueType DefaultValue)
-	{
-		if (IsCompressed(ElementCount))
-		{
-			return DefaultValue & 0xF;
-		}
-
-		return DefaultValue;
-	}
-}  // namespace (anonymous)
+	return DefaultValue;
+}
+}  // namespace
 
 
 
 
 
-template<class ElementType, size_t ElementCount, ElementType DefaultValue>
-void ChunkDataStore<ElementType, ElementCount, DefaultValue>::Assign(const ChunkDataStore<ElementType, ElementCount, DefaultValue> & a_Other)
+template <class ElementType, size_t ElementCount, ElementType DefaultValue>
+void ChunkDataStore<ElementType, ElementCount, DefaultValue>::Assign(
+	const ChunkDataStore<ElementType, ElementCount, DefaultValue> & a_Other
+)
 {
 	for (size_t Y = 0; Y != cChunkDef::NumSections; Y++)
 	{
@@ -69,7 +69,7 @@ void ChunkDataStore<ElementType, ElementCount, DefaultValue>::Assign(const Chunk
 
 
 
-template<class ElementType, size_t ElementCount, ElementType DefaultValue>
+template <class ElementType, size_t ElementCount, ElementType DefaultValue>
 ElementType ChunkDataStore<ElementType, ElementCount, DefaultValue>::Get(const Vector3i a_Position) const
 {
 	const auto Indices = IndicesFromRelPos(a_Position);
@@ -94,8 +94,11 @@ ElementType ChunkDataStore<ElementType, ElementCount, DefaultValue>::Get(const V
 
 
 
-template<class ElementType, size_t ElementCount, ElementType DefaultValue>
-typename ChunkDataStore<ElementType, ElementCount, DefaultValue>::Type * ChunkDataStore<ElementType, ElementCount, DefaultValue>::GetSection(const size_t a_Y) const
+template <class ElementType, size_t ElementCount, ElementType DefaultValue>
+typename ChunkDataStore<ElementType, ElementCount, DefaultValue>::Type * ChunkDataStore<
+	ElementType,
+	ElementCount,
+	DefaultValue>::GetSection(const size_t a_Y) const
 {
 	return Store[a_Y].get();
 }
@@ -104,7 +107,7 @@ typename ChunkDataStore<ElementType, ElementCount, DefaultValue>::Type * ChunkDa
 
 
 
-template<class ElementType, size_t ElementCount, ElementType DefaultValue>
+template <class ElementType, size_t ElementCount, ElementType DefaultValue>
 void ChunkDataStore<ElementType, ElementCount, DefaultValue>::Set(const Vector3i a_Position, const ElementType a_Value)
 {
 	const auto Indices = IndicesFromRelPos(a_Position);
@@ -135,8 +138,11 @@ void ChunkDataStore<ElementType, ElementCount, DefaultValue>::Set(const Vector3i
 
 
 
-template<class ElementType, size_t ElementCount, ElementType DefaultValue>
-void ChunkDataStore<ElementType, ElementCount, DefaultValue>::SetSection(const ElementType (& a_Source)[ElementCount], const size_t a_Y)
+template <class ElementType, size_t ElementCount, ElementType DefaultValue>
+void ChunkDataStore<ElementType, ElementCount, DefaultValue>::SetSection(
+	const ElementType (&a_Source)[ElementCount],
+	const size_t a_Y
+)
 {
 	auto & Section = Store[a_Y];
 	const auto SourceEnd = std::end(a_Source);
@@ -156,12 +162,13 @@ void ChunkDataStore<ElementType, ElementCount, DefaultValue>::SetSection(const E
 
 
 
-template<class ElementType, size_t ElementCount, ElementType DefaultValue>
-void ChunkDataStore<ElementType, ElementCount, DefaultValue>::SetAll(const ElementType (& a_Source)[cChunkDef::NumSections * ElementCount])
+template <class ElementType, size_t ElementCount, ElementType DefaultValue>
+void ChunkDataStore<ElementType, ElementCount, DefaultValue>::SetAll(const ElementType (&a_Source
+)[cChunkDef::NumSections * ElementCount])
 {
 	for (size_t Y = 0; Y != cChunkDef::NumSections; Y++)
 	{
-		SetSection(*reinterpret_cast<const ElementType (*)[ElementCount]>(a_Source + Y * ElementCount), Y);
+		SetSection(*reinterpret_cast<const ElementType(*)[ElementCount]>(a_Source + Y * ElementCount), Y);
 	}
 }
 
@@ -189,7 +196,11 @@ void ChunkBlockData::SetAll(const cChunkDef::BlockTypes & a_BlockSource, const c
 
 
 
-void ChunkBlockData::SetSection(const SectionType & a_BlockSource, const SectionMetaType & a_MetaSource, const size_t a_Y)
+void ChunkBlockData::SetSection(
+	const SectionType & a_BlockSource,
+	const SectionMetaType & a_MetaSource,
+	const size_t a_Y
+)
 {
 	m_Blocks.SetSection(a_BlockSource, a_Y);
 	m_Metas.SetSection(a_MetaSource, a_Y);
@@ -209,7 +220,10 @@ void ChunkLightData::Assign(const ChunkLightData & a_Other)
 
 
 
-void ChunkLightData::SetAll(const cChunkDef::BlockNibbles & a_BlockLightSource, const cChunkDef::BlockNibbles & a_SkyLightSource)
+void ChunkLightData::SetAll(
+	const cChunkDef::BlockNibbles & a_BlockLightSource,
+	const cChunkDef::BlockNibbles & a_SkyLightSource
+)
 {
 	m_BlockLights.SetAll(a_BlockLightSource);
 	m_SkyLights.SetAll(a_SkyLightSource);
@@ -219,7 +233,11 @@ void ChunkLightData::SetAll(const cChunkDef::BlockNibbles & a_BlockLightSource, 
 
 
 
-void ChunkLightData::SetSection(const SectionType & a_BlockLightSource, const SectionType & a_SkyLightSource, const size_t a_Y)
+void ChunkLightData::SetSection(
+	const SectionType & a_BlockLightSource,
+	const SectionType & a_SkyLightSource,
+	const size_t a_Y
+)
 {
 	m_BlockLights.SetSection(a_BlockLightSource, a_Y);
 	m_SkyLights.SetSection(a_SkyLightSource, a_Y);

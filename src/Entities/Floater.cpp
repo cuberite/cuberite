@@ -15,16 +15,12 @@
 // cFloaterEntityCollisionCallback
 class cFloaterEntityCollisionCallback
 {
-public:
+  public:
 	cFloaterEntityCollisionCallback(cFloater * a_Floater, const Vector3d & a_Pos, const Vector3d & a_NextPos) :
-		m_Floater(a_Floater),
-		m_Pos(a_Pos),
-		m_NextPos(a_NextPos),
-		m_MinCoeff(1),
-		m_HitEntity(nullptr)
+		m_Floater(a_Floater), m_Pos(a_Pos), m_NextPos(a_NextPos), m_MinCoeff(1), m_HitEntity(nullptr)
 	{
 	}
-	bool operator () (cEntity & a_Entity)
+	bool operator()(cEntity & a_Entity)
 	{
 		if (!a_Entity.IsMob())  // Floaters can only pull mobs not other entities.
 		{
@@ -59,16 +55,17 @@ public:
 	/** Returns true if the callback has encountered a true hit */
 	bool HasHit(void) const { return (m_MinCoeff < 1); }
 
-protected:
+  protected:
 	cFloater * m_Floater;
 	const Vector3d & m_Pos;
 	const Vector3d & m_NextPos;
 	double m_MinCoeff;  // The coefficient of the nearest hit on the Pos line
 
 	// Although it's bad(tm) to store entity ptrs from a callback, we can afford it here, because the entire callback
-	// is processed inside the tick thread, so the entities won't be removed in between the calls and the final processing
+	// is processed inside the tick thread, so the entities won't be removed in between the calls and the final
+	// processing
 	cEntity * m_HitEntity;  // The nearest hit entity
-} ;
+};
 
 
 
@@ -112,7 +109,9 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	auto & Random = GetRandomProvider();
 	if (IsBlockWater(Chunk->GetBlock(Rel)) && (Chunk->GetMeta(Rel) == 0))
 	{
-		if (!m_CanPickupItem && (m_AttachedMobID == cEntity::INVALID_ID))  // Check if you can't already pickup a fish and if the floater isn't attached to a mob.
+		if (!m_CanPickupItem &&
+			(m_AttachedMobID == cEntity::INVALID_ID
+			))  // Check if you can't already pickup a fish and if the floater isn't attached to a mob.
 		{
 			if (m_CountDownTime <= 0)
 			{
@@ -124,16 +123,17 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				m_CountDownTime = Random.RandInt(100, 900);
 				LOGD("Floater %i can be picked up", GetUniqueID());
 			}
-			else if (m_CountDownTime == 20)  // Calculate the position where the particles should spawn and start producing them.
+			else if (m_CountDownTime ==
+					 20)  // Calculate the position where the particles should spawn and start producing them.
 			{
 				LOGD("Started producing particles for floater %i", GetUniqueID());
 				m_ParticlePos.Set(GetPosX() + Random.RandInt(-4, 4), GetPosY(), GetPosZ() + Random.RandInt(-4, 4));
-				m_World->BroadcastParticleEffect("splash", static_cast<Vector3f>(m_ParticlePos), Vector3f{}, 0, 15);
+				m_World->BroadcastParticleEffect("splash", static_cast<Vector3f>(m_ParticlePos), Vector3f {}, 0, 15);
 			}
 			else if (m_CountDownTime < 20)
 			{
 				m_ParticlePos = (m_ParticlePos + (GetPosition() - m_ParticlePos) / 6);
-				m_World->BroadcastParticleEffect("splash", static_cast<Vector3f>(m_ParticlePos), Vector3f{}, 0, 15);
+				m_World->BroadcastParticleEffect("splash", static_cast<Vector3f>(m_ParticlePos), Vector3f {}, 0, 15);
 			}
 
 			m_CountDownTime--;
@@ -155,10 +155,8 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	// Check water at the top of floater otherwise it floats into the air above the water
-	if (
-		const auto Above = Rel.addedY(FloorC(GetPosY() + GetHeight()));
-		(Above.y < cChunkDef::Height) && IsBlockWater(m_World->GetBlock(Above))
-	)
+	if (const auto Above = Rel.addedY(FloorC(GetPosY() + GetHeight()));
+		(Above.y < cChunkDef::Height) && IsBlockWater(m_World->GetBlock(Above)))
 	{
 		SetSpeedY(0.7);
 	}
@@ -186,7 +184,10 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	if (!m_World->DoWithEntityByID(m_PlayerID, [](cEntity &) { return true; }))  // The owner doesn't exist anymore. Destroy the floater entity.
+	if (!m_World->DoWithEntityByID(
+			m_PlayerID,
+			[](cEntity &) { return true; }
+		))  // The owner doesn't exist anymore. Destroy the floater entity.
 	{
 		Destroy();
 	}

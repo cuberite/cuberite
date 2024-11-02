@@ -8,17 +8,14 @@
 
 
 
-class cBlockFenceGateHandler final :
-	public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x02, 0x03, 0x00, 0x01>>
+class cBlockFenceGateHandler final : public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x02, 0x03, 0x00, 0x01>>
 {
 	using Super = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x02, 0x03, 0x00, 0x01>>;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
@@ -42,7 +39,12 @@ private:
 			// Standing aside - use last direction
 			a_ChunkInterface.SetBlockMeta(a_BlockPos, OldMetaData);
 		}
-		a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, a_BlockPos, 0, a_Player.GetClientHandle());
+		a_Player.GetWorld()->BroadcastSoundParticleEffect(
+			EffectID::SFX_RANDOM_FENCE_GATE_OPEN,
+			a_BlockPos,
+			0,
+			a_Player.GetClientHandle()
+		);
 		return true;
 	}
 
@@ -65,10 +67,7 @@ private:
 
 
 
-	virtual bool IsUseable(void) const override
-	{
-		return true;
-	}
+	virtual bool IsUseable(void) const override { return true; }
 
 
 
@@ -79,12 +78,12 @@ private:
 		UNUSED(a_Meta);
 		switch (m_BlockType)
 		{
-			case E_BLOCK_OAK_FENCE_GATE: return 13;
-			case E_BLOCK_SPRUCE_FENCE_GATE: return 34;
-			case E_BLOCK_BIRCH_FENCE_GATE: return 2;
-			case E_BLOCK_JUNGLE_FENCE_GATE: return 10;
+			case E_BLOCK_OAK_FENCE_GATE:      return 13;
+			case E_BLOCK_SPRUCE_FENCE_GATE:   return 34;
+			case E_BLOCK_BIRCH_FENCE_GATE:    return 2;
+			case E_BLOCK_JUNGLE_FENCE_GATE:   return 10;
 			case E_BLOCK_DARK_OAK_FENCE_GATE: return 26;
-			case E_BLOCK_ACACIA_FENCE_GATE: return 15;
+			case E_BLOCK_ACACIA_FENCE_GATE:   return 15;
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in fence gate handler!");
@@ -92,8 +91,4 @@ private:
 			}
 		}
 	}
-} ;
-
-
-
-
+};

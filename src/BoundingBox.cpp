@@ -10,8 +10,7 @@
 
 
 cBoundingBox::cBoundingBox(double a_MinX, double a_MaxX, double a_MinY, double a_MaxY, double a_MinZ, double a_MaxZ) :
-	m_Min(a_MinX, a_MinY, a_MinZ),
-	m_Max(a_MaxX, a_MaxY, a_MaxZ)
+	m_Min(a_MinX, a_MinY, a_MinZ), m_Max(a_MaxX, a_MaxY, a_MaxZ)
 {
 }
 
@@ -20,8 +19,7 @@ cBoundingBox::cBoundingBox(double a_MinX, double a_MaxX, double a_MinY, double a
 
 
 cBoundingBox::cBoundingBox(Vector3d a_Min, Vector3d a_Max) :
-	m_Min(a_Min),
-	m_Max(a_Max)
+	m_Min(a_Min), m_Max(a_Max)
 {
 }
 
@@ -30,7 +28,7 @@ cBoundingBox::cBoundingBox(Vector3d a_Min, Vector3d a_Max) :
 
 
 cBoundingBox::cBoundingBox(Vector3d a_Pos, double a_Radius, double a_Height) :
-	m_Min(a_Pos.x - a_Radius, a_Pos.y,            a_Pos.z - a_Radius),
+	m_Min(a_Pos.x - a_Radius, a_Pos.y, a_Pos.z - a_Radius),
 	m_Max(a_Pos.x + a_Radius, a_Pos.y + a_Height, a_Pos.z + a_Radius)
 {
 }
@@ -106,7 +104,7 @@ bool cBoundingBox::DoesIntersect(const cBoundingBox & a_Other)
 	return (
 		((a_Other.m_Min.x <= m_Max.x) && (a_Other.m_Max.x >= m_Min.x)) &&  // X coords intersect
 		((a_Other.m_Min.y <= m_Max.y) && (a_Other.m_Max.y >= m_Min.y)) &&  // Y coords intersect
-		((a_Other.m_Min.z <= m_Max.z) && (a_Other.m_Max.z >= m_Min.z))     // Z coords intersect
+		((a_Other.m_Min.z <= m_Max.z) && (a_Other.m_Max.z >= m_Min.z))  // Z coords intersect
 	);
 }
 
@@ -171,8 +169,7 @@ bool cBoundingBox::IsInside(Vector3d a_Min, Vector3d a_Max)
 bool cBoundingBox::IsInside(Vector3d a_Min, Vector3d a_Max, Vector3d a_Point)
 {
 	return (
-		((a_Point.x >= a_Min.x) && (a_Point.x <= a_Max.x)) &&
-		((a_Point.y >= a_Min.y) && (a_Point.y <= a_Max.y)) &&
+		((a_Point.x >= a_Min.x) && (a_Point.x <= a_Max.x)) && ((a_Point.y >= a_Min.y) && (a_Point.y <= a_Max.y)) &&
 		((a_Point.z >= a_Min.z) && (a_Point.z <= a_Max.z))
 	);
 }
@@ -184,8 +181,7 @@ bool cBoundingBox::IsInside(Vector3d a_Min, Vector3d a_Max, Vector3d a_Point)
 bool cBoundingBox::IsInside(Vector3d a_Min, Vector3d a_Max, double a_X, double a_Y, double a_Z)
 {
 	return (
-		((a_X >= a_Min.x) && (a_X <= a_Max.x)) &&
-		((a_Y >= a_Min.y) && (a_Y <= a_Max.y)) &&
+		((a_X >= a_Min.x) && (a_X <= a_Max.x)) && ((a_Y >= a_Min.y) && (a_Y <= a_Max.y)) &&
 		((a_Z >= a_Min.z) && (a_Z <= a_Max.z))
 	);
 }
@@ -194,7 +190,8 @@ bool cBoundingBox::IsInside(Vector3d a_Min, Vector3d a_Max, double a_X, double a
 
 
 
-bool cBoundingBox::CalcLineIntersection(Vector3d a_Line1, Vector3d a_Line2, double & a_LineCoeff, eBlockFace & a_Face) const
+bool cBoundingBox::CalcLineIntersection(Vector3d a_Line1, Vector3d a_Line2, double & a_LineCoeff, eBlockFace & a_Face)
+	const
 {
 	return CalcLineIntersection(m_Min, m_Max, a_Line1, a_Line2, a_LineCoeff, a_Face);
 }
@@ -203,7 +200,14 @@ bool cBoundingBox::CalcLineIntersection(Vector3d a_Line1, Vector3d a_Line2, doub
 
 
 
-bool cBoundingBox::CalcLineIntersection(Vector3d a_Min, Vector3d a_Max, Vector3d a_Line1, Vector3d a_Line2, double & a_LineCoeff, eBlockFace & a_Face)
+bool cBoundingBox::CalcLineIntersection(
+	Vector3d a_Min,
+	Vector3d a_Max,
+	Vector3d a_Line1,
+	Vector3d a_Line2,
+	double & a_LineCoeff,
+	eBlockFace & a_Face
+)
 {
 	if (IsInside(a_Min, a_Max, a_Line1))
 	{
@@ -287,7 +291,3 @@ bool cBoundingBox::Intersect(const cBoundingBox & a_Other, cBoundingBox & a_Inte
 	a_Intersection.m_Max.z = std::min(m_Max.z, a_Other.m_Max.z);
 	return (a_Intersection.m_Min.z < a_Intersection.m_Max.z);
 }
-
-
-
-

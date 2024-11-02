@@ -1,7 +1,8 @@
 
 // BlockInServerPluginInterface.h
 
-// Defines the cBlockInServerPluginInterface class that implements the cBlockPluginInterface for blocks, using the plugin manager
+// Defines the cBlockInServerPluginInterface class that implements the cBlockPluginInterface for blocks, using the
+// plugin manager
 
 
 
@@ -16,31 +17,43 @@
 class cWorld;
 
 
-class cBlockInServerPluginInterface :
-	public cBlockPluginInterface
+class cBlockInServerPluginInterface : public cBlockPluginInterface
 {
-public:
-	cBlockInServerPluginInterface(cWorld & a_World) : m_World(a_World) {}
+  public:
+	cBlockInServerPluginInterface(cWorld & a_World) :
+		m_World(a_World)
+	{
+	}
 
 	virtual bool CallHookBlockSpread(Vector3i a_BlockPos, eSpreadSource a_Source) override
 	{
 		return cPluginManager::Get()->CallHookBlockSpread(m_World, a_BlockPos, a_Source);
 	}
 
-	virtual bool CallHookPlayerBreakingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+	virtual bool CallHookPlayerBreakingBlock(
+		cPlayer & a_Player,
+		Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta
+	) override
 	{
-		return cPluginManager::Get()->CallHookPlayerBreakingBlock(a_Player, a_BlockPos, a_BlockFace, a_BlockType, a_BlockMeta);
+		return cPluginManager::Get()
+			->CallHookPlayerBreakingBlock(a_Player, a_BlockPos, a_BlockFace, a_BlockType, a_BlockMeta);
 	}
 
-	virtual bool CallHookPlayerBrokenBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+	virtual bool CallHookPlayerBrokenBlock(
+		cPlayer & a_Player,
+		Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta
+	) override
 	{
-		return cPluginManager::Get()->CallHookPlayerBrokenBlock(a_Player, a_BlockPos, a_BlockFace, a_BlockType, a_BlockMeta);
+		return cPluginManager::Get()
+			->CallHookPlayerBrokenBlock(a_Player, a_BlockPos, a_BlockFace, a_BlockType, a_BlockMeta);
 	}
 
-private:
+  private:
 	cWorld & m_World;
 };
-
-
-
-

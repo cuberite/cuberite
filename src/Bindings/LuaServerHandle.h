@@ -26,10 +26,9 @@ typedef std::shared_ptr<cLuaServerHandle> cLuaServerHandlePtr;
 
 
 
-class cLuaServerHandle:
-	public cNetwork::cListenCallbacks
+class cLuaServerHandle : public cNetwork::cListenCallbacks
 {
-public:
+  public:
 	/** Creates a new instance of the server handle,
 	wrapping the (listen-) callbacks that are in the specified table. */
 	cLuaServerHandle(UInt16 a_Port, cLuaState::cTableRefPtr && a_Callbacks);
@@ -53,7 +52,7 @@ public:
 	Releases the internal SharedPtr to self, so that the instance may be deallocated. */
 	void Release(void);
 
-protected:
+  protected:
 	/** The Lua table that holds the callbacks to be invoked. */
 	cLuaState::cTableRefPtr m_Callbacks;
 
@@ -76,11 +75,8 @@ protected:
 
 
 	// cNetwork::cListenCallbacks overrides:
-	virtual cTCPLink::cCallbacksPtr OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort) override;
+	virtual cTCPLink::cCallbacksPtr OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort)
+		override;
 	virtual void OnAccepted(cTCPLink & a_Link) override;
 	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override;
 };
-
-
-
-

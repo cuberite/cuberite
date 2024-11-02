@@ -2,9 +2,11 @@
 #include "Globals.h"
 #include "OverridesSettingsRepository.h"
 
-cOverridesSettingsRepository::cOverridesSettingsRepository(std::unique_ptr<cSettingsRepositoryInterface> a_Main, cSettingsRepositoryInterface & a_Overrides) :
-	m_Main(std::move(a_Main)),
-	m_Overrides(&a_Overrides)
+cOverridesSettingsRepository::cOverridesSettingsRepository(
+	std::unique_ptr<cSettingsRepositoryInterface> a_Main,
+	cSettingsRepositoryInterface & a_Overrides
+) :
+	m_Main(std::move(a_Main)), m_Overrides(&a_Overrides)
 {
 }
 
@@ -89,7 +91,11 @@ bool cOverridesSettingsRepository::DeleteKeyComment(const AString & a_keyname, c
 
 
 
-void cOverridesSettingsRepository::AddValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value)
+void cOverridesSettingsRepository::AddValue(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const AString & a_Value
+)
 {
 	if (m_Overrides->HasValue(a_KeyName, a_ValueName))
 	{
@@ -135,7 +141,11 @@ std::vector<std::pair<AString, AString>> cOverridesSettingsRepository::GetValues
 
 
 
-AString cOverridesSettingsRepository::GetValue(const AString & a_KeyName, const AString & a_ValueName, const AString & defValue) const
+AString cOverridesSettingsRepository::GetValue(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const AString & defValue
+) const
 {
 	if (m_Overrides->HasValue(a_KeyName, a_ValueName))
 	{
@@ -151,7 +161,11 @@ AString cOverridesSettingsRepository::GetValue(const AString & a_KeyName, const 
 
 
 
-AString cOverridesSettingsRepository::GetValueSet (const AString & a_KeyName, const AString & a_ValueName, const AString & defValue)
+AString cOverridesSettingsRepository::GetValueSet(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const AString & defValue
+)
 {
 	if (m_Overrides->HasValue(a_KeyName, a_ValueName))
 	{
@@ -167,7 +181,11 @@ AString cOverridesSettingsRepository::GetValueSet (const AString & a_KeyName, co
 
 
 
-int cOverridesSettingsRepository::GetValueSetI(const AString & a_KeyName, const AString & a_ValueName, const int defValue)
+int cOverridesSettingsRepository::GetValueSetI(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const int defValue
+)
 {
 	if (m_Overrides->HasValue(a_KeyName, a_ValueName))
 	{
@@ -183,7 +201,11 @@ int cOverridesSettingsRepository::GetValueSetI(const AString & a_KeyName, const 
 
 
 
-Int64 cOverridesSettingsRepository::GetValueSetI(const AString & a_KeyName, const AString & a_ValueName, const Int64 defValue)
+Int64 cOverridesSettingsRepository::GetValueSetI(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const Int64 defValue
+)
 {
 	if (m_Overrides->HasValue(a_KeyName, a_ValueName))
 	{
@@ -199,7 +221,11 @@ Int64 cOverridesSettingsRepository::GetValueSetI(const AString & a_KeyName, cons
 
 
 
-bool cOverridesSettingsRepository::GetValueSetB(const AString & a_KeyName, const AString & a_ValueName, const bool defValue)
+bool cOverridesSettingsRepository::GetValueSetB(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const bool defValue
+)
 {
 	if (m_Overrides->HasValue(a_KeyName, a_ValueName))
 	{
@@ -215,7 +241,12 @@ bool cOverridesSettingsRepository::GetValueSetB(const AString & a_KeyName, const
 
 
 
-bool cOverridesSettingsRepository::SetValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value, const bool a_CreateIfNotExists)
+bool cOverridesSettingsRepository::SetValue(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const AString & a_Value,
+	const bool a_CreateIfNotExists
+)
 {
 	if (m_Overrides->HasValue(a_KeyName, a_ValueName))
 	{
@@ -231,7 +262,12 @@ bool cOverridesSettingsRepository::SetValue (const AString & a_KeyName, const AS
 
 
 
-bool cOverridesSettingsRepository::SetValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value, const bool a_CreateIfNotExists)
+bool cOverridesSettingsRepository::SetValueI(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const int a_Value,
+	const bool a_CreateIfNotExists
+)
 {
 	if (m_Overrides->HasValue(a_KeyName, a_ValueName))
 	{
@@ -267,4 +303,3 @@ bool cOverridesSettingsRepository::Flush()
 {
 	return m_Overrides->Flush() && m_Main->Flush();
 }
-

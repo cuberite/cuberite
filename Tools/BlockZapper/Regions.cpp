@@ -30,7 +30,16 @@ cRegion::cRegion(void) :
 
 
 
-cRegion::cRegion(int a_MinX, int a_MaxX, int a_MinY, int a_MaxY, int a_MinZ, int a_MaxZ, bool a_ShouldZapBlocks, bool a_ShouldZapEntities) :
+cRegion::cRegion(
+	int a_MinX,
+	int a_MaxX,
+	int a_MinY,
+	int a_MaxY,
+	int a_MinZ,
+	int a_MaxZ,
+	bool a_ShouldZapBlocks,
+	bool a_ShouldZapEntities
+) :
 	m_MinX(a_MinX),
 	m_MaxX(a_MaxX),
 	m_MinY(std::max(0, std::min(255, a_MinY))),
@@ -52,10 +61,7 @@ bool cRegion::TouchesChunk(int a_ChunkX, int a_ChunkZ) const
 	int ChunkEndX = a_ChunkX * 16 + 15;
 	int ChunkBeginZ = a_ChunkZ * 16;
 	int ChunkEndZ = a_ChunkZ * 16 + 15;
-	if (
-		(m_MinX > ChunkEndX) || (m_MaxX < ChunkBeginX) ||
-		(m_MinZ > ChunkEndZ) || (m_MaxZ < ChunkBeginZ)
-	)
+	if ((m_MinX > ChunkEndX) || (m_MaxX < ChunkBeginX) || (m_MinZ > ChunkEndZ) || (m_MaxZ < ChunkBeginZ))
 	{
 		return false;
 	}
@@ -159,5 +165,7 @@ void cRegions::AddRegion(const AStringVector & a_Split)
 	}
 
 	// Store the region
-	m_Regions.push_back(cRegion(Coords[0], Coords[1], Coords[2], Coords[3], Coords[4], Coords[5], ShouldZapBlocks, ShouldZapEntities));
+	m_Regions.push_back(
+		cRegion(Coords[0], Coords[1], Coords[2], Coords[3], Coords[4], Coords[5], ShouldZapBlocks, ShouldZapEntities)
+	);
 }

@@ -21,12 +21,12 @@ bool g_IsVerbose = false;
 /** This class can read and write RCON packets to / from a connected socket */
 class cRCONPacketizer
 {
-public:
+  public:
 	enum
 	{
 		ptCommand = 2,
 		ptLogin = 3,
-	} ;
+	};
 
 	cRCONPacketizer(cSocket & a_Socket);
 
@@ -35,7 +35,7 @@ public:
 	Dumps the reply payload to stdout. */
 	bool SendPacket(int a_PacketType, const AString & a_PacketPayload);
 
-protected:
+  protected:
 	/** The socket to use for reading incoming data and writing outgoing data: */
 	cSocket & m_Socket;
 
@@ -51,15 +51,14 @@ protected:
 	Assumes that the packet length has already been read from the packet
 	If the packet is successfully parsed, increments m_RequestID */
 	bool ParsePacket(cByteBuffer & a_Buffer, int a_PacketLength);
-} ;
+};
 
 
 
 
 
 cRCONPacketizer::cRCONPacketizer(cSocket & a_Socket) :
-	m_Socket(a_Socket),
-	m_RequestID(0)
+	m_Socket(a_Socket), m_RequestID(0)
 {
 }
 
@@ -78,17 +77,23 @@ bool cRCONPacketizer::SendPacket(int a_PacketType, const AString & a_PacketPaylo
 	AString Packet;
 	bb.ReadAll(Packet);
 	size_t Length = Packet.size();
-	if (!m_Socket.Send((const char *)&Length, 4))
+	if (!m_Socket.Send((const char *) &Length, 4))
 	{
-		fprintf(stderr, "Network error while sending packet: %d (%s). Aborting.\n",
-			cSocket::GetLastError(), cSocket::GetLastErrorString().c_str()
+		fprintf(
+			stderr,
+			"Network error while sending packet: %d (%s). Aborting.\n",
+			cSocket::GetLastError(),
+			cSocket::GetLastErrorString().c_str()
 		);
 		return false;
 	}
 	if (!m_Socket.Send(Packet.data(), Packet.size()))
 	{
-		fprintf(stderr, "Network error while sending packet: %d (%s). Aborting.\n",
-			cSocket::GetLastError(), cSocket::GetLastErrorString().c_str()
+		fprintf(
+			stderr,
+			"Network error while sending packet: %d (%s). Aborting.\n",
+			cSocket::GetLastError(),
+			cSocket::GetLastErrorString().c_str()
 		);
 		return false;
 	}
@@ -115,8 +120,12 @@ bool cRCONPacketizer::ReceiveResponse(void)
 		}
 		if (NumReceived < 0)
 		{
-			fprintf(stderr, "Network error while receiving response: %d, %d (%s). Aborting.\n",
-				NumReceived, cSocket::GetLastError(), cSocket::GetLastErrorString().c_str()
+			fprintf(
+				stderr,
+				"Network error while receiving response: %d, %d (%s). Aborting.\n",
+				NumReceived,
+				cSocket::GetLastError(),
+				cSocket::GetLastErrorString().c_str()
 			);
 			return false;
 		}
@@ -162,7 +171,12 @@ bool cRCONPacketizer::ParsePacket(cByteBuffer & a_Buffer, int a_PacketLength)
 		}
 		else
 		{
-			fprintf(stderr, "The server returned an invalid request ID, got %d, exp. %d. Aborting.\n", RequestID, m_RequestID);
+			fprintf(
+				stderr,
+				"The server returned an invalid request ID, got %d, exp. %d. Aborting.\n",
+				RequestID,
+				m_RequestID
+			);
 			return false;
 		}
 	}
@@ -226,7 +240,9 @@ int RealMain(int argc, char * argv[])
 			i++;
 			continue;
 		}
-		if (((NoCaseCompare(argv[i], "-c") == 0) || (NoCaseCompare(argv[i], "--cmd") == 0) || (NoCaseCompare(argv[i], "--command") == 0)) && (i < argc - 1))
+		if (((NoCaseCompare(argv[i], "-c") == 0) || (NoCaseCompare(argv[i], "--cmd") == 0) ||
+			 (NoCaseCompare(argv[i], "--command") == 0)) &&
+			(i < argc - 1))
 		{
 			Commands.push_back(argv[i + 1]);
 			i++;
@@ -258,7 +274,10 @@ int RealMain(int argc, char * argv[])
 
 	if (ServerAddress.empty() || (ServerPort < 0))
 	{
-		fprintf(stderr, "Server address or port not set. Use the --server and --port parameters to set them. Aborting.");
+		fprintf(
+			stderr,
+			"Server address or port not set. Use the --server and --port parameters to set them. Aborting."
+		);
 		return 1;
 	}
 
@@ -273,9 +292,15 @@ int RealMain(int argc, char * argv[])
 		fprintf(stderr, "Connecting to \"%s:%d\"...\n", ServerAddress.c_str(), ServerPort);
 	}
 	cSocket s = cSocket::CreateSocket(cSocket::IPv4);
-	if (!s.ConnectIPv4(ServerAddress, (unsigned short)ServerPort))
+	if (!s.ConnectIPv4(ServerAddress, (unsigned short) ServerPort))
 	{
-		fprintf(stderr, "Cannot connect to \"%s:%d\": %s\n", ServerAddress.c_str(), ServerPort, cSocket::GetLastErrorString().c_str());
+		fprintf(
+			stderr,
+			"Cannot connect to \"%s:%d\": %s\n",
+			ServerAddress.c_str(),
+			ServerPort,
+			cSocket::GetLastErrorString().c_str()
+		);
 		return 3;
 	}
 	cRCONPacketizer Packetizer(s);
@@ -323,7 +348,8 @@ int RealMain(int argc, char * argv[])
 
 int main(int argc, char * argv[])
 {
-	// This redirection function is only so that debugging the program is easier in MSVC - when RealMain exits, it's still possible to place a breakpoint
+	// This redirection function is only so that debugging the program is easier in MSVC - when RealMain exits, it's
+	// still possible to place a breakpoint
 	int res = RealMain(argc, argv);
 	return res;
 }

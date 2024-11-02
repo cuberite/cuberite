@@ -7,13 +7,11 @@
 
 
 
-class cSkeleton:
-	public cAggressiveMonster
+class cSkeleton : public cAggressiveMonster
 {
 	using Super = cAggressiveMonster;
 
-public:
-
+  public:
 	cSkeleton();
 
 	CLASS_PROTODEF(cSkeleton)
@@ -28,8 +26,6 @@ public:
 
 	bool IsChargingBow() const { return m_ChargingBow; }
 
-private:
-
+  private:
 	bool m_ChargingBow;
-
-} ;
+};

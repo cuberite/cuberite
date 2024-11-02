@@ -9,17 +9,14 @@
 
 
 
-class cItemLilypadHandler final:
-	public cItemHandler
+class cItemLilypadHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
-	constexpr cItemLilypadHandler(int a_ItemType):
+  public:
+	constexpr cItemLilypadHandler(int a_ItemType) :
 		Super(a_ItemType)
 	{
-
 	}
 
 
@@ -53,12 +50,8 @@ public:
 			const auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
 
 			// Lilypad should not replace non air and non water blocks:
-			if (
-				const auto BlockToReplace = a_World->GetBlock(PlacePos);
-				(BlockToReplace != E_BLOCK_AIR) &&
-				(BlockToReplace != E_BLOCK_WATER) &&
-				(BlockToReplace != E_BLOCK_STATIONARY_WATER)
-			)
+			if (const auto BlockToReplace = a_World->GetBlock(PlacePos); (BlockToReplace != E_BLOCK_AIR) &&
+				(BlockToReplace != E_BLOCK_WATER) && (BlockToReplace != E_BLOCK_STATIONARY_WATER))
 			{
 				return false;
 			}
@@ -70,11 +63,8 @@ public:
 			}
 
 			// Lilypad should be placed only if there is a water block below:
-			if (
-				const auto BlockBelow = a_World->GetBlock(Below);
-				(BlockBelow != E_BLOCK_WATER) &&
-				(BlockBelow != E_BLOCK_STATIONARY_WATER)
-			)
+			if (const auto BlockBelow = a_World->GetBlock(Below);
+				(BlockBelow != E_BLOCK_WATER) && (BlockBelow != E_BLOCK_STATIONARY_WATER))
 			{
 				return false;
 			}
@@ -88,21 +78,23 @@ public:
 			return true;
 		}
 
-		class cCallbacks:
-			public cBlockTracer::cCallbacks
+		class cCallbacks : public cBlockTracer::cCallbacks
 		{
-		public:
-
-			virtual bool OnNextBlock(Vector3i a_CBBlockPos, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
+		  public:
+			virtual bool OnNextBlock(
+				Vector3i a_CBBlockPos,
+				BLOCKTYPE a_CBBlockType,
+				NIBBLETYPE a_CBBlockMeta,
+				eBlockFace a_CBEntryFace
+			) override
 			{
-				if (
-					!IsBlockWater(a_CBBlockType) ||
-					(a_CBBlockMeta != 0)  // The hit block should be a source
+				if (!IsBlockWater(a_CBBlockType) || (a_CBBlockMeta != 0)  // The hit block should be a source
 				)
 				{
-					// TODO: Vanilla stops the trace. However, we need to continue the trace, to work around our lack of block bounding box support
-					// which would otherwise mean we misbehave when clicking through the voxel a (e.g.) button occupies. Now, however, we misbehave
-					// when clicking on a block near water... Nonetheless, the former would cause ghost blocks, so continue for now.
+					// TODO: Vanilla stops the trace. However, we need to continue the trace, to work around our lack of
+					// block bounding box support which would otherwise mean we misbehave when clicking through the
+					// voxel a (e.g.) button occupies. Now, however, we misbehave when clicking on a block near water...
+					// Nonetheless, the former would cause ghost blocks, so continue for now.
 
 					// Ignore and continue trace:
 					return false;

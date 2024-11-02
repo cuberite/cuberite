@@ -21,7 +21,7 @@ class cTeam;
 class cWorld;
 
 using cObjectiveCallback = cFunctionRef<bool(cObjective &)>;
-using cTeamCallback      = cFunctionRef<bool(cTeam &)>;
+using cTeamCallback = cFunctionRef<bool(cTeam &)>;
 
 
 
@@ -30,8 +30,7 @@ using cTeamCallback      = cFunctionRef<bool(cTeam &)>;
 // tolua_begin
 class cObjective
 {
-public:
-
+  public:
 	typedef int Score;
 
 	enum eType
@@ -61,15 +60,14 @@ public:
 
 	static eType StringToType(const AString & a_Name);
 
-public:
-
+  public:
 	cObjective(const AString & a_Name, const AString & a_DisplayName, eType a_Type, cWorld * a_World);
 
 	// tolua_begin
 
 	eType GetType(void) const { return m_Type; }
 
-	const AString & GetName(void)        const { return m_Name; }
+	const AString & GetName(void) const { return m_Name; }
 	const AString & GetDisplayName(void) const { return m_DisplayName; }
 
 	/** Resets the objective */
@@ -97,8 +95,7 @@ public:
 	/** Send this objective to the specified client */
 	void SendTo(cClientHandle & a_Client);
 
-private:
-
+  private:
 	typedef std::pair<AString, Score> cTrackedPlayer;
 
 	typedef std::map<AString, Score> cScoreMap;
@@ -124,14 +121,10 @@ private:
 // tolua_begin
 class cTeam
 {
-public:
-
+  public:
 	// tolua_end
 
-	cTeam(
-		const AString & a_Name, const AString & a_DisplayName,
-		const AString & a_Prefix, const AString & a_Suffix
-	);
+	cTeam(const AString & a_Name, const AString & a_DisplayName, const AString & a_Prefix, const AString & a_Suffix);
 
 	// tolua_begin
 
@@ -152,16 +145,16 @@ public:
 	/** Returns the number of registered players */
 	size_t GetNumPlayers(void) const;
 
-	bool AllowsFriendlyFire(void)      const { return m_AllowsFriendlyFire; }
+	bool AllowsFriendlyFire(void) const { return m_AllowsFriendlyFire; }
 	bool CanSeeFriendlyInvisible(void) const { return m_CanSeeFriendlyInvisible; }
 
 	const AString & GetDisplayName(void) const { return m_DisplayName; }
-	const AString & GetName(void)        const { return m_Name; }
+	const AString & GetName(void) const { return m_Name; }
 
 	const AString & GetPrefix(void) const { return m_Prefix; }
 	const AString & GetSuffix(void) const { return m_Suffix; }
 
-	void SetFriendlyFire(bool a_Flag)            { m_AllowsFriendlyFire      = a_Flag; }
+	void SetFriendlyFire(bool a_Flag) { m_AllowsFriendlyFire = a_Flag; }
 	void SetCanSeeFriendlyInvisible(bool a_Flag) { m_CanSeeFriendlyInvisible = a_Flag; }
 
 	void SetDisplayName(const AString & a_Name);
@@ -171,8 +164,7 @@ public:
 
 	// tolua_end
 
-private:
-
+  private:
 	typedef std::set<AString> cPlayerNameSet;
 
 	bool m_AllowsFriendlyFire;
@@ -198,8 +190,7 @@ private:
 // tolua_begin
 class cScoreboard
 {
-public:
-
+  public:
 	enum eDisplaySlot
 	{
 		dsList = 0,
@@ -212,8 +203,7 @@ public:
 	// tolua_end
 
 
-public:
-
+  public:
 	cScoreboard(cWorld * a_World);
 
 	// tolua_begin
@@ -228,7 +218,12 @@ public:
 	cObjective * GetObjective(const AString & a_Name);
 
 	/** Registers a new team, returns the cTeam instance, nullptr on name collision */
-	cTeam * RegisterTeam(const AString & a_Name, const AString & a_DisplayName, const AString & a_Prefix, const AString & a_Suffix);
+	cTeam * RegisterTeam(
+		const AString & a_Name,
+		const AString & a_DisplayName,
+		const AString & a_Prefix,
+		const AString & a_Suffix
+	);
 
 	/** Removes a registered team, returns true if operation was successful */
 	bool RemoveTeam(const AString & a_Name);
@@ -271,13 +266,12 @@ public:
 	void SetDisplay(cObjective * a_Objective, eDisplaySlot a_Slot);
 
 
-private:
-
+  private:
 	typedef std::pair<AString, cObjective> cNamedObjective;
-	typedef std::pair<AString, cTeam>      cNamedTeam;
+	typedef std::pair<AString, cTeam> cNamedTeam;
 
 	typedef std::map<AString, cObjective> cObjectiveMap;
-	typedef std::map<AString, cTeam>      cTeamMap;
+	typedef std::map<AString, cTeam> cTeamMap;
 
 	// TODO 2014-01-19 xdot: Potential optimization - Sort objectives based on type
 	cCriticalSection m_CSObjectives;
@@ -294,7 +288,3 @@ private:
 
 
 };  // tolua_export
-
-
-
-

@@ -29,18 +29,20 @@ class cWorld;
 /** Interface that all the world storage schemas need to implement */
 class cWSSchema abstract
 {
-public:
-	cWSSchema(cWorld * a_World) : m_World(a_World) {}
+  public:
+	cWSSchema(cWorld * a_World) :
+		m_World(a_World)
+	{
+	}
 	virtual ~cWSSchema() {}  // Force the descendants' destructors to be virtual
 
 	virtual bool LoadChunk(const cChunkCoords & a_Chunk) = 0;
 	virtual bool SaveChunk(const cChunkCoords & a_Chunk) = 0;
 	virtual const AString GetName(void) const = 0;
 
-protected:
-
+  protected:
 	cWorld * m_World;
-} ;
+};
 
 typedef std::list<cWSSchema *> cWSSchemaList;
 
@@ -49,13 +51,11 @@ typedef std::list<cWSSchema *> cWSSchemaList;
 
 
 /** The actual world storage class */
-class cWorldStorage:
-	public cIsThread
+class cWorldStorage : public cIsThread
 {
 	using Super = cIsThread;
 
-public:
-
+  public:
 	cWorldStorage();
 	virtual ~cWorldStorage() override;
 
@@ -75,10 +75,9 @@ public:
 	size_t GetLoadQueueLength(void);
 	size_t GetSaveQueueLength(void);
 
-protected:
-
+  protected:
 	cWorld * m_World;
-	AString  m_StorageSchemaName;
+	AString m_StorageSchemaName;
 
 	cQueue<cChunkCoords> m_LoadQueue;
 	cQueue<cChunkCoords> m_SaveQueue;
@@ -105,8 +104,4 @@ protected:
 
 	/** Saves one chunk from the queue (if any queued); returns true if there was a chunk in the queue to save */
 	bool SaveOneChunk(void);
-} ;
-
-
-
-
+};

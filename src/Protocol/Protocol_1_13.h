@@ -25,26 +25,30 @@ Declares the 1.13 protocol classes:
 
 
 
-class cProtocol_1_13:
-	public cProtocol_1_12_2
+class cProtocol_1_13 : public cProtocol_1_12_2
 {
 	using Super = cProtocol_1_12_2;
 
-public:
-
+  public:
 	using Super::Super;
 
-protected:
-
-	virtual void SendBlockChange                (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
-	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
-	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
-	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
-	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
-	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
-	virtual void SendStatistics                 (const StatisticsManager & a_Manager) override;
-	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
-	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
+  protected:
+	virtual void SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual void SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
+	virtual void SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
+	virtual void SendPaintingSpawn(const cPainting & a_Painting) override;
+	virtual void SendParticleEffect(
+		const AString & a_ParticleName,
+		Vector3f a_Src,
+		Vector3f a_Offset,
+		float a_ParticleData,
+		int a_ParticleAmount,
+		std::array<int, 2> a_Data
+	) override;
+	virtual void SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
+	virtual void SendStatistics(const StatisticsManager & a_Manager) override;
+	virtual void SendTabCompletionResults(const AStringVector & a_Results) override;
+	virtual void SendUpdateBlockEntity(cBlockEntity & a_BlockEntity) override;
 	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata) const;
 	virtual UInt8 GetEntityMetadataID(EntityMetadataType a_FieldType) const;
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const;
@@ -63,7 +67,8 @@ protected:
 	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, std::string_view a_Channel) override;
 
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) const override;
-	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, EntityMetadata a_Metadata, EntityMetadataType a_FieldType) const;
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, EntityMetadata a_Metadata, EntityMetadataType a_FieldType)
+		const;
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const override;
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const override;
@@ -73,19 +78,26 @@ protected:
 
 
 
-class cProtocol_1_13_1 :
-	public cProtocol_1_13
+class cProtocol_1_13_1 : public cProtocol_1_13
 {
 	using Super = cProtocol_1_13;
 
-public:
-
+  public:
 	using Super::Super;
 
-protected:
-
-	virtual void SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
-	virtual void SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
+  protected:
+	virtual void SendBossBarAdd(
+		UInt32 a_UniqueID,
+		const cCompositeChat & a_Title,
+		float a_FractionFilled,
+		BossBarColor a_Color,
+		BossBarDivisionType a_DivisionType,
+		bool a_DarkenSky,
+		bool a_PlayEndMusic,
+		bool a_CreateFog
+	) override;
+	virtual void SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+		override;
 
 	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
 	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override;
@@ -98,17 +110,14 @@ protected:
 
 
 
-class cProtocol_1_13_2 :
-	public cProtocol_1_13_1
+class cProtocol_1_13_2 : public cProtocol_1_13_1
 {
 	using Super = cProtocol_1_13_1;
 
-public:
-
+  public:
 	using Super::Super;
 
-protected:
-
+  protected:
 	virtual Version GetProtocolVersion() const override;
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) const override;
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const override;

@@ -23,13 +23,11 @@ class cVillagePiecePool;
 
 
 
-class cVillageGen:
-	public cGridStructGen
+class cVillageGen : public cGridStructGen
 {
 	using Super = cGridStructGen;
 
-public:
-
+  public:
 	/** Creates a new instance of the generator with the specified parameters. */
 	cVillageGen(
 		int a_Seed,
@@ -37,14 +35,15 @@ public:
 		int a_MaxOffset,
 		int a_MaxDepth,
 		int a_MaxSize,
-		int a_MinDensity, int a_MaxDensity,
+		int a_MinDensity,
+		int a_MaxDensity,
 		cBiomeGen & a_BiomeGen,
 		cTerrainHeightGen & a_HeightGen,
 		int a_SeaLevel,
 		const AStringVector & a_PrefabsToLoad
 	);
 
-protected:
+  protected:
 	class cVillage;  // fwd: VillageGen.cpp
 	typedef std::vector<std::shared_ptr<cVillagePiecePool>> cVillagePiecePools;
 
@@ -75,4 +74,4 @@ protected:
 
 	// cGridStructGen overrides:
 	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override;
-} ;
+};

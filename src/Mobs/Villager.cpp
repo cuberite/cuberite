@@ -12,7 +12,15 @@
 
 
 cVillager::cVillager(eVillagerType VillagerType) :
-	Super("Villager", mtVillager, "entity.villager.hurt", "entity.villager.death", "entity.villager.ambient", 0.6f, 1.95f),
+	Super(
+		"Villager",
+		mtVillager,
+		"entity.villager.hurt",
+		"entity.villager.death",
+		"entity.villager.ambient",
+		0.6f,
+		1.95f
+	),
 	m_ActionCountDown(-1),
 	m_Type(VillagerType),
 	m_FarmerAction(faIdling),
@@ -118,7 +126,9 @@ void cVillager::TickFarmer()
 		MoveToPosition(static_cast<Vector3d>(m_CropsPos) + Vector3d(0.5, 0, 0.5));
 
 		// Forcing the farmer to look at the work spots.
-		Vector3d Direction = (m_FinalDestination - (GetPosition() + Vector3d(0, 1.6, 0)));  // We get the direction from the eyes of the farmer to the work spot.
+		Vector3d Direction =
+			(m_FinalDestination - (GetPosition() + Vector3d(0, 1.6, 0))
+			);  // We get the direction from the eyes of the farmer to the work spot.
 		Direction.Normalize();
 		SetPitch(std::asin(-Direction.y) / M_PI * 180);
 	}
@@ -155,7 +165,6 @@ void cVillager::TickFarmer()
 	{
 		ScanAreaForWork();
 	}
-
 }
 
 
@@ -171,17 +180,18 @@ void cVillager::ScanAreaForWork()
 
 	// Read area to be checked for crops.
 	cBlockArea Surrounding;
-	Surrounding.Read(
-		*m_World,
-		MinPos, MaxPos
-	);
+	Surrounding.Read(*m_World, MinPos, MaxPos);
 
 	for (int I = 0; I < FARMER_RANDOM_TICK_SPEED; I++)
 	{
 		for (int Y = MinPos.y; Y <= MaxPos.y; Y++)
 		{
 			// Pick random coordinates and check for crops.
-			Vector3i CandidatePos(MinPos.x + m_World->GetTickRandomNumber(MaxPos.x - MinPos.x - 1), Y, MinPos.z + m_World->GetTickRandomNumber(MaxPos.z - MinPos.z - 1));
+			Vector3i CandidatePos(
+				MinPos.x + m_World->GetTickRandomNumber(MaxPos.x - MinPos.x - 1),
+				Y,
+				MinPos.z + m_World->GetTickRandomNumber(MaxPos.z - MinPos.z - 1)
+			);
 
 			// A villager can harvest this.
 			if (IsHarvestable(CandidatePos))
@@ -222,7 +232,11 @@ void cVillager::HandleFarmerTryHarvestCrops()
 		// Check if the blocks didn't change while the villager was walking to the coordinates.
 		if (IsHarvestable(m_CropsPos))
 		{
-			m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, m_CropsPos, m_World->GetBlock(m_CropsPos));
+			m_World->BroadcastSoundParticleEffect(
+				EffectID::PARTICLE_BLOCK_BREAK,
+				m_CropsPos,
+				m_World->GetBlock(m_CropsPos)
+			);
 			m_World->DropBlockAsPickups(m_CropsPos, this, nullptr);
 			// Applying 0.5 second cooldown.
 			m_ActionCountDown = 10;
@@ -239,7 +253,7 @@ void cVillager::CheckForNearbyCrops()
 
 	// Search for adjacent crops
 
-	constexpr std::array<Vector3i, 4> Directions = { Vector3i{0, 0, -1}, {0, 0, 1}, {1, 0, 0}, {-1, 0, 0} };
+	constexpr std::array<Vector3i, 4> Directions = {Vector3i {0, 0, -1}, {0, 0, 1}, {1, 0, 0}, {-1, 0, 0}};
 
 	for (Vector3i Direction : Directions)
 	{
@@ -257,7 +271,6 @@ void cVillager::CheckForNearbyCrops()
 			MoveToPosition(static_cast<Vector3d>(m_CropsPos) + Vector3d(0.5, 0, 0.5));
 			return;
 		}
-
 	}
 
 	// There is no more work to do around the previous crops.
@@ -350,10 +363,8 @@ void cVillager::HandleFarmerTryPlaceCrops()
 
 bool cVillager::CanPlantCrops()
 {
-	return m_Inventory.HasItems(cItem(E_ITEM_SEEDS)) ||
-		m_Inventory.HasItems(cItem(E_ITEM_BEETROOT_SEEDS)) ||
-		m_Inventory.HasItems(cItem(E_ITEM_POTATO)) ||
-		m_Inventory.HasItems(cItem(E_ITEM_CARROT));
+	return m_Inventory.HasItems(cItem(E_ITEM_SEEDS)) || m_Inventory.HasItems(cItem(E_ITEM_BEETROOT_SEEDS)) ||
+		m_Inventory.HasItems(cItem(E_ITEM_POTATO)) || m_Inventory.HasItems(cItem(E_ITEM_CARROT));
 }
 
 
@@ -395,7 +406,8 @@ bool cVillager::IsHarvestable(Vector3i a_CropsPos)
 
 bool cVillager::IsPlantable(Vector3i a_CropsPos)
 {
-	return (m_World->GetBlock(a_CropsPos.addedY(-1)) == E_BLOCK_FARMLAND) && (m_World->GetBlock(a_CropsPos) == E_BLOCK_AIR);
+	return (m_World->GetBlock(a_CropsPos.addedY(-1)) == E_BLOCK_FARMLAND) &&
+		(m_World->GetBlock(a_CropsPos) == E_BLOCK_AIR);
 }
 
 

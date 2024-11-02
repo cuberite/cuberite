@@ -29,8 +29,8 @@ struct cFurnaceRecipe::sFurnaceRecipeState
 
 
 
-cFurnaceRecipe::cFurnaceRecipe()
-	: m_pState(new sFurnaceRecipeState)
+cFurnaceRecipe::cFurnaceRecipe() :
+	m_pState(new sFurnaceRecipeState)
 {
 	ReloadRecipes();
 }
@@ -339,6 +339,3 @@ int cFurnaceRecipe::GetBurnTime(const cItem & a_Fuel) const
 	}
 	return BestFuel;
 }
-
-
-

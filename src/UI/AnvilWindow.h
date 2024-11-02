@@ -15,13 +15,11 @@
 
 
 
-class cAnvilWindow:
-	public cWindow
+class cAnvilWindow : public cWindow
 {
 	using Super = cWindow;
 
-public:
-
+  public:
 	cAnvilWindow(Vector3i a_BlockPos);
 
 	/** Gets the repaired item name. */
@@ -33,14 +31,16 @@ public:
 	/** Gets the Position from the Anvil */
 	const Vector3i & GetBlockPos() { return m_BlockPos; }
 
-	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
+	virtual void DistributeStack(
+		cItem & a_ItemStack,
+		int a_Slot,
+		cPlayer & a_Player,
+		cSlotArea * a_ClickedArea,
+		bool a_ShouldApply
+	) override;
 
-protected:
+  protected:
 	cSlotAreaAnvil * m_AnvilSlotArea;
 	AString m_RepairedItemName;
 	Vector3i m_BlockPos;
 };
-
-
-
-

@@ -16,8 +16,7 @@ class cClientHandle;
 
 
 // tolua_begin
-class cBrewingstandEntity :
-	public cBlockEntityWithItems
+class cBrewingstandEntity : public cBlockEntityWithItems
 {
 	// tolua_end
 
@@ -25,18 +24,17 @@ class cBrewingstandEntity :
 
 	// tolua_begin
 
-public:
-
+  public:
 	enum
 	{
-		bsLeftBottle        = 0,  // Left bottle slot number
-		bsMiddleBottle      = 1,  // Middle bottle slot number
-		bsRightBottle       = 2,  // Right bottle slot number
-		bsIngredient        = 3,  // Top ingredient slot number
-		bsFuel              = 4,  // Top left fuel slot number
+		bsLeftBottle = 0,  // Left bottle slot number
+		bsMiddleBottle = 1,  // Middle bottle slot number
+		bsRightBottle = 2,  // Right bottle slot number
+		bsIngredient = 3,  // Top ingredient slot number
+		bsFuel = 4,  // Top left fuel slot number
 
-		ContentsWidth       = 5,
-		ContentsHeight      = 1,
+		ContentsWidth = 5,
+		ContentsHeight = 1,
 	};
 
 	// tolua_end
@@ -109,8 +107,7 @@ public:
 	/** Gets the recipes. Will be called if the brewing stand gets loaded from the world. */
 	void LoadRecipes(void);
 
-protected:
-
+  protected:
 	/** Set to true if the brewing stand is brewing an item */
 	bool m_IsBrewing;
 
@@ -137,4 +134,4 @@ protected:
 
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
-} ;  // tolua_export
+};  // tolua_export

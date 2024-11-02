@@ -25,56 +25,49 @@ using cSchemeHandlerPtr = std::shared_ptr<cSchemeHandler>;
 
 namespace
 {
-	/** Callbacks implementing the blocking UrlClient behavior. */
-	class cBlockingHTTPCallbacks :
-		public cUrlClient::cCallbacks
+/** Callbacks implementing the blocking UrlClient behavior. */
+class cBlockingHTTPCallbacks : public cUrlClient::cCallbacks
+{
+  public:
+	explicit cBlockingHTTPCallbacks(std::shared_ptr<cEvent> a_Event, AString & a_ResponseBody) :
+		m_Event(std::move(a_Event)), m_ResponseBody(a_ResponseBody), m_IsError(false)
 	{
-	public:
+	}
 
-		explicit cBlockingHTTPCallbacks(std::shared_ptr<cEvent> a_Event, AString & a_ResponseBody) :
-			m_Event(std::move(a_Event)), m_ResponseBody(a_ResponseBody),
-			m_IsError(false)
-		{
-		}
+	void OnBodyFinished() override { m_Event->Set(); }
 
-		void OnBodyFinished() override
-		{
-			m_Event->Set();
-		}
+	void OnError(const AString & a_ErrorMsg) override
+	{
+		LOGERROR("%s %d: HTTP Error: %s", __FILE__, __LINE__, a_ErrorMsg.c_str());
+		m_IsError = true;
+		m_Event->Set();
+	}
 
-		void OnError(const AString & a_ErrorMsg) override
-		{
-			LOGERROR("%s %d: HTTP Error: %s", __FILE__, __LINE__, a_ErrorMsg.c_str());
-			m_IsError = true;
-			m_Event->Set();
-		}
+	void OnBodyData(const void * a_Data, size_t a_Size) override
+	{
+		m_ResponseBody.append(static_cast<const char *>(a_Data), a_Size);
+	}
 
-		void OnBodyData(const void * a_Data, size_t a_Size) override
-		{
-			m_ResponseBody.append(static_cast<const char *>(a_Data), a_Size);
-		}
+	std::shared_ptr<cEvent> m_Event;
 
-		std::shared_ptr<cEvent> m_Event;
+	/** The accumulator for the partial body data, so that OnBodyFinished() can send the entire thing at once. */
+	AString & m_ResponseBody;
 
-		/** The accumulator for the partial body data, so that OnBodyFinished() can send the entire thing at once. */
-		AString & m_ResponseBody;
-
-		/** Indicates whether an error was encountered while processing the request. */
-		bool m_IsError;
-	};
-}
+	/** Indicates whether an error was encountered while processing the request. */
+	bool m_IsError;
+};
+}  // namespace
 
 
 
 
 
-class cUrlClientRequest:
-	public cNetwork::cConnectCallbacks,
-	public cTCPLink::cCallbacks
+class cUrlClientRequest : public cNetwork::cConnectCallbacks,
+						  public cTCPLink::cCallbacks
 {
 	friend class cHttpSchemeHandler;
 
-public:
+  public:
 	static std::pair<bool, AString> Request(
 		const AString & a_Method,
 		const AString & a_URL,
@@ -86,9 +79,9 @@ public:
 	{
 		// Create a new instance of cUrlClientRequest, wrapped in a SharedPtr, so that it has a controlled lifetime.
 		// Cannot use std::make_shared, because the constructor is not public
-		std::shared_ptr<cUrlClientRequest> ptr (new cUrlClientRequest(
-			a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options
-		));
+		std::shared_ptr<cUrlClientRequest> ptr(
+			new cUrlClientRequest(a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options)
+		);
 		return ptr->DoRequest(ptr);
 	}
 
@@ -164,8 +157,7 @@ public:
 		return Cert;
 	}
 
-protected:
-
+  protected:
 	/** Method to be used for the request */
 	AString m_Method;
 
@@ -211,7 +203,7 @@ protected:
 		AStringMap && a_Headers,
 		const AString & a_Body,
 		const AStringMap & a_Options
-	):
+	) :
 		m_Method(a_Method),
 		m_Url(a_Url),
 		m_Callbacks(std::move(a_Callbacks)),
@@ -237,10 +229,7 @@ protected:
 
 
 	// cTCPLink::cCallbacks override: TCP link created
-	virtual void OnLinkCreated(cTCPLinkPtr a_Link) override
-	{
-		m_Link = a_Link;
-	}
+	virtual void OnLinkCreated(cTCPLinkPtr a_Link) override { m_Link = a_Link; }
 
 
 	// cTCPLink::cCallbacks override: TLS handshake completed on the link:
@@ -267,8 +256,8 @@ from right after connecting to the TCP link till the link is closed.
 For an example of a specific handler, see the cHttpSchemeHandler class. */
 class cSchemeHandler abstract
 {
-public:
-	cSchemeHandler(cUrlClientRequest & a_ParentRequest):
+  public:
+	cSchemeHandler(cUrlClientRequest & a_ParentRequest) :
 		m_ParentRequest(a_ParentRequest)
 	{
 	}
@@ -294,7 +283,7 @@ public:
 	Sending data on the link is not an error, but the data won't be delivered. */
 	virtual void OnRemoteClosed(void) = 0;
 
-protected:
+  protected:
 	cUrlClientRequest & m_ParentRequest;
 };
 
@@ -303,19 +292,14 @@ protected:
 
 
 /** cSchemeHandler descendant that handles HTTP (and HTTPS) requests. */
-class cHttpSchemeHandler:
-	public cSchemeHandler,
-	protected cHTTPMessageParser::cCallbacks
+class cHttpSchemeHandler : public cSchemeHandler,
+						   protected cHTTPMessageParser::cCallbacks
 {
 	using Super = cSchemeHandler;
 
-public:
-
-	cHttpSchemeHandler(cUrlClientRequest & a_ParentRequest, bool a_IsTls):
-		Super(a_ParentRequest),
-		m_Parser(*this),
-		m_IsTls(a_IsTls),
-		m_IsRedirect(false)
+  public:
+	cHttpSchemeHandler(cUrlClientRequest & a_ParentRequest, bool a_IsTls) :
+		Super(a_ParentRequest), m_Parser(*this), m_IsTls(a_IsTls), m_IsRedirect(false)
 	{
 	}
 
@@ -325,7 +309,11 @@ public:
 		m_Link = &a_Link;
 		if (m_IsTls)
 		{
-			m_Link->StartTLSClient(m_ParentRequest.GetOwnCert(), m_ParentRequest.GetOwnPrivKey(), m_ParentRequest.GetTrustedRootCAs());
+			m_Link->StartTLSClient(
+				m_ParentRequest.GetOwnCert(),
+				m_ParentRequest.GetOwnPrivKey(),
+				m_ParentRequest.GetTrustedRootCAs()
+			);
 		}
 		else
 		{
@@ -354,7 +342,7 @@ public:
 		// Send the headers:
 		m_Link->Send(fmt::format(FMT_STRING("Host: {}\r\n"), m_ParentRequest.m_UrlHost));
 		m_Link->Send(fmt::format(FMT_STRING("Content-Length: {}\r\n"), m_ParentRequest.m_Body.size()));
-		for (const auto & hdr: m_ParentRequest.m_Headers)
+		for (const auto & hdr : m_ParentRequest.m_Headers)
 		{
 			m_Link->Send(fmt::format(FMT_STRING("{}: {}\r\n"), hdr.first, hdr.second));
 		}  // for itr - m_Headers[]
@@ -379,16 +367,10 @@ public:
 	}
 
 
-	virtual void OnTlsHandshakeCompleted(void) override
-	{
-		SendRequest();
-	}
+	virtual void OnTlsHandshakeCompleted(void) override { SendRequest(); }
 
 
-	virtual void OnRemoteClosed(void) override
-	{
-		m_Link = nullptr;
-	}
+	virtual void OnRemoteClosed(void) override { m_Link = nullptr; }
 
 
 	// cHTTPResponseParser::cCallbacks overrides:
@@ -405,20 +387,27 @@ public:
 		auto idxFirstSpace = a_FirstLine.find(' ');
 		if (idxFirstSpace == AString::npos)
 		{
-			m_ParentRequest.CallErrorCallback(fmt::format(FMT_STRING("Failed to parse HTTP status line \"{}\", no space delimiter."), a_FirstLine));
+			m_ParentRequest.CallErrorCallback(
+				fmt::format(FMT_STRING("Failed to parse HTTP status line \"{}\", no space delimiter."), a_FirstLine)
+			);
 			return;
 		}
 		auto idxSecondSpace = a_FirstLine.find(' ', idxFirstSpace + 1);
 		if (idxSecondSpace == AString::npos)
 		{
-			m_ParentRequest.CallErrorCallback(fmt::format(FMT_STRING("Failed to parse HTTP status line \"{}\", missing second space delimiter."), a_FirstLine));
+			m_ParentRequest.CallErrorCallback(fmt::format(
+				FMT_STRING("Failed to parse HTTP status line \"{}\", missing second space delimiter."),
+				a_FirstLine
+			));
 			return;
 		}
 		int resultCode;
 		auto resultCodeStr = a_FirstLine.substr(idxFirstSpace + 1, idxSecondSpace - idxFirstSpace - 1);
 		if (!StringToInteger(resultCodeStr, resultCode))
 		{
-			m_ParentRequest.CallErrorCallback(fmt::format(FMT_STRING("Failed to parse HTTP result code from response \"{}\""), resultCodeStr));
+			m_ParentRequest.CallErrorCallback(
+				fmt::format(FMT_STRING("Failed to parse HTTP result code from response \"{}\""), resultCodeStr)
+			);
 			return;
 		}
 
@@ -435,7 +424,8 @@ public:
 				return;
 			}
 		}
-		m_ParentRequest.GetCallbacks().OnStatusLine(a_FirstLine.substr(0, idxFirstSpace), resultCode, a_FirstLine.substr(idxSecondSpace + 1));
+		m_ParentRequest.GetCallbacks()
+			.OnStatusLine(a_FirstLine.substr(0, idxFirstSpace), resultCode, a_FirstLine.substr(idxSecondSpace + 1));
 	}
 
 
@@ -497,8 +487,7 @@ public:
 		}
 	}
 
-protected:
-
+  protected:
 	/** The network link. */
 	cTCPLink * m_Link;
 
@@ -508,9 +497,9 @@ protected:
 	/** If true, the TLS should be started on the link before sending the request (used for https). */
 	bool m_IsTls;
 
-	/** Set to true if the first line contains a redirecting HTTP status code and the options specify to follow redirects.
-	If true, and the parent request allows redirects, neither headers not the body contents are reported through the callbacks,
-	and after the entire request is parsed, the redirect is attempted. */
+	/** Set to true if the first line contains a redirecting HTTP status code and the options specify to follow
+	redirects. If true, and the parent request allows redirects, neither headers not the body contents are reported
+	through the callbacks, and after the entire request is parsed, the redirect is attempted. */
 	bool m_IsRedirect;
 
 	/** The Location where the request should be redirected.
@@ -644,7 +633,17 @@ std::pair<bool, AString> cUrlClientRequest::DoRequest(const std::shared_ptr<cUrl
 	m_Self = a_Self;
 
 	// Parse the URL:
-	auto res = cUrlParser::Parse(m_Url, m_UrlScheme, m_UrlUsername, m_UrlPassword, m_UrlHost, m_UrlPort, m_UrlPath, m_UrlQuery, m_UrlFragment);
+	auto res = cUrlParser::Parse(
+		m_Url,
+		m_UrlScheme,
+		m_UrlUsername,
+		m_UrlPassword,
+		m_UrlHost,
+		m_UrlPort,
+		m_UrlPath,
+		m_UrlQuery,
+		m_UrlFragment
+	);
 	if (!res.first)
 	{
 		return res;
@@ -681,9 +680,7 @@ std::pair<bool, AString> cUrlClient::Request(
 	const AStringMap & a_Options
 )
 {
-	return cUrlClientRequest::Request(
-		a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options
-	);
+	return cUrlClientRequest::Request(a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options);
 }
 
 
@@ -698,9 +695,7 @@ std::pair<bool, AString> cUrlClient::Get(
 	const AStringMap & a_Options
 )
 {
-	return cUrlClientRequest::Request(
-		"GET", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options
-	);
+	return cUrlClientRequest::Request("GET", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options);
 }
 
 
@@ -715,9 +710,7 @@ std::pair<bool, AString> cUrlClient::Post(
 	const AStringMap & a_Options
 )
 {
-	return cUrlClientRequest::Request(
-		"POST", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options
-	);
+	return cUrlClientRequest::Request("POST", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options);
 }
 
 
@@ -732,9 +725,7 @@ std::pair<bool, AString> cUrlClient::Put(
 	const AStringMap & a_Options
 )
 {
-	return cUrlClientRequest::Request(
-		"PUT", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options
-	);
+	return cUrlClientRequest::Request("PUT", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options);
 }
 
 
@@ -752,7 +743,8 @@ std::pair<bool, AString> cUrlClient::BlockingRequest(
 	auto EvtFinished = std::make_shared<cEvent>();
 	AString Response;
 	auto Callbacks = std::make_shared<cBlockingHTTPCallbacks>(EvtFinished, Response);
-	auto [Success, ErrorMessage] = cUrlClient::Request(a_Method, a_URL, Callbacks, std::move(a_Headers), a_Body, a_Options);
+	auto [Success, ErrorMessage] =
+		cUrlClient::Request(a_Method, a_URL, Callbacks, std::move(a_Headers), a_Body, a_Options);
 	if (Success)
 	{
 		if (!EvtFinished->Wait(10000))
@@ -813,8 +805,3 @@ std::pair<bool, AString> cUrlClient::BlockingPut(
 {
 	return BlockingRequest("PUT", a_URL, std::move(a_Headers), a_Body, a_Options);
 }
-
-
-
-
-

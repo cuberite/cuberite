@@ -9,14 +9,13 @@ https://minecraft.wiki/w/Ender_Dragon
 
 #include "FinishGen.h"
 
-class cEnderDragonFightStructuresGen :
-	public cFinishGen
+class cEnderDragonFightStructuresGen : public cFinishGen
 {
-public:
+  public:
 	cEnderDragonFightStructuresGen(int a_Seed);
 	void Init(const AString & a_TowerProperties, int a_Radius);
 
-protected:
+  protected:
 	struct sTowerProperties
 	{
 		Vector3i m_Pos;
@@ -33,6 +32,6 @@ protected:
 
 	int m_MinX = -1, m_MaxX = 1, m_MinZ = -1, m_MaxZ = 1;
 
-	void GenFinish(cChunkDesc &a_ChunkDesc) override;
+	void GenFinish(cChunkDesc & a_ChunkDesc) override;
 	void PlaceTower(cChunkDesc & a_ChunkDesc, const sTowerProperties & a_TowerProperties);
 };

@@ -8,15 +8,13 @@
 
 
 // tolua_begin
-class cFloater :
-	public cEntity
+class cFloater : public cEntity
 {
 	// tolua_end
 
 	using Super = cEntity;
 
-public:  // tolua_export
-
+  public:  // tolua_export
 	CLASS_PROTODEF(cFloater)
 
 	cFloater(Vector3d a_Pos, Vector3d a_Speed, UInt32 a_PlayerID, int a_CountDownTime);
@@ -25,13 +23,13 @@ public:  // tolua_export
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 	// tolua_begin
-	bool CanPickup(void)       const { return m_CanPickupItem; }
-	UInt32 GetOwnerID(void)       const { return m_PlayerID; }
+	bool CanPickup(void) const { return m_CanPickupItem; }
+	UInt32 GetOwnerID(void) const { return m_PlayerID; }
 	UInt32 GetAttachedMobID(void) const { return m_AttachedMobID; }
-	Vector3d GetBitePos(void)     const { return m_BitePos; }
+	Vector3d GetBitePos(void) const { return m_BitePos; }
 	// tolua_end
 
-protected:
+  protected:
 	// Position
 	Vector3d m_ParticlePos;
 
@@ -48,4 +46,4 @@ protected:
 	// Entity IDs
 	UInt32 m_PlayerID;
 	UInt32 m_AttachedMobID;
-} ;  // tolua_export
+};  // tolua_export

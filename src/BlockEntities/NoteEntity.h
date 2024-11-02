@@ -9,16 +9,16 @@
 
 enum ENUM_NOTE_INSTRUMENTS
 {
-	E_INST_HARP_PIANO  = 0,
+	E_INST_HARP_PIANO = 0,
 	E_INST_DOUBLE_BASS = 1,
-	E_INST_SNARE_DRUM  = 2,
-	E_INST_CLICKS      = 3,
-	E_INST_BASS_DRUM   = 4,
-	E_INST_FLUTE       = 5,
-	E_INST_BELL        = 6,
-	E_INST_GUITAR      = 7,
-	E_INST_CHIME       = 8,
-	E_INST_XYLOPHONE   = 9
+	E_INST_SNARE_DRUM = 2,
+	E_INST_CLICKS = 3,
+	E_INST_BASS_DRUM = 4,
+	E_INST_FLUTE = 5,
+	E_INST_BELL = 6,
+	E_INST_GUITAR = 7,
+	E_INST_CHIME = 8,
+	E_INST_XYLOPHONE = 9
 };
 
 
@@ -27,15 +27,13 @@ enum ENUM_NOTE_INSTRUMENTS
 
 // tolua_begin
 
-class cNoteEntity :
-	public cBlockEntity
+class cNoteEntity : public cBlockEntity
 {
 	// tolua_end
 
 	using Super = cBlockEntity;
 
-public:  // tolua_export
-
+  public:  // tolua_export
 	/** Creates a new note entity. a_World may be nullptr */
 	cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
@@ -57,7 +55,6 @@ public:  // tolua_export
 	from a note value between 0 and 24 (used in m_Note). */
 	static float PitchFromNote(unsigned char a_Note);
 
-private:
-
+  private:
 	unsigned char m_Note;
-} ;  // tolua_export
+};  // tolua_export

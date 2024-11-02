@@ -10,7 +10,7 @@
 
 
 
-cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
+cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed) :
 	Super(pkEnderPearl, a_Creator, a_Pos, a_Speed, 0.25f, 0.25f)
 {
 }
@@ -60,23 +60,25 @@ void cThrownEnderPearlEntity::TeleportCreator(Vector3d a_HitPos)
 
 
 
-	GetWorld()->FindAndDoWithPlayer(m_CreatorData.m_Name, [=](cPlayer & a_Entity)
-	{
-
-		auto & Random = GetRandomProvider();
-
-		// 5% chance to spawn an endermite
-		if (Random.RandBool(0.05))
+	GetWorld()->FindAndDoWithPlayer(
+		m_CreatorData.m_Name,
+		[=](cPlayer & a_Entity)
 		{
-			Vector3d PlayerPosition = a_Entity.GetPosition();
-			m_World->SpawnMob(PlayerPosition.x, PlayerPosition.y, PlayerPosition.z, mtEndermite);
+			auto & Random = GetRandomProvider();
+
+			// 5% chance to spawn an endermite
+			if (Random.RandBool(0.05))
+			{
+				Vector3d PlayerPosition = a_Entity.GetPosition();
+				m_World->SpawnMob(PlayerPosition.x, PlayerPosition.y, PlayerPosition.z, mtEndermite);
+			}
+
+
+			// Teleport the creator here, make them take 5 damage:
+			a_Entity.TeleportToCoords(a_HitPos.x, a_HitPos.y + 0.2, a_HitPos.z);
+			a_Entity.TakeDamage(dtEnderPearl, this, 5, 0);
+
+			return false;
 		}
-
-
-		// Teleport the creator here, make them take 5 damage:
-		a_Entity.TeleportToCoords(a_HitPos.x, a_HitPos.y + 0.2, a_HitPos.z);
-		a_Entity.TakeDamage(dtEnderPearl, this, 5, 0);
-
-		return false;
-	});
+	);
 }

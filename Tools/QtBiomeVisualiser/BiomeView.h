@@ -9,13 +9,12 @@
 
 
 
-class BiomeView :
-	public QWidget
+class BiomeView : public QWidget
 {
 	typedef QWidget super;
 	Q_OBJECT
 
-public:
+  public:
 	explicit BiomeView(QWidget * parent = NULL);
 
 	QSize minimumSizeHint() const;
@@ -31,7 +30,7 @@ public:
 	/** Sets the zoom level to the specified value and redraws the view. */
 	void setZoomLevel(double a_ZoomLevel);
 
-signals:
+  signals:
 	/** Signalled when the user uses the wheel to scroll upwards. */
 	void wheelUp();
 
@@ -47,7 +46,7 @@ signals:
 	/** Emitted when the user moves the mouse, to reflect the current block under the cursor. */
 	void hoverChanged(int a_BlockX, int a_BlockZ, int a_Biome);
 
-public slots:
+  public slots:
 	/** Redraw the entire widget area. */
 	void redraw();
 
@@ -57,7 +56,7 @@ public slots:
 	/** Reloads the current chunk source and redraws the entire workspace. */
 	void reload();
 
-protected:
+  protected:
 	double m_X, m_Z;
 	double m_Zoom;
 
@@ -110,8 +109,3 @@ protected:
 	/** Called when the user presses a key. */
 	virtual void keyPressEvent(QKeyEvent * a_Event) override;
 };
-
-
-
-
-

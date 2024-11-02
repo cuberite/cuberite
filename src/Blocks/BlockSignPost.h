@@ -8,17 +8,14 @@
 
 
 
-class cBlockSignPostHandler final :
-	public cBlockHandler
+class cBlockSignPostHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		return cItem(E_ITEM_SIGN, 1, 0);
@@ -43,19 +40,13 @@ private:
 
 
 
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) const override
-	{
-		return (a_Meta + 4) & 0x0f;
-	}
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) const override { return (a_Meta + 4) & 0x0f; }
 
 
 
 
 
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override
-	{
-		return (a_Meta + 12) & 0x0f;
-	}
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override { return (a_Meta + 12) & 0x0f; }
 
 
 
@@ -92,8 +83,4 @@ private:
 		UNUSED(a_Meta);
 		return 13;
 	}
-} ;
-
-
-
-
+};

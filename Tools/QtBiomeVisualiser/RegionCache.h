@@ -20,13 +20,12 @@ class ChunkSource;
 
 
 /** Caches regions' chunk data for reuse */
-class RegionCache :
-	public QObject
+class RegionCache : public QObject
 {
 	typedef QObject super;
 	Q_OBJECT
 
-public:
+  public:
 	explicit RegionCache(QObject * parent = NULL);
 
 	/** Retrieves the specified region from the cache.
@@ -43,13 +42,13 @@ public:
 	/** Reloads the current chunk source. */
 	void reload();
 
-signals:
+  signals:
 	void regionAvailable(int a_RegionX, int a_RegionZ);
 
-protected slots:
+  protected slots:
 	void gotRegion(int a_RegionX, int a_RegionZ);
 
-protected:
+  protected:
 	/** The cache of the chunks */
 	QCache<quint32, RegionPtr> m_Cache;
 
@@ -66,8 +65,3 @@ protected:
 	/** Queues the specified region for rendering by m_RegionSource. */
 	void queueRegionRender(int a_RegionX, int a_RegionZ, RegionPtr & a_Region);
 };
-
-
-
-
-

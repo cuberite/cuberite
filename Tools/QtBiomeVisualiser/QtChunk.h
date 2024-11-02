@@ -8,7 +8,7 @@
 
 class Chunk
 {
-public:
+  public:
 	/** The type used for storing image data for a chunk. */
 	typedef uchar Image[16 * 16 * 4];
 
@@ -28,7 +28,7 @@ public:
 	/** Returns the raw biome data for this chunk. */
 	const short * getBiomes(void) const { return m_Biomes; }
 
-protected:
+  protected:
 	/** Flag that specifies if the chunk data is valid - loaded or generated. */
 	bool m_IsValid;
 
@@ -38,8 +38,3 @@ protected:
 };
 
 typedef std::shared_ptr<Chunk> ChunkPtr;
-
-
-
-
-

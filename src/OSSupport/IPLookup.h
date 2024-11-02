@@ -20,13 +20,11 @@
 /** Holds information about an in-progress IP-to-Hostname lookup. */
 class cIPLookup
 {
-public:
-
+  public:
 	/** Creates a lookup object and schedules the lookup. */
 	static void Lookup(const AString & a_IP, cNetwork::cResolveNameCallbacksPtr a_Callbacks);
 
-protected:
-
+  protected:
 	/** The callbacks to call for resolved names / errors. */
 	cNetwork::cResolveNameCallbacksPtr m_Callbacks;
 
@@ -41,8 +39,3 @@ protected:
 };
 typedef std::shared_ptr<cIPLookup> cIPLookupPtr;
 typedef std::vector<cIPLookupPtr> cIPLookupPtrs;
-
-
-
-
-

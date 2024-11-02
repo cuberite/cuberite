@@ -23,15 +23,14 @@ class cChunkMap;
 
 
 
-class cLuaChunkStay:
-	public cChunkStay
+class cLuaChunkStay : public cChunkStay
 {
 	using Super = cChunkStay;
 
-public:
+  public:
 	cLuaChunkStay();
 
-	virtual ~cLuaChunkStay() override { }
+	virtual ~cLuaChunkStay() override {}
 
 	/** Adds chunks in the specified Lua table.
 	Can be called only once.
@@ -39,9 +38,13 @@ public:
 	bool AddChunks(const cLuaState::cStackTable & a_ChunkCoords);
 
 	/** Enables the ChunkStay for the specified chunkmap, with the specified Lua callbacks. */
-	void Enable(cChunkMap & a_ChunkMap, cLuaState::cCallbackPtr a_OnChunkAvailable, cLuaState::cCallbackPtr a_OnAllChunksAvailable);
+	void Enable(
+		cChunkMap & a_ChunkMap,
+		cLuaState::cCallbackPtr a_OnChunkAvailable,
+		cLuaState::cCallbackPtr a_OnAllChunksAvailable
+	);
 
-protected:
+  protected:
 	/** The Lua function to call in OnChunkAvailable. Only valid when enabled. */
 	cLuaState::cCallbackPtr m_OnChunkAvailable;
 
@@ -60,9 +63,4 @@ protected:
 	If the coords are already present, gives a warning and ignores the pair.
 	The a_Index parameter is only for the error messages. */
 	void AddChunkCoord(cLuaState & a_LuaState, int a_Index);
-} ;
-
-
-
-
-
+};

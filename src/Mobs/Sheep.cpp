@@ -113,11 +113,13 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		if (m_TimeToStopEating == 0)
 		{
-			if (m_World->GetBlock({ PosX, PosY, PosZ }) == E_BLOCK_GRASS)  // Make sure grass hasn't been destroyed in the meantime
+			if (m_World->GetBlock({PosX, PosY, PosZ}) ==
+				E_BLOCK_GRASS)  // Make sure grass hasn't been destroyed in the meantime
 			{
 				// The sheep ate the grass so we change it to dirt
-				m_World->SetBlock({ PosX, PosY, PosZ }, E_BLOCK_DIRT, 0);
-				GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, { PosX, PosY, PosZ }, E_BLOCK_GRASS);
+				m_World->SetBlock({PosX, PosY, PosZ}, E_BLOCK_DIRT, 0);
+				GetWorld()
+					->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, {PosX, PosY, PosZ}, E_BLOCK_GRASS);
 				m_IsSheared = false;
 				m_World->BroadcastEntityMetadata(*this);
 			}
@@ -127,7 +129,7 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (GetRandomProvider().RandBool(1.0 / 600.0))
 		{
-			if (m_World->GetBlock({ PosX, PosY, PosZ }) == E_BLOCK_GRASS)
+			if (m_World->GetBlock({PosX, PosY, PosZ}) == E_BLOCK_GRASS)
 			{
 				m_World->BroadcastEntityAnimation(*this, EntityAnimation::SheepEatsGrass);
 				m_TimeToStopEating = 40;
@@ -145,26 +147,25 @@ void cSheep::InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2)
 	static const struct
 	{
 		short Parent1, Parent2, Child;
-	} ColorInheritance[] =
-	{
-		{ E_META_WOOL_BLUE,   E_META_WOOL_RED,   E_META_WOOL_PURPLE     },
-		{ E_META_WOOL_BLUE,   E_META_WOOL_GREEN, E_META_WOOL_CYAN       },
-		{ E_META_WOOL_YELLOW, E_META_WOOL_RED,   E_META_WOOL_ORANGE     },
-		{ E_META_WOOL_GREEN,  E_META_WOOL_WHITE, E_META_WOOL_LIGHTGREEN },
-		{ E_META_WOOL_RED,    E_META_WOOL_WHITE, E_META_WOOL_PINK       },
-		{ E_META_WOOL_WHITE,  E_META_WOOL_BLACK, E_META_WOOL_GRAY       },
-		{ E_META_WOOL_PURPLE, E_META_WOOL_PINK,  E_META_WOOL_MAGENTA    },
-		{ E_META_WOOL_WHITE,  E_META_WOOL_GRAY,  E_META_WOOL_LIGHTGRAY  },
-		{ E_META_WOOL_BLUE,   E_META_WOOL_WHITE, E_META_WOOL_LIGHTBLUE  },
+	} ColorInheritance[] = {
+		{E_META_WOOL_BLUE, E_META_WOOL_RED, E_META_WOOL_PURPLE},
+		{E_META_WOOL_BLUE, E_META_WOOL_GREEN, E_META_WOOL_CYAN},
+		{E_META_WOOL_YELLOW, E_META_WOOL_RED, E_META_WOOL_ORANGE},
+		{E_META_WOOL_GREEN, E_META_WOOL_WHITE, E_META_WOOL_LIGHTGREEN},
+		{E_META_WOOL_RED, E_META_WOOL_WHITE, E_META_WOOL_PINK},
+		{E_META_WOOL_WHITE, E_META_WOOL_BLACK, E_META_WOOL_GRAY},
+		{E_META_WOOL_PURPLE, E_META_WOOL_PINK, E_META_WOOL_MAGENTA},
+		{E_META_WOOL_WHITE, E_META_WOOL_GRAY, E_META_WOOL_LIGHTGRAY},
+		{E_META_WOOL_BLUE, E_META_WOOL_WHITE, E_META_WOOL_LIGHTBLUE},
 	};
 	cSheep * Parent1 = static_cast<cSheep *>(a_Parent1);
 	cSheep * Parent2 = static_cast<cSheep *>(a_Parent2);
 	for (size_t i = 0; i < ARRAYCOUNT(ColorInheritance); i++)
 	{
-		if (
-			((Parent1->GetFurColor() == ColorInheritance[i].Parent1) && (Parent2->GetFurColor() == ColorInheritance[i].Parent2)) ||
-			((Parent1->GetFurColor() == ColorInheritance[i].Parent2) && (Parent2->GetFurColor() == ColorInheritance[i].Parent1))
-		)
+		if (((Parent1->GetFurColor() == ColorInheritance[i].Parent1) &&
+			 (Parent2->GetFurColor() == ColorInheritance[i].Parent2)) ||
+			((Parent1->GetFurColor() == ColorInheritance[i].Parent2) &&
+			 (Parent2->GetFurColor() == ColorInheritance[i].Parent1)))
 		{
 			SetFurColor(ColorInheritance[i].Child);
 			return;

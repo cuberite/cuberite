@@ -32,7 +32,7 @@ class cWorld;
 
 class cSlotArea
 {
-public:
+  public:
 	cSlotArea(int a_NumSlots, cWindow & a_ParentWindow);
 	virtual ~cSlotArea() {}  // force a virtual destructor in all subclasses
 
@@ -65,7 +65,8 @@ public:
 	/** Called when a new player opens the same parent window. The window already tracks the player. CS-locked. */
 	virtual void OnPlayerAdded(cPlayer & a_Player);
 
-	/** Called when one of the players closes the parent window. The window already doesn't track the player. CS-locked. */
+	/** Called when one of the players closes the parent window. The window already doesn't track the player. CS-locked.
+	 */
 	virtual void OnPlayerRemoved(cPlayer & a_Player);
 
 	/** Called to store as much of a_ItemStack in the area as possible. a_ItemStack is modified to reflect the change.
@@ -73,7 +74,13 @@ public:
 	if a_ShouldApply is true, the changes are written into the slots;
 	if a_ShouldApply is false, only a_ItemStack is modified to reflect the number of fits (for fit-testing purposes)
 	If a_KeepEmptySlots is true, empty slots will be skipped and won't be filled */
-	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill);
+	virtual void DistributeStack(
+		cItem & a_ItemStack,
+		cPlayer & a_Player,
+		bool a_ShouldApply,
+		bool a_KeepEmptySlots,
+		bool a_BackFill
+	);
 
 	/** Called on DblClicking to collect all stackable items into hand.
 	The items are accumulated in a_Dragging and removed from the slots immediately.
@@ -81,83 +88,77 @@ public:
 	Returns true if full stack has been collected in a_Dragging, false if there's space remaining to fill. */
 	virtual bool CollectItemsToHand(cItem & a_Dragging, cPlayer & a_Player, bool a_CollectFullStacks);
 
-protected:
-	int       m_NumSlots;
+  protected:
+	int m_NumSlots;
 	cWindow & m_ParentWindow;
-} ;
+};
 
 
 
 
 
 /** Handles any part of the inventory, using parameters in constructor to distinguish between the parts */
-class cSlotAreaInventoryBase:
-	public cSlotArea
+class cSlotAreaInventoryBase : public cSlotArea
 {
 	using Super = cSlotArea;
 
-public:
-
+  public:
 	cSlotAreaInventoryBase(int a_NumSlots, int a_SlotOffset, cWindow & a_ParentWindow);
 
 	// Creative inventory's click handling is somewhat different from survival inventory's, handle that here:
-	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+		override;
 
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
-	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 
-protected:
+  protected:
 	int m_SlotOffset;  // Index that this area's slot 0 has in the underlying cInventory
-} ;
+};
 
 
 
 
 
 /** Handles the main inventory of each player, excluding the armor and hotbar */
-class cSlotAreaInventory:
-	public cSlotAreaInventoryBase
+class cSlotAreaInventory : public cSlotAreaInventoryBase
 {
 	using Super = cSlotAreaInventoryBase;
 
-public:
-
-	cSlotAreaInventory(cWindow & a_ParentWindow):
+  public:
+	cSlotAreaInventory(cWindow & a_ParentWindow) :
 		Super(cInventory::invInventoryCount, cInventory::invInventoryOffset, a_ParentWindow)
 	{
 	}
-} ;
+};
 
 
 
 
 
 /** Handles the hotbar of each player */
-class cSlotAreaHotBar:
-	public cSlotAreaInventoryBase
+class cSlotAreaHotBar : public cSlotAreaInventoryBase
 {
 	using Super = cSlotAreaInventoryBase;
 
-public:
-	cSlotAreaHotBar(cWindow & a_ParentWindow):
+  public:
+	cSlotAreaHotBar(cWindow & a_ParentWindow) :
 		Super(cInventory::invHotbarCount, cInventory::invHotbarOffset, a_ParentWindow)
 	{
 	}
-} ;
+};
 
 
 
 
 
 /** Handles the shield of each player */
-class cSlotAreaShield:
-	public cSlotAreaInventoryBase
+class cSlotAreaShield : public cSlotAreaInventoryBase
 {
 	using Super = cSlotAreaInventoryBase;
 
-public:
-
-	cSlotAreaShield(cWindow & a_ParentWindow):
+  public:
+	cSlotAreaShield(cWindow & a_ParentWindow) :
 		Super(cInventory::invShieldCount, cInventory::invShieldOffset, a_ParentWindow)
 	{
 	}
@@ -168,53 +169,56 @@ public:
 
 
 /** Handles the armor area of the player's inventory */
-class cSlotAreaArmor:
-	public cSlotAreaInventoryBase
+class cSlotAreaArmor : public cSlotAreaInventoryBase
 {
 	using Super = cSlotAreaInventoryBase;
 
-public:
-
-	cSlotAreaArmor(cWindow & a_ParentWindow):
+  public:
+	cSlotAreaArmor(cWindow & a_ParentWindow) :
 		Super(cInventory::invArmorCount, cInventory::invArmorOffset, a_ParentWindow)
 	{
 	}
 
 	/** Distributing the stack is allowed only for compatible items (helmets into helmet slot etc.) */
-	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill) override;
+	virtual void DistributeStack(
+		cItem & a_ItemStack,
+		cPlayer & a_Player,
+		bool a_ShouldApply,
+		bool a_KeepEmptySlots,
+		bool a_BackFill
+	) override;
 
 	/** Called when a player clicks in the window. Parameters taken from the click packet. */
-	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+		override;
 
 	static bool CanPlaceArmorInSlot(int a_SlotNum, const cItem & a_Item);
-} ;
+};
 
 
 
 
 
 /** Handles any slot area that is representing a cItemGrid; same items for all the players */
-class cSlotAreaItemGrid:
-	public cSlotArea,
-	public cItemGrid::cListener
+class cSlotAreaItemGrid : public cSlotArea,
+						  public cItemGrid::cListener
 {
 	using Super = cSlotArea;
 
-public:
-
+  public:
 	cSlotAreaItemGrid(cItemGrid & a_ItemGrid, cWindow & a_ParentWindow);
 
 	virtual ~cSlotAreaItemGrid() override;
 
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
-	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 
-protected:
+  protected:
 	cItemGrid & m_ItemGrid;
 
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
-} ;
+};
 
 
 
@@ -223,55 +227,58 @@ protected:
 /** A cSlotArea with items layout that is private to each player and is temporary, such as
 a crafting grid or an enchantment table.
 This common ancestor stores the items in a per-player map. It also implements tossing items from the map. */
-class cSlotAreaTemporary:
-	public cSlotArea
+class cSlotAreaTemporary : public cSlotArea
 {
 	using Super = cSlotArea;
 
-public:
-
+  public:
 	cSlotAreaTemporary(int a_NumSlots, cWindow & a_ParentWindow);
 
 	// cSlotArea overrides:
-	virtual const cItem * GetSlot        (int a_SlotNum, cPlayer & a_Player) const override;
-	virtual void          SetSlot        (int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
-	virtual void          OnPlayerAdded  (cPlayer & a_Player) override;
-	virtual void          OnPlayerRemoved(cPlayer & a_Player) override;
+	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
+	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+	virtual void OnPlayerAdded(cPlayer & a_Player) override;
+	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
 
 	/** Tosses the player's items in slots [a_Begin, a_End) (ie. incl. a_Begin, but excl. a_End) */
 	void TossItems(cPlayer & a_Player, int a_Begin, int a_End);
 
-protected:
-	using cItemMap = std::map<UInt32, std::vector<cItem> >;  // Maps EntityID -> items
+  protected:
+	using cItemMap = std::map<UInt32, std::vector<cItem>>;  // Maps EntityID -> items
 
 	cItemMap m_Items;
 
 	/** Returns the pointer to the slot array for the player specified. */
 	cItem * GetPlayerSlots(cPlayer & a_Player);
-} ;
+};
 
 
 
 
 
-class cSlotAreaCrafting:
-	public cSlotAreaTemporary
+class cSlotAreaCrafting : public cSlotAreaTemporary
 {
 	using Super = cSlotAreaTemporary;
 
-public:
-
+  public:
 	/** a_GridSize is allowed to be only 2 or 3 */
 	cSlotAreaCrafting(int a_GridSize, cWindow & a_ParentWindow);
 
 	// cSlotAreaTemporary overrides:
-	virtual void Clicked        (cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
-	virtual void DblClicked     (cPlayer & a_Player, int a_SlotNum) override;
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+		override;
+	virtual void DblClicked(cPlayer & a_Player, int a_SlotNum) override;
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
-	virtual void SetSlot        (int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 
 	// Distributing items into this area is completely disabled
-	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill) override;
+	virtual void DistributeStack(
+		cItem & a_ItemStack,
+		cPlayer & a_Player,
+		bool a_ShouldApply,
+		bool a_KeepEmptySlots,
+		bool a_BackFill
+	) override;
 
 	/** Clear the crafting grid */
 	void ClearCraftingGrid(cPlayer & a_Player);
@@ -279,12 +286,12 @@ public:
 	/** Loads the given Recipe into the crafting grid */
 	void LoadRecipe(cPlayer & a_Player, UInt32 a_RecipeId);
 
-protected:
+  protected:
 	/** Maps player's EntityID -> current recipe.
 	Not a std::map because cCraftingGrid needs proper constructor params. */
-	typedef std::list<std::pair<UInt32, cCraftingRecipe> > cRecipeMap;
+	typedef std::list<std::pair<UInt32, cCraftingRecipe>> cRecipeMap;
 
-	int        m_GridSize;
+	int m_GridSize;
 	cRecipeMap m_Recipes;
 
 	/** Handles a click in the result slot.
@@ -298,7 +305,8 @@ protected:
 	/** Handles a drop-click in the result slot. */
 	void DropClickedResult(cPlayer & a_Player);
 
-	/** Updates the current recipe and result slot based on the ingredients currently in the crafting grid of the specified player. */
+	/** Updates the current recipe and result slot based on the ingredients currently in the crafting grid of the
+	 * specified player. */
 	void UpdateRecipe(cPlayer & a_Player);
 
 	/** Retrieves the recipe for the specified player from the map, or creates one if not found. */
@@ -306,25 +314,30 @@ protected:
 
 	/** Called after an item has been crafted to handle statistics e.t.c. */
 	void HandleCraftItem(const cItem & a_Result, cPlayer & a_Player);
-} ;
+};
 
 
 
 
 
-class cSlotAreaAnvil:
-	public cSlotAreaTemporary
+class cSlotAreaAnvil : public cSlotAreaTemporary
 {
 	using Super = cSlotAreaTemporary;
 
-public:
-
+  public:
 	cSlotAreaAnvil(cWindow & a_ParentWindow);
 
 	// cSlotArea overrides:
-	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+		override;
 	virtual void ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem) override;
-	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill) override;
+	virtual void DistributeStack(
+		cItem & a_ItemStack,
+		cPlayer & a_Player,
+		bool a_ShouldApply,
+		bool a_KeepEmptySlots,
+		bool a_BackFill
+	) override;
 
 	// cSlotAreaTemporary overrides:
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
@@ -338,63 +351,73 @@ public:
 	/** Handles a click in the item slot. */
 	void UpdateResult(cPlayer & a_Player);
 
-protected:
+  protected:
 	/** The maximum cost of repairing / renaming in the anvil. */
 	int m_MaximumCost;
 
 	/** The stack size of the second item where was used for repair */
 	char m_StackSizeToBeUsedInRepair;
-} ;
+};
 
 
 
 
 
-class cSlotAreaBeacon:
-	public cSlotArea,
-	public cItemGrid::cListener
+class cSlotAreaBeacon : public cSlotArea,
+						public cItemGrid::cListener
 {
 	using Super = cSlotArea;
 
-public:
-
+  public:
 	cSlotAreaBeacon(cBeaconEntity * a_Beacon, cWindow & a_ParentWindow);
 	virtual ~cSlotAreaBeacon() override;
 
 	static bool IsPlaceableItem(short a_ItemType);
 
-	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
-	virtual void          DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill) override;
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+		override;
+	virtual void DistributeStack(
+		cItem & a_ItemStack,
+		cPlayer & a_Player,
+		bool a_ShouldApply,
+		bool a_KeepEmptySlots,
+		bool a_BackFill
+	) override;
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
-	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 
-protected:
+  protected:
 	cBeaconEntity * m_Beacon;
 
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
-} ;
+};
 
 
 
 
 
-class cSlotAreaEnchanting final :
-	public cSlotAreaTemporary
+class cSlotAreaEnchanting final : public cSlotAreaTemporary
 {
 	using Super = cSlotAreaTemporary;
 
-public:
-
+  public:
 	cSlotAreaEnchanting(cWindow & a_ParentWindow, Vector3i a_BlockPos);
 
 	// cSlotArea overrides:
-	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
-	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill) override;
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+		override;
+	virtual void DistributeStack(
+		cItem & a_ItemStack,
+		cPlayer & a_Player,
+		bool a_ShouldApply,
+		bool a_KeepEmptySlots,
+		bool a_BackFill
+	) override;
 	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 
 	// cSlotAreaTemporary overrides:
-	virtual void OnPlayerAdded  (cPlayer & a_Player) override;
+	virtual void OnPlayerAdded(cPlayer & a_Player) override;
 	virtual void OnPlayerRemoved(cPlayer & a_Player) override;
 
 	/* Get the number of bookshelves which are near the enchanting table */
@@ -404,8 +427,7 @@ public:
 	Ownership of the cItem is transferred to the caller. */
 	cItem SelectEnchantedOption(size_t a_EnchantOption);
 
-protected:
-
+  protected:
 	/** Handles a click in the item slot. */
 	void UpdateResult(cPlayer & a_Player);
 
@@ -417,51 +439,48 @@ protected:
 
 
 
-class cSlotAreaChest :
-	public cSlotArea
+class cSlotAreaChest : public cSlotArea
 {
-public:
+  public:
 	cSlotAreaChest(cChestEntity * a_Chest, cWindow & a_ParentWindow);
 
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
-	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 
-protected:
+  protected:
 	cChestEntity * m_Chest;
-} ;
+};
 
 
 
 
 
-class cSlotAreaDoubleChest :
-	public cSlotArea
+class cSlotAreaDoubleChest : public cSlotArea
 {
-public:
+  public:
 	cSlotAreaDoubleChest(cChestEntity * a_TopChest, cChestEntity * a_BottomChest, cWindow & a_ParentWindow);
 
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
-	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 
-protected:
+  protected:
 	cChestEntity * m_TopChest;
 	cChestEntity * m_BottomChest;
-} ;
+};
 
 
 
 
 
-class cSlotAreaEnderChest :
-	public cSlotArea
+class cSlotAreaEnderChest : public cSlotArea
 {
-public:
+  public:
 	cSlotAreaEnderChest(cEnderChestEntity * a_EnderChest, cWindow & a_ParentWindow);
 
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
-	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 
-protected:
+  protected:
 	cEnderChestEntity * m_EnderChest;
 };
 
@@ -469,24 +488,29 @@ protected:
 
 
 
-class cSlotAreaFurnace:
-	public cSlotArea,
-	public cItemGrid::cListener
+class cSlotAreaFurnace : public cSlotArea,
+						 public cItemGrid::cListener
 {
 	using Super = cSlotArea;
 
-public:
-
+  public:
 	cSlotAreaFurnace(cFurnaceEntity * a_Furnace, cWindow & a_ParentWindow);
 
 	virtual ~cSlotAreaFurnace() override;
 
-	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
-	virtual void          DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill) override;
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+		override;
+	virtual void DistributeStack(
+		cItem & a_ItemStack,
+		cPlayer & a_Player,
+		bool a_ShouldApply,
+		bool a_KeepEmptySlots,
+		bool a_BackFill
+	) override;
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
-	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 
-protected:
+  protected:
 	cFurnaceEntity * m_Furnace;
 
 	// cItemGrid::cListener overrides:
@@ -494,29 +518,35 @@ protected:
 
 	/** Called after an item has been smelted to handle statistics etc. */
 	void HandleSmeltItem(const cItem & a_Result, cPlayer & a_Player);
-} ;
+};
 
 
 
 
 
-class cSlotAreaBrewingstand:
-	public cSlotArea,
-	public cItemGrid::cListener
+class cSlotAreaBrewingstand : public cSlotArea,
+							  public cItemGrid::cListener
 {
 	using Super = cSlotArea;
 
-public:
-
+  public:
 	cSlotAreaBrewingstand(cBrewingstandEntity * a_Brewingstand, cWindow & a_ParentWindow);
 
 	virtual ~cSlotAreaBrewingstand() override;
 
-	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
-	virtual void          DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill) override;
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+		override;
+	virtual void DistributeStack(
+		cItem & a_ItemStack,
+		cPlayer & a_Player,
+		bool a_ShouldApply,
+		bool a_KeepEmptySlots,
+		bool a_BackFill
+	) override;
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
-	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
-protected:
+	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+
+  protected:
 	cBrewingstandEntity * m_Brewingstand;
 
 	// cItemGrid::cListener overrides:
@@ -524,22 +554,21 @@ protected:
 
 	/** Called after an item has been brewed to handle statistics etc. */
 	void HandleBrewedItem(cPlayer & a_Player, const cItem & a_ClickedItem);
-} ;
+};
 
 
 
 
 
-class cSlotAreaMinecartWithChest :
-	public cSlotArea
+class cSlotAreaMinecartWithChest : public cSlotArea
 {
-public:
+  public:
 	cSlotAreaMinecartWithChest(cMinecartWithChest * a_ChestCart, cWindow & a_ParentWindow);
 
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
-	virtual void          SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
+	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
 
-protected:
+  protected:
 	cMinecartWithChest * m_Chest;
 };
 
@@ -548,10 +577,9 @@ protected:
 
 
 /** Slot area holding horse saddle and armor. */
-class cSlotAreaHorse:
-	public cSlotArea
+class cSlotAreaHorse : public cSlotArea
 {
-public:
+  public:
 	enum
 	{
 		SaddleSlot,
@@ -559,10 +587,18 @@ public:
 	};
 
 	cSlotAreaHorse(cHorse & a_Horse, cWindow & a_ParentWindow);
-	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
+	virtual void Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+		override;
 	virtual const cItem * GetSlot(int a_SlotNum, cPlayer & a_Player) const override;
 	virtual void SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem & a_Item) override;
-	virtual void DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill) override;
-private:
+	virtual void DistributeStack(
+		cItem & a_ItemStack,
+		cPlayer & a_Player,
+		bool a_ShouldApply,
+		bool a_KeepEmptySlots,
+		bool a_BackFill
+	) override;
+
+  private:
 	cHorse & m_Horse;
 };

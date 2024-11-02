@@ -15,7 +15,7 @@
 
 class cUrlParser
 {
-public:
+  public:
 	/** Returns true if the specified scheme (http, ftp, mailto, ...) is recognized by the URL parser.
 	Is case sensitive, known schemes are always lowercase. */
 	static bool IsKnownScheme(const AString & a_Scheme) { return (GetDefaultPort(a_Scheme) > 0); }
@@ -55,7 +55,3 @@ public:
 	/** Checks if the supplied URL is valid */
 	static std::pair<bool, AString> Validate(const AString & a_Url);
 };
-
-
-
-

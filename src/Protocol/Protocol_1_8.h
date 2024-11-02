@@ -27,109 +27,144 @@ Declares the 1.8 protocol classes:
 
 
 
-class cProtocol_1_8_0:
-	public cProtocol
+class cProtocol_1_8_0 : public cProtocol
 {
 	using Super = cProtocol;
 
-public:
-
+  public:
 	cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State);
 
 	virtual void DataReceived(cByteBuffer & a_Buffer, ContiguousByteBuffer & a_Data) override;
 	virtual void DataPrepared(ContiguousByteBuffer & a_Data) override;
 
 	// Sending stuff to clients (alphabetically sorted):
-	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
-	virtual void SendBlockAction                (Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
-	virtual void SendBlockBreakAnim	            (UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage) override;
-	virtual void SendBlockChange                (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
-	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
-	virtual void SendBossBarAdd                 (UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
-	virtual void SendBossBarRemove              (UInt32 a_UniqueID) override;
-	virtual void SendBossBarUpdateFlags         (UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
-	virtual void SendBossBarUpdateHealth        (UInt32 a_UniqueID, float a_FractionFilled) override;
-	virtual void SendBossBarUpdateStyle         (UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType) override;
-	virtual void SendBossBarUpdateTitle         (UInt32 a_UniqueID, const cCompositeChat & a_Title) override;
-	virtual void SendCameraSetTo                (const cEntity & a_Entity) override;
-	virtual void SendChat                       (const AString & a_Message, eChatType a_Type) override;
-	virtual void SendChat                       (const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) override;
-	virtual void SendChatRaw                    (const AString & a_MessageRaw, eChatType a_Type) override;
-	virtual void SendChunkData                  (ContiguousByteBufferView a_ChunkData) override;
-	virtual void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) override;
-	virtual void SendDestroyEntity              (const cEntity & a_Entity) override;
-	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
-	virtual void SendDisconnect                 (const AString & a_Reason) override;
-	virtual void SendEditSign                   (Vector3i a_BlockPos) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
-	virtual void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation) override;
-	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration) override;
-	virtual void SendEntityEquipment            (const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
-	virtual void SendEntityHeadLook             (const cEntity & a_Entity) override;
-	virtual void SendEntityLook                 (const cEntity & a_Entity) override;
-	virtual void SendEntityMetadata             (const cEntity & a_Entity) override;
-	virtual void SendEntityPosition             (const cEntity & a_Entity) override;
-	virtual void SendEntityProperties           (const cEntity & a_Entity) override;
-	virtual void SendEntityVelocity             (const cEntity & a_Entity) override;
-	virtual void SendExperience                 (void) override;
-	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
-	virtual void SendExplosion                  (Vector3f a_Position, float a_Power) override;
-	virtual void SendGameMode                   (eGameMode a_GameMode) override;
-	virtual void SendHealth                     (void) override;
-	virtual void SendHeldItemChange             (int a_ItemIndex) override;
-	virtual void SendHideTitle                  (void) override;
-	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
-	virtual void SendKeepAlive                  (UInt32 a_PingID) override;
-	virtual void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
-	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) override;
-	virtual void SendLoginSuccess               (void) override;
-	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
-	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
-	virtual void SendPlayerAbilities            (void) override;
-	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount) override;
-	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
-	virtual void SendPlayerListAddPlayer        (const cPlayer & a_Player) override;
-	virtual void SendPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer) override;
-	virtual void SendPlayerListRemovePlayer     (const cPlayer & a_Player) override;
+	virtual void SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle) override;
+	virtual void SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
+	virtual void SendBlockBreakAnim(UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage) override;
+	virtual void SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual void SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
+	virtual void SendBossBarAdd(
+		UInt32 a_UniqueID,
+		const cCompositeChat & a_Title,
+		float a_FractionFilled,
+		BossBarColor a_Color,
+		BossBarDivisionType a_DivisionType,
+		bool a_DarkenSky,
+		bool a_PlayEndMusic,
+		bool a_CreateFog
+	) override;
+	virtual void SendBossBarRemove(UInt32 a_UniqueID) override;
+	virtual void SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+		override;
+	virtual void SendBossBarUpdateHealth(UInt32 a_UniqueID, float a_FractionFilled) override;
+	virtual void SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType)
+		override;
+	virtual void SendBossBarUpdateTitle(UInt32 a_UniqueID, const cCompositeChat & a_Title) override;
+	virtual void SendCameraSetTo(const cEntity & a_Entity) override;
+	virtual void SendChat(const AString & a_Message, eChatType a_Type) override;
+	virtual void SendChat(const cCompositeChat & a_Message, eChatType a_Type, bool a_ShouldUseChatPrefixes) override;
+	virtual void SendChatRaw(const AString & a_MessageRaw, eChatType a_Type) override;
+	virtual void SendChunkData(ContiguousByteBufferView a_ChunkData) override;
+	virtual void SendCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) override;
+	virtual void SendDestroyEntity(const cEntity & a_Entity) override;
+	virtual void SendDetachEntity(const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
+	virtual void SendDisconnect(const AString & a_Reason) override;
+	virtual void SendEditSign(Vector3i a_BlockPos
+	) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
+	virtual void SendEntityAnimation(const cEntity & a_Entity, EntityAnimation a_Animation) override;
+	virtual void SendEntityEffect(const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration) override;
+	virtual void SendEntityEquipment(const cEntity & a_Entity, short a_SlotNum, const cItem & a_Item) override;
+	virtual void SendEntityHeadLook(const cEntity & a_Entity) override;
+	virtual void SendEntityLook(const cEntity & a_Entity) override;
+	virtual void SendEntityMetadata(const cEntity & a_Entity) override;
+	virtual void SendEntityPosition(const cEntity & a_Entity) override;
+	virtual void SendEntityProperties(const cEntity & a_Entity) override;
+	virtual void SendEntityVelocity(const cEntity & a_Entity) override;
+	virtual void SendExperience(void) override;
+	virtual void SendExperienceOrb(const cExpOrb & a_ExpOrb) override;
+	virtual void SendExplosion(Vector3f a_Position, float a_Power) override;
+	virtual void SendGameMode(eGameMode a_GameMode) override;
+	virtual void SendHealth(void) override;
+	virtual void SendHeldItemChange(int a_ItemIndex) override;
+	virtual void SendHideTitle(void) override;
+	virtual void SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
+	virtual void SendKeepAlive(UInt32 a_PingID) override;
+	virtual void SendLeashEntity(const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
+	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
+	virtual void SendLoginSuccess(void) override;
+	virtual void SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
+	virtual void SendPaintingSpawn(const cPainting & a_Painting) override;
+	virtual void SendPlayerAbilities(void) override;
+	virtual void SendParticleEffect(
+		const AString & a_ParticleName,
+		Vector3f a_Src,
+		Vector3f a_Offset,
+		float a_ParticleData,
+		int a_ParticleAmount
+	) override;
+	virtual void SendParticleEffect(
+		const AString & a_ParticleName,
+		Vector3f a_Src,
+		Vector3f a_Offset,
+		float a_ParticleData,
+		int a_ParticleAmount,
+		std::array<int, 2> a_Data
+	) override;
+	virtual void SendPlayerListAddPlayer(const cPlayer & a_Player) override;
+	virtual void SendPlayerListHeaderFooter(const cCompositeChat & a_Header, const cCompositeChat & a_Footer) override;
+	virtual void SendPlayerListRemovePlayer(const cPlayer & a_Player) override;
 	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) override;
-	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) override;
-	virtual void SendPlayerListUpdatePing       () override;
-	virtual void SendPlayerMoveLook             (Vector3d a_Pos, float a_Yaw, float a_Pitch, bool a_IsRelative) override;
-	virtual void SendPlayerMoveLook             (void) override;
-	virtual void SendPlayerPermissionLevel      (void) override;
-	virtual void SendPlayerPosition             (void) override;
-	virtual void SendPlayerSpawn                (const cPlayer & a_Player) override;
-	virtual void SendPluginMessage              (const AString & a_Channel, ContiguousByteBufferView a_Message) override;
-	virtual void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID) override;
-	virtual void SendResetTitle                 (void) override;
-	virtual void SendResourcePack               (const AString & a_ResourcePackUrl) override;
-	virtual void SendRespawn                    (eDimension a_Dimension) override;
-	virtual void SendSoundEffect                (const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch) override;
-	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
-	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
-	virtual void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
-	virtual void SendSetSubTitle                (const cCompositeChat & a_SubTitle) override;
-	virtual void SendSetRawSubTitle             (const AString & a_SubTitle) override;
-	virtual void SendSetTitle                   (const cCompositeChat & a_Title) override;
-	virtual void SendSetRawTitle                (const AString & a_Title) override;
-	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, Vector3i a_Origin, int a_Data) override;
-	virtual void SendSpawnEntity                (const cEntity & a_Entity) override;
-	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
-	virtual void SendStatistics                 (const StatisticsManager & a_Manager) override;
-	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
-	virtual void SendThunderbolt                (Vector3i a_BlockPos) override;
-	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
-	virtual void SendTimeUpdate                 (cTickTimeLong a_WorldAge, cTickTimeLong a_WorldDate, bool a_DoDaylightCycle) override;
-	virtual void SendUnleashEntity              (const cEntity & a_Entity) override;
-	virtual void SendUnloadChunk                (int a_ChunkX, int a_ChunkZ) override;
-	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
-	virtual void SendUpdateSign                 (Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) override;
-	virtual void SendUnlockRecipe               (UInt32 a_RecipeID) override;
-	virtual void SendInitRecipes                (UInt32 a_RecipeID) override;
-	virtual void SendWeather                    (eWeather a_Weather) override;
-	virtual void SendWholeInventory             (const cWindow & a_Window) override;
-	virtual void SendWindowClose                (const cWindow & a_Window) override;
-	virtual void SendWindowOpen                 (const cWindow & a_Window) override;
-	virtual void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value) override;
+	virtual void SendPlayerListUpdateGameMode(const cPlayer & a_Player) override;
+	virtual void SendPlayerListUpdatePing() override;
+	virtual void SendPlayerMoveLook(Vector3d a_Pos, float a_Yaw, float a_Pitch, bool a_IsRelative) override;
+	virtual void SendPlayerMoveLook(void) override;
+	virtual void SendPlayerPermissionLevel(void) override;
+	virtual void SendPlayerPosition(void) override;
+	virtual void SendPlayerSpawn(const cPlayer & a_Player) override;
+	virtual void SendPluginMessage(const AString & a_Channel, ContiguousByteBufferView a_Message) override;
+	virtual void SendRemoveEntityEffect(const cEntity & a_Entity, int a_EffectID) override;
+	virtual void SendResetTitle(void) override;
+	virtual void SendResourcePack(const AString & a_ResourcePackUrl) override;
+	virtual void SendRespawn(eDimension a_Dimension) override;
+	virtual void SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch)
+		override;
+	virtual void SendScoreboardObjective(const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
+	virtual void SendScoreUpdate(
+		const AString & a_Objective,
+		const AString & a_Player,
+		cObjective::Score a_Score,
+		Byte a_Mode
+	) override;
+	virtual void SendDisplayObjective(const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
+	virtual void SendSetSubTitle(const cCompositeChat & a_SubTitle) override;
+	virtual void SendSetRawSubTitle(const AString & a_SubTitle) override;
+	virtual void SendSetTitle(const cCompositeChat & a_Title) override;
+	virtual void SendSetRawTitle(const AString & a_Title) override;
+	virtual void SendSoundParticleEffect(const EffectID a_EffectID, Vector3i a_Origin, int a_Data) override;
+	virtual void SendSpawnEntity(const cEntity & a_Entity) override;
+	virtual void SendSpawnMob(const cMonster & a_Mob) override;
+	virtual void SendStatistics(const StatisticsManager & a_Manager) override;
+	virtual void SendTabCompletionResults(const AStringVector & a_Results) override;
+	virtual void SendThunderbolt(Vector3i a_BlockPos) override;
+	virtual void SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
+	virtual void SendTimeUpdate(cTickTimeLong a_WorldAge, cTickTimeLong a_WorldDate, bool a_DoDaylightCycle) override;
+	virtual void SendUnleashEntity(const cEntity & a_Entity) override;
+	virtual void SendUnloadChunk(int a_ChunkX, int a_ChunkZ) override;
+	virtual void SendUpdateBlockEntity(cBlockEntity & a_BlockEntity) override;
+	virtual void SendUpdateSign(
+		Vector3i a_BlockPos,
+		const AString & a_Line1,
+		const AString & a_Line2,
+		const AString & a_Line3,
+		const AString & a_Line4
+	) override;
+	virtual void SendUnlockRecipe(UInt32 a_RecipeID) override;
+	virtual void SendInitRecipes(UInt32 a_RecipeID) override;
+	virtual void SendWeather(eWeather a_Weather) override;
+	virtual void SendWholeInventory(const cWindow & a_Window) override;
+	virtual void SendWindowClose(const cWindow & a_Window) override;
+	virtual void SendWindowOpen(const cWindow & a_Window) override;
+	virtual void SendWindowProperty(const cWindow & a_Window, size_t a_Property, short a_Value) override;
 
 	virtual AString GetAuthServerID(void) override { return m_AuthServerID; }
 
@@ -137,8 +172,7 @@ public:
 	a_Compressed will be set to the compressed packet includes packet length and data length. */
 	static void CompressPacket(CircularBufferCompressor & a_Packet, ContiguousByteBuffer & a_Compressed);
 
-protected:
-
+  protected:
 	/** State of the protocol. */
 	State m_State;
 
@@ -164,7 +198,8 @@ protected:
 	/** Converts eMonsterType to protocol-specific mob types */
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const;
 
-	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
+	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name
+	 * is incorrect, it returns 0. */
 	virtual int GetProtocolParticleID(const AString & a_ParticleName) const;
 
 	/** Returns the protocol version. */
@@ -183,31 +218,31 @@ protected:
 	virtual void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer);
 
 	// Packet handlers while in the Game state (m_State == 3):
-	virtual void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketBlockDig               (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketBlockPlace             (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketChatMessage            (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketClientSettings         (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketClientStatus           (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketAnimation(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketBlockDig(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketChatMessage(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketClientSettings(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketClientStatus(cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketEntityAction           (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketKeepAlive              (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketPlayer                 (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketPlayerAbilities        (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketPlayerLook             (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketPlayerPos              (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketPlayerPosLook          (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketPluginMessage          (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketResourcePackStatus     (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketSpectate               (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketSteerVehicle           (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketTabComplete            (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketUpdateSign             (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketUseEntity              (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
-	virtual void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketEntityAction(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPlayer(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPlayerAbilities(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPlayerLook(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketSlotSelect(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketSpectate(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketTabComplete(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketUseEntity(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketEnchantItem(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketWindowClick(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketWindowClose(cByteBuffer & a_ByteBuffer);
 
 	/** Parses Vanilla plugin messages into specific ClientHandle calls.
 	The message payload is still in the bytebuffer, the handler reads it specifically for each handled channel. */
@@ -242,8 +277,7 @@ protected:
 	/** Writes the mob-specific metadata for the specified mob */
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const;
 
-private:
-
+  private:
 	AString m_ServerAddress;
 
 	AString m_AuthServerID;
@@ -263,12 +297,12 @@ private:
 	void AddReceivedData(cByteBuffer & a_Buffer, ContiguousByteBufferView a_Data);
 
 	/** Converts a statistic to a protocol-specific string.
-	Protocols <= 1.12 use strings, hence this is a static as the string-mapping was append-only for the versions that used it.
-	Returns an empty string, handled correctly by the client, for newer, unsupported statistics. */
+	Protocols <= 1.12 use strings, hence this is a static as the string-mapping was append-only for the versions that
+	used it. Returns an empty string, handled correctly by the client, for newer, unsupported statistics. */
 	static const char * GetProtocolStatisticName(CustomStatistic a_Statistic);
 
 	/** Handle a complete packet stored in the given buffer. */
 	void HandlePacket(cByteBuffer & a_Buffer);
 
 	void StartEncryption(const Byte * a_Key);
-} ;
+};

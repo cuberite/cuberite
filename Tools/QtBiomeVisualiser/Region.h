@@ -8,7 +8,7 @@
 
 class Region
 {
-public:
+  public:
 	Region();
 
 	/** Retrieves the chunk with the specified relative coords. */
@@ -29,7 +29,7 @@ public:
 	/** Converts chunk coordinates into region coordinates. */
 	static void chunkToRegion(int a_ChunkX, int a_ChunkZ, int & a_RegionX, int & a_RegionZ);
 
-protected:
+  protected:
 	friend class RegionLoader;
 
 
@@ -40,7 +40,3 @@ protected:
 	be displayed. */
 	bool m_IsValid;
 };
-
-
-
-

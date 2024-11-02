@@ -10,7 +10,7 @@
 
 typedef std::string AString;
 typedef std::vector<AString> AStringVector;
-typedef std::list<AString>   AStringList;
+typedef std::list<AString> AStringList;
 
 /** A string dictionary, used for key-value pairs. */
 typedef std::map<AString, AString> AStringMap;
@@ -93,10 +93,15 @@ extern std::pair<bool, AString> URLDecode(const AString & a_String);  // Exporte
 extern AString URLEncode(const AString & a_Text);
 
 /** Replaces all occurrences of char a_From inside a_String with char a_To. */
-extern AString ReplaceAllCharOccurrences(const AString & a_String, char a_From, char a_To);  // Needn't export to Lua, since Lua doesn't have chars anyway
+extern AString ReplaceAllCharOccurrences(
+	const AString & a_String,
+	char a_From,
+	char a_To
+);  // Needn't export to Lua, since Lua doesn't have chars anyway
 
 /** Decodes a Base64-encoded string into the raw data */
-extern AString Base64Decode(const AString & a_Base64String);  // Exported manually due to embedded NULs and extra parameter
+extern AString Base64Decode(const AString & a_Base64String
+);  // Exported manually due to embedded NULs and extra parameter
 
 /** Encodes a string into Base64 */
 extern AString Base64Encode(const AString & a_Input);  // Exported manually due to embedded NULs and extra parameter
@@ -139,8 +144,7 @@ bool IsOnlyWhitespace(const AString & a_String);
 
 
 /** Parses any integer type. Checks bounds and returns errors out of band. */
-template <class T>
-bool StringToInteger(const AString & a_str, T & a_Num)
+template <class T> bool StringToInteger(const AString & a_str, T & a_Num)
 {
 	size_t i = 0;
 	bool positive = true;
@@ -212,8 +216,7 @@ bool StringToInteger(const AString & a_str, T & a_Num)
 
 /** Returns a number (of any integer type T) from a key-value string map.
 Returns a_Default if the key is not present or the value is not a number representable in type T. */
-template <typename T>
-T GetStringMapInteger(const AStringMap & a_Map, const AString & a_Key, T a_Default)
+template <typename T> T GetStringMapInteger(const AStringMap & a_Map, const AString & a_Key, T a_Default)
 {
 	// Try to locate the key:
 	auto itr = a_Map.find(a_Key);
@@ -236,7 +239,3 @@ T GetStringMapInteger(const AStringMap & a_Map, const AString & a_Key, T a_Defau
 
 
 // If you have any other string helper functions, declare them here
-
-
-
-

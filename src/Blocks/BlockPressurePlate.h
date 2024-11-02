@@ -9,17 +9,14 @@
 
 
 
-class cBlockPressurePlateHandler final :
-	public cClearMetaOnDrop<cBlockHandler>
+class cBlockPressurePlateHandler final : public cClearMetaOnDrop<cBlockHandler>
 {
 	using Super = cClearMetaOnDrop<cBlockHandler>;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
 		if (a_Position.y <= 0)
@@ -72,8 +69,8 @@ private:
 		UNUSED(a_Meta);
 		switch (m_BlockType)
 		{
-			case E_BLOCK_STONE_PRESSURE_PLATE: return 11;
-			case E_BLOCK_WOODEN_PRESSURE_PLATE: return 13;
+			case E_BLOCK_STONE_PRESSURE_PLATE:          return 11;
+			case E_BLOCK_WOODEN_PRESSURE_PLATE:         return 13;
 			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE: return 6;
 			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE: return 30;
 			default:
@@ -83,8 +80,4 @@ private:
 			}
 		}
 	}
-} ;
-
-
-
-
+};

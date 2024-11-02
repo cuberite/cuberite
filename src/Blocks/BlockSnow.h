@@ -7,24 +7,28 @@
 
 
 
-class cBlockSnowHandler final :
-	public cBlockHandler
+class cBlockSnowHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	enum
 	{
 		FullBlockMeta = 7  // Meta value of a full-height snow block.
 	};
 
 
-	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
+	virtual bool DoesIgnoreBuildCollision(
+		const cWorld & a_World,
+		const cItem & a_HeldItem,
+		const Vector3i a_Position,
+		const NIBBLETYPE a_Meta,
+		const eBlockFace a_ClickedBlockFace,
+		const bool a_ClickedDirectly
+	) const override
 	{
 		if (a_Meta == 0)
 		{
@@ -34,7 +38,9 @@ private:
 		// Special case if a player is holding a (thin) snow block and its size can be increased:
 		if ((a_HeldItem.m_ItemType == E_BLOCK_SNOW) && (a_Meta < FullBlockMeta))
 		{
-			return !a_ClickedDirectly || (a_ClickedBlockFace == BLOCK_FACE_YP);  // If clicked an adjacent block, or clicked YP directly, we ignore collision.
+			return !a_ClickedDirectly ||
+				(a_ClickedBlockFace == BLOCK_FACE_YP
+				);  // If clicked an adjacent block, or clicked YP directly, we ignore collision.
 		}
 
 		return false;
@@ -99,23 +105,13 @@ private:
 	}
 
 
-private:
-
+  private:
 	/** Returns true if snow can be placed on top of a block with the given type and meta. */
 	static bool CanBeOn(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
 		// If block below is snowable, or it is a thin snow block and is a full thin snow block, say yay:
 		return (
-			cBlockInfo::IsSnowable(a_BlockType) ||
-			(
-				(a_BlockType == E_BLOCK_SNOW) &&
-				(a_BlockMeta == FullBlockMeta)
-			)
+			cBlockInfo::IsSnowable(a_BlockType) || ((a_BlockType == E_BLOCK_SNOW) && (a_BlockMeta == FullBlockMeta))
 		);
 	}
-
-} ;
-
-
-
-
+};

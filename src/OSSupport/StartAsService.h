@@ -13,16 +13,13 @@
 
 class StartAsService
 {
-public:
-
+  public:
 	/** Make a Windows service. */
-	template <auto UniversalMain>
-	static bool MakeIntoService()
+	template <auto UniversalMain> static bool MakeIntoService()
 	{
-		SERVICE_TABLE_ENTRY ServiceTable[] =
-		{
-			{ g_ServiceName, (LPSERVICE_MAIN_FUNCTION)serviceMain<UniversalMain> },
-			{ nullptr, nullptr }
+		SERVICE_TABLE_ENTRY ServiceTable[] = {
+			{g_ServiceName, (LPSERVICE_MAIN_FUNCTION) serviceMain<UniversalMain>},
+			{nullptr, nullptr}
 		};
 
 		if (StartServiceCtrlDispatcher(ServiceTable) == FALSE)
@@ -33,8 +30,7 @@ public:
 		return true;
 	}
 
-private:
-
+  private:
 	/** Set the internal status of the service */
 	static void serviceSetState(DWORD acceptedControls, DWORD newState, DWORD exitCode)
 	{
@@ -64,8 +60,7 @@ private:
 	}
 
 	/* Startup logic for running as a service */
-	template <auto MainFunction>
-	static void WINAPI serviceMain(DWORD argc, TCHAR *argv[])
+	template <auto MainFunction> static void WINAPI serviceMain(DWORD argc, TCHAR * argv[])
 	{
 		wchar_t applicationFilename[MAX_PATH];
 		wchar_t applicationDirectory[MAX_PATH];
@@ -110,7 +105,7 @@ private:
 		serviceSetState(SERVICE_ACCEPT_STOP, SERVICE_RUNNING, 0);
 
 		char MultibyteArgV0[MAX_PATH];
-		char * MultibyteArgV[] = { MultibyteArgV0 };
+		char * MultibyteArgV[] = {MultibyteArgV0};
 
 		const auto OutputSize = std::size(MultibyteArgV0);
 		const auto TranslateResult = std::wcstombs(MultibyteArgV0, argv[0], OutputSize);
@@ -132,9 +127,9 @@ private:
 		serviceSetState(0, SERVICE_STOPPED, Return);
 	}
 
-	static inline SERVICE_STATUS_HANDLE g_StatusHandle  = nullptr;
-	static inline HANDLE                g_ServiceThread = INVALID_HANDLE_VALUE;
-	static inline wchar_t               g_ServiceName[] = L"Cuberite";
+	static inline SERVICE_STATUS_HANDLE g_StatusHandle = nullptr;
+	static inline HANDLE g_ServiceThread = INVALID_HANDLE_VALUE;
+	static inline wchar_t g_ServiceName[] = L"Cuberite";
 };
 
 #else
@@ -142,8 +137,7 @@ private:
 struct StartAsService
 {
 	/** Make a UNIX daemon. */
-	template <auto>
-	static bool MakeIntoService()
+	template <auto> static bool MakeIntoService()
 	{
 		pid_t pid = fork();
 
@@ -159,7 +153,7 @@ struct StartAsService
 			return true;
 		}
 
-		//  Child process now goes quiet, running in the background.
+		// Child process now goes quiet, running in the background.
 		close(STDIN_FILENO);
 		close(STDOUT_FILENO);
 		close(STDERR_FILENO);

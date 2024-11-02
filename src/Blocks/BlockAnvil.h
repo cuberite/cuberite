@@ -10,17 +10,14 @@
 
 
 
-class cBlockAnvilHandler final :
-	public cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>
+class cBlockAnvilHandler final : public cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>
 {
 	using Super = cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		return cItem(m_BlockType, 1, a_BlockMeta >> 2);
@@ -48,10 +45,7 @@ private:
 
 
 
-	virtual bool IsUseable() const override
-	{
-		return true;
-	}
+	virtual bool IsUseable() const override { return true; }
 
 
 
@@ -62,8 +56,4 @@ private:
 		UNUSED(a_Meta);
 		return 6;
 	}
-} ;
-
-
-
-
+};

@@ -2,7 +2,8 @@
 // DropSpenser.h
 
 // Declares the cDropSpenser class representing a common ancestor to the cDispenserEntity and cDropperEntity
-// The dropper and dispenser only needs to override the DropSpenseFromSlot() function to provide the specific item behavior
+// The dropper and dispenser only needs to override the DropSpenseFromSlot() function to provide the specific item
+// behavior
 
 
 
@@ -23,8 +24,7 @@ class cClientHandle;
 
 
 // tolua_begin
-class cDropSpenserEntity :
-	public cBlockEntityWithItems
+class cDropSpenserEntity : public cBlockEntityWithItems
 {
 	// tolua_end
 
@@ -32,13 +32,12 @@ class cDropSpenserEntity :
 
 	// tolua_begin
 
-public:
-
+  public:
 	enum
 	{
 		ContentsHeight = 3,
-		ContentsWidth  = 3,
-	} ;
+		ContentsWidth = 3,
+	};
 
 	// tolua_end
 
@@ -53,7 +52,8 @@ public:
 
 	// tolua_begin
 
-	/** Modifies the block coords to match the dropspenser direction given (where the dropspensed pickups should materialize) */
+	/** Modifies the block coords to match the dropspenser direction given (where the dropspensed pickups should
+	 * materialize) */
 	void AddDropSpenserDir(Vector3i & a_RelCoord, NIBBLETYPE a_Direction);
 
 	/** Sets the dropspenser to dropspense an item in the next tick */
@@ -61,11 +61,11 @@ public:
 
 	// tolua_end
 
-protected:
-
+  protected:
 	bool m_ShouldDropSpense;  ///< If true, the dropspenser will dropspense an item in the next tick
 
-	/** Does the actual work on dropspensing an item. Chooses the slot, calls DropSpenseFromSlot() and handles smoke / sound effects */
+	/** Does the actual work on dropspensing an item. Chooses the slot, calls DropSpenseFromSlot() and handles smoke /
+	 * sound effects */
 	void DropSpense(cChunk & a_Chunk);
 
 	/** Override this function to provide the specific behavior for item dropspensing (drop / shoot / pour / ...) */
@@ -73,4 +73,4 @@ protected:
 
 	/** Helper function, drops one item from the specified slot (like a dropper) */
 	void DropFromSlot(cChunk & a_Chunk, int a_SlotNum);
-} ;  // tolua_export
+};  // tolua_export

@@ -15,18 +15,18 @@
 
 class cHTTPMessage
 {
-public:
+  public:
 	enum eStatus
 	{
 		HTTP_OK = 200,
 		HTTP_BAD_REQUEST = 400,
-	} ;
+	};
 
 	enum eKind
 	{
 		mkRequest,
 		mkResponse,
-	} ;
+	};
 
 	cHTTPMessage(eKind a_Kind);
 
@@ -36,14 +36,13 @@ public:
 	/** Adds a header into the internal map of headers. Recognizes special headers: Content-Type and Content-Length */
 	virtual void AddHeader(const AString & a_Key, const AString & a_Value);
 
-	void SetContentType  (const AString & a_ContentType) { m_ContentType   = a_ContentType; }
-	void SetContentLength(size_t a_ContentLength)        { m_ContentLength = a_ContentLength; }
+	void SetContentType(const AString & a_ContentType) { m_ContentType = a_ContentType; }
+	void SetContentLength(size_t a_ContentLength) { m_ContentLength = a_ContentLength; }
 
-	const AString & GetContentType  (void) const { return m_ContentType; }
-	size_t          GetContentLength(void) const { return m_ContentLength; }
+	const AString & GetContentType(void) const { return m_ContentType; }
+	size_t GetContentLength(void) const { return m_ContentLength; }
 
-protected:
-
+  protected:
 	using cNameValueMap = std::map<AString, AString>;
 
 
@@ -59,43 +58,39 @@ protected:
 	AString::npos when the object is created.
 	Parsed by AddHeader() or set directly by SetContentLength() */
 	size_t m_ContentLength;
-} ;
+};
 
 
 
 
 
 /** Stores outgoing response headers and serializes them to an HTTP data stream. */
-class cHTTPOutgoingResponse:
-	public cHTTPMessage
+class cHTTPOutgoingResponse : public cHTTPMessage
 {
 	using Super = cHTTPMessage;
 
-public:
-
+  public:
 	cHTTPOutgoingResponse(void);
 
 	/** Appends the response to the specified datastream - response line and headers.
 	The body will be sent later directly through cConnection::Send() */
 	void AppendToData(AString & a_DataStream) const;
-} ;
+};
 
 
 
 
 
 /** Provides storage for an incoming HTTP request. */
-class cHTTPIncomingRequest:
-	public cHTTPMessage
+class cHTTPIncomingRequest : public cHTTPMessage
 {
 	using Super = cHTTPMessage;
 
-public:
-
+  public:
 	/** Base class for anything that can be used as the UserData for the request. */
 	class cUserData
 	{
-	public:
+	  public:
 		// Force a virtual destructor in descendants:
 		virtual ~cUserData() {}
 	};
@@ -135,8 +130,7 @@ public:
 	Overrides the parent to add recognizing additional headers: auth and keepalive. */
 	virtual void AddHeader(const AString & a_Key, const AString & a_Value) override;
 
-protected:
-
+  protected:
 	/** Method of the request (GET / PUT / POST / ...) */
 	AString m_Method;
 

@@ -16,15 +16,13 @@
 
 
 
-class cEndGen :
-	public cTerrainShapeGen,
-	public cTerrainCompositionGen
+class cEndGen : public cTerrainShapeGen,
+				public cTerrainCompositionGen
 {
-public:
+  public:
 	cEndGen(int a_Seed);
 
-protected:
-
+  protected:
 	/** Seed for the noise */
 	int m_Seed;
 
@@ -67,4 +65,4 @@ protected:
 
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) override;
-} ;
+};

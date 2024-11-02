@@ -10,8 +10,7 @@
 
 
 cPig::cPig(void) :
-	Super("Pig", mtPig, "entity.pig.hurt", "entity.pig.death", "entity.pig.ambient", 0.9f, 0.9f),
-	m_bIsSaddled(false)
+	Super("Pig", mtPig, "entity.pig.hurt", "entity.pig.death", "entity.pig.ambient", 0.9f, 0.9f), m_bIsSaddled(false)
 {
 }
 
@@ -101,7 +100,7 @@ void cPig::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (m_Attachee->IsPlayer() && (m_Attachee->GetEquippedWeapon().m_ItemType == E_ITEM_CARROT_ON_STICK))
 		{
-			MoveToPosition((m_Attachee->GetPosition()) + (m_Attachee->GetLookVector()*10));
+			MoveToPosition((m_Attachee->GetPosition()) + (m_Attachee->GetLookVector() * 10));
 		}
 	}
 }
@@ -125,7 +124,3 @@ bool cPig::DoTakeDamage(TakeDamageInfo & a_TDI)
 	}
 	return true;
 }
-
-
-
-

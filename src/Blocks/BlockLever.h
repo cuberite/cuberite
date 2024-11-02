@@ -9,23 +9,17 @@
 #include "BlockSlab.h"
 
 
-class cBlockLeverHandler final :
-	public cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false>
+class cBlockLeverHandler final : public cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false>
 {
 	using Super = cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false>;
 
-public:
-
+  public:
 	using Super::Super;
 
 	/** Extracts the ON bit from metadata and returns if true if it is set */
-	static bool IsLeverOn(NIBBLETYPE a_BlockMeta)
-	{
-		return ((a_BlockMeta & 0x8) == 0x8);
-	}
+	static bool IsLeverOn(NIBBLETYPE a_BlockMeta) { return ((a_BlockMeta & 0x8) == 0x8); }
 
-private:
-
+  private:
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
@@ -40,7 +34,8 @@ private:
 
 		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
 		a_WorldInterface.WakeUpSimulators(a_BlockPos);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.lever.click", a_BlockPos, 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
+		a_WorldInterface.GetBroadcastManager()
+			.BroadcastSoundEffect("block.lever.click", a_BlockPos, 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
 		return true;
 	}
 
@@ -58,10 +53,7 @@ private:
 
 
 
-	virtual bool IsUseable(void) const override
-	{
-		return true;
-	}
+	virtual bool IsUseable(void) const override { return true; }
 
 
 
@@ -117,25 +109,19 @@ private:
 		{
 			return (
 				(((NeighborMeta & 0x08) == 0x08) && (NeighborFace == BLOCK_FACE_TOP)) ||
-				(((NeighborMeta & 0x08) == 0)    && (NeighborFace == BLOCK_FACE_BOTTOM))
+				(((NeighborMeta & 0x08) == 0) && (NeighborFace == BLOCK_FACE_BOTTOM))
 			);
 		}
 		else if (cBlockStairsHandler::IsAnyStairType(NeighborBlockType))
 		{
 			switch (NeighborFace)
 			{
-				case eBlockFace::BLOCK_FACE_YM:
-					return !(NeighborMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
-				case eBlockFace::BLOCK_FACE_YP:
-					return (NeighborMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
-				case eBlockFace::BLOCK_FACE_XP:
-					return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_XP);
-				case eBlockFace::BLOCK_FACE_XM:
-					return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_XM);
-				case eBlockFace::BLOCK_FACE_ZP:
-					return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_ZP);
-				case eBlockFace::BLOCK_FACE_ZM:
-					return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_ZM);
+				case eBlockFace::BLOCK_FACE_YM: return !(NeighborMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
+				case eBlockFace::BLOCK_FACE_YP: return (NeighborMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
+				case eBlockFace::BLOCK_FACE_XP: return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_XP);
+				case eBlockFace::BLOCK_FACE_XM: return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_XM);
+				case eBlockFace::BLOCK_FACE_ZP: return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_ZP);
+				case eBlockFace::BLOCK_FACE_ZM: return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_ZM);
 				default:
 				{
 					return false;
@@ -159,7 +145,7 @@ private:
 			case 0x05: return 0x06;  // Ground rotation
 			case 0x06: return 0x05;
 
-			default:  return Super::MetaRotateCCW(a_Meta);  // Wall Rotation
+			default:   return Super::MetaRotateCCW(a_Meta);  // Wall Rotation
 		}
 	}
 
@@ -177,7 +163,7 @@ private:
 			case 0x05: return 0x06;  // Ground rotation
 			case 0x06: return 0x05;
 
-			default:  return Super::MetaRotateCW(a_Meta);  // Wall Rotation
+			default:   return Super::MetaRotateCW(a_Meta);  // Wall Rotation
 		}
 	}
 
@@ -190,8 +176,4 @@ private:
 		UNUSED(a_Meta);
 		return 0;
 	}
-} ;
-
-
-
-
+};

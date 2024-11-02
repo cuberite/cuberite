@@ -17,21 +17,18 @@
 
 // tolua_begin
 
-class cGhastFireballEntity :
-	public cProjectileEntity
+class cGhastFireballEntity : public cProjectileEntity
 {
 	// tolua_end
 
 	using Super = cProjectileEntity;
 
-public:  // tolua_export
-
+  public:  // tolua_export
 	CLASS_PROTODEF(cGhastFireballEntity)
 
 	cGhastFireballEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed);
 
-protected:
-
+  protected:
 	void Explode(Vector3i a_Block);
 
 	// cProjectileEntity overrides:
@@ -40,8 +37,4 @@ protected:
 
 	// TODO: Deflecting the fireballs by arrow- or sword- hits
 
-} ;  // tolua_export
-
-
-
-
+};  // tolua_export

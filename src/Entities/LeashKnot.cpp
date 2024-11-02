@@ -15,9 +15,7 @@
 
 
 cLeashKnot::cLeashKnot(eBlockFace a_BlockFace, Vector3d a_Pos) :
-	Super(etLeashKnot, a_BlockFace, a_Pos),
-	m_ShouldSelfDestroy(false),
-	m_TicksToSelfDestroy(20 * 1)
+	Super(etLeashKnot, a_BlockFace, a_Pos), m_ShouldSelfDestroy(false), m_TicksToSelfDestroy(20 * 1)
 {
 }
 
@@ -42,7 +40,9 @@ void cLeashKnot::TiePlayersLeashedMobs(cPlayer & a_Player, bool a_ShouldBroadcas
 {
 	// Check leashed nearby mobs to tie them to this knot
 	// taking world from player (instead from this) because this can be called before entity was initialized
-	a_Player.GetWorld()->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8, -4), [&](cEntity & a_Entity)
+	a_Player.GetWorld()->ForEachEntityInBox(
+		cBoundingBox(GetPosition(), 8, 8, -4),
+		[&](cEntity & a_Entity)
 		{
 			// If the entity is not a monster skip it
 			if (a_Entity.GetEntityType() != cEntity::eEntityType::etMonster)
@@ -50,7 +50,7 @@ void cLeashKnot::TiePlayersLeashedMobs(cPlayer & a_Player, bool a_ShouldBroadcas
 				return false;
 			}
 
-			auto & PotentialLeashed = static_cast<cMonster&>(a_Entity);
+			auto & PotentialLeashed = static_cast<cMonster &>(a_Entity);
 
 			// If can't be leashed skip it
 			if (!PotentialLeashed.CanBeLeashed())
@@ -59,11 +59,8 @@ void cLeashKnot::TiePlayersLeashedMobs(cPlayer & a_Player, bool a_ShouldBroadcas
 			}
 
 			// If it's not leashed to the player skip it
-			if (
-				!PotentialLeashed.IsLeashed() ||
-				!PotentialLeashed.GetLeashedTo()->IsPlayer() ||
-				(PotentialLeashed.GetLeashedTo()->GetUniqueID() != a_Player.GetUniqueID())
-			)
+			if (!PotentialLeashed.IsLeashed() || !PotentialLeashed.GetLeashedTo()->IsPlayer() ||
+				(PotentialLeashed.GetLeashedTo()->GetUniqueID() != a_Player.GetUniqueID()))
 			{
 				return false;
 			}
@@ -142,7 +139,9 @@ void cLeashKnot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 cLeashKnot * cLeashKnot::FindKnotAtPos(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos)
 {
 	cLeashKnot * LeashKnot = nullptr;
-	a_WorldInterface.ForEachEntityInBox(cBoundingBox(a_BlockPos, 0.5, 1), [&](cEntity & a_Entity)
+	a_WorldInterface.ForEachEntityInBox(
+		cBoundingBox(a_BlockPos, 0.5, 1),
+		[&](cEntity & a_Entity)
 		{
 			if (a_Entity.IsLeashKnot())
 			{
@@ -155,7 +154,3 @@ cLeashKnot * cLeashKnot::FindKnotAtPos(cWorldInterface & a_WorldInterface, Vecto
 
 	return LeashKnot;
 }
-
-
-
-

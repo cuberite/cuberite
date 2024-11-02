@@ -8,41 +8,41 @@
 
 // OS-dependent stuff:
 #ifdef _WIN32
-	#define WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
 
-	#define _WIN32_WINNT 0x501  // We want to target WinXP and higher
+#define _WIN32_WINNT 0x501  // We want to target WinXP and higher
 
-	#include <Windows.h>
-	#include <winsock2.h>
-	#include <Ws2tcpip.h>  // IPv6 stuff
+#include <Windows.h>
+#include <winsock2.h>
+#include <Ws2tcpip.h>  // IPv6 stuff
 
-	// Windows SDK defines min and max macros, messing up with our std::min and std::max usage
-	#undef min
-	#undef max
+// Windows SDK defines min and max macros, messing up with our std::min and std::max usage
+#undef min
+#undef max
 
-	// Windows SDK defines GetFreeSpace as a constant, probably a Win16 API remnant
-	#ifdef GetFreeSpace
-		#undef GetFreeSpace
-	#endif  // GetFreeSpace
+// Windows SDK defines GetFreeSpace as a constant, probably a Win16 API remnant
+#ifdef GetFreeSpace
+#undef GetFreeSpace
+#endif  // GetFreeSpace
 #else
-	#include <sys/types.h>
-	#include <sys/stat.h>   // for mkdir
-	#include <sys/time.h>
-	#include <sys/socket.h>
-	#include <netinet/in.h>
-	#include <arpa/inet.h>
-	#include <netdb.h>
-	#include <time.h>
-	#include <dirent.h>
-	#include <errno.h>
-	#include <iostream>
+#include <sys/types.h>
+#include <sys/stat.h>  // for mkdir
+#include <sys/time.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+#include <time.h>
+#include <dirent.h>
+#include <errno.h>
+#include <iostream>
 
-	#include <cstdio>
-	#include <cstring>
-	#include <pthread.h>
-	#include <semaphore.h>
-	#include <errno.h>
-	#include <fcntl.h>
+#include <cstdio>
+#include <cstring>
+#include <pthread.h>
+#include <semaphore.h>
+#include <errno.h>
+#include <fcntl.h>
 #endif
 
 
@@ -87,7 +87,7 @@
 #define ARRAYCOUNT(X) (sizeof(X) / sizeof(*(X)))
 
 /** Allows arithmetic expressions like "32 KiB" (but consider using parenthesis around it, "(32 KiB)") */
-#define KiB * 1024
-#define MiB * 1024 * 1024
+#define KiB *1024
+#define MiB *1024 * 1024
 
 #define ASSERT assert

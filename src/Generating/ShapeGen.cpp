@@ -19,11 +19,10 @@
 // cTerrainHeightToShapeGen:
 
 /** Converts old-style height-generators into new-style shape-generators. */
-class cTerrainHeightToShapeGen:
-	public cTerrainShapeGen
+class cTerrainHeightToShapeGen : public cTerrainShapeGen
 {
-public:
-	cTerrainHeightToShapeGen(std::unique_ptr<cTerrainHeightGen> a_HeightGen):
+  public:
+	cTerrainHeightToShapeGen(std::unique_ptr<cTerrainHeightGen> a_HeightGen) :
 		m_HeightGen(std::move(a_HeightGen))
 	{
 	}
@@ -56,12 +55,9 @@ public:
 	}
 
 
-	virtual void InitializeShapeGen(cIniFile & a_IniFile) override
-	{
-		m_HeightGen->InitializeHeightGen(a_IniFile);
-	}
+	virtual void InitializeShapeGen(cIniFile & a_IniFile) override { m_HeightGen->InitializeHeightGen(a_IniFile); }
 
-protected:
+  protected:
 	/** The height generator being converted. */
 	std::unique_ptr<cTerrainHeightGen> m_HeightGen;
 };

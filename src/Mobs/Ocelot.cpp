@@ -48,31 +48,36 @@ void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (m_CheckPlayerTickCount == 23)
 		{
-			m_World->DoWithNearestPlayer(GetPosition(), 10, [&](cPlayer & a_Player) -> bool
-			{
-				cItems Items;
-				GetBreedingItems(Items);
-				if (Items.ContainsType(a_Player.GetEquippedItem().m_ItemType))
+			m_World->DoWithNearestPlayer(
+				GetPosition(),
+				10,
+				[&](cPlayer & a_Player) -> bool
 				{
-					if (!IsBegging())
+					cItems Items;
+					GetBreedingItems(Items);
+					if (Items.ContainsType(a_Player.GetEquippedItem().m_ItemType))
 					{
-						SetIsBegging(true);
-						m_World->BroadcastEntityMetadata(*this);
+						if (!IsBegging())
+						{
+							SetIsBegging(true);
+							m_World->BroadcastEntityMetadata(*this);
+						}
+
+						MoveToPosition(a_Player.GetPosition());
+					}
+					else
+					{
+						if (IsBegging())
+						{
+							SetIsBegging(false);
+							m_World->BroadcastEntityMetadata(*this);
+						}
 					}
 
-					MoveToPosition(a_Player.GetPosition());
-				}
-				else
-				{
-					if (IsBegging())
-					{
-						SetIsBegging(false);
-						m_World->BroadcastEntityMetadata(*this);
-					}
-				}
-
-				return true;
-			}, true);
+					return true;
+				},
+				true
+			);
 			m_CheckPlayerTickCount = 0;
 		}
 		else
@@ -142,10 +147,7 @@ void cOcelot::OnRightClicked(cPlayer & a_Player)
 {
 	if (!IsTame())
 	{
-		if (
-			IsBegging() &&
-			((a_Player.GetPosition() - GetPosition()).Length() <= 3)
-		)
+		if (IsBegging() && ((a_Player.GetPosition() - GetPosition()).Length() <= 3))
 		{
 			cItems Items;
 			GetBreedingItems(Items);

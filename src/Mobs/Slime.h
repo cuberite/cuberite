@@ -7,13 +7,11 @@
 
 
 
-class cSlime:
-	public cAggressiveMonster
+class cSlime : public cAggressiveMonster
 {
 	using Super = cAggressiveMonster;
 
-public:
-
+  public:
 	/** Creates a slime of the specified size; size can be 1, 2 or 4, with 1 is the smallest and 4 is the tallest. */
 	cSlime(int a_Size);
 
@@ -30,13 +28,8 @@ public:
 	Returns either "big" or "small". */
 	static AString GetSizeName(int a_Size);
 
-protected:
-
+  protected:
 	/** Size of the slime, with 1 being the smallest.
 	Vanilla uses sizes 1, 2 and 4 only. */
 	int m_Size;
-} ;
-
-
-
-
+};

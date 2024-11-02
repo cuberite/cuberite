@@ -6,13 +6,11 @@
 
 
 
-class cMagmaCube:
-	public cAggressiveMonster
+class cMagmaCube : public cAggressiveMonster
 {
 	using Super = cAggressiveMonster;
 
-public:
-
+  public:
 	/** Creates a MagmaCube of the specified size; with 1 being the smallest */
 	cMagmaCube(int a_Size);
 
@@ -24,11 +22,10 @@ public:
 	Returns either "big" or "small". */
 	static AString GetSizeName(int a_Size);
 
-private:
-
+  private:
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual bool IsNetherNative(void) override { return true; }
 
 	/** Size of the MagmaCube, with 1 being the smallest */
 	int m_Size;
-} ;
+};

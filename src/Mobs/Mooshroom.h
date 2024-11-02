@@ -7,13 +7,11 @@
 
 
 
-class cMooshroom:
-	public cPassiveMonster
+class cMooshroom : public cPassiveMonster
 {
 	using Super = cPassiveMonster;
 
-public:
-
+  public:
 	cMooshroom();
 
 	CLASS_PROTODEF(cMooshroom)
@@ -21,12 +19,5 @@ public:
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
-	virtual void GetFollowedItems(cItems & a_Items) override
-	{
-		a_Items.Add(E_ITEM_WHEAT);
-	}
-} ;
-
-
-
-
+	virtual void GetFollowedItems(cItems & a_Items) override { a_Items.Add(E_ITEM_WHEAT); }
+};

@@ -15,18 +15,18 @@
 
 
 
-class cBrewingstandWindow :
-	public cWindow
+class cBrewingstandWindow : public cWindow
 {
 	using Super = cWindow;
 
-public:
-
+  public:
 	cBrewingstandWindow(cBrewingstandEntity * a_Brewingstand);
 
-	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
+	virtual void DistributeStack(
+		cItem & a_ItemStack,
+		int a_Slot,
+		cPlayer & a_Player,
+		cSlotArea * a_ClickedArea,
+		bool a_ShouldApply
+	) override;
 };
-
-
-
-

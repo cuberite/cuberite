@@ -16,17 +16,18 @@
 
 
 
-class cDropSpenserWindow :
-	public cWindow
+class cDropSpenserWindow : public cWindow
 {
 	using Super = cWindow;
 
-public:
+  public:
 	cDropSpenserWindow(cDropSpenserEntity * a_DropSpenser);
 
-	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
+	virtual void DistributeStack(
+		cItem & a_ItemStack,
+		int a_Slot,
+		cPlayer & a_Player,
+		cSlotArea * a_ClickedArea,
+		bool a_ShouldApply
+	) override;
 };
-
-
-
-

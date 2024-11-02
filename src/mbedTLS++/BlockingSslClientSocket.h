@@ -16,16 +16,12 @@
 
 
 
-class cBlockingSslClientSocket :
-	protected cCallbackSslContext::cDataCallbacks
+class cBlockingSslClientSocket : protected cCallbackSslContext::cDataCallbacks
 {
-public:
+  public:
 	cBlockingSslClientSocket(void);
 
-	virtual ~cBlockingSslClientSocket(void) override
-	{
-		Disconnect();
-	}
+	virtual ~cBlockingSslClientSocket(void) override { Disconnect(); }
 
 	/** Connects to the specified server and performs SSL handshake.
 	Returns true if successful, false on failure. Sets internal error text on failure. */
@@ -58,7 +54,7 @@ public:
 	/** Returns the text of the last error that has occurred in this instance. */
 	const AString & GetLastErrorText(void) const { return m_LastErrorText; }
 
-protected:
+  protected:
 	friend class cBlockingSslClientSocketConnectCallbacks;
 	friend class cBlockingSslClientSocketLinkCallbacks;
 
@@ -112,8 +108,4 @@ protected:
 	// cCallbackSslContext::cDataCallbacks overrides:
 	virtual int ReceiveEncrypted(unsigned char * a_Buffer, size_t a_NumBytes) override;
 	virtual int SendEncrypted(const unsigned char * a_Buffer, size_t a_NumBytes) override;
-} ;
-
-
-
-
+};

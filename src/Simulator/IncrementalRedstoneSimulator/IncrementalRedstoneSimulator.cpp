@@ -22,7 +22,7 @@ bool cIncrementalRedstoneSimulator::IsAlwaysTicked(BLOCKTYPE a_Block)
 		case E_BLOCK_STONE_PRESSURE_PLATE:
 		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
 		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE: return true;
-		default: return false;
+		default:                                    return false;
 	}
 }
 
@@ -112,7 +112,12 @@ void cIncrementalRedstoneSimulator::ProcessWorkItem(cChunk & Chunk, cChunk & Tic
 
 
 
-void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
+void cIncrementalRedstoneSimulator::SimulateChunk(
+	std::chrono::milliseconds a_Dt,
+	int a_ChunkX,
+	int a_ChunkZ,
+	cChunk * a_Chunk
+)
 {
 	auto & ChunkData = *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk->GetRedstoneSimulatorData());
 	for (auto & DelayInfo : ChunkData.m_MechanismDelays)
@@ -194,7 +199,8 @@ void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position
 {
 	// Having WakeUp called on us directly means someone called SetBlock (or WakeUp)
 	// Since the simulator never does this, something external changed. Clear cached data:
-	static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk.GetRedstoneSimulatorData())->ErasePowerData(a_Position);
+	static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk.GetRedstoneSimulatorData())
+		->ErasePowerData(a_Position);
 
 	// Queue the block, in case the set block was redstone:
 	AddBlock(a_Chunk, a_Position, a_Block);

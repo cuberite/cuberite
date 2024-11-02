@@ -1,10 +1,10 @@
 
 // cAuthenticator.h
 
-// Interfaces to the cAuthenticator class representing the thread that authenticates users against the official Mojang servers
-// Authentication prevents "hackers" from joining with an arbitrary username (possibly impersonating the server admins)
-// For more info, see http://wiki.vg/Session
-// In Cuberite, authentication is implemented as a single thread that receives queued auth requests and dispatches them one by one.
+// Interfaces to the cAuthenticator class representing the thread that authenticates users against the official Mojang
+// servers Authentication prevents "hackers" from joining with an arbitrary username (possibly impersonating the server
+// admins) For more info, see http://wiki.vg/Session In Cuberite, authentication is implemented as a single thread that
+// receives queued auth requests and dispatches them one by one.
 
 
 
@@ -20,20 +20,18 @@ class cSettingsRepositoryInterface;
 
 namespace Json
 {
-	class Value;
+class Value;
 }
 
 
 
 
 
-class cAuthenticator:
-	public cIsThread
+class cAuthenticator : public cIsThread
 {
 	using Super = cIsThread;
 
-public:
-
+  public:
 	cAuthenticator();
 	virtual ~cAuthenticator() override;
 
@@ -49,19 +47,16 @@ public:
 	/** Stops the authenticator thread. The thread may be started and stopped repeatedly */
 	void Stop(void);
 
-private:
-
+  private:
 	class cUser
 	{
-	public:
-		int     m_ClientID;
+	  public:
+		int m_ClientID;
 		AString m_Name;
 		AString m_ServerID;
 
 		cUser(int a_ClientID, const std::string_view a_Name, const std::string_view a_ServerID) :
-			m_ClientID(a_ClientID),
-			m_Name(a_Name),
-			m_ServerID(a_ServerID)
+			m_ClientID(a_ClientID), m_Name(a_Name), m_ServerID(a_ServerID)
 		{
 		}
 	};
@@ -69,8 +64,8 @@ private:
 	using cUserList = std::deque<cUser>;
 
 	cCriticalSection m_CS;
-	cUserList        m_Queue;
-	cEvent           m_QueueNonempty;
+	cUserList m_Queue;
+	cEvent m_QueueNonempty;
 
 	/** The server that is to be contacted for auth / UUID conversions */
 	AString m_Server;
@@ -82,16 +77,13 @@ private:
 	AString m_Address;
 
 	AString m_PropertiesAddress;
-	bool    m_ShouldAuthenticate;
+	bool m_ShouldAuthenticate;
 
 	/** cIsThread override: */
 	virtual void Execute(void) override;
 
 	/** Returns true if the user authenticated okay, false on error
 	Returns the case-corrected username, UUID, and properties (eg. skin). */
-	bool AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, cUUID & a_UUID, Json::Value & a_Properties) const;
+	bool AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, cUUID & a_UUID, Json::Value & a_Properties)
+		const;
 };
-
-
-
-

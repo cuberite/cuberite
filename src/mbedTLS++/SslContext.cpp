@@ -12,8 +12,7 @@
 
 
 cSslContext::cSslContext(void) :
-	m_IsValid(false),
-	m_HasHandshaken(false)
+	m_IsValid(false), m_HasHandshaken(false)
 {
 	mbedtls_ssl_init(&m_Ssl);
 }
@@ -151,7 +150,3 @@ int cSslContext::NotifyClose(void)
 {
 	return mbedtls_ssl_close_notify(&m_Ssl);
 }
-
-
-
-

@@ -28,21 +28,21 @@ It directly outputs a string containing the serialized NBT data.
 
 enum eTagType
 {
-	TAG_Min       = 0,  // The minimum value for a tag type
-	TAG_End       = 0,
-	TAG_Byte      = 1,
-	TAG_Short     = 2,
-	TAG_Int       = 3,
-	TAG_Long      = 4,
-	TAG_Float     = 5,
-	TAG_Double    = 6,
+	TAG_Min = 0,  // The minimum value for a tag type
+	TAG_End = 0,
+	TAG_Byte = 1,
+	TAG_Short = 2,
+	TAG_Int = 3,
+	TAG_Long = 4,
+	TAG_Float = 5,
+	TAG_Double = 6,
 	TAG_ByteArray = 7,
-	TAG_String    = 8,
-	TAG_List      = 9,
-	TAG_Compound  = 10,
-	TAG_IntArray  = 11,
-	TAG_Max       = 11,  // The maximum value for a tag type
-} ;
+	TAG_String = 8,
+	TAG_List = 9,
+	TAG_Compound = 10,
+	TAG_IntArray = 11,
+	TAG_Max = 11,  // The maximum value for a tag type
+};
 
 
 
@@ -56,8 +56,7 @@ Structure (all with the tree structure it describes) supports moving in memory (
 */
 struct cFastNBTTag
 {
-public:
-
+  public:
 	eTagType m_Type;
 
 	// The following members are indices into the data stream. m_DataLength == 0 if no data available
@@ -102,7 +101,7 @@ public:
 		m_LastChild(-1)
 	{
 	}
-} ;
+};
 
 
 
@@ -130,12 +129,10 @@ std::error_code make_error_code(eNBTParseError a_Err) noexcept;
 
 namespace std
 {
-	template <>
-	struct is_error_code_enum<eNBTParseError>:
-		public std::true_type
-	{
-	};
-}
+template <> struct is_error_code_enum<eNBTParseError> : public std::true_type
+{
+};
+}  // namespace std
 
 
 
@@ -143,15 +140,15 @@ namespace std
 
 /** Parses and contains the parsed data
 Also implements data accessor functions for tree traversal and value getters
-The data pointer passed in the constructor is assumed to be valid throughout the object's life. Care must be taken not to initialize from a temporary.
-The parser decomposes the input data into a tree of tags that is stored as an array of cFastNBTTag items,
-and accessing the tree is done by using the array indices for tags. Each tag stores the indices for its parent,
-first child, last child, prev sibling and next sibling, a value of -1 indicates that the indice is not valid.
-Each primitive tag also stores the length of the contained data, in bytes.
+The data pointer passed in the constructor is assumed to be valid throughout the object's life. Care must be taken not
+to initialize from a temporary. The parser decomposes the input data into a tree of tags that is stored as an array of
+cFastNBTTag items, and accessing the tree is done by using the array indices for tags. Each tag stores the indices for
+its parent, first child, last child, prev sibling and next sibling, a value of -1 indicates that the indice is not
+valid. Each primitive tag also stores the length of the contained data, in bytes.
 */
 class cParsedNBT
 {
-public:
+  public:
 	cParsedNBT(ContiguousByteBufferView a_Data);
 
 	bool IsValid(void) const { return (m_Error == eNBTParseError::npSuccess); }
@@ -166,10 +163,10 @@ public:
 	int GetRoot(void) const { return 0; }
 
 	/** Returns the first child of the specified tag, or -1 if none / not applicable. */
-	int GetFirstChild (int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild; }
+	int GetFirstChild(int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild; }
 
 	/** Returns the last child of the specified tag, or -1 if none / not applicable. */
-	int GetLastChild  (int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_LastChild; }
+	int GetLastChild(int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_LastChild; }
 
 	/** Returns the next sibling of the specified tag, or -1 if none. */
 	int GetNextSibling(int a_Tag) const { return m_Tags[static_cast<size_t>(a_Tag)].m_NextSibling; }
@@ -213,7 +210,9 @@ public:
 	eTagType GetChildrenType(int a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_List);
-		return (m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild < 0) ? TAG_End : m_Tags[static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild)].m_Type;
+		return (m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild < 0)
+			? TAG_End
+			: m_Tags[static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild)].m_Type;
 	}
 
 	/** Returns the value stored in a Byte tag. Not valid for any other tag type. */
@@ -277,45 +276,47 @@ public:
 	}
 
 	/** Returns the value stored in a String tag. Not valid for any other tag type. */
-	inline AString GetString(int a_Tag) const
-	{
-		return AString(GetStringView(a_Tag));
-	}
+	inline AString GetString(int a_Tag) const { return AString(GetStringView(a_Tag)); }
 
 	/** Returns the value stored in a String tag. Not valid for any other tag type. */
 	inline std::string_view GetStringView(int a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_String);
-		return { reinterpret_cast<const char *>(GetData(a_Tag)), GetDataLength(a_Tag) };
+		return {reinterpret_cast<const char *>(GetData(a_Tag)), GetDataLength(a_Tag)};
 	}
 
 	/** Returns the tag's name. For tags that are not named, returns an empty string. */
 	inline AString GetName(int a_Tag) const
 	{
 		AString res;
-		res.assign(reinterpret_cast<const char *>(m_Data.data()) + m_Tags[static_cast<size_t>(a_Tag)].m_NameStart, static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_NameLength));
+		res.assign(
+			reinterpret_cast<const char *>(m_Data.data()) + m_Tags[static_cast<size_t>(a_Tag)].m_NameStart,
+			static_cast<size_t>(m_Tags[static_cast<size_t>(a_Tag)].m_NameLength)
+		);
 		return res;
 	}
 
-protected:
-
+  protected:
 	ContiguousByteBufferView m_Data;
 	std::vector<cFastNBTTag> m_Tags;
-	eNBTParseError           m_Error;  // npSuccess if parsing succeeded
+	eNBTParseError m_Error;  // npSuccess if parsing succeeded
 
 	// Used while parsing:
 	size_t m_Pos;
 
 	eNBTParseError Parse(void);
-	eNBTParseError ReadString(size_t & a_StringStart, size_t & a_StringLen);  // Reads a simple string (2 bytes length + data), sets the string descriptors
+	eNBTParseError ReadString(
+		size_t & a_StringStart,
+		size_t & a_StringLen
+	);  // Reads a simple string (2 bytes length + data), sets the string descriptors
 	eNBTParseError ReadCompound(void);  // Reads the latest tag as a compound
 	eNBTParseError ReadList(eTagType a_ChildrenType);  // Reads the latest tag as a list of items of type a_ChildrenType
-	eNBTParseError ReadTag(void);       // Reads the latest tag, depending on its m_Type setting
+	eNBTParseError ReadTag(void);  // Reads the latest tag, depending on its m_Type setting
 
 	/** Returns the minimum size, in bytes, of the specified tag type.
 	Used for sanity-checking. */
 	static size_t GetMinTagSize(eTagType a_TagType);
-} ;
+};
 
 
 
@@ -323,7 +324,7 @@ protected:
 
 class cFastNBTWriter
 {
-public:
+  public:
 	cFastNBTWriter(const AString & a_RootTagName = "");
 
 	void BeginCompound(const AString & a_Name);
@@ -332,16 +333,16 @@ public:
 	void BeginList(const AString & a_Name, eTagType a_ChildrenType);
 	void EndList(void);
 
-	void AddByte     (const AString & a_Name, unsigned char a_Value);
-	void AddShort    (const AString & a_Name, Int16 a_Value);
-	void AddInt      (const AString & a_Name, Int32 a_Value);
-	void AddLong     (const AString & a_Name, Int64 a_Value);
-	void AddFloat    (const AString & a_Name, float a_Value);
-	void AddDouble   (const AString & a_Name, double a_Value);
-	void AddString   (const AString & a_Name, std::string_view a_Value);
+	void AddByte(const AString & a_Name, unsigned char a_Value);
+	void AddShort(const AString & a_Name, Int16 a_Value);
+	void AddInt(const AString & a_Name, Int32 a_Value);
+	void AddLong(const AString & a_Name, Int64 a_Value);
+	void AddFloat(const AString & a_Name, float a_Value);
+	void AddDouble(const AString & a_Name, double a_Value);
+	void AddString(const AString & a_Name, std::string_view a_Value);
 	void AddByteArray(const AString & a_Name, const char * a_Value, size_t a_NumElements);
 	void AddByteArray(const AString & a_Name, size_t a_NumElements, unsigned char a_Value);
-	void AddIntArray (const AString & a_Name, const Int32 * a_Value, size_t a_NumElements);
+	void AddIntArray(const AString & a_Name, const Int32 * a_Value, size_t a_NumElements);
 
 	void AddByteArray(const AString & a_Name, const AString & a_Value)
 	{
@@ -352,21 +353,20 @@ public:
 
 	void Finish(void);
 
-protected:
-
+  protected:
 	struct sParent
 	{
-		int m_Type;   // TAG_Compound or TAG_List
-		int m_Pos;    // for TAG_List, the position of the list count
+		int m_Type;  // TAG_Compound or TAG_List
+		int m_Pos;  // for TAG_List, the position of the list count
 		int m_Count;  // for TAG_List, the element count
 		eTagType m_ItemType;  // for TAG_List, the element type
-	} ;
+	};
 
 	static const int MAX_STACK = 50;  // Highly doubtful that an NBT would be constructed this many levels deep
 
 	// These two fields emulate a stack. A raw array is used due to speed issues - no reallocations are allowed.
 	sParent m_Stack[MAX_STACK];
-	int     m_CurrentStack;
+	int m_CurrentStack;
 
 	ContiguousByteBuffer m_Result;
 
@@ -391,4 +391,4 @@ protected:
 			m_Stack[m_CurrentStack].m_Count++;
 		}
 	}
-} ;
+};

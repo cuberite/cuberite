@@ -14,8 +14,7 @@
 // BioGenSource:
 
 BioGenSource::BioGenSource(cIniFilePtr a_IniFile) :
-	m_IniFile(a_IniFile),
-	m_Mtx(QMutex::Recursive)
+	m_IniFile(a_IniFile), m_Mtx(QMutex::Recursive)
 {
 	reload();
 }
@@ -98,7 +97,7 @@ void BioGenSource::releaseBiomeGen(cBiomeGenPtr && a_BiomeGen, int a_Tag)
 
 class AnvilSource::AnvilFile
 {
-public:
+  public:
 	/** Coordinates of the region file. */
 	int m_RegionX, m_RegionZ;
 
@@ -109,9 +108,7 @@ public:
 
 	/** Creates a new instance with the specified region coords. Reads the file header. */
 	AnvilFile(int a_RegionX, int a_RegionZ, const AString & a_WorldPath) :
-		m_RegionX(a_RegionX),
-		m_RegionZ(a_RegionZ),
-		m_IsValid(false)
+		m_RegionX(a_RegionX), m_RegionZ(a_RegionZ), m_IsValid(false)
 	{
 		readFile(Printf("%s/r.%d.%d.mca", a_WorldPath.c_str(), a_RegionX, a_RegionZ));
 	}
@@ -162,7 +159,7 @@ public:
 		return m_FileData.substr(chunkOffset * 4096 + 5, chunkSize);
 	}
 
-protected:
+  protected:
 	AString m_FileData;
 	UInt32 m_Header[2048];
 
@@ -241,7 +238,7 @@ void AnvilSource::getChunkBiomes(int a_ChunkX, int a_ChunkZ, Chunk & a_DestChunk
 		const char * beBiomes = nbt.GetData(mcsBiomes);
 		for (size_t i = 0; i < ARRAYCOUNT(biomeMap); i++)
 		{
-			biomeMap[i] = (EMCSBiome)GetBEInt(beBiomes + 4 * i);
+			biomeMap[i] = (EMCSBiome) GetBEInt(beBiomes + 4 * i);
 		}
 		a_DestChunk.setBiomes(biomeMap);
 		return;
@@ -320,8 +317,3 @@ AnvilSource::AnvilFilePtr AnvilSource::getAnvilFile(int a_ChunkX, int a_ChunkZ)
 	m_Files.push_front(file);
 	return file;
 }
-
-
-
-
-

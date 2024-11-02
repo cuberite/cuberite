@@ -1,7 +1,8 @@
 
 // ChunkDesc.cpp
 
-// Implements the cChunkDesc class representing the chunk description used while generating a chunk. This class is also exported to Lua for HOOK_CHUNK_GENERATING.
+// Implements the cChunkDesc class representing the chunk description used while generating a chunk. This class is also
+// exported to Lua for HOOK_CHUNK_GENERATING.
 
 #include "Globals.h"
 #include "ChunkDesc.h"
@@ -25,8 +26,8 @@ cChunkDesc::cChunkDesc(cChunkCoords a_Coords) :
 	memset(m_BlockTypes, 0, sizeof(cChunkDef::BlockTypes));
 	memset(m_BlockMeta,  0, sizeof(cChunkDef::BlockNibbles));
 	*/
-	memset(m_BiomeMap,   0, sizeof(cChunkDef::BiomeMap));
-	memset(m_HeightMap,  0, sizeof(cChunkDef::HeightMap));
+	memset(m_BiomeMap, 0, sizeof(cChunkDef::BiomeMap));
+	memset(m_HeightMap, 0, sizeof(cChunkDef::HeightMap));
 }
 
 
@@ -69,7 +70,8 @@ void cChunkDesc::SetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE 
 
 
 
-void cChunkDesc::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
+void cChunkDesc::GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+	const
 {
 	m_BlockArea.GetRelBlockTypeMeta(a_RelX, a_RelY, a_RelZ, a_BlockType, a_BlockMeta);
 }
@@ -268,7 +270,13 @@ bool cChunkDesc::IsUsingDefaultFinish(void) const
 
 
 
-void cChunkDesc::WriteBlockArea(const cBlockArea & a_BlockArea, int a_RelX, int a_RelY, int a_RelZ, cBlockArea::eMergeStrategy a_MergeStrategy)
+void cChunkDesc::WriteBlockArea(
+	const cBlockArea & a_BlockArea,
+	int a_RelX,
+	int a_RelY,
+	int a_RelZ,
+	cBlockArea::eMergeStrategy a_MergeStrategy
+)
 {
 	m_BlockArea.Merge(a_BlockArea, a_RelX, a_RelY, a_RelZ, a_MergeStrategy);
 }
@@ -277,7 +285,15 @@ void cChunkDesc::WriteBlockArea(const cBlockArea & a_BlockArea, int a_RelX, int 
 
 
 
-void cChunkDesc::ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ)
+void cChunkDesc::ReadBlockArea(
+	cBlockArea & a_Dest,
+	int a_MinRelX,
+	int a_MaxRelX,
+	int a_MinRelY,
+	int a_MaxRelY,
+	int a_MinRelZ,
+	int a_MaxRelZ
+)
 {
 	// Normalize the coords:
 	if (a_MinRelX > a_MaxRelX)
@@ -429,10 +445,14 @@ HEIGHTTYPE cChunkDesc::GetMinHeight(void) const
 
 
 void cChunkDesc::FillRelCuboid(
-	int a_MinX, int a_MaxX,
-	int a_MinY, int a_MaxY,
-	int a_MinZ, int a_MaxZ,
-	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+	int a_MinX,
+	int a_MaxX,
+	int a_MinY,
+	int a_MaxY,
+	int a_MinZ,
+	int a_MaxZ,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta
 )
 {
 	int MinX = std::max(a_MinX, 0);
@@ -459,11 +479,16 @@ void cChunkDesc::FillRelCuboid(
 
 
 void cChunkDesc::ReplaceRelCuboid(
-	int a_MinX, int a_MaxX,
-	int a_MinY, int a_MaxY,
-	int a_MinZ, int a_MaxZ,
-	BLOCKTYPE a_SrcType, NIBBLETYPE a_SrcMeta,
-	BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta
+	int a_MinX,
+	int a_MaxX,
+	int a_MinY,
+	int a_MaxY,
+	int a_MinZ,
+	int a_MaxZ,
+	BLOCKTYPE a_SrcType,
+	NIBBLETYPE a_SrcMeta,
+	BLOCKTYPE a_DstType,
+	NIBBLETYPE a_DstMeta
 )
 {
 	int MinX = std::max(a_MinX, 0);
@@ -496,10 +521,14 @@ void cChunkDesc::ReplaceRelCuboid(
 
 
 void cChunkDesc::FloorRelCuboid(
-	int a_MinX, int a_MaxX,
-	int a_MinY, int a_MaxY,
-	int a_MinZ, int a_MaxZ,
-	BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta
+	int a_MinX,
+	int a_MaxX,
+	int a_MinY,
+	int a_MaxY,
+	int a_MinZ,
+	int a_MaxZ,
+	BLOCKTYPE a_DstType,
+	NIBBLETYPE a_DstMeta
 )
 {
 	int MinX = std::max(a_MinX, 0);
@@ -535,11 +564,16 @@ void cChunkDesc::FloorRelCuboid(
 
 
 void cChunkDesc::RandomFillRelCuboid(
-	int a_MinX, int a_MaxX,
-	int a_MinY, int a_MaxY,
-	int a_MinZ, int a_MaxZ,
-	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
-	int a_RandomSeed, int a_ChanceOutOf10k
+	int a_MinX,
+	int a_MaxX,
+	int a_MinY,
+	int a_MaxY,
+	int a_MinZ,
+	int a_MaxZ,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta,
+	int a_RandomSeed,
+	int a_ChanceOutOf10k
 )
 {
 	cNoise Noise(a_RandomSeed);
@@ -595,7 +629,11 @@ cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 	int AbsZ = a_RelZ + m_Coords.m_ChunkZ * cChunkDef::Width;
 
 	// The block entity is not created yet, try to create it and add to list:
-	auto be = cBlockEntity::CreateByBlockType(GetBlockType(a_RelX, a_RelY, a_RelZ), GetBlockMeta(a_RelX, a_RelY, a_RelZ), {AbsX, a_RelY, AbsZ});
+	auto be = cBlockEntity::CreateByBlockType(
+		GetBlockType(a_RelX, a_RelY, a_RelZ),
+		GetBlockMeta(a_RelX, a_RelY, a_RelZ),
+		{AbsX, a_RelY, AbsZ}
+	);
 	if (be == nullptr)
 	{
 		// No block entity for this block type
@@ -670,8 +708,3 @@ void cChunkDesc::VerifyHeightmap(void)
 }
 
 #endif  // !NDEBUG
-
-
-
-
-

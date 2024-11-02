@@ -21,11 +21,7 @@ static int tolua_cRankManager_AddGroup(lua_State * L)
 	// cRankManager:AddGroup(GroupName)
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -50,11 +46,7 @@ static int tolua_cRankManager_AddGroupToRank(lua_State * L)
 	// cRankManager:AddGroupToRank(GroupName, RankName) -> bool
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2, 3) ||
-		!S.CheckParamEnd(4)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2, 3) || !S.CheckParamEnd(4))
 	{
 		return 0;
 	}
@@ -79,11 +71,7 @@ static int tolua_cRankManager_AddPermissionToGroup(lua_State * L)
 	// cRankManager:AddPermissionToGroup(Permission, GroupName) -> bool
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2, 3) ||
-		!S.CheckParamEnd(4)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2, 3) || !S.CheckParamEnd(4))
 	{
 		return 0;
 	}
@@ -108,11 +96,7 @@ static int tolua_cRankManager_AddRank(lua_State * L)
 	// cRankManager:AddRank(RankName)
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2, 5) ||
-		!S.CheckParamEnd(6)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2, 5) || !S.CheckParamEnd(6))
 	{
 		return 0;
 	}
@@ -137,11 +121,7 @@ static int tolua_cRankManager_AddRestrictionToGroup(lua_State * L)
 	// cRankManager:AddRestrictionToGroup(Restriction, GroupName) -> bool
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2, 3) ||
-		!S.CheckParamEnd(4)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2, 3) || !S.CheckParamEnd(4))
 	{
 		return 0;
 	}
@@ -163,10 +143,7 @@ static int tolua_cRankManager_AddRestrictionToGroup(lua_State * L)
 static int tolua_cRankManager_ClearPlayerRanks(lua_State * L)
 {
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamEnd(2)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamEnd(2))
 	{
 		return 0;
 	}
@@ -187,10 +164,7 @@ static int tolua_cRankManager_GetAllGroups(lua_State * L)
 	// cRankManager:GetAllGroups() -> arraytable of GroupNames
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamEnd(2)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamEnd(2))
 	{
 		return 0;
 	}
@@ -214,10 +188,7 @@ static int tolua_cRankManager_GetAllPermissions(lua_State * L)
 	// cRankManager:GetAllPermissions() -> arraytable of Permissions
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamEnd(2)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamEnd(2))
 	{
 		return 0;
 	}
@@ -241,10 +212,7 @@ static int tolua_cRankManager_GetAllPermissionsRestrictions(lua_State * L)
 	// cRankManager:GetAllPermissionsRestrictions() -> arraytable of Permissions and Restrictions together
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamEnd(2)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamEnd(2))
 	{
 		return 0;
 	}
@@ -266,10 +234,7 @@ static int tolua_cRankManager_GetAllPlayerUUIDs(lua_State * L)
 	// cRankManager:GetAllPlayerUUIDs() -> arraytable of Player UUID's
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamStaticSelf("cRankManager") ||
-		!S.CheckParamEnd(2)
-	)
+	if (!S.CheckParamStaticSelf("cRankManager") || !S.CheckParamEnd(2))
 	{
 		return 0;
 	}
@@ -301,10 +266,7 @@ static int tolua_cRankManager_GetAllRanks(lua_State * L)
 	// cRankManager:GetAllRanks() -> arraytable of RankNames
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamEnd(2)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamEnd(2))
 	{
 		return 0;
 	}
@@ -325,10 +287,7 @@ static int tolua_cRankManager_GetAllRestrictions(lua_State * L)
 	// cRankManager:GetAllRestrictions() -> arraytable of Restrictions
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamEnd(2)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamEnd(2))
 	{
 		return 0;
 	}
@@ -350,10 +309,7 @@ static int tolua_cRankManager_GetDefaultRank(lua_State * L)
 	// cRankManager:GetDefaultRank() -> string
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamEnd(2)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamEnd(2))
 	{
 		return 0;
 	}
@@ -374,11 +330,7 @@ static int tolua_cRankManager_GetGroupPermissions(lua_State * L)
 	// cRankManager:GetGroupPermissions(GroupName) -> arraytable of permissions
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -406,11 +358,7 @@ static int tolua_cRankManager_GetGroupRestrictions(lua_State * L)
 	// cRankManager:GetGroupRestrictions(GroupName) -> arraytable of restrictions
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -438,11 +386,7 @@ static int tolua_cRankManager_GetPlayerGroups(lua_State * L)
 	// cRankManager:GetPlayerGroups(PlayerUUID) -> arraytable of GroupNames
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamStaticSelf("cRankManager") ||
-		!S.CheckParamUUID(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamStaticSelf("cRankManager") || !S.CheckParamUUID(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -470,11 +414,7 @@ static int tolua_cRankManager_GetPlayerMsgVisuals(lua_State * L)
 	// cRankManager:GetPlayerMsgVisuals(PlayerUUID) -> string, string, string
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamStaticSelf("cRankManager") ||
-		!S.CheckParamUUID(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamStaticSelf("cRankManager") || !S.CheckParamUUID(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -506,11 +446,7 @@ static int tolua_cRankManager_GetPlayerPermissions(lua_State * L)
 	// cRankManager:GetPlayerPermissions(PlayerUUID) -> arraytable of permissions
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamStaticSelf("cRankManager") ||
-		!S.CheckParamUUID(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamStaticSelf("cRankManager") || !S.CheckParamUUID(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -538,11 +474,7 @@ static int tolua_cRankManager_GetPlayerRestrictions(lua_State * L)
 	// cRankManager:GetPlayerRestrictions(PlayerUUID) -> arraytable of restrictions
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamStaticSelf("cRankManager") ||
-		!S.CheckParamUUID(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamStaticSelf("cRankManager") || !S.CheckParamUUID(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -570,11 +502,7 @@ static int tolua_cRankManager_GetPlayerRankName(lua_State * L)
 	// cRankManager:GetPlayerRankName(PlayerUUID) -> string
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamStaticSelf("cRankManager") ||
-		!S.CheckParamUUID(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamStaticSelf("cRankManager") || !S.CheckParamUUID(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -602,11 +530,7 @@ static int tolua_cRankManager_GetPlayerName(lua_State * L)
 	// cRankManager:GetPlayerName(PlayerUUID) -> string
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamStaticSelf("cRankManager") ||
-		!S.CheckParamUUID(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamStaticSelf("cRankManager") || !S.CheckParamUUID(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -634,11 +558,7 @@ static int tolua_cRankManager_GetRankGroups(lua_State * L)
 	// cRankManager:GetRankGroups(RankName) -> arraytable of groupnames
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -666,11 +586,7 @@ static int tolua_cRankManager_GetRankPermissions(lua_State * L)
 	// cRankManager:GetRankPermissions(RankName) -> arraytable of permissions
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -698,11 +614,7 @@ static int tolua_cRankManager_GetRankRestrictions(lua_State * L)
 	// cRankManager:GetRankRestrictions(RankName) -> arraytable of restrictions
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -730,11 +642,7 @@ static int tolua_cRankManager_GetRankVisuals(lua_State * L)
 	// cRankManager:GetRankVisuals(RankName) -> MsgPrefix, MsgSuffix, MsgNameColorCode
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -767,11 +675,7 @@ static int tolua_cRankManager_GroupExists(lua_State * L)
 	// cRankManager:GroupExists(GroupName) -> bool
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -799,11 +703,7 @@ static int tolua_cRankManager_IsGroupInRank(lua_State * L)
 	// cRankManager:IsGroupInRank(GroupName, RankName) -> bool
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2, 3) ||
-		!S.CheckParamEnd(4)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2, 3) || !S.CheckParamEnd(4))
 	{
 		return 0;
 	}
@@ -831,11 +731,7 @@ static int tolua_cRankManager_IsPermissionInGroup(lua_State * L)
 	// cRankManager:IsPermissionInGroup(Permission, GroupName) -> bool
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2, 3) ||
-		!S.CheckParamEnd(4)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2, 3) || !S.CheckParamEnd(4))
 	{
 		return 0;
 	}
@@ -863,11 +759,7 @@ static int tolua_cRankManager_IsRestrictionInGroup(lua_State * L)
 	// cRankManager:IsRestrictionInGroup(Restriction, GroupName) -> bool
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2, 3) ||
-		!S.CheckParamEnd(4)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2, 3) || !S.CheckParamEnd(4))
 	{
 		return 0;
 	}
@@ -895,11 +787,7 @@ static int tolua_cRankManager_IsPlayerRankSet(lua_State * L)
 	// cRankManager:IsPlayerRankSet(PlayerUUID) -> bool
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamStaticSelf("cRankManager") ||
-		!S.CheckParamUUID(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamStaticSelf("cRankManager") || !S.CheckParamUUID(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -927,11 +815,7 @@ static int tolua_cRankManager_RankExists(lua_State * L)
 	// cRankManager:RankExists(RankName) -> bool
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -959,11 +843,7 @@ static int tolua_cRankManager_RemoveGroup(lua_State * L)
 	// cRankManager:RemoveGroup(GroupName)
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -988,11 +868,7 @@ static int tolua_cRankManager_RemoveGroupFromRank(lua_State * L)
 	// cRankManager:RemoveGroupFromRank(GroupName, RankName)
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2, 3) ||
-		!S.CheckParamEnd(4)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2, 3) || !S.CheckParamEnd(4))
 	{
 		return 0;
 	}
@@ -1017,11 +893,7 @@ static int tolua_cRankManager_RemovePermissionFromGroup(lua_State * L)
 	// cRankManager:RemovePermissionFromGroup(Permission, GroupName)
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2, 3) ||
-		!S.CheckParamEnd(4)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2, 3) || !S.CheckParamEnd(4))
 	{
 		return 0;
 	}
@@ -1046,11 +918,7 @@ static int tolua_cRankManager_RemoveRestrictionFromGroup(lua_State * L)
 	// cRankManager:RemoveRestrictionFromGroup(Restriction, GroupName)
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2, 3) ||
-		!S.CheckParamEnd(4)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2, 3) || !S.CheckParamEnd(4))
 	{
 		return 0;
 	}
@@ -1075,11 +943,7 @@ static int tolua_cRankManager_RemovePlayerRank(lua_State * L)
 	// cRankManager:RemovePlayerRank(PlayerUUID)
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamStaticSelf("cRankManager") ||
-		!S.CheckParamUUID(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamStaticSelf("cRankManager") || !S.CheckParamUUID(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -1104,12 +968,9 @@ static int tolua_cRankManager_RemoveRank(lua_State * L)
 	// cRankManager:RemoveRank(RankName, [ReplacementRankName])
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2) ||
 		// Param 3 is otpional, defaults to nil -> empty string
-		!S.CheckParamEnd(4)
-	)
+		!S.CheckParamEnd(4))
 	{
 		return 0;
 	}
@@ -1134,11 +995,7 @@ static int tolua_cRankManager_RenameGroup(lua_State * L)
 	// cRankManager:RenameGroup(OldName, NewName)
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2, 3) ||
-		!S.CheckParamEnd(4)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2, 3) || !S.CheckParamEnd(4))
 	{
 		return 0;
 	}
@@ -1166,11 +1023,7 @@ static int tolua_cRankManager_RenameRank(lua_State * L)
 	// cRankManager:RenameRank(OldName, NewName)
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2, 3) ||
-		!S.CheckParamEnd(4)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2, 3) || !S.CheckParamEnd(4))
 	{
 		return 0;
 	}
@@ -1198,11 +1051,7 @@ static int tolua_cRankManager_SetDefaultRank(lua_State * L)
 	// cRankManager:SetDefaultRank(RankName) -> bool
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2) ||
-		!S.CheckParamEnd(3)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2) || !S.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -1227,12 +1076,8 @@ static int tolua_cRankManager_SetPlayerRank(lua_State * L)
 	// cRankManager:SetPlayerRank(PlayerUUID, PlayerName, RankName)
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamStaticSelf("cRankManager") ||
-		!S.CheckParamUUID(2) ||
-		!S.CheckParamString(3, 4) ||
-		!S.CheckParamEnd(5)
-	)
+	if (!S.CheckParamStaticSelf("cRankManager") || !S.CheckParamUUID(2) || !S.CheckParamString(3, 4) ||
+		!S.CheckParamEnd(5))
 	{
 		return 0;
 	}
@@ -1258,11 +1103,7 @@ static int tolua_cRankManager_SetRankVisuals(lua_State * L)
 	// cRankManager:SetRankVisuals(RankName, MsgPrefix, MsgSuffix, MsgNameColorCode)
 
 	cLuaState S(L);
-	if (
-		!S.CheckParamUserTable(1, "cRankManager") ||
-		!S.CheckParamString(2, 5) ||
-		!S.CheckParamEnd(6)
-	)
+	if (!S.CheckParamUserTable(1, "cRankManager") || !S.CheckParamString(2, 5) || !S.CheckParamEnd(6))
 	{
 		return 0;
 	}
@@ -1288,51 +1129,47 @@ void cManualBindings::BindRankManager(lua_State * tolua_S)
 
 	// Fill in the functions (alpha-sorted):
 	tolua_beginmodule(tolua_S, "cRankManager");
-		tolua_function(tolua_S, "AddGroup",                      tolua_cRankManager_AddGroup);
-		tolua_function(tolua_S, "AddGroupToRank",                tolua_cRankManager_AddGroupToRank);
-		tolua_function(tolua_S, "AddPermissionToGroup",          tolua_cRankManager_AddPermissionToGroup);
-		tolua_function(tolua_S, "AddRestrictionToGroup",         tolua_cRankManager_AddRestrictionToGroup);
-		tolua_function(tolua_S, "AddRank",                       tolua_cRankManager_AddRank);
-		tolua_function(tolua_S, "ClearPlayerRanks",              tolua_cRankManager_ClearPlayerRanks);
-		tolua_function(tolua_S, "GetAllGroups",                  tolua_cRankManager_GetAllGroups);
-		tolua_function(tolua_S, "GetAllPermissions",             tolua_cRankManager_GetAllPermissions);
-		tolua_function(tolua_S, "GetAllRestrictions",            tolua_cRankManager_GetAllRestrictions);
-		tolua_function(tolua_S, "GetAllPermissionsRestrictions", tolua_cRankManager_GetAllPermissionsRestrictions);
-		tolua_function(tolua_S, "GetAllPlayerUUIDs",             tolua_cRankManager_GetAllPlayerUUIDs);
-		tolua_function(tolua_S, "GetAllRanks",                   tolua_cRankManager_GetAllRanks);
-		tolua_function(tolua_S, "GetDefaultRank",                tolua_cRankManager_GetDefaultRank);
-		tolua_function(tolua_S, "GetGroupPermissions",           tolua_cRankManager_GetGroupPermissions);
-		tolua_function(tolua_S, "GetGroupRestrictions",          tolua_cRankManager_GetGroupRestrictions);
-		tolua_function(tolua_S, "GetPlayerGroups",               tolua_cRankManager_GetPlayerGroups);
-		tolua_function(tolua_S, "GetPlayerMsgVisuals",           tolua_cRankManager_GetPlayerMsgVisuals);
-		tolua_function(tolua_S, "GetPlayerPermissions",          tolua_cRankManager_GetPlayerPermissions);
-		tolua_function(tolua_S, "GetPlayerPermissions",          tolua_cRankManager_GetPlayerRestrictions);
-		tolua_function(tolua_S, "GetPlayerRankName",             tolua_cRankManager_GetPlayerRankName);
-		tolua_function(tolua_S, "GetPlayerName",                 tolua_cRankManager_GetPlayerName);
-		tolua_function(tolua_S, "GetRankGroups",                 tolua_cRankManager_GetRankGroups);
-		tolua_function(tolua_S, "GetRankPermissions",            tolua_cRankManager_GetRankPermissions);
-		tolua_function(tolua_S, "GetRankRestrictions",           tolua_cRankManager_GetRankRestrictions);
-		tolua_function(tolua_S, "GetRankVisuals",                tolua_cRankManager_GetRankVisuals);
-		tolua_function(tolua_S, "GroupExists",                   tolua_cRankManager_GroupExists);
-		tolua_function(tolua_S, "IsGroupInRank",                 tolua_cRankManager_IsGroupInRank);
-		tolua_function(tolua_S, "IsPermissionInGroup",           tolua_cRankManager_IsPermissionInGroup);
-		tolua_function(tolua_S, "IsRestrictionInGroup",          tolua_cRankManager_IsRestrictionInGroup);
-		tolua_function(tolua_S, "IsPlayerRankSet",               tolua_cRankManager_IsPlayerRankSet);
-		tolua_function(tolua_S, "RankExists",                    tolua_cRankManager_RankExists);
-		tolua_function(tolua_S, "RemoveGroup",                   tolua_cRankManager_RemoveGroup);
-		tolua_function(tolua_S, "RemoveGroupFromRank",           tolua_cRankManager_RemoveGroupFromRank);
-		tolua_function(tolua_S, "RemovePermissionFromGroup",     tolua_cRankManager_RemovePermissionFromGroup);
-		tolua_function(tolua_S, "RemoveRestrictionFromGroup",    tolua_cRankManager_RemoveRestrictionFromGroup);
-		tolua_function(tolua_S, "RemovePlayerRank",              tolua_cRankManager_RemovePlayerRank);
-		tolua_function(tolua_S, "RemoveRank",                    tolua_cRankManager_RemoveRank);
-		tolua_function(tolua_S, "RenameGroup",                   tolua_cRankManager_RenameGroup);
-		tolua_function(tolua_S, "RenameRank",                    tolua_cRankManager_RenameRank);
-		tolua_function(tolua_S, "SetDefaultRank",                tolua_cRankManager_SetDefaultRank);
-		tolua_function(tolua_S, "SetPlayerRank",                 tolua_cRankManager_SetPlayerRank);
-		tolua_function(tolua_S, "SetRankVisuals",                tolua_cRankManager_SetRankVisuals);
+	tolua_function(tolua_S, "AddGroup", tolua_cRankManager_AddGroup);
+	tolua_function(tolua_S, "AddGroupToRank", tolua_cRankManager_AddGroupToRank);
+	tolua_function(tolua_S, "AddPermissionToGroup", tolua_cRankManager_AddPermissionToGroup);
+	tolua_function(tolua_S, "AddRestrictionToGroup", tolua_cRankManager_AddRestrictionToGroup);
+	tolua_function(tolua_S, "AddRank", tolua_cRankManager_AddRank);
+	tolua_function(tolua_S, "ClearPlayerRanks", tolua_cRankManager_ClearPlayerRanks);
+	tolua_function(tolua_S, "GetAllGroups", tolua_cRankManager_GetAllGroups);
+	tolua_function(tolua_S, "GetAllPermissions", tolua_cRankManager_GetAllPermissions);
+	tolua_function(tolua_S, "GetAllRestrictions", tolua_cRankManager_GetAllRestrictions);
+	tolua_function(tolua_S, "GetAllPermissionsRestrictions", tolua_cRankManager_GetAllPermissionsRestrictions);
+	tolua_function(tolua_S, "GetAllPlayerUUIDs", tolua_cRankManager_GetAllPlayerUUIDs);
+	tolua_function(tolua_S, "GetAllRanks", tolua_cRankManager_GetAllRanks);
+	tolua_function(tolua_S, "GetDefaultRank", tolua_cRankManager_GetDefaultRank);
+	tolua_function(tolua_S, "GetGroupPermissions", tolua_cRankManager_GetGroupPermissions);
+	tolua_function(tolua_S, "GetGroupRestrictions", tolua_cRankManager_GetGroupRestrictions);
+	tolua_function(tolua_S, "GetPlayerGroups", tolua_cRankManager_GetPlayerGroups);
+	tolua_function(tolua_S, "GetPlayerMsgVisuals", tolua_cRankManager_GetPlayerMsgVisuals);
+	tolua_function(tolua_S, "GetPlayerPermissions", tolua_cRankManager_GetPlayerPermissions);
+	tolua_function(tolua_S, "GetPlayerPermissions", tolua_cRankManager_GetPlayerRestrictions);
+	tolua_function(tolua_S, "GetPlayerRankName", tolua_cRankManager_GetPlayerRankName);
+	tolua_function(tolua_S, "GetPlayerName", tolua_cRankManager_GetPlayerName);
+	tolua_function(tolua_S, "GetRankGroups", tolua_cRankManager_GetRankGroups);
+	tolua_function(tolua_S, "GetRankPermissions", tolua_cRankManager_GetRankPermissions);
+	tolua_function(tolua_S, "GetRankRestrictions", tolua_cRankManager_GetRankRestrictions);
+	tolua_function(tolua_S, "GetRankVisuals", tolua_cRankManager_GetRankVisuals);
+	tolua_function(tolua_S, "GroupExists", tolua_cRankManager_GroupExists);
+	tolua_function(tolua_S, "IsGroupInRank", tolua_cRankManager_IsGroupInRank);
+	tolua_function(tolua_S, "IsPermissionInGroup", tolua_cRankManager_IsPermissionInGroup);
+	tolua_function(tolua_S, "IsRestrictionInGroup", tolua_cRankManager_IsRestrictionInGroup);
+	tolua_function(tolua_S, "IsPlayerRankSet", tolua_cRankManager_IsPlayerRankSet);
+	tolua_function(tolua_S, "RankExists", tolua_cRankManager_RankExists);
+	tolua_function(tolua_S, "RemoveGroup", tolua_cRankManager_RemoveGroup);
+	tolua_function(tolua_S, "RemoveGroupFromRank", tolua_cRankManager_RemoveGroupFromRank);
+	tolua_function(tolua_S, "RemovePermissionFromGroup", tolua_cRankManager_RemovePermissionFromGroup);
+	tolua_function(tolua_S, "RemoveRestrictionFromGroup", tolua_cRankManager_RemoveRestrictionFromGroup);
+	tolua_function(tolua_S, "RemovePlayerRank", tolua_cRankManager_RemovePlayerRank);
+	tolua_function(tolua_S, "RemoveRank", tolua_cRankManager_RemoveRank);
+	tolua_function(tolua_S, "RenameGroup", tolua_cRankManager_RenameGroup);
+	tolua_function(tolua_S, "RenameRank", tolua_cRankManager_RenameRank);
+	tolua_function(tolua_S, "SetDefaultRank", tolua_cRankManager_SetDefaultRank);
+	tolua_function(tolua_S, "SetPlayerRank", tolua_cRankManager_SetPlayerRank);
+	tolua_function(tolua_S, "SetRankVisuals", tolua_cRankManager_SetRankVisuals);
 	tolua_endmodule(tolua_S);
 }
-
-
-
-

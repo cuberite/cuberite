@@ -16,38 +16,38 @@ If no value is in the string, both values are left unchanged.
 If only the minimum is in the string, it is assigned to both a_Min and a_Max. */
 namespace VerticalLimit
 {
-	static bool ParseRange(const AString & a_Params, int & a_Min, int & a_Max, bool a_LogWarnings)
+static bool ParseRange(const AString & a_Params, int & a_Min, int & a_Max, bool a_LogWarnings)
+{
+	auto params = StringSplitAndTrim(a_Params, "|");
+	if (params.size() == 0)
 	{
-		auto params = StringSplitAndTrim(a_Params, "|");
-		if (params.size() == 0)
-		{
-			// No params, generate directly on top:
-			return true;
-		}
-		if (!StringToInteger(params[0], a_Min))
-		{
-			// Failed to parse the min rel height:
-			CONDWARNING(a_LogWarnings, "Cannot parse minimum height from string \"%s\"!", params[0].c_str());
-			return false;
-		}
-		if (params.size() == 1)
-		{
-			// Only one param was given, there's no range
-			a_Max = a_Min;
-			return true;
-		}
-		if (!StringToInteger(params[1], a_Max))
-		{
-			CONDWARNING(a_LogWarnings, "Cannot parse maximum height from string \"%s\"!", params[1].c_str());
-			return false;
-		}
-		if (a_Max < a_Min)
-		{
-			std::swap(a_Max, a_Min);
-		}
+		// No params, generate directly on top:
 		return true;
 	}
+	if (!StringToInteger(params[0], a_Min))
+	{
+		// Failed to parse the min rel height:
+		CONDWARNING(a_LogWarnings, "Cannot parse minimum height from string \"%s\"!", params[0].c_str());
+		return false;
+	}
+	if (params.size() == 1)
+	{
+		// Only one param was given, there's no range
+		a_Max = a_Min;
+		return true;
+	}
+	if (!StringToInteger(params[1], a_Max))
+	{
+		CONDWARNING(a_LogWarnings, "Cannot parse maximum height from string \"%s\"!", params[1].c_str());
+		return false;
+	}
+	if (a_Max < a_Min)
+	{
+		std::swap(a_Max, a_Min);
+	}
+	return true;
 }
+}  // namespace VerticalLimit
 
 
 
@@ -55,22 +55,21 @@ namespace VerticalLimit
 
 ////////////////////////////////////////////////////////////////////////////////
 /** Limit that accepts any height. The default for all pieces. */
-class cVerticalLimitNone:
-	public cPiece::cVerticalLimit
+class cVerticalLimitNone : public cPiece::cVerticalLimit
 {
-public:
-		virtual bool CanBeAtHeight(int a_BlockX, int a_BlockZ, int a_Height) override
-		{
-			// Any height is okay
-			return true;
-		}
+  public:
+	virtual bool CanBeAtHeight(int a_BlockX, int a_BlockZ, int a_Height) override
+	{
+		// Any height is okay
+		return true;
+	}
 
 
-		virtual bool InitializeFromString(const AString & a_Params, bool a_LogWarnings) override
-		{
-			// No parameters to read, no checks being done
-			return true;
-		}
+	virtual bool InitializeFromString(const AString & a_Params, bool a_LogWarnings) override
+	{
+		// No parameters to read, no checks being done
+		return true;
+	}
 };
 
 
@@ -79,14 +78,10 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////
 /** Limit that accepts heights above the specified minimum fixed height. */
-class cVerticalLimitAbove:
-	public cPiece::cVerticalLimit
+class cVerticalLimitAbove : public cPiece::cVerticalLimit
 {
-public:
-	virtual bool CanBeAtHeight(int a_BlockX, int a_BlockZ, int a_Height) override
-	{
-		return (a_Height >= m_MinHeight);
-	}
+  public:
+	virtual bool CanBeAtHeight(int a_BlockX, int a_BlockZ, int a_Height) override { return (a_Height >= m_MinHeight); }
 
 
 	virtual bool InitializeFromString(const AString & a_Params, bool a_LogWarnings) override
@@ -100,7 +95,7 @@ public:
 		return true;
 	}
 
-protected:
+  protected:
 	/** The minimum accepted height. */
 	int m_MinHeight;
 };
@@ -111,10 +106,9 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////
 /** Limit that accepts heights that are a specified number of blocks above terrain. */
-class cVerticalLimitAboveTerrain:
-	public cPiece::cVerticalLimit
+class cVerticalLimitAboveTerrain : public cPiece::cVerticalLimit
 {
-public:
+  public:
 	virtual bool CanBeAtHeight(int a_BlockX, int a_BlockZ, int a_Height) override
 	{
 		ASSERT(m_TerrainHeightGen != nullptr);
@@ -122,7 +116,7 @@ public:
 		int compareHeight = a_Height - terrainHeight;
 		return (
 			(compareHeight >= m_MinBlocksAbove) &&  // Above the minimum
-			(compareHeight <= m_MaxBlocksAbove)     // and below the maximum
+			(compareHeight <= m_MaxBlocksAbove)  // and below the maximum
 		);
 	}
 
@@ -136,12 +130,13 @@ public:
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel)
+		override
 	{
 		m_TerrainHeightGen = &a_TerrainHeightGen;
 	}
 
-protected:
+  protected:
 	/** The underlying height generator. */
 	cTerrainHeightGen * m_TerrainHeightGen;
 
@@ -158,10 +153,9 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////
 /** Limit that accepts heights that are a specified number of blocks above terrain and sealevel, whichever is higher. */
-class cVerticalLimitAboveTerrainAndOcean:
-	public cPiece::cVerticalLimit
+class cVerticalLimitAboveTerrainAndOcean : public cPiece::cVerticalLimit
 {
-public:
+  public:
 	virtual bool CanBeAtHeight(int a_BlockX, int a_BlockZ, int a_Height) override
 	{
 		ASSERT(m_TerrainHeightGen != nullptr);
@@ -169,7 +163,7 @@ public:
 		int compareHeight = a_Height - std::max(terrainHeight, m_SeaLevel);
 		return (
 			(compareHeight >= m_MinBlocksAbove) &&  // Above the minimum
-			(compareHeight <= m_MaxBlocksAbove)     // and below the maximum
+			(compareHeight <= m_MaxBlocksAbove)  // and below the maximum
 		);
 	}
 
@@ -183,13 +177,14 @@ public:
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel)
+		override
 	{
 		m_TerrainHeightGen = &a_TerrainHeightGen;
 		m_SeaLevel = a_SeaLevel;
 	}
 
-protected:
+  protected:
 	/** The underlying height generator. */
 	cTerrainHeightGen * m_TerrainHeightGen;
 
@@ -210,14 +205,10 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 /** Limit that accepts heights below the specified fixed height.
 NOTE that the query height is the BOTTOM of the piece. */
-class cVerticalLimitBelow:
-	public cPiece::cVerticalLimit
+class cVerticalLimitBelow : public cPiece::cVerticalLimit
 {
-public:
-	virtual bool CanBeAtHeight(int a_BlockX, int a_BlockZ, int a_Height) override
-	{
-		return (a_Height <= m_MaxHeight);
-	}
+  public:
+	virtual bool CanBeAtHeight(int a_BlockX, int a_BlockZ, int a_Height) override { return (a_Height <= m_MaxHeight); }
 
 
 	virtual bool InitializeFromString(const AString & a_Params, bool a_LogWarnings) override
@@ -231,7 +222,7 @@ public:
 		return true;
 	}
 
-protected:
+  protected:
 	/** The maximum accepted height. */
 	int m_MaxHeight;
 };
@@ -243,18 +234,14 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 /** Limit that accepts heights that are within a specified range below terrain.
 NOTE that the query height is the BOTTOM of the piece. */
-class cVerticalLimitBelowTerrain:
-	public cPiece::cVerticalLimit
+class cVerticalLimitBelowTerrain : public cPiece::cVerticalLimit
 {
-public:
+  public:
 	virtual bool CanBeAtHeight(int a_BlockX, int a_BlockZ, int a_Height) override
 	{
 		auto terrainHeight = m_TerrainHeightGen->GetHeightAt(a_BlockX, a_BlockZ);
 		auto compareHeight = terrainHeight - a_Height;
-		return (
-			(compareHeight >= m_MinBlocksBelow) &&
-			(compareHeight <= m_MaxBlocksBelow)
-		);
+		return ((compareHeight >= m_MinBlocksBelow) && (compareHeight <= m_MaxBlocksBelow));
 	}
 
 
@@ -267,12 +254,13 @@ public:
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel)
+		override
 	{
 		m_TerrainHeightGen = &a_TerrainHeightGen;
 	}
 
-protected:
+  protected:
 	/** The underlying height generator. */
 	cTerrainHeightGen * m_TerrainHeightGen;
 
@@ -289,18 +277,14 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////
 /** Limit that accepts heights that are a specified number of blocks below terrain or sealevel, whichever is higher. */
-class cVerticalLimitBelowTerrainOrOcean:
-	public cPiece::cVerticalLimit
+class cVerticalLimitBelowTerrainOrOcean : public cPiece::cVerticalLimit
 {
-public:
+  public:
 	virtual bool CanBeAtHeight(int a_BlockX, int a_BlockZ, int a_Height) override
 	{
 		int terrainHeight = m_TerrainHeightGen->GetHeightAt(a_BlockX, a_BlockZ);
 		auto compareHeight = std::max(terrainHeight, m_SeaLevel) - a_Height;
-		return (
-			(compareHeight >= m_MinBlocksBelow) &&
-			(compareHeight <= m_MaxBlocksBelow)
-		);
+		return ((compareHeight >= m_MinBlocksBelow) && (compareHeight <= m_MaxBlocksBelow));
 	}
 
 
@@ -313,13 +297,14 @@ public:
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel)
+		override
 	{
 		m_TerrainHeightGen = &a_TerrainHeightGen;
 		m_SeaLevel = a_SeaLevel;
 	}
 
-protected:
+  protected:
 	/** The underlying height generator. */
 	cTerrainHeightGen * m_TerrainHeightGen;
 

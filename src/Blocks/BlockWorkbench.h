@@ -9,17 +9,14 @@
 
 
 
-class cBlockWorkbenchHandler final :
-	public cBlockHandler
+class cBlockWorkbenchHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
@@ -40,10 +37,7 @@ private:
 
 
 
-	virtual bool IsUseable(void) const override
-	{
-		return true;
-	}
+	virtual bool IsUseable(void) const override { return true; }
 
 
 
@@ -54,8 +48,4 @@ private:
 		UNUSED(a_Meta);
 		return 13;
 	}
-} ;
-
-
-
-
+};

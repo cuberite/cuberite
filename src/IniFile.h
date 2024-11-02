@@ -20,8 +20,8 @@
 
 #include "SettingsRepositoryInterface.h"
 
-#define MAX_KEYNAME    128
-#define MAX_VALUENAME  128
+#define MAX_KEYNAME 128
+#define MAX_VALUENAME 128
 #define MAX_VALUEDATA 2048
 
 
@@ -30,11 +30,9 @@
 
 // tolua_begin
 
-class cIniFile:
-	public cSettingsRepositoryInterface
+class cIniFile : public cSettingsRepositoryInterface
 {
-private:
-
+  private:
 	// tolua_end
 
 	using Super = cSettingsRepositoryInterface;
@@ -49,9 +47,9 @@ private:
 		std::vector<AString> m_Names;
 		std::vector<AString> m_Values;
 		std::vector<AString> m_Comments;
-	} ;
+	};
 
-	std::vector<key>     m_Keys;
+	std::vector<key> m_Keys;
 	std::vector<AString> m_Names;
 	std::vector<AString> m_Comments;
 
@@ -63,8 +61,7 @@ private:
 
 	// tolua_begin
 
-public:
-
+  public:
 	// NOTE: This has to be present for ToLua++'s parser to output the noID constant into the API
 	// We don't want to export the entire base class, so the constant needs to get pulled into this descendant
 	enum
@@ -86,7 +83,7 @@ public:
 
 	// Sets whether or not keynames and valuenames should be case sensitive.
 	// The default is case insensitive.
-	void CaseSensitive  (void) { m_IsCaseInsensitive = false; }
+	void CaseSensitive(void) { m_IsCaseInsensitive = false; }
 	void CaseInsensitive(void) { m_IsCaseInsensitive = true; }
 
 	/** Reads the contents of the specified ini file
@@ -133,28 +130,28 @@ public:
 	// Gets value of [keyname] valuename =.
 	// Overloaded to return string, int, and double.
 	// Returns defValue if key / value not found.
-	AString GetValue (const AString & keyname, const AString & valuename, const AString & defValue = "")    const override;
-	AString GetValue (const int keyID,    const int valueID,    const AString & defValue = "")    const;
-	double  GetValueF(const AString & keyname, const AString & valuename, const double    defValue = 0)     const;
-	int     GetValueI(const AString & keyname, const AString & valuename, const int       defValue = 0)     const;
-	bool    GetValueB(const AString & keyname, const AString & valuename, const bool      defValue = false) const
+	AString GetValue(const AString & keyname, const AString & valuename, const AString & defValue = "") const override;
+	AString GetValue(const int keyID, const int valueID, const AString & defValue = "") const;
+	double GetValueF(const AString & keyname, const AString & valuename, const double defValue = 0) const;
+	int GetValueI(const AString & keyname, const AString & valuename, const int defValue = 0) const;
+	bool GetValueB(const AString & keyname, const AString & valuename, const bool defValue = false) const
 	{
 		return (GetValueI(keyname, valuename, defValue ? 1 : 0) != 0);
 	}
 
 	// Gets the value; if not found, write the default to the INI file
-	AString GetValueSet (const AString & keyname, const AString & valuename, const AString & defValue = "") override;
-	double  GetValueSetF(const AString & keyname, const AString & valuename, const double    defValue = 0.0);
-	int     GetValueSetI(const AString & keyname, const AString & valuename, const int       defValue = 0) override;
-	Int64   GetValueSetI(const AString & keyname, const AString & valuename, const Int64     defValue = 0) override;
-	bool    GetValueSetB(const AString & keyname, const AString & valuename, const bool      defValue = false) override
+	AString GetValueSet(const AString & keyname, const AString & valuename, const AString & defValue = "") override;
+	double GetValueSetF(const AString & keyname, const AString & valuename, const double defValue = 0.0);
+	int GetValueSetI(const AString & keyname, const AString & valuename, const int defValue = 0) override;
+	Int64 GetValueSetI(const AString & keyname, const AString & valuename, const Int64 defValue = 0) override;
+	bool GetValueSetB(const AString & keyname, const AString & valuename, const bool defValue = false) override
 	{
 		return (GetValueSetI(keyname, valuename, defValue ? 1 : 0) != 0);
 	}
 
 	// Adds a new value to the specified key.
 	// If a value of the same name already exists, creates another one (non-standard INI file)
-	void AddValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value) override;
+	void AddValue(const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value) override;
 	void AddValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value);
 	void AddValueB(const AString & a_KeyName, const AString & a_ValueName, const bool a_Value)
 	{
@@ -166,15 +163,40 @@ public:
 	// Specify the optional parameter as false (0) if you do not want the value created if it doesn't exist.
 	// Returns true if value set, false otherwise.
 	// Overloaded to accept string, int, and double.
-	bool SetValue (const int keyID, const int valueID, const AString & value);
-	bool SetValue (const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value, const bool a_CreateIfNotExists = true) override;
-	bool SetValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value, const bool a_CreateIfNotExists = true) override;
-	bool SetValueI(const AString & a_Keyname, const AString & a_ValueName, const Int64 a_Value, const bool a_CreateIfNotExists = true);
-	bool SetValueB(const AString & a_KeyName, const AString & a_ValueName, const bool a_Value, const bool a_CreateIfNotExists = true)
+	bool SetValue(const int keyID, const int valueID, const AString & value);
+	bool SetValue(
+		const AString & a_KeyName,
+		const AString & a_ValueName,
+		const AString & a_Value,
+		const bool a_CreateIfNotExists = true
+	) override;
+	bool SetValueI(
+		const AString & a_KeyName,
+		const AString & a_ValueName,
+		const int a_Value,
+		const bool a_CreateIfNotExists = true
+	) override;
+	bool SetValueI(
+		const AString & a_Keyname,
+		const AString & a_ValueName,
+		const Int64 a_Value,
+		const bool a_CreateIfNotExists = true
+	);
+	bool SetValueB(
+		const AString & a_KeyName,
+		const AString & a_ValueName,
+		const bool a_Value,
+		const bool a_CreateIfNotExists = true
+	)
 	{
 		return SetValueI(a_KeyName, a_ValueName, int(a_Value), a_CreateIfNotExists);
 	}
-	bool SetValueF(const AString & a_KeyName, const AString & a_ValueName, const double a_Value, const bool a_CreateIfNotExists = true);
+	bool SetValueF(
+		const AString & a_KeyName,
+		const AString & a_ValueName,
+		const double a_Value,
+		const bool a_CreateIfNotExists = true
+	);
 
 	// Deletes specified value.
 	// Returns true if value existed and deleted, false otherwise.
@@ -189,7 +211,7 @@ public:
 	// Header comments are those comments before the first key.
 
 	/** Returns the number of header comments */
-	int GetNumHeaderComments(void) {return static_cast<int>(m_Comments.size());}
+	int GetNumHeaderComments(void) { return static_cast<int>(m_Comments.size()); }
 
 	/** Adds a header comment */
 	void AddHeaderComment(const AString & comment);
@@ -201,7 +223,7 @@ public:
 	bool DeleteHeaderComment(int commentID);
 
 	/** Deletes all header comments */
-	void DeleteHeaderComments(void) {m_Comments.clear();}
+	void DeleteHeaderComments(void) { m_Comments.clear(); }
 
 
 	// Key comment functions.
@@ -241,10 +263,11 @@ public:
 
 
 
-/** Reads the list of ports from the INI file, possibly upgrading from IPv4 / IPv6-specific values into new version-agnostic value.
-Reads the list of ports from a_PortsValueName. If that value doesn't exist or is empty, the list is combined from values
-in a_OldIPv4ValueName and a_OldIPv6ValueName; in this case the old values are removed from the INI file.
-If there is none of the three values or they are all empty, the default is used and stored in the Ports value. */
+/** Reads the list of ports from the INI file, possibly upgrading from IPv4 / IPv6-specific values into new
+version-agnostic value. Reads the list of ports from a_PortsValueName. If that value doesn't exist or is empty, the list
+is combined from values in a_OldIPv4ValueName and a_OldIPv6ValueName; in this case the old values are removed from the
+INI file. If there is none of the three values or they are all empty, the default is used and stored in the Ports value.
+*/
 AStringVector ReadUpgradeIniPorts(
 	cSettingsRepositoryInterface & a_Settings,
 	const AString & a_KeyName,
@@ -253,6 +276,3 @@ AStringVector ReadUpgradeIniPorts(
 	const AString & a_OldIPv6ValueName,
 	const AString & a_DefaultValue
 );
-
-
-

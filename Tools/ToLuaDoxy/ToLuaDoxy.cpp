@@ -19,19 +19,14 @@ typedef std::vector<AString> AStrings;
 
 class cProcessor
 {
-public:
+  public:
 	cProcessor(const AString & a_FileOut) :
-		m_Out(a_FileOut.c_str(), std::ios::out),
-		m_IsInToLua(false),
-		m_IsInComment(false)
+		m_Out(a_FileOut.c_str(), std::ios::out), m_IsInToLua(false), m_IsInComment(false)
 	{
 	}
 
 
-	bool IsGood(void) const
-	{
-		return !m_Out.fail();
-	}
+	bool IsGood(void) const { return !m_Out.fail(); }
 
 
 	void ProcessFile(const AString & a_FileIn)
@@ -50,11 +45,11 @@ public:
 		}
 	}
 
-protected:
+  protected:
 	std::ofstream m_Out;
-	bool          m_IsInToLua;    ///< Set to true if inside a tolua_begin .. tolua_end block
-	bool          m_IsInComment;  ///< Set to true if previous line has started a multiline comment; only outside tolua blocks
-	AString       m_LastComment;  ///< Accumulator for a multiline comment preceding a tolua block
+	bool m_IsInToLua;  ///< Set to true if inside a tolua_begin .. tolua_end block
+	bool m_IsInComment;  ///< Set to true if previous line has started a multiline comment; only outside tolua blocks
+	AString m_LastComment;  ///< Accumulator for a multiline comment preceding a tolua block
 
 
 	void PushLine(const AString & a_Line)
@@ -129,7 +124,7 @@ protected:
 			m_LastComment.clear();
 		}
 	}
-} ;
+};
 
 
 
@@ -188,14 +183,14 @@ void ProcessCFile(const AString & a_CFileIn, const AString & a_CFileOut)
 int main(int argc, char * argv[])
 {
 	AString BaseDir = (argc > 1) ? argv[1] : ".";
-	AString OutDir  = (argc > 2) ? argv[2] : "Out";
+	AString OutDir = (argc > 2) ? argv[2] : "Out";
 
-	// Create the output directory:
-	#ifdef _WIN32
+// Create the output directory:
+#ifdef _WIN32
 	CreateDirectory(OutDir.c_str(), NULL);
-	#else
+#else
 	mkdir(OutDir.c_str(), S_IRWXU | S_IRWXG | S_IRWXO);
-	#endif
+#endif
 
 	// Parse the package file
 	AStrings CFiles;

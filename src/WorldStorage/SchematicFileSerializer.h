@@ -1,7 +1,8 @@
 
 // SchematicFileSerializer.h
 
-// Declares the cSchematicFileSerializer class representing the interface to load and save cBlockArea to a .schematic file
+// Declares the cSchematicFileSerializer class representing the interface to load and save cBlockArea to a .schematic
+// file
 
 
 
@@ -25,8 +26,7 @@ class cParsedNBT;
 
 class cSchematicFileSerializer
 {
-public:
-
+  public:
 	/** Loads an area from a .schematic file. */
 	static void LoadFromSchematicFile(cBlockArea & a_BlockArea, const std::string & a_FileName);
 
@@ -39,8 +39,7 @@ public:
 	/** Saves the area into a string containing the .schematic file data. */
 	static Compression::Result SaveToSchematicString(const cBlockArea & a_BlockArea);
 
-private:
-
+  private:
 	/** Loads the area from a schematic file uncompressed and parsed into a NBT tree. */
 	static void LoadFromSchematicNBT(cBlockArea & a_BlockArea, const cParsedNBT & a_NBT);
 

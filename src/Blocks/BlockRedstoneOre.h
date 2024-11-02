@@ -8,13 +8,11 @@
 
 
 
-class cBlockRedstoneOreHandler final :
-	public cBlockOreHandler
+class cBlockRedstoneOreHandler final : public cBlockOreHandler
 {
 	using Super = cBlockOreHandler;
 
-public:
-
+  public:
 	using Super::Super;  // Inherit constructor from base
 
 
@@ -22,7 +20,9 @@ public:
 
 
 	virtual bool OnUse(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
@@ -50,23 +50,18 @@ public:
 
 
 
-	virtual bool IsUseable() const override
-	{
-		return true;
-	}
+	virtual bool IsUseable() const override { return true; }
 };
 
 
 
 
 
-class cBlockGlowingRedstoneOreHandler final :
-	public cBlockOreHandler
+class cBlockGlowingRedstoneOreHandler final : public cBlockOreHandler
 {
 	using Super = cBlockOreHandler;
 
-public:
-
+  public:
 	using Super::Super;  // Inherit constructor from base
 
 
@@ -85,8 +80,3 @@ public:
 		a_ChunkInterface.SetBlock(BlockPos, E_BLOCK_REDSTONE_ORE, 0);
 	}
 };
-
-
-
-
-

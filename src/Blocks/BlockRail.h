@@ -24,13 +24,11 @@ enum ENUM_PURE
 
 
 
-class cBlockRailHandler final :
-	public cClearMetaOnDrop<cBlockHandler>
+class cBlockRailHandler final : public cClearMetaOnDrop<cBlockHandler>
 {
 	using Super = cClearMetaOnDrop<cBlockHandler>;
 
-public:
-
+  public:
 	using Super::Super;
 
 
@@ -38,29 +36,50 @@ public:
 	{
 		NIBBLETYPE Meta = 0;
 		char RailsCnt = 0;
-		bool Neighbors[8];  // 0 - EAST, 1 - WEST, 2 - NORTH, 3 - SOUTH, 4 - EAST UP, 5 - WEST UP, 6 - NORTH UP, 7 - SOUTH UP
+		bool Neighbors[8];  // 0 - EAST, 1 - WEST, 2 - NORTH, 3 - SOUTH, 4 - EAST UP, 5 - WEST UP, 6 - NORTH UP, 7 -
+							// SOUTH UP
 		memset(Neighbors, 0, sizeof(Neighbors));
-		Neighbors[0] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(1, 0, 0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_EAST, E_PURE_DOWN));
-		Neighbors[1] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(-1, 0, 0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_WEST, E_PURE_DOWN));
-		Neighbors[2] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, 0, -1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_NORTH, E_PURE_DOWN));
-		Neighbors[3] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, 0, 1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_SOUTH, E_PURE_DOWN));
-		Neighbors[4] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(1, 1, 0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_EAST, E_PURE_NONE));
-		Neighbors[5] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(-1, 1, 0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_WEST, E_PURE_NONE));
-		Neighbors[6] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, -1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_NORTH, E_PURE_NONE));
-		Neighbors[7] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_SOUTH, E_PURE_NONE));
-		if (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(1, -1, 0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_EAST))
+		Neighbors[0] =
+			(IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(1, 0, 0)) ||
+			 !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_EAST, E_PURE_DOWN));
+		Neighbors[1] =
+			(IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(-1, 0, 0)) ||
+			 !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_WEST, E_PURE_DOWN));
+		Neighbors[2] =
+			(IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, 0, -1)) ||
+			 !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_NORTH, E_PURE_DOWN));
+		Neighbors[3] =
+			(IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, 0, 1)) ||
+			 !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_SOUTH, E_PURE_DOWN));
+		Neighbors[4] =
+			(IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(1, 1, 0)) ||
+			 !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_EAST, E_PURE_NONE));
+		Neighbors[5] =
+			(IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(-1, 1, 0)) ||
+			 !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_WEST, E_PURE_NONE));
+		Neighbors[6] =
+			(IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, -1)) ||
+			 !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_NORTH, E_PURE_NONE));
+		Neighbors[7] =
+			(IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 1)) ||
+			 !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_SOUTH, E_PURE_NONE));
+		if (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(1, -1, 0)) ||
+			!IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_EAST))
 		{
 			Neighbors[0] = true;
 		}
-		if (IsUnstable(a_ChunkInterface, a_BlockPos - Vector3i(1, 1, 0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_WEST))
+		if (IsUnstable(a_ChunkInterface, a_BlockPos - Vector3i(1, 1, 0)) ||
+			!IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_WEST))
 		{
 			Neighbors[1] = true;
 		}
-		if (IsUnstable(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_NORTH))
+		if (IsUnstable(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 1)) ||
+			!IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_NORTH))
 		{
 			Neighbors[2] = true;
 		}
-		if (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, -1, 1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_SOUTH))
+		if (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, -1, 1)) ||
+			!IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_SOUTH))
 		{
 			Neighbors[3] = true;
 		}
@@ -160,8 +179,7 @@ public:
 		return Meta;
 	}
 
-private:
-
+  private:
 	static bool CanBeSupportedBy(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
 		if (cBlockSlabHandler::IsAnySlabType(a_BlockType))
@@ -195,14 +213,13 @@ private:
 			{
 				// Mapping between the meta and the neighbors that need checking
 				a_Meta -= E_META_RAIL_ASCEND_XP;  // Base index at zero
-				static const Vector3i Coords[] =
-				{
-					{ 1, 0,  0},  // east,  XP
-					{-1, 0,  0},  // west,  XM
-					{ 0, 0, -1},  // north, ZM
-					{ 0, 0,  1},  // south, ZP
-				} ;
-				BLOCKTYPE  BlockType;
+				static const Vector3i Coords[] = {
+					{1, 0, 0},  // east,  XP
+					{-1, 0, 0},  // west,  XM
+					{0, 0, -1},  // north, ZM
+					{0, 0, 1},  // south, ZP
+				};
+				BLOCKTYPE BlockType;
 				NIBBLETYPE BlockMeta;
 				if (!a_Chunk.UnboundedRelGetBlock(a_Position + Coords[a_Meta], BlockType, BlockMeta))
 				{
@@ -228,10 +245,8 @@ private:
 		{
 			case E_META_RAIL_ZM_ZP:
 			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_NORTH, E_PURE_DOWN) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_SOUTH, E_PURE_DOWN)
-				)
+				if (IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_NORTH, E_PURE_DOWN) ||
+					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_SOUTH, E_PURE_DOWN))
 				{
 					return true;
 				}
@@ -240,10 +255,8 @@ private:
 
 			case E_META_RAIL_XM_XP:
 			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_EAST, E_PURE_DOWN) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_WEST, E_PURE_DOWN)
-				)
+				if (IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_EAST, E_PURE_DOWN) ||
+					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_WEST, E_PURE_DOWN))
 				{
 					return true;
 				}
@@ -252,10 +265,8 @@ private:
 
 			case E_META_RAIL_ASCEND_XP:
 			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos + Vector3i(0, 1, 0), BLOCK_FACE_EAST) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_WEST)
-				)
+				if (IsNotConnected(a_ChunkInterface, a_Pos + Vector3i(0, 1, 0), BLOCK_FACE_EAST) ||
+					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_WEST))
 				{
 					return true;
 				}
@@ -264,10 +275,8 @@ private:
 
 			case E_META_RAIL_ASCEND_XM:
 			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_EAST) ||
-					IsNotConnected(a_ChunkInterface, a_Pos + Vector3i(0, 1, 0), BLOCK_FACE_WEST)
-				)
+				if (IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_EAST) ||
+					IsNotConnected(a_ChunkInterface, a_Pos + Vector3i(0, 1, 0), BLOCK_FACE_WEST))
 				{
 					return true;
 				}
@@ -276,10 +285,8 @@ private:
 
 			case E_META_RAIL_ASCEND_ZM:
 			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos + Vector3i(0, 1, 0), BLOCK_FACE_NORTH) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_SOUTH)
-				)
+				if (IsNotConnected(a_ChunkInterface, a_Pos + Vector3i(0, 1, 0), BLOCK_FACE_NORTH) ||
+					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_SOUTH))
 				{
 					return true;
 				}
@@ -288,10 +295,8 @@ private:
 
 			case E_META_RAIL_ASCEND_ZP:
 			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_NORTH) ||
-					IsNotConnected(a_ChunkInterface, a_Pos + Vector3i(0, 1, 0), BLOCK_FACE_SOUTH)
-				)
+				if (IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_NORTH) ||
+					IsNotConnected(a_ChunkInterface, a_Pos + Vector3i(0, 1, 0), BLOCK_FACE_SOUTH))
 				{
 					return true;
 				}
@@ -300,10 +305,8 @@ private:
 
 			case E_META_RAIL_CURVED_ZP_XP:
 			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_SOUTH) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_EAST)
-				)
+				if (IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_SOUTH) ||
+					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_EAST))
 				{
 					return true;
 				}
@@ -312,10 +315,8 @@ private:
 
 			case E_META_RAIL_CURVED_ZP_XM:
 			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_SOUTH) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_WEST)
-				)
+				if (IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_SOUTH) ||
+					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_WEST))
 				{
 					return true;
 				}
@@ -324,10 +325,8 @@ private:
 
 			case E_META_RAIL_CURVED_ZM_XM:
 			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_NORTH) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_WEST)
-				)
+				if (IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_NORTH) ||
+					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_WEST))
 				{
 					return true;
 				}
@@ -336,10 +335,8 @@ private:
 
 			case E_META_RAIL_CURVED_ZM_XP:
 			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_NORTH) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_EAST)
-				)
+				if (IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_NORTH) ||
+					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_EAST))
 				{
 					return true;
 				}
@@ -350,7 +347,12 @@ private:
 	}
 
 
-	static bool IsNotConnected(cChunkInterface  & a_ChunkInterface, Vector3i a_Pos, eBlockFace a_BlockFace, char a_Pure = 0)
+	static bool IsNotConnected(
+		cChunkInterface & a_ChunkInterface,
+		Vector3i a_Pos,
+		eBlockFace a_BlockFace,
+		char a_Pure = 0
+	)
 	{
 		a_Pos = AddFaceDirection(a_Pos, a_BlockFace, false);
 
@@ -383,13 +385,8 @@ private:
 		{
 			case BLOCK_FACE_NORTH:
 			{
-				if (
-					(Meta == E_META_RAIL_ZM_ZP) ||
-					(Meta == E_META_RAIL_ASCEND_ZM) ||
-					(Meta == E_META_RAIL_ASCEND_ZP) ||
-					(Meta == E_META_RAIL_CURVED_ZP_XP) ||
-					(Meta == E_META_RAIL_CURVED_ZP_XM)
-				)
+				if ((Meta == E_META_RAIL_ZM_ZP) || (Meta == E_META_RAIL_ASCEND_ZM) || (Meta == E_META_RAIL_ASCEND_ZP) ||
+					(Meta == E_META_RAIL_CURVED_ZP_XP) || (Meta == E_META_RAIL_CURVED_ZP_XM))
 				{
 					return false;
 				}
@@ -398,13 +395,8 @@ private:
 
 			case BLOCK_FACE_SOUTH:
 			{
-				if (
-					(Meta == E_META_RAIL_ZM_ZP) ||
-					(Meta == E_META_RAIL_ASCEND_ZM) ||
-					(Meta == E_META_RAIL_ASCEND_ZP) ||
-					(Meta == E_META_RAIL_CURVED_ZM_XP) ||
-					(Meta == E_META_RAIL_CURVED_ZM_XM)
-				)
+				if ((Meta == E_META_RAIL_ZM_ZP) || (Meta == E_META_RAIL_ASCEND_ZM) || (Meta == E_META_RAIL_ASCEND_ZP) ||
+					(Meta == E_META_RAIL_CURVED_ZM_XP) || (Meta == E_META_RAIL_CURVED_ZM_XM))
 				{
 					return false;
 				}
@@ -413,13 +405,8 @@ private:
 
 			case BLOCK_FACE_EAST:
 			{
-				if (
-					(Meta == E_META_RAIL_XM_XP) ||
-					(Meta == E_META_RAIL_ASCEND_XP) ||
-					(Meta == E_META_RAIL_ASCEND_XM) ||
-					(Meta == E_META_RAIL_CURVED_ZP_XM) ||
-					(Meta == E_META_RAIL_CURVED_ZM_XM)
-				)
+				if ((Meta == E_META_RAIL_XM_XP) || (Meta == E_META_RAIL_ASCEND_XP) || (Meta == E_META_RAIL_ASCEND_XM) ||
+					(Meta == E_META_RAIL_CURVED_ZP_XM) || (Meta == E_META_RAIL_CURVED_ZM_XM))
 				{
 					return false;
 				}
@@ -427,13 +414,8 @@ private:
 			}
 			case BLOCK_FACE_WEST:
 			{
-				if (
-					(Meta == E_META_RAIL_XM_XP) ||
-					(Meta == E_META_RAIL_ASCEND_XP) ||
-					(Meta == E_META_RAIL_ASCEND_XM) ||
-					(Meta == E_META_RAIL_CURVED_ZP_XP) ||
-					(Meta == E_META_RAIL_CURVED_ZM_XP)
-				)
+				if ((Meta == E_META_RAIL_XM_XP) || (Meta == E_META_RAIL_ASCEND_XP) || (Meta == E_META_RAIL_ASCEND_XM) ||
+					(Meta == E_META_RAIL_CURVED_ZP_XP) || (Meta == E_META_RAIL_CURVED_ZM_XP))
 				{
 					return false;
 				}
@@ -451,33 +433,40 @@ private:
 
 
 	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BLOCKTYPE a_OldBlockType,
+		NIBBLETYPE a_OldBlockMeta,
 		const cEntity * a_Digger
 	) const override
 	{
 		Super::OnBroken(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_OldBlockType, a_OldBlockMeta, a_Digger);
 
 		// Alert diagonal rails:
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1,  1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1,  1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1,  1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1, -1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1, -1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1, -1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1,  1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1, -1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(1, 1, 0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1, 1, 0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(0, +1, 1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(0, +1, -1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(1, -1, 0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1, -1, 0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(0, -1, 1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(0, -1, -1), BLOCK_FACE_NONE);
 	}
 
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor)
+		const override
 	{
 		const auto Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
 		const auto NewMeta = FindMeta(a_ChunkInterface, a_BlockPos, m_BlockType);
 		if ((Meta != NewMeta) && IsUnstable(a_ChunkInterface, a_BlockPos))
 		{
-			a_ChunkInterface.FastSetBlock(a_BlockPos, m_BlockType, (m_BlockType == E_BLOCK_RAIL) ? NewMeta : NewMeta | (Meta & 0x08));
+			a_ChunkInterface.FastSetBlock(
+				a_BlockPos,
+				m_BlockType,
+				(m_BlockType == E_BLOCK_RAIL) ? NewMeta : NewMeta | (Meta & 0x08)
+			);
 		}
 
 		Super::OnNeighborChanged(a_ChunkInterface, a_BlockPos, a_WhichNeighbor);
@@ -485,22 +474,24 @@ private:
 
 
 	virtual void OnPlaced(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta
 	) const override
 	{
 		Super::OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_BlockType, a_BlockMeta);
 
 		// Alert diagonal rails:
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1,  1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1,  1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1,  1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1, -1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1, -1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1, -1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1,  1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1, -1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(1, 1, 0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1, 1, 0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(0, +1, 1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(0, +1, -1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(1, -1, 0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1, -1, 0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(0, -1, 1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(0, -1, -1), BLOCK_FACE_NONE);
 	}
 
 
@@ -510,7 +501,7 @@ private:
 		// Bit 0x08 specifies direction when a_Meta is in the range 0x06-0x09.
 		if ((a_Meta < 0x06) || (a_Meta > 0x09))
 		{
-			//  Save powered rail flag.
+			// Save powered rail flag.
 			NIBBLETYPE OtherMeta = a_Meta & 0x08;
 			// Rotates according to table; 0x07 == 0111.
 			// Rails can either be flat (North / South) or Ascending (Asc. East)
@@ -546,7 +537,7 @@ private:
 		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x006--0x09.
 		if ((a_Meta < 0x06) || (a_Meta > 0x09))
 		{
-			//  Save powered rail flag.
+			// Save powered rail flag.
 			NIBBLETYPE OtherMeta = a_Meta & 0x08;
 			// Rotates according to table; 0x07 == 0111.
 			// Rails can either be flat (North / South) or Ascending (Asc. East)
@@ -660,4 +651,4 @@ private:
 		UNUSED(a_Meta);
 		return 0;
 	}
-} ;
+};

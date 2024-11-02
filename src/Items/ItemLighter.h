@@ -9,13 +9,11 @@
 
 
 
-class cItemLighterHandler final:
-	public cItemHandler
+class cItemLighterHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 
@@ -76,4 +74,4 @@ public:
 
 		return false;
 	}
-} ;
+};

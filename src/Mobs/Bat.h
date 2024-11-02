@@ -7,20 +7,14 @@
 
 
 
-class cBat:
-	public cPassiveMonster
+class cBat : public cPassiveMonster
 {
 	using Super = cPassiveMonster;
 
-public:
-
+  public:
 	cBat();
 
 	CLASS_PROTODEF(cBat)
 
-	bool IsHanging(void) const {return false; }
-} ;
-
-
-
-
+	bool IsHanging(void) const { return false; }
+};

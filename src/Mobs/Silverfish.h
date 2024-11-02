@@ -7,16 +7,14 @@
 
 
 
-class cSilverfish:
-	public cAggressiveMonster
+class cSilverfish : public cAggressiveMonster
 {
 	using Super = cAggressiveMonster;
 
-public:
-
+  public:
 	cSilverfish();
 
 	CLASS_PROTODEF(cSilverfish)
 
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
-} ;
+};

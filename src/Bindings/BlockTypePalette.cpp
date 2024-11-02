@@ -31,7 +31,7 @@ static size_t findNextSeparator(const AString & aString, size_t aStartIdx = 0)
 
 
 
-BlockTypePalette::BlockTypePalette():
+BlockTypePalette::BlockTypePalette() :
 	mMaxIndex(0)
 {
 }
@@ -59,7 +59,8 @@ UInt32 BlockTypePalette::index(const AString & aBlockTypeName, const BlockState 
 
 
 
-std::pair<UInt32, bool> BlockTypePalette::maybeIndex(const AString & aBlockTypeName, const BlockState & aBlockState) const
+std::pair<UInt32, bool> BlockTypePalette::maybeIndex(const AString & aBlockTypeName, const BlockState & aBlockState)
+	const
 {
 	auto itr1 = mBlockToNumber.find(aBlockTypeName);
 	if (itr1 == mBlockToNumber.end())
@@ -104,7 +105,7 @@ const std::pair<AString, BlockState> & BlockTypePalette::entry(UInt32 aIndex) co
 std::map<UInt32, UInt32> BlockTypePalette::createTransformMapAddMissing(const BlockTypePalette & aFrom)
 {
 	std::map<UInt32, UInt32> res;
-	for (const auto & fromEntry: aFrom.mNumberToBlock)
+	for (const auto & fromEntry : aFrom.mNumberToBlock)
 	{
 		auto fromIndex = fromEntry.first;
 		const auto & blockTypeName = fromEntry.second.first;
@@ -118,10 +119,13 @@ std::map<UInt32, UInt32> BlockTypePalette::createTransformMapAddMissing(const Bl
 
 
 
-std::map<UInt32, UInt32> BlockTypePalette::createTransformMapWithFallback(const BlockTypePalette & aFrom, UInt32 aFallbackIndex) const
+std::map<UInt32, UInt32> BlockTypePalette::createTransformMapWithFallback(
+	const BlockTypePalette & aFrom,
+	UInt32 aFallbackIndex
+) const
 {
 	std::map<UInt32, UInt32> res;
-	for (const auto & fromEntry: aFrom.mNumberToBlock)
+	for (const auto & fromEntry : aFrom.mNumberToBlock)
 	{
 		auto fromIndex = fromEntry.first;
 		const auto & blockTypeName = fromEntry.second.first;
@@ -189,9 +193,10 @@ void BlockTypePalette::loadFromJsonString(const AString & aJsonPalette)
 		const auto & states = (*itr)["states"];
 		if (states == Json::Value())
 		{
-			throw LoadFailedException(fmt::format(FMT_STRING("Missing \"states\" for block type \"{}\""), blockTypeName));
+			throw LoadFailedException(fmt::format(FMT_STRING("Missing \"states\" for block type \"{}\""), blockTypeName)
+			);
 		}
-		for (const auto & state: states)
+		for (const auto & state : states)
 		{
 			auto id = static_cast<UInt32>(std::stoul(state["id"].asString()));
 			std::map<AString, AString> props;
@@ -200,9 +205,13 @@ void BlockTypePalette::loadFromJsonString(const AString & aJsonPalette)
 				const auto & properties = state["properties"];
 				if (!properties.isObject())
 				{
-					throw LoadFailedException(fmt::format(FMT_STRING("Member \"properties\" is not a JSON object (block type \"{}\", id {})."), blockTypeName, id));
+					throw LoadFailedException(fmt::format(
+						FMT_STRING("Member \"properties\" is not a JSON object (block type \"{}\", id {})."),
+						blockTypeName,
+						id
+					));
 				}
-				for (const auto & key: properties.getMemberNames())
+				for (const auto & key : properties.getMemberNames())
 				{
 					props[key] = properties[key].asString();
 				}
@@ -233,7 +242,7 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 	{
 		throw LoadFailedException("Unknown signature");
 	}
-	if (aTsvPalette[idx] == '\r')   // CR of the CRLF pair, skip the LF:
+	if (aTsvPalette[idx] == '\r')  // CR of the CRLF pair, skip the LF:
 	{
 		idx += 1;
 	}
@@ -277,7 +286,9 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 			}
 			else if (version != 1)
 			{
-				throw LoadFailedException(fmt::format(FMT_STRING("Unknown FileVersion: {}. Only version 1 is supported."), version));
+				throw LoadFailedException(
+					fmt::format(FMT_STRING("Unknown FileVersion: {}. Only version 1 is supported."), version)
+				);
 			}
 			hasHadVersion = true;
 		}
@@ -348,7 +359,8 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 			auto valueEnd = findNextSeparator(aTsvPalette, keyEnd + 1);
 			if (valueEnd == AString::npos)
 			{
-				throw LoadFailedException(fmt::format(FMT_STRING("Incomplete data on line {} (blockState value)"), line));
+				throw LoadFailedException(fmt::format(FMT_STRING("Incomplete data on line {} (blockState value)"), line)
+				);
 			}
 			auto key = aTsvPalette.substr(blockStateEnd + 1, keyEnd - blockStateEnd - 1);
 			auto value = aTsvPalette.substr(keyEnd + 1, valueEnd - keyEnd - 1);

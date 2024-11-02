@@ -18,12 +18,13 @@ class cPlayer;
 
 
 
-class cChunkInterface:
-	public cForEachChunkProvider
+class cChunkInterface : public cForEachChunkProvider
 {
-public:
-
-	cChunkInterface(cChunkMap * a_ChunkMap) : m_ChunkMap(a_ChunkMap) {}
+  public:
+	cChunkInterface(cChunkMap * a_ChunkMap) :
+		m_ChunkMap(a_ChunkMap)
+	{
+	}
 
 	bool DoWithChunkAt(Vector3i a_BlockPos, cFunctionRef<bool(cChunk &)> a_Callback);
 
@@ -65,9 +66,16 @@ public:
 	returns true if the use was successful, return false to use the block as a "normal" block */
 	bool UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ);
 
-	virtual bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback) override;
+	virtual bool ForEachChunkInRect(
+		int a_MinChunkX,
+		int a_MaxChunkX,
+		int a_MinChunkZ,
+		int a_MaxChunkZ,
+		cChunkDataCallback & a_Callback
+	) override;
 
-	virtual bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes) override;
+	virtual bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
+		override;
 
 	bool DigBlock(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, cEntity * a_Digger);
 
@@ -75,10 +83,6 @@ public:
 	void DropBlockAsPickups(Vector3i a_BlockPos, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr);
 
 
-private:
+  private:
 	cChunkMap * m_ChunkMap;
 };
-
-
-
-

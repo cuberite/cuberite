@@ -40,39 +40,39 @@ Serialization will never put zero-level enchantments into the stringspec and wil
 // tolua_begin
 class cEnchantments
 {
-public:
+  public:
 	/** Individual enchantment IDs, corresponding to their NBT IDs: https://minecraft.wiki/w/Data_values#Enchantment_IDs
-	*/
+	 */
 
 	enum eEnchantment
 	{
 		// Currently missing: Frost walker, curse of binding, sweeping edge, mending, and curse of vanishing.
-		enchProtection           = 0,
-		enchFireProtection       = 1,
-		enchFeatherFalling       = 2,
-		enchBlastProtection      = 3,
+		enchProtection = 0,
+		enchFireProtection = 1,
+		enchFeatherFalling = 2,
+		enchBlastProtection = 3,
 		enchProjectileProtection = 4,
-		enchRespiration          = 5,
-		enchAquaAffinity         = 6,
-		enchThorns               = 7,
-		enchDepthStrider         = 8,
-		enchSharpness            = 16,
-		enchSmite                = 17,
-		enchBaneOfArthropods     = 18,
-		enchKnockback            = 19,
-		enchFireAspect           = 20,
-		enchLooting              = 21,
-		enchEfficiency           = 32,
-		enchSilkTouch            = 33,
-		enchUnbreaking           = 34,
-		enchFortune              = 35,
-		enchPower                = 48,
-		enchPunch                = 49,
-		enchFlame                = 50,
-		enchInfinity             = 51,
-		enchLuckOfTheSea         = 61,
-		enchLure                 = 62,
-	} ;
+		enchRespiration = 5,
+		enchAquaAffinity = 6,
+		enchThorns = 7,
+		enchDepthStrider = 8,
+		enchSharpness = 16,
+		enchSmite = 17,
+		enchBaneOfArthropods = 18,
+		enchKnockback = 19,
+		enchFireAspect = 20,
+		enchLooting = 21,
+		enchEfficiency = 32,
+		enchSilkTouch = 33,
+		enchUnbreaking = 34,
+		enchFortune = 35,
+		enchPower = 48,
+		enchPunch = 49,
+		enchFlame = 50,
+		enchInfinity = 51,
+		enchLuckOfTheSea = 61,
+		enchLure = 62,
+	};
 
 	/** Creates an empty enchantments container */
 	cEnchantments(void);
@@ -81,7 +81,8 @@ public:
 	cEnchantments(const AString & a_StringSpec);
 
 	/** Adds the enchantments contained in a_Other into this object.
-	Existing enchantments are preserved, unless a_Other specifies a different level, in which case the level is changed to the a_Other's one. */
+	Existing enchantments are preserved, unless a_Other specifies a different level, in which case the level is changed
+	to the a_Other's one. */
 	void Add(const cEnchantments & a_Other);
 
 	/** Adds enchantments in the stringspec; if a specified enchantment already exists, overwrites it */
@@ -105,14 +106,16 @@ public:
 	/** Returns true if there are no enchantments */
 	bool IsEmpty(void) const;
 
-	/** Returns true if the given enchantment could be legally added to this object. Note that adding the enchantment may not actually increase the level. */
+	/** Returns true if the given enchantment could be legally added to this object. Note that adding the enchantment
+	 * may not actually increase the level. */
 	bool CanAddEnchantment(int a_EnchantmentID) const;
 
-	/** Converts enchantment name or ID (number in string) to the numeric representation; returns -1 if enchantment name not found; case insensitive */
+	/** Converts enchantment name or ID (number in string) to the numeric representation; returns -1 if enchantment name
+	 * not found; case insensitive */
 	static int StringToEnchantmentID(const AString & a_EnchantmentName);
 
 	/** Returns true if a_Other contains exactly the same enchantments and levels */
-	bool operator ==(const cEnchantments & a_Other) const;
+	bool operator==(const cEnchantments & a_Other) const;
 
 	// tolua_end
 
@@ -126,22 +129,40 @@ public:
 	static unsigned int GetLevelCap(int a_EnchantmentID);
 
 	/** Add enchantment weights from item to the vector */
-	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, unsigned a_EnchantmentLevel);
+	static void AddItemEnchantmentWeights(
+		cWeightedEnchantments & a_Enchantments,
+		short a_ItemType,
+		unsigned a_EnchantmentLevel
+	);
 
 	/** Add a enchantment with weight to the vector */
-	static void AddEnchantmentWeightToVector(cWeightedEnchantments & a_Enchantments, int a_Weight, int a_EnchantmentID, unsigned int a_EnchantmentLevel);
+	static void AddEnchantmentWeightToVector(
+		cWeightedEnchantments & a_Enchantments,
+		int a_Weight,
+		int a_EnchantmentID,
+		unsigned int a_EnchantmentLevel
+	);
 
 	/** Remove the entire enchantment (with weight) from the vector */
 	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, int a_EnchantmentID);
 
 	/** Remove the entire enchantment (with weight) from the vector */
-	static void RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, const cEnchantments & a_Enchantment);
+	static void RemoveEnchantmentWeightFromVector(
+		cWeightedEnchantments & a_Enchantments,
+		const cEnchantments & a_Enchantment
+	);
 
 	/** Check enchantment conflicts from enchantments from the vector */
-	static void CheckEnchantmentConflictsFromVector(cWeightedEnchantments & a_Enchantments, const cEnchantments & a_FirstEnchantment);
+	static void CheckEnchantmentConflictsFromVector(
+		cWeightedEnchantments & a_Enchantments,
+		const cEnchantments & a_FirstEnchantment
+	);
 
 	/** Gets random enchantment from Vector and returns it, with randomness derived from the provided PRNG. */
-	static cEnchantments GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, MTRand & a_Random);
+	static cEnchantments GetRandomEnchantmentFromVector(
+		const cWeightedEnchantments & a_Enchantments,
+		MTRand & a_Random
+	);
 
 	/** Selects one enchantment from a Vector using cNoise. Mostly used for generators.
 	Uses the enchantments' weights for the random distribution.
@@ -149,25 +170,34 @@ public:
 	static cEnchantments SelectEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, int a_Seed);
 
 	/** Returns true if a_Other doesn't contain exactly the same enchantments and levels */
-	bool operator !=(const cEnchantments & a_Other) const;
+	bool operator!=(const cEnchantments & a_Other) const;
 
-	/** Writes the enchantments into the specified NBT writer; begins with the LIST tag of the specified name ("ench" or "StoredEnchantments") */
-	friend void EnchantmentSerializer::WriteToNBTCompound(const cEnchantments & a_Enchantments, cFastNBTWriter & a_Writer, const AString & a_ListTagName);
+	/** Writes the enchantments into the specified NBT writer; begins with the LIST tag of the specified name ("ench" or
+	 * "StoredEnchantments") */
+	friend void EnchantmentSerializer::WriteToNBTCompound(
+		const cEnchantments & a_Enchantments,
+		cFastNBTWriter & a_Writer,
+		const AString & a_ListTagName
+	);
 
 	/** Reads the enchantments from the specified NBT list tag (ench or StoredEnchantments) */
-	friend void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const cParsedNBT & a_NBT, int a_EnchListTagIdx);
+	friend void EnchantmentSerializer::ParseFromNBT(
+		cEnchantments & a_Enchantments,
+		const cParsedNBT & a_NBT,
+		int a_EnchListTagIdx
+	);
 
-protected:
+  protected:
 	/** Maps enchantment ID -> enchantment level */
 	typedef std::map<int, unsigned int> cMap;
 
 	/** Currently stored enchantments */
 	cMap m_Enchantments;
 
-public:
+  public:
 	/** Make this class iterable */
 	cMap::const_iterator begin() const { return m_Enchantments.begin(); }
-	cMap::const_iterator end()   const { return m_Enchantments.end(); }
+	cMap::const_iterator end() const { return m_Enchantments.end(); }
 };  // tolua_export
 
 
@@ -179,6 +209,3 @@ struct cWeightedEnchantment
 	int m_Weight;
 	cEnchantments m_Enchantments;
 };
-
-
-

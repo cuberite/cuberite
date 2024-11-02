@@ -26,8 +26,12 @@ Unfortunately it is very slow, so it is disabled even for regular DEBUG builds. 
 // If a string sent over the protocol is larger than this, a warning is emitted to the console
 #define MAX_STRING_SIZE (512 KiB)
 
-#define NEEDBYTES(Num) if (!CanReadBytes(Num))  return false  // Check if at least Num bytes can be read from  the buffer, return false if not
-#define PUTBYTES(Num)  if (!CanWriteBytes(Num)) return false  // Check if at least Num bytes can be written to the buffer, return false if not
+#define NEEDBYTES(Num)      \
+	if (!CanReadBytes(Num)) \
+	return false  // Check if at least Num bytes can be read from  the buffer, return false if not
+#define PUTBYTES(Num)        \
+	if (!CanWriteBytes(Num)) \
+	return false  // Check if at least Num bytes can be written to the buffer, return false if not
 
 
 
@@ -35,44 +39,44 @@ Unfortunately it is very slow, so it is disabled even for regular DEBUG builds. 
 
 #ifdef DEBUG_SINGLE_THREAD_ACCESS
 
-	/** Simple RAII class that is used for checking that no two threads are using an object simultanously.
-	It requires the monitored object to provide the storage for a thread ID.
-	It uses that storage to check if the thread ID of consecutive calls is the same all the time. */
-	class cSingleThreadAccessChecker
+/** Simple RAII class that is used for checking that no two threads are using an object simultanously.
+It requires the monitored object to provide the storage for a thread ID.
+It uses that storage to check if the thread ID of consecutive calls is the same all the time. */
+class cSingleThreadAccessChecker
+{
+  public:
+	cSingleThreadAccessChecker(std::thread::id * a_ThreadID) :
+		m_ThreadID(a_ThreadID)
 	{
-	public:
-		cSingleThreadAccessChecker(std::thread::id * a_ThreadID) :
-			m_ThreadID(a_ThreadID)
-		{
-			ASSERT(
-				(*a_ThreadID == std::this_thread::get_id()) ||  // Either the object is used by current thread...
-				(*a_ThreadID == m_EmptyThreadID)                // ... or by no thread at all
-			);
+		ASSERT(
+			(*a_ThreadID == std::this_thread::get_id()) ||  // Either the object is used by current thread...
+			(*a_ThreadID == m_EmptyThreadID)  // ... or by no thread at all
+		);
 
-			// Mark as being used by this thread:
-			*m_ThreadID = std::this_thread::get_id();
-		}
+		// Mark as being used by this thread:
+		*m_ThreadID = std::this_thread::get_id();
+	}
 
-		~cSingleThreadAccessChecker()
-		{
-			// Mark as not being used by any thread:
-			*m_ThreadID = std::thread::id();
-		}
+	~cSingleThreadAccessChecker()
+	{
+		// Mark as not being used by any thread:
+		*m_ThreadID = std::thread::id();
+	}
 
-	protected:
-		/** Points to the storage used for ID of the thread using the object. */
-		std::thread::id * m_ThreadID;
+  protected:
+	/** Points to the storage used for ID of the thread using the object. */
+	std::thread::id * m_ThreadID;
 
-		/** The value of an unassigned thread ID, used to speed up checking. */
-		static std::thread::id m_EmptyThreadID;
-	};
+	/** The value of an unassigned thread ID, used to speed up checking. */
+	static std::thread::id m_EmptyThreadID;
+};
 
-	std::thread::id cSingleThreadAccessChecker::m_EmptyThreadID;
+std::thread::id cSingleThreadAccessChecker::m_EmptyThreadID;
 
-	#define CHECK_THREAD cSingleThreadAccessChecker Checker(&m_ThreadID);
+#define CHECK_THREAD cSingleThreadAccessChecker Checker(&m_ThreadID);
 
 #else
-	#define CHECK_THREAD
+#define CHECK_THREAD
 #endif
 
 
@@ -115,10 +119,10 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 
 	// Store the current free space for a check after writing:
 	size_t CurFreeSpace = GetFreeSpace();
-	#ifndef NDEBUG
-		size_t CurReadableSpace = GetReadableSpace();
-		size_t WrittenBytes = 0;
-	#endif
+#ifndef NDEBUG
+	size_t CurReadableSpace = GetReadableSpace();
+	size_t WrittenBytes = 0;
+#endif
 
 	if (CurFreeSpace < a_Count)
 	{
@@ -135,9 +139,9 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 			memcpy(m_Buffer + m_WritePos, Bytes, TillEnd);
 			Bytes += TillEnd;
 			a_Count -= TillEnd;
-			#ifndef NDEBUG
-				WrittenBytes = TillEnd;
-			#endif
+#ifndef NDEBUG
+			WrittenBytes = TillEnd;
+#endif
 		}
 		m_WritePos = 0;
 	}
@@ -147,9 +151,9 @@ bool cByteBuffer::Write(const void * a_Bytes, size_t a_Count)
 	{
 		memcpy(m_Buffer + m_WritePos, Bytes, a_Count);
 		m_WritePos += a_Count;
-		#ifndef NDEBUG
-			WrittenBytes += a_Count;
-		#endif
+#ifndef NDEBUG
+		WrittenBytes += a_Count;
+#endif
 	}
 
 	ASSERT(GetFreeSpace() == CurFreeSpace - WrittenBytes);
@@ -424,7 +428,8 @@ bool cByteBuffer::ReadVarInt32(UInt32 & a_Value)
 		ReadBuf(&b, 1);
 		Value = Value | ((static_cast<UInt32>(b & 0x7f)) << Shift);
 		Shift += 7;
-	} while ((b & 0x80) != 0);
+	}
+	while ((b & 0x80) != 0);
 	a_Value = Value;
 	return true;
 }
@@ -446,7 +451,8 @@ bool cByteBuffer::ReadVarInt64(UInt64 & a_Value)
 		ReadBuf(&b, 1);
 		Value = Value | ((static_cast<UInt64>(b & 0x7f)) << Shift);
 		Shift += 7;
-	} while ((b & 0x80) != 0);
+	}
+	while ((b & 0x80) != 0);
 	a_Value = Value;
 	return true;
 }
@@ -475,7 +481,7 @@ bool cByteBuffer::ReadVarUTF8String(AString & a_Value)
 	}
 	// "Convert" a UTF-8 encoded string into system-native char.
 	// This isn't great, better would be to use codecvt:
-	a_Value = { reinterpret_cast<const char *>(Buffer.data()), Buffer.size() };
+	a_Value = {reinterpret_cast<const char *>(Buffer.data()), Buffer.size()};
 	return true;
 }
 
@@ -490,10 +496,11 @@ bool cByteBuffer::ReadLEInt(int & a_Value)
 	NEEDBYTES(4);
 	ReadBuf(&a_Value, 4);
 
-	#ifdef IS_BIG_ENDIAN
-		// Convert:
-		a_Value = ((a_Value >> 24) & 0xff) | ((a_Value >> 16) & 0xff00) | ((a_Value >> 8) & 0xff0000) | (a_Value & 0xff000000);
-	#endif
+#ifdef IS_BIG_ENDIAN
+	// Convert:
+	a_Value =
+		((a_Value >> 24) & 0xff) | ((a_Value >> 16) & 0xff00) | ((a_Value >> 8) & 0xff0000) | (a_Value & 0xff000000);
+#endif
 
 	return true;
 }
@@ -513,13 +520,15 @@ bool cByteBuffer::ReadXYZPosition64(int & a_BlockX, int & a_BlockY, int & a_Bloc
 
 	// Convert the 64 received bits into 3 coords:
 	UInt32 BlockXRaw = (Value >> 38) & 0x03ffffff;  // Top 26 bits
-	UInt32 BlockYRaw = (Value >> 26) & 0x0fff;      // Middle 12 bits
-	UInt32 BlockZRaw = (Value & 0x03ffffff);        // Bottom 26 bits
+	UInt32 BlockYRaw = (Value >> 26) & 0x0fff;  // Middle 12 bits
+	UInt32 BlockZRaw = (Value & 0x03ffffff);  // Bottom 26 bits
 
 	// If the highest bit in the number's range is set, convert the number into negative:
-	a_BlockX = ((BlockXRaw & 0x02000000) == 0) ? static_cast<int>(BlockXRaw) : -(0x04000000 - static_cast<int>(BlockXRaw));
-	a_BlockY = ((BlockYRaw & 0x0800) == 0)     ? static_cast<int>(BlockYRaw) : -(0x01000    - static_cast<int>(BlockYRaw));
-	a_BlockZ = ((BlockZRaw & 0x02000000) == 0) ? static_cast<int>(BlockZRaw) : -(0x04000000 - static_cast<int>(BlockZRaw));
+	a_BlockX =
+		((BlockXRaw & 0x02000000) == 0) ? static_cast<int>(BlockXRaw) : -(0x04000000 - static_cast<int>(BlockXRaw));
+	a_BlockY = ((BlockYRaw & 0x0800) == 0) ? static_cast<int>(BlockYRaw) : -(0x01000 - static_cast<int>(BlockYRaw));
+	a_BlockZ =
+		((BlockZRaw & 0x02000000) == 0) ? static_cast<int>(BlockZRaw) : -(0x04000000 - static_cast<int>(BlockZRaw));
 	return true;
 }
 
@@ -548,12 +557,14 @@ bool cByteBuffer::ReadXZYPosition64(int & a_BlockX, int & a_BlockY, int & a_Bloc
 	// Convert the 64 received bits into 3 coords:
 	UInt32 BlockXRaw = (Value >> 38) & 0x03ffffff;  // Top 26 bits
 	UInt32 BlockZRaw = (Value >> 12) & 0x03ffffff;  // Middle 26 bits
-	UInt32 BlockYRaw = (Value & 0x0fff);            // Bottom 12 bits
+	UInt32 BlockYRaw = (Value & 0x0fff);  // Bottom 12 bits
 
 	// If the highest bit in the number's range is set, convert the number into negative:
-	a_BlockX = ((BlockXRaw & 0x02000000) == 0) ? static_cast<int>(BlockXRaw) : (static_cast<int>(BlockXRaw) - 0x04000000);
-	a_BlockY = ((BlockYRaw & 0x0800)     == 0) ? static_cast<int>(BlockYRaw) : (static_cast<int>(BlockYRaw) - 0x01000);
-	a_BlockZ = ((BlockZRaw & 0x02000000) == 0) ? static_cast<int>(BlockZRaw) : (static_cast<int>(BlockZRaw) - 0x04000000);
+	a_BlockX =
+		((BlockXRaw & 0x02000000) == 0) ? static_cast<int>(BlockXRaw) : (static_cast<int>(BlockXRaw) - 0x04000000);
+	a_BlockY = ((BlockYRaw & 0x0800) == 0) ? static_cast<int>(BlockYRaw) : (static_cast<int>(BlockYRaw) - 0x01000);
+	a_BlockZ =
+		((BlockZRaw & 0x02000000) == 0) ? static_cast<int>(BlockZRaw) : (static_cast<int>(BlockZRaw) - 0x04000000);
 	return true;
 }
 
@@ -755,7 +766,8 @@ bool cByteBuffer::WriteVarInt32(UInt32 a_Value)
 		b[idx] = (a_Value & 0x7f) | ((a_Value > 0x7f) ? 0x80 : 0x00);
 		a_Value = a_Value >> 7;
 		idx++;
-	} while (a_Value > 0);
+	}
+	while (a_Value > 0);
 
 	return WriteBuf(b, idx);
 }
@@ -777,7 +789,8 @@ bool cByteBuffer::WriteVarInt64(UInt64 a_Value)
 		b[idx] = (a_Value & 0x7f) | ((a_Value > 0x7f) ? 0x80 : 0x00);
 		a_Value = a_Value >> 7;
 		idx++;
-	} while (a_Value > 0);
+	}
+	while (a_Value > 0);
 
 	return WriteBuf(b, idx);
 }
@@ -808,8 +821,7 @@ bool cByteBuffer::WriteXYZPosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_Blo
 	CHECK_THREAD
 	CheckValid();
 	return WriteBEUInt64(
-		((static_cast<UInt64>(a_BlockX) & 0x3FFFFFF) << 38) |
-		((static_cast<UInt64>(a_BlockY) & 0xFFF) << 26) |
+		((static_cast<UInt64>(a_BlockX) & 0x3FFFFFF) << 38) | ((static_cast<UInt64>(a_BlockY) & 0xFFF) << 26) |
 		(static_cast<UInt64>(a_BlockZ) & 0x3FFFFFF)
 	);
 }
@@ -823,8 +835,7 @@ bool cByteBuffer::WriteXZYPosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_Blo
 	CHECK_THREAD
 	CheckValid();
 	return WriteBEUInt64(
-		((static_cast<UInt64>(a_BlockX) & 0x3FFFFFF) << 38) |
-		((static_cast<UInt64>(a_BlockZ) & 0x3FFFFFF) << 12) |
+		((static_cast<UInt64>(a_BlockX) & 0x3FFFFFF) << 38) | ((static_cast<UInt64>(a_BlockZ) & 0x3FFFFFF) << 12) |
 		(static_cast<UInt64>(a_BlockY) & 0xFFF)
 	);
 }
@@ -1088,7 +1099,8 @@ size_t cByteBuffer::GetVarIntSize(UInt32 a_Value)
 		// If the value cannot be expressed in 7 bits, it needs to take up another byte
 		Count++;
 		a_Value >>= 7;
-	} while (a_Value != 0);
+	}
+	while (a_Value != 0);
 
 	return Count;
 }

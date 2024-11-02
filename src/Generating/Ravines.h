@@ -15,16 +15,14 @@
 
 
 
-class cStructGenRavines:
-	public cGridStructGen
+class cStructGenRavines : public cGridStructGen
 {
 	using Super = cGridStructGen;
 
-public:
-
+  public:
 	cStructGenRavines(int a_Seed, int a_Size);
 
-protected:
+  protected:
 	class cRavine;  // fwd: Ravines.cpp
 
 	int m_Size;  // Max size, in blocks, of the ravines generated
@@ -32,7 +30,4 @@ protected:
 
 	// cGridStructGen overrides:
 	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override;
-} ;
-
-
-
+};

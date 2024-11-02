@@ -32,7 +32,7 @@ stays valid but doesn't call into Lua code anymore, returning false for "failure
 
 extern "C"
 {
-	#include "lua/src/lauxlib.h"
+#include "lua/src/lauxlib.h"
 }
 
 #include "../Defines.h"
@@ -54,65 +54,70 @@ class cDeadlockDetect;
 /** Encapsulates a Lua state and provides some syntactic sugar for common operations */
 class cLuaState
 {
-public:
-
-	#ifndef NDEBUG
-		/** Asserts that the Lua stack has the same amount of entries when this object is destructed, as when it was constructed.
-		Used for checking functions that should preserve Lua stack balance. */
-		class cStackBalanceCheck
+  public:
+#ifndef NDEBUG
+	/** Asserts that the Lua stack has the same amount of entries when this object is destructed, as when it was
+	constructed. Used for checking functions that should preserve Lua stack balance. */
+	class cStackBalanceCheck
+	{
+	  public:
+		cStackBalanceCheck(
+			const char * a_FileName,
+			int a_LineNum,
+			lua_State * a_LuaState,
+			bool a_ShouldLogStack = true
+		) :
+			m_FileName(a_FileName), m_LineNum(a_LineNum), m_LuaState(a_LuaState), m_StackPos(lua_gettop(a_LuaState))
 		{
-		public:
-			cStackBalanceCheck(const char * a_FileName, int a_LineNum, lua_State * a_LuaState, bool a_ShouldLogStack = true):
-				m_FileName(a_FileName),
-				m_LineNum(a_LineNum),
-				m_LuaState(a_LuaState),
-				m_StackPos(lua_gettop(a_LuaState))
+			if (a_ShouldLogStack)
 			{
-				if (a_ShouldLogStack)
-				{
-					// DEBUG: If an unbalanced stack is reported, uncommenting the next line can help debug the imbalance
-					// cLuaState::LogStackValues(a_LuaState, fmt::format(FMT_STRING("Started checking Lua stack balance, currently {} items:"), m_StackPos).c_str());
-					// Since LogStackValues() itself uses the balance check, we must not call it recursively
-				}
+				// DEBUG: If an unbalanced stack is reported, uncommenting the next line can help debug the imbalance
+				// cLuaState::LogStackValues(a_LuaState, fmt::format(FMT_STRING("Started checking Lua stack balance,
+				// currently {} items:"), m_StackPos).c_str()); Since LogStackValues() itself uses the balance check, we
+				// must not call it recursively
 			}
+		}
 
-			~cStackBalanceCheck() noexcept(false)
+		~cStackBalanceCheck() noexcept(false)
+		{
+			auto currStackPos = lua_gettop(m_LuaState);
+			if (currStackPos != m_StackPos)
 			{
-				auto currStackPos = lua_gettop(m_LuaState);
-				if (currStackPos != m_StackPos)
-				{
-					LOGD("Lua stack not balanced. Expected %d items, found %d items. Stack watching started in %s:%d",
-						m_StackPos, currStackPos,
-						m_FileName.c_str(), m_LineNum
-					);
-					cLuaState::LogStackValues(m_LuaState);
-					ASSERT(!"Lua stack unbalanced");  // If this assert fires, the Lua stack is inbalanced, check the callstack / m_FileName / m_LineNum
-				}
+				LOGD(
+					"Lua stack not balanced. Expected %d items, found %d items. Stack watching started in %s:%d",
+					m_StackPos,
+					currStackPos,
+					m_FileName.c_str(),
+					m_LineNum
+				);
+				cLuaState::LogStackValues(m_LuaState);
+				ASSERT(!"Lua stack unbalanced"
+				);  // If this assert fires, the Lua stack is inbalanced, check the callstack / m_FileName / m_LineNum
 			}
+		}
 
-		protected:
-			const AString m_FileName;
-			int m_LineNum;
-			lua_State * m_LuaState;
-			int m_StackPos;
-		};
+	  protected:
+		const AString m_FileName;
+		int m_LineNum;
+		lua_State * m_LuaState;
+		int m_StackPos;
+	};
 
-		#define STRINGIFY2(X, Y) X##Y
-		#define STRINGIFY(X, Y) STRINGIFY2(X, Y)
-		#define ASSERT_LUA_STACK_BALANCE(...) cStackBalanceCheck STRINGIFY(Check, __COUNTER__)(__FILE__, __LINE__, __VA_ARGS__)
-	#else
-		#define ASSERT_LUA_STACK_BALANCE(...)
-	#endif
+#define STRINGIFY2(X, Y) X##Y
+#define STRINGIFY(X, Y) STRINGIFY2(X, Y)
+#define ASSERT_LUA_STACK_BALANCE(...) cStackBalanceCheck STRINGIFY(Check, __COUNTER__)(__FILE__, __LINE__, __VA_ARGS__)
+#else
+#define ASSERT_LUA_STACK_BALANCE(...)
+#endif
 
 
-	/** Makes sure that the Lua state's stack has the same number of elements on destruction as it had on construction of this object (RAII).
-	Can only remove elements, if there are less than expected, throws. */
+	/** Makes sure that the Lua state's stack has the same number of elements on destruction as it had on construction
+	of this object (RAII). Can only remove elements, if there are less than expected, throws. */
 	class cStackBalancePopper
 	{
-	public:
-		cStackBalancePopper(cLuaState & a_LuaState):
-			m_LuaState(a_LuaState),
-			m_Count(lua_gettop(a_LuaState))
+	  public:
+		cStackBalancePopper(cLuaState & a_LuaState) :
+			m_LuaState(a_LuaState), m_Count(lua_gettop(a_LuaState))
 		{
 		}
 
@@ -122,33 +127,49 @@ public:
 			if (curTop > m_Count)
 			{
 				// There are some leftover elements, adjust the stack:
-				m_LuaState.LogStackValues(fmt::format(FMT_STRING("Re-balancing Lua stack, expected {} values, got {}:"), m_Count, curTop).c_str());
+				m_LuaState.LogStackValues(
+					fmt::format(FMT_STRING("Re-balancing Lua stack, expected {} values, got {}:"), m_Count, curTop)
+						.c_str()
+				);
 				lua_pop(m_LuaState, curTop - m_Count);
 			}
 			else if (curTop < m_Count)
 			{
-				// This is an irrecoverable error, rather than letting the Lua engine crash undefinedly later on, abort now:
-				LOGERROR("Unable to re-balance Lua stack, there are elements missing. Expected at least %d elements, got %d.", m_Count, curTop);
-				throw std::runtime_error(fmt::format(FMT_STRING("Unable to re-balance Lua stack, there are elements missing. Expected at least {} elements, got {}."), m_Count, curTop));
+				// This is an irrecoverable error, rather than letting the Lua engine crash undefinedly later on, abort
+				// now:
+				LOGERROR(
+					"Unable to re-balance Lua stack, there are elements missing. Expected at least %d elements, got "
+					"%d.",
+					m_Count,
+					curTop
+				);
+				throw std::runtime_error(fmt::format(
+					FMT_STRING("Unable to re-balance Lua stack, there are elements missing. Expected at least {} "
+							   "elements, got {}."),
+					m_Count,
+					curTop
+				));
 			}
 		}
 
-	protected:
+	  protected:
 		cLuaState & m_LuaState;
 		int m_Count;
 	};
 
 
 	/** Provides a RAII-style locking for the LuaState.
-	Used mainly by the cPluginLua internals to provide the actual locking for interface operations, such as callbacks. */
+	Used mainly by the cPluginLua internals to provide the actual locking for interface operations, such as callbacks.
+  */
 	class cLock
 	{
-	public:
-		cLock(cLuaState & a_LuaState):
+	  public:
+		cLock(cLuaState & a_LuaState) :
 			m_Lock(a_LuaState.m_CS)
 		{
 		}
-	protected:
+
+	  protected:
 		cCSLock m_Lock;
 	};
 
@@ -158,7 +179,7 @@ public:
 	The reference can also be reset by calling RefStack(). */
 	class cRef
 	{
-	public:
+	  public:
 		/** Creates an unbound reference object. */
 		cRef(void);
 
@@ -179,7 +200,7 @@ public:
 		void UnRef(void);
 
 		/** Returns true if the reference is valid */
-		bool IsValid(void) const {return (m_Ref != LUA_REFNIL); }
+		bool IsValid(void) const { return (m_Ref != LUA_REFNIL); }
 
 		/** Allows to use this class wherever an int (i. e. ref) is to be used */
 		explicit operator int(void) const { return m_Ref; }
@@ -188,7 +209,8 @@ public:
 		lua_State * GetLuaState(void) { return m_LuaState; }
 
 		/** Creates a Lua reference to the specified object instance in the specified Lua state.
-		This is useful to make anti-GC references for objects that were created by Lua and need to stay alive longer than Lua GC would normally guarantee. */
+		This is useful to make anti-GC references for objects that were created by Lua and need to stay alive longer
+		than Lua GC would normally guarantee. */
 		template <typename T> void CreateFromObject(cLuaState & a_LuaState, T && a_Object)
 		{
 			a_LuaState.Push(std::forward<T>(a_Object));
@@ -196,13 +218,13 @@ public:
 			a_LuaState.Pop();
 		}
 
-	protected:
+	  protected:
 		lua_State * m_LuaState;
 		int m_Ref;
 
 		// Remove the copy-constructor:
 		cRef(const cRef &) = delete;
-	} ;
+	};
 
 
 	/** Represents a reference to a Lua object that has a tracked lifetime -
@@ -215,14 +237,12 @@ public:
 	class cTrackedRef
 	{
 		friend class ::cLuaState;
-	public:
+
+	  public:
 		/** Creates an unbound ref instance. */
 		cTrackedRef(void);
 
-		~cTrackedRef()
-		{
-			Clear();
-		}
+		~cTrackedRef() { Clear(); }
 
 		/** Set the contained reference to the object at the specified Lua state's stack position.
 		If another reference has been previously contained, it is Clear()-ed first. */
@@ -233,15 +253,17 @@ public:
 		void Clear(void);
 
 		/** Returns true if the contained reference is valid.
-		(Note that depending on this value is not thread-safe, another thread may invalidate the ref in the meantime. It is meant for quick ASSERTs only). */
+		(Note that depending on this value is not thread-safe, another thread may invalidate the ref in the meantime. It
+		is meant for quick ASSERTs only). */
 		bool IsValid(void);
 
 		/** Returns true if the reference resides in the specified Lua state.
 		Internally, compares the reference's canon Lua state.
-		(Note that depending on this value is not thread-safe, another thread may modify the ref in the meantime. It is meant for quick ASSERTs only). */
+		(Note that depending on this value is not thread-safe, another thread may modify the ref in the meantime. It is
+		meant for quick ASSERTs only). */
 		bool IsSameLuaState(cLuaState & a_LuaState);
 
-	protected:
+	  protected:
 		friend class cLuaState;
 
 		/** The mutex protecting m_Ref against multithreaded access.
@@ -280,20 +302,17 @@ public:
 	with a cCallbackPtr. Note that instances of this class are tracked in the canon LuaState instance, so that
 	they can be invalidated when the LuaState is unloaded; due to multithreading issues they can only be tracked
 	by-ptr, which has an unfortunate effect of disabling the copy and move constructors. */
-	class cCallback:
-		public cTrackedRef
+	class cCallback : public cTrackedRef
 	{
 		using Super = cTrackedRef;
 
-	public:
-
+	  public:
 		cCallback(void) {}
 
 		/** Calls the Lua callback, if still available.
 		Returns true if callback has been called.
 		Returns false if the Lua state isn't valid anymore. */
-		template <typename... Args>
-		bool Call(Args &&... args)
+		template <typename... Args> bool Call(Args &&... args)
 		{
 			auto cs = m_CS.load();
 			if (cs == nullptr)
@@ -313,8 +332,7 @@ public:
 		Returns true on success, false on failure (not a function at the specified stack pos). */
 		bool RefStack(cLuaState & a_LuaState, int a_StackPos);
 
-	protected:
-
+	  protected:
 		/** This class cannot be copied, because it is tracked in the LuaState by-ptr.
 		Use cCallbackPtr for a copyable object. */
 		cCallback(const cCallback &) = delete;
@@ -329,13 +347,11 @@ public:
 
 	/** Same thing as cCallback, but GetStackValue() won't fail if the callback value is nil.
 	Used for callbacks that are optional - they needn't be present and in such a case they won't get called. */
-	class cOptionalCallback:
-		public cCallback
+	class cOptionalCallback : public cCallback
 	{
 		using Super = cCallback;
 
-	public:
-
+	  public:
 		cOptionalCallback(void) {}
 
 		/** Set the contained callback to the function in the specified Lua state's stack position.
@@ -343,8 +359,7 @@ public:
 		Returns true on success, false on failure (not a function at the specified stack pos). */
 		bool RefStack(cLuaState & a_LuaState, int a_StackPos);
 
-	protected:
-
+	  protected:
 		/** This class cannot be copied, because it is tracked in the LuaState by-ptr.
 		Use cCallbackPtr for a copyable object. */
 		cOptionalCallback(const cOptionalCallback &) = delete;
@@ -364,19 +379,17 @@ public:
 	Note that instances of this class are tracked in the canon LuaState instance, so that they can be
 	invalidated when the LuaState is unloaded; due to multithreading issues they can only be tracked by-ptr,
 	which has an unfortunate effect of disabling the copy and move constructors. */
-	class cTableRef:
-		public cTrackedRef
+	class cTableRef : public cTrackedRef
 	{
 		using Super = cTrackedRef;
 
-	public:
+	  public:
 		cTableRef(void) {}
 
 		/** Calls the Lua function stored under the specified name in the referenced table, if still available.
 		Returns true if callback has been called.
 		Returns false if the Lua state isn't valid anymore, or the function doesn't exist. */
-		template <typename... Args>
-		bool CallTableFn(const char * a_FnName, Args &&... args)
+		template <typename... Args> bool CallTableFn(const char * a_FnName, Args &&... args)
 		{
 			auto cs = m_CS.load();
 			if (cs == nullptr)
@@ -395,8 +408,7 @@ public:
 		A "self" parameter is injected in front of all the given parameters and is set to the callback table.
 		Returns true if callback has been called.
 		Returns false if the Lua state isn't valid anymore, or the function doesn't exist. */
-		template <typename... Args>
-		bool CallTableFnWithSelf(const char * a_FnName, Args &&... args)
+		template <typename... Args> bool CallTableFnWithSelf(const char * a_FnName, Args &&... args)
 		{
 			auto cs = m_CS.load();
 			if (cs == nullptr)
@@ -419,21 +431,21 @@ public:
 	typedef std::unique_ptr<cTableRef> cTableRefPtr;
 
 
-	/** Represents a parameter that is optional - calling a GetStackValue() with this object will not fail if the value on the Lua stack is nil.
-	Note that the GetStackValue() will still fail if the param is present but of a different type.
-	The class itself is just a marker so that the template magic will select the correct GetStackValue() overload. */
-	template <typename T>
-	class cOptionalParam
+	/** Represents a parameter that is optional - calling a GetStackValue() with this object will not fail if the value
+	on the Lua stack is nil. Note that the GetStackValue() will still fail if the param is present but of a different
+	type. The class itself is just a marker so that the template magic will select the correct GetStackValue() overload.
+  */
+	template <typename T> class cOptionalParam
 	{
-	public:
-		explicit cOptionalParam(T & a_Dest):
+	  public:
+		explicit cOptionalParam(T & a_Dest) :
 			m_Dest(a_Dest)
 		{
 		}
 
 		T & GetDest(void) { return m_Dest; }
 
-	protected:
+	  protected:
 		T & m_Dest;
 	};
 
@@ -441,7 +453,7 @@ public:
 	/** A dummy class that's used only to delimit function args from return values for cLuaState::Call() */
 	class cRet
 	{
-	} ;
+	};
 	static const cRet Return;  // Use this constant to delimit function args from return values for cLuaState::Call()
 
 
@@ -456,21 +468,20 @@ public:
 	Will pop the value off the stack in the destructor. */
 	class cStackValue
 	{
-	public:
-		cStackValue(void):
+	  public:
+		cStackValue(void) :
 			m_LuaState(nullptr)
 		{
 		}
 
-		cStackValue(cLuaState & a_LuaState):
+		cStackValue(cLuaState & a_LuaState) :
 			m_LuaState(a_LuaState)
 		{
 			m_StackLen = lua_gettop(a_LuaState);
 		}
 
-		cStackValue(cStackValue && a_Src):
-			m_LuaState(nullptr),
-			m_StackLen(-1)
+		cStackValue(cStackValue && a_Src) :
+			m_LuaState(nullptr), m_StackLen(-1)
 		{
 			std::swap(m_LuaState, a_Src.m_LuaState);
 			std::swap(m_StackLen, a_Src.m_StackLen);
@@ -491,12 +502,9 @@ public:
 			m_StackLen = lua_gettop(a_LuaState);
 		}
 
-		bool IsValid(void) const
-		{
-			return (m_LuaState != nullptr);
-		}
+		bool IsValid(void) const { return (m_LuaState != nullptr); }
 
-	protected:
+	  protected:
 		lua_State * m_LuaState;
 
 		/** Used for debugging, Lua state's stack size is checked against this number to make sure
@@ -514,7 +522,7 @@ public:
 	used for immediate queries in API bindings. */
 	class cStackTable
 	{
-	public:
+	  public:
 		cStackTable(cLuaState & a_LuaState, int a_StackPos);
 
 		/** Iterates over all array elements in the table consecutively and calls the a_ElementCallback for each.
@@ -532,7 +540,7 @@ public:
 
 		cLuaState & GetLuaState(void) const { return m_LuaState; }
 
-	protected:
+	  protected:
 		/** The Lua state in which the table resides. */
 		cLuaState & m_LuaState;
 
@@ -556,7 +564,7 @@ public:
 	~cLuaState();
 
 	/** Allows this object to be used in the same way as a lua_State *, for example in the LuaLib functions */
-	operator lua_State * (void) { return m_LuaState; }
+	operator lua_State *(void) { return m_LuaState; }
 
 	/** Creates the m_LuaState, if not created already.
 	This state will be automatically closed in the destructor.
@@ -570,7 +578,8 @@ public:
 	/** Closes the m_LuaState, if not closed already */
 	void Close(void);
 
-	/** Attaches the specified state. Operations will be carried out on this state, but it will not be closed in the destructor */
+	/** Attaches the specified state. Operations will be carried out on this state, but it will not be closed in the
+	 * destructor */
 	void Attach(lua_State * a_State);
 
 	/** Detaches a previously attached state. */
@@ -670,7 +679,10 @@ public:
 	template <class T, typename = std::enable_if_t<std::is_integral_v<T>>>
 	bool GetStackValue(int a_StackPos, T & a_ReturnedVal)
 	{
-		if (!lua_isnumber(m_LuaState, a_StackPos))  // Also accepts strings representing a number: https://pgl.yoyo.org/luai/i/lua_isnumber
+		if (!lua_isnumber(
+				m_LuaState,
+				a_StackPos
+			))  // Also accepts strings representing a number: https://pgl.yoyo.org/luai/i/lua_isnumber
 		{
 			return false;
 		}
@@ -688,8 +700,7 @@ public:
 	}
 
 	/** Retrieves an optional value on the stack - doesn't fail if the stack contains nil instead of the value. */
-	template <typename T>
-	bool GetStackValue(int a_StackPos, cOptionalParam<T> && a_ReturnedVal)
+	template <typename T> bool GetStackValue(int a_StackPos, cOptionalParam<T> && a_ReturnedVal)
 	{
 		if (lua_isnoneornil(m_LuaState, a_StackPos))
 		{
@@ -699,8 +710,7 @@ public:
 	}
 
 	/** Retrieves any Vector3 value and coerces it into a Vector3<T>. */
-	template <typename T>
-	bool GetStackValue(int a_StackPos, Vector3<T> & a_ReturnedVal);
+	template <typename T> bool GetStackValue(int a_StackPos, Vector3<T> & a_ReturnedVal);
 
 	/** Pushes the named value in the table at the top of the stack.
 	a_Name may be a path containing multiple table levels, such as "cChatColor.Blue".
@@ -710,8 +720,8 @@ public:
 
 	/** Pushes the named value in the global table to the top of the stack.
 	a_Name may be a path containing multiple table levels, such as "cChatColor.Blue".
-	If the value is found in the global table, it is pushed to the top of the stack and the returned cStackValue is valid.
-	If the value is not found, the stack is unchanged and the returned cStackValue is invalid. */
+	If the value is found in the global table, it is pushed to the top of the stack and the returned cStackValue is
+	valid. If the value is not found, the stack is unchanged and the returned cStackValue is invalid. */
 	cStackValue WalkToNamedGlobal(const AString & a_Name);
 
 	/** Retrieves the named value in the table at the top of the Lua stack.
@@ -728,8 +738,8 @@ public:
 		return GetStackValue(-1, a_Value);
 	}
 
-	/** Retrieves the named global value. a_Name may be a path containing multiple table levels, such as "_G.cChatColor.Blue".
-	Returns true if the value was successfully retrieved, false on error. */
+	/** Retrieves the named global value. a_Name may be a path containing multiple table levels, such as
+	"_G.cChatColor.Blue". Returns true if the value was successfully retrieved, false on error. */
 	template <typename T> bool GetNamedGlobal(const AString & a_Name, T & a_Value)
 	{
 		// Push the globals table onto the stack and make it RAII-removed:
@@ -740,15 +750,14 @@ public:
 		return GetNamedValue(a_Name, a_Value);
 	}
 
-	// Include the auto-generated Push and GetStackValue() functions:
-	#include "LuaState_Declaration.inc"
+// Include the auto-generated Push and GetStackValue() functions:
+#include "LuaState_Declaration.inc"
 
 	/** Call the specified Lua function.
 	Returns true if call succeeded, false if there was an error.
 	A special param of cRet & signifies the end of param list and the start of return values.
 	Example call: Call(Fn, Param1, Param2, Param3, cLuaState::Return, Ret1, Ret2) */
-	template <typename FnT, typename... Args>
-	bool Call(const FnT & a_Function, Args &&... args)
+	template <typename FnT, typename... Args> bool Call(const FnT & a_Function, Args &&... args)
 	{
 		cStackBalancePopper balancer(*this);
 		m_NumCurrentFunctionArgs = -1;
@@ -772,10 +781,12 @@ public:
 		return GetStackValues(a_StartStackPos + 1, std::forward<Args>(args)...);
 	}
 
-	/** Returns true if the specified parameters on the stack are of the specified usertable type; also logs warning if not. Used for static functions */
+	/** Returns true if the specified parameters on the stack are of the specified usertable type; also logs warning if
+	 * not. Used for static functions */
 	bool CheckParamUserTable(int a_StartParam, const char * a_UserTable, int a_EndParam = -1);
 
-	/** Returns true if the specified parameters on the stack are of the specified usertype; also logs warning if not. Used for regular functions */
+	/** Returns true if the specified parameters on the stack are of the specified usertype; also logs warning if not.
+	 * Used for regular functions */
 	bool CheckParamUserType(int a_StartParam, const char * a_UserType, int a_EndParam = -1);
 
 	/** Returns true if the specified parameters on the stack are tables; also logs warning if not */
@@ -836,9 +847,9 @@ public:
 	/** Logs all items in the current stack trace to the server console */
 	static void LogStackTrace(lua_State * a_LuaState, int a_StartingDepth = 0);
 
-	/** Prints the message, prefixed with the current function name, then logs the stack contents and raises a Lua error.
-	To be used for bindings when they detect bad parameters.
-	Doesn't return, but a dummy return type is provided so that Lua API functions may do "return ApiParamError(...)". */
+	/** Prints the message, prefixed with the current function name, then logs the stack contents and raises a Lua
+	error. To be used for bindings when they detect bad parameters. Doesn't return, but a dummy return type is provided
+	so that Lua API functions may do "return ApiParamError(...)". */
 	int ApiParamError(std::string_view a_Msg);
 
 	/** Returns the type of the item on the specified position in the stack */
@@ -856,20 +867,20 @@ public:
 
 	/** Copies objects on the stack from the specified state.
 	Only numbers, bools, strings, API classes and simple tables containing these (recursively) are copied.
-	a_NumAllowedNestingLevels specifies how many table nesting levels are allowed, copying fails if there's a deeper table.
-	If successful, returns the number of objects copied.
-	If failed, returns a negative number and rewinds the stack position. */
+	a_NumAllowedNestingLevels specifies how many table nesting levels are allowed, copying fails if there's a deeper
+	table. If successful, returns the number of objects copied. If failed, returns a negative number and rewinds the
+	stack position. */
 	int CopyStackFrom(cLuaState & a_SrcLuaState, int a_SrcStart, int a_SrcEnd, int a_NumAllowedNestingLevels = 16);
 
 	/** Copies a table at the specified stack index of the source Lua state to the top of this Lua state's stack.
-	a_NumAllowedNestingLevels specifies how many table nesting levels are allowed, copying fails if there's a deeper table.
-	Returns true if successful, false on failure.
-	Can copy only simple values - numbers, bools, strings and recursively simple tables. */
+	a_NumAllowedNestingLevels specifies how many table nesting levels are allowed, copying fails if there's a deeper
+	table. Returns true if successful, false on failure. Can copy only simple values - numbers, bools, strings and
+	recursively simple tables. */
 	bool CopyTableFrom(cLuaState & a_SrcLuaState, int a_TableIdx, int a_NumAllowedNestingLevels);
 
-	/** Copies a single value from the specified stack index of the source Lua state to the top of this Lua state's stack.
-	a_NumAllowedNestingLevels specifies how many table nesting levels are allowed, copying fails if there's a deeper table.
-	Returns true if the value was copied, false on failure. */
+	/** Copies a single value from the specified stack index of the source Lua state to the top of this Lua state's
+	stack. a_NumAllowedNestingLevels specifies how many table nesting levels are allowed, copying fails if there's a
+	deeper table. Returns true if the value was copied, false on failure. */
 	bool CopySingleValueFrom(cLuaState & a_SrcLuaState, int a_StackIdx, int a_NumAllowedNestingLevels);
 
 	/** Reads the value at the specified stack position as a string and sets it to a_String. */
@@ -881,8 +892,8 @@ public:
 	/** Logs all the elements' types on the API stack, with an optional header for the listing. */
 	static void LogStackValues(lua_State * a_LuaState, const char * a_Header = nullptr);
 
-	/** Returns the canon Lua state (the primary cLuaState instance that was used to create, rather than attach, the lua_State structure).
-	Returns nullptr if the canon Lua state cannot be queried. */
+	/** Returns the canon Lua state (the primary cLuaState instance that was used to create, rather than attach, the
+	lua_State structure). Returns nullptr if the canon Lua state cannot be queried. */
 	cLuaState * QueryCanonLuaState(void) const;
 
 	/** Outputs to log a warning about API call being unable to read its parameters from the stack,
@@ -895,8 +906,7 @@ public:
 	/** Removes this object's CS from the DeadlockDetect's tracked CSs. */
 	void UntrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect);
 
-protected:
-
+  protected:
 	cCriticalSection m_CS;
 
 	lua_State * m_LuaState;
@@ -927,8 +937,7 @@ protected:
 	Returns true if call succeeded, false if there was an error (not a table ref, function name not found).
 	A special param of cRet & signifies the end of param list and the start of return values.
 	Example call: CallTableFn(TableRef, "FnName", Param1, Param2, Param3, cLuaState::Return, Ret1, Ret2) */
-	template <typename... Args>
-	bool CallTableFn(const cRef & a_TableRef, const char * a_FnName, Args &&... args)
+	template <typename... Args> bool CallTableFn(const cRef & a_TableRef, const char * a_FnName, Args &&... args)
 	{
 		if (!PushFunction(a_TableRef, a_FnName))
 		{
@@ -939,24 +948,21 @@ protected:
 	}
 
 	/** Variadic template terminator: If there's nothing more to push / pop, just call the function.
-	Note that there are no return values either, because those are prefixed by a cRet value, so the arg list is never empty. */
-	bool PushCallPop(void)
-	{
-		return CallFunction(0);
-	}
+	Note that there are no return values either, because those are prefixed by a cRet value, so the arg list is never
+	empty. */
+	bool PushCallPop(void) { return CallFunction(0); }
 
 	/** Variadic template recursor: More params to push. Push them and recurse. */
-	template <typename T, typename... Args>
-	inline bool PushCallPop(T && a_Param, Args &&... args)
+	template <typename T, typename... Args> inline bool PushCallPop(T && a_Param, Args &&... args)
 	{
 		Push(std::forward<T>(a_Param));
 		m_NumCurrentFunctionArgs += 1;
 		return PushCallPop(std::forward<Args>(args)...);
 	}
 
-	/** Variadic template terminator: If there's nothing more to push, but return values to collect, call the function and collect the returns. */
-	template <typename... Args>
-	bool PushCallPop(cLuaState::cRet, Args &&... args)
+	/** Variadic template terminator: If there's nothing more to push, but return values to collect, call the function
+	 * and collect the returns. */
+	template <typename... Args> bool PushCallPop(cLuaState::cRet, Args &&... args)
 	{
 		// Calculate the number of return values (number of args left):
 		int NumReturns = sizeof...(args);
@@ -976,12 +982,10 @@ protected:
 	}
 
 	/** Variadic template terminator: If there are no more values to get, bail out.
-	This function is not available in the public API, because it's an error to request no values directly; only internal functions can do that.
-	If you get a compile error saying this function is not accessible, check your calling code, you aren't reading any stack values. */
-	bool GetStackValues(int a_StartingStackPos)
-	{
-		return true;
-	}
+	This function is not available in the public API, because it's an error to request no values directly; only internal
+	functions can do that. If you get a compile error saying this function is not accessible, check your calling code,
+	you aren't reading any stack values. */
+	bool GetStackValues(int a_StartingStackPos) { return true; }
 
 	/** Pushes the function of the specified name onto the stack.
 	Returns true if successful. Logs a warning on failure (incl. m_SubsystemName)
@@ -1038,7 +1042,7 @@ extern template bool cLuaState::GetStackValue(int a_StackPos, Vector3i & a_Retur
 Can query each for the amount of currently used memory. */
 class cLuaStateTracker
 {
-public:
+  public:
 	/** Adds the specified Lua state to the internal list of LuaStates. */
 	static void Add(cLuaState & a_LuaState);
 
@@ -1048,7 +1052,7 @@ public:
 	/** Returns the statistics for all the registered LuaStates. */
 	static AString GetStats(void);
 
-protected:
+  protected:
 	typedef cLuaState * cLuaStatePtr;
 	typedef std::vector<cLuaStatePtr> cLuaStatePtrs;
 
@@ -1063,7 +1067,3 @@ protected:
 	/** Returns the single instance of this class. */
 	static cLuaStateTracker & Get(void);
 };
-
-
-
-

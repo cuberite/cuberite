@@ -54,7 +54,7 @@ void cAesCfb128Decryptor::Init(const Byte a_Key[16], const Byte a_IV[16])
 	} Key;
 
 	const DWORD Mode = CRYPT_MODE_CFB;
-	Key.Header = { PLAINTEXTKEYBLOB, CUR_BLOB_VERSION, 0, CALG_AES_128 };
+	Key.Header = {PLAINTEXTKEYBLOB, CUR_BLOB_VERSION, 0, CALG_AES_128};
 	Key.Length = 16;
 	std::copy_n(a_Key, 16, Key.Key);
 
@@ -83,6 +83,13 @@ void cAesCfb128Decryptor::ProcessData(std::byte * const a_EncryptedIn, const siz
 	DWORD Length = static_cast<DWORD>(a_Length);
 	CryptDecrypt(m_Key, 0, FALSE, 0, reinterpret_cast<BYTE *>(a_EncryptedIn), &Length);
 #else
-	mbedtls_aes_crypt_cfb8(&m_Aes, MBEDTLS_AES_DECRYPT, a_Length, m_IV, reinterpret_cast<unsigned char *>(a_EncryptedIn), reinterpret_cast<unsigned char *>(a_EncryptedIn));
+	mbedtls_aes_crypt_cfb8(
+		&m_Aes,
+		MBEDTLS_AES_DECRYPT,
+		a_Length,
+		m_IV,
+		reinterpret_cast<unsigned char *>(a_EncryptedIn),
+		reinterpret_cast<unsigned char *>(a_EncryptedIn)
+	);
 #endif
 }

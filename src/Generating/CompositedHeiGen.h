@@ -1,8 +1,9 @@
 
 // CompositedHeiGen.h
 
-// Declares the cCompositedHeiGen class representing a cTerrainHeightGen descendant that calculates heightmap of the composited terrain
-// This is used to further cache heightmaps for chunks already generated for finishers that require only heightmap information
+// Declares the cCompositedHeiGen class representing a cTerrainHeightGen descendant that calculates heightmap of the
+// composited terrain This is used to further cache heightmaps for chunks already generated for finishers that require
+// only heightmap information
 
 
 
@@ -16,14 +17,15 @@
 
 
 
-class cCompositedHeiGen:
-	public cTerrainHeightGen
+class cCompositedHeiGen : public cTerrainHeightGen
 {
-public:
-	cCompositedHeiGen(cBiomeGen & a_BiomeGen, cTerrainShapeGen & a_ShapeGen, cTerrainCompositionGen & a_CompositionGen):
-		m_BiomeGen(a_BiomeGen),
-		m_ShapeGen(a_ShapeGen),
-		m_CompositionGen(a_CompositionGen)
+  public:
+	cCompositedHeiGen(
+		cBiomeGen & a_BiomeGen,
+		cTerrainShapeGen & a_ShapeGen,
+		cTerrainCompositionGen & a_CompositionGen
+	) :
+		m_BiomeGen(a_BiomeGen), m_ShapeGen(a_ShapeGen), m_CompositionGen(a_CompositionGen)
 	{
 	}
 
@@ -41,7 +43,7 @@ public:
 		memcpy(a_HeightMap, desc.GetHeightMap(), sizeof(a_HeightMap));
 	}
 
-protected:
+  protected:
 	cBiomeGen & m_BiomeGen;
 	cTerrainShapeGen & m_ShapeGen;
 	cTerrainCompositionGen & m_CompositionGen;

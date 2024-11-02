@@ -12,10 +12,10 @@
 
 
 cSslHTTPServerConnection::cSslHTTPServerConnection(
-	cHTTPServer & a_HTTPServer, const std::shared_ptr<const cSslConfig> & a_Config
-):
-	Super(a_HTTPServer),
-	m_Ssl(64000)
+	cHTTPServer & a_HTTPServer,
+	const std::shared_ptr<const cSslConfig> & a_Config
+) :
+	Super(a_HTTPServer), m_Ssl(64000)
 {
 	if (a_Config != nullptr)
 	{
@@ -115,7 +115,3 @@ void cSslHTTPServerConnection::SendData(const void * a_Data, size_t a_Size)
 		}
 	}
 }
-
-
-
-

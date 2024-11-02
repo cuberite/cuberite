@@ -11,9 +11,7 @@
 
 
 
-cLuaChunkStay::cLuaChunkStay()
-{
-}
+cLuaChunkStay::cLuaChunkStay() {}
 
 
 
@@ -25,12 +23,16 @@ bool cLuaChunkStay::AddChunks(const cLuaState::cStackTable & a_ChunkCoordsTable)
 	ASSERT(m_Chunks.empty());
 
 	// Add each set of coords:
-	a_ChunkCoordsTable.ForEachArrayElement([=](cLuaState & a_LuaState, int a_Index)
+	a_ChunkCoordsTable.ForEachArrayElement(
+		[=](cLuaState & a_LuaState, int a_Index)
 		{
 			if (!lua_istable(a_LuaState, -1))
 			{
-				LOGWARNING("%s: Element #%d is not a table (got %s). Ignoring the element.",
-					__FUNCTION__, a_Index, lua_typename(a_LuaState, -1)
+				LOGWARNING(
+					"%s: Element #%d is not a table (got %s). Ignoring the element.",
+					__FUNCTION__,
+					a_Index,
+					lua_typename(a_LuaState, -1)
 				);
 				a_LuaState.LogStackTrace();
 				lua_pop(a_LuaState, 1);
@@ -63,8 +65,11 @@ void cLuaChunkStay::AddChunkCoord(cLuaState & L, int a_Index)
 	int NumCoords = luaL_getn(L, -1);
 	if (NumCoords != 2)
 	{
-		LOGWARNING("%s: Element #%d doesn't contain 2 coords (got %d). Ignoring the element.",
-			__FUNCTION__, a_Index, NumCoords
+		LOGWARNING(
+			"%s: Element #%d doesn't contain 2 coords (got %d). Ignoring the element.",
+			__FUNCTION__,
+			a_Index,
+			NumCoords
 		);
 		return;
 	}
@@ -81,9 +86,7 @@ void cLuaChunkStay::AddChunkCoord(cLuaState & L, int a_Index)
 	{
 		if ((itr->m_ChunkX == ChunkX) && (itr->m_ChunkZ == ChunkZ))
 		{
-			LOGWARNING("%s: Element #%d is a duplicate, ignoring it.",
-				__FUNCTION__, a_Index
-			);
+			LOGWARNING("%s: Element #%d is a duplicate, ignoring it.", __FUNCTION__, a_Index);
 			return;
 		}
 	}  // for itr - m_Chunks[]
@@ -95,7 +98,11 @@ void cLuaChunkStay::AddChunkCoord(cLuaState & L, int a_Index)
 
 
 
-void cLuaChunkStay::Enable(cChunkMap & a_ChunkMap, cLuaState::cCallbackPtr a_OnChunkAvailable, cLuaState::cCallbackPtr a_OnAllChunksAvailable)
+void cLuaChunkStay::Enable(
+	cChunkMap & a_ChunkMap,
+	cLuaState::cCallbackPtr a_OnChunkAvailable,
+	cLuaState::cCallbackPtr a_OnAllChunksAvailable
+)
 {
 	m_OnChunkAvailable = std::move(a_OnChunkAvailable);
 	m_OnAllChunksAvailable = std::move(a_OnAllChunksAvailable);
@@ -145,7 +152,3 @@ void cLuaChunkStay::OnDisabled(void)
 	// This object is no longer needed, delete it
 	delete this;
 }
-
-
-
-

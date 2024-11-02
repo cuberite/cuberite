@@ -9,7 +9,7 @@
 #include "PluginLua.h"
 extern "C"
 {
-	#include "lua/src/lauxlib.h"  // Needed for LUA_REFNIL
+#include "lua/src/lauxlib.h"  // Needed for LUA_REFNIL
 }
 #include "../Root.h"
 #include "../ClientHandle.h"
@@ -20,12 +20,18 @@ extern "C"
 ////////////////////////////////////////////////////////////////////////////////
 // cLuaWindow:
 
-cLuaWindow::cLuaWindow(cLuaState & a_LuaState, cWindow::WindowType a_WindowType, int a_SlotsX, int a_SlotsY, const AString & a_Title) :
-	Super(a_WindowType, a_Title),
-	m_Contents(a_SlotsX, a_SlotsY),
-	m_LuaState(a_LuaState.QueryCanonLuaState())
+cLuaWindow::cLuaWindow(
+	cLuaState & a_LuaState,
+	cWindow::WindowType a_WindowType,
+	int a_SlotsX,
+	int a_SlotsY,
+	const AString & a_Title
+) :
+	Super(a_WindowType, a_Title), m_Contents(a_SlotsX, a_SlotsY), m_LuaState(a_LuaState.QueryCanonLuaState())
 {
-	ASSERT(m_LuaState != nullptr);  // We must have a valid Lua state; this assert fails only if there was no Canon Lua state
+	ASSERT(
+		m_LuaState != nullptr
+	);  // We must have a valid Lua state; this assert fails only if there was no Canon Lua state
 
 	m_Contents.AddListener(*this);
 	m_SlotAreas.push_back(new cSlotAreaItemGrid(m_Contents, *this));
@@ -57,7 +63,8 @@ cLuaWindow::~cLuaWindow()
 	m_Contents.RemoveListener(*this);
 
 	// Close open lua window from players, to avoid dangling pointers
-	cRoot::Get()->ForEachPlayer([this](cPlayer & a_Player)
+	cRoot::Get()->ForEachPlayer(
+		[this](cPlayer & a_Player)
 		{
 			if (a_Player.GetWindow() == this)
 			{
@@ -123,7 +130,8 @@ void cLuaWindow::SetOnSlotChanged(cLuaState::cCallbackPtr && a_OnSlotChanged)
 
 void cLuaWindow::OpenedByPlayer(cPlayer & a_Player)
 {
-	// If the first player is opening the window, create a Lua Reference to the window object so that Lua will not GC it until the last player closes the window:
+	// If the first player is opening the window, create a Lua Reference to the window object so that Lua will not GC it
+	// until the last player closes the window:
 	if (m_PlayerCount == 0)
 	{
 		m_LuaRef.CreateFromObject(*m_LuaState, this);
@@ -143,9 +151,8 @@ bool cLuaWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 	if (m_OnClosing != nullptr)
 	{
 		bool res;
-		if (
-			m_OnClosing->Call(this, &a_Player, a_CanRefuse, cLuaState::Return, res) &&  // The callback succeeded
-			res                                                                         // The callback says not to close the window
+		if (m_OnClosing->Call(this, &a_Player, a_CanRefuse, cLuaState::Return, res) &&  // The callback succeeded
+			res  // The callback says not to close the window
 		)
 		{
 			// The callback disagrees (the higher levels check the CanRefuse flag compliance)
@@ -179,7 +186,13 @@ void cLuaWindow::Destroy(void)
 
 
 
-void cLuaWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
+void cLuaWindow::DistributeStack(
+	cItem & a_ItemStack,
+	int a_Slot,
+	cPlayer & a_Player,
+	cSlotArea * a_ClickedArea,
+	bool a_ShouldApply
+)
 {
 	cSlotAreas Areas;
 	for (auto && Area : m_SlotAreas)
@@ -212,7 +225,13 @@ void cLuaWindow::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 
 
-void cLuaWindow::Clicked(cPlayer & a_Player, int a_WindowID, short a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+void cLuaWindow::Clicked(
+	cPlayer & a_Player,
+	int a_WindowID,
+	short a_SlotNum,
+	eClickAction a_ClickAction,
+	const cItem & a_ClickedItem
+)
 {
 	if (m_OnClicked != nullptr)
 	{
@@ -229,7 +248,3 @@ void cLuaWindow::Clicked(cPlayer & a_Player, int a_WindowID, short a_SlotNum, eC
 
 	cWindow::Clicked(a_Player, a_WindowID, a_SlotNum, a_ClickAction, a_ClickedItem);
 }
-
-
-
-

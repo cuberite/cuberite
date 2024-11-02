@@ -1,7 +1,8 @@
 
 // ChunkSender.h
 
-// Interfaces to the cChunkSender class representing the thread that waits for chunks becoming ready (loaded / generated) and sends them to clients
+// Interfaces to the cChunkSender class representing the thread that waits for chunks becoming ready (loaded /
+// generated) and sends them to clients
 
 /*
 The whole thing is a thread that runs in a loop, waiting for either:
@@ -47,14 +48,12 @@ class cChunkSender;
 
 
 
-class cChunkSender final :
-	public cIsThread,
-	public cChunkDataCopyCollector
+class cChunkSender final : public cIsThread,
+						   public cChunkDataCopyCollector
 {
 	using Super = cIsThread;
 
-public:
-
+  public:
 	cChunkSender(cWorld & a_World);
 	virtual ~cChunkSender() override;
 
@@ -72,10 +71,14 @@ public:
 
 	/** Queues a chunk to be sent to a specific client */
 	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cClientHandle * a_Client);
-	void QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, const std::vector<cClientHandle *> & a_Clients);
+	void QueueSendChunkTo(
+		int a_ChunkX,
+		int a_ChunkZ,
+		Priority a_Priority,
+		const std::vector<cClientHandle *> & a_Clients
+	);
 
-protected:
-
+  protected:
 	using WeakClients = std::set<std::weak_ptr<cClientHandle>, std::owner_less<std::weak_ptr<cClientHandle>>>;
 
 	struct sChunkQueue
@@ -83,7 +86,7 @@ protected:
 		Priority m_Priority;
 		cChunkCoords m_Chunk;
 
-		bool operator <(const sChunkQueue & a_Other) const
+		bool operator<(const sChunkQueue & a_Other) const
 		{
 			// The operator will return true to affirm we're less urgent than Other
 			// This comparison depends on the Priority enum ordering lower priority as smaller:
@@ -98,8 +101,7 @@ protected:
 		WeakClients m_Clients;
 		Priority m_Priority;
 		sSendChunk(cChunkCoords a_Chunk, Priority a_Priority) :
-			m_Chunk(a_Chunk),
-			m_Priority(a_Priority)
+			m_Chunk(a_Chunk), m_Priority(a_Priority)
 		{
 		}
 	};
@@ -109,7 +111,7 @@ protected:
 	/** An instance of a chunk serializer, held to maintain its internal cache. */
 	cChunkDataSerializer m_Serializer;
 
-	cCriticalSection  m_CS;
+	cCriticalSection m_CS;
 	std::priority_queue<sChunkQueue> m_SendChunks;
 	std::unordered_map<cChunkCoords, sSendChunk, cChunkCoordsHash> m_ChunkInfo;
 	cEvent m_evtQueue;  // Set when anything is added to m_ChunksReady
@@ -118,20 +120,17 @@ protected:
 	// NOTE that m_BlockData[] is inherited from the cChunkDataCollector
 	unsigned char m_BiomeMap[cChunkDef::Width * cChunkDef::Width];
 	std::vector<Vector3i> m_BlockEntities;  // Coords of the block entities to send
-	std::vector<UInt32> m_EntityIDs;        // Entity-IDs of the entities to send
+	std::vector<UInt32> m_EntityIDs;  // Entity-IDs of the entities to send
 
 	// cIsThread override:
 	virtual void Execute(void) override;
 
 	// cChunkDataCollector overrides:
 	// (Note that they are called while the ChunkMap's CS is locked - don't do heavy calculations here!)
-	virtual void BiomeMap     (const cChunkDef::BiomeMap & a_BiomeMap) override;
-	virtual void Entity       (cEntity *      a_Entity) override;
-	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
+	virtual void BiomeMap(const cChunkDef::BiomeMap & a_BiomeMap) override;
+	virtual void Entity(cEntity * a_Entity) override;
+	virtual void BlockEntity(cBlockEntity * a_Entity) override;
 
 	/** Sends the specified chunk to all the specified clients */
 	void SendChunk(int a_ChunkX, int a_ChunkZ, const WeakClients & a_Clients);
-} ;
-
-
-
+};

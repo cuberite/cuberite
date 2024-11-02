@@ -17,18 +17,20 @@
 
 
 /** Example storage schema - forgets all chunks */
-class cWSSForgetful :
-	public cWSSchema
+class cWSSForgetful : public cWSSchema
 {
-public:
-	cWSSForgetful(cWorld * a_World) : cWSSchema(a_World) {}
+  public:
+	cWSSForgetful(cWorld * a_World) :
+		cWSSchema(a_World)
+	{
+	}
 
-protected:
+  protected:
 	// cWSSchema overrides:
-	virtual bool LoadChunk(const cChunkCoords & a_Chunk) override {return false; }
-	virtual bool SaveChunk(const cChunkCoords & a_Chunk) override {return true; }
-	virtual const AString GetName(void) const override {return "forgetful"; }
-} ;
+	virtual bool LoadChunk(const cChunkCoords & a_Chunk) override { return false; }
+	virtual bool SaveChunk(const cChunkCoords & a_Chunk) override { return true; }
+	virtual const AString GetName(void) const override { return "forgetful"; }
+};
 
 
 
@@ -38,9 +40,7 @@ protected:
 // cWorldStorage:
 
 cWorldStorage::cWorldStorage(void) :
-	Super("World Storage Executor"),
-	m_World(nullptr),
-	m_SaveSchema(nullptr)
+	Super("World Storage Executor"), m_World(nullptr), m_SaveSchema(nullptr)
 {
 }
 
@@ -144,7 +144,7 @@ void cWorldStorage::QueueLoadChunk(int a_ChunkX, int a_ChunkZ)
 	ASSERT((a_ChunkZ > -0x08000000) && (a_ChunkZ < 0x08000000));
 	ASSERT(m_World->IsChunkQueued(a_ChunkX, a_ChunkZ));
 
-	m_LoadQueue.EnqueueItem({ a_ChunkX, a_ChunkZ });
+	m_LoadQueue.EnqueueItem({a_ChunkX, a_ChunkZ});
 	m_Event.Set();
 }
 
@@ -156,7 +156,7 @@ void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_World->IsChunkValid(a_ChunkX, a_ChunkZ));
 
-	m_SaveQueue.EnqueueItem({ a_ChunkX, a_ChunkZ });
+	m_SaveQueue.EnqueueItem({a_ChunkX, a_ChunkZ});
 	m_Event.Set();
 }
 
@@ -167,7 +167,7 @@ void cWorldStorage::QueueSaveChunk(int a_ChunkX, int a_ChunkZ)
 void cWorldStorage::InitSchemas(int a_StorageCompressionFactor)
 {
 	// The first schema added is considered the default
-	m_Schemas.push_back(new cWSSAnvil    (m_World, a_StorageCompressionFactor));
+	m_Schemas.push_back(new cWSSAnvil(m_World, a_StorageCompressionFactor));
 	m_Schemas.push_back(new cWSSForgetful(m_World));
 	// Add new schemas here
 
@@ -186,8 +186,10 @@ void cWorldStorage::InitSchemas(int a_StorageCompressionFactor)
 	}  // for itr - m_Schemas[]
 
 	// Unknown schema selected, let the admin know:
-	LOGWARNING("Unknown storage schema name \"%s\". Using default (\"%s\"). Available schemas:",
-		m_StorageSchemaName.c_str(), m_SaveSchema->GetName().c_str()
+	LOGWARNING(
+		"Unknown storage schema name \"%s\". Using default (\"%s\"). Available schemas:",
+		m_StorageSchemaName.c_str(),
+		m_SaveSchema->GetName().c_str()
 	);
 	for (cWSSchemaList::iterator itr = m_Schemas.begin(); itr != m_Schemas.end(); ++itr)
 	{
@@ -216,7 +218,8 @@ void cWorldStorage::Execute(void)
 
 			Success = LoadOneChunk();
 			Success |= SaveOneChunk();
-		} while (Success);
+		}
+		while (Success);
 	}
 }
 
@@ -297,8 +300,3 @@ bool cWorldStorage::LoadChunk(int a_ChunkX, int a_ChunkZ)
 
 	return false;
 }
-
-
-
-
-

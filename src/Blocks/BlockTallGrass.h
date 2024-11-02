@@ -9,18 +9,22 @@
 
 
 /** Handles the grass that is 1 block tall */
-class cBlockTallGrassHandler final :
-	public cBlockHandler
+class cBlockTallGrassHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
-	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
+  private:
+	virtual bool DoesIgnoreBuildCollision(
+		const cWorld & a_World,
+		const cItem & a_HeldItem,
+		const Vector3i a_Position,
+		const NIBBLETYPE a_Meta,
+		const eBlockFace a_ClickedBlockFace,
+		const bool a_ClickedDirectly
+	) const override
 	{
 		return true;
 	}
@@ -82,7 +86,7 @@ private:
 			case E_META_TALL_GRASS_FERN:  largeFlowerMeta = E_META_BIG_FLOWER_LARGE_FERN; break;
 			default:                      return 0;
 		}
-		a_Chunk.SetBlock(a_RelPos,           E_BLOCK_BIG_FLOWER, largeFlowerMeta);
+		a_Chunk.SetBlock(a_RelPos, E_BLOCK_BIG_FLOWER, largeFlowerMeta);
 		a_Chunk.SetBlock(a_RelPos.addedY(1), E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
 		return 1;
 	}
@@ -96,8 +100,4 @@ private:
 		UNUSED(a_Meta);
 		return 7;
 	}
-} ;
-
-
-
-
+};

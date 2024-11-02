@@ -11,5 +11,3 @@ cBat::cBat(void) :
 	SetGravity(-2.0f);
 	SetAirDrag(0.05f);
 }
-
-

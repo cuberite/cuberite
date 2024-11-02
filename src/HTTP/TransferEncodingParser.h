@@ -20,10 +20,10 @@ typedef std::shared_ptr<cTransferEncodingParser> cTransferEncodingParserPtr;
 /** Used as both the interface that all the parsers share and the (static) factory creating such parsers. */
 class cTransferEncodingParser
 {
-public:
+  public:
 	class cCallbacks
 	{
-	public:
+	  public:
 		// Force a virtual destructor in descendants
 		virtual ~cCallbacks() {}
 
@@ -42,8 +42,8 @@ public:
 	virtual ~cTransferEncodingParser() {}
 
 	/** Parses the incoming data and calls the appropriate callbacks.
-	Returns the number of bytes from the end of a_Data that is already not part of this message (if the parser can detect it).
-	Returns AString::npos on an error. */
+	Returns the number of bytes from the end of a_Data that is already not part of this message (if the parser can
+	detect it). Returns AString::npos on an error. */
 	virtual size_t Parse(const char * a_Data, size_t a_Size) = 0;
 
 	/** To be called when the stream is terminated from the source (connection closed).
@@ -60,17 +60,13 @@ public:
 		size_t a_ContentLength
 	);
 
-protected:
+  protected:
 	/** The callbacks used to report progress. */
 	cCallbacks & m_Callbacks;
 
 
-	cTransferEncodingParser(cCallbacks & a_Callbacks):
+	cTransferEncodingParser(cCallbacks & a_Callbacks) :
 		m_Callbacks(a_Callbacks)
 	{
 	}
 };
-
-
-
-

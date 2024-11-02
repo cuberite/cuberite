@@ -24,8 +24,7 @@ class cMap;
 /** Utility class used to serialize maps. */
 class cMapSerializer
 {
-public:
-
+  public:
 	cMapSerializer(const AString & a_WorldName, cMap * a_Map);
 
 	/** Try to load the map */
@@ -35,8 +34,7 @@ public:
 	bool Save(void);
 
 
-private:
-
+  private:
 	void SaveMapToNBT(cFastNBTWriter & a_Writer);
 
 	bool LoadMapFromNBT(const cParsedNBT & a_NBT);
@@ -44,9 +42,7 @@ private:
 	cMap * m_Map;
 
 	AString m_Path;
-
-
-} ;
+};
 
 
 
@@ -57,8 +53,7 @@ the last registered ID of each item is serialized to an NBT file.
 */
 class cIDCountSerializer
 {
-public:
-
+  public:
 	cIDCountSerializer(const AString & a_WorldName);
 
 	/** Try to load the ID counts */
@@ -72,14 +67,8 @@ public:
 	inline void SetMapCount(unsigned int a_MapCount) { m_MapCount = a_MapCount; }
 
 
-private:
-
+  private:
 	AString m_Path;
 
 	unsigned int m_MapCount;
-
 };
-
-
-
-

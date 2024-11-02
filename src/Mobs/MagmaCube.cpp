@@ -10,7 +10,7 @@ cMagmaCube::cMagmaCube(int a_Size) :
 	Super(
 		"MagmaCube",
 		mtMagmaCube,
-		fmt::format(FMT_STRING("entity.{}magmacube.hurt"),  GetSizeName(a_Size)),
+		fmt::format(FMT_STRING("entity.{}magmacube.hurt"), GetSizeName(a_Size)),
 		fmt::format(FMT_STRING("entity.{}magmacube.death"), GetSizeName(a_Size)),
 		"",
 		0.51f * a_Size,

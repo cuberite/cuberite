@@ -14,14 +14,13 @@
 // cFloaterCallback
 class cFloaterCallback
 {
-public:
+  public:
 	cFloaterCallback(void) :
-		m_CanPickup(false),
-		m_AttachedMobID(cEntity::INVALID_ID)
+		m_CanPickup(false), m_AttachedMobID(cEntity::INVALID_ID)
 	{
 	}
 
-	bool operator () (cEntity & a_Entity)
+	bool operator()(cEntity & a_Entity)
 	{
 		auto & Floater = static_cast<cFloater &>(a_Entity);
 		m_CanPickup = Floater.CanPickup();
@@ -32,30 +31,28 @@ public:
 		return true;
 	}
 
-	bool CanPickup(void)       const { return m_CanPickup; }
-	bool IsAttached(void)      const { return (m_AttachedMobID != cEntity::INVALID_ID); }
+	bool CanPickup(void) const { return m_CanPickup; }
+	bool IsAttached(void) const { return (m_AttachedMobID != cEntity::INVALID_ID); }
 	UInt32 GetAttachedMobID(void) const { return m_AttachedMobID; }
-	Vector3d GetPos(void)      const { return m_Pos; }
-	Vector3d GetBitePos(void)  const { return m_BitePos; }
+	Vector3d GetPos(void) const { return m_Pos; }
+	Vector3d GetBitePos(void) const { return m_BitePos; }
 
-protected:
+  protected:
 	bool m_CanPickup;
 	UInt32 m_AttachedMobID;
 	Vector3d m_Pos;
 	Vector3d m_BitePos;
-} ;
+};
 
 
 
 
 
-class cItemFishingRodHandler final:
-	public cItemHandler
+class cItemFishingRodHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 
@@ -84,9 +81,11 @@ public:
 		{
 			// Cast a hook:
 			auto & Random = GetRandomProvider();
-			auto CountDownTime = Random.RandInt(100, 900) - static_cast<int>(a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100);
+			auto CountDownTime = Random.RandInt(100, 900) -
+				static_cast<int>(a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLure) * 100);
 			auto Floater = std::make_unique<cFloater>(
-				a_Player->GetEyePosition(), a_Player->GetLookVector() * 15,
+				a_Player->GetEyePosition(),
+				a_Player->GetLookVector() * 15,
 				a_Player->GetUniqueID(),
 				CountDownTime
 			);
@@ -104,7 +103,8 @@ public:
 
 
 
-	/** Reels back the fishing line, reeling any attached mob, or creating fished loot, or just breaking the fishing rod. */
+	/** Reels back the fishing line, reeling any attached mob, or creating fished loot, or just breaking the fishing
+	 * rod. */
 	void ReelIn(cWorld & a_World, cPlayer & a_Player) const
 	{
 		cFloaterCallback FloaterInfo;
@@ -140,7 +140,9 @@ public:
 	void ReelInEntity(cWorld & a_World, cPlayer & a_Player, UInt32 a_EntityID) const
 	{
 		auto PlayerPos = a_Player.GetPosition();
-		a_World.DoWithEntityByID(a_EntityID, [=](cEntity & a_Entity)
+		a_World.DoWithEntityByID(
+			a_EntityID,
+			[=](cEntity & a_Entity)
 			{
 				auto Speed = PlayerPos - a_Entity.GetPosition();
 				a_Entity.AddSpeed(Speed);
@@ -156,7 +158,8 @@ public:
 
 	void ReelInLoot(cWorld & a_World, cPlayer & a_Player, const Vector3d a_FloaterBitePos) const
 	{
-		auto LotSLevel = std::min(a_Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLuckOfTheSea), 3u);
+		auto LotSLevel =
+			std::min(a_Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchLuckOfTheSea), 3u);
 
 		// Chances for getting an item from the category for each level of Luck of the Sea (0 - 3)
 		const int TreasureChances[] = {50, 71, 92, 113};  // 5% | 7.1% | 9.2% | 11.3%
@@ -303,4 +306,4 @@ public:
 		// Notify plugins
 		cRoot::Get()->GetPluginManager()->CallHookPlayerFished(a_Player, Drops, Experience);
 	}
-} ;
+};

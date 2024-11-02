@@ -17,15 +17,13 @@
 
 // tolua_begin
 
-class cFireworkEntity :
-	public cProjectileEntity
+class cFireworkEntity : public cProjectileEntity
 {
 	// tolua_end
 
 	using Super = cProjectileEntity;
 
-public:  // tolua_export
-
+  public:  // tolua_export
 	CLASS_PROTODEF(cFireworkEntity)
 
 	cFireworkEntity(cEntity * a_Creator, Vector3d a_Pos, const cItem & a_Item);
@@ -46,19 +44,13 @@ public:  // tolua_export
 
 	// tolua_end
 
-protected:
-
+  protected:
 	// cProjectileEntity overrides:
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
-private:
-
+  private:
 	int m_TicksToExplosion;
 	cItem m_FireworkItem;
 
 };  // tolua_export
-
-
-
-

@@ -14,18 +14,19 @@
 
 
 
-class cBlockLeavesHandler final :
-	public cBlockHandler
+class cBlockLeavesHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
-	static double FortuneDropProbability(unsigned char a_DefaultDenominator, unsigned char a_FirstDenominatorReduction, unsigned char a_FortuneLevel)
+  private:
+	static double FortuneDropProbability(
+		unsigned char a_DefaultDenominator,
+		unsigned char a_FirstDenominatorReduction,
+		unsigned char a_FortuneLevel
+	)
 	{
 		// Fortune 3 behaves like fortune 4 for some reason
 		if (a_FortuneLevel == 3)
@@ -34,7 +35,8 @@ private:
 		}
 
 		// Denominator, capped at minimum of 10.
-		const auto Denominator = std::max<unsigned char>(10, a_DefaultDenominator - a_FortuneLevel * a_FirstDenominatorReduction);
+		const auto Denominator =
+			std::max<unsigned char>(10, a_DefaultDenominator - a_FortuneLevel * a_FirstDenominatorReduction);
 		return 1.0 / Denominator;
 	}
 
@@ -42,7 +44,8 @@ private:
 
 
 
-	/** Returns true if the area contains a continous path from the specified block to a log block entirely made out of leaves blocks. */
+	/** Returns true if the area contains a continous path from the specified block to a log block entirely made out of
+	 * leaves blocks. */
 	static bool HasNearLog(cBlockArea & a_Area, const Vector3i a_BlockPos)
 	{
 		// Filter the blocks into a {leaves, log, other (air)} set:
@@ -67,7 +70,8 @@ private:
 		}  // for i - Types[]
 
 		// Perform a breadth-first search to see if there's a log connected within 4 blocks of the leaves block:
-		// Simply replace all reachable leaves blocks with a sponge block plus iteration (in the Area) and see if we can reach a log
+		// Simply replace all reachable leaves blocks with a sponge block plus iteration (in the Area) and see if we can
+		// reach a log
 		a_Area.SetBlockType(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, E_BLOCK_SPONGE);
 		for (int i = 0; i < LEAVES_CHECK_DISTANCE; i++)
 		{
@@ -75,9 +79,13 @@ private:
 			{
 				switch (a_Area.GetBlockType(cbx, cby, cbz))
 				{
-					case E_BLOCK_LEAVES: a_Area.SetBlockType(cbx, cby, cbz, static_cast<BLOCKTYPE>(E_BLOCK_SPONGE + i + 1)); break;
+					case E_BLOCK_LEAVES:
+						a_Area.SetBlockType(cbx, cby, cbz, static_cast<BLOCKTYPE>(E_BLOCK_SPONGE + i + 1));
+						break;
 					case E_BLOCK_LOG: return true;
-					case E_BLOCK_NEW_LEAVES: a_Area.SetBlockType(cbx, cby, cbz, static_cast<BLOCKTYPE>(E_BLOCK_SPONGE + i + 1)); break;
+					case E_BLOCK_NEW_LEAVES:
+						a_Area.SetBlockType(cbx, cby, cbz, static_cast<BLOCKTYPE>(E_BLOCK_SPONGE + i + 1));
+						break;
 					case E_BLOCK_NEW_LOG: return true;
 				}
 				return false;
@@ -92,14 +100,9 @@ private:
 						{
 							continue;
 						}
-						if (
-							ProcessNeighbor(x - 1, y,     z) ||
-							ProcessNeighbor(x + 1, y,     z) ||
-							ProcessNeighbor(x,     y,     z - 1) ||
-							ProcessNeighbor(x,     y,     z + 1) ||
-							ProcessNeighbor(x,     y + 1, z) ||
-							ProcessNeighbor(x,     y - 1, z)
-						)
+						if (ProcessNeighbor(x - 1, y, z) || ProcessNeighbor(x + 1, y, z) ||
+							ProcessNeighbor(x, y, z - 1) || ProcessNeighbor(x, y, z + 1) ||
+							ProcessNeighbor(x, y + 1, z) || ProcessNeighbor(x, y - 1, z))
 						{
 							return true;
 						}
@@ -171,7 +174,8 @@ private:
 
 
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor)
+		const override
 	{
 		auto meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
 
@@ -211,11 +215,11 @@ private:
 		auto worldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
 		cBlockArea Area;
 		if (!Area.Read(
-			*a_Chunk.GetWorld(),
-			worldPos - Vector3i(LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE),
-			worldPos + Vector3i(LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE),
-			cBlockArea::baTypes)
-		)
+				*a_Chunk.GetWorld(),
+				worldPos - Vector3i(LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE),
+				worldPos + Vector3i(LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE, LEAVES_CHECK_DISTANCE),
+				cBlockArea::baTypes
+			))
 		{
 			// Cannot check leaves, a chunk is missing too close
 			return;
@@ -241,4 +245,4 @@ private:
 		UNUSED(a_Meta);
 		return 7;
 	}
-} ;
+};

@@ -31,37 +31,34 @@ typedef std::vector<cServerHandleImplPtr> cServerHandleImplPtrs;
 
 
 
-class cServerHandleImpl:
-	public cServerHandle
+class cServerHandleImpl : public cServerHandle
 {
 	using Super = cServerHandle;
 	friend class cTCPLinkImpl;
 
-public:
-
+  public:
 	/** Closes the server, dropping all the connections. */
 	virtual ~cServerHandleImpl() override;
 
 	/** Creates a new server instance listening on the specified port.
 	Both IPv4 and IPv6 interfaces are used, if possible.
-	Always returns a server instance; in the event of a failure, the instance holds the error details. Use IsListening() to query success. */
-	static cServerHandleImplPtr Listen(
-		UInt16 a_Port,
-		cNetwork::cListenCallbacksPtr a_ListenCallbacks
-	);
+	Always returns a server instance; in the event of a failure, the instance holds the error details. Use IsListening()
+	to query success. */
+	static cServerHandleImplPtr Listen(UInt16 a_Port, cNetwork::cListenCallbacksPtr a_ListenCallbacks);
 
 	// cServerHandle overrides:
 	virtual void Close(void) override;
 	virtual bool IsListening(void) const override { return m_IsListening; }
 
-protected:
+  protected:
 	/** The callbacks used to notify about incoming connections. */
 	cNetwork::cListenCallbacksPtr m_ListenCallbacks;
 
 	/** The LibEvent handle representing the main listening socket. */
 	evconnlistener * m_ConnListener;
 
-	/** The LibEvent handle representing the secondary listening socket (only when side-by-side listening is needed, such as WinXP). */
+	/** The LibEvent handle representing the secondary listening socket (only when side-by-side listening is needed,
+	 * such as WinXP). */
 	evconnlistener * m_SecondaryConnListener;
 
 	/** Set to true when the server is initialized successfully and is listening for incoming connections. */
@@ -93,14 +90,15 @@ protected:
 	bool Listen(UInt16 a_Port);
 
 	/** The callback called by LibEvent upon incoming connection. */
-	static void Callback(evconnlistener * a_Listener, evutil_socket_t a_Socket, sockaddr * a_Addr, int a_Len, void * a_Self);
+	static void Callback(
+		evconnlistener * a_Listener,
+		evutil_socket_t a_Socket,
+		sockaddr * a_Addr,
+		int a_Len,
+		void * a_Self
+	);
 
 	/** Removes the specified link from m_Connections.
 	Called by cTCPLinkImpl when the link is terminated. */
 	void RemoveLink(const cTCPLinkImpl * a_Link);
 };
-
-
-
-
-

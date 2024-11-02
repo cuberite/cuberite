@@ -7,14 +7,12 @@
 
 
 
-class cItemGoldenAppleHandler final:
-	public cItemFoodHandler
+class cItemGoldenAppleHandler final : public cItemFoodHandler
 {
 	using Super = cItemFoodHandler;
 
-public:
-
-	constexpr cItemGoldenAppleHandler(int a_ItemType):
+  public:
+	constexpr cItemGoldenAppleHandler(int a_ItemType) :
 		Super(a_ItemType, FoodInfo(4, 9.6))
 	{
 	}
@@ -43,5 +41,4 @@ public:
 
 		return true;
 	}
-
 };

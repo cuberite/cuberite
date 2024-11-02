@@ -23,8 +23,7 @@ class cScoreboard;
 
 class cScoreboardSerializer
 {
-public:
-
+  public:
 	cScoreboardSerializer(const AString & a_WorldName, cScoreboard * a_ScoreBoard);
 
 	/** Try to load the scoreboard */
@@ -34,8 +33,7 @@ public:
 	bool Save(void);
 
 
-private:
-
+  private:
 	void SaveScoreboardToNBT(cFastNBTWriter & a_Writer);
 
 	bool LoadScoreboardFromNBT(const cParsedNBT & a_NBT);
@@ -43,10 +41,4 @@ private:
 	cScoreboard * m_ScoreBoard;
 
 	AString m_Path;
-
-
-} ;
-
-
-
-
+};

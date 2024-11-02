@@ -118,7 +118,7 @@ eBlockFace RotateBlockFaceCW(eBlockFace a_BlockFace)
 
 
 
-eBlockFace ReverseBlockFace(eBlockFace  a_BlockFace)
+eBlockFace ReverseBlockFace(eBlockFace a_BlockFace)
 {
 	switch (a_BlockFace)
 	{
@@ -142,12 +142,12 @@ AString BlockFaceToString(eBlockFace a_BlockFace)
 {
 	switch (a_BlockFace)
 	{
-		case BLOCK_FACE_XM: return "BLOCK_FACE_XM";
-		case BLOCK_FACE_XP: return "BLOCK_FACE_XP";
-		case BLOCK_FACE_YM: return "BLOCK_FACE_YM";
-		case BLOCK_FACE_YP: return "BLOCK_FACE_YP";
-		case BLOCK_FACE_ZM: return "BLOCK_FACE_ZM";
-		case BLOCK_FACE_ZP: return "BLOCK_FACE_ZP";
+		case BLOCK_FACE_XM:   return "BLOCK_FACE_XM";
+		case BLOCK_FACE_XP:   return "BLOCK_FACE_XP";
+		case BLOCK_FACE_YM:   return "BLOCK_FACE_YM";
+		case BLOCK_FACE_YP:   return "BLOCK_FACE_YP";
+		case BLOCK_FACE_ZM:   return "BLOCK_FACE_ZM";
+		case BLOCK_FACE_ZP:   return "BLOCK_FACE_ZP";
 		case BLOCK_FACE_NONE: return "BLOCK_FACE_NONE";
 	}
 	UNREACHABLE("Unsupported block face");
@@ -171,9 +171,8 @@ bool IsValidBlock(int a_BlockType)
 
 bool IsValidItem(int a_ItemType)
 {
-	if (
-		((a_ItemType >= E_ITEM_FIRST) && (a_ItemType <= E_ITEM_MAX_CONSECUTIVE_TYPE_ID)) ||  // Basic items range
-		((a_ItemType >= E_ITEM_FIRST_DISC) && (a_ItemType <= E_ITEM_LAST_DISC))   // Music discs' special range
+	if (((a_ItemType >= E_ITEM_FIRST) && (a_ItemType <= E_ITEM_MAX_CONSECUTIVE_TYPE_ID)) ||  // Basic items range
+		((a_ItemType >= E_ITEM_FIRST_DISC) && (a_ItemType <= E_ITEM_LAST_DISC))  // Music discs' special range
 	)
 	{
 		return true;
@@ -206,16 +205,15 @@ eDimension StringToDimension(const AString & a_DimensionString)
 	{
 		eDimension m_Dimension;
 		const char * m_String;
-	} DimensionMap [] =
-	{
-		{ dimOverworld, "Overworld"},
-		{ dimOverworld, "Normal"},
-		{ dimOverworld, "World"},
-		{ dimNether,    "Nether"},
-		{ dimNether,    "Hell"},  // Alternate name for Nether
-		{ dimEnd,       "End"},
-		{ dimEnd,       "Sky"},  // Old name for End
-	} ;
+	} DimensionMap[] = {
+		{dimOverworld, "Overworld"},
+		{dimOverworld, "Normal"},
+		{dimOverworld, "World"},
+		{dimNether, "Nether"},
+		{dimNether, "Hell"},  // Alternate name for Nether
+		{dimEnd, "End"},
+		{dimEnd, "Sky"},  // Old name for End
+	};
 	for (size_t i = 0; i < ARRAYCOUNT(DimensionMap); i++)
 	{
 		if (NoCaseCompare(DimensionMap[i].m_String, a_DimensionString) == 0)
@@ -240,11 +238,10 @@ AString DimensionToString(eDimension a_Dimension)
 	{
 		eDimension m_Dimension;
 		const char * m_String;
-	} DimensionMap[] =
-	{
-		{ dimOverworld, "Overworld" },
-		{ dimNether, "Nether" },
-		{ dimEnd, "End" },
+	} DimensionMap[] = {
+		{dimOverworld, "Overworld"},
+		{dimNether, "Nether"},
+		{dimEnd, "End"},
 	};
 
 	for (size_t i = 0; i < ARRAYCOUNT(DimensionMap); i++)
@@ -310,55 +307,54 @@ eDamageType StringToDamageType(const AString & a_DamageTypeString)
 	// Decode using a built-in map:
 	static struct
 	{
-		eDamageType  m_DamageType;
+		eDamageType m_DamageType;
 		const char * m_String;
-	} DamageTypeMap [] =
-	{
+	} DamageTypeMap[] = {
 		// Cannonical names:
-		{ dtAttack,          "dtAttack"},
-		{ dtRangedAttack,    "dtRangedAttack"},
-		{ dtLightning,       "dtLightning"},
-		{ dtFalling,         "dtFalling"},
-		{ dtDrowning,        "dtDrowning"},
-		{ dtSuffocating,     "dtSuffocation"},
-		{ dtStarving,        "dtStarving"},
-		{ dtCactusContact,   "dtCactusContact"},
-		{ dtMagmaContact,    "dtMagmaContact"},
-		{ dtLavaContact,     "dtLavaContact"},
-		{ dtPoisoning,       "dtPoisoning"},
-		{ dtWithering,       "dtWithering"},
-		{ dtOnFire,          "dtOnFire"},
-		{ dtFireContact,     "dtFireContact"},
-		{ dtInVoid,          "dtInVoid"},
-		{ dtPotionOfHarming, "dtPotionOfHarming"},
-		{ dtAdmin,           "dtAdmin"},
-		{ dtExplosion,       "dtExplosion"},
-		{ dtEnvironment,     "dtEnvironment"},
+		{dtAttack, "dtAttack"},
+		{dtRangedAttack, "dtRangedAttack"},
+		{dtLightning, "dtLightning"},
+		{dtFalling, "dtFalling"},
+		{dtDrowning, "dtDrowning"},
+		{dtSuffocating, "dtSuffocation"},
+		{dtStarving, "dtStarving"},
+		{dtCactusContact, "dtCactusContact"},
+		{dtMagmaContact, "dtMagmaContact"},
+		{dtLavaContact, "dtLavaContact"},
+		{dtPoisoning, "dtPoisoning"},
+		{dtWithering, "dtWithering"},
+		{dtOnFire, "dtOnFire"},
+		{dtFireContact, "dtFireContact"},
+		{dtInVoid, "dtInVoid"},
+		{dtPotionOfHarming, "dtPotionOfHarming"},
+		{dtAdmin, "dtAdmin"},
+		{dtExplosion, "dtExplosion"},
+		{dtEnvironment, "dtEnvironment"},
 
 		// Common synonyms:
-		{ dtAttack,        "dtPawnAttack"},
-		{ dtAttack,        "dtEntityAttack"},
-		{ dtAttack,        "dtMob"},
-		{ dtAttack,        "dtMobAttack"},
-		{ dtRangedAttack,  "dtArrowAttack"},
-		{ dtRangedAttack,  "dtArrow"},
-		{ dtRangedAttack,  "dtProjectile"},
-		{ dtFalling,       "dtFall"},
-		{ dtDrowning,      "dtDrown"},
-		{ dtSuffocating,   "dtSuffocation"},
-		{ dtStarving,      "dtStarvation"},
-		{ dtStarving,      "dtHunger"},
-		{ dtCactusContact, "dtCactus"},
-		{ dtCactusContact, "dtCactuses"},
-		{ dtCactusContact, "dtCacti"},
-		{ dtMagmaContact,  "dtMagma"},
-		{ dtLavaContact,   "dtLava"},
-		{ dtPoisoning,     "dtPoison"},
-		{ dtWithering,     "dtWither"},
-		{ dtOnFire,        "dtBurning"},
-		{ dtFireContact,   "dtInFire"},
-		{ dtAdmin,         "dtPlugin"},
-	} ;
+		{dtAttack, "dtPawnAttack"},
+		{dtAttack, "dtEntityAttack"},
+		{dtAttack, "dtMob"},
+		{dtAttack, "dtMobAttack"},
+		{dtRangedAttack, "dtArrowAttack"},
+		{dtRangedAttack, "dtArrow"},
+		{dtRangedAttack, "dtProjectile"},
+		{dtFalling, "dtFall"},
+		{dtDrowning, "dtDrown"},
+		{dtSuffocating, "dtSuffocation"},
+		{dtStarving, "dtStarvation"},
+		{dtStarving, "dtHunger"},
+		{dtCactusContact, "dtCactus"},
+		{dtCactusContact, "dtCactuses"},
+		{dtCactusContact, "dtCacti"},
+		{dtMagmaContact, "dtMagma"},
+		{dtLavaContact, "dtLava"},
+		{dtPoisoning, "dtPoison"},
+		{dtWithering, "dtWither"},
+		{dtOnFire, "dtBurning"},
+		{dtFireContact, "dtInFire"},
+		{dtAdmin, "dtPlugin"},
+	};
 	for (size_t i = 0; i < ARRAYCOUNT(DamageTypeMap); i++)
 	{
 		if (NoCaseCompare(DamageTypeMap[i].m_String, a_DamageTypeString) == 0)
@@ -379,7 +375,7 @@ void AddFaceDirection(int & a_BlockX, int & a_BlockY, int & a_BlockZ, eBlockFace
 {
 	LOGWARNING("AddFaceDirection with X/Y/Z parameters is deprecated, use the vector version");
 
-	const auto Offset = AddFaceDirection({ a_BlockX, a_BlockY, a_BlockZ }, a_BlockFace, a_bInverse);
+	const auto Offset = AddFaceDirection({a_BlockX, a_BlockY, a_BlockZ}, a_BlockFace, a_bInverse);
 	a_BlockX = Offset.x;
 	a_BlockY = Offset.y;
 	a_BlockZ = Offset.z;
@@ -395,12 +391,12 @@ Vector3i AddFaceDirection(const Vector3i a_Position, const eBlockFace a_BlockFac
 
 	switch (a_BlockFace)
 	{
-		case BLOCK_FACE_YP: return a_Position.addedY(+Offset);
-		case BLOCK_FACE_YM: return a_Position.addedY(-Offset);
-		case BLOCK_FACE_ZM: return a_Position.addedZ(-Offset);
-		case BLOCK_FACE_ZP: return a_Position.addedZ(+Offset);
-		case BLOCK_FACE_XP: return a_Position.addedX(+Offset);
-		case BLOCK_FACE_XM: return a_Position.addedX(-Offset);
+		case BLOCK_FACE_YP:   return a_Position.addedY(+Offset);
+		case BLOCK_FACE_YM:   return a_Position.addedY(-Offset);
+		case BLOCK_FACE_ZM:   return a_Position.addedZ(-Offset);
+		case BLOCK_FACE_ZP:   return a_Position.addedZ(+Offset);
+		case BLOCK_FACE_XP:   return a_Position.addedX(+Offset);
+		case BLOCK_FACE_XM:   return a_Position.addedX(-Offset);
 		case BLOCK_FACE_NONE: break;
 	}
 
@@ -459,11 +455,8 @@ bool ItemCategory::IsAxe(short a_ItemType)
 
 bool ItemCategory::IsSword(short a_ItemID)
 {
-	return (a_ItemID == E_ITEM_WOODEN_SWORD)
-		|| (a_ItemID == E_ITEM_STONE_SWORD)
-		|| (a_ItemID == E_ITEM_IRON_SWORD)
-		|| (a_ItemID == E_ITEM_GOLD_SWORD)
-		|| (a_ItemID == E_ITEM_DIAMOND_SWORD);
+	return (a_ItemID == E_ITEM_WOODEN_SWORD) || (a_ItemID == E_ITEM_STONE_SWORD) || (a_ItemID == E_ITEM_IRON_SWORD) ||
+		(a_ItemID == E_ITEM_GOLD_SWORD) || (a_ItemID == E_ITEM_DIAMOND_SWORD);
 }
 
 
@@ -472,11 +465,8 @@ bool ItemCategory::IsSword(short a_ItemID)
 
 bool ItemCategory::IsHoe(short a_ItemID)
 {
-	return (a_ItemID == E_ITEM_WOODEN_HOE)
-		|| (a_ItemID == E_ITEM_STONE_HOE)
-		|| (a_ItemID == E_ITEM_IRON_HOE)
-		|| (a_ItemID == E_ITEM_GOLD_HOE)
-		|| (a_ItemID == E_ITEM_DIAMOND_HOE);
+	return (a_ItemID == E_ITEM_WOODEN_HOE) || (a_ItemID == E_ITEM_STONE_HOE) || (a_ItemID == E_ITEM_IRON_HOE) ||
+		(a_ItemID == E_ITEM_GOLD_HOE) || (a_ItemID == E_ITEM_DIAMOND_HOE);
 }
 
 
@@ -485,11 +475,8 @@ bool ItemCategory::IsHoe(short a_ItemID)
 
 bool ItemCategory::IsShovel(short a_ItemID)
 {
-	return (a_ItemID == E_ITEM_WOODEN_SHOVEL)
-		|| (a_ItemID == E_ITEM_STONE_SHOVEL)
-		|| (a_ItemID == E_ITEM_IRON_SHOVEL)
-		|| (a_ItemID == E_ITEM_GOLD_SHOVEL)
-		|| (a_ItemID == E_ITEM_DIAMOND_SHOVEL);
+	return (a_ItemID == E_ITEM_WOODEN_SHOVEL) || (a_ItemID == E_ITEM_STONE_SHOVEL) ||
+		(a_ItemID == E_ITEM_IRON_SHOVEL) || (a_ItemID == E_ITEM_GOLD_SHOVEL) || (a_ItemID == E_ITEM_DIAMOND_SHOVEL);
 }
 
 
@@ -498,11 +485,7 @@ bool ItemCategory::IsShovel(short a_ItemID)
 
 bool ItemCategory::IsTool(short a_ItemID)
 {
-	return IsPickaxe( a_ItemID)
-		|| IsAxe    ( a_ItemID)
-		|| IsSword  ( a_ItemID)
-		|| IsHoe    ( a_ItemID)
-		|| IsShovel ( a_ItemID);
+	return IsPickaxe(a_ItemID) || IsAxe(a_ItemID) || IsSword(a_ItemID) || IsHoe(a_ItemID) || IsShovel(a_ItemID);
 }
 
 
@@ -512,10 +495,8 @@ bool ItemCategory::IsTool(short a_ItemID)
 bool ItemCategory::IsHelmet(short a_ItemType)
 {
 	return (
-		(a_ItemType == E_ITEM_LEATHER_CAP) ||
-		(a_ItemType == E_ITEM_GOLD_HELMET) ||
-		(a_ItemType == E_ITEM_CHAIN_HELMET) ||
-		(a_ItemType == E_ITEM_IRON_HELMET) ||
+		(a_ItemType == E_ITEM_LEATHER_CAP) || (a_ItemType == E_ITEM_GOLD_HELMET) ||
+		(a_ItemType == E_ITEM_CHAIN_HELMET) || (a_ItemType == E_ITEM_IRON_HELMET) ||
 		(a_ItemType == E_ITEM_DIAMOND_HELMET)
 	);
 }
@@ -527,12 +508,9 @@ bool ItemCategory::IsHelmet(short a_ItemType)
 bool ItemCategory::IsChestPlate(short a_ItemType)
 {
 	return (
-		(a_ItemType == E_ITEM_ELYTRA) ||
-		(a_ItemType == E_ITEM_LEATHER_TUNIC) ||
-		(a_ItemType == E_ITEM_GOLD_CHESTPLATE) ||
-		(a_ItemType == E_ITEM_CHAIN_CHESTPLATE) ||
-		(a_ItemType == E_ITEM_IRON_CHESTPLATE) ||
-		(a_ItemType == E_ITEM_DIAMOND_CHESTPLATE)
+		(a_ItemType == E_ITEM_ELYTRA) || (a_ItemType == E_ITEM_LEATHER_TUNIC) ||
+		(a_ItemType == E_ITEM_GOLD_CHESTPLATE) || (a_ItemType == E_ITEM_CHAIN_CHESTPLATE) ||
+		(a_ItemType == E_ITEM_IRON_CHESTPLATE) || (a_ItemType == E_ITEM_DIAMOND_CHESTPLATE)
 	);
 }
 
@@ -543,10 +521,8 @@ bool ItemCategory::IsChestPlate(short a_ItemType)
 bool ItemCategory::IsLeggings(short a_ItemType)
 {
 	return (
-		(a_ItemType == E_ITEM_LEATHER_PANTS) ||
-		(a_ItemType == E_ITEM_GOLD_LEGGINGS) ||
-		(a_ItemType == E_ITEM_CHAIN_LEGGINGS) ||
-		(a_ItemType == E_ITEM_IRON_LEGGINGS) ||
+		(a_ItemType == E_ITEM_LEATHER_PANTS) || (a_ItemType == E_ITEM_GOLD_LEGGINGS) ||
+		(a_ItemType == E_ITEM_CHAIN_LEGGINGS) || (a_ItemType == E_ITEM_IRON_LEGGINGS) ||
 		(a_ItemType == E_ITEM_DIAMOND_LEGGINGS)
 	);
 }
@@ -558,11 +534,8 @@ bool ItemCategory::IsLeggings(short a_ItemType)
 bool ItemCategory::IsBoots(short a_ItemType)
 {
 	return (
-		(a_ItemType == E_ITEM_LEATHER_BOOTS) ||
-		(a_ItemType == E_ITEM_GOLD_BOOTS) ||
-		(a_ItemType == E_ITEM_CHAIN_BOOTS) ||
-		(a_ItemType == E_ITEM_IRON_BOOTS) ||
-		(a_ItemType == E_ITEM_DIAMOND_BOOTS)
+		(a_ItemType == E_ITEM_LEATHER_BOOTS) || (a_ItemType == E_ITEM_GOLD_BOOTS) ||
+		(a_ItemType == E_ITEM_CHAIN_BOOTS) || (a_ItemType == E_ITEM_IRON_BOOTS) || (a_ItemType == E_ITEM_DIAMOND_BOOTS)
 	);
 }
 
@@ -573,10 +546,8 @@ bool ItemCategory::IsBoots(short a_ItemType)
 bool ItemCategory::IsMinecart(short a_ItemType)
 {
 	return (
-		(a_ItemType == E_ITEM_MINECART) ||
-		(a_ItemType == E_ITEM_CHEST_MINECART) ||
-		(a_ItemType == E_ITEM_FURNACE_MINECART) ||
-		(a_ItemType == E_ITEM_MINECART_WITH_TNT) ||
+		(a_ItemType == E_ITEM_MINECART) || (a_ItemType == E_ITEM_CHEST_MINECART) ||
+		(a_ItemType == E_ITEM_FURNACE_MINECART) || (a_ItemType == E_ITEM_MINECART_WITH_TNT) ||
 		(a_ItemType == E_ITEM_MINECART_WITH_HOPPER)
 	);
 }
@@ -587,12 +558,7 @@ bool ItemCategory::IsMinecart(short a_ItemType)
 
 bool ItemCategory::IsArmor(short a_ItemType)
 {
-	return (
-		IsHelmet(a_ItemType) ||
-		IsChestPlate(a_ItemType) ||
-		IsLeggings(a_ItemType) ||
-		IsBoots(a_ItemType)
-	);
+	return (IsHelmet(a_ItemType) || IsChestPlate(a_ItemType) || IsLeggings(a_ItemType) || IsBoots(a_ItemType));
 }
 
 

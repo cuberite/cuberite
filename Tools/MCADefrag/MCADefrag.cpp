@@ -53,8 +53,7 @@ int main(int argc, char ** argv)
 // cMCADefrag:
 
 cMCADefrag::cMCADefrag(void) :
-	m_NumThreads(4),
-	m_ShouldRecompress(true)
+	m_NumThreads(4), m_ShouldRecompress(true)
 {
 }
 
@@ -210,12 +209,8 @@ void cMCADefrag::cThread::ProcessFile(const AString & a_FileName)
 	for (size_t i = 0; i < 1024; i++)
 	{
 		size_t idx = i * 4;
-		if (
-			(Locations[idx] == 0) &&
-			(Locations[idx + 1] == 0) &&
-			(Locations[idx + 2] == 0) &&
-			(Locations[idx + 3] == 0)
-		)
+		if ((Locations[idx] == 0) && (Locations[idx + 1] == 0) && (Locations[idx + 2] == 0) &&
+			(Locations[idx + 3] == 0))
 		{
 			// Chunk not present
 			continue;
@@ -258,8 +253,10 @@ bool cMCADefrag::cThread::ReadChunk(cFile & a_File, const Byte * a_LocationRaw)
 	int SizeInSectors = a_LocationRaw[3] * (4 KiB);
 	if (a_File.Seek(SectorNum * (4 KiB)) < 0)
 	{
-		LOGWARNING("Failed to seek to chunk data - file pos %llu (%d KiB, %.02f MiB)!",
-			static_cast<Int64>(SectorNum) * (4 KiB), SectorNum * 4,
+		LOGWARNING(
+			"Failed to seek to chunk data - file pos %llu (%d KiB, %.02f MiB)!",
+			static_cast<Int64>(SectorNum) * (4 KiB),
+			SectorNum * 4,
 			static_cast<double>(SectorNum) / 256
 		);
 		return false;
@@ -275,7 +272,11 @@ bool cMCADefrag::cThread::ReadChunk(cFile & a_File, const Byte * a_LocationRaw)
 	m_CompressedChunkDataSize = (Buf[0] << 24) | (Buf[1] << 16) | (Buf[2] << 8) | Buf[3];
 	if ((m_CompressedChunkDataSize > SizeInSectors) || (m_CompressedChunkDataSize < 0))
 	{
-		LOGWARNING("Invalid chunk data - SizeInSectors (%d) smaller that RealSize (%d)", SizeInSectors, m_CompressedChunkDataSize);
+		LOGWARNING(
+			"Invalid chunk data - SizeInSectors (%d) smaller that RealSize (%d)",
+			SizeInSectors,
+			m_CompressedChunkDataSize
+		);
 		return false;
 	}
 
@@ -318,7 +319,9 @@ bool cMCADefrag::cThread::WriteChunk(cFile & a_File, Byte * a_LocationRaw)
 	a_LocationRaw[0] = static_cast<Byte>(m_CurrentSectorOut >> 16);
 	a_LocationRaw[1] = (m_CurrentSectorOut >> 8) & 0xff;
 	a_LocationRaw[2] = m_CurrentSectorOut & 0xff;
-	a_LocationRaw[3] = static_cast<Byte>((m_CompressedChunkDataSize + (4 KiB) + 3) / (4 KiB));  // +3 because the m_CompressedChunkDataSize doesn't include the exact-length
+	a_LocationRaw[3] = static_cast<Byte>(
+		(m_CompressedChunkDataSize + (4 KiB) + 3) / (4 KiB)
+	);  // +3 because the m_CompressedChunkDataSize doesn't include the exact-length
 	m_CurrentSectorOut += a_LocationRaw[3];
 
 	// Write the data length:
@@ -334,7 +337,8 @@ bool cMCADefrag::cThread::WriteChunk(cFile & a_File, Byte * a_LocationRaw)
 	}
 
 	// Write the data:
-	if (a_File.Write(m_CompressedChunkData, static_cast<size_t>(m_CompressedChunkDataSize)) != m_CompressedChunkDataSize)
+	if (a_File.Write(m_CompressedChunkData, static_cast<size_t>(m_CompressedChunkDataSize)) !=
+		m_CompressedChunkDataSize)
 	{
 		LOGWARNING("Failed to write chunk data!");
 		return false;
@@ -389,10 +393,11 @@ bool cMCADefrag::cThread::UncompressChunkZlib(void)
 		// Uncompress the data
 
 		const auto ExtractedData = m_Extractor.ExtractZLib(
-		{
-			reinterpret_cast<const std::byte *>(m_CompressedChunkData + 1),  // The first byte is the compression method, skip it
-			static_cast<size_t>(m_CompressedChunkDataSize - 1)
-		});
+			{reinterpret_cast<const std::byte *>(
+				 m_CompressedChunkData + 1
+			 ),  // The first byte is the compression method, skip it
+			 static_cast<size_t>(m_CompressedChunkDataSize - 1)}
+		);
 		const auto Extracted = ExtractedData.GetView();
 
 		if (Extracted.size() > MAX_RAW_CHUNK_DATA_SIZE)
@@ -424,10 +429,8 @@ bool cMCADefrag::cThread::CompressChunk(void)
 		// Compress the data (using the highest compression factor, as set in the constructor)
 
 		const auto CompressedData = m_Compressor.CompressZLib(
-		{
-			reinterpret_cast<const std::byte *>(m_RawChunkData),
-			static_cast<size_t>(m_RawChunkDataSize)
-		});
+			{reinterpret_cast<const std::byte *>(m_RawChunkData), static_cast<size_t>(m_RawChunkDataSize)}
+		);
 		const auto Compressed = CompressedData.GetView();
 
 		// Check that the compressed data can fit:

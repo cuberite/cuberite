@@ -48,7 +48,7 @@ enum eEntityType
 	entZombieVillager,
 	entUnknown,
 	entMax = entUnknown,
-} ;
+};
 
 
 
@@ -59,6 +59,3 @@ extern const char * GetBlockTypeString(unsigned char a_BlockType);
 extern eEntityType GetEntityType(const AString & a_EntityTypeString);
 extern const char * GetEntityTypeString(eEntityType a_EntityType);
 extern int GetNumCores(void);
-
-
-

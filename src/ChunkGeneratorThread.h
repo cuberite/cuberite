@@ -21,17 +21,15 @@ Before generating, the thread checks if the chunk hasn't been already generated.
 It is theoretically possible to have multiple generator threads by having multiple instances of this object,
 but then it MAY happen that the chunk is generated twice.
 If the generator queue is overloaded, the generator skips chunks with no clients in them. */
-class cChunkGeneratorThread :
-	public cIsThread
+class cChunkGeneratorThread : public cIsThread
 {
 	using Super = cIsThread;
 
-public:
-
+  public:
 	/** The interface through which the plugins are called for their OnChunkGenerating / OnChunkGenerated hooks. */
 	class cPluginInterface
 	{
-	public:
+	  public:
 		// Force a virtual destructor
 		virtual ~cPluginInterface() {}
 
@@ -42,13 +40,13 @@ public:
 		/** Called after the chunk is generated, before it is handed to the chunk sink.
 		a_ChunkDesc contains the generated chunk data. Implementation may modify this data. */
 		virtual void CallHookChunkGenerated(cChunkDesc & a_ChunkDesc) = 0;
-	} ;
+	};
 
 
 	/** The interface through which the generated chunks are handed to the cWorld or whoever created us. */
 	class cChunkSink
 	{
-	public:
+	  public:
 		// Force a virtual destructor
 		virtual ~cChunkSink() {}
 
@@ -70,10 +68,10 @@ public:
 		/** Called to check whether the specified chunk is in the queued state.
 		Currently used only in Debug-mode asserts. */
 		virtual bool IsChunkQueued(cChunkCoords a_Coords) = 0;
-	} ;
+	};
 
 
-	cChunkGeneratorThread (void);
+	cChunkGeneratorThread(void);
 	virtual ~cChunkGeneratorThread() override;
 
 	/** Read settings from the ini file and initialize in preperation for being started. */
@@ -83,12 +81,17 @@ public:
 
 	/** Queues the chunk for generation
 	If a-ForceGenerate is set, the chunk is regenerated even if the data is already present in the chunksink.
-	a_Callback is called after the chunk is generated. If the chunk was already present, the callback is still called, even if not regenerating.
-	It is legal to set the callback to nullptr, no callback is called then.
-	If the generator becomes overloaded and skips this chunk, the callback is still called. */
-	void QueueGenerateChunk(cChunkCoords a_Coords, bool a_ForceRegeneration, cChunkCoordCallback * a_Callback = nullptr);
+	a_Callback is called after the chunk is generated. If the chunk was already present, the callback is still called,
+	even if not regenerating. It is legal to set the callback to nullptr, no callback is called then. If the generator
+	becomes overloaded and skips this chunk, the callback is still called. */
+	void QueueGenerateChunk(
+		cChunkCoords a_Coords,
+		bool a_ForceRegeneration,
+		cChunkCoordCallback * a_Callback = nullptr
+	);
 
-	/** Generates the biomes for the specified chunk (directly, not in a separate thread). Used by the world loader if biomes failed loading. */
+	/** Generates the biomes for the specified chunk (directly, not in a separate thread). Used by the world loader if
+	 * biomes failed loading. */
 	void GenerateBiomes(cChunkCoords a_Coords, cChunkDef::BiomeMap & a_BiomeMap);
 
 	void WaitForQueueEmpty();
@@ -101,8 +104,7 @@ public:
 	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ);
 
 
-private:
-
+  private:
 	struct QueueItem
 	{
 		/** The chunk coords */
@@ -114,10 +116,8 @@ private:
 		/** Callback to call after generating. */
 		cChunkCoordCallback * m_Callback;
 
-		QueueItem(cChunkCoords a_Coords, bool a_ForceRegeneration, cChunkCoordCallback * a_Callback):
-			m_Coords(a_Coords),
-			m_ForceRegeneration(a_ForceRegeneration),
-			m_Callback(a_Callback)
+		QueueItem(cChunkCoords a_Coords, bool a_ForceRegeneration, cChunkCoordCallback * a_Callback) :
+			m_Coords(a_Coords), m_ForceRegeneration(a_ForceRegeneration), m_Callback(a_Callback)
 		{
 		}
 	};
@@ -153,7 +153,3 @@ private:
 	/** Generates the specified chunk and sets it into the chunksink. */
 	void DoGenerate(cChunkCoords a_Coords);
 };
-
-
-
-

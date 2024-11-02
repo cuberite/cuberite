@@ -25,13 +25,13 @@ class cFastNBTWriter;
 
 class cZapper
 {
-public:
+  public:
 	cZapper(const AString & a_MCAFolder);
 
 	/** Zaps all the specified regions */
 	void ZapRegions(const cRegionVector & a_Regions);
 
-protected:
+  protected:
 	static const int BlocksPerChunkX = 16;
 	static const int BlocksPerChunkZ = 16;
 	static const int ChunksPerMCAX = 32;
@@ -49,8 +49,8 @@ protected:
 	void ZapRegionInMCAFile(const cRegion & a_Region, int a_MCAX, int a_MCAZ);
 
 	/** Loads raw compressed chunk data from the specified file
-	* chunk is specified by ChunkHeaderValue, which is the int describing the chunk in file header.
-	*/
+	 * chunk is specified by ChunkHeaderValue, which is the int describing the chunk in file header.
+	 */
 	void LoadChunkData(cFile & a_InFile, int a_ChunkHeaderValue, AString & a_ChunkData, int a_ChunkX, int a_ChunkZ);
 
 	/** Zaps the specified region in the raw (compressed) chunk data. */
@@ -73,4 +73,4 @@ protected:
 
 	/** Serializes the NBT subtree into a writer */
 	void SerializeNBTTag(const cParsedNBT & a_NBT, int a_Tag, cFastNBTWriter & a_Writer);
-} ;
+};

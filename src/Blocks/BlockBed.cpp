@@ -15,9 +15,11 @@
 
 
 void cBlockBedHandler::OnBroken(
-	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+	cChunkInterface & a_ChunkInterface,
+	cWorldInterface & a_WorldInterface,
 	const Vector3i a_BlockPos,
-	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+	BLOCKTYPE a_OldBlockType,
+	NIBBLETYPE a_OldBlockMeta,
 	const cEntity * a_Digger
 ) const
 {
@@ -94,10 +96,8 @@ bool cBlockBedHandler::OnUse(
 	a_Player.SetBedPos(a_BlockPos);
 
 	// Sleeping is allowed only during night and thunderstorms:
-	if (
-		!(((a_WorldInterface.GetTimeOfDay() > 12541_tick) && (a_WorldInterface.GetTimeOfDay() < 23458_tick)) ||
-		(a_Player.GetWorld()->GetWeather() == wThunderstorm))
-	)
+	if (!(((a_WorldInterface.GetTimeOfDay() > 12541_tick) && (a_WorldInterface.GetTimeOfDay() < 23458_tick)) ||
+		  (a_Player.GetWorld()->GetWeather() == wThunderstorm)))
 	{
 		a_Player.SendAboveActionBarMessage("You can only sleep at night and during thunderstorms");
 		return true;
@@ -111,12 +111,11 @@ bool cBlockBedHandler::OnUse(
 	}
 
 	// Cannot sleep if there are hostile mobs nearby:
-	if (
-		!a_Player.GetWorld()->ForEachEntityInBox({ a_Player.GetPosition().addedY(-5), 8, 10 }, [](cEntity & a_Entity)
-		{
-			return a_Entity.IsMob() && (static_cast<cMonster&>(a_Entity).GetMobFamily() == cMonster::mfHostile);
-		})
-	)
+	if (!a_Player.GetWorld()->ForEachEntityInBox(
+			{a_Player.GetPosition().addedY(-5), 8, 10},
+			[](cEntity & a_Entity)
+			{ return a_Entity.IsMob() && (static_cast<cMonster &>(a_Entity).GetMobFamily() == cMonster::mfHostile); }
+		))
 	{
 		a_Player.SendAboveActionBarMessage("You may not rest now, there are monsters nearby");
 		return true;
@@ -137,16 +136,20 @@ bool cBlockBedHandler::OnUse(
 
 	// When sleeping, the player's bounding box moves to approximately where his head is.
 	// Set the player's position to somewhere close to the edge of the pillow block:
-	a_Player.SetPosition(Vector3f(0.4f, 1, 0.4f) * MetaDataToDirection(Meta & 0x03) + Vector3f(0.5f, 0.6875, 0.5f) + a_BlockPos);
+	a_Player.SetPosition(
+		Vector3f(0.4f, 1, 0.4f) * MetaDataToDirection(Meta & 0x03) + Vector3f(0.5f, 0.6875, 0.5f) + a_BlockPos
+	);
 
 	// Fast-forward the time if all players in the world are in their beds:
 	if (a_WorldInterface.ForEachPlayer([](cPlayer & a_OtherPlayer) { return !a_OtherPlayer.IsInBed(); }))
 	{
-		a_WorldInterface.ForEachPlayer([&a_ChunkInterface](cPlayer & a_OtherPlayer)
-		{
-			VacateBed(a_ChunkInterface, a_OtherPlayer);
-			return false;
-		});
+		a_WorldInterface.ForEachPlayer(
+			[&a_ChunkInterface](cPlayer & a_OtherPlayer)
+			{
+				VacateBed(a_ChunkInterface, a_OtherPlayer);
+				return false;
+			}
+		);
 		a_WorldInterface.SetTimeOfDay(0_tick);
 	}
 

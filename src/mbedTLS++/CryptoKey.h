@@ -20,7 +20,7 @@ class cCryptoKey
 {
 	friend class cSslConfig;
 
-public:
+  public:
 	/** Constructs an empty key instance. Before use, it needs to be filled by ParsePublic() or ParsePrivate() */
 	cCryptoKey(void);
 
@@ -36,7 +36,12 @@ public:
 	/** Decrypts the data using the stored public key
 	Both a_EncryptedData and a_DecryptedData must be at least <KeySizeBytes> bytes large.
 	Returns the number of bytes decrypted, or negative number for error. */
-	int Decrypt(const Byte * a_EncryptedData, size_t a_EncryptedLength, Byte * a_DecryptedData, size_t a_DecryptedMaxLength);
+	int Decrypt(
+		const Byte * a_EncryptedData,
+		size_t a_EncryptedLength,
+		Byte * a_DecryptedData,
+		size_t a_DecryptedMaxLength
+	);
 
 	/** Encrypts the data using the stored public key
 	Both a_EncryptedData and a_DecryptedData must be at least <KeySizeBytes> bytes large.
@@ -57,7 +62,7 @@ public:
 	/** Returns true if the contained key is valid. */
 	bool IsValid(void) const;
 
-protected:
+  protected:
 	/** The mbedTLS representation of the key data */
 	mbedtls_pk_context m_Pk;
 
@@ -67,10 +72,6 @@ protected:
 
 	/** Returns the internal context ptr. Only use in mbedTLS API calls. */
 	mbedtls_pk_context * GetInternal(void) { return &m_Pk; }
-} ;
+};
 
 typedef std::shared_ptr<cCryptoKey> cCryptoKeyPtr;
-
-
-
-

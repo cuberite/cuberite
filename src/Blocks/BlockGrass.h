@@ -10,15 +10,12 @@
 
 
 
-class cBlockGrassHandler final :
-	public cBlockHandler
+class cBlockGrassHandler final : public cBlockHandler
 {
-public:
-
+  public:
 	using cBlockHandler::cBlockHandler;
 
-private:
-
+  private:
 	enum class Survivability
 	{
 		// Light level so good that the grass can try to spread to neighbours
@@ -91,8 +88,7 @@ private:
 		return 1;
 	}
 
-private:
-
+  private:
 	/** Check if conditions are favourable to a grass block at the given position.
 	If they are not, the grass dies and is turned to dirt.
 	Returns whether conditions are so good that the grass can try to spread to neighbours. */
@@ -107,9 +103,7 @@ private:
 		// Grass turns back to dirt when the block above it is not transparent or water.
 		// It does not turn to dirt when a snow layer is above.
 		const auto Above = a_Chunk.GetBlock(AbovePos);
-		if (
-			(Above != E_BLOCK_SNOW) &&
-			(!cBlockInfo::IsTransparent(Above) || IsBlockWater(Above)))
+		if ((Above != E_BLOCK_SNOW) && (!cBlockInfo::IsTransparent(Above) || IsBlockWater(Above)))
 		{
 			return Survivability::DieInDarkness;
 		}
@@ -139,7 +133,7 @@ private:
 			return;
 		}
 
-		BLOCKTYPE  DestBlock;
+		BLOCKTYPE DestBlock;
 		NIBBLETYPE DestMeta;
 		Chunk->GetBlockTypeMeta(a_RelPos, DestBlock, DestMeta);
 
@@ -153,12 +147,7 @@ private:
 		const auto Above = Chunk->GetBlock(AbovePos);
 		const auto Light = std::max(Chunk->GetBlockLight(AbovePos), Chunk->GetSkyLightAltered(AbovePos));
 
-		if (
-			(Light > 4) &&
-			cBlockInfo::IsTransparent(Above) &&
-			!IsBlockLava(Above) &&
-			!IsBlockWaterOrIce(Above)
-		)
+		if ((Light > 4) && cBlockInfo::IsTransparent(Above) && !IsBlockLava(Above) && !IsBlockWaterOrIce(Above))
 		{
 			const auto AbsPos = Chunk->RelativeToAbsolute(a_RelPos);
 			if (!cRoot::Get()->GetPluginManager()->CallHookBlockSpread(*Chunk->GetWorld(), AbsPos, ssGrassSpread))
@@ -167,4 +156,4 @@ private:
 			}
 		}
 	}
-} ;
+};

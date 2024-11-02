@@ -9,10 +9,7 @@
 
 
 cPathFinder::cPathFinder(float a_MobWidth, float a_MobHeight) :
-	m_Width(a_MobWidth),
-	m_Height(a_MobHeight),
-	m_GiveUpCounter(0),
-	m_NotFoundCooldown(0)
+	m_Width(a_MobWidth), m_Height(a_MobHeight), m_GiveUpCounter(0), m_NotFoundCooldown(0)
 {
 }
 
@@ -20,7 +17,13 @@ cPathFinder::cPathFinder(float a_MobWidth, float a_MobHeight) :
 
 
 
-ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d & a_Source, Vector3d * a_Destination, Vector3d * a_OutputWaypoint, bool a_DontCare)
+ePathFinderStatus cPathFinder::GetNextWayPoint(
+	cChunk & a_Chunk,
+	const Vector3d & a_Source,
+	Vector3d * a_Destination,
+	Vector3d * a_OutputWaypoint,
+	bool a_DontCare
+)
 {
 	m_FinalDestination = *a_Destination;
 	m_Source = a_Source;
@@ -69,11 +72,13 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 			if (a_DontCare)
 			{
 				m_FinalDestination = m_PathDestination;
-				*a_Destination = m_FinalDestination;  // Modify the mob's final destination because it doesn't care about reaching an exact spot
+				*a_Destination = m_FinalDestination;  // Modify the mob's final destination because it doesn't care
+													  // about reaching an exact spot
 			}
 			else
 			{
-				m_DeviationOrigin = m_FinalDestination;  // This is the only case in which m_DeviationOrigin != m_PathDestination
+				m_DeviationOrigin =
+					m_FinalDestination;  // This is the only case in which m_DeviationOrigin != m_PathDestination
 			}
 			return ePathFinderStatus::CALCULATING;
 			// The next call will trigger the PATH_FOUND case
@@ -124,7 +129,6 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 				{
 					*a_OutputWaypoint = m_FinalDestination;
 					return ePathFinderStatus::PATH_FOUND;
-
 				}
 				else
 				{
@@ -139,7 +143,8 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 			Waypoint.y = 0;
 			Source.y = 0;
 
-			if (m_Path->IsFirstPoint() || (((Waypoint - Source).SqrLength() < WAYPOINT_RADIUS) && (m_Source.y >= m_WayPoint.y)))
+			if (m_Path->IsFirstPoint() ||
+				(((Waypoint - Source).SqrLength() < WAYPOINT_RADIUS) && (m_Source.y >= m_WayPoint.y)))
 			{
 				// if the mob has just started or if the mob reached a waypoint, give them a new waypoint.
 				m_WayPoint = m_Path->GetNextPoint();
@@ -148,7 +153,8 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 			}
 			else
 			{
-				// Otherwise, the mob is still walking towards its waypoint, we'll patiently wait. We won't update m_WayPoint.
+				// Otherwise, the mob is still walking towards its waypoint, we'll patiently wait. We won't update
+				// m_WayPoint.
 				*a_OutputWaypoint = m_WayPoint;
 				return ePathFinderStatus::PATH_FOUND;
 			}
@@ -161,7 +167,7 @@ ePathFinderStatus cPathFinder::GetNextWayPoint(cChunk & a_Chunk, const Vector3d 
 
 
 
-void cPathFinder::ResetPathFinding(cChunk &a_Chunk)
+void cPathFinder::ResetPathFinding(cChunk & a_Chunk)
 {
 	m_GiveUpCounter = 40;
 	m_NoPathToTarget = false;
@@ -192,26 +198,22 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 	if (!cChunkDef::IsValidHeight(Below))
 	{
 		return false;
-
 	}
 	auto BelowRel = cChunkDef::AbsoluteToRelative(Below);
 
 	Chunk->GetBlockTypeMeta(BelowRel, BlockType, BlockMeta);
 	if (!(IsWaterOrSolid(BlockType)))
 	{
-		constexpr std::array<Vector3i, 8> Offsets =
-		{
-			{
-				{-1, 0, 0},
-				{1, 0, 0},
-				{0, 0, -1},
-				{0, 0, 1},
-				{-1, 0, -1},
-				{-1, 0, 1},
-				{1, 0, -1},
-				{1, 0, 1},
-			}
-		};
+		constexpr std::array<Vector3i, 8> Offsets = {{
+			{-1, 0, 0},
+			{1, 0, 0},
+			{0, 0, -1},
+			{0, 0, 1},
+			{-1, 0, -1},
+			{-1, 0, 1},
+			{1, 0, -1},
+			{1, 0, 1},
+		}};
 
 		// Looks for a neighbouring block one block in x or z direction that is water or solid.
 		bool InTheAir = true;

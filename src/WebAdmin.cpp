@@ -25,31 +25,27 @@ static const char DEFAULT_WEBADMIN_PORTS[] = "8080";
 // cWebadminRequestData
 
 /** The form parser callbacks for requests in the "/webadmin" and "/~webadmin" paths */
-class cWebadminRequestData :
-	public cHTTPFormParser::cCallbacks,
-	public cHTTPIncomingRequest::cUserData
+class cWebadminRequestData : public cHTTPFormParser::cCallbacks,
+							 public cHTTPIncomingRequest::cUserData
 {
-public:
+  public:
 	cHTTPFormParser m_Form;
 
 
-	cWebadminRequestData(const cHTTPIncomingRequest & a_Request):
+	cWebadminRequestData(const cHTTPIncomingRequest & a_Request) :
 		m_Form(a_Request, *this)
 	{
 	}
 
 	// cHTTPFormParser::cCallbacks overrides. Files are ignored:
-	virtual void OnFileStart(cHTTPFormParser &, const AString & a_FileName) override
-	{
-		UNUSED(a_FileName);
-	}
+	virtual void OnFileStart(cHTTPFormParser &, const AString & a_FileName) override { UNUSED(a_FileName); }
 	virtual void OnFileData(cHTTPFormParser &, const char * a_Data, size_t a_Size) override
 	{
 		UNUSED(a_Data);
 		UNUSED(a_Size);
 	}
 	virtual void OnFileEnd(cHTTPFormParser &) override {}
-} ;
+};
 
 
 
@@ -59,9 +55,7 @@ public:
 // cWebAdmin:
 
 cWebAdmin::cWebAdmin(void) :
-	m_TemplateScript("<webadmin_template>"),
-	m_IsInitialized(false),
-	m_IsRunning(false)
+	m_TemplateScript("<webadmin_template>"), m_IsInitialized(false), m_IsRunning(false)
 {
 }
 
@@ -167,10 +161,12 @@ bool cWebAdmin::LoadLoginPage(void)
 void cWebAdmin::RemoveAllPluginWebTabs(const AString & a_PluginName)
 {
 	cCSLock lock(m_CS);
-	m_WebTabs.erase(std::remove_if(m_WebTabs.begin(), m_WebTabs.end(), [=](const cWebTabPtr & a_CBWebTab)
-		{
-			return (a_CBWebTab->m_PluginName == a_PluginName);
-		}),
+	m_WebTabs.erase(
+		std::remove_if(
+			m_WebTabs.begin(),
+			m_WebTabs.end(),
+			[=](const cWebTabPtr & a_CBWebTab) { return (a_CBWebTab->m_PluginName == a_PluginName); }
+		),
 		m_WebTabs.end()
 	);
 }
@@ -185,17 +181,13 @@ void cWebAdmin::Reload(void)
 	if (!LoadIniFile())
 	{
 		// We are asked to disable the webadmin, cannot do that, so warn the admin:
-		LOGWARNING(
-			"WebAdmin was previously enabled and now the settings say to disable it."
-			" This will not take effect until you restart the server."
-		);
+		LOGWARNING("WebAdmin was previously enabled and now the settings say to disable it."
+				   " This will not take effect until you restart the server.");
 	}
 	else if (!HasUsers())
 	{
-		LOGWARNING(
-			"The webadmin is enabled but has no users configured."
-			" To add new users, edit webadmin.ini"
-		);
+		LOGWARNING("The webadmin is enabled but has no users configured."
+				   " To add new users, edit webadmin.ini");
 	}
 
 	// Initialize the WebAdmin template script and reload the file:
@@ -217,13 +209,12 @@ void cWebAdmin::Reload(void)
 		LOGWARN("Could not load WebAdmin login page \"%s\", using fallback template.", "webadmin/login_template.html");
 
 		// Set the fallback:
-		m_LoginPage = \
-		"<h1>Cuberite WebAdmin</h1>" \
-		"<center>" \
-		"<form method='get' action='webadmin/'>" \
-		"<input type='submit' value='Log in'>" \
-		"</form>" \
-		"</center>";
+		m_LoginPage = "<h1>Cuberite WebAdmin</h1>"
+					  "<center>"
+					  "<form method='get' action='webadmin/'>"
+					  "<input type='submit' value='Log in'>"
+					  "</form>"
+					  "</center>";
 	}
 }
 
@@ -329,7 +320,8 @@ void cWebAdmin::HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTT
 		size_t idxQM = URL.find('?');
 		if (idxQM != AString::npos)
 		{
-			cHTTPFormParser URLParams(cHTTPFormParser::fpkURL, URL.c_str() + idxQM + 1, URL.length() - idxQM - 1, *Data);
+			cHTTPFormParser
+				URLParams(cHTTPFormParser::fpkURL, URL.c_str() + idxQM + 1, URL.length() - idxQM - 1, *Data);
 			URLParams.Finish();
 			for (cHTTPFormParser::const_iterator itr = URLParams.begin(), end = URLParams.end(); itr != end; ++itr)
 			{
@@ -443,23 +435,23 @@ AString cWebAdmin::GetContentTypeFromFileExt(const AString & a_FileExtension)
 	if (!IsInitialized)
 	{
 		// Initialize the ContentTypeMap:
-		ContentTypeMap["png"]   = "image/png";
-		ContentTypeMap["fif"]   = "image/fif";
-		ContentTypeMap["gif"]   = "image/gif";
-		ContentTypeMap["jpeg"]  = "image/jpeg";
-		ContentTypeMap["jpg"]   = "image/jpeg";
-		ContentTypeMap["jpe"]   = "image/jpeg";
-		ContentTypeMap["tiff"]  = "image/tiff";
-		ContentTypeMap["ico"]   = "image/ico";
-		ContentTypeMap["csv"]   = "text/csv";
-		ContentTypeMap["css"]   = "text/css";
-		ContentTypeMap["js"]    = "text/javascript";
-		ContentTypeMap["txt"]   = "text/plain";
-		ContentTypeMap["rtx"]   = "text/richtext";
-		ContentTypeMap["rtf"]   = "text/richtext";
-		ContentTypeMap["xml"]   = "text/xml";
-		ContentTypeMap["html"]  = "text/html";
-		ContentTypeMap["htm"]   = "text/html";
+		ContentTypeMap["png"] = "image/png";
+		ContentTypeMap["fif"] = "image/fif";
+		ContentTypeMap["gif"] = "image/gif";
+		ContentTypeMap["jpeg"] = "image/jpeg";
+		ContentTypeMap["jpg"] = "image/jpeg";
+		ContentTypeMap["jpe"] = "image/jpeg";
+		ContentTypeMap["tiff"] = "image/tiff";
+		ContentTypeMap["ico"] = "image/ico";
+		ContentTypeMap["csv"] = "text/csv";
+		ContentTypeMap["css"] = "text/css";
+		ContentTypeMap["js"] = "text/javascript";
+		ContentTypeMap["txt"] = "text/plain";
+		ContentTypeMap["rtx"] = "text/richtext";
+		ContentTypeMap["rtf"] = "text/richtext";
+		ContentTypeMap["xml"] = "text/xml";
+		ContentTypeMap["html"] = "text/html";
+		ContentTypeMap["htm"] = "text/html";
 		ContentTypeMap["xhtml"] = "application/xhtml+xml";  // Not recomended for IE6, but no-one uses that anymore
 	}
 
@@ -490,12 +482,9 @@ sWebAdminPage cWebAdmin::GetPage(const HTTPRequest & a_Request)
 	cWebTabPtr tab;
 	{
 		cCSLock Lock(m_CS);
-		for (auto & wt: m_WebTabs)
+		for (auto & wt : m_WebTabs)
 		{
-			if (
-				(wt->m_PluginName == split[1]) &&
-				(wt->m_UrlPath == split[2])
-			)
+			if ((wt->m_PluginName == split[1]) && (wt->m_UrlPath == split[2]))
 			{
 				tab = wt;
 				break;
@@ -511,7 +500,8 @@ sWebAdminPage cWebAdmin::GetPage(const HTTPRequest & a_Request)
 		{
 			page.Content = GetHTMLEscapedString(fmt::format(
 				FMT_STRING("WebTab callback for plugin {}, page {} has failed."),
-				tab->m_PluginName, tab->m_Title
+				tab->m_PluginName,
+				tab->m_Title
 			));
 		}
 		page.PluginName = tab->m_PluginName;
@@ -581,11 +571,11 @@ AString cWebAdmin::GetHTMLEscapedString(const AString & a_Input)
 	{
 		switch (a_Input[i])
 		{
-			case '&':  dst.append("&amp;");  break;
+			case '&':  dst.append("&amp;"); break;
 			case '\'': dst.append("&apos;"); break;
 			case '"':  dst.append("&quot;"); break;
-			case '<':  dst.append("&lt;");   break;
-			case '>':  dst.append("&gt;");   break;
+			case '<':  dst.append("&lt;"); break;
+			case '>':  dst.append("&gt;"); break;
 			default:
 			{
 				dst.push_back(a_Input[i]);
@@ -632,10 +622,7 @@ void cWebAdmin::OnRequestBegun(cHTTPServerConnection & a_Connection, cHTTPIncomi
 {
 	UNUSED(a_Connection);
 	const AString & URL = a_Request.GetURL();
-	if (
-		(strncmp(URL.c_str(), "/webadmin", 9) == 0) ||
-		(strncmp(URL.c_str(), "/~webadmin", 10) == 0)
-	)
+	if ((strncmp(URL.c_str(), "/webadmin", 9) == 0) || (strncmp(URL.c_str(), "/~webadmin", 10) == 0))
 	{
 		a_Request.SetUserData(std::make_shared<cWebadminRequestData>(a_Request));
 		return;
@@ -652,7 +639,12 @@ void cWebAdmin::OnRequestBegun(cHTTPServerConnection & a_Connection, cHTTPIncomi
 
 
 
-void cWebAdmin::OnRequestBody(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request, const char * a_Data, size_t a_Size)
+void cWebAdmin::OnRequestBody(
+	cHTTPServerConnection & a_Connection,
+	cHTTPIncomingRequest & a_Request,
+	const char * a_Data,
+	size_t a_Size
+)
 {
 	UNUSED(a_Connection);
 	auto Data = std::static_pointer_cast<cWebadminRequestData>(a_Request.GetUserData());
@@ -670,10 +662,7 @@ void cWebAdmin::OnRequestBody(cHTTPServerConnection & a_Connection, cHTTPIncomin
 void cWebAdmin::OnRequestFinished(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request)
 {
 	const AString & URL = a_Request.GetURL();
-	if (
-		(strncmp(URL.c_str(), "/webadmin", 9) == 0) ||
-		(strncmp(URL.c_str(), "/~webadmin", 10) == 0)
-	)
+	if ((strncmp(URL.c_str(), "/webadmin", 9) == 0) || (strncmp(URL.c_str(), "/~webadmin", 10) == 0))
 	{
 		HandleWebadminRequest(a_Connection, a_Request);
 	}
@@ -687,8 +676,3 @@ void cWebAdmin::OnRequestFinished(cHTTPServerConnection & a_Connection, cHTTPInc
 		HandleFileRequest(a_Connection, a_Request);
 	}
 }
-
-
-
-
-

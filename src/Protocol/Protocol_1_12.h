@@ -23,17 +23,14 @@ Declares the 1.12 protocol classes:
 
 
 
-class cProtocol_1_12:
-	public cProtocol_1_11_1
+class cProtocol_1_12 : public cProtocol_1_11_1
 {
 	using Super = cProtocol_1_11_1;
 
-public:
-
+  public:
 	using Super::Super;
 
-protected:
-
+  protected:
 	virtual UInt32 GetPacketID(ePacketType a_Packet) const override;
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
@@ -52,17 +49,14 @@ protected:
 
 
 
-class cProtocol_1_12_1:
-	public cProtocol_1_12
+class cProtocol_1_12_1 : public cProtocol_1_12
 {
 	using Super = cProtocol_1_12;
 
-public:
-
+  public:
 	using Super::Super;
 
-protected:
-
+  protected:
 	virtual UInt32 GetPacketID(ePacketType a_Packet) const override;
 	virtual Version GetProtocolVersion() const override;
 
@@ -73,17 +67,14 @@ protected:
 
 
 
-class cProtocol_1_12_2:
-	public cProtocol_1_12_1
+class cProtocol_1_12_2 : public cProtocol_1_12_1
 {
 	using Super = cProtocol_1_12_1;
 
-public:
-
+  public:
 	using Super::Super;
 
-protected:
-
+  protected:
 	virtual Version GetProtocolVersion() const override;
 
 	virtual void HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer) override;

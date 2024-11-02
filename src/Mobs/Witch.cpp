@@ -42,7 +42,3 @@ void cWitch::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	}
 	AddRandomWeaponDropItem(a_Drops, LootingLevel);
 }
-
-
-
-

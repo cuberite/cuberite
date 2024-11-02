@@ -13,14 +13,28 @@
 // The number of NBT tags that are reserved when an NBT parsing is started.
 // You can override this by using a cmdline define
 #ifndef NBT_RESERVE_SIZE
-	#define NBT_RESERVE_SIZE 200
+#define NBT_RESERVE_SIZE 200
 #endif  // NBT_RESERVE_SIZE
 
 #ifdef _MSC_VER
-	// Dodge a C4127 (conditional expression is constant) for this specific macro usage
-	#define PROPAGATE_ERROR(X) do { auto Err = (X); if (Err != eNBTParseError::npSuccess) return Err; } while ((false, false))
+// Dodge a C4127 (conditional expression is constant) for this specific macro usage
+#define PROPAGATE_ERROR(X)                    \
+	do                                        \
+	{                                         \
+		auto Err = (X);                       \
+		if (Err != eNBTParseError::npSuccess) \
+			return Err;                       \
+	}                                         \
+	while ((false, false))
 #else
-	#define PROPAGATE_ERROR(X) do { auto Err = (X); if (Err != eNBTParseError::npSuccess) return Err; } while (false)
+#define PROPAGATE_ERROR(X)                    \
+	do                                        \
+	{                                         \
+		auto Err = (X);                       \
+		if (Err != eNBTParseError::npSuccess) \
+			return Err;                       \
+	}                                         \
+	while (false)
 #endif
 
 
@@ -31,16 +45,13 @@
 namespace
 {
 
-class cNBTParseErrorCategory final :
-	public std::error_category
+class cNBTParseErrorCategory final : public std::error_category
 {
 	cNBTParseErrorCategory() = default;
-public:
+
+  public:
 	/** Category name */
-	virtual const char * name() const noexcept override
-	{
-		return "NBT parse error";
-	}
+	virtual const char * name() const noexcept override { return "NBT parse error"; }
 
 	/** Maps a parse error code to an error message */
 	virtual AString message(int a_Condition) const override;
@@ -117,7 +128,7 @@ AString cNBTParseErrorCategory::message(int a_Condition) const
 	UNREACHABLE("Unsupported nbt parse error");
 }
 
-}  // namespace (anonymous)
+}  // namespace
 
 
 
@@ -125,7 +136,7 @@ AString cNBTParseErrorCategory::message(int a_Condition) const
 
 std::error_code make_error_code(eNBTParseError a_Err) noexcept
 {
-	return { static_cast<int>(a_Err), cNBTParseErrorCategory::Get() };
+	return {static_cast<int>(a_Err), cNBTParseErrorCategory::Get()};
 }
 
 
@@ -135,21 +146,22 @@ std::error_code make_error_code(eNBTParseError a_Err) noexcept
 ////////////////////////////////////////////////////////////////////////////////
 // cParsedNBT:
 
-#define NEEDBYTES(N, ERR) \
-	do { \
+#define NEEDBYTES(N, ERR)                                   \
+	do                                                      \
+	{                                                       \
 		if (m_Data.size() - m_Pos < static_cast<size_t>(N)) \
-		{ \
-			return ERR; \
-		} \
-	} while (false)
+		{                                                   \
+			return ERR;                                     \
+		}                                                   \
+	}                                                       \
+	while (false)
 
 
 
 
 
 cParsedNBT::cParsedNBT(const ContiguousByteBufferView a_Data) :
-	m_Data(a_Data),
-	m_Pos(0)
+	m_Data(a_Data), m_Pos(0)
 {
 	m_Error = Parse();
 }
@@ -281,14 +293,14 @@ eNBTParseError cParsedNBT::ReadList(eTagType a_ChildrenType)
 
 
 
-#define CASE_SIMPLE_TAG(TAGTYPE, LEN) \
-	case TAG_##TAGTYPE: \
-	{ \
+#define CASE_SIMPLE_TAG(TAGTYPE, LEN)                    \
+	case TAG_##TAGTYPE:                                  \
+	{                                                    \
 		NEEDBYTES(LEN, eNBTParseError::npSimpleMissing); \
-		Tag.m_DataStart = m_Pos; \
-		Tag.m_DataLength = LEN; \
-		m_Pos += LEN; \
-		return eNBTParseError::npSuccess; \
+		Tag.m_DataStart = m_Pos;                         \
+		Tag.m_DataLength = LEN;                          \
+		m_Pos += LEN;                                    \
+		return eNBTParseError::npSuccess;                \
 	}
 
 eNBTParseError cParsedNBT::ReadTag(void)
@@ -296,11 +308,11 @@ eNBTParseError cParsedNBT::ReadTag(void)
 	cFastNBTTag & Tag = m_Tags.back();
 	switch (Tag.m_Type)
 	{
-		CASE_SIMPLE_TAG(Byte,   1)
-		CASE_SIMPLE_TAG(Short,  2)
-		CASE_SIMPLE_TAG(Int,    4)
-		CASE_SIMPLE_TAG(Long,   8)
-		CASE_SIMPLE_TAG(Float,  4)
+		CASE_SIMPLE_TAG(Byte, 1)
+		CASE_SIMPLE_TAG(Short, 2)
+		CASE_SIMPLE_TAG(Int, 4)
+		CASE_SIMPLE_TAG(Long, 8)
+		CASE_SIMPLE_TAG(Float, 4)
 		CASE_SIMPLE_TAG(Double, 8)
 
 		case TAG_String:
@@ -387,12 +399,11 @@ int cParsedNBT::FindChildByName(int a_Tag, const char * a_Name, size_t a_NameLen
 	{
 		a_NameLength = strlen(a_Name);
 	}
-	for (int Child = m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild; Child != -1; Child = m_Tags[static_cast<size_t>(Child)].m_NextSibling)
+	for (int Child = m_Tags[static_cast<size_t>(a_Tag)].m_FirstChild; Child != -1;
+		 Child = m_Tags[static_cast<size_t>(Child)].m_NextSibling)
 	{
-		if (
-			(m_Tags[static_cast<size_t>(Child)].m_NameLength == a_NameLength) &&
-			(memcmp(m_Data.data() + m_Tags[static_cast<size_t>(Child)].m_NameStart, a_Name, a_NameLength) == 0)
-		)
+		if ((m_Tags[static_cast<size_t>(Child)].m_NameLength == a_NameLength) &&
+			(memcmp(m_Data.data() + m_Tags[static_cast<size_t>(Child)].m_NameStart, a_Name, a_NameLength) == 0))
 		{
 			return Child;
 		}
@@ -523,9 +534,9 @@ void cFastNBTWriter::BeginList(const AString & a_Name, eTagType a_ChildrenType)
 	m_Result.append(4, std::byte(0));
 
 	++m_CurrentStack;
-	m_Stack[m_CurrentStack].m_Type     = TAG_List;
-	m_Stack[m_CurrentStack].m_Pos      = static_cast<int>(m_Result.size()) - 4;
-	m_Stack[m_CurrentStack].m_Count    = 0;
+	m_Stack[m_CurrentStack].m_Type = TAG_List;
+	m_Stack[m_CurrentStack].m_Pos = static_cast<int>(m_Result.size()) - 4;
+	m_Stack[m_CurrentStack].m_Count = 0;
 	m_Stack[m_CurrentStack].m_ItemType = a_ChildrenType;
 }
 
@@ -618,7 +629,7 @@ void cFastNBTWriter::AddString(const AString & a_Name, const std::string_view a_
 	TagCommon(a_Name, TAG_String);
 	const UInt16 Length = htons(static_cast<UInt16>(a_Value.size()));
 	m_Result.append(reinterpret_cast<const std::byte *>(&Length), sizeof(Length));
-	m_Result.append({ reinterpret_cast<const std::byte *>(a_Value.data()), a_Value.size() });
+	m_Result.append({reinterpret_cast<const std::byte *>(a_Value.data()), a_Value.size()});
 }
 
 

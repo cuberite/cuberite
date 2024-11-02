@@ -24,14 +24,10 @@ struct cRavDefPoint
 	int m_Bottom;
 
 	cRavDefPoint(int a_BlockX, int a_BlockZ, int a_Radius, int a_Top, int a_Bottom) :
-		m_BlockX(a_BlockX),
-		m_BlockZ(a_BlockZ),
-		m_Radius(a_Radius),
-		m_Top   (a_Top),
-		m_Bottom(a_Bottom)
+		m_BlockX(a_BlockX), m_BlockZ(a_BlockZ), m_Radius(a_Radius), m_Top(a_Top), m_Bottom(a_Bottom)
 	{
 	}
-} ;
+};
 
 using cRavDefPoints = std::vector<cRavDefPoint>;
 
@@ -39,8 +35,7 @@ using cRavDefPoints = std::vector<cRavDefPoint>;
 
 
 
-class cStructGenRavines::cRavine:
-	public cGridStructGen::cStructure
+class cStructGenRavines::cRavine : public cGridStructGen::cStructure
 {
 	using Super = cGridStructGen::cStructure;
 
@@ -59,19 +54,18 @@ class cStructGenRavines::cRavine:
 	/** Linearly interpolates the points so that the maximum distance between two neighbors is max 1 block */
 	void FinishLinear(void);
 
-public:
-
+  public:
 	cRavine(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_Size, cNoise & a_Noise);
 
-	#ifndef NDEBUG
+#ifndef NDEBUG
 	/** Exports itself as a SVG line definition */
 	AString ExportAsSVG(int a_Color, int a_OffsetX = 0, int a_OffsetZ = 0) const;
-	#endif  // !NDEBUG
+#endif  // !NDEBUG
 
-protected:
+  protected:
 	// cGridStructGen::cStructure overrides:
 	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override;
-} ;
+};
 
 
 
@@ -81,8 +75,7 @@ protected:
 // cStructGenRavines:
 
 cStructGenRavines::cStructGenRavines(int a_Seed, int a_Size) :
-	Super(a_Seed, a_Size, a_Size, a_Size, a_Size, a_Size * 2, a_Size * 2, 100),
-	m_Size(a_Size)
+	Super(a_Seed, a_Size, a_Size, a_Size, a_Size, a_Size * 2, a_Size * 2, 100), m_Size(a_Size)
 {
 }
 
@@ -102,7 +95,14 @@ cGridStructGen::cStructurePtr cStructGenRavines::CreateStructure(int a_GridX, in
 ////////////////////////////////////////////////////////////////////////////////
 // cStructGenRavines::cRavine
 
-cStructGenRavines::cRavine::cRavine(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_Size, cNoise & a_Noise) :
+cStructGenRavines::cRavine::cRavine(
+	int a_GridX,
+	int a_GridZ,
+	int a_OriginX,
+	int a_OriginZ,
+	int a_Size,
+	cNoise & a_Noise
+) :
 	Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ)
 {
 	// Calculate the ravine shape-defining points:
@@ -123,23 +123,31 @@ cStructGenRavines::cRavine::cRavine(int a_GridX, int a_GridZ, int a_OriginX, int
 void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_BlockZ, int a_Size, cNoise & a_Noise)
 {
 	// Modify the size slightly to have different-sized ravines (1 / 2 to 1 / 1 of a_Size):
-	a_Size = (512 + ((a_Noise.IntNoise3DInt(19 * a_BlockX, 11 * a_BlockZ, a_BlockX + a_BlockZ) / 17) % 512)) * a_Size / 1024;
+	a_Size =
+		(512 + ((a_Noise.IntNoise3DInt(19 * a_BlockX, 11 * a_BlockZ, a_BlockX + a_BlockZ) / 17) % 512)) * a_Size / 1024;
 
 	// The complete offset of the ravine from its cellpoint, up to 2 * a_Size in each direction
-	int OffsetX = (((a_Noise.IntNoise3DInt(50 * a_BlockX, 30 * a_BlockZ, 0)    / 9) % (2 * a_Size)) + ((a_Noise.IntNoise3DInt(30 * a_BlockX, 50 * a_BlockZ, 1000) / 7) % (2 * a_Size)) - 2 * a_Size) / 2;
-	int OffsetZ = (((a_Noise.IntNoise3DInt(50 * a_BlockX, 30 * a_BlockZ, 2000) / 7) % (2 * a_Size)) + ((a_Noise.IntNoise3DInt(30 * a_BlockX, 50 * a_BlockZ, 3000) / 9) % (2 * a_Size)) - 2 * a_Size) / 2;
+	int OffsetX = (((a_Noise.IntNoise3DInt(50 * a_BlockX, 30 * a_BlockZ, 0) / 9) % (2 * a_Size)) +
+				   ((a_Noise.IntNoise3DInt(30 * a_BlockX, 50 * a_BlockZ, 1000) / 7) % (2 * a_Size)) - 2 * a_Size) /
+		2;
+	int OffsetZ = (((a_Noise.IntNoise3DInt(50 * a_BlockX, 30 * a_BlockZ, 2000) / 7) % (2 * a_Size)) +
+				   ((a_Noise.IntNoise3DInt(30 * a_BlockX, 50 * a_BlockZ, 3000) / 9) % (2 * a_Size)) - 2 * a_Size) /
+		2;
 	int CenterX = a_BlockX + OffsetX;
 	int CenterZ = a_BlockZ + OffsetZ;
 
 	// Get the base angle in which the ravine "axis" goes:
-	float Angle = static_cast<float>((static_cast<float>((a_Noise.IntNoise3DInt(20 * a_BlockX, 70 * a_BlockZ, 6000) / 9) % 16384)) / 16384.0 * M_PI);
+	float Angle = static_cast<float>(
+		(static_cast<float>((a_Noise.IntNoise3DInt(20 * a_BlockX, 70 * a_BlockZ, 6000) / 9) % 16384)) / 16384.0 * M_PI
+	);
 	float xc = sinf(Angle);
 	float zc = cosf(Angle);
 
 	// Calculate the definition points and radii:
-	int MaxRadius = static_cast<int>(sqrt(12.0 + ((a_Noise.IntNoise2DInt(61 * a_BlockX, 97 * a_BlockZ) / 13) % a_Size) / 16));
-	int Top       = 32 + ((a_Noise.IntNoise2DInt(13 * a_BlockX, 17 * a_BlockZ) / 23) % 32);
-	int Bottom    = 5 + ((a_Noise.IntNoise2DInt(17 * a_BlockX, 29 * a_BlockZ) / 13) % 32);
+	int MaxRadius =
+		static_cast<int>(sqrt(12.0 + ((a_Noise.IntNoise2DInt(61 * a_BlockX, 97 * a_BlockZ) / 13) % a_Size) / 16));
+	int Top = 32 + ((a_Noise.IntNoise2DInt(13 * a_BlockX, 17 * a_BlockZ) / 23) % 32);
+	int Bottom = 5 + ((a_Noise.IntNoise2DInt(17 * a_BlockX, 29 * a_BlockZ) / 13) % 32);
 	int Mid = (Top + Bottom) / 2;
 	int DefinitionPointX = CenterX - static_cast<int>(xc * a_Size / 2);
 	int DefinitionPointZ = CenterZ - static_cast<int>(zc * a_Size / 2);
@@ -154,8 +162,8 @@ void cStructGenRavines::cRavine::GenerateBaseDefPoints(int a_BlockX, int a_Block
 		int PointX = LineX + static_cast<int>(zc * Amplitude);
 		int PointZ = LineZ - static_cast<int>(xc * Amplitude);
 		int Radius = MaxRadius - abs(i - NUM_RAVINE_POINTS / 2);  // TODO: better radius function
-		int ThisTop    = Top    + ((a_Noise.IntNoise3DInt(7 *  a_BlockX, 19 * a_BlockZ, i * 31) / 13) % 8) - 4;
-		int ThisBottom = Bottom + ((a_Noise.IntNoise3DInt(19 * a_BlockX, 7 *  a_BlockZ, i * 31) / 13) % 8) - 4;
+		int ThisTop = Top + ((a_Noise.IntNoise3DInt(7 * a_BlockX, 19 * a_BlockZ, i * 31) / 13) % 8) - 4;
+		int ThisBottom = Bottom + ((a_Noise.IntNoise3DInt(19 * a_BlockX, 7 * a_BlockZ, i * 31) / 13) % 8) - 4;
 		m_Points.emplace_back(PointX, PointZ, Radius, ThisTop, ThisBottom);
 	}  // for i - m_Points[]
 	DefinitionPointX = CenterX + static_cast<int>(xc * a_Size / 2);
@@ -197,7 +205,7 @@ void cStructGenRavines::cRavine::RefineDefPoints(const cRavDefPoints & a_Src, cR
 			continue;
 		}
 		int dr = itr->m_Radius - PrevR;
-		int dt = itr->m_Top    - PrevT;
+		int dt = itr->m_Top - PrevT;
 		int db = itr->m_Bottom - PrevB;
 		int Rad1 = std::max(PrevR + 1 * dr / 4, 1);
 		int Rad2 = std::max(PrevR + 3 * dr / 4, 1);
@@ -231,7 +239,8 @@ void cStructGenRavines::cRavine::FinishLinear(void)
 {
 	// For each segment, use Bresenham's line algorithm to draw a "line" of defpoints
 	// _X 2012_07_20: I tried modifying this algorithm to produce "thick" lines (only one coord change per point)
-	//   But the results were about the same as the original, so I disposed of it again - no need to use twice the count of points
+	//   But the results were about the same as the original, so I disposed of it again - no need to use twice the count
+	//   of points
 
 	cRavDefPoints Pts;
 	std::swap(Pts, m_Points);
@@ -290,29 +299,45 @@ AString cStructGenRavines::cRavine::ExportAsSVG(int a_Color, int a_OffsetX, int 
 	SVG.append("\"/>\n");
 
 	// Base point highlight:
-	SVG.append(fmt::format(FMT_STRING("<path style=\"fill:none;stroke:#ff0000;stroke-width:1px;\"\nd=\"M {}, {} L {}, {}\"/>\n"),
-		a_OffsetX + m_OriginX - 5, a_OffsetZ + m_OriginZ, a_OffsetX + m_OriginX + 5, a_OffsetZ + m_OriginZ
+	SVG.append(fmt::format(
+		FMT_STRING("<path style=\"fill:none;stroke:#ff0000;stroke-width:1px;\"\nd=\"M {}, {} L {}, {}\"/>\n"),
+		a_OffsetX + m_OriginX - 5,
+		a_OffsetZ + m_OriginZ,
+		a_OffsetX + m_OriginX + 5,
+		a_OffsetZ + m_OriginZ
 	));
-	SVG.append(fmt::format(FMT_STRING("<path style=\"fill:none;stroke:#ff0000;stroke-width:1px;\"\nd=\"M {}, {} L {}, {}\"/>\n"),
-		a_OffsetX + m_OriginX, a_OffsetZ + m_OriginZ - 5, a_OffsetX + m_OriginX, a_OffsetZ + m_OriginZ + 5
+	SVG.append(fmt::format(
+		FMT_STRING("<path style=\"fill:none;stroke:#ff0000;stroke-width:1px;\"\nd=\"M {}, {} L {}, {}\"/>\n"),
+		a_OffsetX + m_OriginX,
+		a_OffsetZ + m_OriginZ - 5,
+		a_OffsetX + m_OriginX,
+		a_OffsetZ + m_OriginZ + 5
 	));
 
 	// A gray line from the base point to the first point of the ravine, for identification:
-	SVG.append(fmt::format(FMT_STRING("<path style=\"fill:none;stroke:#cfcfcf;stroke-width:1px;\"\nd=\"M {}, {} L {}, {}\"/>\n"),
-		a_OffsetX + m_OriginX, a_OffsetZ + m_OriginZ, a_OffsetX + m_Points.front().m_BlockX, a_OffsetZ + m_Points.front().m_BlockZ
+	SVG.append(fmt::format(
+		FMT_STRING("<path style=\"fill:none;stroke:#cfcfcf;stroke-width:1px;\"\nd=\"M {}, {} L {}, {}\"/>\n"),
+		a_OffsetX + m_OriginX,
+		a_OffsetZ + m_OriginZ,
+		a_OffsetX + m_Points.front().m_BlockX,
+		a_OffsetZ + m_Points.front().m_BlockZ
 	));
 
 	// Offset guides:
 	if (a_OffsetX > 0)
 	{
-		SVG.append(fmt::format(FMT_STRING("<path style=\"fill:none;stroke:#0000ff;stroke-width:1px;\"\nd=\"M {}, 0 L {}, 1024\"/>\n"),
-			a_OffsetX, a_OffsetX
+		SVG.append(fmt::format(
+			FMT_STRING("<path style=\"fill:none;stroke:#0000ff;stroke-width:1px;\"\nd=\"M {}, 0 L {}, 1024\"/>\n"),
+			a_OffsetX,
+			a_OffsetX
 		));
 	}
 	if (a_OffsetZ > 0)
 	{
-		SVG.append(fmt::format(FMT_STRING("<path style=\"fill:none;stroke:#0000ff;stroke-width:1px;\"\nd=\"M 0, {} L 1024, {}\"/>\n"),
-			a_OffsetZ, a_OffsetZ
+		SVG.append(fmt::format(
+			FMT_STRING("<path style=\"fill:none;stroke:#0000ff;stroke-width:1px;\"\nd=\"M 0, {} L 1024, {}\"/>\n"),
+			a_OffsetZ,
+			a_OffsetZ
 		));
 	}
 	return SVG;
@@ -331,66 +356,61 @@ void cStructGenRavines::cRavine::DrawIntoChunk(cChunkDesc & a_ChunkDesc)
 	int BlockEndZ = BlockStartZ + cChunkDef::Width;
 	for (cRavDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
 	{
-		if (
-			(itr->m_BlockX + itr->m_Radius < BlockStartX) ||
-			(itr->m_BlockX - itr->m_Radius > BlockEndX) ||
-			(itr->m_BlockZ + itr->m_Radius < BlockStartZ) ||
-			(itr->m_BlockZ - itr->m_Radius > BlockEndZ)
-		)
+		if ((itr->m_BlockX + itr->m_Radius < BlockStartX) || (itr->m_BlockX - itr->m_Radius > BlockEndX) ||
+			(itr->m_BlockZ + itr->m_Radius < BlockStartZ) || (itr->m_BlockZ - itr->m_Radius > BlockEndZ))
 		{
 			// Cannot intersect, bail out early
 			continue;
 		}
 
 		// Carve out a cylinder around the xz point, m_Radius in diameter, from Bottom to Top:
-		int RadiusSq = itr->m_Radius * itr->m_Radius;  // instead of doing sqrt for each distance, we do sqr of the radius
+		int RadiusSq =
+			itr->m_Radius * itr->m_Radius;  // instead of doing sqrt for each distance, we do sqr of the radius
 		int DifX = BlockStartX - itr->m_BlockX;  // substitution for faster calc
 		int DifZ = BlockStartZ - itr->m_BlockZ;  // substitution for faster calc
-		for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
-		{
-			#ifndef NDEBUG
-			// DEBUG: Make the ravine shapepoints visible on a single layer (so that we can see with Minutor what's going on)
-			if ((DifX + x == 0) && (DifZ + z == 0))
+		for (int x = 0; x < cChunkDef::Width; x++)
+			for (int z = 0; z < cChunkDef::Width; z++)
 			{
-				a_ChunkDesc.SetBlockType(x, 4, z, E_BLOCK_LAPIS_ORE);
-			}
-			#endif  // !NDEBUG
-
-			int DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);
-			if (DistSq <= RadiusSq)
-			{
-				int Top = std::min(itr->m_Top, static_cast<int>(cChunkDef::Height));  // Stupid gcc needs int cast
-				for (int y = std::max(itr->m_Bottom, 1); y <= Top; y++)
+#ifndef NDEBUG
+				// DEBUG: Make the ravine shapepoints visible on a single layer (so that we can see with Minutor what's
+				// going on)
+				if ((DifX + x == 0) && (DifZ + z == 0))
 				{
-					switch (a_ChunkDesc.GetBlockType(x, y, z))
+					a_ChunkDesc.SetBlockType(x, 4, z, E_BLOCK_LAPIS_ORE);
+				}
+#endif  // !NDEBUG
+
+				int DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);
+				if (DistSq <= RadiusSq)
+				{
+					int Top = std::min(itr->m_Top, static_cast<int>(cChunkDef::Height));  // Stupid gcc needs int cast
+					for (int y = std::max(itr->m_Bottom, 1); y <= Top; y++)
 					{
-						// Only carve out these specific block types
-						case E_BLOCK_DIRT:
-						case E_BLOCK_GRASS:
-						case E_BLOCK_STONE:
-						case E_BLOCK_COBBLESTONE:
-						case E_BLOCK_GRAVEL:
-						case E_BLOCK_SAND:
-						case E_BLOCK_SANDSTONE:
-						case E_BLOCK_NETHERRACK:
-						case E_BLOCK_COAL_ORE:
-						case E_BLOCK_IRON_ORE:
-						case E_BLOCK_GOLD_ORE:
-						case E_BLOCK_DIAMOND_ORE:
-						case E_BLOCK_REDSTONE_ORE:
-						case E_BLOCK_REDSTONE_ORE_GLOWING:
+						switch (a_ChunkDesc.GetBlockType(x, y, z))
 						{
-							a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
-							break;
+							// Only carve out these specific block types
+							case E_BLOCK_DIRT:
+							case E_BLOCK_GRASS:
+							case E_BLOCK_STONE:
+							case E_BLOCK_COBBLESTONE:
+							case E_BLOCK_GRAVEL:
+							case E_BLOCK_SAND:
+							case E_BLOCK_SANDSTONE:
+							case E_BLOCK_NETHERRACK:
+							case E_BLOCK_COAL_ORE:
+							case E_BLOCK_IRON_ORE:
+							case E_BLOCK_GOLD_ORE:
+							case E_BLOCK_DIAMOND_ORE:
+							case E_BLOCK_REDSTONE_ORE:
+							case E_BLOCK_REDSTONE_ORE_GLOWING:
+							{
+								a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
+								break;
+							}
+							default: break;
 						}
-						default: break;
 					}
 				}
-			}
-		}  // for x, z - a_BlockTypes
+			}  // for x, z - a_BlockTypes
 	}  // for itr - m_Points[]
 }
-
-
-
-

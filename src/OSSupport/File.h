@@ -36,26 +36,26 @@ For reading entire files into memory, just use the static cFile::ReadWholeFile()
 
 class cFile
 {
-public:
-
+  public:
 	// tolua_end
 	inline static char PathSeparator()
 	{
-		#ifdef _WIN32
-			return '\\';
-		#else
-			return '/';
-		#endif
+#ifdef _WIN32
+		return '\\';
+#else
+		return '/';
+#endif
 	}
 
 	/** The mode in which to open the file */
 	enum eMode
 	{
-		fmRead,       // Read-only. If the file doesn't exist, object will not be valid
-		fmWrite,      // Write-only. If the file already exists, it will be overwritten
-		fmReadWrite,  // Read / write. If the file already exists, it will be left intact; writing will overwrite the data from the beginning
-		fmAppend      // Write-only. If the file already exists cursor will be moved to the end of the file
-	} ;
+		fmRead,  // Read-only. If the file doesn't exist, object will not be valid
+		fmWrite,  // Write-only. If the file already exists, it will be overwritten
+		fmReadWrite,  // Read / write. If the file already exists, it will be left intact; writing will overwrite the
+					  // data from the beginning
+		fmAppend  // Write-only. If the file already exists cursor will be moved to the end of the file
+	};
 
 	/** Simple constructor - creates an unopened file object, use Open() to open / create a real file */
 	cFile(void);
@@ -71,37 +71,39 @@ public:
 	bool IsOpen(void) const;
 	bool IsEOF(void) const;
 
-	/** Reads up to a_NumBytes bytes into a_Buffer, returns the number of bytes actually read, or -1 on failure; asserts if not open */
+	/** Reads up to a_NumBytes bytes into a_Buffer, returns the number of bytes actually read, or -1 on failure; asserts
+	 * if not open */
 	int Read(void * a_Buffer, size_t a_NumBytes);
 
-	/** Reads up to a_NumBytes bytes, returns the bytes actually read, or empty string on failure; asserts if not open */
+	/** Reads up to a_NumBytes bytes, returns the bytes actually read, or empty string on failure; asserts if not open
+	 */
 	std::basic_string<std::byte> Read(size_t a_NumBytes);
 
-	/** Writes up to a_NumBytes bytes from a_Buffer, returns the number of bytes actually written, or -1 on failure; asserts if not open */
+	/** Writes up to a_NumBytes bytes from a_Buffer, returns the number of bytes actually written, or -1 on failure;
+	 * asserts if not open */
 	int Write(const void * a_Buffer, size_t a_NumBytes);
 
-	int Write(std::string_view a_String)
-	{
-		return Write(a_String.data(), a_String.size());
-	}
+	int Write(std::string_view a_String) { return Write(a_String.data(), a_String.size()); }
 
 	/** Seeks to iPosition bytes from file start, returns old position or -1 for failure; asserts if not open */
-	long Seek (int iPosition);
+	long Seek(int iPosition);
 
 	/** Returns the current position (bytes from file start) or -1 for failure; asserts if not open */
-	long Tell (void) const;
+	long Tell(void) const;
 
 	/** Returns the size of file, in bytes, or -1 for failure; asserts if not open */
 	long GetSize(void) const;
 
-	/** Reads the file from current position till EOF into an AString; returns the number of bytes read or -1 for error */
+	/** Reads the file from current position till EOF into an AString; returns the number of bytes read or -1 for error
+	 */
 	int ReadRestOfFile(AString & a_Contents);
 
 	/** Returns true if the file specified exists */
 	static bool Exists(const AString & a_FileName);  // Exported in ManualBindings.cpp
 
 	/** Deletes a file or a folder, returns true if successful.
-	Prefer to use DeleteFile or DeleteFolder, since those don't have the penalty of checking whether a_Path is a folder. */
+	Prefer to use DeleteFile or DeleteFolder, since those don't have the penalty of checking whether a_Path is a folder.
+  */
 	static bool Delete(const AString & a_Path);  // Exported in ManualBindings.cpp
 
 	/** Deletes a file, returns true if successful.
@@ -138,7 +140,8 @@ public:
 
 	/** Creates a new folder with the specified name, creating its parents if needed. Path may be relative or absolute.
 	Returns true if the folder exists at the end of the operation (either created, or already existed).
-	Supports only paths that use the path separator used by the current platform (MSVC CRT supports slashes for file paths, too, but this function doesn't) */
+	Supports only paths that use the path separator used by the current platform (MSVC CRT supports slashes for file
+	paths, too, but this function doesn't) */
 	static bool CreateFolderRecursive(const AString & a_FolderPath);  // Exported in ManualBindings.cpp
 
 	/** Returns the entire contents of the specified file as a string. Returns empty string on error. */
@@ -146,7 +149,10 @@ public:
 
 	/** Returns a_FileName with its extension changed to a_NewExt.
 	a_FileName may contain path specification. */
-	static AString ChangeFileExt(const AString & a_FileName, const AString & a_NewExt);  // Exported in ManualBindings.cpp
+	static AString ChangeFileExt(
+		const AString & a_FileName,
+		const AString & a_NewExt
+	);  // Exported in ManualBindings.cpp
 
 	/** Returns the last modification time (in current timezone) of the specified file.
 	The value returned is in the same units as the value returned by time() function.
@@ -157,7 +163,8 @@ public:
 	// tolua_begin
 
 	/** Returns the path separator used by the current platform.
-	Note that the platform / CRT may support additional path separators (such as slashes on Windows), these don't get reported. */
+	Note that the platform / CRT may support additional path separators (such as slashes on Windows), these don't get
+	reported. */
 	static AString GetPathSeparator();
 
 	/** Returns the customary executable extension used by the current platform. */
@@ -171,20 +178,18 @@ public:
 	/** Flushes all the bufferef output into the file (only when writing) */
 	void Flush();
 
-private:
+  private:
 	FILE * m_File;
-} ;  // tolua_export
+};  // tolua_export
 
 
 
 
 
 /** A wrapper for file streams that enables exceptions. */
-template <class StreamType>
-class FileStream final : public StreamType
+template <class StreamType> class FileStream final : public StreamType
 {
-public:
-
+  public:
 	FileStream(const std::string & Path);
 	FileStream(const std::string & Path, const typename FileStream::openmode Mode);
 };

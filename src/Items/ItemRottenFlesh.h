@@ -7,14 +7,12 @@
 
 
 
-class cItemRottenFleshHandler final:
-	public cItemFoodHandler
+class cItemRottenFleshHandler final : public cItemFoodHandler
 {
 	using Super = cItemFoodHandler;
 
-public:
-
-	constexpr cItemRottenFleshHandler(int a_ItemType):
+  public:
+	constexpr cItemRottenFleshHandler(int a_ItemType) :
 		Super(a_ItemType, FoodInfo(4, 0.8))
 	{
 	}
@@ -33,5 +31,4 @@ public:
 
 		return true;
 	}
-
 };

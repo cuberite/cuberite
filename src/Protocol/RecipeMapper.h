@@ -12,7 +12,7 @@ directory, e.g. `Server/Protocol/1.12.2/base.recipes.txt`
 */
 class cRecipeMapper
 {
-public:
+  public:
 	cRecipeMapper(void);
 	~cRecipeMapper();
 
@@ -22,7 +22,7 @@ public:
 	/** Translates the protocol specific RecipeId to the cuberite RecipeId */
 	std::optional<UInt32> GetCuberiteRecipeId(UInt32 a_ProtocolRecipeId, UInt32 a_ProtocolVersion);
 
-private:
+  private:
 	/** A mapping for each protocol from the protocol specific RecipeId and the cuberite RecipeId */
 	std::map<AString, std::map<UInt32, UInt32>> m_ProtocolVersionMap;
 
@@ -30,6 +30,10 @@ private:
 	void loadRecipes(const AString & a_ProtocolVersion);
 
 	/** Handles a single line of the protocol specific mapping file */
-	void AddRecipeLine(const AString & a_ProtocolVersion, int a_LineNum, const AString & a_RecipeLine, const std::map<AString, UInt32> & a_RecipeNameMap);
-
+	void AddRecipeLine(
+		const AString & a_ProtocolVersion,
+		int a_LineNum,
+		const AString & a_RecipeLine,
+		const std::map<AString, UInt32> & a_RecipeNameMap
+	);
 };

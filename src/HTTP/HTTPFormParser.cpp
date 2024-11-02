@@ -13,10 +13,7 @@
 
 
 cHTTPFormParser::cHTTPFormParser(const cHTTPIncomingRequest & a_Request, cCallbacks & a_Callbacks) :
-	m_Callbacks(a_Callbacks),
-	m_IsValid(true),
-	m_IsCurrentPartFile(false),
-	m_FileHasBeenAnnounced(false)
+	m_Callbacks(a_Callbacks), m_IsValid(true), m_IsCurrentPartFile(false), m_FileHasBeenAnnounced(false)
 {
 	if (a_Request.GetMethod() == "GET")
 	{
@@ -54,11 +51,7 @@ cHTTPFormParser::cHTTPFormParser(const cHTTPIncomingRequest & a_Request, cCallba
 
 
 cHTTPFormParser::cHTTPFormParser(eKind a_Kind, const char * a_Data, size_t a_Size, cCallbacks & a_Callbacks) :
-	m_Callbacks(a_Callbacks),
-	m_Kind(a_Kind),
-	m_IsValid(true),
-	m_IsCurrentPartFile(false),
-	m_FileHasBeenAnnounced(false)
+	m_Callbacks(a_Callbacks), m_Kind(a_Kind), m_IsValid(true), m_IsCurrentPartFile(false), m_FileHasBeenAnnounced(false)
 {
 	Parse(a_Data, a_Size);
 }
@@ -126,10 +119,7 @@ bool cHTTPFormParser::HasFormData(const cHTTPIncomingRequest & a_Request)
 	return (
 		(ContentType == "application/x-www-form-urlencoded") ||
 		(strncmp(ContentType.c_str(), "multipart/form-data", 19) == 0) ||
-		(
-			(a_Request.GetMethod() == "GET") &&
-			(a_Request.GetURL().find('?') != AString::npos)
-		)
+		((a_Request.GetMethod() == "GET") && (a_Request.GetURL().find('?') != AString::npos))
 	);
 }
 
@@ -150,7 +140,8 @@ void cHTTPFormParser::BeginMultipart(const cHTTPIncomingRequest & a_Request)
 void cHTTPFormParser::ParseFormUrlEncoded(void)
 {
 	// Parse m_IncomingData for all the variables; no more data is incoming, since this is called from Finish()
-	// This may not be the most performant version, but we don't care, the form data is small enough and we're not a full-fledged web server anyway
+	// This may not be the most performant version, but we don't care, the form data is small enough and we're not a
+	// full-fledged web server anyway
 	AStringVector Lines = StringSplit(m_IncomingData, "&");
 	for (AStringVector::iterator itr = Lines.begin(), end = Lines.end(); itr != end; ++itr)
 	{
@@ -295,7 +286,3 @@ void cHTTPFormParser::OnPartEnd(void)
 	m_CurrentPartName.clear();
 	m_CurrentPartFileName.clear();
 }
-
-
-
-

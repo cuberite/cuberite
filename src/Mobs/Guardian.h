@@ -7,13 +7,11 @@
 
 
 
-class cGuardian:
-	public cAggressiveMonster
+class cGuardian : public cAggressiveMonster
 {
 	using Super = cAggressiveMonster;
 
-public:
-
+  public:
 	cGuardian();
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
@@ -25,8 +23,4 @@ public:
 	// Guardians do not drown (or float)
 	virtual void HandleAir(void) override {}
 	virtual void SetSwimState(cChunk & a_Chunk) override {}
-} ;
-
-
-
-
+};

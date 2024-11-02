@@ -8,13 +8,11 @@
 
 
 
-class cItemArmorHandler final :
-	public cItemHandler
+class cItemArmorHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 
@@ -100,7 +98,8 @@ public:
 			{
 				return (a_ItemType == E_ITEM_GOLD);
 			}
-			case E_ITEM_ELYTRA:  // TODO: require Phantom Membrane instead of leather starting from protocol version 369 or 1.13 release
+			case E_ITEM_ELYTRA:  // TODO: require Phantom Membrane instead of leather starting from protocol version 369
+								 // or 1.13 release
 			case E_ITEM_LEATHER_BOOTS:
 			case E_ITEM_LEATHER_CAP:
 			case E_ITEM_LEATHER_PANTS:
@@ -111,9 +110,4 @@ public:
 		}
 		return false;
 	}
-
-} ;
-
-
-
-
+};

@@ -8,25 +8,30 @@
 
 
 
-class cItemStairsHandler final  :
-	public cItemHandler
+class cItemStairsHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
+  private:
+	virtual bool CommitPlacement(
+		cPlayer & a_Player,
+		const cItem & a_HeldItem,
+		const Vector3i a_PlacePosition,
+		const eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPosition
+	) const override
 	{
 		NIBBLETYPE Meta = cBlockStairsHandler::YawToMetaData(a_Player.GetYaw());
 
 		switch (a_ClickedBlockFace)
 		{
-			case BLOCK_FACE_TOP:    break;
-			case BLOCK_FACE_BOTTOM: Meta |= 0x4; break;  // When placing onto a bottom face, always place an upside-down stairs block.
+			case BLOCK_FACE_TOP: break;
+			case BLOCK_FACE_BOTTOM:
+				Meta |= 0x4;
+				break;  // When placing onto a bottom face, always place an upside-down stairs block.
 			case BLOCK_FACE_EAST:
 			case BLOCK_FACE_NORTH:
 			case BLOCK_FACE_SOUTH:

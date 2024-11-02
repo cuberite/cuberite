@@ -18,24 +18,28 @@
 
 
 
-class cStructGenTrees :
-	public cFinishGen
+class cStructGenTrees : public cFinishGen
 {
-public:
-	cStructGenTrees(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainShapeGen & a_ShapeGen, cTerrainCompositionGen & a_CompositionGen) :
+  public:
+	cStructGenTrees(
+		int a_Seed,
+		cBiomeGen & a_BiomeGen,
+		cTerrainShapeGen & a_ShapeGen,
+		cTerrainCompositionGen & a_CompositionGen
+	) :
 		m_Seed(a_Seed),
 		m_Noise(a_Seed),
 		m_BiomeGen(a_BiomeGen),
 		m_ShapeGen(a_ShapeGen),
 		m_CompositionGen(a_CompositionGen)
-	{}
+	{
+	}
 
-protected:
-
+  protected:
 	int m_Seed;
 	cNoise m_Noise;
-	cBiomeGen &              m_BiomeGen;
-	cTerrainShapeGen &       m_ShapeGen;
+	cBiomeGen & m_BiomeGen;
+	cTerrainShapeGen & m_ShapeGen;
 	cTerrainCompositionGen & m_CompositionGen;
 
 	/** Generates and applies an image of a single tree.
@@ -43,16 +47,19 @@ protected:
 	Parts of the tree outside the chunk are stored in a_OutsideXYZ
 	*/
 	void GenerateSingleTree(
-		int a_ChunkX, int a_ChunkZ, int a_Seq,
+		int a_ChunkX,
+		int a_ChunkZ,
+		int a_Seq,
 		Vector3i a_Pos,
 		cChunkDesc & a_ChunkDesc,
 		sSetBlockVector & a_OutsideLogs,
 		sSetBlockVector & a_OutsideOther
-	) ;
+	);
 
 	/** Applies an image into chunk blockdata; all blocks outside the chunk will be appended to a_Overflow. */
 	void ApplyTreeImage(
-		int a_ChunkX, int a_ChunkZ,
+		int a_ChunkX,
+		int a_ChunkZ,
 		cChunkDesc & a_ChunkDesc,
 		const sSetBlockVector & a_Image,
 		sSetBlockVector & a_Overflow
@@ -61,36 +68,28 @@ protected:
 	/** Get the the number of trees to generate in a_Chunk
 	If the value is between 0 and 1, it should be interpreted as the probability that a tree should be generated.
 	*/
-	double GetNumTrees(
-		int a_ChunkX, int a_ChunkZ,
-		const cChunkDef::BiomeMap & a_Biomes
-	);
+	double GetNumTrees(int a_ChunkX, int a_ChunkZ, const cChunkDef::BiomeMap & a_Biomes);
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
-} ;
+};
 
 
 
 
 
-class cStructGenLakes :
-	public cFinishGen
+class cStructGenLakes : public cFinishGen
 {
-public:
+  public:
 	cStructGenLakes(int a_Seed, BLOCKTYPE a_Fluid, cTerrainShapeGen & a_ShapeGen, int a_Probability) :
-		m_Noise(a_Seed),
-		m_Seed(a_Seed),
-		m_Fluid(a_Fluid),
-		m_ShapeGen(a_ShapeGen),
-		m_Probability(a_Probability)
+		m_Noise(a_Seed), m_Seed(a_Seed), m_Fluid(a_Fluid), m_ShapeGen(a_ShapeGen), m_Probability(a_Probability)
 	{
 	}
 
-protected:
-	cNoise             m_Noise;
-	int                m_Seed;
-	BLOCKTYPE          m_Fluid;
+  protected:
+	cNoise m_Noise;
+	int m_Seed;
+	BLOCKTYPE m_Fluid;
 	cTerrainShapeGen & m_ShapeGen;
 
 	/** Chance, [0 .. 100], of a chunk having the lake. */
@@ -102,39 +101,37 @@ protected:
 
 	/** Creates a lake image for the specified chunk into a_Lake. */
 	void CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeHeight, cBlockArea & a_Lake);
-} ;
+};
 
 
 
 
 
-class cStructGenDirectOverhangs :
-	public cFinishGen
+class cStructGenDirectOverhangs : public cFinishGen
 {
-public:
+  public:
 	cStructGenDirectOverhangs(int a_Seed);
 
-protected:
-	cNoise    m_Noise1;
-	cNoise    m_Noise2;
+  protected:
+	cNoise m_Noise1;
+	cNoise m_Noise2;
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 	bool HasWantedBiome(cChunkDesc & a_ChunkDesc) const;
-} ;
+};
 
 
 
 
 
-class cStructGenDistortedMembraneOverhangs :
-	public cFinishGen
+class cStructGenDistortedMembraneOverhangs : public cFinishGen
 {
-public:
+  public:
 	cStructGenDistortedMembraneOverhangs(int a_Seed);
 
-protected:
+  protected:
 	cNoise m_NoiseX;
 	cNoise m_NoiseY;
 	cNoise m_NoiseZ;
@@ -142,4 +139,4 @@ protected:
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
-} ;
+};

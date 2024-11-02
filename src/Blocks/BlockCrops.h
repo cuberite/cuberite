@@ -9,18 +9,14 @@
 
 
 /** Common class that takes care of beetroots, carrots, potatoes and wheat */
-template <NIBBLETYPE RipeMeta>
-class cBlockCropsHandler final :
-	public cBlockPlant<true>
+template <NIBBLETYPE RipeMeta> class cBlockCropsHandler final : public cBlockPlant<true>
 {
 	using Super = cBlockPlant<true>;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	/** Calculate the number of seeds to drop when the crop is broken. */
 	static char CalculateSeedCount(char a_Min, char a_BaseRolls, unsigned char a_FortuneLevel)
 	{

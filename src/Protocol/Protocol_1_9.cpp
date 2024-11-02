@@ -65,9 +65,7 @@ Implements the 1.9 protocol classes:
 // cProtocol_1_9_0:
 
 cProtocol_1_9_0::cProtocol_1_9_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State) :
-	Super(a_Client, a_ServerAddress, a_State),
-	m_IsTeleportIdConfirmed(true),
-	m_OutstandingTeleportId(0)
+	Super(a_Client, a_ServerAddress, a_State), m_IsTeleportIdConfirmed(true), m_OutstandingTeleportId(0)
 {
 }
 
@@ -88,7 +86,16 @@ void cProtocol_1_9_0::SendAttachEntity(const cEntity & a_Entity, const cEntity &
 
 
 
-void cProtocol_1_9_0::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+void cProtocol_1_9_0::SendBossBarAdd(
+	UInt32 a_UniqueID,
+	const cCompositeChat & a_Title,
+	float a_FractionFilled,
+	BossBarColor a_Color,
+	BossBarDivisionType a_DivisionType,
+	bool a_DarkenSky,
+	bool a_PlayEndMusic,
+	bool a_CreateFog
+)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -99,32 +106,36 @@ void cProtocol_1_9_0::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a
 	Pkt.WriteVarInt32(0);  // Add
 	Pkt.WriteString(a_Title.CreateJsonString());
 	Pkt.WriteBEFloat(a_FractionFilled);
-	Pkt.WriteVarInt32([a_Color]
-	{
-		switch (a_Color)
+	Pkt.WriteVarInt32(
+		[a_Color]
 		{
-			case BossBarColor::Pink: return 0U;
-			case BossBarColor::Blue: return 1U;
-			case BossBarColor::Red: return 2U;
-			case BossBarColor::Green: return 3U;
-			case BossBarColor::Yellow: return 4U;
-			case BossBarColor::Purple: return 5U;
-			case BossBarColor::White: return 6U;
-		}
-		UNREACHABLE("Unsupported boss bar property");
-	}());
-	Pkt.WriteVarInt32([a_DivisionType]
-	{
-		switch (a_DivisionType)
+			switch (a_Color)
+			{
+				case BossBarColor::Pink:   return 0U;
+				case BossBarColor::Blue:   return 1U;
+				case BossBarColor::Red:    return 2U;
+				case BossBarColor::Green:  return 3U;
+				case BossBarColor::Yellow: return 4U;
+				case BossBarColor::Purple: return 5U;
+				case BossBarColor::White:  return 6U;
+			}
+			UNREACHABLE("Unsupported boss bar property");
+		}()
+	);
+	Pkt.WriteVarInt32(
+		[a_DivisionType]
 		{
-			case BossBarDivisionType::None: return 0U;
-			case BossBarDivisionType::SixNotches: return 1U;
-			case BossBarDivisionType::TenNotches: return 2U;
-			case BossBarDivisionType::TwelveNotches: return 3U;
-			case BossBarDivisionType::TwentyNotches: return 4U;
-		}
-		UNREACHABLE("Unsupported boss bar property");
-	}());
+			switch (a_DivisionType)
+			{
+				case BossBarDivisionType::None:          return 0U;
+				case BossBarDivisionType::SixNotches:    return 1U;
+				case BossBarDivisionType::TenNotches:    return 2U;
+				case BossBarDivisionType::TwelveNotches: return 3U;
+				case BossBarDivisionType::TwentyNotches: return 4U;
+			}
+			UNREACHABLE("Unsupported boss bar property");
+		}()
+	);
 	{
 		UInt8 Flags = 0x00;
 		if (a_DarkenSky)
@@ -201,7 +212,11 @@ void cProtocol_1_9_0::SendBossBarUpdateHealth(UInt32 a_UniqueID, float a_Fractio
 
 
 
-void cProtocol_1_9_0::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType)
+void cProtocol_1_9_0::SendBossBarUpdateStyle(
+	UInt32 a_UniqueID,
+	BossBarColor a_Color,
+	BossBarDivisionType a_DivisionType
+)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -210,32 +225,36 @@ void cProtocol_1_9_0::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_C
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_UniqueID);
 	Pkt.WriteVarInt32(4);  // Update health
-	Pkt.WriteVarInt32([a_Color]
-	{
-		switch (a_Color)
+	Pkt.WriteVarInt32(
+		[a_Color]
 		{
-			case BossBarColor::Pink: return 0U;
-			case BossBarColor::Blue: return 1U;
-			case BossBarColor::Red: return 2U;
-			case BossBarColor::Green: return 3U;
-			case BossBarColor::Yellow: return 4U;
-			case BossBarColor::Purple: return 5U;
-			case BossBarColor::White: return 6U;
-		}
-		UNREACHABLE("Unsupported boss bar property");
-	}());
-	Pkt.WriteVarInt32([a_DivisionType]
-	{
-		switch (a_DivisionType)
+			switch (a_Color)
+			{
+				case BossBarColor::Pink:   return 0U;
+				case BossBarColor::Blue:   return 1U;
+				case BossBarColor::Red:    return 2U;
+				case BossBarColor::Green:  return 3U;
+				case BossBarColor::Yellow: return 4U;
+				case BossBarColor::Purple: return 5U;
+				case BossBarColor::White:  return 6U;
+			}
+			UNREACHABLE("Unsupported boss bar property");
+		}()
+	);
+	Pkt.WriteVarInt32(
+		[a_DivisionType]
 		{
-			case BossBarDivisionType::None: return 0U;
-			case BossBarDivisionType::SixNotches: return 1U;
-			case BossBarDivisionType::TenNotches: return 2U;
-			case BossBarDivisionType::TwelveNotches: return 3U;
-			case BossBarDivisionType::TwentyNotches: return 4U;
-		}
-		UNREACHABLE("Unsupported boss bar property");
-	}());
+			switch (a_DivisionType)
+			{
+				case BossBarDivisionType::None:          return 0U;
+				case BossBarDivisionType::SixNotches:    return 1U;
+				case BossBarDivisionType::TenNotches:    return 2U;
+				case BossBarDivisionType::TwelveNotches: return 3U;
+				case BossBarDivisionType::TwentyNotches: return 4U;
+			}
+			UNREACHABLE("Unsupported boss bar property");
+		}()
+	);
 }
 
 
@@ -307,15 +326,12 @@ void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	const auto Delta = (a_Entity.GetPosition() * 32 * 128).Floor() - (a_Entity.GetLastSentPosition() * 32 * 128).Floor();
+	const auto Delta =
+		(a_Entity.GetPosition() * 32 * 128).Floor() - (a_Entity.GetLastSentPosition() * 32 * 128).Floor();
 
 	// Ensure that the delta has enough precision and is within range of a BEInt16:
-	if (
-		Delta.HasNonZeroLength() &&
-		cByteBuffer::CanBEInt16Represent(Delta.x) &&
-		cByteBuffer::CanBEInt16Represent(Delta.y) &&
-		cByteBuffer::CanBEInt16Represent(Delta.z)
-	)
+	if (Delta.HasNonZeroLength() && cByteBuffer::CanBEInt16Represent(Delta.x) &&
+		cByteBuffer::CanBEInt16Represent(Delta.y) && cByteBuffer::CanBEInt16Represent(Delta.z))
 	{
 		const auto Move = static_cast<Vector3<Int16>>(Delta);
 
@@ -381,7 +397,9 @@ void cProtocol_1_9_0::SendKeepAlive(UInt32 a_PingID)
 	// Drop the packet if the protocol is not in the Game state yet (caused a client crash):
 	if (m_State != 3)
 	{
-		LOG("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class prevented the packet.", m_State);
+		LOG("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class "
+			"prevented the packet.",
+			m_State);
 		return;
 	}
 
@@ -450,7 +468,8 @@ void cProtocol_1_9_0::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Da
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetDecorators().size()));
 	for (const auto & Decorator : a_Map.GetDecorators())
 	{
-		Pkt.WriteBEUInt8(static_cast<Byte>((static_cast<Int32>(Decorator.GetType()) << 4) | (Decorator.GetRot() & 0xF)));
+		Pkt.WriteBEUInt8(static_cast<Byte>((static_cast<Int32>(Decorator.GetType()) << 4) | (Decorator.GetRot() & 0xF))
+		);
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelX()));
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelZ()));
 	}
@@ -470,7 +489,12 @@ void cProtocol_1_9_0::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Da
 
 
 
-void cProtocol_1_9_0::SendPlayerMoveLook (const Vector3d a_Pos, const float a_Yaw, const float a_Pitch, const bool a_IsRelative)
+void cProtocol_1_9_0::SendPlayerMoveLook(
+	const Vector3d a_Pos,
+	const float a_Yaw,
+	const float a_Pitch,
+	const bool a_IsRelative
+)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -505,7 +529,12 @@ void cProtocol_1_9_0::SendPlayerMoveLook (const Vector3d a_Pos, const float a_Ya
 void cProtocol_1_9_0::SendPlayerMoveLook(void)
 {
 	cPlayer * Player = m_Client->GetPlayer();
-	SendPlayerMoveLook(Player->GetPosition(), static_cast<float>(Player->GetYaw()), static_cast<float>(Player->GetPitch()), false);
+	SendPlayerMoveLook(
+		Player->GetPosition(),
+		static_cast<float>(Player->GetYaw()),
+		static_cast<float>(Player->GetPitch()),
+		false
+	);
 }
 
 
@@ -518,30 +547,37 @@ void cProtocol_1_9_0::SendPlayerPermissionLevel()
 
 	cPacketizer Pkt(*this, pktEntityStatus);
 	Pkt.WriteBEUInt32(Player.GetUniqueID());
-	Pkt.WriteBEInt8([&Player]() -> signed char
-	{
-		if (Player.HasPermission("core.stop") || Player.HasPermission("core.reload") || Player.HasPermission("core.save-all"))
+	Pkt.WriteBEInt8(
+		[&Player]() -> signed char
 		{
-			return 28;
-		}
+			if (Player.HasPermission("core.stop") || Player.HasPermission("core.reload") ||
+				Player.HasPermission("core.save-all"))
+			{
+				return 28;
+			}
 
-		if (Player.HasPermission("core.ban") || Player.HasPermission("core.deop") || Player.HasPermission("core.kick") || Player.HasPermission("core.op"))
-		{
-			return 27;
-		}
+			if (Player.HasPermission("core.ban") || Player.HasPermission("core.deop") ||
+				Player.HasPermission("core.kick") || Player.HasPermission("core.op"))
+			{
+				return 27;
+			}
 
-		if (Player.HasPermission("cuberite.comandblock.set") || Player.HasPermission("core.clear") || Player.HasPermission("core.difficulty") || Player.HasPermission("core.effect") || Player.HasPermission("core.gamemode") || Player.HasPermission("core.tp") || Player.HasPermission("core.give"))
-		{
-			return 26;
-		}
+			if (Player.HasPermission("cuberite.comandblock.set") || Player.HasPermission("core.clear") ||
+				Player.HasPermission("core.difficulty") || Player.HasPermission("core.effect") ||
+				Player.HasPermission("core.gamemode") || Player.HasPermission("core.tp") ||
+				Player.HasPermission("core.give"))
+			{
+				return 26;
+			}
 
-		if (Player.HasPermission("core.spawnprotect.bypass"))
-		{
-			return 25;
-		}
+			if (Player.HasPermission("core.spawnprotect.bypass"))
+			{
+				return 25;
+			}
 
-		return 24;
-	}());
+			return 24;
+		}()
+	);
 }
 
 
@@ -556,7 +592,9 @@ void cProtocol_1_9_0::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteUUID(a_Player.GetUUID());
 	Vector3d LastSentPos = a_Player.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);
-	Pkt.WriteBEDouble(LastSentPos.y + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
+	Pkt.WriteBEDouble(
+		LastSentPos.y + 0.001
+	);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
 	Pkt.WriteBEDouble(LastSentPos.z);
 	Pkt.WriteByteAngle(a_Player.GetYaw());
 	Pkt.WriteByteAngle(a_Player.GetPitch());
@@ -737,8 +775,7 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet) const
 			break;
 		}
 
-		default:
-			break;
+		default: break;
 	}
 	UNREACHABLE("Unsupported outgoing packet type");
 }
@@ -766,11 +803,11 @@ signed char cProtocol_1_9_0::GetProtocolEntityStatus(const EntityAnimation a_Ani
 	switch (a_Animation)
 	{
 		case EntityAnimation::ArmorStandGetsHit: return 32;
-		case EntityAnimation::ArrowTipSparkles: return 0;
-		case EntityAnimation::PawnShieldBlocks: return 29;
-		case EntityAnimation::PawnShieldBreaks: return 30;
-		case EntityAnimation::PawnThornsPricks: return 33;
-		default: return Super::GetProtocolEntityStatus(a_Animation);
+		case EntityAnimation::ArrowTipSparkles:  return 0;
+		case EntityAnimation::PawnShieldBlocks:  return 29;
+		case EntityAnimation::PawnShieldBreaks:  return 30;
+		case EntityAnimation::PawnThornsPricks:  return 33;
+		default:                                 return Super::GetProtocolEntityStatus(a_Animation);
 	}
 }
 
@@ -809,7 +846,7 @@ bool cProtocol_1_9_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
-				case 0x01: HandlePacketStatusPing   (a_ByteBuffer); return true;
+				case 0x01: HandlePacketStatusPing(a_ByteBuffer); return true;
 			}
 			break;
 		}
@@ -818,7 +855,7 @@ bool cProtocol_1_9_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 		{
 			switch (a_PacketType)
 			{
-				case 0x00: HandlePacketLoginStart             (a_ByteBuffer); return true;
+				case 0x00: HandlePacketLoginStart(a_ByteBuffer); return true;
 				case 0x01: HandlePacketLoginEncryptionResponse(a_ByteBuffer); return true;
 			}
 			break;
@@ -828,36 +865,36 @@ bool cProtocol_1_9_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 		{
 			switch (a_PacketType)
 			{
-				case 0x00: HandleConfirmTeleport              (a_ByteBuffer); return true;
-				case 0x01: HandlePacketTabComplete            (a_ByteBuffer); return true;
-				case 0x02: HandlePacketChatMessage            (a_ByteBuffer); return true;
-				case 0x03: HandlePacketClientStatus           (a_ByteBuffer); return true;
-				case 0x04: HandlePacketClientSettings         (a_ByteBuffer); return true;
+				case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
+				case 0x01: HandlePacketTabComplete(a_ByteBuffer); return true;
+				case 0x02: HandlePacketChatMessage(a_ByteBuffer); return true;
+				case 0x03: HandlePacketClientStatus(a_ByteBuffer); return true;
+				case 0x04: HandlePacketClientSettings(a_ByteBuffer); return true;
 				case 0x05: break;  // Confirm transaction - not used in MCS
-				case 0x06: HandlePacketEnchantItem            (a_ByteBuffer); return true;
-				case 0x07: HandlePacketWindowClick            (a_ByteBuffer); return true;
-				case 0x08: HandlePacketWindowClose            (a_ByteBuffer); return true;
-				case 0x09: HandlePacketPluginMessage          (a_ByteBuffer); return true;
-				case 0x0a: HandlePacketUseEntity              (a_ByteBuffer); return true;
-				case 0x0b: HandlePacketKeepAlive              (a_ByteBuffer); return true;
-				case 0x0c: HandlePacketPlayerPos              (a_ByteBuffer); return true;
-				case 0x0d: HandlePacketPlayerPosLook          (a_ByteBuffer); return true;
-				case 0x0e: HandlePacketPlayerLook             (a_ByteBuffer); return true;
-				case 0x0f: HandlePacketPlayer                 (a_ByteBuffer); return true;
-				case 0x10: HandlePacketVehicleMove            (a_ByteBuffer); return true;
-				case 0x11: HandlePacketBoatSteer              (a_ByteBuffer); return true;
-				case 0x12: HandlePacketPlayerAbilities        (a_ByteBuffer); return true;
-				case 0x13: HandlePacketBlockDig               (a_ByteBuffer); return true;
-				case 0x14: HandlePacketEntityAction           (a_ByteBuffer); return true;
-				case 0x15: HandlePacketSteerVehicle           (a_ByteBuffer); return true;
-				case 0x16: HandlePacketResourcePackStatus     (a_ByteBuffer); return true;
-				case 0x17: HandlePacketSlotSelect             (a_ByteBuffer); return true;
+				case 0x06: HandlePacketEnchantItem(a_ByteBuffer); return true;
+				case 0x07: HandlePacketWindowClick(a_ByteBuffer); return true;
+				case 0x08: HandlePacketWindowClose(a_ByteBuffer); return true;
+				case 0x09: HandlePacketPluginMessage(a_ByteBuffer); return true;
+				case 0x0a: HandlePacketUseEntity(a_ByteBuffer); return true;
+				case 0x0b: HandlePacketKeepAlive(a_ByteBuffer); return true;
+				case 0x0c: HandlePacketPlayerPos(a_ByteBuffer); return true;
+				case 0x0d: HandlePacketPlayerPosLook(a_ByteBuffer); return true;
+				case 0x0e: HandlePacketPlayerLook(a_ByteBuffer); return true;
+				case 0x0f: HandlePacketPlayer(a_ByteBuffer); return true;
+				case 0x10: HandlePacketVehicleMove(a_ByteBuffer); return true;
+				case 0x11: HandlePacketBoatSteer(a_ByteBuffer); return true;
+				case 0x12: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
+				case 0x13: HandlePacketBlockDig(a_ByteBuffer); return true;
+				case 0x14: HandlePacketEntityAction(a_ByteBuffer); return true;
+				case 0x15: HandlePacketSteerVehicle(a_ByteBuffer); return true;
+				case 0x16: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
+				case 0x17: HandlePacketSlotSelect(a_ByteBuffer); return true;
 				case 0x18: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
-				case 0x19: HandlePacketUpdateSign             (a_ByteBuffer); return true;
-				case 0x1a: HandlePacketAnimation              (a_ByteBuffer); return true;
-				case 0x1b: HandlePacketSpectate               (a_ByteBuffer); return true;
-				case 0x1c: HandlePacketBlockPlace             (a_ByteBuffer); return true;
-				case 0x1d: HandlePacketUseItem                (a_ByteBuffer); return true;
+				case 0x19: HandlePacketUpdateSign(a_ByteBuffer); return true;
+				case 0x1a: HandlePacketAnimation(a_ByteBuffer); return true;
+				case 0x1b: HandlePacketSpectate(a_ByteBuffer); return true;
+				case 0x1c: HandlePacketBlockPlace(a_ByteBuffer); return true;
+				case 0x1d: HandlePacketUseItem(a_ByteBuffer); return true;
 			}
 			break;
 		}
@@ -876,7 +913,9 @@ void cProtocol_1_9_0::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
 
-	m_Client->HandleAnimation(Hand == MAIN_HAND);  // Packet exists solely for arm-swing notification (main and off-hand).
+	m_Client->HandleAnimation(
+		Hand == MAIN_HAND
+	);  // Packet exists solely for arm-swing notification (main and off-hand).
 }
 
 
@@ -948,11 +987,11 @@ void cProtocol_1_9_0::HandlePacketBoatSteer(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_9_0::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Locale);
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   ViewDistance);
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   ChatFlags);
-	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    ChatColors);
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   SkinParts);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt,        UInt32,  MainHand);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, ViewDistance);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, ChatFlags);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, ChatColors);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, SkinParts);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, MainHand);
 
 	m_Client->SetLocale(Locale);
 	m_Client->SetViewDistance(ViewDistance);
@@ -982,9 +1021,9 @@ void cProtocol_1_9_0::HandleConfirmTeleport(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_9_0::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadVarInt,  UInt32, PlayerID);
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8,  Action);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt,  UInt32, JumpBoost);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, PlayerID);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Action);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, JumpBoost);
 
 	if (PlayerID != m_Client->GetPlayer()->GetUniqueID())
 	{
@@ -1013,7 +1052,7 @@ void cProtocol_1_9_0::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosX);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosY);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosZ);
-	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, IsOnGround);
 
 	if (m_IsTeleportIdConfirmed)
 	{
@@ -1030,9 +1069,9 @@ void cProtocol_1_9_0::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosX);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosY);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosZ);
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Yaw);
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Pitch);
-	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Yaw);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Pitch);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, IsOnGround);
 
 	if (m_IsTeleportIdConfirmed)
 	{
@@ -1071,8 +1110,8 @@ void cProtocol_1_9_0::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_9_0::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Text);
-	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    AssumeCommand);
-	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    HasPosition);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, AssumeCommand);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, HasPosition);
 
 	if (HasPosition)
 	{
@@ -1119,7 +1158,8 @@ void cProtocol_1_9_0::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 		{
 			HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, Hand);
 
-			if (Hand == MAIN_HAND)  // TODO: implement handling of off-hand actions; ignore them for now to avoid processing actions twice
+			if (Hand == MAIN_HAND)  // TODO: implement handling of off-hand actions; ignore them for now to avoid
+									// processing actions twice
 			{
 				m_Client->HandleUseEntity(EntityID, false);
 			}
@@ -1169,8 +1209,8 @@ void cProtocol_1_9_0::HandlePacketVehicleMove(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, xPos);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, yPos);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, zPos);
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  yaw);
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  pitch);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, yaw);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, pitch);
 
 	// Get the players vehicle
 	cEntity * Vehicle = m_Client->GetPlayer()->GetAttached();
@@ -1191,11 +1231,11 @@ void cProtocol_1_9_0::HandlePacketVehicleMove(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_9_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  WindowID);
-	HANDLE_READ(a_ByteBuffer, ReadBEInt16,  Int16,  SlotNum);
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  Button);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, WindowID);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt16, Int16, SlotNum);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Button);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt16, UInt16, TransactionID);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt32,  UInt32,  Mode);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, Mode);
 	cItem Item;
 	ReadItem(a_ByteBuffer, Item);
 
@@ -1206,35 +1246,39 @@ void cProtocol_1_9_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 	eClickAction Action;
 	switch ((Mode << 8) | Button)
 	{
-		case 0x0000: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caLeftClick  : caLeftClickOutside;  break;
+		case 0x0000: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caLeftClick : caLeftClickOutside; break;
 		case 0x0001: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caRightClick : caRightClickOutside; break;
-		case 0x0100: Action = caShiftLeftClick;  break;
+		case 0x0100: Action = caShiftLeftClick; break;
 		case 0x0101: Action = caShiftRightClick; break;
-		case 0x0200: Action = caNumber1;         break;
-		case 0x0201: Action = caNumber2;         break;
-		case 0x0202: Action = caNumber3;         break;
-		case 0x0203: Action = caNumber4;         break;
-		case 0x0204: Action = caNumber5;         break;
-		case 0x0205: Action = caNumber6;         break;
-		case 0x0206: Action = caNumber7;         break;
-		case 0x0207: Action = caNumber8;         break;
-		case 0x0208: Action = caNumber9;         break;
-		case 0x0302: Action = caMiddleClick;     break;
-		case 0x0400: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftClickOutsideHoldNothing  : caDropKey;     break;
+		case 0x0200: Action = caNumber1; break;
+		case 0x0201: Action = caNumber2; break;
+		case 0x0202: Action = caNumber3; break;
+		case 0x0203: Action = caNumber4; break;
+		case 0x0204: Action = caNumber5; break;
+		case 0x0205: Action = caNumber6; break;
+		case 0x0206: Action = caNumber7; break;
+		case 0x0207: Action = caNumber8; break;
+		case 0x0208: Action = caNumber9; break;
+		case 0x0302: Action = caMiddleClick; break;
+		case 0x0400: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftClickOutsideHoldNothing : caDropKey; break;
 		case 0x0401: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightClickOutsideHoldNothing : caCtrlDropKey; break;
-		case 0x0500: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftPaintBegin               : caUnknown;     break;
-		case 0x0501: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caLeftPaintProgress            : caUnknown;     break;
-		case 0x0502: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftPaintEnd                 : caUnknown;     break;
-		case 0x0504: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightPaintBegin              : caUnknown;     break;
-		case 0x0505: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caRightPaintProgress           : caUnknown;     break;
-		case 0x0506: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightPaintEnd                : caUnknown;     break;
-		case 0x0508: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caMiddlePaintBegin             : caUnknown;     break;
-		case 0x0509: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caMiddlePaintProgress          : caUnknown;     break;
-		case 0x050a: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caMiddlePaintEnd               : caUnknown;     break;
+		case 0x0500: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftPaintBegin : caUnknown; break;
+		case 0x0501: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caLeftPaintProgress : caUnknown; break;
+		case 0x0502: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftPaintEnd : caUnknown; break;
+		case 0x0504: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightPaintBegin : caUnknown; break;
+		case 0x0505: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caRightPaintProgress : caUnknown; break;
+		case 0x0506: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightPaintEnd : caUnknown; break;
+		case 0x0508: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caMiddlePaintBegin : caUnknown; break;
+		case 0x0509: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caMiddlePaintProgress : caUnknown; break;
+		case 0x050a: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caMiddlePaintEnd : caUnknown; break;
 		case 0x0600: Action = caDblClick; break;
 		default:
 		{
-			LOGWARNING("Unhandled window click mode / button combination: %d (0x%x)", (Mode << 8) | Button, (Mode << 8) | Button);
+			LOGWARNING(
+				"Unhandled window click mode / button combination: %d (0x%x)",
+				(Mode << 8) | Button,
+				(Mode << 8) | Button
+			);
 			Action = caUnknown;
 			break;
 		}
@@ -1307,8 +1351,12 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 	{
 		AString HexDump;
 		CreateHexDump(HexDump, a_Metadata.data(), std::max<size_t>(a_Metadata.size(), 1024), 16);
-		LOGWARNING("Cannot parse NBT item metadata: %s at (%zu / %zu bytes)\n%s",
-			NBT.GetErrorCode().message().c_str(), NBT.GetErrorPos(), a_Metadata.size(), HexDump.c_str()
+		LOGWARNING(
+			"Cannot parse NBT item metadata: %s at (%zu / %zu bytes)\n%s",
+			NBT.GetErrorCode().message().c_str(),
+			NBT.GetErrorPos(),
+			a_Metadata.size(),
+			HexDump.c_str()
 		);
 		return;
 	}
@@ -1331,16 +1379,20 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 			{
 				if (TagName == "display")  // Custom name and lore tag
 				{
-					for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0; displaytag = NBT.GetNextSibling(displaytag))
+					for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0;
+						 displaytag = NBT.GetNextSibling(displaytag))
 					{
-						if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name"))  // Custon name tag
+						if ((NBT.GetType(displaytag) == TAG_String) &&
+							(NBT.GetName(displaytag) == "Name"))  // Custon name tag
 						{
 							a_Item.m_CustomName = NBT.GetString(displaytag);
 						}
-						else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore"))  // Lore tag
+						else if ((NBT.GetType(displaytag) == TAG_List) &&
+								 (NBT.GetName(displaytag) == "Lore"))  // Lore tag
 						{
 							a_Item.m_LoreTable.clear();
-							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag))  // Loop through array of strings
+							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0;
+								 loretag = NBT.GetNextSibling(loretag))  // Loop through array of strings
 							{
 								a_Item.m_LoreTable.push_back(NBT.GetString(loretag));
 							}
@@ -1353,11 +1405,17 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 				}
 				else if ((TagName == "Fireworks") || (TagName == "Explosion"))
 				{
-					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+					cFireworkItem::ParseFromNBT(
+						a_Item.m_FireworkItem,
+						NBT,
+						tag,
+						static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType)
+					);
 				}
 				else if (TagName == "EntityTag")
 				{
-					for (int entitytag = NBT.GetFirstChild(tag); entitytag >= 0; entitytag = NBT.GetNextSibling(entitytag))
+					for (int entitytag = NBT.GetFirstChild(tag); entitytag >= 0;
+						 entitytag = NBT.GetNextSibling(entitytag))
 					{
 						if ((NBT.GetType(entitytag) == TAG_String) && (NBT.GetName(entitytag) == "id"))
 						{
@@ -1365,7 +1423,6 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 							ReplaceString(NBTName, "minecraft:", "");
 							eMonsterType MonsterType = cMonster::StringToMobType(NBTName);
 							a_Item.m_ItemDamage = static_cast<short>(GetProtocolMobType(MonsterType));
-
 						}
 					}
 				}
@@ -1539,7 +1596,7 @@ void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 		a_Writer.AddInt("y", a_BlockEntity.GetPosY());
 		a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
 		a_Writer.BeginCompound("SpawnData");  // New: SpawnData compound
-			a_Writer.AddString("id", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
+		a_Writer.AddString("id", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
 		a_Writer.EndCompound();
 		a_Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
 	}
@@ -1793,7 +1850,8 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 
 	if ((ItemType == E_ITEM_POTION) && ((a_Item.m_ItemDamage & 0x4000) != 0))
 	{
-		// Ugly special case for splash potion ids which changed in 1.9; this can be removed when the new 1.9 ids are implemented
+		// Ugly special case for splash potion ids which changed in 1.9; this can be removed when the new 1.9 ids are
+		// implemented
 		a_Pkt.WriteBEInt16(438);  // minecraft:splash_potion
 	}
 	else
@@ -1812,7 +1870,9 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
 	}
 
-	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (ItemType != E_ITEM_FIREWORK_ROCKET) && (ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid() && (ItemType != E_ITEM_POTION) && (ItemType != E_ITEM_SPAWN_EGG))
+	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (ItemType != E_ITEM_FIREWORK_ROCKET) &&
+		(ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid() && (ItemType != E_ITEM_POTION) &&
+		(ItemType != E_ITEM_SPAWN_EGG))
 	{
 		a_Pkt.WriteBEInt8(0);
 		return;
@@ -1857,7 +1917,11 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	}
 	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
 	{
-		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+		cFireworkItem::WriteToNBTCompound(
+			a_Item.m_FireworkItem,
+			Writer,
+			static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType)
+		);
 	}
 	if (a_Item.m_ItemType == E_ITEM_POTION)
 	{
@@ -1869,20 +1933,20 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		{
 			switch (Type)
 			{
-				case cEntityEffect::effRegeneration: PotionID = "regeneration"; break;
-				case cEntityEffect::effSpeed: PotionID = "swiftness"; break;
+				case cEntityEffect::effRegeneration:   PotionID = "regeneration"; break;
+				case cEntityEffect::effSpeed:          PotionID = "swiftness"; break;
 				case cEntityEffect::effFireResistance: PotionID = "fire_resistance"; break;
-				case cEntityEffect::effPoison: PotionID = "poison"; break;
-				case cEntityEffect::effInstantHealth: PotionID = "healing"; break;
-				case cEntityEffect::effNightVision: PotionID = "night_vision"; break;
-				case cEntityEffect::effWeakness: PotionID = "weakness"; break;
-				case cEntityEffect::effStrength: PotionID = "strength"; break;
-				case cEntityEffect::effSlowness: PotionID = "slowness"; break;
-				case cEntityEffect::effJumpBoost: PotionID = "leaping"; break;
-				case cEntityEffect::effInstantDamage: PotionID = "harming"; break;
+				case cEntityEffect::effPoison:         PotionID = "poison"; break;
+				case cEntityEffect::effInstantHealth:  PotionID = "healing"; break;
+				case cEntityEffect::effNightVision:    PotionID = "night_vision"; break;
+				case cEntityEffect::effWeakness:       PotionID = "weakness"; break;
+				case cEntityEffect::effStrength:       PotionID = "strength"; break;
+				case cEntityEffect::effSlowness:       PotionID = "slowness"; break;
+				case cEntityEffect::effJumpBoost:      PotionID = "leaping"; break;
+				case cEntityEffect::effInstantDamage:  PotionID = "harming"; break;
 				case cEntityEffect::effWaterBreathing: PotionID = "water_breathing"; break;
-				case cEntityEffect::effInvisibility: PotionID = "invisibility"; break;
-				default: ASSERT(!"Unknown potion effect"); break;
+				case cEntityEffect::effInvisibility:   PotionID = "invisibility"; break;
+				default:                               ASSERT(!"Unknown potion effect"); break;
 			}
 			if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1)
 			{
@@ -2365,7 +2429,9 @@ void cProtocol_1_9_1::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 		cServer * Server = cRoot::Get()->GetServer();
 		cPacketizer Pkt(*this, pktJoinGame);
 		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
-		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
+		Pkt.WriteBEUInt8(
+			static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0)
+		);  // Hardcore flag bit 4
 		Pkt.WriteBEInt32(static_cast<Int32>(a_World.GetDimension()));  // This is the change from 1.9.0 (Int8 to Int32)
 		Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<size_t>(Server->GetMaxPlayers(), 0, 255)));
@@ -2414,7 +2480,13 @@ cProtocol::Version cProtocol_1_9_2::GetProtocolVersion() const
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_4:
 
-void cProtocol_1_9_4::SendUpdateSign(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+void cProtocol_1_9_4::SendUpdateSign(
+	Vector3i a_BlockPos,
+	const AString & a_Line1,
+	const AString & a_Line2,
+	const AString & a_Line3,
+	const AString & a_Line4
+)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -2424,9 +2496,9 @@ void cProtocol_1_9_4::SendUpdateSign(Vector3i a_BlockPos, const AString & a_Line
 	Pkt.WriteBEUInt8(9);  // Action 9 - update sign
 
 	cFastNBTWriter Writer;
-	Writer.AddInt("x",        a_BlockPos.x);
-	Writer.AddInt("y",        a_BlockPos.y);
-	Writer.AddInt("z",        a_BlockPos.z);
+	Writer.AddInt("x", a_BlockPos.x);
+	Writer.AddInt("y", a_BlockPos.y);
+	Writer.AddInt("z", a_BlockPos.z);
 	Writer.AddString("id", "Sign");
 
 	Json::Value Line1;
@@ -2460,7 +2532,7 @@ UInt32 cProtocol_1_9_4::GetPacketID(cProtocol::ePacketType a_Packet) const
 		case pktPlayerListHeaderFooter: return 0x47;
 		case pktTeleportEntity:         return 0x49;
 
-		default: return Super::GetPacketID(a_Packet);
+		default:                        return Super::GetPacketID(a_Packet);
 	}
 }
 

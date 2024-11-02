@@ -40,8 +40,7 @@ struct StatisticsManager
 	/** Returns whether the prerequisite for awarding an achievement are satisfied. */
 	bool SatisfiesPrerequisite(CustomStatistic a_Stat) const;
 
-private:
-
+  private:
 	/** Returns if a statistic is both present and has nonzero value. */
 	bool IsStatisticPresent(CustomStatistic a_Stat) const;
 };

@@ -8,15 +8,13 @@
 
 
 // tolua_begin
-class cExpOrb:
-	public cEntity
+class cExpOrb : public cEntity
 {
 	// tolua_end
 
 	using Super = cEntity;
 
-public:  // tolua_export
-
+  public:  // tolua_export
 	CLASS_PROTODEF(cExpOrb)
 
 	cExpOrb(Vector3d a_Pos, int a_Reward);
@@ -47,9 +45,9 @@ public:  // tolua_export
 	/** Split reward into small values according to regular Minecraft rules */
 	static std::vector<int> Split(int a_Reward);
 
-protected:
+  protected:
 	int m_Reward;
 
 	/** The number of ticks that the entity has existed / timer between collect and destroy; in msec */
 	std::chrono::milliseconds m_Timer;
-} ;  // tolua_export
+};  // tolua_export

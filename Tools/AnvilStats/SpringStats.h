@@ -1,7 +1,8 @@
 
 // SpringStats.h
 
-// Declares the cSpringStats class representing a cCallback descendant that collects statistics on lava and water springs
+// Declares the cSpringStats class representing a cCallback descendant that collects statistics on lava and water
+// springs
 
 
 
@@ -15,13 +16,12 @@
 
 
 
-class cSpringStats :
-	public cCallback
+class cSpringStats : public cCallback
 {
-public:
+  public:
 	class cStats
 	{
-	public:
+	  public:
 		/** Per-height, per-biome frequencies of springs */
 		typedef UInt64 SpringStats[256][256];
 
@@ -33,29 +33,34 @@ public:
 
 		cStats(void);
 		void Add(const cStats & a_Other);
-	} ;
+	};
 
 	cSpringStats(void);
 
 	const cStats & GetStats(void) const { return m_Stats; }
 
-protected:
-
-	BLOCKTYPE  m_BlockTypes[16 * 16 * 256];
+  protected:
+	BLOCKTYPE m_BlockTypes[16 * 16 * 256];
 	NIBBLETYPE m_BlockMetas[16 * 16 * 256 / 2];
-	char       m_Biomes[16 * 16];
-	bool       m_AreBiomesValid;
+	char m_Biomes[16 * 16];
+	bool m_AreBiomesValid;
 
 	cStats m_Stats;
 
 	// cCallback overrides:
 	virtual bool OnNewChunk(int a_ChunkX, int a_ChunkZ) override;
 	virtual bool OnHeader(int a_FileOffset, unsigned char a_NumSectors, int a_Timestamp) override { return false; }
-	virtual bool OnCompressedDataSizePos(int a_CompressedDataSize, int a_DataOffset, char a_CompressionMethod) override { return false; }
+	virtual bool OnCompressedDataSizePos(int a_CompressedDataSize, int a_DataOffset, char a_CompressionMethod) override
+	{
+		return false;
+	}
 	virtual bool OnDecompressedData(const char * a_DecompressedNBT, int a_DataSize) override { return false; }
 	virtual bool OnRealCoords(int a_ChunkX, int a_ChunkZ) override { return false; }
 	virtual bool OnLastUpdate(Int64 a_LastUpdate) override { return false; }
-	virtual bool OnTerrainPopulated(bool a_Populated) override { return !a_Populated; }  // If not populated, we don't want it!
+	virtual bool OnTerrainPopulated(bool a_Populated) override
+	{
+		return !a_Populated;
+	}  // If not populated, we don't want it!
 	virtual bool OnBiomes(const unsigned char * a_BiomeData) override;
 	virtual bool OnHeightMap(const int * a_HeightMap) override { return false; }
 	virtual bool OnSection(
@@ -70,22 +75,18 @@ protected:
 
 	/** Tests the specified block, if it appears to be a spring, it is added to a_Stats */
 	void TestSpring(int a_RelX, int a_RelY, int a_RelZ, cStats::SpringStats & a_Stats);
-} ;
+};
 
 
 
 
 
-class cSpringStatsFactory :
-	public cCallbackFactory
+class cSpringStatsFactory : public cCallbackFactory
 {
-public:
+  public:
 	virtual ~cSpringStatsFactory();
 
-	virtual cCallback * CreateNewCallback(void) override
-	{
-		return new cSpringStats;
-	}
+	virtual cCallback * CreateNewCallback(void) override { return new cSpringStats; }
 
 	cSpringStats::cStats m_CombinedStats;
 
@@ -96,4 +97,4 @@ public:
 
 	/** Saves complete per-height, per-biome statistics for the springs to the file */
 	void SaveStatistics(const cSpringStats::cStats::SpringStats & a_Stats, const AString & a_FileName);
-} ;
+};

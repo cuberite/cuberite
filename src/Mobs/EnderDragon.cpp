@@ -10,7 +10,15 @@
 
 
 cEnderDragon::cEnderDragon(void) :
-	Super("EnderDragon", mtEnderDragon, "entity.enderdragon.hurt", "entity.enderdragon.death", "entity.enderdragon.ambient", 16, 8)
+	Super(
+		"EnderDragon",
+		mtEnderDragon,
+		"entity.enderdragon.hurt",
+		"entity.enderdragon.death",
+		"entity.enderdragon.ambient",
+		16,
+		8
+	)
 {
 }
 
@@ -47,5 +55,14 @@ void cEnderDragon::SpawnOn(cClientHandle & a_Client)
 	Super::SpawnOn(a_Client);
 
 	// Red boss bar with no divisions that plays boss music and creates fog:
-	a_Client.SendBossBarAdd(GetUniqueID(), cCompositeChat("Ender Dragon"), GetHealth() / GetMaxHealth(), BossBarColor::Red, BossBarDivisionType::None, false, true, true);
+	a_Client.SendBossBarAdd(
+		GetUniqueID(),
+		cCompositeChat("Ender Dragon"),
+		GetHealth() / GetMaxHealth(),
+		BossBarColor::Red,
+		BossBarDivisionType::None,
+		false,
+		true,
+		true
+	);
 }

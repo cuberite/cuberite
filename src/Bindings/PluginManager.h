@@ -43,8 +43,7 @@ typedef std::vector<cPluginPtr> cPluginPtrs;
 // tolua_begin
 class cPluginManager
 {
-public:
-
+  public:
 	enum CommandResult
 	{
 		crExecuted,
@@ -52,7 +51,7 @@ public:
 		crError,
 		crBlocked,
 		crNoPermission,
-	} ;
+	};
 
 
 	/** Defines the status of a single plugin - whether it is loaded, disabled or errored. */
@@ -159,7 +158,7 @@ public:
 		// Keep these two as the last items, they are used for validity checking and get their values automagically
 		HOOK_NUM_HOOKS,
 		HOOK_MAX = HOOK_NUM_HOOKS - 1,
-	} ;  // tolua_export
+	};  // tolua_export
 
 
 	/** Defines the deferred actions needed for a plugin */
@@ -173,20 +172,26 @@ public:
 	/** Used as a callback for enumerating bound commands */
 	class cCommandEnumCallback
 	{
-	public:
+	  public:
 		virtual ~cCommandEnumCallback() {}
 
 		/** Called for each command; return true to abort enumeration
 		For console commands, a_Permission is not used (set to empty string)
 		*/
-		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) = 0;
-	} ;
+		virtual bool Command(
+			const AString & a_Command,
+			const cPlugin * a_Plugin,
+			const AString & a_Permission,
+			const AString & a_HelpString
+		) = 0;
+	};
 
 
-	/** Interface that must be provided by any class that implements a command handler, either in-game or console command. */
+	/** Interface that must be provided by any class that implements a command handler, either in-game or console
+	 * command. */
 	class cCommandHandler
 	{
-	public:
+	  public:
 		// Force a virtual destructor in descendants
 		virtual ~cCommandHandler() {}
 
@@ -194,7 +199,8 @@ public:
 		a_Split is the command string, split at the spaces.
 		a_Player is the player executing the command, nullptr in case of the console.
 		a_Command is the entire command string.
-		a_Output is the sink into which the additional text returned by the command handler should be sent; only used for console commands. */
+		a_Output is the sink into which the additional text returned by the command handler should be sent; only used
+		for console commands. */
 		virtual bool ExecuteCommand(
 			const AStringVector & a_Split,
 			cPlayer * a_Player,
@@ -236,76 +242,193 @@ public:
 	size_t GetNumLoadedPlugins(void) const;  // tolua_export
 
 	// Calls for individual hooks. Each returns false if the action is to continue or true if the plugin wants to abort
-	bool CallHookBlockSpread              (cWorld & a_World, Vector3i a_BlockPos, eSpreadSource a_Source);
-	bool CallHookBlockToPickups           (cWorld & a_World, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool, cItems & a_Pickups);
-	bool CallHookBrewingCompleting        (cWorld & a_World, cBrewingstandEntity & a_Brewingstand);
-	bool CallHookBrewingCompleted         (cWorld & a_World, cBrewingstandEntity & a_Brewingstand);
-	bool CallHookChat                     (cPlayer & a_Player, AString & a_Message);
-	bool CallHookChunkAvailable           (cWorld & a_World, int a_ChunkX, int a_ChunkZ);
-	bool CallHookChunkGenerated           (cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);
-	bool CallHookChunkGenerating          (cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);
-	bool CallHookChunkUnloaded            (cWorld & a_World, int a_ChunkX, int a_ChunkZ);
-	bool CallHookChunkUnloading           (cWorld & a_World, int a_ChunkX, int a_ChunkZ);
-	bool CallHookCollectingPickup         (cPlayer & a_Player, cPickup & a_Pickup);
-	bool CallHookCraftingNoRecipe         (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe);
-	bool CallHookDisconnect               (cClientHandle & a_Client, const AString & a_Reason);
-	bool CallHookEntityAddEffect          (cEntity & a_Entity, int a_EffectType, int a_EffectDurationTicks, int a_EffectIntensity, double a_DistanceModifier);
-	bool CallHookEntityTeleport           (cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition);
-	bool CallHookEntityChangingWorld      (cEntity & a_Entity, cWorld & a_World);
-	bool CallHookEntityChangedWorld       (cEntity & a_Entity, cWorld & a_World);
-	bool CallHookExecuteCommand           (cPlayer * a_Player, const AStringVector & a_Split, const AString & a_EntireCommand, CommandResult & a_Result);  // If a_Player == nullptr, it is a console cmd
-	bool CallHookExploded                 (cWorld & a_World, double a_ExplosionSize,   bool a_CanCauseFire,   double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
-	bool CallHookExploding                (cWorld & a_World, double & a_ExplosionSize, bool & a_CanCauseFire, double a_X, double a_Y, double a_Z, eExplosionSource a_Source, void * a_SourceData);
-	bool CallHookHandshake                (cClientHandle & a_ClientHandle, const AString & a_Username);
-	bool CallHookHopperPullingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum);
-	bool CallHookHopperPushingItem        (cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum);
-	bool CallHookDropSpense               (cWorld & a_World, cDropSpenserEntity & a_DropSpenser, int a_SlotNum);
-	bool CallHookKilled                   (cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage);
-	bool CallHookKilling                  (cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI);
-	bool CallHookLogin                    (cClientHandle & a_Client, UInt32 a_ProtocolVersion, const AString & a_Username);
-	bool CallHookLoginForge               (cClientHandle & a_Client, AStringMap & a_Mods);
-	bool CallHookPlayerAnimation          (cPlayer & a_Player, int a_Animation);
-	bool CallHookPlayerBreakingBlock      (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool CallHookPlayerBrokenBlock        (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool CallHookPlayerDestroyed          (cPlayer & a_Player);
-	bool CallHookPlayerEating             (cPlayer & a_Player);
-	bool CallHookPlayerFished             (cPlayer & a_Player, const cItems & a_Reward, const int ExperienceAmount);
-	bool CallHookPlayerFishing            (cPlayer & a_Player, cItems & a_Reward, int & ExperienceAmount);
-	bool CallHookPlayerFoodLevelChange    (cPlayer & a_Player, int a_NewFoodLevel);
-	bool CallHookPlayerJoined             (cPlayer & a_Player);
-	bool CallHookPlayerLeftClick          (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, char a_Status);
-	bool CallHookPlayerMoving             (cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition, bool a_PreviousIsOnGround);
-	bool CallHookPlayerOpeningWindow      (cPlayer & a_Player, cWindow & a_Window);
-	bool CallHookPlayerPlacedBlock        (cPlayer & a_Player, const sSetBlock & a_BlockChange);
-	bool CallHookPlayerPlacingBlock       (cPlayer & a_Player, const sSetBlock & a_BlockChange);
-	bool CallHookPlayerCrouched           (cPlayer & a_Player);
-	bool CallHookPlayerRightClick         (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos);
+	bool CallHookBlockSpread(cWorld & a_World, Vector3i a_BlockPos, eSpreadSource a_Source);
+	bool CallHookBlockToPickups(
+		cWorld & a_World,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta,
+		const cBlockEntity * a_BlockEntity,
+		const cEntity * a_Digger,
+		const cItem * a_Tool,
+		cItems & a_Pickups
+	);
+	bool CallHookBrewingCompleting(cWorld & a_World, cBrewingstandEntity & a_Brewingstand);
+	bool CallHookBrewingCompleted(cWorld & a_World, cBrewingstandEntity & a_Brewingstand);
+	bool CallHookChat(cPlayer & a_Player, AString & a_Message);
+	bool CallHookChunkAvailable(cWorld & a_World, int a_ChunkX, int a_ChunkZ);
+	bool CallHookChunkGenerated(cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);
+	bool CallHookChunkGenerating(cWorld & a_World, int a_ChunkX, int a_ChunkZ, cChunkDesc * a_ChunkDesc);
+	bool CallHookChunkUnloaded(cWorld & a_World, int a_ChunkX, int a_ChunkZ);
+	bool CallHookChunkUnloading(cWorld & a_World, int a_ChunkX, int a_ChunkZ);
+	bool CallHookCollectingPickup(cPlayer & a_Player, cPickup & a_Pickup);
+	bool CallHookCraftingNoRecipe(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe);
+	bool CallHookDisconnect(cClientHandle & a_Client, const AString & a_Reason);
+	bool CallHookEntityAddEffect(
+		cEntity & a_Entity,
+		int a_EffectType,
+		int a_EffectDurationTicks,
+		int a_EffectIntensity,
+		double a_DistanceModifier
+	);
+	bool CallHookEntityTeleport(cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition);
+	bool CallHookEntityChangingWorld(cEntity & a_Entity, cWorld & a_World);
+	bool CallHookEntityChangedWorld(cEntity & a_Entity, cWorld & a_World);
+	bool CallHookExecuteCommand(
+		cPlayer * a_Player,
+		const AStringVector & a_Split,
+		const AString & a_EntireCommand,
+		CommandResult & a_Result
+	);  // If a_Player == nullptr, it is a console cmd
+	bool CallHookExploded(
+		cWorld & a_World,
+		double a_ExplosionSize,
+		bool a_CanCauseFire,
+		double a_X,
+		double a_Y,
+		double a_Z,
+		eExplosionSource a_Source,
+		void * a_SourceData
+	);
+	bool CallHookExploding(
+		cWorld & a_World,
+		double & a_ExplosionSize,
+		bool & a_CanCauseFire,
+		double a_X,
+		double a_Y,
+		double a_Z,
+		eExplosionSource a_Source,
+		void * a_SourceData
+	);
+	bool CallHookHandshake(cClientHandle & a_ClientHandle, const AString & a_Username);
+	bool CallHookHopperPullingItem(
+		cWorld & a_World,
+		cHopperEntity & a_Hopper,
+		int a_DstSlotNum,
+		cBlockEntityWithItems & a_SrcEntity,
+		int a_SrcSlotNum
+	);
+	bool CallHookHopperPushingItem(
+		cWorld & a_World,
+		cHopperEntity & a_Hopper,
+		int a_SrcSlotNum,
+		cBlockEntityWithItems & a_DstEntity,
+		int a_DstSlotNum
+	);
+	bool CallHookDropSpense(cWorld & a_World, cDropSpenserEntity & a_DropSpenser, int a_SlotNum);
+	bool CallHookKilled(cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage);
+	bool CallHookKilling(cEntity & a_Victim, cEntity * a_Killer, TakeDamageInfo & a_TDI);
+	bool CallHookLogin(cClientHandle & a_Client, UInt32 a_ProtocolVersion, const AString & a_Username);
+	bool CallHookLoginForge(cClientHandle & a_Client, AStringMap & a_Mods);
+	bool CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation);
+	bool CallHookPlayerBreakingBlock(
+		cPlayer & a_Player,
+		Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta
+	);
+	bool CallHookPlayerBrokenBlock(
+		cPlayer & a_Player,
+		Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta
+	);
+	bool CallHookPlayerDestroyed(cPlayer & a_Player);
+	bool CallHookPlayerEating(cPlayer & a_Player);
+	bool CallHookPlayerFished(cPlayer & a_Player, const cItems & a_Reward, const int ExperienceAmount);
+	bool CallHookPlayerFishing(cPlayer & a_Player, cItems & a_Reward, int & ExperienceAmount);
+	bool CallHookPlayerFoodLevelChange(cPlayer & a_Player, int a_NewFoodLevel);
+	bool CallHookPlayerJoined(cPlayer & a_Player);
+	bool CallHookPlayerLeftClick(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, char a_Status);
+	bool CallHookPlayerMoving(
+		cPlayer & a_Player,
+		const Vector3d & a_OldPosition,
+		const Vector3d & a_NewPosition,
+		bool a_PreviousIsOnGround
+	);
+	bool CallHookPlayerOpeningWindow(cPlayer & a_Player, cWindow & a_Window);
+	bool CallHookPlayerPlacedBlock(cPlayer & a_Player, const sSetBlock & a_BlockChange);
+	bool CallHookPlayerPlacingBlock(cPlayer & a_Player, const sSetBlock & a_BlockChange);
+	bool CallHookPlayerCrouched(cPlayer & a_Player);
+	bool CallHookPlayerRightClick(
+		cPlayer & a_Player,
+		Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		Vector3i a_CursorPos
+	);
 	bool CallHookPlayerRightClickingEntity(cPlayer & a_Player, cEntity & a_Entity);
-	bool CallHookPlayerShooting           (cPlayer & a_Player);
-	bool CallHookPlayerSpawned            (cPlayer & a_Player);
-	bool CallHookPlayerTossingItem        (cPlayer & a_Player);
-	bool CallHookPlayerUsedBlock          (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool CallHookPlayerUsedItem           (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos);
-	bool CallHookPlayerUsingBlock         (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool CallHookPlayerUsingItem          (cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos);
-	bool CallHookPluginMessage            (cClientHandle & a_Client, const AString & a_Channel, ContiguousByteBufferView a_Message);
-	bool CallHookPluginsLoaded            (void);
-	bool CallHookPostCrafting             (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe);
-	bool CallHookPreCrafting              (cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe);
-	bool CallHookProjectileHitBlock       (cProjectileEntity & a_Projectile, Vector3i a_BlockPos, eBlockFace a_Face, const Vector3d & a_BlockHitPos);
-	bool CallHookProjectileHitEntity      (cProjectileEntity & a_Projectile, cEntity & a_HitEntity);
-	bool CallHookServerPing               (cClientHandle & a_ClientHandle, AString & a_ServerDescription, int & a_OnlinePlayersCount, int & a_MaxPlayersCount, AString & a_Favicon);
-	bool CallHookSpawnedEntity            (cWorld & a_World, cEntity & a_Entity);
-	bool CallHookSpawnedMonster           (cWorld & a_World, cMonster & a_Monster);
-	bool CallHookSpawningEntity           (cWorld & a_World, cEntity & a_Entity);
-	bool CallHookSpawningMonster          (cWorld & a_World, cMonster & a_Monster);
-	bool CallHookTakeDamage               (cEntity & a_Receiver, TakeDamageInfo & a_TDI);
-	bool CallHookUpdatedSign              (cWorld & a_World, Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player);
-	bool CallHookUpdatingSign             (cWorld & a_World, Vector3i a_BlockPos,       AString & a_Line1,       AString & a_Line2,       AString & a_Line3,       AString & a_Line4, cPlayer * a_Player);
-	bool CallHookWeatherChanged           (cWorld & a_World);
-	bool CallHookWeatherChanging          (cWorld & a_World, eWeather & a_NewWeather);
-	bool CallHookWorldStarted             (cWorld & a_World);
-	bool CallHookWorldTick                (cWorld & a_World, std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
+	bool CallHookPlayerShooting(cPlayer & a_Player);
+	bool CallHookPlayerSpawned(cPlayer & a_Player);
+	bool CallHookPlayerTossingItem(cPlayer & a_Player);
+	bool CallHookPlayerUsedBlock(
+		cPlayer & a_Player,
+		Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		Vector3i a_CursorPos,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta
+	);
+	bool CallHookPlayerUsedItem(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos);
+	bool CallHookPlayerUsingBlock(
+		cPlayer & a_Player,
+		Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		Vector3i a_CursorPos,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta
+	);
+	bool CallHookPlayerUsingItem(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos);
+	bool CallHookPluginMessage(cClientHandle & a_Client, const AString & a_Channel, ContiguousByteBufferView a_Message);
+	bool CallHookPluginsLoaded(void);
+	bool CallHookPostCrafting(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe);
+	bool CallHookPreCrafting(cPlayer & a_Player, cCraftingGrid & a_Grid, cCraftingRecipe & a_Recipe);
+	bool CallHookProjectileHitBlock(
+		cProjectileEntity & a_Projectile,
+		Vector3i a_BlockPos,
+		eBlockFace a_Face,
+		const Vector3d & a_BlockHitPos
+	);
+	bool CallHookProjectileHitEntity(cProjectileEntity & a_Projectile, cEntity & a_HitEntity);
+	bool CallHookServerPing(
+		cClientHandle & a_ClientHandle,
+		AString & a_ServerDescription,
+		int & a_OnlinePlayersCount,
+		int & a_MaxPlayersCount,
+		AString & a_Favicon
+	);
+	bool CallHookSpawnedEntity(cWorld & a_World, cEntity & a_Entity);
+	bool CallHookSpawnedMonster(cWorld & a_World, cMonster & a_Monster);
+	bool CallHookSpawningEntity(cWorld & a_World, cEntity & a_Entity);
+	bool CallHookSpawningMonster(cWorld & a_World, cMonster & a_Monster);
+	bool CallHookTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a_TDI);
+	bool CallHookUpdatedSign(
+		cWorld & a_World,
+		Vector3i a_BlockPos,
+		const AString & a_Line1,
+		const AString & a_Line2,
+		const AString & a_Line3,
+		const AString & a_Line4,
+		cPlayer * a_Player
+	);
+	bool CallHookUpdatingSign(
+		cWorld & a_World,
+		Vector3i a_BlockPos,
+		AString & a_Line1,
+		AString & a_Line2,
+		AString & a_Line3,
+		AString & a_Line4,
+		cPlayer * a_Player
+	);
+	bool CallHookWeatherChanged(cWorld & a_World);
+	bool CallHookWeatherChanging(cWorld & a_World, eWeather & a_NewWeather);
+	bool CallHookWorldStarted(cWorld & a_World);
+	bool CallHookWorldTick(
+		cWorld & a_World,
+		std::chrono::milliseconds a_Dt,
+		std::chrono::milliseconds a_LastTickDurationMSec
+	);
 
 	/** Queues the specified plugin to be unloaded in the next call to Tick().
 	Note that this function returns before the plugin is unloaded, to avoid deadlocks. */
@@ -351,10 +474,12 @@ public:
 	/** Returns the permission needed for the specified command; empty string if command not found */
 	AString GetCommandPermission(const AString & a_Command);  // tolua_export
 
-	/** Executes the command, as if it was requested by a_Player. Checks permissions first. Returns crExecuted if executed. */
+	/** Executes the command, as if it was requested by a_Player. Checks permissions first. Returns crExecuted if
+	 * executed. */
 	CommandResult ExecuteCommand(cPlayer & a_Player, const AString & a_Command);  // tolua_export
 
-	/** Executes the command, as if it was requested by a_Player. Permisssions are not checked. Returns crExecuted if executed. */
+	/** Executes the command, as if it was requested by a_Player. Permisssions are not checked. Returns crExecuted if
+	 * executed. */
 	CommandResult ForceExecuteCommand(cPlayer & a_Player, const AString & a_Command);  // tolua_export
 
 	/** Removes all console command bindings that the specified plugin has made */
@@ -379,7 +504,11 @@ public:
 	/** Executes the command split into a_Split, as if it was given on the console.
 	Returns true if executed. Output is sent to the a_Output callback
 	Exported in ManualBindings.cpp with a different signature. */
-	bool ExecuteConsoleCommand(const AStringVector & a_Split, cCommandOutputCallback & a_Output, const AString & a_Command);
+	bool ExecuteConsoleCommand(
+		const AStringVector & a_Split,
+		cCommandOutputCallback & a_Output,
+		const AString & a_Command
+	);
 
 	/** Appends all commands beginning with a_Text (case-insensitive) into a_Results.
 	If a_Player is not nullptr, only commands for which the player has permissions are added.
@@ -394,7 +523,8 @@ public:
 	bool DoWithPlugin(const AString & a_PluginName, cPluginCallback a_Callback);
 
 	/** Calls the specified callback for each plugin in m_Plugins.
-	Returns true if all plugins have been reported, false if the callback has aborted the enumeration by returning true. */
+	Returns true if all plugins have been reported, false if the callback has aborted the enumeration by returning true.
+  */
 	bool ForEachPlugin(cPluginCallback a_Callback);
 
 	/** Returns the name of the folder (cPlugin::GetFolderName()) from which the specified plugin was loaded. */
@@ -404,17 +534,17 @@ public:
 	The path doesn't end in a slash. */
 	static AString GetPluginsPath(void) { return "Plugins"; }  // tolua_export
 
-private:
+  private:
 	friend class cRoot;
 
 	class cCommandReg
 	{
-	public:
+	  public:
 		cPlugin * m_Plugin;
-		AString   m_Permission;  // Not used for console commands
-		AString   m_HelpString;
+		AString m_Permission;  // Not used for console commands
+		AString m_HelpString;
 		cCommandHandlerPtr m_Handler;
-	} ;
+	};
 
 	typedef std::map<int, cPluginManager::PluginList> HookMap;
 	typedef std::map<AString, cCommandReg> CommandMap;
@@ -431,7 +561,7 @@ private:
 	/** All plugins that have been found in the Plugins folder. */
 	cPluginPtrs m_Plugins;
 
-	HookMap    m_Hooks;
+	HookMap m_Hooks;
 	CommandMap m_Commands;
 	CommandMap m_ConsoleCommands;
 
@@ -454,10 +584,12 @@ private:
 	/** Unloads all plugins */
 	void UnloadPluginsNow(void);
 
-	/** Handles writing default plugins if 'Plugins' key not found using a settings repo expected to be intialised to settings.ini */
+	/** Handles writing default plugins if 'Plugins' key not found using a settings repo expected to be intialised to
+	 * settings.ini */
 	void InsertDefaultPlugins(cSettingsRepositoryInterface & a_Settings);
 
-	/** Tries to match a_Command to the internal table of commands, if a match is found, the corresponding plugin is called. Returns crExecuted if the command is executed. */
+	/** Tries to match a_Command to the internal table of commands, if a match is found, the corresponding plugin is
+	 * called. Returns crExecuted if the command is executed. */
 	CommandResult HandleCommand(cPlayer & a_Player, const AString & a_Command, bool a_ShouldCheckPermissions);
 
 	/** Returns the folders that are specified in the settings ini to load plugins from. */
@@ -466,9 +598,5 @@ private:
 	/** Calls a_HookFunction on each plugin registered to the hook HookName.
 	Returns false if the action is to continue or true if the plugin wants to abort.
 	Accessible only from within PluginManager.cpp */
-	template <typename HookFunction>
-	bool GenericCallHook(PluginHook a_HookName, HookFunction a_HookFunction);
-} ;  // tolua_export
-
-
-
+	template <typename HookFunction> bool GenericCallHook(PluginHook a_HookName, HookFunction a_HookFunction);
+};  // tolua_export

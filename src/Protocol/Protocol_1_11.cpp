@@ -51,265 +51,265 @@ Implements the 1.11 protocol classes:
 // Metadata indexes. Adding a new enum value causes the following values to
 // increase their index. Therefore the ordering of the enum values is VERY important!
 #ifdef __clang__
-	#pragma clang diagnostic push
-	#pragma clang diagnostic ignored "-Wduplicate-enum"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wduplicate-enum"
 #endif
 
 namespace Metadata_1_11
 {
-	enum MetadataIndex
-	{
-		// Entity
-		ENTITY_FLAGS,
-		ENTITY_AIR,
-		ENTITY_CUSTOM_NAME,
-		ENTITY_CUSTOM_NAME_VISIBLE,
-		ENTITY_SILENT,
-		ENTITY_NO_GRAVITY,
-		_ENTITY_NEXT,  // Used by descendants
+enum MetadataIndex
+{
+	// Entity
+	ENTITY_FLAGS,
+	ENTITY_AIR,
+	ENTITY_CUSTOM_NAME,
+	ENTITY_CUSTOM_NAME_VISIBLE,
+	ENTITY_SILENT,
+	ENTITY_NO_GRAVITY,
+	_ENTITY_NEXT,  // Used by descendants
 
-		// Potion
-		POTION_THROWN = _ENTITY_NEXT,
+	// Potion
+	POTION_THROWN = _ENTITY_NEXT,
 
-		// FallingBlock
-		FALLING_BLOCK_POSITION = _ENTITY_NEXT,
+	// FallingBlock
+	FALLING_BLOCK_POSITION = _ENTITY_NEXT,
 
-		// AreaEffectCloud
-		AREA_EFFECT_CLOUD_RADIUS = _ENTITY_NEXT,
-		AREA_EFFECT_CLOUD_COLOR,
-		AREA_EFFECT_CLOUD_SINGLE_POINT_EFFECT,
-		AREA_EFFECT_CLOUD_PARTICLE_ID,
-		AREA_EFFECT_CLOUD_PARTICLE_PARAMETER1,
-		AREA_EFFECT_CLOUD_PARTICLE_PARAMETER2,
+	// AreaEffectCloud
+	AREA_EFFECT_CLOUD_RADIUS = _ENTITY_NEXT,
+	AREA_EFFECT_CLOUD_COLOR,
+	AREA_EFFECT_CLOUD_SINGLE_POINT_EFFECT,
+	AREA_EFFECT_CLOUD_PARTICLE_ID,
+	AREA_EFFECT_CLOUD_PARTICLE_PARAMETER1,
+	AREA_EFFECT_CLOUD_PARTICLE_PARAMETER2,
 
-		// Arrow
-		ARROW_CRITICAL = _ENTITY_NEXT,
-		_ARROW_NEXT,
+	// Arrow
+	ARROW_CRITICAL = _ENTITY_NEXT,
+	_ARROW_NEXT,
 
-		// TippedArrow
-		TIPPED_ARROW_COLOR = _ARROW_NEXT,
+	// TippedArrow
+	TIPPED_ARROW_COLOR = _ARROW_NEXT,
 
-		// Boat
-		BOAT_LAST_HIT_TIME = _ENTITY_NEXT,
-		BOAT_FORWARD_DIRECTION,
-		BOAT_DAMAGE_TAKEN,
-		BOAT_TYPE,
-		BOAT_RIGHT_PADDLE_TURNING,
-		BOAT_LEFT_PADDLE_TURNING,
+	// Boat
+	BOAT_LAST_HIT_TIME = _ENTITY_NEXT,
+	BOAT_FORWARD_DIRECTION,
+	BOAT_DAMAGE_TAKEN,
+	BOAT_TYPE,
+	BOAT_RIGHT_PADDLE_TURNING,
+	BOAT_LEFT_PADDLE_TURNING,
 
-		// EnderCrystal
-		ENDER_CRYSTAL_BEAM_TARGET = _ENTITY_NEXT,
-		ENDER_CRYSTAL_SHOW_BOTTOM,
+	// EnderCrystal
+	ENDER_CRYSTAL_BEAM_TARGET = _ENTITY_NEXT,
+	ENDER_CRYSTAL_SHOW_BOTTOM,
 
-		// Fireball
-		_FIREBALL_NEXT = _ENTITY_NEXT,
+	// Fireball
+	_FIREBALL_NEXT = _ENTITY_NEXT,
 
-		// WitherSkull
-		WITHER_SKULL_INVULNERABLE = _FIREBALL_NEXT,
+	// WitherSkull
+	WITHER_SKULL_INVULNERABLE = _FIREBALL_NEXT,
 
-		// Fireworks
-		FIREWORK_INFO = _ENTITY_NEXT,
-		FIREWORK_BOOSTED_ENTITY_ID,  // 1.11.1 only
+	// Fireworks
+	FIREWORK_INFO = _ENTITY_NEXT,
+	FIREWORK_BOOSTED_ENTITY_ID,  // 1.11.1 only
 
-		// Hanging
-		_HANGING_NEXT = _ENTITY_NEXT,
+	// Hanging
+	_HANGING_NEXT = _ENTITY_NEXT,
 
-		// ItemFrame
-		ITEM_FRAME_ITEM = _HANGING_NEXT,
-		ITEM_FRAME_ROTATION,
+	// ItemFrame
+	ITEM_FRAME_ITEM = _HANGING_NEXT,
+	ITEM_FRAME_ROTATION,
 
-		// Item
-		ITEM_ITEM = _ENTITY_NEXT,
+	// Item
+	ITEM_ITEM = _ENTITY_NEXT,
 
-		// Living
-		LIVING_ACTIVE_HAND = _ENTITY_NEXT,
-		LIVING_HEALTH,
-		LIVING_POTION_EFFECT_COLOR,
-		LIVING_POTION_EFFECT_AMBIENT,
-		LIVING_NUMBER_OF_ARROWS,
-		_LIVING_NEXT,
+	// Living
+	LIVING_ACTIVE_HAND = _ENTITY_NEXT,
+	LIVING_HEALTH,
+	LIVING_POTION_EFFECT_COLOR,
+	LIVING_POTION_EFFECT_AMBIENT,
+	LIVING_NUMBER_OF_ARROWS,
+	_LIVING_NEXT,
 
-		// Player
-		PLAYER_ADDITIONAL_HEARTHS = _LIVING_NEXT,
-		PLAYER_SCORE,
-		PLAYER_DISPLAYED_SKIN_PARTS,
-		PLAYER_MAIN_HAND,
+	// Player
+	PLAYER_ADDITIONAL_HEARTHS = _LIVING_NEXT,
+	PLAYER_SCORE,
+	PLAYER_DISPLAYED_SKIN_PARTS,
+	PLAYER_MAIN_HAND,
 
-		// ArmorStand
-		ARMOR_STAND_STATUS = _LIVING_NEXT,
-		ARMOR_STAND_HEAD_ROTATION,
-		ARMOR_STAND_BODY_ROTATION,
-		ARMOR_STAND_LEFT_ARM_ROTATION,
-		ARMOR_STAND_RIGHT_ARM_ROTATION,
-		ARMOR_STAND_LEFT_LEG_ROTATION,
-		ARMOR_STAND_RIGHT_LEG_ROTATION,
+	// ArmorStand
+	ARMOR_STAND_STATUS = _LIVING_NEXT,
+	ARMOR_STAND_HEAD_ROTATION,
+	ARMOR_STAND_BODY_ROTATION,
+	ARMOR_STAND_LEFT_ARM_ROTATION,
+	ARMOR_STAND_RIGHT_ARM_ROTATION,
+	ARMOR_STAND_LEFT_LEG_ROTATION,
+	ARMOR_STAND_RIGHT_LEG_ROTATION,
 
-		// Insentient
-		INSENTIENT_STATUS = _LIVING_NEXT,
-		_INSENTIENT_NEXT,
+	// Insentient
+	INSENTIENT_STATUS = _LIVING_NEXT,
+	_INSENTIENT_NEXT,
 
-		// Ambient
-		_AMBIENT_NEXT = _INSENTIENT_NEXT,
+	// Ambient
+	_AMBIENT_NEXT = _INSENTIENT_NEXT,
 
-		// Bat
-		BAT_HANGING = _AMBIENT_NEXT,
+	// Bat
+	BAT_HANGING = _AMBIENT_NEXT,
 
-		// Creature
-		_CREATURE_NEXT = _INSENTIENT_NEXT,
+	// Creature
+	_CREATURE_NEXT = _INSENTIENT_NEXT,
 
-		// Ageable
-		AGEABLE_BABY = _CREATURE_NEXT,
-		_AGEABLE_NEXT,
+	// Ageable
+	AGEABLE_BABY = _CREATURE_NEXT,
+	_AGEABLE_NEXT,
 
-		// PolarBear
-		POLAR_BEAR_STANDING = _AGEABLE_NEXT,
+	// PolarBear
+	POLAR_BEAR_STANDING = _AGEABLE_NEXT,
 
-		// Animal
-		_ANIMAL_NEXT = _AGEABLE_NEXT,
+	// Animal
+	_ANIMAL_NEXT = _AGEABLE_NEXT,
 
-		// Abstract horse
-		ABSTRACT_HORSE_STATUS = _ANIMAL_NEXT,
-		ABSTRACT_HORSE_OWNER,
-		_ABSTRACT_HORSE_NEXT,
+	// Abstract horse
+	ABSTRACT_HORSE_STATUS = _ANIMAL_NEXT,
+	ABSTRACT_HORSE_OWNER,
+	_ABSTRACT_HORSE_NEXT,
 
-		// Horse
-		HORSE_VARIANT = _ABSTRACT_HORSE_NEXT,
-		HORSE_ARMOR,
+	// Horse
+	HORSE_VARIANT = _ABSTRACT_HORSE_NEXT,
+	HORSE_ARMOR,
 
-		// Chested horse
-		CHESTED_HORSE_CHESTED = _ABSTRACT_HORSE_NEXT,
-		_CHESTED_HORSE_NEXT,
+	// Chested horse
+	CHESTED_HORSE_CHESTED = _ABSTRACT_HORSE_NEXT,
+	_CHESTED_HORSE_NEXT,
 
-		// Llama
-		LLAMA_STRENGTH = _CHESTED_HORSE_NEXT,
-		LLAMA_CARPET_COLOR,
-		LLAMA_VARIANT,
+	// Llama
+	LLAMA_STRENGTH = _CHESTED_HORSE_NEXT,
+	LLAMA_CARPET_COLOR,
+	LLAMA_VARIANT,
 
-		// Pig
-		PIG_HAS_SADDLE = _ANIMAL_NEXT,
-		PIG_TOTAL_CARROT_ON_A_STICK_BOOST,  // 1.11.1 only
+	// Pig
+	PIG_HAS_SADDLE = _ANIMAL_NEXT,
+	PIG_TOTAL_CARROT_ON_A_STICK_BOOST,  // 1.11.1 only
 
-		// Rabbit
-		RABBIT_TYPE = _ANIMAL_NEXT,
+	// Rabbit
+	RABBIT_TYPE = _ANIMAL_NEXT,
 
-		// Sheep
-		SHEEP_STATUS = _ANIMAL_NEXT,
+	// Sheep
+	SHEEP_STATUS = _ANIMAL_NEXT,
 
-		// TameableAnimal
-		TAMEABLE_ANIMAL_STATUS = _ANIMAL_NEXT,
-		TAMEABLE_ANIMAL_OWNER,
-		_TAMEABLE_NEXT,
+	// TameableAnimal
+	TAMEABLE_ANIMAL_STATUS = _ANIMAL_NEXT,
+	TAMEABLE_ANIMAL_OWNER,
+	_TAMEABLE_NEXT,
 
-		// Ocelot
-		OCELOT_TYPE = _TAMEABLE_NEXT,
+	// Ocelot
+	OCELOT_TYPE = _TAMEABLE_NEXT,
 
-		// Wolf
-		WOLF_DAMAGE_TAKEN = _TAMEABLE_NEXT,
-		WOLF_BEGGING,
-		WOLF_COLLAR_COLOR,
+	// Wolf
+	WOLF_DAMAGE_TAKEN = _TAMEABLE_NEXT,
+	WOLF_BEGGING,
+	WOLF_COLLAR_COLOR,
 
-		// Villager
-		VILLAGER_PROFESSION = _AGEABLE_NEXT,
+	// Villager
+	VILLAGER_PROFESSION = _AGEABLE_NEXT,
 
-		// Golem
-		_GOLEM_NEXT = _CREATURE_NEXT,
+	// Golem
+	_GOLEM_NEXT = _CREATURE_NEXT,
 
-		// IronGolem
-		IRON_GOLEM_PLAYER_CREATED = _GOLEM_NEXT,
+	// IronGolem
+	IRON_GOLEM_PLAYER_CREATED = _GOLEM_NEXT,
 
-		// Shulker
-		SHULKER_FACING_DIRECTION = _GOLEM_NEXT,
-		SHULKER_ATTACHMENT_FALLING_BLOCK_POSITION,
-		SHULKER_SHIELD_HEIGHT,
+	// Shulker
+	SHULKER_FACING_DIRECTION = _GOLEM_NEXT,
+	SHULKER_ATTACHMENT_FALLING_BLOCK_POSITION,
+	SHULKER_SHIELD_HEIGHT,
 
-		// Monster
-		_MONSTER_NEXT = _CREATURE_NEXT,
+	// Monster
+	_MONSTER_NEXT = _CREATURE_NEXT,
 
-		// Blaze
-		BLAZE_ON_FIRE = _MONSTER_NEXT,
+	// Blaze
+	BLAZE_ON_FIRE = _MONSTER_NEXT,
 
-		// Creeper
-		CREEPER_STATE = _MONSTER_NEXT,
-		CREEPER_POWERED,
-		CREEPER_IGNITED,
+	// Creeper
+	CREEPER_STATE = _MONSTER_NEXT,
+	CREEPER_POWERED,
+	CREEPER_IGNITED,
 
-		// Guardian
-		GUARDIAN_STATUS = _MONSTER_NEXT,
-		GUARDIAN_TARGET,
+	// Guardian
+	GUARDIAN_STATUS = _MONSTER_NEXT,
+	GUARDIAN_TARGET,
 
-		// Abstract Skeleton
-		ABSTRACT_SKELETON_ARMS_SWINGING = _MONSTER_NEXT,
+	// Abstract Skeleton
+	ABSTRACT_SKELETON_ARMS_SWINGING = _MONSTER_NEXT,
 
-		// Spider
-		SPIDER_CLIMBING = _MONSTER_NEXT,
+	// Spider
+	SPIDER_CLIMBING = _MONSTER_NEXT,
 
-		// Witch
-		WITCH_AGGRESIVE = _MONSTER_NEXT,
+	// Witch
+	WITCH_AGGRESIVE = _MONSTER_NEXT,
 
-		// Wither
-		WITHER_FIRST_HEAD_TARGET = _MONSTER_NEXT,
-		WITHER_SECOND_HEAD_TARGET,
-		WITHER_THIRD_HEAD_TARGET,
-		WITHER_INVULNERABLE_TIMER,
+	// Wither
+	WITHER_FIRST_HEAD_TARGET = _MONSTER_NEXT,
+	WITHER_SECOND_HEAD_TARGET,
+	WITHER_THIRD_HEAD_TARGET,
+	WITHER_INVULNERABLE_TIMER,
 
-		// Zombie
-		ZOMBIE_IS_BABY = _MONSTER_NEXT,
-		ZOMBIE_UNUSED,  // Was type
-		ZOMBIE_HANDS_RISED_UP,
-		_ZOMBIE_NEXT,
+	// Zombie
+	ZOMBIE_IS_BABY = _MONSTER_NEXT,
+	ZOMBIE_UNUSED,  // Was type
+	ZOMBIE_HANDS_RISED_UP,
+	_ZOMBIE_NEXT,
 
-		// Zombie villager
-		ZOMBIE_VILLAGER_CONVERTING = _ZOMBIE_NEXT,
-		ZOMBIE_VILLAGER_PROFESSION,
+	// Zombie villager
+	ZOMBIE_VILLAGER_CONVERTING = _ZOMBIE_NEXT,
+	ZOMBIE_VILLAGER_PROFESSION,
 
-		// Enderman
-		ENDERMAN_CARRIED_BLOCK = _MONSTER_NEXT,
-		ENDERMAN_SCREAMING,
+	// Enderman
+	ENDERMAN_CARRIED_BLOCK = _MONSTER_NEXT,
+	ENDERMAN_SCREAMING,
 
-		// Evocation illager
-		EVOKER_SPELL = _MONSTER_NEXT,
+	// Evocation illager
+	EVOKER_SPELL = _MONSTER_NEXT,
 
-		// Vex
-		VEX_FLAGS = _MONSTER_NEXT,
+	// Vex
+	VEX_FLAGS = _MONSTER_NEXT,
 
-		// Vindication illager
-		VINDICATOR_FLAGS = _MONSTER_NEXT,
+	// Vindication illager
+	VINDICATOR_FLAGS = _MONSTER_NEXT,
 
-		// EnderDragon
-		ENDER_DRAGON_DRAGON_PHASE = _INSENTIENT_NEXT,
+	// EnderDragon
+	ENDER_DRAGON_DRAGON_PHASE = _INSENTIENT_NEXT,
 
-		// Flying
-		_FLYING_NEXT = _INSENTIENT_NEXT,
+	// Flying
+	_FLYING_NEXT = _INSENTIENT_NEXT,
 
-		// Ghast
-		GHAST_ATTACKING = _FLYING_NEXT,
+	// Ghast
+	GHAST_ATTACKING = _FLYING_NEXT,
 
-		// Slime
-		SLIME_SIZE = _INSENTIENT_NEXT,
+	// Slime
+	SLIME_SIZE = _INSENTIENT_NEXT,
 
-		// Minecart
-		MINECART_SHAKING_POWER = _ENTITY_NEXT,
-		MINECART_SHAKING_DIRECTION,
-		MINECART_SHAKING_MULTIPLIER,
-		MINECART_BLOCK_ID_META,
-		MINECART_BLOCK_Y,
-		MINECART_SHOW_BLOCK,
-		_MINECART_NEXT,
+	// Minecart
+	MINECART_SHAKING_POWER = _ENTITY_NEXT,
+	MINECART_SHAKING_DIRECTION,
+	MINECART_SHAKING_MULTIPLIER,
+	MINECART_BLOCK_ID_META,
+	MINECART_BLOCK_Y,
+	MINECART_SHOW_BLOCK,
+	_MINECART_NEXT,
 
-		// MinecartCommandBlock
-		MINECART_COMMAND_BLOCK_COMMAND = _MINECART_NEXT,
-		MINECART_COMMAND_BLOCK_LAST_OUTPUT,
+	// MinecartCommandBlock
+	MINECART_COMMAND_BLOCK_COMMAND = _MINECART_NEXT,
+	MINECART_COMMAND_BLOCK_LAST_OUTPUT,
 
-		// MinecartFurnace
-		MINECART_FURNACE_POWERED = _MINECART_NEXT,
+	// MinecartFurnace
+	MINECART_FURNACE_POWERED = _MINECART_NEXT,
 
-		// TNTPrimed
-		TNT_PRIMED_FUSE_TIME = _ENTITY_NEXT,
-	};
+	// TNTPrimed
+	TNT_PRIMED_FUSE_TIME = _ENTITY_NEXT,
+};
 }
 
 #ifdef __clang__
-	#pragma clang diagnostic pop  // Restore ignored clang errors
+#pragma clang diagnostic pop  // Restore ignored clang errors
 #endif
 
 
@@ -341,7 +341,8 @@ void cProtocol_1_11_0::SendEntityAnimation(const cEntity & a_Entity, const Entit
 		case EntityAnimation::SnowballPoofs:
 		{
 			// Vanilla stopped doing clientside prediction for thrown projectile particle effects (for some reason).
-			// But they're still doing motion prediction, and latency exists, hence re-send the server position to avoid particle effects happening inside a block:
+			// But they're still doing motion prediction, and latency exists, hence re-send the server position to avoid
+			// particle effects happening inside a block:
 			SendEntityPosition(a_Entity);
 			break;
 		}
@@ -461,16 +462,16 @@ void cProtocol_1_11_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 			break;
 		}
 
-		case E_BLOCK_MOB_SPAWNER:       Action = 1;  break;  // Update mob spawner spinny mob thing
-		case E_BLOCK_COMMAND_BLOCK:     Action = 2;  break;  // Update command block text
-		case E_BLOCK_BEACON:            Action = 3;  break;  // Update beacon entity
-		case E_BLOCK_HEAD:              Action = 4;  break;  // Update mobhead entity
-		case E_BLOCK_FLOWER_POT:        Action = 5;  break;  // Update flower pot
+		case E_BLOCK_MOB_SPAWNER:     Action = 1; break;  // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK:   Action = 2; break;  // Update command block text
+		case E_BLOCK_BEACON:          Action = 3; break;  // Update beacon entity
+		case E_BLOCK_HEAD:            Action = 4; break;  // Update mobhead entity
+		case E_BLOCK_FLOWER_POT:      Action = 5; break;  // Update flower pot
 		case E_BLOCK_WALL_BANNER:
-		case E_BLOCK_STANDING_BANNER:   Action = 6;  break;  // Update banner
-		case E_BLOCK_BED:               Action = 11; break;  // Update bed color (new!)
+		case E_BLOCK_STANDING_BANNER: Action = 6; break;  // Update banner
+		case E_BLOCK_BED:             Action = 11; break;  // Update bed color (new!)
 
-		default: return;  // Block entities change between versions
+		default:                      return;  // Block entities change between versions
 	}
 
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
@@ -491,12 +492,12 @@ signed char cProtocol_1_11_0::GetProtocolEntityStatus(const EntityAnimation a_An
 {
 	switch (a_Animation)
 	{
-		case EntityAnimation::EggCracks: return 3;
-		case EntityAnimation::EvokerFangsAttacks: return 4;
+		case EntityAnimation::EggCracks:            return 3;
+		case EntityAnimation::EvokerFangsAttacks:   return 4;
 		case EntityAnimation::IronGolemStashesGift: return 34;
-		case EntityAnimation::PawnTotemActivates: return 35;
-		case EntityAnimation::SnowballPoofs: return 3;
-		default: return Super::GetProtocolEntityStatus(a_Animation);
+		case EntityAnimation::PawnTotemActivates:   return 35;
+		case EntityAnimation::SnowballPoofs:        return 3;
+		default:                                    return Super::GetProtocolEntityStatus(a_Animation);
 	}
 }
 
@@ -509,54 +510,54 @@ UInt32 cProtocol_1_11_0::GetProtocolMobType(const eMonsterType a_MobType) const
 	switch (a_MobType)
 	{
 		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
-		case mtInvalidType:           return 53;
-		case mtBat:                   return 65;
-		case mtBlaze:                 return 61;
-		case mtCaveSpider:            return 59;
-		case mtChicken:               return 93;
-		case mtCow:                   return 92;
-		case mtCreeper:               return 50;
-		case mtDonkey:                return 31;
-		case mtEnderDragon:           return 63;
-		case mtEnderman:              return 58;
-		case mtEndermite:             return 67;
-		case mtEvoker:                return 34;
-		case mtGhast:                 return 56;
-		case mtGiant:                 return 53;
-		case mtGuardian:              return 68;
-		case mtHorse:                 return 100;
-		case mtHusk:                  return 23;
-		case mtIronGolem:             return 99;
-		case mtLlama:                 return 103;
-		case mtMagmaCube:             return 62;
-		case mtMooshroom:             return 96;
-		case mtMule:                  return 32;
-		case mtOcelot:                return 98;
-		case mtPig:                   return 90;
-		case mtPolarBear:             return 102;
-		case mtRabbit:                return 101;
-		case mtSheep:                 return 91;
-		case mtShulker:               return 69;
-		case mtSilverfish:            return 60;
-		case mtSkeleton:              return 51;
-		case mtSlime:                 return 55;
-		case mtSnowGolem:             return 97;
-		case mtSpider:                return 52;
-		case mtStray:                 return 6;
-		case mtTraderLlama:           return 103;
-		case mtSquid:                 return 94;
-		case mtVex:                   return 35;
-		case mtVillager:              return 120;
-		case mtVindicator:            return 36;
-		case mtWitch:                 return 66;
-		case mtWither:                return 64;
-		case mtWitherSkeleton:        return 5;
-		case mtWolf:                  return 95;
-		case mtZombie:                return 54;
-		case mtZombiePigman:          return 57;
-		case mtZombieVillager:        return 27;
+		case mtInvalidType:    return 53;
+		case mtBat:            return 65;
+		case mtBlaze:          return 61;
+		case mtCaveSpider:     return 59;
+		case mtChicken:        return 93;
+		case mtCow:            return 92;
+		case mtCreeper:        return 50;
+		case mtDonkey:         return 31;
+		case mtEnderDragon:    return 63;
+		case mtEnderman:       return 58;
+		case mtEndermite:      return 67;
+		case mtEvoker:         return 34;
+		case mtGhast:          return 56;
+		case mtGiant:          return 53;
+		case mtGuardian:       return 68;
+		case mtHorse:          return 100;
+		case mtHusk:           return 23;
+		case mtIronGolem:      return 99;
+		case mtLlama:          return 103;
+		case mtMagmaCube:      return 62;
+		case mtMooshroom:      return 96;
+		case mtMule:           return 32;
+		case mtOcelot:         return 98;
+		case mtPig:            return 90;
+		case mtPolarBear:      return 102;
+		case mtRabbit:         return 101;
+		case mtSheep:          return 91;
+		case mtShulker:        return 69;
+		case mtSilverfish:     return 60;
+		case mtSkeleton:       return 51;
+		case mtSlime:          return 55;
+		case mtSnowGolem:      return 97;
+		case mtSpider:         return 52;
+		case mtStray:          return 6;
+		case mtTraderLlama:    return 103;
+		case mtSquid:          return 94;
+		case mtVex:            return 35;
+		case mtVillager:       return 120;
+		case mtVindicator:     return 36;
+		case mtWitch:          return 66;
+		case mtWither:         return 64;
+		case mtWitherSkeleton: return 5;
+		case mtWolf:           return 95;
+		case mtZombie:         return 54;
+		case mtZombiePigman:   return 57;
+		case mtZombieVillager: return 27;
 
-		default:                      return 0;
+		default:               return 0;
 	}
 }
 
@@ -587,7 +588,12 @@ void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorZ);
 
-	m_Client->HandleRightClick(Position, FaceIntToBlockFace(Face), {FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16)}, Hand == 0);
+	m_Client->HandleRightClick(
+		Position,
+		FaceIntToBlockFace(Face),
+		{FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16)},
+		Hand == 0
+	);
 }
 
 
@@ -608,7 +614,10 @@ void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockE
 		{
 			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
 			a_Writer.BeginCompound("SpawnData");
-				a_Writer.AddString("id", cMonster::MobTypeToVanillaNBT(MobSpawnerEntity.GetEntity()));  // New: uses namespaced ID
+			a_Writer.AddString(
+				"id",
+				cMonster::MobTypeToVanillaNBT(MobSpawnerEntity.GetEntity())
+			);  // New: uses namespaced ID
 			a_Writer.EndCompound();
 			a_Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
 			break;

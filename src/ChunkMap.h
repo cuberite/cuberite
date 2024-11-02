@@ -26,9 +26,9 @@ class cDeadlockDetect;
 
 struct SetChunkData;
 
-using cChunkCallback        = cFunctionRef<bool(cChunk       &)>;
-using cEntityCallback       = cFunctionRef<bool(cEntity      &)>;
-using cBlockEntityCallback  = cFunctionRef<bool(cBlockEntity &)>;
+using cChunkCallback = cFunctionRef<bool(cChunk &)>;
+using cEntityCallback = cFunctionRef<bool(cEntity &)>;
+using cBlockEntityCallback = cFunctionRef<bool(cBlockEntity &)>;
 
 
 
@@ -36,8 +36,7 @@ using cBlockEntityCallback  = cFunctionRef<bool(cBlockEntity &)>;
 
 class cChunkMap
 {
-public:
-
+  public:
 	cChunkMap(cWorld * a_World);
 
 	/** Sends the block entity, if it is at the coords specified, to a_Client */
@@ -47,10 +46,12 @@ public:
 	returns true if the use was successful, return false to use the block as a "normal" block */
 	bool UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);
 
-	/** Calls the callback for the chunk specified, with ChunkMapCS locked; returns false if the chunk doesn't exist, otherwise returns the same value as the callback */
+	/** Calls the callback for the chunk specified, with ChunkMapCS locked; returns false if the chunk doesn't exist,
+	 * otherwise returns the same value as the callback */
 	bool DoWithChunk(int a_ChunkX, int a_ChunkZ, cChunkCallback a_Callback);
 
-	/** Calls the callback for the chunk at the block position specified, with ChunkMapCS locked; returns false if the chunk doesn't exist, otherwise returns the same value as the callback */
+	/** Calls the callback for the chunk at the block position specified, with ChunkMapCS locked; returns false if the
+	 * chunk doesn't exist, otherwise returns the same value as the callback */
 	bool DoWithChunkAt(Vector3i a_BlockPos, cChunkCallback a_Callback);
 
 	/** Wakes up simulators for the specified block */
@@ -59,13 +60,14 @@ public:
 	// DEPRECATED, use the vector-parametered version instead.
 	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
-		LOGWARNING("cChunkMap::WakeUpSimulators(int, int, int) is deprecated, use cChunkMap::WakeUpSimulators(Vector3i) instead.");
+		LOGWARNING("cChunkMap::WakeUpSimulators(int, int, int) is deprecated, use "
+				   "cChunkMap::WakeUpSimulators(Vector3i) instead.");
 		WakeUpSimulators(Vector3i(a_BlockX, a_BlockY, a_BlockZ));
 	}
 
-	void MarkChunkDirty     (int a_ChunkX, int a_ChunkZ);
-	void MarkChunkSaving    (int a_ChunkX, int a_ChunkZ);
-	void MarkChunkSaved     (int a_ChunkX, int a_ChunkZ);
+	void MarkChunkDirty(int a_ChunkX, int a_ChunkZ);
+	void MarkChunkSaving(int a_ChunkX, int a_ChunkZ);
+	void MarkChunkSaved(int a_ChunkX, int a_ChunkZ);
 
 	/** Sets the chunk data as either loaded from the storage or generated.
 	BlockLight and BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
@@ -75,7 +77,8 @@ public:
 	void SetChunkData(SetChunkData && a_SetChunkData);
 
 	void ChunkLighted(
-		int a_ChunkX, int a_ChunkZ,
+		int a_ChunkX,
+		int a_ChunkZ,
 		const cChunkDef::BlockNibbles & a_BlockLight,
 		const cChunkDef::BlockNibbles & a_SkyLight
 	);
@@ -91,10 +94,10 @@ public:
 	bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) const;
 	bool IsWeatherWetAt(Vector3i a_Position) const;
 
-	bool      IsChunkValid       (int a_ChunkX, int a_ChunkZ) const;
-	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkZ) const;
-	int       GetHeight          (int a_BlockX, int a_BlockZ);  // Waits for the chunk to get loaded / generated
-	bool      TryGetHeight       (int a_BlockX, int a_BlockZ, int & a_Height);  // Returns false if chunk not loaded / generated
+	bool IsChunkValid(int a_ChunkX, int a_ChunkZ) const;
+	bool HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const;
+	int GetHeight(int a_BlockX, int a_BlockZ);  // Waits for the chunk to get loaded / generated
+	bool TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height);  // Returns false if chunk not loaded / generated
 
 	/** Sets the block at the specified coords to the specified value.
 	The replacement doesn't trigger block updates, nor wake up simulators.
@@ -105,18 +108,24 @@ public:
 	/** Makes the specified entity collect all the pickups around them. */
 	void CollectPickupsByEntity(cEntity & a_Entity);
 
-	BLOCKTYPE  GetBlock          (Vector3i a_BlockPos) const;
-	NIBBLETYPE GetBlockMeta      (Vector3i a_BlockPos) const;
-	NIBBLETYPE GetBlockSkyLight  (Vector3i a_BlockPos) const;
+	BLOCKTYPE GetBlock(Vector3i a_BlockPos) const;
+	NIBBLETYPE GetBlockMeta(Vector3i a_BlockPos) const;
+	NIBBLETYPE GetBlockSkyLight(Vector3i a_BlockPos) const;
 	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos) const;
 
 	/** Sets the meta for the specified block, while keeping the blocktype.
 	Ignored if the chunk is invalid. */
 	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta);
 
-	void SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	bool GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
-	bool GetBlockInfo      (Vector3i, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
+	void SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
+	bool GetBlockInfo(
+		Vector3i,
+		BLOCKTYPE & a_BlockType,
+		NIBBLETYPE & a_Meta,
+		NIBBLETYPE & a_SkyLight,
+		NIBBLETYPE & a_BlockLight
+	) const;
 
 	/** Special function used for growing trees, replaces only blocks that tree may overwrite */
 	void ReplaceTreeBlocks(const sSetBlockVector & a_Blocks);
@@ -133,8 +142,8 @@ public:
 	bool SetAreaBiome(int a_MinX, int a_MaxX, int a_MinZ, int a_MaxZ, EMCSBiome a_Biome);
 
 	/** Retrieves block types and metas of the specified blocks.
-	If a chunk is not loaded, doesn't modify the block and consults a_ContinueOnFailure whether to process the rest of the array.
-	Returns true if all blocks were read, false if any one failed. */
+	If a chunk is not loaded, doesn't modify the block and consults a_ContinueOnFailure whether to process the rest of
+	the array. Returns true if all blocks were read, false if any one failed. */
 	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
 
 	/** Removes the block at the specified coords and wakes up simulators.
@@ -144,9 +153,9 @@ public:
 
 	/** Returns all the pickups that would result if the a_Digger dug up the block at a_BlockPos using a_Tool.
 	a_Digger is usually a player, but can be nullptr for natural causes.
-	a_Tool is an optional item used to dig up the block, used by the handlers (empty hand vs shears produce different pickups from leaves).
-	An empty hand is assumed if a_Tool is nullptr.
-	Returns an empty cItems object if the chunk is not present. */
+	a_Tool is an optional item used to dig up the block, used by the handlers (empty hand vs shears produce different
+	pickups from leaves). An empty hand is assumed if a_Tool is nullptr. Returns an empty cItems object if the chunk is
+	not present. */
 	cItems PickupsFromBlock(Vector3i a_BlockPos, const cEntity * a_Digger, const cItem * a_Tool);
 
 	/** Sends the block at the specified coords to the specified player.
@@ -155,7 +164,13 @@ public:
 	void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, const cPlayer & a_Player);
 
 	/** Compares clients of two chunks, calls the callback accordingly */
-	void CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback);
+	void CompareChunkClients(
+		int a_ChunkX1,
+		int a_ChunkZ1,
+		int a_ChunkX2,
+		int a_ChunkZ2,
+		cClientDiffCallback & a_Callback
+	);
 
 	/** Compares clients of two chunks, calls the callback accordingly */
 	void CompareChunkClients(cChunk * a_Chunk1, cChunk * a_Chunk2, cClientDiffCallback & a_Callback);
@@ -182,10 +197,12 @@ public:
 	Returns an owning reference to the found entity. */
 	OwnedEntity RemoveEntity(cEntity & a_Entity);
 
-	/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the callback aborted by returning true */
+	/** Calls the callback for each entity in the entire world; returns true if all entities processed, false if the
+	 * callback aborted by returning true */
 	bool ForEachEntity(cEntityCallback a_Callback) const;  // Lua-accessible
 
-	/** Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the callback aborted by returning true */
+	/** Calls the callback for each entity in the specified chunk; returns true if all entities processed, false if the
+	 * callback aborted by returning true */
 	bool ForEachEntityInChunk(int a_ChunkX, int a_ChunkZ, cEntityCallback a_Callback);  // Lua-accessible
 
 	/** Calls the callback for each entity that has a nonempty intersection with the specified boundingbox.
@@ -207,9 +224,13 @@ public:
 
 	/** Queues the chunk for preparing - making sure that it's generated and lit.
 	The specified chunk is queued to be loaded or generated, and lit if needed.
-	The specified callback is called after the chunk has been prepared. If there's no preparation to do, only the callback is called.
-	It is legal to call without the callback. */
-	void PrepareChunk(int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallAfter = {});  // Lua-accessible
+	The specified callback is called after the chunk has been prepared. If there's no preparation to do, only the
+	callback is called. It is legal to call without the callback. */
+	void PrepareChunk(
+		int a_ChunkX,
+		int a_ChunkZ,
+		std::unique_ptr<cChunkCoordCallback> a_CallAfter = {}
+	);  // Lua-accessible
 
 	/** Queues the chunk for generating.
 	First attempts to load the chunk from the storage. If that fails, queues the chunk for generating. */
@@ -218,18 +239,27 @@ public:
 	/** Marks the chunk as failed-to-load */
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
 
-	/** Marks the chunk as being regenerated - all its clients want that chunk again (used by cWorld::RegenerateChunk()) */
+	/** Marks the chunk as being regenerated - all its clients want that chunk again (used by cWorld::RegenerateChunk())
+	 */
 	void MarkChunkRegenerating(int a_ChunkX, int a_ChunkZ);
 
 	bool IsChunkLighted(int a_ChunkX, int a_ChunkZ);
 
-	/** Calls the callback for each chunk in the coords specified (all cords are inclusive). Returns true if all chunks have been processed successfully */
-	bool ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback);
+	/** Calls the callback for each chunk in the coords specified (all cords are inclusive). Returns true if all chunks
+	 * have been processed successfully */
+	bool ForEachChunkInRect(
+		int a_MinChunkX,
+		int a_MaxChunkX,
+		int a_MinChunkZ,
+		int a_MaxChunkZ,
+		cChunkDataCallback & a_Callback
+	);
 
 	/** Calls the callback for each loaded chunk. Returns true if all chunks have been processed successfully */
 	bool ForEachLoadedChunk(cFunctionRef<bool(int, int)> a_Callback) const;
 
-	/** Writes the block area into the specified coords. Returns true if all chunks have been processed. Prefer cBlockArea::Write() instead. */
+	/** Writes the block area into the specified coords. Returns true if all chunks have been processed. Prefer
+	 * cBlockArea::Write() instead. */
 	bool WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
 
 	/** Returns the number of valid chunks and the number of dirty chunks */
@@ -284,8 +314,7 @@ public:
 	/** Removes this chunkmap's CS from the DeadlockDetect's tracked CSs. */
 	void UntrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect);
 
-private:
-
+  private:
 	// Chunks query their neighbors using FindChunk(), while being ticked
 	friend class cChunk;
 
@@ -314,10 +343,12 @@ private:
 	/** Constructs a chunk and queues it for loading / generating if not valid, returning it */
 	cChunk & GetChunk(int a_ChunkX, int a_ChunkZ);
 
-	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be called only from cChunkMap. */
+	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be
+	 * called only from cChunkMap. */
 	cChunk * FindChunk(int a_ChunkX, int a_ChunkZ);
 
-	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be called only from cChunkMap. */
+	/** Locates a chunk ptr in the chunkmap; doesn't create it when not found; assumes m_CSChunks is locked. To be
+	 * called only from cChunkMap. */
 	const cChunk * FindChunk(int a_ChunkX, int a_ChunkZ) const;
 
 	/** Adds a new cChunkStay descendant to the internal list of ChunkStays; loads its chunks.
@@ -327,5 +358,4 @@ private:
 	/** Removes the specified cChunkStay descendant from the internal list of ChunkStays.
 	To be used only by cChunkStay; others should use cChunkStay::Disable() instead */
 	void DelChunkStay(cChunkStay & a_ChunkStay);
-
 };

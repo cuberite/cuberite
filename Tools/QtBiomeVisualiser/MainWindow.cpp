@@ -20,9 +20,17 @@
 
 
 
-const double MainWindow::m_ViewZooms[] =
-{
-	0.0625, 0.125, 0.25, 0.5, 1, 2, 4, 8, 16, 24,
+const double MainWindow::m_ViewZooms[] = {
+	0.0625,
+	0.125,
+	0.25,
+	0.5,
+	1,
+	2,
+	4,
+	8,
+	16,
+	24,
 };
 
 
@@ -30,18 +38,15 @@ const double MainWindow::m_ViewZooms[] =
 
 
 MainWindow::MainWindow(QWidget * parent) :
-	QMainWindow(parent),
-	m_GeneratorSetup(nullptr),
-	m_LineSeparator(nullptr),
-	m_CurrentZoomLevel(2)
+	QMainWindow(parent), m_GeneratorSetup(nullptr), m_LineSeparator(nullptr), m_CurrentZoomLevel(2)
 {
 	initMinecraftPath();
 
 	m_BiomeView = new BiomeView();
 	connect(m_BiomeView, SIGNAL(increaseZoom()), this, SLOT(increaseZoom()));
 	connect(m_BiomeView, SIGNAL(decreaseZoom()), this, SLOT(decreaseZoom()));
-	connect(m_BiomeView, SIGNAL(wheelUp()),      this, SLOT(increaseZoom()));
-	connect(m_BiomeView, SIGNAL(wheelDown()),    this, SLOT(decreaseZoom()));
+	connect(m_BiomeView, SIGNAL(wheelUp()), this, SLOT(increaseZoom()));
+	connect(m_BiomeView, SIGNAL(wheelDown()), this, SLOT(decreaseZoom()));
 	m_BiomeView->setZoomLevel(m_ViewZooms[m_CurrentZoomLevel]);
 
 	m_StatusBar = new QStatusBar();
@@ -225,7 +230,7 @@ void MainWindow::hoverChanged(int a_BlockX, int a_BlockZ, int a_Biome)
 {
 	m_StatusBlockX->setText(tr("X: %1").arg(a_BlockX));
 	m_StatusBlockZ->setText(tr("Z: %1").arg(a_BlockZ));
-	m_StatusBiome->setText (tr("B: %1 (%2)").arg(BiomeToString(a_Biome).c_str()).arg(a_Biome));
+	m_StatusBiome->setText(tr("B: %1 (%2)").arg(BiomeToString(a_Biome).c_str()).arg(a_Biome));
 }
 
 
@@ -234,14 +239,14 @@ void MainWindow::hoverChanged(int a_BlockX, int a_BlockZ, int a_Biome)
 
 void MainWindow::initMinecraftPath()
 {
-	#ifdef Q_OS_MAC
-		m_MinecraftPath = QDir::homePath() + QDir::toNativeSeparators("/Library/Application Support/minecraft");
-	#elif defined Q_OS_WIN32
-		QSettings ini(QSettings::IniFormat, QSettings::UserScope, ".minecraft", "minecraft1");
-		m_MinecraftPath = QFileInfo(ini.fileName()).absolutePath();
-	#else
-		m_MinecraftPath = QDir::homePath() + QDir::toNativeSeparators("/.minecraft");
-	#endif
+#ifdef Q_OS_MAC
+	m_MinecraftPath = QDir::homePath() + QDir::toNativeSeparators("/Library/Application Support/minecraft");
+#elif defined Q_OS_WIN32
+	QSettings ini(QSettings::IniFormat, QSettings::UserScope, ".minecraft", "minecraft1");
+	m_MinecraftPath = QFileInfo(ini.fileName()).absolutePath();
+#else
+	m_MinecraftPath = QDir::homePath() + QDir::toNativeSeparators("/.minecraft");
+#endif
 }
 
 
@@ -434,7 +439,3 @@ void MainWindow::closeGeneratorSetup()
 	m_GeneratorSetup = nullptr;
 	m_LineSeparator = nullptr;
 }
-
-
-
-

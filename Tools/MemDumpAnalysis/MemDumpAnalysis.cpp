@@ -6,7 +6,7 @@
 #include "Globals.h"
 
 #ifdef _WIN32
-	#pragma comment(lib, "ws2_32.lib")  // Needed for StringUtils' RawBEToUtf8() et al.
+#pragma comment(lib, "ws2_32.lib")  // Needed for StringUtils' RawBEToUtf8() et al.
 #endif  // _WIN32
 
 
@@ -21,17 +21,16 @@ typedef std::set<AString> AStringSet;
 
 class cFunction
 {
-public:
-	int        m_Size;   ///< Sum of memory block sizes allocated by this function or its children
-	int        m_Count;  ///< Total number of memory blocks allocated by this function or its children
+  public:
+	int m_Size;  ///< Sum of memory block sizes allocated by this function or its children
+	int m_Count;  ///< Total number of memory blocks allocated by this function or its children
 	AStringSet m_ChildrenNames;
 
 	cFunction(void) :
-		m_Size(0),
-		m_Count(0)
+		m_Size(0), m_Count(0)
 	{
 	}
-} ;
+};
 
 typedef std::map<AString, cFunction> FunctionMap;
 
@@ -50,8 +49,7 @@ AString g_PrevFunctionName;
 
 bool IsFnBlackListed(const char * a_FnName)
 {
-	static const char * BlackList[] =
-	{
+	static const char * BlackList[] = {
 		"MyAllocHook",
 		"_heap_alloc_dbg_impl",
 		"_nh_malloc_dbg_impl",
@@ -65,7 +63,7 @@ bool IsFnBlackListed(const char * a_FnName)
 		"l_alloc",
 		"luaM_realloc_",
 		"",
-	} ;
+	};
 
 	for (int i = 0; i < ARRAYCOUNT(BlackList); i++)
 	{
@@ -101,9 +99,9 @@ void OnStartElement(void * a_Data, const char * a_Element, const char ** a_Attrs
 {
 	if (strcmp(a_Element, "LEAK") == 0)
 	{
-		const char * attrID   = FindAttr(a_Attrs, "requestID");
+		const char * attrID = FindAttr(a_Attrs, "requestID");
 		const char * attrSize = FindAttr(a_Attrs, "size");
-		g_CurrentID   = atoi((attrID   == NULL) ? "-1" : attrID);
+		g_CurrentID = atoi((attrID == NULL) ? "-1" : attrID);
 		g_CurrentSize = atoi((attrSize == NULL) ? "-1" : attrSize);
 		g_PrevFunctionName.clear();
 		return;
@@ -167,7 +165,7 @@ bool CompareFnInt(const std::pair<AString, int> & a_First, const std::pair<AStri
 
 void WriteSizeStatistics(void)
 {
-	typedef std::vector<std::pair<AString, int> > StringIntPairs;
+	typedef std::vector<std::pair<AString, int>> StringIntPairs;
 	StringIntPairs FnSizes;
 
 	cFile f("memdump_totals.txt", cFile::fmWrite);
@@ -195,7 +193,7 @@ void WriteSizeStatistics(void)
 
 void WriteCountStatistics(void)
 {
-	typedef std::vector<std::pair<AString, int> > StringIntPairs;
+	typedef std::vector<std::pair<AString, int>> StringIntPairs;
 	StringIntPairs FnCounts;
 
 	cFile f("memdump_counts.txt", cFile::fmWrite);
@@ -258,7 +256,8 @@ void WriteDotGraph(void)
 	f.Printf("digraph {\n\tnode [shape=plaintext]\n\n");
 	for (FunctionMap::const_iterator itrF = g_FnMap.begin(), endF = g_FnMap.end(); itrF != endF; ++itrF)
 	{
-		f.Printf("\t\"%s\" [label=<%s<BR/>%d bytes (%d KiB)<BR/>%d blocks>]\n",
+		f.Printf(
+			"\t\"%s\" [label=<%s<BR/>%d bytes (%d KiB)<BR/>%d blocks>]\n",
 			itrF->first.c_str(),
 			HTMLEscape(itrF->first).c_str(),
 			itrF->second.m_Size,

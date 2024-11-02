@@ -14,7 +14,11 @@ PalettedBlockArea::PalettedBlockArea()
 
 
 
-PalettedBlockArea PalettedBlockArea::createFilled(Vector3i aSize, const AString & aBlockTypeName, const BlockState & aBlockState)
+PalettedBlockArea PalettedBlockArea::createFilled(
+	Vector3i aSize,
+	const AString & aBlockTypeName,
+	const BlockState & aBlockState
+)
 {
 	ASSERT(aSize.x > 0);
 	ASSERT(aSize.y > 0);
@@ -77,7 +81,10 @@ UInt32 PalettedBlockArea::paletteIndex(const AString & aBlockTypeName, const Blo
 
 
 
-std::pair<UInt32, bool> PalettedBlockArea::maybePaletteIndex(const AString & aBlockTypeName, const BlockState & aBlockState) const
+std::pair<UInt32, bool> PalettedBlockArea::maybePaletteIndex(
+	const AString & aBlockTypeName,
+	const BlockState & aBlockState
+) const
 {
 	return mPalette.maybeIndex(aBlockTypeName, aBlockState);
 }
@@ -117,7 +124,7 @@ const std::pair<AString, BlockState> & PalettedBlockArea::paletteEntry(UInt32 aP
 bool PalettedBlockArea::isPositionValid(Vector3i aPos) const
 {
 	return (
-		(aPos.x >= 0) && (aPos.y >= 0) && (aPos.z >= 0) &&              // Non-negative coords
+		(aPos.x >= 0) && (aPos.y >= 0) && (aPos.z >= 0) &&  // Non-negative coords
 		(aPos.x < mSize.x) && (aPos.y < mSize.y) && (aPos.z < mSize.z)  // Fit into size
 	);
 }

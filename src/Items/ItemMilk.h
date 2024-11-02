@@ -5,13 +5,11 @@
 
 
 
-class cItemMilkHandler final:
-	public cItemHandler
+class cItemMilkHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 	virtual bool IsDrinkable(short a_ItemDamage) const override

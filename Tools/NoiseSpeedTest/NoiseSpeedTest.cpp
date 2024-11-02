@@ -5,10 +5,12 @@
 /*
 This program compares the performance of the highly-optimized noise implementation in Cuberite, and the Simplex noise.
 Since the Simplex noise is not yet implemented in Cuberite, an own implementation is provided.
-Also, the performance difference between using a float and double as datatype is measured, by using a templatized Simplex noise.
+Also, the performance difference between using a float and double as datatype is measured, by using a templatized
+Simplex noise.
 
-The testing is done on a usage of the generator that is typical for the Cuberite's terrain generator: generate a 3D array of numbers with
-not much variance in the coords. The exact sizes and coord ranges were adapted from the cNoise3DComposable generator.
+The testing is done on a usage of the generator that is typical for the Cuberite's terrain generator: generate a 3D
+array of numbers with not much variance in the coords. The exact sizes and coord ranges were adapted from the
+cNoise3DComposable generator.
 */
 
 #include "Globals.h"
@@ -59,7 +61,7 @@ static void measureClassicNoise(int a_NumIterations)
 
 /** Calculates the specified number of iterations of the Simplex noise.
 a_TypeStr is a string representing the DATATYPE (for logging purposes). */
-template<typename DATATYPE> static void measureSimplexNoise(int a_NumIterations, const char * a_TypeStr)
+template <typename DATATYPE> static void measureSimplexNoise(int a_NumIterations, const char * a_TypeStr)
 {
 	cSimplexNoise<DATATYPE> noise(1);
 	DATATYPE total = 0;
@@ -80,7 +82,12 @@ template<typename DATATYPE> static void measureSimplexNoise(int a_NumIterations,
 	}
 	auto timeEnd = std::chrono::high_resolution_clock::now();
 	auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(timeEnd - timeStart);
-	printf("SimplexNoise<%s> took %d milliseconds, returned total %f\n", a_TypeStr, static_cast<int>(msec.count()), total);
+	printf(
+		"SimplexNoise<%s> took %d milliseconds, returned total %f\n",
+		a_TypeStr,
+		static_cast<int>(msec.count()),
+		total
+	);
 }
 
 
@@ -108,10 +115,10 @@ int main(int argc, char ** argv)
 	measureSimplexNoise<double>(numIterations, "double");
 	measureSimplexNoise<double>(numIterations, "double");
 
-	// If build on Windows using MSVC, wait for a keypress before ending:
-	#ifdef _MSC_VER
-		getchar();
-	#endif
+// If build on Windows using MSVC, wait for a keypress before ending:
+#ifdef _MSC_VER
+	getchar();
+#endif
 
 	return 0;
 }

@@ -13,11 +13,8 @@
 
 
 
-cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
-	m_Entity(mtPig),
-	m_SpawnDelay(100),
-	m_IsActive(false)
+cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) :
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World), m_Entity(mtPig), m_SpawnDelay(100), m_IsActive(false)
 {
 	ASSERT(a_BlockType == E_BLOCK_MOB_SPAWNER);
 }
@@ -58,7 +55,8 @@ bool cMobSpawnerEntity::UsedBy(cPlayer * a_Player)
 {
 	if (a_Player->GetEquippedItem().m_ItemType == E_ITEM_SPAWN_EGG)
 	{
-		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(a_Player->GetEquippedItem().m_ItemDamage);
+		eMonsterType MonsterType =
+			cItemSpawnEggHandler::ItemDamageToMonsterType(a_Player->GetEquippedItem().m_ItemDamage);
 		if (MonsterType == eMonsterType::mtInvalidType)
 		{
 			return false;
@@ -140,7 +138,10 @@ void cMobSpawnerEntity::SpawnEntity(void)
 		return;
 	}
 
-	bool EntitiesSpawned = m_World->DoWithChunk(GetChunkX(), GetChunkZ(), [this, NearbyEntities](cChunk & a_Chunk)
+	bool EntitiesSpawned = m_World->DoWithChunk(
+		GetChunkX(),
+		GetChunkZ(),
+		[this, NearbyEntities](cChunk & a_Chunk)
 		{
 			auto & Random = GetRandomProvider();
 			auto EntitySpawnTally = NearbyEntities;
@@ -155,9 +156,13 @@ void cMobSpawnerEntity::SpawnEntity(void)
 
 				auto SpawnRelPos(GetRelPos());
 				SpawnRelPos += Vector3i(
-					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * static_cast<double>(m_SpawnRange)),
+					static_cast<int>(
+						(Random.RandReal<double>() - Random.RandReal<double>()) * static_cast<double>(m_SpawnRange)
+					),
 					Random.RandInt(-1, 1),
-					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * static_cast<double>(m_SpawnRange))
+					static_cast<int>(
+						(Random.RandReal<double>() - Random.RandReal<double>()) * static_cast<double>(m_SpawnRange)
+					)
 				);
 
 				auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(SpawnRelPos);
@@ -216,7 +221,11 @@ int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 		return false;
 	};
 
-	const cBoundingBox PlayerBoundingBox(Vector3d(m_Pos.x, m_Pos.y - m_RequiredPlayerRange, m_Pos.z), m_RequiredPlayerRange, m_RequiredPlayerRange * 2);
+	const cBoundingBox PlayerBoundingBox(
+		Vector3d(m_Pos.x, m_Pos.y - m_RequiredPlayerRange, m_Pos.z),
+		m_RequiredPlayerRange,
+		m_RequiredPlayerRange * 2
+	);
 	m_World->ForEachEntityInBox(PlayerBoundingBox, Callback);
 
 	return NumPlayers;

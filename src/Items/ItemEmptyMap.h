@@ -7,15 +7,13 @@
 
 
 
-class cItemEmptyMapHandler final:
-	public cItemHandler
+class cItemEmptyMapHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
 	static const unsigned int DEFAULT_SCALE = 0;
 
-public:
-
+  public:
 	using Super::Super;
 
 
@@ -34,7 +32,8 @@ public:
 		UNUSED(a_HeldItem);
 		UNUSED(a_ClickedBlockFace);
 
-		// The map center is fixed at the central point of the 8x8 block of chunks you are standing in when you right-click it.
+		// The map center is fixed at the central point of the 8x8 block of chunks you are standing in when you
+		// right-click it.
 
 		const int RegionWidth = cChunkDef::Width * 8;
 
@@ -51,4 +50,4 @@ public:
 		a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_MAP, 1, static_cast<short>(NewMap->GetID() & 0x7fff)));
 		return true;
 	}
-} ;
+};

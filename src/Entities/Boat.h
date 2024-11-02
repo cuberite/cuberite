@@ -15,8 +15,7 @@
 
 // tolua_begin
 
-class cBoat:
-	public cEntity
+class cBoat : public cEntity
 {
 	// tolua_end
 
@@ -24,7 +23,7 @@ class cBoat:
 
 	// tolua_begin
 
-public:
+  public:
 	enum eMaterial
 	{
 		bmOak,
@@ -63,7 +62,8 @@ public:
 	/** Sets the eMaterial of the boat */
 	void SetMaterial(cBoat::eMaterial a_Material) { m_Material = a_Material; }
 
-	/** Returns the eMaterial that should be used for a boat created from the specified item. Returns bmOak if not a boat item */
+	/** Returns the eMaterial that should be used for a boat created from the specified item. Returns bmOak if not a
+	 * boat item */
 	static eMaterial ItemToMaterial(const cItem & a_Item);
 
 	/** Returns the boat item of the boat material */
@@ -83,7 +83,8 @@ public:
 	void SetLastDamage(int TimeSinceLastHit);
 
 	void UpdatePaddles(bool rightPaddleUsed, bool leftPaddleUsed);
-private:
+
+  private:
 	int m_LastDamage;
 	int m_ForwardDirection;
 
@@ -93,4 +94,4 @@ private:
 
 	bool m_RightPaddleUsed;
 	bool m_LeftPaddleUsed;
-} ;  // tolua_export
+};  // tolua_export

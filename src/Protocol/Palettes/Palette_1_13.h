@@ -6,8 +6,8 @@
 
 namespace Palette_1_13
 {
-	UInt32 From(BlockState Block);
-	UInt32 From(Item ID);
-	UInt32 From(CustomStatistic ID);
-	Item ToItem(UInt32 ID);
-}
+UInt32 From(BlockState Block);
+UInt32 From(Item ID);
+UInt32 From(CustomStatistic ID);
+Item ToItem(UInt32 ID);
+}  // namespace Palette_1_13

@@ -7,17 +7,14 @@
 
 
 
-class cBlockPortalHandler final :
-	public cBlockHandler
+class cBlockPortalHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// No pickups
@@ -53,22 +50,20 @@ private:
 	{
 		if ((a_Position.y <= 0) || (a_Position.y >= cChunkDef::Height - 1))
 		{
-			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1.
+			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get
+						   // invalid coords at Y - 1 or Y + 1.
 		}
 
 		switch (a_Meta)
 		{
 			case 0x1:
 			{
-				static const std::array<Vector3i, 4> PortalCheck
-				{
-					{
-						{ 0, 1, 0 },
-						{ 0, -1, 0 },
-						{ 1, 0, 0 },
-						{ -1, 0, 0 },
-					}
-				};
+				static const std::array<Vector3i, 4> PortalCheck {{
+					{0, 1, 0},
+					{0, -1, 0},
+					{1, 0, 0},
+					{-1, 0, 0},
+				}};
 
 				for (const auto & Direction : PortalCheck)
 				{
@@ -83,15 +78,12 @@ private:
 			}
 			case 0x2:
 			{
-				static const std::array<Vector3i, 4> PortalCheck
-				{
-					{
-						{ 0, 1, 0 },
-						{ 0, -1, 0 },
-						{ 0, 0, -1 },
-						{ 0, 0, 1 },
-					}
-				};
+				static const std::array<Vector3i, 4> PortalCheck {{
+					{0, 1, 0},
+					{0, -1, 0},
+					{0, 0, -1},
+					{0, 0, 1},
+				}};
 
 				for (const auto & Direction : PortalCheck)
 				{
@@ -117,8 +109,4 @@ private:
 		UNUSED(a_Meta);
 		return 24;
 	}
-} ;
-
-
-
-
+};

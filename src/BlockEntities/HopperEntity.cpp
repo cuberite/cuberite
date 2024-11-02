@@ -24,7 +24,7 @@
 
 
 
-cHopperEntity::cHopperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+cHopperEntity::cHopperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) :
 	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_LastMoveItemsInTick(0),
 	m_LastMoveItemsOutTick(0),
@@ -52,10 +52,10 @@ std::pair<bool, Vector3i> cHopperEntity::GetOutputBlockPos(NIBBLETYPE a_BlockMet
 	switch (a_BlockMeta)
 	{
 		case E_META_HOPPER_FACING_XM: return {true, pos.addedX(-1)};
-		case E_META_HOPPER_FACING_XP: return {true, pos.addedX( 1)};
+		case E_META_HOPPER_FACING_XP: return {true, pos.addedX(1)};
 		case E_META_HOPPER_FACING_YM: return {true, pos.addedY(-1)};
 		case E_META_HOPPER_FACING_ZM: return {true, pos.addedZ(-1)};
-		case E_META_HOPPER_FACING_ZP: return {true, pos.addedZ( 1)};
+		case E_META_HOPPER_FACING_ZP: return {true, pos.addedZ(1)};
 		default:
 		{
 			// Not attached
@@ -184,7 +184,9 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, const cTickTimeLong a_CurrentT
 		case E_BLOCK_DROPPER:
 		case E_BLOCK_HOPPER:
 		{
-			res = MoveItemsFromGrid(*static_cast<cBlockEntityWithItems *>(a_Chunk.GetBlockEntity(this->GetPos().addedY(1))));
+			res =
+				MoveItemsFromGrid(*static_cast<cBlockEntityWithItems *>(a_Chunk.GetBlockEntity(this->GetPos().addedY(1))
+				));
 			break;
 		}
 	}
@@ -206,15 +208,13 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk)
 {
 	class cHopperPickupSearchCallback
 	{
-	public:
+	  public:
 		cHopperPickupSearchCallback(Vector3i a_Pos, cItemGrid & a_Contents) :
-			m_Pos(a_Pos),
-			m_bFoundPickupsAbove(false),
-			m_Contents(a_Contents)
+			m_Pos(a_Pos), m_bFoundPickupsAbove(false), m_Contents(a_Contents)
 		{
 		}
 
-		bool operator () (cEntity & a_Entity)
+		bool operator()(cEntity & a_Entity)
 		{
 			if (!a_Entity.IsPickup())
 			{
@@ -222,7 +222,11 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk)
 			}
 
 			Vector3f EntityPos = a_Entity.GetPosition();
-			Vector3f BlockPos(m_Pos.x + 0.5f, static_cast<float>(m_Pos.y) + 1, m_Pos.z + 0.5f);  // One block above hopper, and search from center outwards
+			Vector3f BlockPos(
+				m_Pos.x + 0.5f,
+				static_cast<float>(m_Pos.y) + 1,
+				m_Pos.z + 0.5f
+			);  // One block above hopper, and search from center outwards
 			double Distance = (EntityPos - BlockPos).Length();
 
 			if (Distance < 0.5)
@@ -256,7 +260,8 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk)
 
 					auto PreviousCount = m_Contents.GetSlot(i).m_ItemCount;
 
-					Item.m_ItemCount -= m_Contents.ChangeSlotCount(i, Item.m_ItemCount) - PreviousCount;  // Set count to however many items were added
+					Item.m_ItemCount -= m_Contents.ChangeSlotCount(i, Item.m_ItemCount) -
+						PreviousCount;  // Set count to however many items were added
 
 					if (Item.IsEmpty())
 					{
@@ -268,12 +273,9 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk)
 			return false;
 		}
 
-		bool FoundPickupsAbove(void) const
-		{
-			return m_bFoundPickupsAbove;
-		}
+		bool FoundPickupsAbove(void) const { return m_bFoundPickupsAbove; }
 
-	protected:
+	  protected:
 		Vector3i m_Pos;
 		bool m_bFoundPickupsAbove;
 		cItemGrid & m_Contents;

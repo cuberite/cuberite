@@ -37,26 +37,23 @@ per-village density setting, the cVillage class itself implements the cPiecePool
 calls to the underlying cVillagePiecePool, after processing the density check.
 */
 
-class cVillagePiecePool:
-	public cPrefabPiecePool
+class cVillagePiecePool : public cPrefabPiecePool
 {
 	using Super = cPrefabPiecePool;
 
-public:
-
+  public:
 	cVillagePiecePool(
-		const cPrefab::sDef * a_PieceDefs,         size_t a_NumPieceDefs,
-		const cPrefab::sDef * a_StartingPieceDefs, size_t a_NumStartingPieceDefs
-	):
+		const cPrefab::sDef * a_PieceDefs,
+		size_t a_NumPieceDefs,
+		const cPrefab::sDef * a_StartingPieceDefs,
+		size_t a_NumStartingPieceDefs
+	) :
 		Super(a_PieceDefs, a_NumPieceDefs, a_StartingPieceDefs, a_NumStartingPieceDefs)
 	{
 		AddRoadPieces();
 	}
 
-	cVillagePiecePool(void)
-	{
-		AddRoadPieces();
-	}
+	cVillagePiecePool(void) { AddRoadPieces(); }
 
 	void AddRoadPieces(void)
 	{
@@ -67,7 +64,7 @@ public:
 			BA.Create(len, 1, 3, cBlockArea::baTypes | cBlockArea::baMetas);
 			BA.Fill(cBlockArea::baTypes | cBlockArea::baMetas, E_BLOCK_GRAVEL, 0);
 			cPrefab * RoadPiece = new cPrefab(BA, 1);
-			RoadPiece->AddConnector(0,       0, 1, cPiece::cConnector::dirXM, -2);
+			RoadPiece->AddConnector(0, 0, 1, cPiece::cConnector::dirXM, -2);
 			RoadPiece->AddConnector(len - 1, 0, 1, cPiece::cConnector::dirXP, -2);
 			RoadPiece->SetDefaultWeight(100);
 
@@ -93,10 +90,15 @@ public:
 
 
 	// cPrefabPiecePool overrides:
-	virtual int GetPieceWeight(const cPlacedPiece & a_PlacedPiece, const cPiece::cConnector & a_ExistingConnector, const cPiece & a_NewPiece) override
+	virtual int GetPieceWeight(
+		const cPlacedPiece & a_PlacedPiece,
+		const cPiece::cConnector & a_ExistingConnector,
+		const cPiece & a_NewPiece
+	) override
 	{
 		// Roads cannot branch T-wise (appending -2 connector to a +2 connector on a 1-high piece):
-		if ((a_ExistingConnector.m_Type == 2) && (a_PlacedPiece.GetDepth() > 0) && (a_PlacedPiece.GetPiece().GetSize().y == 1))
+		if ((a_ExistingConnector.m_Type == 2) && (a_PlacedPiece.GetDepth() > 0) &&
+			(a_PlacedPiece.GetPiece().GetSize().y == 1))
 		{
 			return 0;
 		}
@@ -109,24 +111,24 @@ public:
 
 
 
-class cVillageGen::cVillage:
-	public cGridStructGen::cStructure,
-	protected cPiecePool
+class cVillageGen::cVillage : public cGridStructGen::cStructure,
+							  protected cPiecePool
 {
 	using Super = cGridStructGen::cStructure;
 
-public:
-
+  public:
 	cVillage(
 		int a_Seed,
-		int a_GridX, int a_GridZ,
-		int a_OriginX, int a_OriginZ,
+		int a_GridX,
+		int a_GridZ,
+		int a_OriginX,
+		int a_OriginZ,
 		int a_MaxRoadDepth,
 		int a_MaxSize,
 		int a_Density,
 		cVillagePiecePool & a_Prefabs,
 		cTerrainHeightGen & a_HeightGen
-	):
+	) :
 		Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 		m_Seed(a_Seed),
 		m_Noise(a_Seed),
@@ -149,7 +151,7 @@ public:
 	}
 
 
-protected:
+  protected:
 	/** Seed for the random functions */
 	int m_Seed;
 
@@ -258,10 +260,7 @@ protected:
 	}
 
 
-	virtual cPieces GetStartingPieces(void) override
-	{
-		return m_Prefabs.GetStartingPieces();
-	}
+	virtual cPieces GetStartingPieces(void) override { return m_Prefabs.GetStartingPieces(); }
 
 
 	virtual int GetPieceWeight(
@@ -292,16 +291,10 @@ protected:
 	}
 
 
-	virtual void PiecePlaced(const cPiece & a_Piece) override
-	{
-		m_Prefabs.PiecePlaced(a_Piece);
-	}
+	virtual void PiecePlaced(const cPiece & a_Piece) override { m_Prefabs.PiecePlaced(a_Piece); }
 
 
-	virtual void Reset(void) override
-	{
-		m_Prefabs.Reset();
-	}
+	virtual void Reset(void) override { m_Prefabs.Reset(); }
 
 
 	void MoveAllDescendants(cPlacedPieces & a_PlacedPieces, size_t a_Pivot, int a_HeightDifference)
@@ -310,9 +303,9 @@ protected:
 		auto & Pivot = a_PlacedPieces[a_Pivot];
 		for (size_t i = a_Pivot + 1; i < num; i++)
 		{
-			if (
-				(a_PlacedPieces[i]->GetParent() == Pivot.get()) &&  // It is a direct dependant of the pivot
-				!(static_cast<const cPrefab &>(a_PlacedPieces[i]->GetPiece())).ShouldMoveToGround()  // It attaches strictly by connectors
+			if ((a_PlacedPieces[i]->GetParent() == Pivot.get()) &&  // It is a direct dependant of the pivot
+				!(static_cast<const cPrefab &>(a_PlacedPieces[i]->GetPiece()))
+					 .ShouldMoveToGround()  // It attaches strictly by connectors
 			)
 			{
 				a_PlacedPieces[i]->MoveToGroundBy(a_HeightDifference);
@@ -320,7 +313,7 @@ protected:
 			}
 		}  // for i - a_PlacedPieces[]
 	}
-} ;
+};
 
 
 
@@ -351,7 +344,7 @@ cVillageGen::cVillageGen(
 	m_BiomeGen(a_BiomeGen),
 	m_HeightGen(a_HeightGen)
 {
-	for (const auto & toLoad: a_PrefabsToLoad)
+	for (const auto & toLoad : a_PrefabsToLoad)
 	{
 		auto prefabs = std::make_shared<cVillagePiecePool>();
 		auto fileName = fmt::format(FMT_STRING("Prefabs{0}Villages{0}{1}.cubeset"), cFile::GetPathSeparator(), toLoad);
@@ -359,8 +352,11 @@ cVillageGen::cVillageGen(
 		{
 			if (NoCaseCompare(prefabs->GetIntendedUse(), "village") != 0)
 			{
-				LOGWARNING("Village generator: File %s is intended for use in \"%s\", rather than villages. Loading the file, but the generator may behave unexpectedly.",
-					fileName, prefabs->GetIntendedUse()
+				LOGWARNING(
+					"Village generator: File %s is intended for use in \"%s\", rather than villages. Loading the file, "
+					"but the generator may behave unexpectedly.",
+					fileName,
+					prefabs->GetIntendedUse()
 				);
 			}
 			prefabs->AssignGens(a_Seed, m_BiomeGen, m_HeightGen, a_SeaLevel);
@@ -382,16 +378,18 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_GridX, int a_Gr
 	m_BiomeGen.GenBiomes({ChunkX, ChunkZ}, Biomes);
 
 	// Get a list of pools that support each biome within the chunk:
-	// If just one column's biome is not allowed, the pool is not used because it's likely that an unfriendly biome is too close
+	// If just one column's biome is not allowed, the pool is not used because it's likely that an unfriendly biome is
+	// too close
 	auto availablePools = m_Pools;
 	for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
 	{
 		auto biome = Biomes[i];
-		availablePools.erase(std::remove_if(availablePools.begin(), availablePools.end(),
-			[biome](std::shared_ptr<cVillagePiecePool> & a_Pool)
-			{
-				return !a_Pool->IsBiomeAllowed(biome);
-			}),
+		availablePools.erase(
+			std::remove_if(
+				availablePools.begin(),
+				availablePools.end(),
+				[biome](std::shared_ptr<cVillagePiecePool> & a_Pool) { return !a_Pool->IsBiomeAllowed(biome); }
+			),
 			availablePools.end()
 		);
 		// Bail out if no compatible pools left:
@@ -422,5 +420,16 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_GridX, int a_Gr
 	}
 
 	// Create a village based on the chosen prefabs:
-	return cStructurePtr(new cVillage(m_Seed, a_GridX, a_GridZ, a_OriginX, a_OriginZ, m_MaxDepth, m_MaxSize, Density, *pool.get(), m_HeightGen));
+	return cStructurePtr(new cVillage(
+		m_Seed,
+		a_GridX,
+		a_GridZ,
+		a_OriginX,
+		a_OriginZ,
+		m_MaxDepth,
+		m_MaxSize,
+		Density,
+		*pool.get(),
+		m_HeightGen
+	));
 }

@@ -14,7 +14,7 @@ The Out() function is called for any output the command has produced.
 Descendants override that function to provide specific processing of the output. */
 class cCommandOutputCallback
 {
-public:
+  public:
 	virtual ~cCommandOutputCallback() {}  // Force a virtual destructor in subclasses
 
 	/** Called when the command wants to output anything; may be called multiple times */
@@ -29,15 +29,14 @@ public:
 
 	/** Called when the command processing has been finished */
 	virtual void Finished() {}
-} ;
+};
 
 
 
 
 
 /** Class that discards all command output */
-class cNullCommandOutputCallback :
-	public cCommandOutputCallback
+class cNullCommandOutputCallback : public cCommandOutputCallback
 {
 	// cCommandOutputCallback overrides:
 	virtual void Out(const AString & a_Text) override
@@ -45,20 +44,18 @@ class cNullCommandOutputCallback :
 		// Do nothing
 		UNUSED(a_Text);
 	}
-} ;
+};
 
 
 
 
 
 /** Accumulates all command output into a string. */
-class cStringAccumCommandOutputCallback:
-	public cCommandOutputCallback
+class cStringAccumCommandOutputCallback : public cCommandOutputCallback
 {
 	using Super = cCommandOutputCallback;
 
-public:
-
+  public:
 	// cCommandOutputCallback overrides:
 	virtual void Out(const AString & a_Text) override;
 	virtual void Finished() override {}
@@ -66,31 +63,29 @@ public:
 	/** Returns the accumulated command output in a string. */
 	const AString & GetAccum() const { return m_Accum; }
 
-protected:
+  protected:
 	/** Output is stored here until the command finishes processing */
 	AString m_Accum;
-} ;
+};
 
 
 
 
 
 /** Sends all command output to a log, line by line, when the command finishes processing */
-class cLogCommandOutputCallback :
-	public cStringAccumCommandOutputCallback
+class cLogCommandOutputCallback : public cStringAccumCommandOutputCallback
 {
-public:
+  public:
 	// cStringAccumCommandOutputCallback overrides:
 	virtual void Finished() override;
-} ;
+};
 
 
 
 
 
 /** Sends all command output to a log, line by line; deletes self when command finishes processing */
-class cLogCommandDeleteSelfOutputCallback:
-	public cLogCommandOutputCallback
+class cLogCommandDeleteSelfOutputCallback : public cLogCommandOutputCallback
 {
 	using Super = cLogCommandOutputCallback;
 
@@ -99,8 +94,4 @@ class cLogCommandDeleteSelfOutputCallback:
 		Super::Finished();
 		delete this;
 	}
-} ;
-
-
-
-
+};

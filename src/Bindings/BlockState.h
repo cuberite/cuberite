@@ -7,10 +7,10 @@
 
 
 /** Represents the state of a single block (previously known as "block meta").
-The state consists of a map of string -> string, plus a mechanism for fast equality checks between two BlockState instances.
-Once a BlockState instance is created, it is then immutable - there's no way of changing it, only by creating a (modified) copy.
-A BlockState instance can be created from hard-coded data or from dynamic data:
-	BlockState bs({{"key1", "value1"}, {key2", "value2"}});  // Hard-coded
+The state consists of a map of string -> string, plus a mechanism for fast equality checks between two BlockState
+instances. Once a BlockState instance is created, it is then immutable - there's no way of changing it, only by creating
+a (modified) copy. A BlockState instance can be created from hard-coded data or from dynamic data: BlockState
+bs({{"key1", "value1"}, {key2", "value2"}});  // Hard-coded
 	- or -
 	std::map<AString, AString> map({{"key1", "value1"}, {key2", "value2"}});
 	map["key3"] = "value3";
@@ -18,8 +18,7 @@ A BlockState instance can be created from hard-coded data or from dynamic data:
 */
 class BlockState
 {
-public:
-
+  public:
 	/** Creates a new instance with an empty map. */
 	BlockState();
 
@@ -41,36 +40,35 @@ public:
 	BlockState(std::map<AString, AString> && aKeysAndValues);
 
 	/** Creates a copy of the specified BlockState with the (hard-coded) additional keys and values added to it.
-	Any key in aAdditionalKeysAndValues that is already present in aCopyFrom is overwritten with the aAdditionalKeysAndValues' one.
-	Any key with an empty value is not stored in the map.
-	(it's possible to erase a key from aCopyFrom by setting it to empty string in aAdditionalKeysAndValues). */
-	BlockState(const BlockState & aCopyFrom, std::initializer_list<std::pair<const AString, AString>> aAdditionalKeysAndValues);
+	Any key in aAdditionalKeysAndValues that is already present in aCopyFrom is overwritten with the
+	aAdditionalKeysAndValues' one. Any key with an empty value is not stored in the map. (it's possible to erase a key
+	from aCopyFrom by setting it to empty string in aAdditionalKeysAndValues). */
+	BlockState(
+		const BlockState & aCopyFrom,
+		std::initializer_list<std::pair<const AString, AString>> aAdditionalKeysAndValues
+	);
 
 	/** Creates a copy of the specified BlockState with the (dynamic) additional keys and values added to it.
-	Any key in aAdditionalKeysAndValues that is already present in aCopyFrom is overwritten with the aAdditionalKeysAndValues' one.
-	Any key with an empty value is not stored in the map.
-	(it's possible to erase a key from aCopyFrom by setting it to empty string in aAdditionalKeysAndValues). */
+	Any key in aAdditionalKeysAndValues that is already present in aCopyFrom is overwritten with the
+	aAdditionalKeysAndValues' one. Any key with an empty value is not stored in the map. (it's possible to erase a key
+	from aCopyFrom by setting it to empty string in aAdditionalKeysAndValues). */
 	BlockState(const BlockState & aCopyFrom, const std::map<AString, AString> & aAdditionalKeysAndValues);
 
 	/** Less-than comparison. */
-	bool operator <(const BlockState & aOther) const;
+	bool operator<(const BlockState & aOther) const;
 
 	/** Fast equality check. */
-	bool operator ==(const BlockState & aOther) const;
+	bool operator==(const BlockState & aOther) const;
 
 	/** Fast inequality check. */
-	bool operator !=(const BlockState & aOther) const
-	{
-		return !(operator ==(aOther));
-	}
+	bool operator!=(const BlockState & aOther) const { return !(operator==(aOther)); }
 
 	/** Returns the value at the specified key.
 	If the key is not present, returns an empty string. */
 	const AString & value(const AString & aKey) const;
 
 
-protected:
-
+  protected:
 	/** The state, represented as a string->string map. */
 	std::map<AString, AString> mState;
 

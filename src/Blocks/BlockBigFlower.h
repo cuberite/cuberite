@@ -9,27 +9,28 @@
 
 
 
-class cBlockBigFlowerHandler final :
-	public cBlockHandler
+class cBlockBigFlowerHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
-	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
+  private:
+	virtual bool DoesIgnoreBuildCollision(
+		const cWorld & a_World,
+		const cItem & a_HeldItem,
+		const Vector3i a_Position,
+		NIBBLETYPE a_Meta,
+		const eBlockFace a_ClickedBlockFace,
+		const bool a_ClickedDirectly
+	) const override
 	{
 		if (IsMetaTopPart(a_Meta))
 		{
 			BLOCKTYPE BottomType;
-			if (
-				(a_Position.y < 1) ||
-				!a_World.GetBlockTypeMeta(a_Position - Vector3i(0, 1, 0), BottomType, a_Meta) ||
-				(BottomType != E_BLOCK_BIG_FLOWER)
-			)
+			if ((a_Position.y < 1) || !a_World.GetBlockTypeMeta(a_Position - Vector3i(0, 1, 0), BottomType, a_Meta) ||
+				(BottomType != E_BLOCK_BIG_FLOWER))
 			{
 				// Can't find the flower meta so assume grass
 				return true;
@@ -37,10 +38,7 @@ private:
 		}
 
 		NIBBLETYPE FlowerMeta = a_Meta & 0x07;
-		return (
-			(FlowerMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) ||
-			(FlowerMeta == E_META_BIG_FLOWER_LARGE_FERN)
-		);
+		return ((FlowerMeta == E_META_BIG_FLOWER_DOUBLE_TALL_GRASS) || (FlowerMeta == E_META_BIG_FLOWER_LARGE_FERN));
 	}
 
 
@@ -89,10 +87,7 @@ private:
 
 
 
-	static bool IsMetaTopPart(NIBBLETYPE a_Meta)
-	{
-		return ((a_Meta & 0x08) != 0);
-	}
+	static bool IsMetaTopPart(NIBBLETYPE a_Meta) { return ((a_Meta & 0x08) != 0); }
 
 
 
@@ -112,9 +107,11 @@ private:
 
 
 	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
 		const Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BLOCKTYPE a_OldBlockType,
+		NIBBLETYPE a_OldBlockMeta,
 		const cEntity * a_Digger
 	) const override
 	{
@@ -124,8 +121,10 @@ private:
 			if (a_ChunkInterface.GetBlock(LowerPart) == a_OldBlockType)
 			{
 				// Prevent creative punches from dropping pickups.
-				// TODO: Simplify to SetBlock and remove the IsMetaTopPart check in DropBlockAsPickups when 1.13 blockstates arrive.
-				if ((a_Digger != nullptr) && a_Digger->IsPlayer() && static_cast<const cPlayer *>(a_Digger)->IsGameModeCreative())
+				// TODO: Simplify to SetBlock and remove the IsMetaTopPart check in DropBlockAsPickups when 1.13
+				// blockstates arrive.
+				if ((a_Digger != nullptr) && a_Digger->IsPlayer() &&
+					static_cast<const cPlayer *>(a_Digger)->IsGameModeCreative())
 				{
 					a_ChunkInterface.SetBlock(LowerPart, E_BLOCK_AIR, 0);
 				}
@@ -154,4 +153,4 @@ private:
 		UNUSED(a_Meta);
 		return 7;
 	}
-} ;
+};

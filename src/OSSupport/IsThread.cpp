@@ -14,8 +14,7 @@
 // cIsThread:
 
 cIsThread::cIsThread(AString && a_ThreadName) :
-	m_ShouldTerminate(false),
-	m_ThreadName(std::move(a_ThreadName))
+	m_ShouldTerminate(false), m_ThreadName(std::move(a_ThreadName))
 {
 }
 
@@ -106,15 +105,15 @@ void cIsThread::SetThreadName() const
 #pragma pack(push, 8)
 	struct THREADNAME_INFO
 	{
-		DWORD  dwType;      // Must be 0x1000.
-		LPCSTR szName;      // Pointer to name (in user addr space).
-		DWORD  dwThreadID;  // Thread ID (-1 = caller thread).
-		DWORD  dwFlags;     // Reserved for future use, must be zero.
+		DWORD dwType;  // Must be 0x1000.
+		LPCSTR szName;  // Pointer to name (in user addr space).
+		DWORD dwThreadID;  // Thread ID (-1 = caller thread).
+		DWORD dwFlags;  // Reserved for future use, must be zero.
 	};
 #pragma pack(pop)
 
 	const DWORD NAME_EXCEPTION = 0x406D1388;
-	const THREADNAME_INFO Name = { 0x1000, m_ThreadName.c_str(), static_cast<DWORD>(-1), 0 };
+	const THREADNAME_INFO Name = {0x1000, m_ThreadName.c_str(), static_cast<DWORD>(-1), 0};
 
 	__try
 	{

@@ -12,11 +12,7 @@
 
 
 cHeightBiomeMap::cHeightBiomeMap(void) :
-	super("HeBi"),
-	m_MinRegionX(100000),
-	m_MaxRegionX(-100000),
-	m_MinRegionZ(100000),
-	m_MaxRegionZ(-100000)
+	super("HeBi"), m_MinRegionX(100000), m_MaxRegionX(-100000), m_MinRegionZ(100000), m_MaxRegionZ(-100000)
 {
 }
 
@@ -68,7 +64,6 @@ bool cHeightBiomeMap::OnNewChunk(int a_ChunkX, int a_ChunkZ)
 
 
 
-
 bool cHeightBiomeMap::OnBiomes(const unsigned char * a_BiomeData)
 {
 	memcpy(m_ChunkBiomes, a_BiomeData, sizeof(m_ChunkBiomes));
@@ -114,8 +109,7 @@ bool cHeightBiomeMap::OnSection(
 
 bool cHeightBiomeMap::OnSectionsFinished(void)
 {
-	static const int BiomePalette[] =
-	{
+	static const int BiomePalette[] = {
 		// ARGB:
 		0xff0000ff, /* Ocean */
 		0xff00cf3f, /* Plains */
@@ -140,7 +134,7 @@ bool cHeightBiomeMap::OnSectionsFinished(void)
 		0xff7f8f7f, /* Extreme Hills Edge */
 		0xff004f00, /* Jungle */
 		0xff003f00, /* Jungle Hills */
-	} ;
+	};
 
 	// Remove trees and other unwanted stuff from the heightmap:
 	for (int z = 0; z < 16; z++)
@@ -185,7 +179,7 @@ cHeightBiomeMapFactory::~cHeightBiomeMapFactory()
 	int MaxRegionZ = -100000;
 	for (cCallbacks::iterator itr = m_Callbacks.begin(), end = m_Callbacks.end(); itr != end; ++itr)
 	{
-		cHeightBiomeMap * cb = (cHeightBiomeMap *)(*itr);
+		cHeightBiomeMap * cb = (cHeightBiomeMap *) (*itr);
 		if (cb->m_MinRegionX < MinRegionX)
 		{
 			MinRegionX = cb->m_MinRegionX;
@@ -205,7 +199,8 @@ cHeightBiomeMapFactory::~cHeightBiomeMapFactory()
 	}
 
 	// If the size is small enough, write an HTML file referencing all the images in a table:
-	if ((MaxRegionX >= MinRegionX) && (MaxRegionZ >= MinRegionZ) && (MaxRegionX - MinRegionX < 100) && (MaxRegionZ - MinRegionZ < 100))
+	if ((MaxRegionX >= MinRegionX) && (MaxRegionZ >= MinRegionZ) && (MaxRegionX - MinRegionX < 100) &&
+		(MaxRegionZ - MinRegionZ < 100))
 	{
 		cFile HTML("HeBi.html", cFile::fmWrite);
 		if (HTML.IsOpen())

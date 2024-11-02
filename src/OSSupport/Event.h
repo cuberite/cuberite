@@ -16,7 +16,7 @@
 
 class cEvent
 {
-public:
+  public:
 	cEvent(void);
 
 	/** Waits until the event has been set.
@@ -35,8 +35,7 @@ public:
 	Returns true if the event was signalled, false if the timeout was hit or there was an error. */
 	bool Wait(unsigned a_TimeoutMSec);
 
-private:
-
+  private:
 	/** Used for checking for spurious wakeups. */
 	bool m_ShouldContinue;
 
@@ -45,9 +44,4 @@ private:
 
 	/** The condition variable used as the Event. */
 	std::condition_variable m_CondVar;
-} ;
-
-
-
-
-
+};

@@ -22,11 +22,7 @@ class cLuaState;
 
 class cLuaJson
 {
-public:
+  public:
 	/** Registers the Json library in the specified Lua state. */
 	static void Bind(cLuaState & a_LuaState);
 };
-
-
-
-

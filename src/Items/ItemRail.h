@@ -8,21 +8,28 @@
 
 
 
-class cItemRailHandler final :
-	public cItemHandler
+class cItemRailHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
+  private:
+	virtual bool CommitPlacement(
+		cPlayer & a_Player,
+		const cItem & a_HeldItem,
+		const Vector3i a_PlacePosition,
+		const eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPosition
+	) const override
 	{
 		cChunkInterface ChunkInterface(a_Player.GetWorld()->GetChunkMap());
 		const auto RailType = static_cast<BLOCKTYPE>(a_HeldItem.m_ItemType);
-		return a_Player.PlaceBlock(a_PlacePosition, RailType, cBlockRailHandler::FindMeta(ChunkInterface, a_PlacePosition, RailType));
+		return a_Player.PlaceBlock(
+			a_PlacePosition,
+			RailType,
+			cBlockRailHandler::FindMeta(ChunkInterface, a_PlacePosition, RailType)
+		);
 	}
 };

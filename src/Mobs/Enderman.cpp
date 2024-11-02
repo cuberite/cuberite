@@ -13,16 +13,13 @@
 // cPlayerLookCheck
 class cPlayerLookCheck
 {
-public:
-
+  public:
 	cPlayerLookCheck(Vector3d a_EndermanHeadPosition, int a_SightDistance) :
-		m_Player(nullptr),
-		m_EndermanHeadPosition(a_EndermanHeadPosition),
-		m_SightDistance(a_SightDistance)
+		m_Player(nullptr), m_EndermanHeadPosition(a_EndermanHeadPosition), m_SightDistance(a_SightDistance)
 	{
 	}
 
-	bool operator () (cPlayer & a_Player)
+	bool operator()(cPlayer & a_Player)
 	{
 		// Don't check players who cannot be targeted
 		if (!a_Player.CanMobsTarget())
@@ -55,7 +52,12 @@ public:
 		}
 
 		// TODO: Check if endermen are angered through water in Vanilla
-		if (!cLineBlockTracer::LineOfSightTrace(*a_Player.GetWorld(), m_EndermanHeadPosition, PlayerHeadPosition, cLineBlockTracer::losAirWater))
+		if (!cLineBlockTracer::LineOfSightTrace(
+				*a_Player.GetWorld(),
+				m_EndermanHeadPosition,
+				PlayerHeadPosition,
+				cLineBlockTracer::losAirWater
+			))
 		{
 			// No direct line of sight
 			return false;
@@ -67,19 +69,26 @@ public:
 
 	cPlayer * GetPlayer(void) const { return m_Player; }
 
-protected:
-
+  protected:
 	cPlayer * m_Player;
 	Vector3d m_EndermanHeadPosition;
 	int m_SightDistance;
-} ;
+};
 
 
 
 
 
 cEnderman::cEnderman(void) :
-	Super("Enderman", mtEnderman, "entity.endermen.hurt", "entity.endermen.death", "entity.endermen.ambient", 0.6f, 2.9f),
+	Super(
+		"Enderman",
+		mtEnderman,
+		"entity.endermen.hurt",
+		"entity.endermen.death",
+		"entity.endermen.ambient",
+		0.6f,
+		2.9f
+	),
 	m_bIsScreaming(false),
 	m_CarriedBlock(E_BLOCK_AIR),
 	m_CarriedMeta(0)

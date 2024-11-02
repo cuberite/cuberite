@@ -74,7 +74,3 @@ EMCSBiome cChunkGenerator::GetBiomeAt(int a_BlockX, int a_BlockZ)
 	GenerateBiomes({ChunkX, ChunkZ}, Biomes);
 	return cChunkDef::GetBiome(Biomes, a_BlockX, a_BlockZ);
 }
-
-
-
-

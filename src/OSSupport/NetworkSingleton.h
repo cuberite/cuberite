@@ -37,7 +37,7 @@ typedef std::vector<cServerHandlePtr> cServerHandlePtrs;
 
 class cNetworkSingleton
 {
-public:
+  public:
 	cNetworkSingleton();
 	~cNetworkSingleton() noexcept(false);
 
@@ -50,7 +50,8 @@ public:
 
 	/** Terminates all network-related threads.
 	To be used only on app shutdown or restart.
-	MSVC runtime requires that the LibEvent networking be shut down before the main() function is exitted; this is the way to do it. */
+	MSVC runtime requires that the LibEvent networking be shut down before the main() function is exitted; this is the
+	way to do it. */
 	void Terminate(void);
 
 	/** Returns the main LibEvent handle for event registering. */
@@ -76,8 +77,7 @@ public:
 	Used by the underlying server handle implementation when the server is closed. */
 	void RemoveServer(const cServerHandle * a_Server);
 
-protected:
-
+  protected:
 	/** The main LibEvent container for driving the event loop. */
 	event_base * m_EventBase;
 
@@ -112,12 +112,3 @@ protected:
 	/** Callback called by LibEvent when the event loop is started. */
 	static void SignalizeStartup(evutil_socket_t a_Socket, short a_Events, void * a_Self);
 };
-
-
-
-
-
-
-
-
-

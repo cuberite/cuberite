@@ -8,17 +8,14 @@
 
 
 
-class cBlockNetherWartHandler final :
-	public cBlockPlant<false>
+class cBlockNetherWartHandler final : public cBlockPlant<false>
 {
 	using Super = cBlockPlant<false>;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		if (a_BlockMeta == 0x03)
@@ -45,7 +42,8 @@ private:
 			return meta - oldMeta;
 		}
 
-		// In older versions of cuberite, there was a bug which made wart grow too much. This check fixes previously saved buggy warts.
+		// In older versions of cuberite, there was a bug which made wart grow too much. This check fixes previously
+		// saved buggy warts.
 		if (oldMeta > 3)
 		{
 			a_Chunk.FastSetBlock(a_RelPos, m_BlockType, 3);
@@ -72,4 +70,4 @@ private:
 		UNUSED(a_Meta);
 		return 35;
 	}
-} ;
+};

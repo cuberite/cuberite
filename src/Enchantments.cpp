@@ -33,7 +33,9 @@ cEnchantments::cEnchantments(const AString & a_StringSpec)
 
 void cEnchantments::Add(const cEnchantments & a_Other)
 {
-	for (cEnchantments::cMap::const_iterator itr = a_Other.m_Enchantments.begin(), end = a_Other.m_Enchantments.end(); itr != end; ++itr)
+	for (cEnchantments::cMap::const_iterator itr = a_Other.m_Enchantments.begin(), end = a_Other.m_Enchantments.end();
+		 itr != end;
+		 ++itr)
 	{
 		SetLevel(itr->first, itr->second);
 	}  // for itr - a_Other.m_Enchantments[]
@@ -98,7 +100,8 @@ AString cEnchantments::ToString() const
 {
 	// Serialize all the enchantments into a string
 	AString res;
-	for (cEnchantments::cMap::const_iterator itr = m_Enchantments.begin(), end = m_Enchantments.end(); itr != end; ++itr)
+	for (cEnchantments::cMap::const_iterator itr = m_Enchantments.begin(), end = m_Enchantments.end(); itr != end;
+		 ++itr)
 	{
 		res.append(fmt::format(FMT_STRING("{}={};"), itr->first, itr->second));
 	}  // for itr - m_Enchantments[]
@@ -286,16 +289,15 @@ bool cEnchantments::CanAddEnchantment(int a_EnchantmentID) const
 		return true;
 	}
 
-	static const std::vector<std::set<int> > IncompatibleEnchantments =
-	{
+	static const std::vector<std::set<int>> IncompatibleEnchantments = {
 		// Armor
-		{ enchProtection, enchFireProtection, enchBlastProtection, enchProjectileProtection },
+		{enchProtection, enchFireProtection, enchBlastProtection, enchProjectileProtection},
 
 		// Tool
-		{ enchFortune, enchSilkTouch },
+		{enchFortune, enchSilkTouch},
 
 		// Sword
-		{ enchSharpness, enchSmite, enchBaneOfArthropods },
+		{enchSharpness, enchSmite, enchBaneOfArthropods},
 
 		// Boots
 		// {enchDepthStrider, enchFrostWalker},
@@ -304,12 +306,12 @@ bool cEnchantments::CanAddEnchantment(int a_EnchantmentID) const
 		// {enchInfinity, enchMending}
 	};
 
-	for (const auto & excl: IncompatibleEnchantments)
+	for (const auto & excl : IncompatibleEnchantments)
 	{
 		if (excl.count(a_EnchantmentID) != 0)
 		{
 			// See if we also have any of the enchantments
-			for (auto ench: excl)
+			for (auto ench : excl)
 			{
 				if (GetLevel(ench) > 0)
 				{
@@ -331,34 +333,33 @@ int cEnchantments::StringToEnchantmentID(const AString & a_EnchantmentName)
 	{
 		int m_Value;
 		const char * m_Name;
-	} EnchantmentNames[] =
-	{
-		{ enchProtection,           "Protection" },
-		{ enchFireProtection,       "FireProtection" },
-		{ enchFeatherFalling,       "FeatherFalling" },
-		{ enchBlastProtection,      "BlastProtection" },
-		{ enchProjectileProtection, "ProjectileProtection" },
-		{ enchRespiration,          "Respiration" },
-		{ enchAquaAffinity,         "AquaAffinity" },
-		{ enchThorns,               "Thorns" },
-		{ enchDepthStrider,         "DepthStrider" },
-		{ enchSharpness,            "Sharpness" },
-		{ enchSmite,                "Smite" },
-		{ enchBaneOfArthropods,     "BaneOfArthropods" },
-		{ enchKnockback,            "Knockback" },
-		{ enchFireAspect,           "FireAspect" },
-		{ enchLooting,              "Looting" },
-		{ enchEfficiency,           "Efficiency" },
-		{ enchSilkTouch,            "SilkTouch" },
-		{ enchUnbreaking,           "Unbreaking" },
-		{ enchFortune,              "Fortune" },
-		{ enchPower,                "Power" },
-		{ enchPunch,                "Punch" },
-		{ enchFlame,                "Flame" },
-		{ enchInfinity,             "Infinity" },
-		{ enchLuckOfTheSea,         "LuckOfTheSea" },
-		{ enchLure,                 "Lure" },
-	} ;
+	} EnchantmentNames[] = {
+		{enchProtection, "Protection"},
+		{enchFireProtection, "FireProtection"},
+		{enchFeatherFalling, "FeatherFalling"},
+		{enchBlastProtection, "BlastProtection"},
+		{enchProjectileProtection, "ProjectileProtection"},
+		{enchRespiration, "Respiration"},
+		{enchAquaAffinity, "AquaAffinity"},
+		{enchThorns, "Thorns"},
+		{enchDepthStrider, "DepthStrider"},
+		{enchSharpness, "Sharpness"},
+		{enchSmite, "Smite"},
+		{enchBaneOfArthropods, "BaneOfArthropods"},
+		{enchKnockback, "Knockback"},
+		{enchFireAspect, "FireAspect"},
+		{enchLooting, "Looting"},
+		{enchEfficiency, "Efficiency"},
+		{enchSilkTouch, "SilkTouch"},
+		{enchUnbreaking, "Unbreaking"},
+		{enchFortune, "Fortune"},
+		{enchPower, "Power"},
+		{enchPunch, "Punch"},
+		{enchFlame, "Flame"},
+		{enchInfinity, "Infinity"},
+		{enchLuckOfTheSea, "LuckOfTheSea"},
+		{enchLure, "Lure"},
+	};
 
 	// First try to parse as a number:
 	int id = atoi(a_EnchantmentName.c_str());
@@ -382,7 +383,7 @@ int cEnchantments::StringToEnchantmentID(const AString & a_EnchantmentName)
 
 
 
-bool cEnchantments::operator ==(const cEnchantments & a_Other) const
+bool cEnchantments::operator==(const cEnchantments & a_Other) const
 {
 	return m_Enchantments == a_Other.m_Enchantments;
 }
@@ -391,7 +392,7 @@ bool cEnchantments::operator ==(const cEnchantments & a_Other) const
 
 
 
-bool cEnchantments::operator !=(const cEnchantments & a_Other) const
+bool cEnchantments::operator!=(const cEnchantments & a_Other) const
 {
 	return m_Enchantments != a_Other.m_Enchantments;
 }
@@ -400,7 +401,11 @@ bool cEnchantments::operator !=(const cEnchantments & a_Other) const
 
 
 
-void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, unsigned a_EnchantmentLevel)
+void cEnchantments::AddItemEnchantmentWeights(
+	cWeightedEnchantments & a_Enchantments,
+	short a_ItemType,
+	unsigned a_EnchantmentLevel
+)
 {
 	if (ItemCategory::IsSword(a_ItemType))
 	{
@@ -1066,7 +1071,12 @@ void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantm
 
 
 
-void cEnchantments::AddEnchantmentWeightToVector(cWeightedEnchantments & a_Enchantments, int a_Weight, int a_EnchantmentID, unsigned int a_EnchantmentLevel)
+void cEnchantments::AddEnchantmentWeightToVector(
+	cWeightedEnchantments & a_Enchantments,
+	int a_Weight,
+	int a_EnchantmentID,
+	unsigned int a_EnchantmentLevel
+)
 {
 	cWeightedEnchantment weightedenchantment;
 	weightedenchantment.m_Weight = a_Weight;
@@ -1096,7 +1106,10 @@ void cEnchantments::RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_
 
 
 
-void cEnchantments::RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_Enchantments, const cEnchantments & a_Enchantment)
+void cEnchantments::RemoveEnchantmentWeightFromVector(
+	cWeightedEnchantments & a_Enchantments,
+	const cEnchantments & a_Enchantment
+)
 {
 	for (cWeightedEnchantments::iterator it = a_Enchantments.begin(); it != a_Enchantments.end(); ++it)
 	{
@@ -1113,7 +1126,8 @@ void cEnchantments::RemoveEnchantmentWeightFromVector(cWeightedEnchantments & a_
 
 
 void cEnchantments::CheckEnchantmentConflictsFromVector(
-	cWeightedEnchantments & a_Enchantments, const cEnchantments & a_FirstEnchantment
+	cWeightedEnchantments & a_Enchantments,
+	const cEnchantments & a_FirstEnchantment
 )
 {
 	if (a_FirstEnchantment.GetLevel(cEnchantments::enchProtection) > 0)
@@ -1170,15 +1184,18 @@ void cEnchantments::CheckEnchantmentConflictsFromVector(
 
 
 
-cEnchantments cEnchantments::GetRandomEnchantmentFromVector(const cWeightedEnchantments & a_Enchantments, MTRand & a_Random)
+cEnchantments cEnchantments::GetRandomEnchantmentFromVector(
+	const cWeightedEnchantments & a_Enchantments,
+	MTRand & a_Random
+)
 {
 	int AllWeights = 0;
-	for (const auto & Enchantment: a_Enchantments)
+	for (const auto & Enchantment : a_Enchantments)
 	{
 		AllWeights += Enchantment.m_Weight;
 	}
 	int RandomNumber = a_Random.RandInt(AllWeights - 1);
-	for (const auto & Enchantment: a_Enchantments)
+	for (const auto & Enchantment : a_Enchantments)
 	{
 		RandomNumber -= Enchantment.m_Weight;
 		if (RandomNumber < 0)
@@ -1224,7 +1241,3 @@ cEnchantments cEnchantments::SelectEnchantmentFromVector(const cWeightedEnchantm
 	// No enchantment picked, return an empty one (we probably shouldn't ever get here):
 	return cEnchantments();
 }
-
-
-
-

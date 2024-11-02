@@ -10,38 +10,49 @@ template <typename T>
 class Vector3
 {
 
-	TOLUA_TEMPLATE_BIND((T, int, float, double))
+	TOLUA_TEMPLATE_BIND((T, int, float, double) )
 
-public:
-
+  public:
 	T x, y, z;
 
 
-	constexpr Vector3(void) : x(0), y(0), z(0) {}
-	constexpr Vector3(T a_x, T a_y, T a_z) : x(a_x), y(a_y), z(a_z) {}
+	constexpr Vector3(void) :
+		x(0), y(0), z(0)
+	{
+	}
+	constexpr Vector3(T a_x, T a_y, T a_z) :
+		x(a_x), y(a_y), z(a_z)
+	{
+	}
 
 
-	#ifdef TOLUA_EXPOSITION  // Hardcoded copy constructors (tolua++ does not support function templates .. yet)
-		Vector3(const Vector3<float>  & a_Rhs);
-		Vector3(const Vector3<double> & a_Rhs);
-		Vector3(const Vector3<int>    & a_Rhs);
-	#endif
+#ifdef TOLUA_EXPOSITION  // Hardcoded copy constructors (tolua++ does not support function templates .. yet)
+	Vector3(const Vector3<float> & a_Rhs);
+	Vector3(const Vector3<double> & a_Rhs);
+	Vector3(const Vector3<int> & a_Rhs);
+#endif
 
 
 	// tolua_end
 	// Conversion constructors where U is not the same as T leaving the copy-constructor implicitly generated
-	template <typename U, std::enable_if_t<(!std::is_same<U, T>::value) && ((!std::is_integral<T>::value) || (std::is_integral<U>::value)), bool> = true>
-	constexpr Vector3<T>(const Vector3<U> & a_Rhs):
-			x(static_cast<T>(a_Rhs.x)),
-			y(static_cast<T>(a_Rhs.y)),
-			z(static_cast<T>(a_Rhs.z))
+	template <
+		typename U,
+		std::enable_if_t<
+			(!std::is_same<U, T>::value) && ((!std::is_integral<T>::value) || (std::is_integral<U>::value)),
+			bool> = true>
+	constexpr Vector3<T>(const Vector3<U> & a_Rhs) :
+		x(static_cast<T>(a_Rhs.x)), y(static_cast<T>(a_Rhs.y)), z(static_cast<T>(a_Rhs.z))
 	{
 	}
-	template <typename U, std::enable_if_t<(!std::is_same<U, T>::value) && ((std::is_integral<T>::value) && (!std::is_integral<U>::value)), bool> = true>
-	constexpr Vector3<T>(const Vector3<U> & a_Rhs):
-			x(static_cast<T>(std::floor(a_Rhs.x))),
-			y(static_cast<T>(std::floor(a_Rhs.y))),
-			z(static_cast<T>(std::floor(a_Rhs.z)))
+	template <
+		typename U,
+		std::enable_if_t<
+			(!std::is_same<U, T>::value) && ((std::is_integral<T>::value) && (!std::is_integral<U>::value)),
+			bool> = true>
+	constexpr Vector3<T>(const Vector3<U> & a_Rhs) :
+		x(static_cast<T>(std::floor(a_Rhs.x))),
+		y(static_cast<T>(std::floor(a_Rhs.y))),
+		z(static_cast<T>(std::floor(a_Rhs.z)))
 	{
 	}
 	// tolua_begin
@@ -66,11 +77,7 @@ public:
 	{
 		double Len = 1.0 / Length();
 
-		return Vector3<T>(
-			static_cast<T>(x * Len),
-			static_cast<T>(y * Len),
-			static_cast<T>(z * Len)
-		);
+		return Vector3<T>(static_cast<T>(x * Len), static_cast<T>(y * Len), static_cast<T>(z * Len));
 	}
 
 	// tolua_end
@@ -81,43 +88,30 @@ public:
 	{
 		double Len = 1.0 / Length();
 
-		a_Rhs.Set(
-			static_cast<T>(x * Len),
-			static_cast<T>(y * Len),
-			static_cast<T>(z * Len)
-		);
+		a_Rhs.Set(static_cast<T>(x * Len), static_cast<T>(y * Len), static_cast<T>(z * Len));
 	}
 
 	// tolua_begin
 
 	inline bool HasNonZeroLength(void) const
 	{
-		#ifdef __clang__
-			#pragma clang diagnostic push
-			#pragma clang diagnostic ignored "-Wfloat-equal"
-		#endif
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
 
 		return ((x != 0) || (y != 0) || (z != 0));
 
-		#ifdef __clang__
-			#pragma clang diagnostic pop
-		#endif
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 	}
 
-	inline double Length(void) const
-	{
-		return sqrt(static_cast<double>(x * x + y * y + z * z));
-	}
+	inline double Length(void) const { return sqrt(static_cast<double>(x * x + y * y + z * z)); }
 
-	inline double SqrLength(void) const
-	{
-		return x * x + y * y + z * z;
-	}
+	inline double SqrLength(void) const { return x * x + y * y + z * z; }
 
-	inline T Dot(const Vector3<T> & a_Rhs) const
-	{
-		return x * a_Rhs.x + y * a_Rhs.y + z * a_Rhs.z;
-	}
+	inline T Dot(const Vector3<T> & a_Rhs) const { return x * a_Rhs.x + y * a_Rhs.y + z * a_Rhs.z; }
 
 	/** Updates each coord to its absolute value */
 	inline void Abs()
@@ -137,11 +131,7 @@ public:
 
 	inline Vector3<T> Cross(const Vector3<T> & a_Rhs) const
 	{
-		return Vector3<T>(
-			y * a_Rhs.z - z * a_Rhs.y,
-			z * a_Rhs.x - x * a_Rhs.z,
-			x * a_Rhs.y - y * a_Rhs.x
-		);
+		return Vector3<T>(y * a_Rhs.z - z * a_Rhs.y, z * a_Rhs.x - x * a_Rhs.z, x * a_Rhs.y - y * a_Rhs.x);
 	}
 
 	inline bool Equals(const Vector3<T> & a_Rhs) const
@@ -149,16 +139,16 @@ public:
 		// Perform a strict comparison of the contents - we want to know whether this object is exactly equal
 		// To perform EPS-based comparison, use the EqualsEps() function
 
-		#ifdef __clang__
-			#pragma clang diagnostic push
-			#pragma clang diagnostic ignored "-Wfloat-equal"
-		#endif
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
 
 		return !((x != a_Rhs.x) || (y != a_Rhs.y) || (z != a_Rhs.z));
 
-		#ifdef __clang__
-			#pragma clang diagnostic pop
-		#endif
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 	}
 
 	inline bool EqualsEps(const Vector3<T> & a_Rhs, T a_Eps) const
@@ -181,69 +171,43 @@ public:
 	}
 
 	/** Returns a new Vector3i with coords set to std::floor() of this vector's coords. */
-	inline Vector3<int> Floor(void) const
-	{
-		return Vector3<int>(
-			FloorC(x),
-			FloorC(y),
-			FloorC(z)
-		);
-	}
+	inline Vector3<int> Floor(void) const { return Vector3<int>(FloorC(x), FloorC(y), FloorC(z)); }
 
 	/** Returns a new Vector3i with coords set to std::ceil() of this vector's coords. */
-	inline Vector3<int> Ceil() const
-	{
-		return Vector3<int>(
-			CeilC(x),
-			CeilC(y),
-			CeilC(z)
-		);
-	}
+	inline Vector3<int> Ceil() const { return Vector3<int>(CeilC(x), CeilC(y), CeilC(z)); }
 
 	// tolua_end
 
-	inline bool operator != (const Vector3<T> & a_Rhs) const
-	{
-		return !Equals(a_Rhs);
-	}
+	inline bool operator!=(const Vector3<T> & a_Rhs) const { return !Equals(a_Rhs); }
 
-	inline bool operator == (const Vector3<T> & a_Rhs) const
-	{
-		return Equals(a_Rhs);
-	}
+	inline bool operator==(const Vector3<T> & a_Rhs) const { return Equals(a_Rhs); }
 
-	inline bool operator > (const Vector3<T> & a_Rhs) const
-	{
-		return (SqrLength() > a_Rhs.SqrLength());
-	}
+	inline bool operator>(const Vector3<T> & a_Rhs) const { return (SqrLength() > a_Rhs.SqrLength()); }
 
-	inline bool operator < (const Vector3<T> & a_Rhs) const
-	{
-		return (SqrLength() < a_Rhs.SqrLength());
-	}
+	inline bool operator<(const Vector3<T> & a_Rhs) const { return (SqrLength() < a_Rhs.SqrLength()); }
 
-	inline void operator += (const Vector3<T> & a_Rhs)
+	inline void operator+=(const Vector3<T> & a_Rhs)
 	{
 		x += a_Rhs.x;
 		y += a_Rhs.y;
 		z += a_Rhs.z;
 	}
 
-	inline void operator -= (const Vector3<T> & a_Rhs)
+	inline void operator-=(const Vector3<T> & a_Rhs)
 	{
 		x -= a_Rhs.x;
 		y -= a_Rhs.y;
 		z -= a_Rhs.z;
 	}
 
-	inline void operator *= (const Vector3<T> & a_Rhs)
+	inline void operator*=(const Vector3<T> & a_Rhs)
 	{
 		x *= a_Rhs.x;
 		y *= a_Rhs.y;
 		z *= a_Rhs.z;
 	}
 
-	inline void operator *= (T a_v)
+	inline void operator*=(T a_v)
 	{
 		x *= a_v;
 		y *= a_v;
@@ -252,88 +216,40 @@ public:
 
 	// tolua_begin
 
-	inline Vector3<T> operator + (const Vector3<T>& a_Rhs) const
+	inline Vector3<T> operator+(const Vector3<T> & a_Rhs) const
 	{
-		return Vector3<T>(
-			x + a_Rhs.x,
-			y + a_Rhs.y,
-			z + a_Rhs.z
-		);
+		return Vector3<T>(x + a_Rhs.x, y + a_Rhs.y, z + a_Rhs.z);
 	}
 
-	inline Vector3<T> operator - (const Vector3<T>& a_Rhs) const
+	inline Vector3<T> operator-(const Vector3<T> & a_Rhs) const
 	{
-		return Vector3<T>(
-			x - a_Rhs.x,
-			y - a_Rhs.y,
-			z - a_Rhs.z
-		);
+		return Vector3<T>(x - a_Rhs.x, y - a_Rhs.y, z - a_Rhs.z);
 	}
 
-	inline Vector3<T> operator - (void) const
+	inline Vector3<T> operator-(void) const { return Vector3<T>(-x, -y, -z); }
+
+	inline Vector3<T> operator*(const Vector3<T> & a_Rhs) const
 	{
-		return Vector3<T>(-x, -y, -z);
+		return Vector3<T>(x * a_Rhs.x, y * a_Rhs.y, z * a_Rhs.z);
 	}
 
-	inline Vector3<T> operator * (const Vector3<T>& a_Rhs) const
-	{
-		return Vector3<T>(
-			x * a_Rhs.x,
-			y * a_Rhs.y,
-			z * a_Rhs.z
-		);
-	}
+	inline Vector3<T> operator/(const Vector3<T> & a_Rhs) { return Vector3<T>(x / a_Rhs.x, y / a_Rhs.y, z / a_Rhs.z); }
 
-	inline Vector3<T> operator / (const Vector3<T> & a_Rhs)
-	{
-		return Vector3<T>(
-			x / a_Rhs.x,
-			y / a_Rhs.y,
-			z / a_Rhs.z
-		);
-	}
+	inline Vector3<T> operator*(T a_v) const { return Vector3<T>(x * a_v, y * a_v, z * a_v); }
 
-	inline Vector3<T> operator * (T a_v) const
-	{
-		return Vector3<T>(
-			x * a_v,
-			y * a_v,
-			z * a_v
-		);
-	}
-
-	inline Vector3<T> operator / (T a_v) const
-	{
-		return Vector3<T>(
-			x / a_v,
-			y / a_v,
-			z / a_v
-		);
-	}
+	inline Vector3<T> operator/(T a_v) const { return Vector3<T>(x / a_v, y / a_v, z / a_v); }
 
 	/** Returns a copy of this vector moved by the specified amount on the X axis. */
-	inline Vector3<T> addedX(T a_AddX) const
-	{
-		return Vector3<T>(x + a_AddX, y, z);
-	}
+	inline Vector3<T> addedX(T a_AddX) const { return Vector3<T>(x + a_AddX, y, z); }
 
 	/** Returns a copy of this vector moved by the specified amount on the y axis. */
-	inline Vector3<T> addedY(T a_AddY) const
-	{
-		return Vector3<T>(x, y + a_AddY, z);
-	}
+	inline Vector3<T> addedY(T a_AddY) const { return Vector3<T>(x, y + a_AddY, z); }
 
 	/** Returns a copy of this vector moved by the specified amount on the Z axis. */
-	inline Vector3<T> addedZ(T a_AddZ) const
-	{
-		return Vector3<T>(x, y, z + a_AddZ);
-	}
+	inline Vector3<T> addedZ(T a_AddZ) const { return Vector3<T>(x, y, z + a_AddZ); }
 
 	/** Returns a copy of this vector moved by the specified amount on the X and Z axes. */
-	inline Vector3<T> addedXZ(T a_AddX, T a_AddZ) const
-	{
-		return Vector3<T>(x + a_AddX, y, z + a_AddZ);
-	}
+	inline Vector3<T> addedXZ(T a_AddX, T a_AddZ) const { return Vector3<T>(x + a_AddX, y, z + a_AddZ); }
 
 	/** Returns the coefficient for the (a_OtherEnd - this) line to reach the specified Z coord.
 	The result satisfies the following equation:
@@ -410,29 +326,24 @@ public:
 
 /** Allows formatting a Vector<T> using the same format specifiers as for T
 e.g. `fmt::format("{0:0.2f}", Vector3f{0.0231f, 1.2146f, 1.0f}) == "{0.02, 1.21, 1.00}"` */
-template <typename What>
-class fmt::formatter<Vector3<What>> : public fmt::formatter<What>
+template <typename What> class fmt::formatter<Vector3<What>> : public fmt::formatter<What>
 {
 	using Super = fmt::formatter<What>;
 
-	template <typename FormatContext, size_t Len>
-	void Write(FormatContext & a_Ctx, const char (& a_Str)[Len])
+	template <typename FormatContext, size_t Len> void Write(FormatContext & a_Ctx, const char (&a_Str)[Len])
 	{
 		const auto Itr = std::copy_n(&a_Str[0], Len - 1, a_Ctx.out());
 		a_Ctx.advance_to(Itr);
 	}
 
-	template <typename FormatContext>
-	void Write(FormatContext & a_Ctx, const What & a_Arg)
+	template <typename FormatContext> void Write(FormatContext & a_Ctx, const What & a_Arg)
 	{
 		const auto Itr = Super::format(a_Arg, a_Ctx);
 		a_Ctx.advance_to(Itr);
 	}
 
-public:
-
-	template <typename FormatContext>
-	auto format(const Vector3<What> & a_Vec, FormatContext & a_Ctx)
+  public:
+	template <typename FormatContext> auto format(const Vector3<What> & a_Vec, FormatContext & a_Ctx)
 	{
 		Write(a_Ctx, "{");
 		Write(a_Ctx, a_Vec.x);
@@ -458,10 +369,9 @@ template <> inline Vector3<int> Vector3<int>::Floor(void) const
 
 
 
-template <typename What>
-class VectorHasher
+template <typename What> class VectorHasher
 {
-public:
+  public:
 	/** Provides a hash of a vector's contents */
 	size_t operator()(const Vector3<What> & a_Vector) const
 	{
@@ -478,11 +388,9 @@ public:
 
 
 
-template <typename T>
-const double Vector3<T>::EPS = 0.000001;
+template <typename T> const double Vector3<T>::EPS = 0.000001;
 
-template <typename T>
-const double Vector3<T>::NO_INTERSECTION = 1e70;
+template <typename T> const double Vector3<T>::NO_INTERSECTION = 1e70;
 
 
 
@@ -490,8 +398,8 @@ const double Vector3<T>::NO_INTERSECTION = 1e70;
 
 // tolua_begin
 typedef Vector3<double> Vector3d;
-typedef Vector3<float>  Vector3f;
-typedef Vector3<int>    Vector3i;
+typedef Vector3<float> Vector3f;
+typedef Vector3<int> Vector3i;
 // tolua_end
 
 

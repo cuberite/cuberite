@@ -6,10 +6,11 @@
 /*
 Options that can be set via the Options parameter to the cUrlClient calls:
 "MaxRedirects":       The maximum number of allowed redirects before the client refuses a redirect with an error
-"OwnCert":            The client certificate to use, if requested by the server. Any string that can be parsed by cX509Cert.
-"OwnPrivKey":         The private key appropriate for OwnCert. Any string that can be parsed by cCryptoKey.
+"OwnCert":            The client certificate to use, if requested by the server. Any string that can be parsed by
+cX509Cert. "OwnPrivKey":         The private key appropriate for OwnCert. Any string that can be parsed by cCryptoKey.
 "OwnPrivKeyPassword": The password for OwnPrivKey. If not present or empty, no password is assumed.
-"TrustedRootCAs":     The trusted root CA certificates (\n-delimited concatenated PEM format) to be used for peer cert verification. If not present, peer cert is not verified.
+"TrustedRootCAs":     The trusted root CA certificates (\n-delimited concatenated PEM format) to be used for peer cert
+verification. If not present, peer cert is not verified.
 
 Behavior:
 - If a redirect is received, and redirection is allowed, the redirection is reported via OnRedirecting() callback
@@ -33,11 +34,11 @@ without reporting the redirect's headers nor body.
 
 class cUrlClient
 {
-public:
+  public:
 	/** Callbacks that are used for progress and result reporting. */
 	class cCallbacks
 	{
-	public:
+	  public:
 		// Force a virtual destructor in descendants:
 		virtual ~cCallbacks() {}
 
@@ -51,8 +52,9 @@ public:
 		virtual bool OnCertificateReceived() { return true; }
 
 		/** Called for TLS connections, when the TLS handshake has been completed.
-		An empty default implementation is provided so that clients don't need to reimplement it unless they are interested in the event. */
-		virtual void OnTlsHandshakeCompleted() { }
+		An empty default implementation is provided so that clients don't need to reimplement it unless they are
+		interested in the event. */
+		virtual void OnTlsHandshakeCompleted() {}
 
 		/** Called after the entire request has been sent to the remote peer. */
 		virtual void OnRequestSent() {}
@@ -72,8 +74,8 @@ public:
 		This can be called multiple times, as data arrives over the network. */
 		virtual void OnBodyData(const void * a_Data, size_t a_Size) {}
 
-		/** Called after the response body has been fully reported by OnBody() calls, unless the response is an allowed redirect.
-		There will be no more OnBody() calls. */
+		/** Called after the response body has been fully reported by OnBody() calls, unless the response is an allowed
+		redirect. There will be no more OnBody() calls. */
 		virtual void OnBodyFinished() {}
 
 		/** Called when an asynchronous error is encountered. */
@@ -93,11 +95,11 @@ public:
 	/** Used for HTTP status codes. */
 	enum eHTTPStatus
 	{
-		HTTP_STATUS_OK                 = 200,
-		HTTP_STATUS_MULTIPLE_CHOICES   = 300,  // MAY have a redirect using the "Location" header
-		HTTP_STATUS_MOVED_PERMANENTLY  = 301,  // redirect using the "Location" header
-		HTTP_STATUS_FOUND              = 302,  // redirect using the "Location" header
-		HTTP_STATUS_SEE_OTHER          = 303,  // redirect using the "Location" header
+		HTTP_STATUS_OK = 200,
+		HTTP_STATUS_MULTIPLE_CHOICES = 300,  // MAY have a redirect using the "Location" header
+		HTTP_STATUS_MOVED_PERMANENTLY = 301,  // redirect using the "Location" header
+		HTTP_STATUS_FOUND = 302,  // redirect using the "Location" header
+		HTTP_STATUS_SEE_OTHER = 303,  // redirect using the "Location" header
 		HTTP_STATUS_TEMPORARY_REDIRECT = 307,  // redirect using the "Location" header
 	};
 
@@ -182,7 +184,3 @@ public:
 		const AStringMap & a_Options = {}
 	);
 };
-
-
-
-

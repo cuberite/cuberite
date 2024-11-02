@@ -18,7 +18,7 @@ typedef float NOISE_DATATYPE;
 
 class cNoise
 {
-public:
+  public:
 	cNoise(int a_Seed);
 	cNoise(const cNoise & a_Noise);
 
@@ -34,7 +34,8 @@ public:
 		return a_Min + std::abs(IntNoise2D(a_X, a_Y)) * (a_Max - a_Min);
 	}
 
-	// Note: These functions have a mod8-irregular chance - each of the mod8 remainders has different chance of occurrence. Divide by 8 to rectify.
+	// Note: These functions have a mod8-irregular chance - each of the mod8 remainders has different chance of
+	// occurrence. Divide by 8 to rectify.
 	inline int IntNoise1DInt(int a_X) const;
 	inline int IntNoise2DInt(int a_X, int a_Y) const;
 	inline int IntNoise3DInt(int a_X, int a_Y, int a_Z) const;
@@ -42,23 +43,29 @@ public:
 
 	NOISE_DATATYPE LinearNoise1D(NOISE_DATATYPE a_X) const;
 	NOISE_DATATYPE CosineNoise1D(NOISE_DATATYPE a_X) const;
-	NOISE_DATATYPE CubicNoise1D (NOISE_DATATYPE a_X) const;
+	NOISE_DATATYPE CubicNoise1D(NOISE_DATATYPE a_X) const;
 	NOISE_DATATYPE SmoothNoise1D(int a_X) const;
 
-	NOISE_DATATYPE CubicNoise2D (NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y) const;
+	NOISE_DATATYPE CubicNoise2D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y) const;
 
-	NOISE_DATATYPE CubicNoise3D (NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOISE_DATATYPE a_Z) const;
+	NOISE_DATATYPE CubicNoise3D(NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOISE_DATATYPE a_Z) const;
 
 	void SetSeed(int a_Seed) { m_Seed = a_Seed; }
 	int GetSeed(void) const { return m_Seed; }
 
-	inline static NOISE_DATATYPE CubicInterpolate (NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_C, NOISE_DATATYPE a_D, NOISE_DATATYPE a_Pct);
+	inline static NOISE_DATATYPE CubicInterpolate(
+		NOISE_DATATYPE a_A,
+		NOISE_DATATYPE a_B,
+		NOISE_DATATYPE a_C,
+		NOISE_DATATYPE a_D,
+		NOISE_DATATYPE a_Pct
+	);
 	inline static NOISE_DATATYPE CosineInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct);
 	inline static NOISE_DATATYPE LinearInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct);
 
-private:
+  private:
 	int m_Seed;
-} ;
+};
 
 
 
@@ -66,7 +73,7 @@ private:
 
 class cCubicNoise
 {
-public:
+  public:
 	/** Maximum size of each dimension of the query arrays. */
 	static const int MAX_SIZE = 512;
 
@@ -77,24 +84,31 @@ public:
 
 	/** Fills a 2D array with the values of the noise. */
 	void Generate2D(
-		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
-		int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
-		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY   ///< Noise-space coords of the array in the Y direction
+		NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
+		int a_SizeX,
+		int a_SizeY,  ///< Count of the array, in each direction
+		NOISE_DATATYPE a_StartX,
+		NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+		NOISE_DATATYPE a_StartY,
+		NOISE_DATATYPE a_EndY  ///< Noise-space coords of the array in the Y direction
 	) const;
 
 
 	/** Fills a 3D array with the values of the noise. */
 	void Generate3D(
-		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
-		int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Count of the array, in each direction
-		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ   ///< Noise-space coords of the array in the Z direction
+		NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
+		int a_SizeX,
+		int a_SizeY,
+		int a_SizeZ,  ///< Count of the array, in each direction
+		NOISE_DATATYPE a_StartX,
+		NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+		NOISE_DATATYPE a_StartY,
+		NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+		NOISE_DATATYPE a_StartZ,
+		NOISE_DATATYPE a_EndZ  ///< Noise-space coords of the array in the Z direction
 	) const;
 
-protected:
-
+  protected:
 	/** Noise used for integral random values. */
 	cNoise m_Noise;
 
@@ -106,11 +120,14 @@ protected:
 	a_NumSame will receive the count of a_Same elements (total count of different integral parts). */
 	void CalcFloorFrac(
 		int a_Size,
-		NOISE_DATATYPE a_Start, NOISE_DATATYPE a_End,
-		int * a_Floor, NOISE_DATATYPE * a_Frac,
-		int * a_Same, int & a_NumSame
+		NOISE_DATATYPE a_Start,
+		NOISE_DATATYPE a_End,
+		int * a_Floor,
+		NOISE_DATATYPE * a_Frac,
+		int * a_Same,
+		int & a_NumSame
 	) const;
-} ;
+};
 
 
 
@@ -120,7 +137,7 @@ protected:
 Implementation adapted from Perlin's Java implementation: https://mrl.nyu.edu/~perlin/noise/ */
 class cImprovedNoise
 {
-public:
+  public:
 	/** Constructs a new instance of the noise obbject.
 	Note that this operation is quite expensive (the permutation array being constructed). */
 	cImprovedNoise(int a_Seed);
@@ -128,36 +145,40 @@ public:
 
 	/** Fills a 2D array with the values of the noise. */
 	void Generate2D(
-		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
-		int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
-		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY   ///< Noise-space coords of the array in the Y direction
+		NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
+		int a_SizeX,
+		int a_SizeY,  ///< Count of the array, in each direction
+		NOISE_DATATYPE a_StartX,
+		NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+		NOISE_DATATYPE a_StartY,
+		NOISE_DATATYPE a_EndY  ///< Noise-space coords of the array in the Y direction
 	) const;
 
 
 	/** Fills a 3D array with the values of the noise. */
 	void Generate3D(
-		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
-		int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Count of the array, in each direction
-		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ   ///< Noise-space coords of the array in the Z direction
+		NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
+		int a_SizeX,
+		int a_SizeY,
+		int a_SizeZ,  ///< Count of the array, in each direction
+		NOISE_DATATYPE a_StartX,
+		NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+		NOISE_DATATYPE a_StartY,
+		NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+		NOISE_DATATYPE a_StartZ,
+		NOISE_DATATYPE a_EndZ  ///< Noise-space coords of the array in the Z direction
 	) const;
 
 	/** Returns the value at the specified integral coords. Used for raw speed measurement. */
 	NOISE_DATATYPE GetValueAt(int a_X, int a_Y, int a_Z);
 
-protected:
-
+  protected:
 	/** The permutation table used by the noise function. Initialized using seed. */
 	int m_Perm[512];
 
 
 	/** Calculates the fade curve, 6 * t^5 - 15 * t^4 + 10 * t^3. */
-	inline static NOISE_DATATYPE Fade(NOISE_DATATYPE a_T)
-	{
-		return a_T * a_T * a_T * (a_T * (a_T * 6 - 15) + 10);
-	}
+	inline static NOISE_DATATYPE Fade(NOISE_DATATYPE a_T) { return a_T * a_T * a_T * (a_T * (a_T * 6 - 15) + 10); }
 
 	/** Returns the gradient value based on the hash. */
 	inline static NOISE_DATATYPE Grad(int a_Hash, NOISE_DATATYPE a_X, NOISE_DATATYPE a_Y, NOISE_DATATYPE a_Z)
@@ -211,7 +232,8 @@ NOISE_DATATYPE cNoise::IntNoise3D(int a_X, int a_Y, int a_Z) const
 {
 	int n = a_X + a_Y * 57 + a_Z * 57 * 57 + m_Seed * 57 * 57 * 57;
 	n = (n << 13) ^ n;
-	return (static_cast<NOISE_DATATYPE>(1) -
+	return (
+		static_cast<NOISE_DATATYPE>(1) -
 		static_cast<NOISE_DATATYPE>((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0f
 	);
 	// returns a float number in the range of [-1, 1]
@@ -271,7 +293,13 @@ int cNoise::IntNoise3DInt(Vector3i a_Pos) const
 
 
 
-NOISE_DATATYPE cNoise::CubicInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_C, NOISE_DATATYPE a_D, NOISE_DATATYPE a_Pct)
+NOISE_DATATYPE cNoise::CubicInterpolate(
+	NOISE_DATATYPE a_A,
+	NOISE_DATATYPE a_B,
+	NOISE_DATATYPE a_C,
+	NOISE_DATATYPE a_D,
+	NOISE_DATATYPE a_Pct
+)
 {
 	NOISE_DATATYPE P = (a_D - a_C) - (a_A - a_B);
 	NOISE_DATATYPE Q = (a_A - a_B) - P;
@@ -288,8 +316,9 @@ NOISE_DATATYPE cNoise::CubicInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, 
 NOISE_DATATYPE cNoise::CosineInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct)
 {
 	const NOISE_DATATYPE ft = a_Pct * static_cast<NOISE_DATATYPE>(3.1415927);
-	const NOISE_DATATYPE f = static_cast<NOISE_DATATYPE>(static_cast<NOISE_DATATYPE>(1 - cos(ft)) * static_cast<NOISE_DATATYPE>(0.5));
-	return  a_A * (1 - f) + a_B * f;
+	const NOISE_DATATYPE f =
+		static_cast<NOISE_DATATYPE>(static_cast<NOISE_DATATYPE>(1 - cos(ft)) * static_cast<NOISE_DATATYPE>(0.5));
+	return a_A * (1 - f) + a_B * f;
 }
 
 
@@ -298,7 +327,7 @@ NOISE_DATATYPE cNoise::CosineInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B,
 
 NOISE_DATATYPE cNoise::LinearInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B, NOISE_DATATYPE a_Pct)
 {
-	return  a_A * (1 - a_Pct) + a_B * a_Pct;
+	return a_A * (1 - a_Pct) + a_B * a_Pct;
 }
 
 
@@ -310,11 +339,24 @@ NOISE_DATATYPE cNoise::LinearInterpolate(NOISE_DATATYPE a_A, NOISE_DATATYPE a_B,
 
 /** Exports the noise array into a file.
 a_Coeff specifies the value that each array value is multiplied by before being converted into a byte. */
-extern void Debug2DNoise(const NOISE_DATATYPE * a_Array, size_t a_SizeX, size_t a_SizeY, const AString & a_FileNameBase, NOISE_DATATYPE a_Coeff = 32);
+extern void Debug2DNoise(
+	const NOISE_DATATYPE * a_Array,
+	size_t a_SizeX,
+	size_t a_SizeY,
+	const AString & a_FileNameBase,
+	NOISE_DATATYPE a_Coeff = 32
+);
 
 /** Exports the noise array into a set of files, ordered by XY and XZ.
 a_Coeff specifies the value that each array value is multiplied by before being converted into a byte. */
-extern void Debug3DNoise(const NOISE_DATATYPE * a_Array, size_t a_SizeX, size_t a_SizeY, size_t a_SizeZ, const AString & a_FileNameBase, NOISE_DATATYPE a_Coeff = 32);
+extern void Debug3DNoise(
+	const NOISE_DATATYPE * a_Array,
+	size_t a_SizeX,
+	size_t a_SizeY,
+	size_t a_SizeZ,
+	const AString & a_FileNameBase,
+	NOISE_DATATYPE a_Coeff = 32
+);
 
 
 

@@ -14,9 +14,8 @@
 
 
 
-cEnderChestEntity::cEnderChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
-	cBlockEntityWindowOwner(this)
+cEnderChestEntity::cEnderChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) :
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World), cBlockEntityWindowOwner(this)
 {
 	ASSERT(a_BlockType == E_BLOCK_ENDER_CHEST);
 }
@@ -50,13 +49,9 @@ void cEnderChestEntity::OnRemoveFromWorld()
 
 bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 {
-	if (
-		(GetPosY() < cChunkDef::Height - 1) &&
-		(
-			!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPos().addedY(1))) ||
-			!cOcelot::IsCatSittingOnBlock(GetWorld(), Vector3d(GetPos()))
-		)
-	)
+	if ((GetPosY() < cChunkDef::Height - 1) &&
+		(!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPos().addedY(1))) ||
+		 !cOcelot::IsCatSittingOnBlock(GetWorld(), Vector3d(GetPos()))))
 	{
 		// Obstruction, don't open
 		return false;

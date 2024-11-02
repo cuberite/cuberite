@@ -24,8 +24,7 @@ class cTeam;
 
 
 // tolua_begin
-class cPlayer:
-	public cPawn
+class cPlayer : public cPawn
 {
 	// tolua_end
 
@@ -80,8 +79,7 @@ class cPlayer:
 
 	// tolua_begin
 
-public:
-
+  public:
 	static const int MAX_HEALTH;
 
 	static const int MAX_FOOD_LEVEL;
@@ -93,7 +91,8 @@ public:
 	cPlayer(const std::shared_ptr<cClientHandle> & a_Client);
 	virtual ~cPlayer() override;
 
-	/** Called when spectation stops, because the player crouched or when the entity we're spectating gets removed from the world. */
+	/** Called when spectation stops, because the player crouched or when the entity we're spectating gets removed from
+	 * the world. */
 	void OnLoseSpectated();
 
 	// tolua_begin
@@ -153,7 +152,7 @@ public:
 	void SetTouchGround(bool a_bTouchGround);
 	double GetEyeHeight(void) const;  // tolua_export
 	Vector3d GetEyePosition(void) const;  // tolua_export
-	inline cInventory &       GetInventory(void)       { return m_Inventory; }  // tolua_export
+	inline cInventory & GetInventory(void) { return m_Inventory; }  // tolua_export
 	inline const cInventory & GetInventory(void) const { return m_Inventory; }
 
 	/** Gets the contents of the player's associated enderchest */
@@ -225,7 +224,6 @@ public:
 	virtual bool IsFireproof() const override
 	{
 		return (m_IsFireproof || IsGameModeCreative() || IsGameModeSpectator());
-
 	}
 
 	/** Returns true if the player can be targeted by Mobs */
@@ -267,7 +265,8 @@ public:
 	/** Opens the specified window; closes the current one first using CloseWindow() */
 	void OpenWindow(cWindow & a_Window);
 
-	/** Closes the current window, resets current window to m_InventoryWindow. A plugin may refuse the closing if a_CanRefuse is true */
+	/** Closes the current window, resets current window to m_InventoryWindow. A plugin may refuse the closing if
+	 * a_CanRefuse is true */
 	void CloseWindow(bool a_CanRefuse = true);
 
 	/** Closes the current window if it matches the specified ID, resets current window to m_InventoryWindow */
@@ -278,7 +277,8 @@ public:
 	// tolua_end
 
 	/** Get a copy of the PRNG for enchanting related generation, don't use this for other purposes.
-	The PRNG's state is initialised with an internal seed, such that until PermuteEnchantmentSeed is called, this function returns the same PRNG. */
+	The PRNG's state is initialised with an internal seed, such that until PermuteEnchantmentSeed is called, this
+	function returns the same PRNG. */
 	MTRand GetEnchantmentRandomProvider();
 
 	/** Permute the seed for enchanting related PRNGs, don't use this for other purposes. */
@@ -286,18 +286,18 @@ public:
 
 	// tolua_begin
 
-	void SendMessage              (const AString & a_Message);
-	void SendMessageInfo          (const AString & a_Message);
-	void SendMessageFailure       (const AString & a_Message);
-	void SendMessageSuccess       (const AString & a_Message);
-	void SendMessageWarning       (const AString & a_Message);
-	void SendMessageFatal         (const AString & a_Message);
-	void SendMessagePrivateMsg    (const AString & a_Message, const AString & a_Sender);
-	void SendMessage              (const cCompositeChat & a_Message);
-	void SendMessageRaw           (const AString & a_MessageRaw, eChatType a_Type = eChatType::ctChatBox);
-	void SendSystemMessage        (const AString & a_Message);
+	void SendMessage(const AString & a_Message);
+	void SendMessageInfo(const AString & a_Message);
+	void SendMessageFailure(const AString & a_Message);
+	void SendMessageSuccess(const AString & a_Message);
+	void SendMessageWarning(const AString & a_Message);
+	void SendMessageFatal(const AString & a_Message);
+	void SendMessagePrivateMsg(const AString & a_Message, const AString & a_Sender);
+	void SendMessage(const cCompositeChat & a_Message);
+	void SendMessageRaw(const AString & a_MessageRaw, eChatType a_Type = eChatType::ctChatBox);
+	void SendSystemMessage(const AString & a_Message);
 	void SendAboveActionBarMessage(const AString & a_Message);
-	void SendSystemMessage        (const cCompositeChat & a_Message);
+	void SendSystemMessage(const cCompositeChat & a_Message);
 	void SendAboveActionBarMessage(const cCompositeChat & a_Message);
 
 	const AString & GetName(void) const;
@@ -307,9 +307,12 @@ public:
 	bool HasPermission(const AString & a_Permission) const;  // tolua_export
 
 	/** Returns true iff a_Permission matches the a_Template.
-	A match is defined by either being exactly the same, or each sub-item matches until there's a wildcard in a_Template.
-	Ie. {"a", "b", "c"} matches {"a", "b", "*"} but doesn't match {"a", "b"} */
-	static bool PermissionMatches(const AStringVector & a_Permission, const AStringVector & a_Template);  // Exported in ManualBindings with AString params
+	A match is defined by either being exactly the same, or each sub-item matches until there's a wildcard in
+	a_Template. Ie. {"a", "b", "c"} matches {"a", "b", "*"} but doesn't match {"a", "b"} */
+	static bool PermissionMatches(
+		const AStringVector & a_Permission,
+		const AStringVector & a_Template
+	);  // Exported in ManualBindings with AString params
 
 	/** Returns all the permissions that the player has assigned to them. */
 	const AStringVector & GetPermissions(void) const { return m_Permissions; }  // Exported in ManualBindings.cpp
@@ -351,18 +354,18 @@ public:
 	/** Heals the player by the specified amount of HPs (positive only); sends health update */
 	virtual void Heal(int a_Health) override;
 
-	int    GetFoodLevel                 (void) const { return m_FoodLevel; }
-	double GetFoodSaturationLevel       (void) const { return m_FoodSaturationLevel; }
-	int    GetFoodTickTimer             (void) const { return m_FoodTickTimer; }
-	double GetFoodExhaustionLevel       (void) const { return m_FoodExhaustionLevel; }
+	int GetFoodLevel(void) const { return m_FoodLevel; }
+	double GetFoodSaturationLevel(void) const { return m_FoodSaturationLevel; }
+	int GetFoodTickTimer(void) const { return m_FoodTickTimer; }
+	double GetFoodExhaustionLevel(void) const { return m_FoodExhaustionLevel; }
 
 	/** Returns true if the player is satiated, i. e. their foodlevel is at the max and they cannot eat anymore */
 	bool IsSatiated(void) const { return (m_FoodLevel >= MAX_FOOD_LEVEL); }
 
-	void SetFoodLevel                 (int a_FoodLevel);
-	void SetFoodSaturationLevel       (double a_FoodSaturationLevel);
-	void SetFoodTickTimer             (int a_FoodTickTimer);
-	void SetFoodExhaustionLevel       (double a_FoodExhaustionLevel);
+	void SetFoodLevel(int a_FoodLevel);
+	void SetFoodSaturationLevel(double a_FoodSaturationLevel);
+	void SetFoodTickTimer(int a_FoodTickTimer);
+	void SetFoodExhaustionLevel(double a_FoodExhaustionLevel);
 
 	/** Adds to FoodLevel and FoodSaturationLevel, returns true if any food has been consumed, false if player "full" */
 	bool Feed(int a_Food, double a_Saturation);
@@ -385,7 +388,11 @@ public:
 	/** Returns true if the player has thrown out a floater */
 	bool IsFishing(void) const { return m_IsFishing; }
 
-	void SetIsFishing(bool a_IsFishing, UInt32 a_FloaterID = cEntity::INVALID_ID) { m_IsFishing = a_IsFishing; m_FloaterID = a_FloaterID; }
+	void SetIsFishing(bool a_IsFishing, UInt32 a_FloaterID = cEntity::INVALID_ID)
+	{
+		m_IsFishing = a_IsFishing;
+		m_FloaterID = a_FloaterID;
+	}
 
 	UInt32 GetFloaterID(void) const { return m_FloaterID; }
 
@@ -417,13 +424,14 @@ public:
 
 	void Respawn(void);  // tolua_export
 
-	void SetVisible( bool a_bVisible);  // tolua_export
+	void SetVisible(bool a_bVisible);  // tolua_export
 
 	/** Saves all player data, such as inventory, to JSON. */
 	void SaveToDisk(void);
 
 	/** Loads the player data from the save file.
-	Sets m_World to the world where the player will spawn, based on the stored world name or the default world by calling LoadFromFile(). */
+	Sets m_World to the world where the player will spawn, based on the stored world name or the default world by
+	calling LoadFromFile(). */
 	void LoadFromDisk();
 
 	const AString & GetLoadedWorldName() const { return m_CurrentWorldName; }
@@ -445,7 +453,7 @@ public:
 	void UseItem(int a_SlotNumber, short a_Damage = 1);
 
 	/** In UI windows, get the item that the player is dragging */
-	cItem & GetDraggingItem(void) {return m_DraggingItem; }  // tolua_export
+	cItem & GetDraggingItem(void) { return m_DraggingItem; }  // tolua_export
 
 	/** In UI windows, set the item that the player is dragging */
 	void SetDraggingItem(const cItem & a_Item);  // tolua_export
@@ -566,14 +574,15 @@ public:
 	bool PlaceBlock(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
 	/** Calls the block placement hooks and places the blocks in the world.
-	First the "placing" hooks for all the blocks are called, then the blocks are placed, and finally the "placed" hooks are called.
-	If the any of the "placing" hooks aborts, none of the blocks are placed and the function returns false.
+	First the "placing" hooks for all the blocks are called, then the blocks are placed, and finally the "placed" hooks
+	are called. If the any of the "placing" hooks aborts, none of the blocks are placed and the function returns false.
 	Returns true if all the blocks are placed. */
 	bool PlaceBlocks(std::initializer_list<sSetBlock> a_Blocks);
 
 	/** Notify nearby wolves that the player or one of the player's wolves took damage or did damage to an entity
 	@param a_Opponent the opponent we're fighting.
-	@param a_IsPlayerInvolved Should be true if the player took or did damage, and false if one of the player's wolves took or did damage.
+	@param a_IsPlayerInvolved Should be true if the player took or did damage, and false if one of the player's wolves
+	took or did damage.
 	*/
 	void NotifyNearbyWolves(cPawn * a_Opponent, bool a_IsPlayerInvolved);
 
@@ -604,12 +613,12 @@ public:
 	virtual bool IsOnGround(void) const override { return m_bTouchGround; }
 	virtual bool IsSprinting(void) const override;
 
-private:
-
-	typedef std::vector<std::vector<AString> > AStringVectorVector;
+  private:
+	typedef std::vector<std::vector<AString>> AStringVectorVector;
 
 	/** The current body stance the player has adopted. */
-	std::variant<BodyStanceCrouching, BodyStanceSleeping, BodyStanceSprinting, BodyStanceStanding, BodyStanceGliding> m_BodyStance;
+	std::variant<BodyStanceCrouching, BodyStanceSleeping, BodyStanceSprinting, BodyStanceStanding, BodyStanceGliding>
+		m_BodyStance;
 
 	/** The name of the rank assigned to this player. */
 	AString m_Rank;
@@ -642,7 +651,8 @@ private:
 	/** Count-up to the healing or damaging action, based on m_FoodLevel */
 	int m_FoodTickTimer;
 
-	/** A "buffer" which adds up hunger before it is substracted from m_FoodSaturationLevel or m_FoodLevel. Each action adds a little */
+	/** A "buffer" which adds up hunger before it is substracted from m_FoodSaturationLevel or m_FoodLevel. Each action
+	 * adds a little */
 	double m_FoodExhaustionLevel;
 
 	/** Stores the player's inventory, consisting of crafting grid, hotbar, and main slots */
@@ -655,11 +665,13 @@ private:
 	cWindow * m_InventoryWindow;
 
 	/** The player's potential respawn position, initialised to world spawn by default.
-	During player respawn from death, if m_IsRespawnPointForced is false and no bed exists here, it will be reset to world spawn. */
+	During player respawn from death, if m_IsRespawnPointForced is false and no bed exists here, it will be reset to
+	world spawn. */
 	Vector3i m_RespawnPosition;
 
 	/** The name of the world which the player respawns in upon death.
-	This is stored as a string to enable SaveToDisk to not touch cRoot, and thus can be safely called in the player's destructor. */
+	This is stored as a string to enable SaveToDisk to not touch cRoot, and thus can be safely called in the player's
+	destructor. */
 	std::string m_SpawnWorldName;
 
 	/** The name of the world which the player currently resides in.
@@ -710,7 +722,8 @@ private:
 	/** Was the player frozen manually by a plugin or automatically by the server? */
 	bool m_IsManuallyFrozen;
 
-	/** Whether we unconditionally respawn to m_RespawnPosition, or check if a bed is unobstructed and available first. */
+	/** Whether we unconditionally respawn to m_RespawnPosition, or check if a bed is unobstructed and available first.
+	 */
 	bool m_IsRespawnPointForced;
 
 	/** Flag used by food handling system to determine whether a teleport has just happened.
@@ -756,7 +769,8 @@ private:
 	/** Called in each tick to handle food-related processing */
 	void HandleFood(void);
 
-	/** Called in each tick if the player is fishing to make sure the floater dissapears when the player doesn't have a fishing rod as equipped item. */
+	/** Called in each tick if the player is fishing to make sure the floater dissapears when the player doesn't have a
+	 * fishing rod as equipped item. */
 	void HandleFloater(void);
 
 	/** Returns the filename for the player data based on the UUID given.
@@ -776,10 +790,10 @@ private:
 	/** Returns the dig speed using the current tool on the block a_Block.
 	Returns one if using hand.
 	If the player is using a tool that is good to break the block the value is higher.
-	If he has an enchanted tool with efficiency or he has a haste or mining fatique effect it gets multiplied by a specific factor depending on the strength of the effect or enchantment.
-	In he is in water it gets divided by 5 except if his tool is enchanted with aqua affinity.
-	If he is not on ground it also gets divided by 5.
-	Source: https://minecraft.wiki/w/Breaking#Calculation */
+	If he has an enchanted tool with efficiency or he has a haste or mining fatique effect it gets multiplied by a
+	specific factor depending on the strength of the effect or enchantment. In he is in water it gets divided by 5
+	except if his tool is enchanted with aqua affinity. If he is not on ground it also gets divided by 5. Source:
+	https://minecraft.wiki/w/Breaking#Calculation */
 	float GetDigSpeed(BLOCKTYPE a_Block);
 
 	/** Add the recipe Id to the known recipes.
@@ -807,4 +821,4 @@ private:
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
-} ;  // tolua_export
+};  // tolua_export

@@ -89,7 +89,12 @@ void cZapper::ZapRegionInMCAFile(const cRegion & a_Region, int a_MCAX, int a_MCA
 	AString FileNameOut = Printf("%s/r.%d.%d.zap", m_MCAFolder.c_str(), a_MCAX, a_MCAZ);
 	if (!fOut.Open(FileNameOut, cFile::fmWrite))
 	{
-		fprintf(stderr, "Cannot open temporary file \"%s\" for writing, skipping file \"%s\".", FileNameOut.c_str(), FileNameIn.c_str());
+		fprintf(
+			stderr,
+			"Cannot open temporary file \"%s\" for writing, skipping file \"%s\".",
+			FileNameOut.c_str(),
+			FileNameIn.c_str()
+		);
 		return;
 	}
 
@@ -124,16 +129,17 @@ void cZapper::ZapRegionInMCAFile(const cRegion & a_Region, int a_MCAX, int a_MCA
 		size_t DataSize = ChunkData.size() + 1;
 		ChunkHeader[0] = (DataSize >> 24) & 0xff;
 		ChunkHeader[1] = (DataSize >> 16) & 0xff;
-		ChunkHeader[2] = (DataSize >> 8)  & 0xff;
+		ChunkHeader[2] = (DataSize >> 8) & 0xff;
 		ChunkHeader[3] = DataSize & 0xff;
 		ChunkHeader[4] = 2;  // zlib compression
-		size_t Alignment = 4096 - (ChunkData.size() + 5) % 4096;  // 5 bytes of the header are appended outside of ChunkData
+		size_t Alignment =
+			4096 - (ChunkData.size() + 5) % 4096;  // 5 bytes of the header are appended outside of ChunkData
 		if (Alignment > 0)
 		{
-			ChunkData.append(Alignment, (char)0);
+			ChunkData.append(Alignment, (char) 0);
 		}
 		HeaderOut[i] = htonl(((DataOut.size() / 4096 + 2) << 8) | ((ChunkData.size() + 5) / 4096));
-		DataOut.append((const char *)ChunkHeader, sizeof(ChunkHeader));
+		DataOut.append((const char *) ChunkHeader, sizeof(ChunkHeader));
 		DataOut.append(ChunkData);
 	}  // for i - chunks in fIn
 	for (int i = 1024; i < 2048; i++)
@@ -162,13 +168,19 @@ void cZapper::LoadChunkData(cFile & a_InFile, int a_ChunkHeaderValue, AString & 
 	a_InFile.Read(ChunkHeader, sizeof(ChunkHeader));
 	if (ChunkHeader[4] != 2)
 	{
-		fprintf(stderr, "Chunk [%d, %d] is compressed in an unknown scheme (%d), skipping", a_ChunkX, a_ChunkZ, ChunkHeader[4]);
+		fprintf(
+			stderr,
+			"Chunk [%d, %d] is compressed in an unknown scheme (%d), skipping",
+			a_ChunkX,
+			a_ChunkZ,
+			ChunkHeader[4]
+		);
 		return;
 	}
-	int ActualSize = (ChunkHeader[0] << 24) |  (ChunkHeader[1] << 16) | (ChunkHeader[2] << 8) | ChunkHeader[3];
+	int ActualSize = (ChunkHeader[0] << 24) | (ChunkHeader[1] << 16) | (ChunkHeader[2] << 8) | ChunkHeader[3];
 	ActualSize -= 1;  // Compression took 1 byte
 	a_ChunkData.resize(ActualSize);
-	int BytesRead = a_InFile.Read((void *)(a_ChunkData.data()), ActualSize);
+	int BytesRead = a_InFile.Read((void *) (a_ChunkData.data()), ActualSize);
 	if (BytesRead != ActualSize)
 	{
 		fprintf(stderr, "Chunk is truncated in file (%d bytes out of %d), skipping.", BytesRead, ActualSize);
@@ -186,14 +198,14 @@ void cZapper::ZapRegionInRawChunkData(const cRegion & a_Region, AString & a_Chun
 	// Decompress the data:
 	char Uncompressed[CHUNK_INFLATE_MAX];
 	z_stream strm;
-	strm.zalloc = (alloc_func)NULL;
-	strm.zfree = (free_func)NULL;
+	strm.zalloc = (alloc_func) NULL;
+	strm.zfree = (free_func) NULL;
 	strm.opaque = NULL;
 	inflateInit(&strm);
-	strm.next_out  = (Bytef *)Uncompressed;
+	strm.next_out = (Bytef *) Uncompressed;
 	strm.avail_out = sizeof(Uncompressed);
-	strm.next_in   = (Bytef *)a_ChunkData.data();
-	strm.avail_in  = a_ChunkData.size();
+	strm.next_in = (Bytef *) a_ChunkData.data();
+	strm.avail_in = a_ChunkData.size();
 	int res = inflate(&strm, Z_FINISH);
 	inflateEnd(&strm);
 	if (res != Z_STREAM_END)
@@ -268,7 +280,13 @@ void cZapper::ZapRegionInNBTChunk(const cRegion & a_Region, cParsedNBT & a_NBT, 
 		int SectionsTag = a_NBT.FindChildByName(LevelTag, "Sections");
 		if (SectionsTag < 0)
 		{
-			fprintf(stderr, "Cannot find the Sections tag in the Level tag in chunk [%d, %d]'s NBT. Skipping block-zapping in chunk.", a_ChunkX, a_ChunkZ);
+			fprintf(
+				stderr,
+				"Cannot find the Sections tag in the Level tag in chunk [%d, %d]'s NBT. Skipping block-zapping in "
+				"chunk.",
+				a_ChunkX,
+				a_ChunkZ
+			);
 			return;
 		}
 		ZapRegionBlocksInNBT(Local, a_NBT, SectionsTag);
@@ -279,7 +297,13 @@ void cZapper::ZapRegionInNBTChunk(const cRegion & a_Region, cParsedNBT & a_NBT, 
 		int EntitiesTag = a_NBT.FindChildByName(LevelTag, "Entities");
 		if (EntitiesTag < 0)
 		{
-			fprintf(stderr, "Cannot find the Entities tag in the Level tag in chunk [%d, %d]'s NBT. Skipping entity-zapping in chunk.", a_ChunkX, a_ChunkZ);
+			fprintf(
+				stderr,
+				"Cannot find the Entities tag in the Level tag in chunk [%d, %d]'s NBT. Skipping entity-zapping in "
+				"chunk.",
+				a_ChunkX,
+				a_ChunkZ
+			);
 			return;
 		}
 		ZapRegionEntitiesInNBT(Local, a_NBT, EntitiesTag);
@@ -307,18 +331,18 @@ void cZapper::ZapRegionBlocksInNBT(const cRegion & a_Region, cParsedNBT & a_NBT,
 		}
 		int BlockDataTag = a_NBT.FindChildByName(Child, "Blocks");
 		int BlockMetaTag = a_NBT.FindChildByName(Child, "Data");
-		int BlockAddTag  = a_NBT.FindChildByName(Child, "Add");
+		int BlockAddTag = a_NBT.FindChildByName(Child, "Add");
 		if (BlockDataTag > 0)
 		{
-			ZapRegionInNBTSectionBytes(a_Region, y, (unsigned char *)(a_NBT.GetData(BlockDataTag)));
+			ZapRegionInNBTSectionBytes(a_Region, y, (unsigned char *) (a_NBT.GetData(BlockDataTag)));
 		}
 		if (BlockMetaTag > 0)
 		{
-			ZapRegionInNBTSectionNibbles(a_Region, y, (unsigned char *)(a_NBT.GetData(BlockMetaTag)));
+			ZapRegionInNBTSectionNibbles(a_Region, y, (unsigned char *) (a_NBT.GetData(BlockMetaTag)));
 		}
 		if (BlockAddTag > 0)
 		{
-			ZapRegionInNBTSectionNibbles(a_Region, y, (unsigned char *)(a_NBT.GetData(BlockAddTag)));
+			ZapRegionInNBTSectionNibbles(a_Region, y, (unsigned char *) (a_NBT.GetData(BlockAddTag)));
 		}
 	}  // for Child - Level / Sections / []
 }
@@ -384,25 +408,28 @@ void cZapper::SerializeNBTTag(const cParsedNBT & a_NBT, int a_Tag, cFastNBTWrite
 {
 	switch (a_NBT.GetType(a_Tag))
 	{
-		case TAG_Byte:      a_Writer.AddByte     (a_NBT.GetName(a_Tag), a_NBT.GetByte  (a_Tag)); break;
-		case TAG_Short:     a_Writer.AddShort    (a_NBT.GetName(a_Tag), a_NBT.GetShort (a_Tag)); break;
-		case TAG_Int:       a_Writer.AddInt      (a_NBT.GetName(a_Tag), a_NBT.GetInt   (a_Tag)); break;
-		case TAG_Long:      a_Writer.AddLong     (a_NBT.GetName(a_Tag), a_NBT.GetLong  (a_Tag)); break;
-		case TAG_Float:     a_Writer.AddFloat    (a_NBT.GetName(a_Tag), a_NBT.GetFloat (a_Tag)); break;
-		case TAG_Double:    a_Writer.AddDouble   (a_NBT.GetName(a_Tag), a_NBT.GetDouble(a_Tag)); break;
-		case TAG_ByteArray: a_Writer.AddByteArray(a_NBT.GetName(a_Tag), a_NBT.GetData  (a_Tag), a_NBT.GetDataLength(a_Tag)); break;
-		case TAG_String:    a_Writer.AddString   (a_NBT.GetName(a_Tag), a_NBT.GetString(a_Tag)); break;
+		case TAG_Byte:   a_Writer.AddByte(a_NBT.GetName(a_Tag), a_NBT.GetByte(a_Tag)); break;
+		case TAG_Short:  a_Writer.AddShort(a_NBT.GetName(a_Tag), a_NBT.GetShort(a_Tag)); break;
+		case TAG_Int:    a_Writer.AddInt(a_NBT.GetName(a_Tag), a_NBT.GetInt(a_Tag)); break;
+		case TAG_Long:   a_Writer.AddLong(a_NBT.GetName(a_Tag), a_NBT.GetLong(a_Tag)); break;
+		case TAG_Float:  a_Writer.AddFloat(a_NBT.GetName(a_Tag), a_NBT.GetFloat(a_Tag)); break;
+		case TAG_Double: a_Writer.AddDouble(a_NBT.GetName(a_Tag), a_NBT.GetDouble(a_Tag)); break;
+		case TAG_ByteArray:
+			a_Writer.AddByteArray(a_NBT.GetName(a_Tag), a_NBT.GetData(a_Tag), a_NBT.GetDataLength(a_Tag));
+			break;
+		case TAG_String: a_Writer.AddString(a_NBT.GetName(a_Tag), a_NBT.GetString(a_Tag)); break;
 		case TAG_IntArray:
 		{
 			std::vector<int> Data;
 			int NumInts = a_NBT.GetDataLength(a_Tag) / 4;
 			Data.reserve(NumInts);
-			int * OrigData = (int *)(a_NBT.GetData(a_Tag));
+			int * OrigData = (int *) (a_NBT.GetData(a_Tag));
 			for (int i = 0; i < NumInts; i++)
 			{
 				Data.push_back(ntohl(OrigData[i]));
 			}
-			a_Writer.AddIntArray (a_NBT.GetName(a_Tag), &Data.front(), Data.size()); break;
+			a_Writer.AddIntArray(a_NBT.GetName(a_Tag), &Data.front(), Data.size());
+			break;
 		}
 
 		case TAG_List:

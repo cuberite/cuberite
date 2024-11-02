@@ -8,13 +8,11 @@
 
 
 
-class cItemBowHandler final:
-	public cItemHandler
+class cItemBowHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 
@@ -73,12 +71,8 @@ public:
 		{
 			return;
 		}
-		a_Player->GetWorld()->BroadcastSoundEffect(
-			"entity.arrow.shoot",
-			a_Player->GetPosition(),
-			0.5,
-			static_cast<float>(Force)
-		);
+		a_Player->GetWorld()
+			->BroadcastSoundEffect("entity.arrow.shoot", a_Player->GetPosition(), 0.5, static_cast<float>(Force));
 		if (!a_Player->IsGameModeCreative())
 		{
 			if (a_Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchInfinity) == 0)
@@ -97,4 +91,4 @@ public:
 			ArrowPtr->StartBurning(100);
 		}
 	}
-} ;
+};

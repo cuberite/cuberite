@@ -14,7 +14,12 @@
 
 
 
-void cVaporizeFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
+void cVaporizeFluidSimulator::SimulateChunk(
+	std::chrono::milliseconds a_Dt,
+	int a_ChunkX,
+	int a_ChunkZ,
+	cChunk * a_Chunk
+)
 {
 	// Nothing needed
 
@@ -33,11 +38,7 @@ void cVaporizeFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BL
 	if ((a_Block == m_FluidBlock) || (a_Block == m_StationaryFluidBlock))
 	{
 		a_Chunk.FastSetBlock(a_Position, E_BLOCK_AIR, 0);
-		World::GetBroadcastInterface(m_World).BroadcastSoundEffect(
-			"block.fire.extinguish",
-			Vector3d(a_Position),
-			1.0f,
-			0.6f
-		);
+		World::GetBroadcastInterface(m_World)
+			.BroadcastSoundEffect("block.fire.extinguish", Vector3d(a_Position), 1.0f, 0.6f);
 	}
 }

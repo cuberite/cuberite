@@ -9,17 +9,14 @@
 
 
 
-class cItemSignHandler final:
-	public cItemHandler
+class cItemSignHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	/** Converts the block face of the neighbor to which the wallsign is attached to the wallsign block's meta. */
 	static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_NeighborBlockFace)
 	{
@@ -40,7 +37,13 @@ private:
 	}
 
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
+	virtual bool CommitPlacement(
+		cPlayer & a_Player,
+		const cItem & a_HeldItem,
+		const Vector3i a_PlacePosition,
+		const eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPosition
+	) const override
 	{
 		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
 		{
@@ -60,10 +63,7 @@ private:
 	}
 
 
-	virtual bool IsPlaceable(void) const override
-	{
-		return true;
-	}
+	virtual bool IsPlaceable(void) const override { return true; }
 
 
 	/** Converts the (player) rotation to placed-signpost block meta. */
@@ -79,8 +79,4 @@ private:
 
 		return static_cast<NIBBLETYPE>(a_Rotation) % 16;
 	}
-} ;
-
-
-
-
+};

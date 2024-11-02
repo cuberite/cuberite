@@ -7,10 +7,8 @@
 
 
 
-class cDefaultItemHandler final :
-	public cItemHandler
+class cDefaultItemHandler final : public cItemHandler
 {
-public:
-
+  public:
 	using cItemHandler::cItemHandler;
 };

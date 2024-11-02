@@ -8,9 +8,7 @@
 
 
 cFluidSimulator::cFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid) :
-	Super(a_World),
-	m_FluidBlock(a_Fluid),
-	m_StationaryFluidBlock(a_StationaryFluid)
+	Super(a_World), m_FluidBlock(a_Fluid), m_StationaryFluidBlock(a_StationaryFluid)
 {
 }
 
@@ -87,9 +85,7 @@ bool cFluidSimulator::IsSolidBlock(BLOCKTYPE a_BlockType)
 bool cFluidSimulator::IsPassableForFluid(BLOCKTYPE a_BlockType)
 {
 	return (
-		(a_BlockType == E_BLOCK_AIR) ||
-		(a_BlockType == E_BLOCK_FIRE) ||
-		IsAllowedBlock(a_BlockType) ||
+		(a_BlockType == E_BLOCK_AIR) || (a_BlockType == E_BLOCK_FIRE) || IsAllowedBlock(a_BlockType) ||
 		CanWashAway(a_BlockType)
 	);
 }
@@ -143,25 +139,17 @@ Vector3f cFluidSimulator::GetFlowingDirection(Vector3i a_Pos)
 	}
 
 	const auto HeightFromMeta = [](NIBBLETYPE a_BlockMeta) -> NIBBLETYPE
-		{
-			// Falling water blocks are always full height (0)
-			return ((a_BlockMeta & 0x08) != 0) ? 0 : a_BlockMeta;
-		};
+	{
+		// Falling water blocks are always full height (0)
+		return ((a_BlockMeta & 0x08) != 0) ? 0 : a_BlockMeta;
+	};
 
 	auto BlockMeta = m_World.GetBlockMeta(a_Pos);
 	NIBBLETYPE CentralPoint = HeightFromMeta(BlockMeta);
 	NIBBLETYPE LevelPoint[4];
 
 	// blocks around the checking pos
-	std::array<Vector3i, 4> Offsets
-	{
-		{
-			{ 1, 0, 0 },
-			{ 0, 0, 1 },
-			{ 1, 0, 0 },
-			{ 0, 0, 1 }
-		}
-	};
+	std::array<Vector3i, 4> Offsets {{{1, 0, 0}, {0, 0, 1}, {1, 0, 0}, {0, 0, 1}}};
 
 	for (size_t i = 0; i < Offsets.size(); i++)
 	{
@@ -189,4 +177,3 @@ Vector3f cFluidSimulator::GetFlowingDirection(Vector3i a_Pos)
 
 	return Direction;
 }
-

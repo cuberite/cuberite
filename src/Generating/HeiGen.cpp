@@ -19,39 +19,97 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cHeiGenSteppy:
 
-class cHeiGenSteppy:
-	public cTerrainHeightGen
+class cHeiGenSteppy : public cTerrainHeightGen
 {
-public:
+  public:
 	cHeiGenSteppy(int a_Seed) :
 		m_Seed(a_Seed)
 	{
-		m_Gen =
-			std::make_shared<cProtIntGenWeightAvg<16, 1, 0>>(
-			std::make_shared<cProtIntGenSmooth>             (a_Seed + 1,
-			std::make_shared<cProtIntGenZoom>               (a_Seed + 2,
-			std::make_shared<cProtIntGenSmooth>             (a_Seed + 3,
-			std::make_shared<cProtIntGenZoom>               (a_Seed + 4,
-			std::make_shared<cProtIntGenAddRnd>             (a_Seed + 5, 1,
-			std::make_shared<cProtIntGenSmooth>             (a_Seed + 6,
-			std::make_shared<cProtIntGenZoom>               (a_Seed + 7,
-			std::make_shared<cProtIntGenRndBetween>         (a_Seed + 8, 60,
-			std::make_shared<cProtIntGenAddRnd>             (a_Seed + 9, 1,
-			std::make_shared<cProtIntGenSmooth>             (a_Seed + 1,
-			std::make_shared<cProtIntGenZoom>               (a_Seed + 2,
-			std::make_shared<cProtIntGenRndBetween>         (a_Seed + 3, 60,
-			std::make_shared<cProtIntGenSmooth>             (a_Seed + 4,
-			std::make_shared<cProtIntGenZoom>               (a_Seed + 5,
-			std::make_shared<cProtIntGenRndBetween>         (a_Seed + 6, 60,
-			std::make_shared<cProtIntGenRndChoice>          (a_Seed + 7, 10, 50, 50,
-			std::make_shared<cProtIntGenSmooth>             (a_Seed + 8,
-			std::make_shared<cProtIntGenZoom>               (a_Seed + 9,
-			std::make_shared<cProtIntGenRndChoice>          (a_Seed + 1, 10, 50, 50,
-			std::make_shared<cProtIntGenAddRnd>             (a_Seed + 2, 2,
-			std::make_shared<cProtIntGenZoom>               (a_Seed + 3,
-			std::make_shared<cProtIntGenZoom>               (a_Seed + 4,
-			std::make_shared<cProtIntGenChoice>             (a_Seed + 5, 10)
-		)))))))))))))))))))))));
+		m_Gen = std::make_shared<cProtIntGenWeightAvg<16, 1, 0>>(std::make_shared<cProtIntGenSmooth>(
+			a_Seed + 1,
+			std::make_shared<cProtIntGenZoom>(
+				a_Seed + 2,
+				std::make_shared<cProtIntGenSmooth>(
+					a_Seed + 3,
+					std::make_shared<cProtIntGenZoom>(
+						a_Seed + 4,
+						std::make_shared<cProtIntGenAddRnd>(
+							a_Seed + 5,
+							1,
+							std::make_shared<cProtIntGenSmooth>(
+								a_Seed + 6,
+								std::make_shared<cProtIntGenZoom>(
+									a_Seed + 7,
+									std::make_shared<cProtIntGenRndBetween>(
+										a_Seed + 8,
+										60,
+										std::make_shared<cProtIntGenAddRnd>(
+											a_Seed + 9,
+											1,
+											std::make_shared<cProtIntGenSmooth>(
+												a_Seed + 1,
+												std::make_shared<cProtIntGenZoom>(
+													a_Seed + 2,
+													std::make_shared<cProtIntGenRndBetween>(
+														a_Seed + 3,
+														60,
+														std::make_shared<cProtIntGenSmooth>(
+															a_Seed + 4,
+															std::make_shared<cProtIntGenZoom>(
+																a_Seed + 5,
+																std::make_shared<cProtIntGenRndBetween>(
+																	a_Seed + 6,
+																	60,
+																	std::make_shared<cProtIntGenRndChoice>(
+																		a_Seed + 7,
+																		10,
+																		50,
+																		50,
+																		std::make_shared<cProtIntGenSmooth>(
+																			a_Seed + 8,
+																			std::make_shared<cProtIntGenZoom>(
+																				a_Seed + 9,
+																				std::make_shared<cProtIntGenRndChoice>(
+																					a_Seed + 1,
+																					10,
+																					50,
+																					50,
+																					std::make_shared<cProtIntGenAddRnd>(
+																						a_Seed + 2,
+																						2,
+																						std::make_shared<
+																							cProtIntGenZoom>(
+																							a_Seed + 3,
+																							std::make_shared<
+																								cProtIntGenZoom>(
+																								a_Seed + 4,
+																								std::make_shared<
+																									cProtIntGenChoice>(
+																									a_Seed + 5,
+																									10
+																								)
+																							)
+																						)
+																					)
+																				)
+																			)
+																		)
+																	)
+																)
+															)
+														)
+													)
+												)
+											)
+										)
+									)
+								)
+							)
+						)
+					)
+				)
+			)
+		));
 	}
 
 	// cTerrainHeightGen overrides:
@@ -59,8 +117,11 @@ public:
 	{
 		int heights[cChunkDef::Width * cChunkDef::Width];
 		m_Gen->GetInts(
-			a_ChunkCoords.m_ChunkX * cChunkDef::Width, a_ChunkCoords.m_ChunkZ * cChunkDef::Width,
-			static_cast<size_t>(cChunkDef::Width), static_cast<size_t>(cChunkDef::Width), heights
+			a_ChunkCoords.m_ChunkX * cChunkDef::Width,
+			a_ChunkCoords.m_ChunkZ * cChunkDef::Width,
+			static_cast<size_t>(cChunkDef::Width),
+			static_cast<size_t>(cChunkDef::Width),
+			heights
 		);
 		for (size_t i = 0; i < ARRAYCOUNT(heights); i++)
 		{
@@ -68,7 +129,7 @@ public:
 		}
 	}
 
-protected:
+  protected:
 	int m_Seed;
 
 	std::shared_ptr<cProtIntGen> m_Gen;
@@ -107,11 +168,7 @@ void cHeiGenFlat::InitializeHeightGen(cIniFile & a_IniFile)
 // cHeiGenCache:
 
 cHeiGenCache::cHeiGenCache(cTerrainHeightGen & a_HeiGenToCache, size_t a_CacheSize) :
-	m_HeiGenToCache(a_HeiGenToCache),
-	m_CacheSize(a_CacheSize),
-	m_NumHits(0),
-	m_NumMisses(0),
-	m_TotalChain(0)
+	m_HeiGenToCache(a_HeiGenToCache), m_CacheSize(a_CacheSize), m_NumHits(0), m_NumMisses(0), m_TotalChain(0)
 {
 	m_CacheOrder.resize(a_CacheSize);
 	m_CacheData.resize(a_CacheSize);
@@ -130,8 +187,8 @@ void cHeiGenCache::GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap
 	/*
 	if (((m_NumHits + m_NumMisses) % 1024) == 10)
 	{
-		LOGD("HeiGenCache: %d hits, %d misses, saved %.2f %%", m_NumHits, m_NumMisses, 100.0 * m_NumHits / (m_NumHits + m_NumMisses));
-		LOGD("HeiGenCache: Avg cache chain length: %.2f", static_cast<double>(m_TotalChain) / m_NumHits);
+		LOGD("HeiGenCache: %d hits, %d misses, saved %.2f %%", m_NumHits, m_NumMisses, 100.0 * m_NumHits / (m_NumHits +
+	m_NumMisses)); LOGD("HeiGenCache: Avg cache chain length: %.2f", static_cast<double>(m_TotalChain) / m_NumHits);
 	}
 	//*/
 
@@ -219,9 +276,12 @@ bool cHeiGenCache::GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_Rel
 ////////////////////////////////////////////////////////////////////////////////
 // cHeiGenMultiCache:
 
-cHeiGenMultiCache::cHeiGenMultiCache(std::unique_ptr<cTerrainHeightGen> a_HeiGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches):
-	m_NumSubCaches(a_NumSubCaches),
-	m_Underlying(std::move(a_HeiGenToCache))
+cHeiGenMultiCache::cHeiGenMultiCache(
+	std::unique_ptr<cTerrainHeightGen> a_HeiGenToCache,
+	size_t a_SubCacheSize,
+	size_t a_NumSubCaches
+) :
+	m_NumSubCaches(a_NumSubCaches), m_Underlying(std::move(a_HeiGenToCache))
 {
 	// Create the individual sub-caches:
 	m_SubCaches.reserve(a_NumSubCaches);
@@ -238,7 +298,9 @@ cHeiGenMultiCache::cHeiGenMultiCache(std::unique_ptr<cTerrainHeightGen> a_HeiGen
 void cHeiGenMultiCache::GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap)
 {
 	// Get the subcache responsible for this chunk:
-	const size_t cacheIdx = (static_cast<size_t>(a_ChunkCoords.m_ChunkX) + m_CoeffZ * static_cast<size_t>(a_ChunkCoords.m_ChunkZ)) % m_NumSubCaches;
+	const size_t cacheIdx =
+		(static_cast<size_t>(a_ChunkCoords.m_ChunkX) + m_CoeffZ * static_cast<size_t>(a_ChunkCoords.m_ChunkZ)) %
+		m_NumSubCaches;
 
 	// Ask the subcache:
 	m_SubCaches[cacheIdx]->GenHeightMap(a_ChunkCoords, a_HeightMap);
@@ -328,7 +390,8 @@ void cHeiGenClassic::GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightM
 		{
 			const float xx = static_cast<float>(a_ChunkCoords.m_ChunkX * cChunkDef::Width + x);
 
-			HEIGHTTYPE hei = static_cast<HEIGHTTYPE>(Clamp(static_cast<int>(64 + (GetNoise(xx * 0.05f, zz * 0.05f) * 16)), 10, 250));
+			HEIGHTTYPE hei =
+				static_cast<HEIGHTTYPE>(Clamp(static_cast<int>(64 + (GetNoise(xx * 0.05f, zz * 0.05f) * 16)), 10, 250));
 			cChunkDef::SetHeight(a_HeightMap, x, z, hei);
 		}  // for x
 	}  // for z
@@ -343,9 +406,9 @@ void cHeiGenClassic::InitializeHeightGen(cIniFile & a_IniFile)
 	m_HeightFreq1 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "ClassicHeightFreq1", 0.1));
 	m_HeightFreq2 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "ClassicHeightFreq2", 1.0));
 	m_HeightFreq3 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "ClassicHeightFreq3", 2.0));
-	m_HeightAmp1  = static_cast<float>(a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp1",  1.0));
-	m_HeightAmp2  = static_cast<float>(a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp2",  0.5));
-	m_HeightAmp3  = static_cast<float>(a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp3",  0.5));
+	m_HeightAmp1 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp1", 1.0));
+	m_HeightAmp2 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp2", 0.5));
+	m_HeightAmp3 = static_cast<float>(a_IniFile.GetValueSetF("Generator", "ClassicHeightAmp3", 0.5));
 }
 
 
@@ -356,10 +419,7 @@ void cHeiGenClassic::InitializeHeightGen(cIniFile & a_IniFile)
 // cHeiGenMountains:
 
 cHeiGenMountains::cHeiGenMountains(int a_Seed) :
-	m_Seed(a_Seed),
-	m_MountainNoise(a_Seed + 100),
-	m_DitchNoise(a_Seed + 200),
-	m_Perlin(a_Seed + 300)
+	m_Seed(a_Seed), m_MountainNoise(a_Seed + 100), m_DitchNoise(a_Seed + 200), m_Perlin(a_Seed + 300)
 {
 }
 
@@ -370,9 +430,9 @@ cHeiGenMountains::cHeiGenMountains(int a_Seed) :
 void cHeiGenMountains::GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap)
 {
 	NOISE_DATATYPE StartX = static_cast<NOISE_DATATYPE>(a_ChunkCoords.m_ChunkX * cChunkDef::Width);
-	NOISE_DATATYPE EndX   = static_cast<NOISE_DATATYPE>(a_ChunkCoords.m_ChunkX * cChunkDef::Width + cChunkDef::Width - 1);
+	NOISE_DATATYPE EndX = static_cast<NOISE_DATATYPE>(a_ChunkCoords.m_ChunkX * cChunkDef::Width + cChunkDef::Width - 1);
 	NOISE_DATATYPE StartZ = static_cast<NOISE_DATATYPE>(a_ChunkCoords.m_ChunkZ * cChunkDef::Width);
-	NOISE_DATATYPE EndZ   = static_cast<NOISE_DATATYPE>(a_ChunkCoords.m_ChunkZ * cChunkDef::Width + cChunkDef::Width - 1);
+	NOISE_DATATYPE EndZ = static_cast<NOISE_DATATYPE>(a_ChunkCoords.m_ChunkZ * cChunkDef::Width + cChunkDef::Width - 1);
 	NOISE_DATATYPE Workspace[16 * 16];
 	NOISE_DATATYPE MountainNoise[16 * 16];
 	NOISE_DATATYPE DitchNoise[16 * 16];
@@ -386,7 +446,9 @@ void cHeiGenMountains::GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::Heigh
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
 			int idx = IdxZ + x;
-			HEIGHTTYPE hei = static_cast<HEIGHTTYPE>(Clamp(100 - static_cast<int>((MountainNoise[idx] - DitchNoise[idx] + PerlinNoise[idx]) * 15), 10, 250));
+			HEIGHTTYPE hei = static_cast<HEIGHTTYPE>(
+				Clamp(100 - static_cast<int>((MountainNoise[idx] - DitchNoise[idx] + PerlinNoise[idx]) * 15), 10, 250)
+			);
 			cChunkDef::SetHeight(a_HeightMap, x, z, hei);
 		}  // for x
 	}  // for z
@@ -399,10 +461,10 @@ void cHeiGenMountains::GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::Heigh
 void cHeiGenMountains::InitializeHeightGen(cIniFile & a_IniFile)
 {
 	// TODO: Read the params from an INI file
-	m_MountainNoise.AddOctave(0.1f,  0.2f);
+	m_MountainNoise.AddOctave(0.1f, 0.2f);
 	m_MountainNoise.AddOctave(0.05f, 0.4f);
 	m_MountainNoise.AddOctave(0.02f, 1.0f);
-	m_DitchNoise.AddOctave(0.1f,  0.2f);
+	m_DitchNoise.AddOctave(0.1f, 0.2f);
 	m_DitchNoise.AddOctave(0.05f, 0.4f);
 	m_DitchNoise.AddOctave(0.02f, 1.0f);
 
@@ -416,95 +478,187 @@ void cHeiGenMountains::InitializeHeightGen(cIniFile & a_IniFile)
 ////////////////////////////////////////////////////////////////////////////////
 // cHeiGenBiomal:
 
-const cHeiGenBiomal::sGenParam cHeiGenBiomal::m_GenParam[256] =
-{
+const cHeiGenBiomal::sGenParam cHeiGenBiomal::m_GenParam[256] = {
 	/*                        Fast-changing | Middle-changing | Slow-changing | */
 	/* Biome               |  Freq1  | Amp1 | Freq2   | Amp2  | Freq3  | Amp3 | BaseHeight */
-	/* biOcean               */ { 0.1f,   2.0f,  0.05f,    10.0f,  0.01f,    8.0f,  50},
-	/* biPlains              */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  68},
-	/* biDesert              */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  68},
-	/* biExtremeHills        */ { 0.2f,   4.0f,  0.05f,    20.0f,  0.01f,   16.0f, 100},
-	/* biForest              */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  70},
-	/* biTaiga               */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  70},
-	/* biSwampland           */ { 0.1f,   1.1f,  0.05f,     1.5f,  0.02f,    2.5f,  61.5},
-	/* biRiver               */ { 0.2f,   0.1f,  0.05f,     0.1f,  0.01f,    0.1f,  56},
-	/* biNether              */ { 0.1f,   0.0f,  0.01f,     0.0f,  0.01f,    0.0f,   0},  // Unused, but must be here due to indexing
-	/* biSky                 */ { 0.1f,   0.0f,  0.01f,     0.0f,  0.01f,    0.0f,   0},  // Unused, but must be here due to indexing
-	/* biFrozenOcean         */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},
-	/* biFrozenRiver         */ { 0.2f,   0.1f,  0.05f,     0.1f,  0.01f,    0.1f,  56},
-	/* biIcePlains           */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  68},
-	/* biIceMountains        */ { 0.2f,   2.0f,  0.05f,    10.0f,  0.01f,    8.0f,  80},
-	/* biMushroomIsland      */ { 0.1f,   2.0f,  0.05f,     8.0f,  0.01f,    6.0f,  80},
-	/* biMushroomShore       */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  64},
-	/* biBeach               */ { 0.1f,   0.5f,  0.05f,     1.0f,  0.01f,    1.0f,  64},
-	/* biDesertHills         */ { 0.2f,   2.0f,  0.05f,     5.0f,  0.01f,    4.0f,  75},
-	/* biForestHills         */ { 0.2f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  80},
-	/* biTaigaHills          */ { 0.2f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  80},
-	/* biExtremeHillsEdge    */ { 0.2f,   3.0f,  0.05f,    16.0f,  0.01f,   12.0f,  80},
-	/* biJungle              */ { 0.1f,   3.0f,  0.05f,     6.0f,  0.01f,    6.0f,  70},
-	/* biJungleHills         */ { 0.2f,   3.0f,  0.05f,    12.0f,  0.01f,   10.0f,  80},
-	/* biJungleEdge          */ { 0.1f,   3.0f,  0.05f,     6.0f,  0.01f,    6.0f,  70},
-	/* biDeepOcean           */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},
-	/* biStoneBeach          */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},
-	/* biColdBeach           */ { 0.1f,   0.5f,  0.05f,     1.0f,  0.01f,    1.0f,  64},
-	/* biBirchForest         */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  70},
-	/* biBirchForestHills    */ { 0.2f,   2.0f,  0.05f,    10.0f,  0.01f,    8.0f,  80},
-	/* biRoofedForest        */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  70},
-	/* biColdTaiga           */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  70},
-	/* biColdTaigaHills      */ { 0.2f,   2.0f,  0.05f,    10.0f,  0.01f,    8.0f,  80},
-	/* biMegaTaiga           */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  70},
-	/* biMegaTaigaHills      */ { 0.2f,   2.0f,  0.05f,    10.0f,  0.01f,    8.0f,  80},
-	/* biExtremeHillsPlus    */ { 0.2f,   4.0f,  0.05f,    20.0f,  0.01f,   16.0f, 120},
-	/* biSavanna             */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  68},
-	/* biSavannaPlateau      */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  80},
-	/* biMesa                */ { 0.2f,   2.0f,  0.05f,    10.0f,  0.01f,    8.0f,  70},  // 165
-	/* biMesaPlateauF        */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  80},
-	/* biMesaPlateau         */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  80},
+	/* biOcean               */ {0.1f, 2.0f, 0.05f, 10.0f, 0.01f, 8.0f, 50},
+	/* biPlains              */ {0.1f, 1.0f, 0.05f, 1.5f, 0.01f, 4.0f, 68},
+	/* biDesert              */ {0.1f, 1.0f, 0.05f, 1.5f, 0.01f, 4.0f, 68},
+	/* biExtremeHills        */ {0.2f, 4.0f, 0.05f, 20.0f, 0.01f, 16.0f, 100},
+	/* biForest              */ {0.1f, 1.0f, 0.05f, 2.0f, 0.01f, 4.0f, 70},
+	/* biTaiga               */ {0.1f, 1.0f, 0.05f, 2.0f, 0.01f, 4.0f, 70},
+	/* biSwampland           */ {0.1f, 1.1f, 0.05f, 1.5f, 0.02f, 2.5f, 61.5},
+	/* biRiver               */ {0.2f, 0.1f, 0.05f, 0.1f, 0.01f, 0.1f, 56},
+	/* biNether              */ {0.1f, 0.0f, 0.01f, 0.0f, 0.01f, 0.0f, 0},  // Unused, but must be here due to indexing
+	/* biSky                 */ {0.1f, 0.0f, 0.01f, 0.0f, 0.01f, 0.0f, 0},  // Unused, but must be here due to indexing
+	/* biFrozenOcean         */ {0.1f, 2.0f, 0.05f, 12.0f, 0.01f, 10.0f, 40},
+	/* biFrozenRiver         */ {0.2f, 0.1f, 0.05f, 0.1f, 0.01f, 0.1f, 56},
+	/* biIcePlains           */ {0.1f, 1.0f, 0.05f, 1.5f, 0.01f, 4.0f, 68},
+	/* biIceMountains        */ {0.2f, 2.0f, 0.05f, 10.0f, 0.01f, 8.0f, 80},
+	/* biMushroomIsland      */ {0.1f, 2.0f, 0.05f, 8.0f, 0.01f, 6.0f, 80},
+	/* biMushroomShore       */ {0.1f, 1.0f, 0.05f, 2.0f, 0.01f, 4.0f, 64},
+	/* biBeach               */ {0.1f, 0.5f, 0.05f, 1.0f, 0.01f, 1.0f, 64},
+	/* biDesertHills         */ {0.2f, 2.0f, 0.05f, 5.0f, 0.01f, 4.0f, 75},
+	/* biForestHills         */ {0.2f, 2.0f, 0.05f, 12.0f, 0.01f, 10.0f, 80},
+	/* biTaigaHills          */ {0.2f, 2.0f, 0.05f, 12.0f, 0.01f, 10.0f, 80},
+	/* biExtremeHillsEdge    */ {0.2f, 3.0f, 0.05f, 16.0f, 0.01f, 12.0f, 80},
+	/* biJungle              */ {0.1f, 3.0f, 0.05f, 6.0f, 0.01f, 6.0f, 70},
+	/* biJungleHills         */ {0.2f, 3.0f, 0.05f, 12.0f, 0.01f, 10.0f, 80},
+	/* biJungleEdge          */ {0.1f, 3.0f, 0.05f, 6.0f, 0.01f, 6.0f, 70},
+	/* biDeepOcean           */ {0.1f, 2.0f, 0.05f, 12.0f, 0.01f, 10.0f, 40},
+	/* biStoneBeach          */ {0.1f, 2.0f, 0.05f, 12.0f, 0.01f, 10.0f, 40},
+	/* biColdBeach           */ {0.1f, 0.5f, 0.05f, 1.0f, 0.01f, 1.0f, 64},
+	/* biBirchForest         */ {0.1f, 1.0f, 0.05f, 2.0f, 0.01f, 4.0f, 70},
+	/* biBirchForestHills    */ {0.2f, 2.0f, 0.05f, 10.0f, 0.01f, 8.0f, 80},
+	/* biRoofedForest        */ {0.1f, 1.0f, 0.05f, 2.0f, 0.01f, 4.0f, 70},
+	/* biColdTaiga           */ {0.1f, 1.0f, 0.05f, 2.0f, 0.01f, 4.0f, 70},
+	/* biColdTaigaHills      */ {0.2f, 2.0f, 0.05f, 10.0f, 0.01f, 8.0f, 80},
+	/* biMegaTaiga           */ {0.1f, 1.0f, 0.05f, 2.0f, 0.01f, 4.0f, 70},
+	/* biMegaTaigaHills      */ {0.2f, 2.0f, 0.05f, 10.0f, 0.01f, 8.0f, 80},
+	/* biExtremeHillsPlus    */ {0.2f, 4.0f, 0.05f, 20.0f, 0.01f, 16.0f, 120},
+	/* biSavanna             */ {0.1f, 1.0f, 0.05f, 1.5f, 0.01f, 4.0f, 68},
+	/* biSavannaPlateau      */ {0.1f, 1.0f, 0.05f, 1.5f, 0.01f, 4.0f, 80},
+	/* biMesa                */ {0.2f, 2.0f, 0.05f, 10.0f, 0.01f, 8.0f, 70},  // 165
+	/* biMesaPlateauF        */ {0.1f, 1.0f, 0.05f, 1.5f, 0.01f, 4.0f, 80},
+	/* biMesaPlateau         */ {0.1f, 1.0f, 0.05f, 1.5f, 0.01f, 4.0f, 80},
 
 	// biomes 40 .. 128 are unused, 89 empty placeholders here:
-	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 40 .. 49
-	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 50 .. 59
-	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 60 .. 69
-	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 70 .. 79
-	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 80 .. 89
-	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 90 .. 99
-	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 100 .. 109
-	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 110 .. 119
-	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},                                           // 120 .. 128
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 40 .. 49
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 50 .. 59
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 60 .. 69
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 70 .. 79
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 80 .. 89
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 90 .. 99
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 100 .. 109
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 110 .. 119
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 120 .. 128
 
-	/* biSunflowerPlains      */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},  // 129
-	/* biDesertM              */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},  // 130
-	/* biExtremeHillsM        */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},  // 131
-	/* biFlowerForest         */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},  // 132
-	/* biTaigaM               */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},  // 133
-	/* biSwamplandM           */ { 1.0f,   3.0f,  1.10f,     7.0f,  0.01f,   0.01f,  60},  // 134
+	/* biSunflowerPlains      */ {0.1f, 2.0f, 0.05f, 12.0f, 0.01f, 10.0f, 40},  // 129
+	/* biDesertM              */ {0.1f, 2.0f, 0.05f, 12.0f, 0.01f, 10.0f, 40},  // 130
+	/* biExtremeHillsM        */ {0.1f, 2.0f, 0.05f, 12.0f, 0.01f, 10.0f, 40},  // 131
+	/* biFlowerForest         */ {0.1f, 2.0f, 0.05f, 12.0f, 0.01f, 10.0f, 40},  // 132
+	/* biTaigaM               */ {0.1f, 2.0f, 0.05f, 12.0f, 0.01f, 10.0f, 40},  // 133
+	/* biSwamplandM           */ {1.0f, 3.0f, 1.10f, 7.0f, 0.01f, 0.01f, 60},  // 134
 
 	// Biomes 135 .. 139 unused, 5 empty placeholders here:
-	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 135 .. 139
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 135 .. 139
 
-	/* biIcePlainsSpikes      */ { 0.1f,   2.0f,  0.05f,    12.0f,  0.01f,   10.0f,  40},  // 140
+	/* biIcePlainsSpikes      */ {0.1f, 2.0f, 0.05f, 12.0f, 0.01f, 10.0f, 40},  // 140
 
 	// Biomes 141 .. 148 unused, 8 empty placeholders here:
-	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 141 .. 148
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 141 .. 148
 
-	/* biJungleM              */ { 0.1f,   3.0f,  0.05f,     6.0f,  0.01f,    6.0f,  70},  // 149
-	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},                                               // 150
-	/* biJungleEdgeM          */ { 0.1f,   3.0f,  0.05f,     6.0f,  0.01f,    6.0f,  70},  // 151
-	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0}, {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 152 .. 154
-	/* biBirchForestM         */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  70},  // 155
-	/* biBirchForestHillsM    */ { 0.2f,   2.0f,  0.05f,    10.0f,  0.01f,    8.0f,  80},  // 156
-	/* biRoofedForestM        */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  70},  // 157
-	/* biColdTaigaM           */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  70},  // 158
-	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},                                               // 159
-	/* biMegaSpruceTaiga      */ { 0.1f,   1.0f,  0.05f,     2.0f,  0.01f,    4.0f,  70},  // 160
-	/* biMegaSpruceTaigaHills */ { 0.2f,   2.0f,  0.05f,    10.0f,  0.01f,    8.0f,  80},  // 161
-	/* biExtremeHillsPlusM    */ { 0.2f,   4.0f,  0.05f,    20.0f,  0.01f,   16.0f, 120},  // 162
-	/* biSavannaM             */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  68},  // 163
-	/* biSavannaPlateauM      */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  80},  // 164
-	/* biMesaBryce            */ { 0.2f,   2.0f,  0.1f,     30.0f,  0.01f,    8.0f,  80},
-	/* biMesaPlateauFM        */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  80},  // 166
-	/* biMesaPlateauM         */ { 0.1f,   1.0f,  0.05f,     1.5f,  0.01f,    4.0f,  80},  // 167
-} ;
+	/* biJungleM              */ {0.1f, 3.0f, 0.05f, 6.0f, 0.01f, 6.0f, 70},  // 149
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 150
+	/* biJungleEdgeM          */ {0.1f, 3.0f, 0.05f, 6.0f, 0.01f, 6.0f, 70},  // 151
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 152 .. 154
+	/* biBirchForestM         */ {0.1f, 1.0f, 0.05f, 2.0f, 0.01f, 4.0f, 70},  // 155
+	/* biBirchForestHillsM    */ {0.2f, 2.0f, 0.05f, 10.0f, 0.01f, 8.0f, 80},  // 156
+	/* biRoofedForestM        */ {0.1f, 1.0f, 0.05f, 2.0f, 0.01f, 4.0f, 70},  // 157
+	/* biColdTaigaM           */ {0.1f, 1.0f, 0.05f, 2.0f, 0.01f, 4.0f, 70},  // 158
+	{0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0},  // 159
+	/* biMegaSpruceTaiga      */ {0.1f, 1.0f, 0.05f, 2.0f, 0.01f, 4.0f, 70},  // 160
+	/* biMegaSpruceTaigaHills */ {0.2f, 2.0f, 0.05f, 10.0f, 0.01f, 8.0f, 80},  // 161
+	/* biExtremeHillsPlusM    */ {0.2f, 4.0f, 0.05f, 20.0f, 0.01f, 16.0f, 120},  // 162
+	/* biSavannaM             */ {0.1f, 1.0f, 0.05f, 1.5f, 0.01f, 4.0f, 68},  // 163
+	/* biSavannaPlateauM      */ {0.1f, 1.0f, 0.05f, 1.5f, 0.01f, 4.0f, 80},  // 164
+	/* biMesaBryce            */ {0.2f, 2.0f, 0.1f, 30.0f, 0.01f, 8.0f, 80},
+	/* biMesaPlateauFM        */ {0.1f, 1.0f, 0.05f, 1.5f, 0.01f, 4.0f, 80},  // 166
+	/* biMesaPlateauM         */ {0.1f, 1.0f, 0.05f, 1.5f, 0.01f, 4.0f, 80},  // 167
+};
 
 
 
@@ -559,7 +713,13 @@ void cHeiGenBiomal::InitializeHeightGen(cIniFile & a_IniFile)
 
 
 
-NOISE_DATATYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int a_ChunkZ, const cHeiGenBiomal::BiomeNeighbors & a_BiomeNeighbors)
+NOISE_DATATYPE cHeiGenBiomal::GetHeightAt(
+	int a_RelX,
+	int a_RelZ,
+	int a_ChunkX,
+	int a_ChunkZ,
+	const cHeiGenBiomal::BiomeNeighbors & a_BiomeNeighbors
+)
 {
 	// Sum up how many biomes of each type there are in the neighborhood:
 	int BiomeCounts[256];
@@ -606,9 +766,15 @@ NOISE_DATATYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, 
 			ASSERT(m_GenParam[i].m_HeightFreq3 < 1000);
 			*/
 
-			NOISE_DATATYPE oct1 = m_Noise.CubicNoise2D(BlockX * m_GenParam[i].m_HeightFreq1, BlockZ * m_GenParam[i].m_HeightFreq1) * m_GenParam[i].m_HeightAmp1;
-			NOISE_DATATYPE oct2 = m_Noise.CubicNoise2D(BlockX * m_GenParam[i].m_HeightFreq2, BlockZ * m_GenParam[i].m_HeightFreq2) * m_GenParam[i].m_HeightAmp2;
-			NOISE_DATATYPE oct3 = m_Noise.CubicNoise2D(BlockX * m_GenParam[i].m_HeightFreq3, BlockZ * m_GenParam[i].m_HeightFreq3) * m_GenParam[i].m_HeightAmp3;
+			NOISE_DATATYPE oct1 =
+				m_Noise.CubicNoise2D(BlockX * m_GenParam[i].m_HeightFreq1, BlockZ * m_GenParam[i].m_HeightFreq1) *
+				m_GenParam[i].m_HeightAmp1;
+			NOISE_DATATYPE oct2 =
+				m_Noise.CubicNoise2D(BlockX * m_GenParam[i].m_HeightFreq2, BlockZ * m_GenParam[i].m_HeightFreq2) *
+				m_GenParam[i].m_HeightAmp2;
+			NOISE_DATATYPE oct3 =
+				m_Noise.CubicNoise2D(BlockX * m_GenParam[i].m_HeightFreq3, BlockZ * m_GenParam[i].m_HeightFreq3) *
+				m_GenParam[i].m_HeightAmp3;
 			Height += BiomeCounts[i] * (m_GenParam[i].m_BaseHeight + oct1 + oct2 + oct3);
 		}
 		NOISE_DATATYPE res = Height / Sum;
@@ -627,20 +793,16 @@ NOISE_DATATYPE cHeiGenBiomal::GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, 
 ////////////////////////////////////////////////////////////////////////////////
 // cHeiGenMinMax:
 
-class cHeiGenMinMax:
-	public cTerrainHeightGen
+class cHeiGenMinMax : public cTerrainHeightGen
 {
 	using Super = cTerrainHeightGen;
 
 	/** Size of the averaging process, in columns (for each direction). Must be less than 16. */
 	static const int AVERAGING_SIZE = 4;
 
-public:
-
-	cHeiGenMinMax(int a_Seed, cBiomeGen & a_BiomeGen):
-		m_Noise(a_Seed),
-		m_BiomeGen(a_BiomeGen),
-		m_TotalWeight(0)
+  public:
+	cHeiGenMinMax(int a_Seed, cBiomeGen & a_BiomeGen) :
+		m_Noise(a_Seed), m_BiomeGen(a_BiomeGen), m_TotalWeight(0)
 	{
 		// Initialize the weights:
 		for (int z = 0; z <= AVERAGING_SIZE * 2; z++)
@@ -653,9 +815,9 @@ public:
 		}
 
 		// Initialize the Perlin generator:
-		m_Perlin.AddOctave(0.04f,   0.2f);
-		m_Perlin.AddOctave(0.02f,   0.1f);
-		m_Perlin.AddOctave(0.01f,   0.05f);
+		m_Perlin.AddOctave(0.04f, 0.2f);
+		m_Perlin.AddOctave(0.02f, 0.1f);
+		m_Perlin.AddOctave(0.01f, 0.05f);
 	}
 
 
@@ -663,10 +825,14 @@ public:
 	{
 		// Generate the biomes for the 3 * 3 neighbors:
 		cChunkDef::BiomeMap neighborBiomes[3][3];
-		for (int z = 0; z < 3; z++) for (int x = 0; x < 3; x++)
-		{
-			m_BiomeGen.GenBiomes({a_ChunkCoords.m_ChunkX + x - 1, a_ChunkCoords.m_ChunkZ + z - 1}, neighborBiomes[z][x]);
-		}
+		for (int z = 0; z < 3; z++)
+			for (int x = 0; x < 3; x++)
+			{
+				m_BiomeGen.GenBiomes(
+					{a_ChunkCoords.m_ChunkX + x - 1, a_ChunkCoords.m_ChunkZ + z - 1},
+					neighborBiomes[z][x]
+				);
+			}
 
 		// Get the min and max heights based on the biomes:
 		double minHeight[cChunkDef::Width * cChunkDef::Width];
@@ -680,13 +846,13 @@ public:
 				for (int relz = 0; relz <= AVERAGING_SIZE * 2; relz++)
 				{
 					int bz = z + 16 + relz - AVERAGING_SIZE;  // Biome Z coord relative to the neighborBiomes start
-					int cz = bz / 16;                         // Chunk Z coord relative to the neighborBiomes start
-					bz = bz % 16;                             // Biome Z coord relative to cz in neighborBiomes
+					int cz = bz / 16;  // Chunk Z coord relative to the neighborBiomes start
+					bz = bz % 16;  // Biome Z coord relative to cz in neighborBiomes
 					for (int relx = 0; relx <= AVERAGING_SIZE * 2; relx++)
 					{
 						int bx = x + 16 + relx - AVERAGING_SIZE;  // Biome X coord relative to the neighborBiomes start
-						int cx = bx / 16;                         // Chunk X coord relative to the neighborBiomes start
-						bx = bx % 16;                             // Biome X coord relative to cz in neighborBiomes
+						int cx = bx / 16;  // Chunk X coord relative to the neighborBiomes start
+						bx = bx % 16;  // Biome X coord relative to cz in neighborBiomes
 
 						// Get the biome's min and max heights:
 						double bmin, bmax;
@@ -730,7 +896,7 @@ public:
 		// No settings available
 	}
 
-protected:
+  protected:
 	cNoise m_Noise;
 
 	cPerlinNoise m_Perlin;
@@ -750,67 +916,250 @@ protected:
 	{
 		switch (a_Biome)
 		{
-			case biBeach:                a_Min = 61; a_Max = 64; break;
-			case biBirchForest:          a_Min = 63; a_Max = 75; break;
-			case biBirchForestHills:     a_Min = 63; a_Max = 90; break;
-			case biBirchForestHillsM:    a_Min = 63; a_Max = 90; break;
-			case biBirchForestM:         a_Min = 63; a_Max = 75; break;
-			case biColdBeach:            a_Min = 61; a_Max = 64; break;
-			case biColdTaiga:            a_Min = 63; a_Max = 75; break;
-			case biColdTaigaHills:       a_Min = 63; a_Max = 90; break;
-			case biColdTaigaM:           a_Min = 63; a_Max = 75; break;
-			case biDeepOcean:            a_Min = 30; a_Max = 60; break;
-			case biDesert:               a_Min = 63; a_Max = 70; break;
-			case biDesertHills:          a_Min = 63; a_Max = 85; break;
-			case biDesertM:              a_Min = 63; a_Max = 70; break;
-			case biEnd:                  a_Min = 10; a_Max = 100; break;
-			case biExtremeHills:         a_Min = 60; a_Max = 120; break;
-			case biExtremeHillsEdge:     a_Min = 63; a_Max = 100; break;
-			case biExtremeHillsM:        a_Min = 60; a_Max = 120; break;
-			case biExtremeHillsPlus:     a_Min = 60; a_Max = 140; break;
-			case biExtremeHillsPlusM:    a_Min = 60; a_Max = 140; break;
-			case biFlowerForest:         a_Min = 63; a_Max = 75; break;
-			case biForest:               a_Min = 63; a_Max = 75; break;
-			case biForestHills:          a_Min = 63; a_Max = 90; break;
-			case biFrozenOcean:          a_Min = 45; a_Max = 64; break;
-			case biFrozenRiver:          a_Min = 60; a_Max = 62; break;
-			case biIceMountains:         a_Min = 63; a_Max = 90; break;
-			case biIcePlains:            a_Min = 63; a_Max = 70; break;
-			case biIcePlainsSpikes:      a_Min = 60; a_Max = 70; break;
-			case biJungle:               a_Min = 60; a_Max = 80; break;
-			case biJungleEdge:           a_Min = 62; a_Max = 75; break;
-			case biJungleEdgeM:          a_Min = 62; a_Max = 75; break;
-			case biJungleHills:          a_Min = 60; a_Max = 90; break;
-			case biJungleM:              a_Min = 60; a_Max = 75; break;
-			case biMegaSpruceTaiga:      a_Min = 63; a_Max = 75; break;
-			case biMegaSpruceTaigaHills: a_Min = 63; a_Max = 90; break;
-			case biMegaTaiga:            a_Min = 63; a_Max = 75; break;
-			case biMegaTaigaHills:       a_Min = 63; a_Max = 90; break;
-			case biMesa:                 a_Min = 63; a_Max = 90; break;
-			case biMesaBryce:            a_Min = 60; a_Max = 67; break;
-			case biMesaPlateau:          a_Min = 75; a_Max = 85; break;
-			case biMesaPlateauF:         a_Min = 80; a_Max = 90; break;
-			case biMesaPlateauFM:        a_Min = 80; a_Max = 90; break;
-			case biMesaPlateauM:         a_Min = 75; a_Max = 85; break;
-			case biMushroomIsland:       a_Min = 63; a_Max = 90; break;
-			case biMushroomShore:        a_Min = 60; a_Max = 75; break;
-			case biNether:               a_Min = 10; a_Max = 100; break;
-			case biOcean:                a_Min = 45; a_Max = 64; break;
-			case biPlains:               a_Min = 63; a_Max = 70; break;
-			case biRiver:                a_Min = 60; a_Max = 62; break;
-			case biRoofedForest:         a_Min = 63; a_Max = 75; break;
-			case biRoofedForestM:        a_Min = 63; a_Max = 75; break;
-			case biSavanna:              a_Min = 63; a_Max = 75; break;
-			case biSavannaM:             a_Min = 63; a_Max = 80; break;
-			case biSavannaPlateau:       a_Min = 75; a_Max = 100; break;
-			case biSavannaPlateauM:      a_Min = 80; a_Max = 160; break;
-			case biStoneBeach:           a_Min = 60; a_Max = 64; break;
-			case biSunflowerPlains:      a_Min = 63; a_Max = 70; break;
-			case biSwampland:            a_Min = 60; a_Max = 67; break;
-			case biSwamplandM:           a_Min = 61; a_Max = 67; break;
-			case biTaiga:                a_Min = 63; a_Max = 75; break;
-			case biTaigaHills:           a_Min = 63; a_Max = 90; break;
-			case biTaigaM:               a_Min = 63; a_Max = 80; break;
+			case biBeach:
+				a_Min = 61;
+				a_Max = 64;
+				break;
+			case biBirchForest:
+				a_Min = 63;
+				a_Max = 75;
+				break;
+			case biBirchForestHills:
+				a_Min = 63;
+				a_Max = 90;
+				break;
+			case biBirchForestHillsM:
+				a_Min = 63;
+				a_Max = 90;
+				break;
+			case biBirchForestM:
+				a_Min = 63;
+				a_Max = 75;
+				break;
+			case biColdBeach:
+				a_Min = 61;
+				a_Max = 64;
+				break;
+			case biColdTaiga:
+				a_Min = 63;
+				a_Max = 75;
+				break;
+			case biColdTaigaHills:
+				a_Min = 63;
+				a_Max = 90;
+				break;
+			case biColdTaigaM:
+				a_Min = 63;
+				a_Max = 75;
+				break;
+			case biDeepOcean:
+				a_Min = 30;
+				a_Max = 60;
+				break;
+			case biDesert:
+				a_Min = 63;
+				a_Max = 70;
+				break;
+			case biDesertHills:
+				a_Min = 63;
+				a_Max = 85;
+				break;
+			case biDesertM:
+				a_Min = 63;
+				a_Max = 70;
+				break;
+			case biEnd:
+				a_Min = 10;
+				a_Max = 100;
+				break;
+			case biExtremeHills:
+				a_Min = 60;
+				a_Max = 120;
+				break;
+			case biExtremeHillsEdge:
+				a_Min = 63;
+				a_Max = 100;
+				break;
+			case biExtremeHillsM:
+				a_Min = 60;
+				a_Max = 120;
+				break;
+			case biExtremeHillsPlus:
+				a_Min = 60;
+				a_Max = 140;
+				break;
+			case biExtremeHillsPlusM:
+				a_Min = 60;
+				a_Max = 140;
+				break;
+			case biFlowerForest:
+				a_Min = 63;
+				a_Max = 75;
+				break;
+			case biForest:
+				a_Min = 63;
+				a_Max = 75;
+				break;
+			case biForestHills:
+				a_Min = 63;
+				a_Max = 90;
+				break;
+			case biFrozenOcean:
+				a_Min = 45;
+				a_Max = 64;
+				break;
+			case biFrozenRiver:
+				a_Min = 60;
+				a_Max = 62;
+				break;
+			case biIceMountains:
+				a_Min = 63;
+				a_Max = 90;
+				break;
+			case biIcePlains:
+				a_Min = 63;
+				a_Max = 70;
+				break;
+			case biIcePlainsSpikes:
+				a_Min = 60;
+				a_Max = 70;
+				break;
+			case biJungle:
+				a_Min = 60;
+				a_Max = 80;
+				break;
+			case biJungleEdge:
+				a_Min = 62;
+				a_Max = 75;
+				break;
+			case biJungleEdgeM:
+				a_Min = 62;
+				a_Max = 75;
+				break;
+			case biJungleHills:
+				a_Min = 60;
+				a_Max = 90;
+				break;
+			case biJungleM:
+				a_Min = 60;
+				a_Max = 75;
+				break;
+			case biMegaSpruceTaiga:
+				a_Min = 63;
+				a_Max = 75;
+				break;
+			case biMegaSpruceTaigaHills:
+				a_Min = 63;
+				a_Max = 90;
+				break;
+			case biMegaTaiga:
+				a_Min = 63;
+				a_Max = 75;
+				break;
+			case biMegaTaigaHills:
+				a_Min = 63;
+				a_Max = 90;
+				break;
+			case biMesa:
+				a_Min = 63;
+				a_Max = 90;
+				break;
+			case biMesaBryce:
+				a_Min = 60;
+				a_Max = 67;
+				break;
+			case biMesaPlateau:
+				a_Min = 75;
+				a_Max = 85;
+				break;
+			case biMesaPlateauF:
+				a_Min = 80;
+				a_Max = 90;
+				break;
+			case biMesaPlateauFM:
+				a_Min = 80;
+				a_Max = 90;
+				break;
+			case biMesaPlateauM:
+				a_Min = 75;
+				a_Max = 85;
+				break;
+			case biMushroomIsland:
+				a_Min = 63;
+				a_Max = 90;
+				break;
+			case biMushroomShore:
+				a_Min = 60;
+				a_Max = 75;
+				break;
+			case biNether:
+				a_Min = 10;
+				a_Max = 100;
+				break;
+			case biOcean:
+				a_Min = 45;
+				a_Max = 64;
+				break;
+			case biPlains:
+				a_Min = 63;
+				a_Max = 70;
+				break;
+			case biRiver:
+				a_Min = 60;
+				a_Max = 62;
+				break;
+			case biRoofedForest:
+				a_Min = 63;
+				a_Max = 75;
+				break;
+			case biRoofedForestM:
+				a_Min = 63;
+				a_Max = 75;
+				break;
+			case biSavanna:
+				a_Min = 63;
+				a_Max = 75;
+				break;
+			case biSavannaM:
+				a_Min = 63;
+				a_Max = 80;
+				break;
+			case biSavannaPlateau:
+				a_Min = 75;
+				a_Max = 100;
+				break;
+			case biSavannaPlateauM:
+				a_Min = 80;
+				a_Max = 160;
+				break;
+			case biStoneBeach:
+				a_Min = 60;
+				a_Max = 64;
+				break;
+			case biSunflowerPlains:
+				a_Min = 63;
+				a_Max = 70;
+				break;
+			case biSwampland:
+				a_Min = 60;
+				a_Max = 67;
+				break;
+			case biSwamplandM:
+				a_Min = 61;
+				a_Max = 67;
+				break;
+			case biTaiga:
+				a_Min = 63;
+				a_Max = 75;
+				break;
+			case biTaigaHills:
+				a_Min = 63;
+				a_Max = 90;
+				break;
+			case biTaigaM:
+				a_Min = 63;
+				a_Max = 80;
+				break;
 			case biInvalidBiome:
 			case biNumBiomes:
 			case biVariant:
@@ -832,7 +1181,12 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cTerrainHeightGen:
 
-std::unique_ptr<cTerrainHeightGen> cTerrainHeightGen::CreateHeightGen(cIniFile & a_IniFile, cBiomeGen & a_BiomeGen, int a_Seed, bool & a_CacheOffByDefault)
+std::unique_ptr<cTerrainHeightGen> cTerrainHeightGen::CreateHeightGen(
+	cIniFile & a_IniFile,
+	cBiomeGen & a_BiomeGen,
+	int a_Seed,
+	bool & a_CacheOffByDefault
+)
 {
 	AString HeightGenName = a_IniFile.GetValueSet("Generator", "HeightGen", "");
 	if (HeightGenName.empty())
@@ -854,14 +1208,14 @@ std::unique_ptr<cTerrainHeightGen> cTerrainHeightGen::CreateHeightGen(cIniFile &
 	}
 	else if (NoCaseCompare(HeightGenName, "DistortedHeightmap") == 0)
 	{
-		// Not a heightmap-based generator, but it used to be accessible via HeightGen, so we need to skip making the default out of it
-		// Return an empty pointer, the caller will create the proper generator:
+		// Not a heightmap-based generator, but it used to be accessible via HeightGen, so we need to skip making the
+		// default out of it Return an empty pointer, the caller will create the proper generator:
 		return nullptr;
 	}
 	else if (NoCaseCompare(HeightGenName, "End") == 0)
 	{
-		// Not a heightmap-based generator, but it used to be accessible via HeightGen, so we need to skip making the default out of it
-		// Return an empty pointer, the caller will create the proper generator:
+		// Not a heightmap-based generator, but it used to be accessible via HeightGen, so we need to skip making the
+		// default out of it Return an empty pointer, the caller will create the proper generator:
 		return nullptr;
 	}
 	else if (NoCaseCompare(HeightGenName, "MinMax") == 0)
@@ -874,8 +1228,8 @@ std::unique_ptr<cTerrainHeightGen> cTerrainHeightGen::CreateHeightGen(cIniFile &
 	}
 	else if (NoCaseCompare(HeightGenName, "BiomalNoise3D") == 0)
 	{
-		// Not a heightmap-based generator, but it used to be accessible via HeightGen, so we need to skip making the default out of it
-		// Return an empty pointer, the caller will create the proper generator:
+		// Not a heightmap-based generator, but it used to be accessible via HeightGen, so we need to skip making the
+		// default out of it Return an empty pointer, the caller will create the proper generator:
 		return nullptr;
 	}
 	else if (NoCaseCompare(HeightGenName, "Steppy") == 0)
@@ -884,8 +1238,8 @@ std::unique_ptr<cTerrainHeightGen> cTerrainHeightGen::CreateHeightGen(cIniFile &
 	}
 	else if (NoCaseCompare(HeightGenName, "Noise3D") == 0)
 	{
-		// Not a heightmap-based generator, but it used to be accessible via HeightGen, so we need to skip making the default out of it
-		// Return an empty pointer, the caller will create the proper generator:
+		// Not a heightmap-based generator, but it used to be accessible via HeightGen, so we need to skip making the
+		// default out of it Return an empty pointer, the caller will create the proper generator:
 		return nullptr;
 	}
 	else if (NoCaseCompare(HeightGenName, "Biomal") == 0)
@@ -918,8 +1272,3 @@ std::unique_ptr<cTerrainHeightGen> cTerrainHeightGen::CreateHeightGen(cIniFile &
 
 	return res;
 }
-
-
-
-
-

@@ -1,7 +1,8 @@
 
 // ProjectileEntity.cpp
 
-// Implements the cProjectileEntity class representing the common base class for projectiles, as well as individual projectile types
+// Implements the cProjectileEntity class representing the common base class for projectiles, as well as individual
+// projectile types
 
 #include "Globals.h"
 
@@ -33,24 +34,23 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cProjectileTracerCallback:
 
-class cProjectileTracerCallback :
-	public cBlockTracer::cCallbacks
+class cProjectileTracerCallback : public cBlockTracer::cCallbacks
 {
-public:
+  public:
 	cProjectileTracerCallback(cProjectileEntity * a_Projectile) :
-		m_Projectile(a_Projectile),
-		m_SlowdownCoeff(0.99)  // Default slowdown when not in water
+		m_Projectile(a_Projectile), m_SlowdownCoeff(0.99)  // Default slowdown when not in water
 	{
 	}
 
 	double GetSlowdownCoeff(void) const { return m_SlowdownCoeff; }
 
-protected:
+  protected:
 	cProjectileEntity * m_Projectile;
 	double m_SlowdownCoeff;
 
 	// cCallbacks overrides:
-	virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace)
+		override
 	{
 		/*
 		// DEBUG:
@@ -66,14 +66,18 @@ protected:
 		{
 			// The projectile hit a solid block, calculate the exact hit coords:
 			cBoundingBox bb(a_BlockPos, a_BlockPos + Vector3i(1, 1, 1));  // Bounding box of the block hit
-			const Vector3d LineStart = m_Projectile->GetPosition();  // Start point for the imaginary line that goes through the block hit
-			const Vector3d LineEnd = LineStart + m_Projectile->GetSpeed();  // End point for the imaginary line that goes through the block hit
-			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
+			const Vector3d LineStart =
+				m_Projectile->GetPosition();  // Start point for the imaginary line that goes through the block hit
+			const Vector3d LineEnd = LineStart +
+				m_Projectile->GetSpeed();  // End point for the imaginary line that goes through the block hit
+			double LineCoeff =
+				0;  // Used to calculate where along the line an intersection with the bounding box occurs
 			eBlockFace Face;  // Face hit
 
 			if (bb.CalcLineIntersection(LineStart, LineEnd, LineCoeff, Face))
 			{
-				Vector3d Intersection = LineStart + m_Projectile->GetSpeed() * LineCoeff;  // Point where projectile goes into the hit block
+				Vector3d Intersection =
+					LineStart + m_Projectile->GetSpeed() * LineCoeff;  // Point where projectile goes into the hit block
 
 				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, a_BlockPos, Face, Intersection))
 				{
@@ -96,14 +100,16 @@ protected:
 			case E_BLOCK_STATIONARY_LAVA:
 			{
 				m_Projectile->StartBurning(30);
-				m_SlowdownCoeff = std::min(m_SlowdownCoeff, 0.9);  // Slow down to 0.9* the speed each tick when moving through lava
+				m_SlowdownCoeff =
+					std::min(m_SlowdownCoeff, 0.9);  // Slow down to 0.9* the speed each tick when moving through lava
 				break;
 			}
 			case E_BLOCK_WATER:
 			case E_BLOCK_STATIONARY_WATER:
 			{
 				m_Projectile->StopBurning();
-				m_SlowdownCoeff = std::min(m_SlowdownCoeff, 0.8);  // Slow down to 0.8* the speed each tick when moving through water
+				m_SlowdownCoeff =
+					std::min(m_SlowdownCoeff, 0.8);  // Slow down to 0.8* the speed each tick when moving through water
 				break;
 			}
 		}  // switch (a_BlockType)
@@ -111,7 +117,7 @@ protected:
 		// Continue tracing
 		return false;
 	}
-} ;
+};
 
 
 
@@ -122,21 +128,20 @@ protected:
 
 class cProjectileEntityCollisionCallback
 {
-public:
-	cProjectileEntityCollisionCallback(cProjectileEntity * a_Projectile, const Vector3d & a_Pos, const Vector3d & a_NextPos) :
-		m_Projectile(a_Projectile),
-		m_Pos(a_Pos),
-		m_NextPos(a_NextPos),
-		m_MinCoeff(1),
-		m_HitEntity(nullptr)
+  public:
+	cProjectileEntityCollisionCallback(
+		cProjectileEntity * a_Projectile,
+		const Vector3d & a_Pos,
+		const Vector3d & a_NextPos
+	) :
+		m_Projectile(a_Projectile), m_Pos(a_Pos), m_NextPos(a_NextPos), m_MinCoeff(1), m_HitEntity(nullptr)
 	{
 	}
 
 
-	bool operator () (cEntity & a_Entity)
+	bool operator()(cEntity & a_Entity)
 	{
-		if (
-			(&a_Entity == m_Projectile) ||          // Do not check collisions with self
+		if ((&a_Entity == m_Projectile) ||  // Do not check collisions with self
 			(a_Entity.GetUniqueID() == m_Projectile->GetCreatorUniqueID())  // Do not check whoever shot the projectile
 		)
 		{
@@ -149,8 +154,8 @@ public:
 
 		auto EntBox = a_Entity.GetBoundingBox();
 
-		// Instead of colliding the bounding box with another bounding box in motion, we collide an enlarged bounding box with a hairline.
-		// The results should be good enough for our purposes
+		// Instead of colliding the bounding box with another bounding box in motion, we collide an enlarged bounding
+		// box with a hairline. The results should be good enough for our purposes
 		double LineCoeff;
 		eBlockFace Face;
 		EntBox.Expand(m_Projectile->GetWidth() / 2, m_Projectile->GetHeight() / 2, m_Projectile->GetWidth() / 2);
@@ -160,16 +165,9 @@ public:
 			return false;
 		}
 
-		if (
-			!a_Entity.IsMob() &&
-			!a_Entity.IsMinecart() &&
-			(
-				!a_Entity.IsPlayer() ||
-				static_cast<cPlayer &>(a_Entity).IsGameModeSpectator()
-			) &&
-			!a_Entity.IsBoat() &&
-			!a_Entity.IsEnderCrystal()
-		)
+		if (!a_Entity.IsMob() && !a_Entity.IsMinecart() &&
+			(!a_Entity.IsPlayer() || static_cast<cPlayer &>(a_Entity).IsGameModeSpectator()) && !a_Entity.IsBoat() &&
+			!a_Entity.IsEnderCrystal())
 		{
 			// Not an entity that interacts with a projectile
 			return false;
@@ -201,16 +199,17 @@ public:
 	/** Returns true if the callback has encountered a true hit */
 	bool HasHit(void) const { return (m_MinCoeff < 1); }
 
-protected:
+  protected:
 	cProjectileEntity * m_Projectile;
 	const Vector3d & m_Pos;
 	const Vector3d & m_NextPos;
 	double m_MinCoeff;  // The coefficient of the nearest hit on the Pos line
 
 	// Although it's bad(tm) to store entity ptrs from a callback, we can afford it here, because the entire callback
-	// is processed inside the tick thread, so the entities won't be removed in between the calls and the final processing
+	// is processed inside the tick thread, so the entities won't be removed in between the calls and the final
+	// processing
 	cEntity * m_HitEntity;  // The nearest hit entity
-} ;
+};
 
 
 
@@ -219,7 +218,7 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cProjectileEntity:
 
-cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, float a_Width, float a_Height):
+cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, float a_Width, float a_Height) :
 	Super(etProjectile, a_Pos, a_Width, a_Height),
 	m_ProjectileKind(a_Kind),
 	m_CreatorData(
@@ -237,7 +236,14 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d
 
 
 
-cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed, float a_Width, float a_Height):
+cProjectileEntity::cProjectileEntity(
+	eKind a_Kind,
+	cEntity * a_Creator,
+	Vector3d a_Pos,
+	Vector3d a_Speed,
+	float a_Width,
+	float a_Height
+) :
 	cProjectileEntity(a_Kind, a_Creator, a_Pos, a_Width, a_Height)
 {
 	SetSpeed(a_Speed);
@@ -265,15 +271,15 @@ std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(
 
 	switch (a_Kind)
 	{
-		case pkArrow:         return std::make_unique<cArrowEntity>           (a_Creator, a_Pos, Speed);
-		case pkEgg:           return std::make_unique<cThrownEggEntity>       (a_Creator, a_Pos, Speed);
+		case pkArrow:         return std::make_unique<cArrowEntity>(a_Creator, a_Pos, Speed);
+		case pkEgg:           return std::make_unique<cThrownEggEntity>(a_Creator, a_Pos, Speed);
 		case pkEnderPearl:    return std::make_unique<cThrownEnderPearlEntity>(a_Creator, a_Pos, Speed);
-		case pkSnowball:      return std::make_unique<cThrownSnowballEntity>  (a_Creator, a_Pos, Speed);
-		case pkGhastFireball: return std::make_unique<cGhastFireballEntity>   (a_Creator, a_Pos, Speed);
-		case pkFireCharge:    return std::make_unique<cFireChargeEntity>      (a_Creator, a_Pos, Speed);
-		case pkExpBottle:     return std::make_unique<cExpBottleEntity>       (a_Creator, a_Pos, Speed);
-		case pkSplashPotion:  return std::make_unique<cSplashPotionEntity>    (a_Creator, a_Pos, Speed, *a_Item);
-		case pkWitherSkull:   return std::make_unique<cWitherSkullEntity>     (a_Creator, a_Pos, Speed);
+		case pkSnowball:      return std::make_unique<cThrownSnowballEntity>(a_Creator, a_Pos, Speed);
+		case pkGhastFireball: return std::make_unique<cGhastFireballEntity>(a_Creator, a_Pos, Speed);
+		case pkFireCharge:    return std::make_unique<cFireChargeEntity>(a_Creator, a_Pos, Speed);
+		case pkExpBottle:     return std::make_unique<cExpBottleEntity>(a_Creator, a_Pos, Speed);
+		case pkSplashPotion:  return std::make_unique<cSplashPotionEntity>(a_Creator, a_Pos, Speed, *a_Item);
+		case pkWitherSkull:   return std::make_unique<cWitherSkullEntity>(a_Creator, a_Pos, Speed);
 		case pkFirework:
 		{
 			ASSERT(a_Item != nullptr);
@@ -301,9 +307,7 @@ void cProjectileEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 	SetSpeed(0, 0, 0);
 
 	// DEBUG:
-	FLOGD("Projectile {0}: pos {1:.02f}, hit solid block at face {2}",
-		m_UniqueID, a_HitPos, a_HitFace
-	);
+	FLOGD("Projectile {0}: pos {1:.02f}, hit solid block at face {2}", m_UniqueID, a_HitPos, a_HitFace);
 
 	m_IsInGround = true;
 }
@@ -320,9 +324,11 @@ void cProjectileEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 	if (a_EntityHit.IsPawn() && (GetCreatorName() != ""))
 	{
 		auto EntityHit = static_cast<cPawn *>(&a_EntityHit);
-		m_World->DoWithEntityByID(GetCreatorUniqueID(), [=](cEntity & a_Hitter)
+		m_World->DoWithEntityByID(
+			GetCreatorUniqueID(),
+			[=](cEntity & a_Hitter)
 			{
-				static_cast<cPlayer&>(a_Hitter).NotifyNearbyWolves(EntityHit, true);
+				static_cast<cPlayer &>(a_Hitter).NotifyNearbyWolves(EntityHit, true);
 				return true;
 			}
 		);
@@ -393,7 +399,8 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 		Vector3d HitPos = Pos + (NextPos - Pos) * EntityCollisionCallback.GetMinCoeff();
 
 		// DEBUG:
-		FLOGD("Projectile {0} has hit an entity {1} ({2}) at {3:.02f} (coeff {4:.03f})",
+		FLOGD(
+			"Projectile {0} has hit an entity {1} ({2}) at {3:.02f} (coeff {4:.03f})",
 			m_UniqueID,
 			EntityCollisionCallback.GetHitEntity()->GetUniqueID(),
 			EntityCollisionCallback.GetHitEntity()->GetClass(),
@@ -416,7 +423,8 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 		// Something has been hit, abort all other processing
 		return;
 	}
-	// The tracer also checks the blocks for slowdown blocks - water and lava - and stores it for later in its SlowdownCoeff
+	// The tracer also checks the blocks for slowdown blocks - water and lava - and stores it for later in its
+	// SlowdownCoeff
 
 	// Update the position:
 	SetPosition(NextPos);
@@ -455,4 +463,3 @@ void cProjectileEntity::CollectedBy(cPlayer & a_Dest)
 	// Overriden in arrow
 	UNUSED(a_Dest);
 }
-

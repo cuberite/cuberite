@@ -14,18 +14,13 @@
 
 
 
-class cTwoHeights:
-	public cTerrainShapeGen
+class cTwoHeights : public cTerrainShapeGen
 {
 	using Super = cTerrainShapeGen;
 
-public:
-
-	cTwoHeights(int a_Seed, cBiomeGen & a_BiomeGen):
-		m_Seed(a_Seed),
-		m_Choice(a_Seed),
-		m_HeightA(a_Seed + 1, a_BiomeGen),
-		m_HeightB(a_Seed + 2, a_BiomeGen)
+  public:
+	cTwoHeights(int a_Seed, cBiomeGen & a_BiomeGen) :
+		m_Seed(a_Seed), m_Choice(a_Seed), m_HeightA(a_Seed + 1, a_BiomeGen), m_HeightB(a_Seed + 2, a_BiomeGen)
 	{
 	}
 
@@ -44,10 +39,10 @@ public:
 		NOISE_DATATYPE workspace[33 * 5 * 5];
 		NOISE_DATATYPE startX = 0;
 		NOISE_DATATYPE endX = 256 * m_FrequencyY;
-		NOISE_DATATYPE startY =  a_ChunkCoords.m_ChunkX * cChunkDef::Width * m_FrequencyX;
-		NOISE_DATATYPE endY   = (a_ChunkCoords.m_ChunkX * cChunkDef::Width + cChunkDef::Width + 1) * m_FrequencyX;
-		NOISE_DATATYPE startZ =  a_ChunkCoords.m_ChunkZ * cChunkDef::Width * m_FrequencyZ;
-		NOISE_DATATYPE endZ   = (a_ChunkCoords.m_ChunkZ * cChunkDef::Width + cChunkDef::Width + 1) * m_FrequencyZ;
+		NOISE_DATATYPE startY = a_ChunkCoords.m_ChunkX * cChunkDef::Width * m_FrequencyX;
+		NOISE_DATATYPE endY = (a_ChunkCoords.m_ChunkX * cChunkDef::Width + cChunkDef::Width + 1) * m_FrequencyX;
+		NOISE_DATATYPE startZ = a_ChunkCoords.m_ChunkZ * cChunkDef::Width * m_FrequencyZ;
+		NOISE_DATATYPE endZ = (a_ChunkCoords.m_ChunkZ * cChunkDef::Width + cChunkDef::Width + 1) * m_FrequencyZ;
 		m_Choice.Generate3D(smallChoice, 33, 5, 5, startX, endX, startY, endY, startZ, endZ, workspace);
 		NOISE_DATATYPE choice[257 * 17 * 17];
 		LinearUpscale3DArray(smallChoice, 33, 5, 5, choice, 8, 4, 4);
@@ -93,7 +88,7 @@ public:
 		}
 	}
 
-protected:
+  protected:
 	int m_Seed;
 
 	/** The noise used to decide between the two heightmaps. */

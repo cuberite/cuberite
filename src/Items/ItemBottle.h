@@ -9,13 +9,11 @@
 
 
 
-class cItemBottleHandler final:
-	public cItemHandler
+class cItemBottleHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 
@@ -27,20 +25,24 @@ public:
 	Returns false if not. */
 	bool GetBlockFromTrace(cWorld * a_World, cPlayer * a_Player, Vector3i & a_BlockPos) const
 	{
-		class cCallbacks:
-			public cBlockTracer::cCallbacks
+		class cCallbacks : public cBlockTracer::cCallbacks
 		{
-		public:
+		  public:
 			Vector3i m_Pos;
-			bool     m_HasHitFluid;
+			bool m_HasHitFluid;
 
 
-			cCallbacks():
+			cCallbacks() :
 				m_HasHitFluid(false)
 			{
 			}
 
-			virtual bool OnNextBlock(Vector3i a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+			virtual bool OnNextBlock(
+				Vector3i a_BlockPosition,
+				BLOCKTYPE a_BlockType,
+				NIBBLETYPE a_BlockMeta,
+				eBlockFace a_EntryFace
+			) override
 			{
 				if (IsBlockWater(a_BlockType))
 				{
@@ -98,8 +100,4 @@ public:
 		}
 		return true;
 	}
-} ;
-
-
-
-
+};

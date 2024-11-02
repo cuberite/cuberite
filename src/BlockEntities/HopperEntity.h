@@ -16,8 +16,7 @@
 
 
 // tolua_begin
-class cHopperEntity :
-	public cBlockEntityWithItems
+class cHopperEntity : public cBlockEntityWithItems
 {
 	// tolua_end
 
@@ -25,13 +24,12 @@ class cHopperEntity :
 
 	// tolua_begin
 
-public:
-
+  public:
 	enum
 	{
 		ContentsHeight = 1,
-		ContentsWidth  = 5
-	} ;
+		ContentsWidth = 5
+	};
 
 	// tolua_end
 
@@ -45,8 +43,7 @@ public:
 
 	void SetLocked(bool a_Value);
 
-protected:
-
+  protected:
 	cTickTimeLong m_LastMoveItemsInTick;
 	cTickTimeLong m_LastMoveItemsOutTick;
 
@@ -77,7 +74,8 @@ protected:
 	/** Moves items from the specified a_Entity's Contents into this hopper. Returns true if contents have changed. */
 	bool MoveItemsFromGrid(cBlockEntityWithItems & a_Entity);
 
-	/** Moves one piece from the specified itemstack into this hopper. Returns true if contents have changed. Doesn't change the itemstack. */
+	/** Moves one piece from the specified itemstack into this hopper. Returns true if contents have changed. Doesn't
+	 * change the itemstack. */
 	bool MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_SrcSlotNum);
 
 	/** Moves items to the chest at the specified absolute coords. Returns true if contents have changed */
@@ -92,7 +90,6 @@ protected:
 	/** Moves one piece to the specified entity's contents' slot. Returns true if contents have changed. */
 	bool MoveItemsToSlot(cBlockEntityWithItems & a_Entity, int a_DstSlotNum);
 
-private:
-
+  private:
 	bool m_Locked;
-} ;  // tolua_export
+};  // tolua_export

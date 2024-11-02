@@ -11,7 +11,7 @@
 /** UUID normalised in textual form. */
 struct sShortUUID
 {
-	char Data[32]{};
+	char Data[32] {};
 	bool IsValid = false;
 };
 
@@ -32,21 +32,17 @@ static sShortUUID ShortenUUID(const AString & a_StringUUID)
 		case 36:
 		{
 			// Long UUID, confirm dashed
-			if (
-				(a_StringUUID[ 8] != '-') ||
-				(a_StringUUID[13] != '-') ||
-				(a_StringUUID[18] != '-') ||
-				(a_StringUUID[23] != '-')
-			)
+			if ((a_StringUUID[8] != '-') || (a_StringUUID[13] != '-') || (a_StringUUID[18] != '-') ||
+				(a_StringUUID[23] != '-'))
 			{
 				break;
 			}
 
 			// Copy everying but the dashes from the string
-			std::memcpy(UUID.Data,      a_StringUUID.data(),       8);
-			std::memcpy(UUID.Data +  8, a_StringUUID.data() +  9,  4);
-			std::memcpy(UUID.Data + 12, a_StringUUID.data() + 14,  4);
-			std::memcpy(UUID.Data + 16, a_StringUUID.data() + 19,  4);
+			std::memcpy(UUID.Data, a_StringUUID.data(), 8);
+			std::memcpy(UUID.Data + 8, a_StringUUID.data() + 9, 4);
+			std::memcpy(UUID.Data + 12, a_StringUUID.data() + 14, 4);
+			std::memcpy(UUID.Data + 16, a_StringUUID.data() + 19, 4);
 			std::memcpy(UUID.Data + 20, a_StringUUID.data() + 24, 12);
 			UUID.IsValid = true;
 		}
@@ -85,11 +81,7 @@ static Byte FromHexDigit(char a_Hex)
 static char ToHexDigit(UInt8 a_Nibble)
 {
 	ASSERT((a_Nibble & 0xf0) == 0);
-	return static_cast<char>(
-		(a_Nibble < 10) ?
-		('0' + a_Nibble) :
-		('a' + (a_Nibble - 10))
-	);
+	return static_cast<char>((a_Nibble < 10) ? ('0' + a_Nibble) : ('a' + (a_Nibble - 10)));
 }
 
 
@@ -107,11 +99,11 @@ bool cUUID::FromString(const AString & a_StringUUID)
 		return false;
 	}
 
-	std::array<Byte, 16> ParsedUUID{{0}};
+	std::array<Byte, 16> ParsedUUID {{0}};
 	for (size_t i = 0; i != m_UUID.size(); ++i)
 	{
-		Byte HighNibble = FromHexDigit(Norm.Data[2 * i    ]);
-		Byte LowNibble  = FromHexDigit(Norm.Data[2 * i + 1]);
+		Byte HighNibble = FromHexDigit(Norm.Data[2 * i]);
+		Byte LowNibble = FromHexDigit(Norm.Data[2 * i + 1]);
 		if ((HighNibble > 0x0f) || (LowNibble > 0x0f))
 		{
 			// Invalid hex digit
@@ -136,9 +128,9 @@ AString cUUID::ToShortString() const
 	for (size_t i = 0; i != m_UUID.size(); ++i)
 	{
 		Byte HighNibble = (m_UUID[i] >> 4) & 0x0f;
-		Byte LowNibble  = m_UUID[i] & 0x0f;
+		Byte LowNibble = m_UUID[i] & 0x0f;
 
-		ShortString[2 * i    ] = ToHexDigit(HighNibble);
+		ShortString[2 * i] = ToHexDigit(HighNibble);
 		ShortString[2 * i + 1] = ToHexDigit(LowNibble);
 	}
 	return ShortString;
@@ -155,7 +147,7 @@ AString cUUID::ToLongString() const
 
 	// Convert to long form by inserting the dashes
 	auto First = LongString.begin();
-	LongString.insert(First +  8, '-');
+	LongString.insert(First + 8, '-');
 	LongString.insert(First + 13, '-');
 	LongString.insert(First + 18, '-');
 	LongString.insert(First + 23, '-');
@@ -275,7 +267,3 @@ cUUID cUUID::GenerateVersion3(const AString & a_Name)
 
 	return UUID;
 }
-
-
-
-

@@ -1,5 +1,5 @@
 
-//  WitherSkullEntity.cpp
+// WitherSkullEntity.cpp
 
 // Implements the cWitherSkullEntity class representing the entity used by both blue and black wither skulls
 
@@ -12,7 +12,7 @@
 
 
 
-cWitherSkullEntity::cWitherSkullEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
+cWitherSkullEntity::cWitherSkullEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed) :
 	Super(pkWitherSkull, a_Creator, a_Pos, 0.3125f, 0.3125f)
 {
 	SetSpeed(a_Speed);
@@ -45,7 +45,3 @@ void cWitherSkullEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 
 	Destroy();
 }
-
-
-
-

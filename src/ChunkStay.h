@@ -34,7 +34,7 @@ different threads' - the caller, the Loader or the Generator thread.
 */
 class cChunkStay
 {
-public:
+  public:
 	cChunkStay(void);
 
 	/** Deletes the object. Note that this calls Clear(), which means that the ChunkStay needs to be disabled. */
@@ -54,9 +54,10 @@ public:
 
 	/** Enables the ChunkStay on the specified chunkmap, causing it to load and generate chunks.
 	All the contained chunks are queued for loading / generating. */
-	void Enable (cChunkMap & a_ChunkMap);
+	void Enable(cChunkMap & a_ChunkMap);
 
-	/** Disables the ChunkStay, the chunks are released and the ChunkStay object can be edited with Add() and Remove() again */
+	/** Disables the ChunkStay, the chunks are released and the ChunkStay object can be edited with Add() and Remove()
+	 * again */
 	virtual void Disable(void);
 
 	/** Returns all the chunks that should be kept */
@@ -66,14 +67,14 @@ public:
 	virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) = 0;
 
 	/** Called once all of the contained chunks are available.
-	If returns true, the ChunkStay is automatically disabled by the ChunkMap; if it returns false, the ChunkStay is kept. */
+	If returns true, the ChunkStay is automatically disabled by the ChunkMap; if it returns false, the ChunkStay is
+	kept. */
 	virtual bool OnAllChunksAvailable(void) = 0;
 
 	/** Called by the ChunkMap when the ChunkStay is disabled. The object may choose to delete itself. */
 	virtual void OnDisabled(void) = 0;
 
-protected:
-
+  protected:
 	friend class cChunkMap;
 
 
@@ -90,11 +91,7 @@ protected:
 
 	/** Called by cChunkMap when a chunk is available, checks m_NumLoaded and triggers the appropriate callbacks.
 	May be called for chunks outside this ChunkStay.
-	Returns true if the ChunkStay is to be automatically disabled by the ChunkMap; returns false to keep the ChunkStay. */
+	Returns true if the ChunkStay is to be automatically disabled by the ChunkMap; returns false to keep the ChunkStay.
+  */
 	bool ChunkAvailable(int a_ChunkX, int a_ChunkZ);
-} ;
-
-
-
-
-
+};

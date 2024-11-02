@@ -13,7 +13,7 @@
 
 
 
-cFurnaceWindow::cFurnaceWindow(cFurnaceEntity * a_Furnace):
+cFurnaceWindow::cFurnaceWindow(cFurnaceEntity * a_Furnace) :
 	cWindow(wtFurnace, "Furnace")
 {
 	m_SlotAreas.push_back(new cSlotAreaFurnace(a_Furnace, *this));
@@ -25,7 +25,13 @@ cFurnaceWindow::cFurnaceWindow(cFurnaceEntity * a_Furnace):
 
 
 
-void cFurnaceWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
+void cFurnaceWindow::DistributeStack(
+	cItem & a_ItemStack,
+	int a_Slot,
+	cPlayer & a_Player,
+	cSlotArea * a_ClickedArea,
+	bool a_ShouldApply
+)
 {
 	cSlotAreas AreasInOrder;
 
@@ -35,15 +41,15 @@ void cFurnaceWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & 
 		if (a_Slot == 2)
 		{
 			// Result Slot
-			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
-			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
+			AreasInOrder.push_back(m_SlotAreas[2]); /* Hotbar    */
+			AreasInOrder.push_back(m_SlotAreas[1]); /* Inventory */
 			Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
 		}
 		else
 		{
 			// Furnace Input / Fuel Slot
-			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
-			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
+			AreasInOrder.push_back(m_SlotAreas[1]); /* Inventory */
+			AreasInOrder.push_back(m_SlotAreas[2]); /* Hotbar    */
 			Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 		}
 	}
@@ -53,22 +59,18 @@ void cFurnaceWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & 
 		if ((FurnaceRecipes->GetRecipeFrom(a_ItemStack) != nullptr) || (FurnaceRecipes->IsFuel(a_ItemStack)))
 		{
 			// The item is a valid input item or fuel
-			AreasInOrder.push_back(m_SlotAreas[0]);  /* Furnace Area */
+			AreasInOrder.push_back(m_SlotAreas[0]); /* Furnace Area */
 		}
 		else if (a_ClickedArea == m_SlotAreas[1])
 		{
 			// Inventory Area
-			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar */
+			AreasInOrder.push_back(m_SlotAreas[2]); /* Hotbar */
 		}
 		else
 		{
 			// Hotbar Area
-			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
+			AreasInOrder.push_back(m_SlotAreas[1]); /* Inventory */
 		}
 		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 	}
 }
-
-
-
-

@@ -23,11 +23,9 @@ typedef cCoordWithIntList cSandSimulatorChunkData;
 
 
 /** Despite the class name, this simulator takes care of all blocks that fall when suspended in the air. */
-class cSandSimulator :
-	public cSimulator
+class cSandSimulator : public cSimulator
 {
-public:
-
+  public:
 	cSandSimulator(cWorld & a_World, cIniFile & a_IniFile);
 
 	/** Returns true if a falling-able block can start falling through the specified block type */
@@ -47,19 +45,22 @@ public:
 	It either rematerializes the block (a_FallingBlockType) at the specified coords, or creates a pickup,
 	based on the block currently present in the world at the dest specified coords. */
 	static void FinishFalling(
-		cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,
-		BLOCKTYPE a_FallingBlockType, NIBBLETYPE a_FallingBlockMeta
+		cWorld * a_World,
+		int a_BlockX,
+		int a_BlockY,
+		int a_BlockZ,
+		BLOCKTYPE a_FallingBlockType,
+		NIBBLETYPE a_FallingBlockMeta
 	);
 
 	static bool IsAllowedBlock(BLOCKTYPE a_BlockType);
 
-private:
-
+  private:
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
 
 	bool m_IsInstantFall;  // If set to true, blocks don't fall using cFallingBlock entity, but instantly instead
 
-	int  m_TotalBlocks;    // Total number of blocks currently in the queue for simulating
+	int m_TotalBlocks;  // Total number of blocks currently in the queue for simulating
 
 	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
 

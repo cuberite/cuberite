@@ -12,9 +12,8 @@
 
 
 
-cLuaServerHandle::cLuaServerHandle(UInt16 a_Port, cLuaState::cTableRefPtr && a_Callbacks):
-	m_Callbacks(std::move(a_Callbacks)),
-	m_Port(a_Port)
+cLuaServerHandle::cLuaServerHandle(UInt16 a_Port, cLuaState::cTableRefPtr && a_Callbacks) :
+	m_Callbacks(std::move(a_Callbacks)), m_Port(a_Port)
 {
 }
 
@@ -62,7 +61,7 @@ void cLuaServerHandle::Close(void)
 		cCSLock Lock(m_CSConnections);
 		std::swap(Connections, m_Connections);
 	}
-	for (auto & conn: Connections)
+	for (auto & conn : Connections)
 	{
 		conn->Close();
 	}
@@ -127,10 +126,15 @@ cTCPLink::cCallbacksPtr cLuaServerHandle::OnIncomingConnection(const AString & a
 {
 	// Ask the plugin for link callbacks:
 	cLuaState::cTableRefPtr LinkCallbacks;
-	if (
-		!m_Callbacks->CallTableFn("OnIncomingConnection", a_RemoteIPAddress, a_RemotePort, m_Port, cLuaState::Return, LinkCallbacks) ||
-		!LinkCallbacks->IsValid()
-	)
+	if (!m_Callbacks->CallTableFn(
+			"OnIncomingConnection",
+			a_RemoteIPAddress,
+			a_RemotePort,
+			m_Port,
+			cLuaState::Return,
+			LinkCallbacks
+		) ||
+		!LinkCallbacks->IsValid())
 	{
 		LOGINFO("cNetwork server (port %d) OnIncomingConnection callback failed. Dropping connection.", m_Port);
 		return nullptr;
@@ -165,8 +169,3 @@ void cLuaServerHandle::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 	// Notify the plugin:
 	m_Callbacks->CallTableFn("OnError", a_ErrorCode, a_ErrorMsg);
 }
-
-
-
-
-

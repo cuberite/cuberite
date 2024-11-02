@@ -24,15 +24,15 @@ typedef std::weak_ptr<cLuaServerHandle> cLuaServerHandleWPtr;
 
 
 
-class cLuaTCPLink:
-	public cNetwork::cConnectCallbacks,
-	public cTCPLink::cCallbacks
+class cLuaTCPLink : public cNetwork::cConnectCallbacks,
+					public cTCPLink::cCallbacks
 {
-public:
+  public:
 	/** Creates a new instance of the link, wrapping the callbacks that are in the specified table. */
 	cLuaTCPLink(cLuaState::cTableRefPtr && a_Callbacks);
 
-	/** Creates a new instance of the link, attached to the specified plugin and wrapping the callbacks that are in the specified referenced table. */
+	/** Creates a new instance of the link, attached to the specified plugin and wrapping the callbacks that are in the
+	 * specified referenced table. */
 	cLuaTCPLink(cLuaState::cTableRefPtr && a_Callbacks, cLuaServerHandleWPtr a_Server);
 
 	virtual ~cLuaTCPLink() override;
@@ -90,8 +90,7 @@ public:
 		const AString & a_StartTLSData
 	);
 
-protected:
-
+  protected:
 	/** The Lua table that holds the callbacks to be invoked. */
 	cLuaState::cTableRefPtr m_Callbacks;
 
@@ -120,7 +119,3 @@ protected:
 	virtual void OnRemoteClosed(void) override;
 	// The OnError() callback is shared with cNetwork::cConnectCallbacks
 };
-
-
-
-

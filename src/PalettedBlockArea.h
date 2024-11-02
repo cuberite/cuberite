@@ -19,11 +19,14 @@ The PalettedBlockArea always contains Blocks and their associated BlockEntities,
 There's no way to instantiate this class directly, you need to use either createFilled(), or read from cWorld. */
 class PalettedBlockArea
 {
-public:
-
+  public:
 	/** Creates a new PBA of the specified size filled with the specified block.
 	Throws if there is an error (memory allocation etc.) */
-	static PalettedBlockArea createFilled(Vector3i aSize, const AString & aBlockTypeName, const BlockState & aBlockState);
+	static PalettedBlockArea createFilled(
+		Vector3i aSize,
+		const AString & aBlockTypeName,
+		const BlockState & aBlockState
+	);
 
 	/** Returns the actual size of the area in all 3 axes. */
 	const Vector3i & size() const { return mSize; }
@@ -93,8 +96,7 @@ public:
 	const BlockTypePalette & palette() { return mPalette; }
 
 
-protected:
-
+  protected:
 	/** The palette used in the area. */
 	BlockTypePalette mPalette;
 

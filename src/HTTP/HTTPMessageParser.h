@@ -17,14 +17,13 @@
 
 
 
-class cHTTPMessageParser:
-	protected cEnvelopeParser::cCallbacks,
-	protected cTransferEncodingParser::cCallbacks
+class cHTTPMessageParser : protected cEnvelopeParser::cCallbacks,
+						   protected cTransferEncodingParser::cCallbacks
 {
-public:
+  public:
 	class cCallbacks
 	{
-	public:
+	  public:
 		// Force a virtual destructor in descendants:
 		virtual ~cCallbacks() {}
 
@@ -66,8 +65,7 @@ public:
 	void Reset(void);
 
 
-protected:
-
+  protected:
 	/** The callbacks used for reporting. */
 	cCallbacks & m_Callbacks;
 
@@ -120,7 +118,3 @@ protected:
 	virtual void OnBodyData(const void * a_Data, size_t a_Size) override;
 	virtual void OnBodyFinished(void) override;
 };
-
-
-
-

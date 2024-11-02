@@ -14,26 +14,32 @@
 
 
 
-class cRoughRavines:
-	public cGridStructGen
+class cRoughRavines : public cGridStructGen
 {
 	using Super = cGridStructGen;
 
-public:
-
+  public:
 	cRoughRavines(
 		int a_Seed,
-		int a_MaxSize, int a_MinSize,
-		float a_MaxCenterWidth, float a_MinCenterWidth,
-		float a_MaxRoughness,   float a_MinRoughness,
-		float a_MaxFloorHeightEdge,     float a_MinFloorHeightEdge,
-		float a_MaxFloorHeightCenter,   float a_MinFloorHeightCenter,
-		float a_MaxCeilingHeightEdge,   float a_MinCeilingHeightEdge,
-		float a_MaxCeilingHeightCenter, float a_MinCeilingHeightCenter,
-		int a_GridSize, int a_MaxOffset
+		int a_MaxSize,
+		int a_MinSize,
+		float a_MaxCenterWidth,
+		float a_MinCenterWidth,
+		float a_MaxRoughness,
+		float a_MinRoughness,
+		float a_MaxFloorHeightEdge,
+		float a_MinFloorHeightEdge,
+		float a_MaxFloorHeightCenter,
+		float a_MinFloorHeightCenter,
+		float a_MaxCeilingHeightEdge,
+		float a_MinCeilingHeightEdge,
+		float a_MaxCeilingHeightCenter,
+		float a_MinCeilingHeightCenter,
+		int a_GridSize,
+		int a_MaxOffset
 	);
 
-protected:
+  protected:
 	/** Maximum size of the ravine, in each of the X / Z axis */
 	int m_MaxSize;
 
@@ -79,7 +85,3 @@ protected:
 	// cGridStructGen overrides:
 	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) override;
 };
-
-
-
-

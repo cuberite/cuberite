@@ -9,13 +9,11 @@
 
 
 
-class cItemEndCrystalHandler final :
-	public cItemHandler
+class cItemEndCrystalHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	constexpr cItemEndCrystalHandler(int a_ItemType) :
 		Super(a_ItemType)
 	{
@@ -23,10 +21,13 @@ public:
 
 
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player,
-		cBlockPluginInterface & a_PluginInterface, const cItem & a_HeldItem,
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
 		const Vector3i a_BlockPos,
-		eBlockFace a_ClickedBlockFace) const override
+		eBlockFace a_ClickedBlockFace
+	) const override
 	{
 		// Must click a valid block:
 		if (a_ClickedBlockFace < 0)
@@ -34,12 +35,10 @@ public:
 			return false;
 		}
 
-		if (
-			const auto BlockType = a_World->GetBlock(a_BlockPos);
+		if (const auto BlockType = a_World->GetBlock(a_BlockPos);
 
 			// Don't place if placement block is not obsidian or bedrock:
-			(BlockType != E_BLOCK_OBSIDIAN) && (BlockType != E_BLOCK_BEDROCK)
-		)
+			(BlockType != E_BLOCK_OBSIDIAN) && (BlockType != E_BLOCK_BEDROCK))
 		{
 			return false;
 		}

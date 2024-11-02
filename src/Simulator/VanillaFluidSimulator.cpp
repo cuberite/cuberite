@@ -28,7 +28,7 @@ cVanillaFluidSimulator::cVanillaFluidSimulator(
 	NIBBLETYPE a_Falloff,
 	int a_TickDelay,
 	int a_NumNeighborsForSource
-):
+) :
 	Super(a_World, a_Fluid, a_StationaryFluid, a_Falloff, a_TickDelay, a_NumNeighborsForSource)
 {
 }
@@ -41,10 +41,10 @@ void cVanillaFluidSimulator::SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, 
 {
 	// Calculate the distance to the nearest "hole" in each direction:
 	int Cost[4];
-	Cost[0] = CalculateFlowCost(a_Chunk, a_RelX + 1, a_RelY, a_RelZ,     X_PLUS);
-	Cost[1] = CalculateFlowCost(a_Chunk, a_RelX - 1, a_RelY, a_RelZ,     X_MINUS);
-	Cost[2] = CalculateFlowCost(a_Chunk, a_RelX,     a_RelY, a_RelZ + 1, Z_PLUS);
-	Cost[3] = CalculateFlowCost(a_Chunk, a_RelX,     a_RelY, a_RelZ - 1, Z_MINUS);
+	Cost[0] = CalculateFlowCost(a_Chunk, a_RelX + 1, a_RelY, a_RelZ, X_PLUS);
+	Cost[1] = CalculateFlowCost(a_Chunk, a_RelX - 1, a_RelY, a_RelZ, X_MINUS);
+	Cost[2] = CalculateFlowCost(a_Chunk, a_RelX, a_RelY, a_RelZ + 1, Z_PLUS);
+	Cost[3] = CalculateFlowCost(a_Chunk, a_RelX, a_RelY, a_RelZ - 1, Z_MINUS);
 
 	// Find the minimum distance:
 	int MinCost = InfiniteCost;
@@ -79,7 +79,14 @@ void cVanillaFluidSimulator::SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, 
 
 
 
-int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, Direction a_Dir, unsigned a_Iteration)
+int cVanillaFluidSimulator::CalculateFlowCost(
+	cChunk * a_Chunk,
+	int a_RelX,
+	int a_RelY,
+	int a_RelZ,
+	Direction a_Dir,
+	unsigned a_Iteration
+)
 {
 	int Cost = InfiniteCost;
 
@@ -91,8 +98,7 @@ int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, int a_RelX, int 
 	{
 		return Cost;
 	}
-	if (
-		!IsPassableForFluid(BlockType) ||                 // The block cannot be passed by the liquid ...
+	if (!IsPassableForFluid(BlockType) ||  // The block cannot be passed by the liquid ...
 		(IsAllowedBlock(BlockType) && (BlockMeta == 0))  // ... or if it is liquid, it is a source block
 	)
 	{
@@ -152,7 +158,3 @@ int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, int a_RelX, int 
 
 	return Cost;
 }
-
-
-
-

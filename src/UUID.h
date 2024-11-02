@@ -9,9 +9,9 @@
 
 class cUUID
 {
-public:
+  public:
 	/** Default constructed "nil" UUID */
-	cUUID():
+	cUUID() :
 		m_UUID()
 	{
 	}
@@ -29,7 +29,9 @@ public:
 	/** Returns true if this contains the "nil" UUID with all bits set to 0 */
 	bool IsNil() const
 	{
-		return (m_UUID == std::array<Byte, 16>{{0}});
+		// tolua_end
+		return (m_UUID == std::array<Byte, 16> {{0}});
+		// tolua_begin
 	}
 
 	/** Tries to interpret the string as a short or long form UUID and assign from it.
@@ -59,7 +61,7 @@ public:
 	/** Assigns from raw memory representation, respecting UUID variant. */
 	void FromRaw(const std::array<Byte, 16> & a_Raw);
 
-private:
+  private:
 	/** Binary UUID stored big-endian. */
 	std::array<Byte, 16> m_UUID;
 };  // tolua_export
@@ -67,34 +69,32 @@ private:
 
 // Comparison operators:
 
-inline bool operator == (const cUUID & a_Lhs, const cUUID & a_Rhs)
+inline bool operator==(const cUUID & a_Lhs, const cUUID & a_Rhs)
 {
 	return (a_Lhs.Compare(a_Rhs) == 0);
 }
 
-inline bool operator != (const cUUID & a_Lhs, const cUUID & a_Rhs)
+inline bool operator!=(const cUUID & a_Lhs, const cUUID & a_Rhs)
 {
 	return (a_Lhs.Compare(a_Rhs) != 0);
 }
 
-inline bool operator < (const cUUID & a_Lhs, const cUUID & a_Rhs)
+inline bool operator<(const cUUID & a_Lhs, const cUUID & a_Rhs)
 {
 	return (a_Lhs.Compare(a_Rhs) < 0);
 }
 
-inline bool operator <= (const cUUID & a_Lhs, const cUUID & a_Rhs)
+inline bool operator<=(const cUUID & a_Lhs, const cUUID & a_Rhs)
 {
 	return (a_Lhs.Compare(a_Rhs) <= 0);
 }
 
-inline bool operator > (const cUUID & a_Lhs, const cUUID & a_Rhs)
+inline bool operator>(const cUUID & a_Lhs, const cUUID & a_Rhs)
 {
 	return (a_Lhs.Compare(a_Rhs) > 0);
 }
 
-inline bool operator >= (const cUUID & a_Lhs, const cUUID & a_Rhs)
+inline bool operator>=(const cUUID & a_Lhs, const cUUID & a_Rhs)
 {
 	return (a_Lhs.Compare(a_Rhs) >= 0);
 }
-
-

@@ -24,17 +24,17 @@ typedef std::shared_ptr<cLuaUDPEndpoint> cLuaUDPEndpointPtr;
 
 
 
-class cLuaUDPEndpoint:
-	public cUDPEndpoint::cCallbacks
+class cLuaUDPEndpoint : public cUDPEndpoint::cCallbacks
 {
-public:
+  public:
 	/** Creates a new instance of the endpoint, wrapping the callbacks that are in the specified table. */
 	cLuaUDPEndpoint(cLuaState::cTableRefPtr && a_Callbacks);
 
 	virtual ~cLuaUDPEndpoint() override;
 
 	/** Opens the endpoint so that it starts listening for incoming data on the specified port.
-	a_Self is the shared pointer to self that the object keeps to keep itself alive for as long as it needs (for Lua). */
+	a_Self is the shared pointer to self that the object keeps to keep itself alive for as long as it needs (for Lua).
+  */
 	bool Open(UInt16 a_Port, cLuaUDPEndpointPtr a_Self);
 
 	/** Sends the data contained in the string to the specified remote peer.
@@ -57,7 +57,7 @@ public:
 	Releases the internal SharedPtr to self, so that the instance may be deallocated. */
 	void Release(void);
 
-protected:
+  protected:
 	/** The Lua table that holds the callbacks to be invoked. */
 	cLuaState::cTableRefPtr m_Callbacks;
 
@@ -75,9 +75,6 @@ protected:
 
 	// cUDPEndpoint::cCallbacks overrides:
 	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override;
-	virtual void OnReceivedData(const char * a_Data, size_t a_Size, const AString & a_RemotePeer, UInt16 a_RemotePort) override;
+	virtual void OnReceivedData(const char * a_Data, size_t a_Size, const AString & a_RemotePeer, UInt16 a_RemotePort)
+		override;
 };
-
-
-
-

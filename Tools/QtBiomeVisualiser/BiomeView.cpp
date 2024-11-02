@@ -22,73 +22,255 @@ static struct
 {
 	EMCSBiome m_Biome;
 	uchar m_Color[3];
-} biomeColors[] =
-{
-	{ biOcean,                { 0x00, 0x00, 0x70 }, },
-	{ biPlains,               { 0x8d, 0xb3, 0x60 }, },
-	{ biDesert,               { 0xfa, 0x94, 0x18 }, },
-	{ biExtremeHills,         { 0x60, 0x60, 0x60 }, },
-	{ biForest,               { 0x05, 0x66, 0x21 }, },
-	{ biTaiga,                { 0x0b, 0x66, 0x59 }, },
-	{ biSwampland,            { 0x2f, 0xff, 0xda }, },
-	{ biRiver,                { 0x30, 0x30, 0xaf }, },
-	{ biHell,                 { 0x7f, 0x00, 0x00 }, },
-	{ biSky,                  { 0x00, 0x7f, 0xff }, },
-	{ biFrozenOcean,          { 0xa0, 0xa0, 0xdf }, },
-	{ biFrozenRiver,          { 0xa0, 0xa0, 0xff }, },
-	{ biIcePlains,            { 0xff, 0xff, 0xff }, },
-	{ biIceMountains,         { 0xa0, 0xa0, 0xa0 }, },
-	{ biMushroomIsland,       { 0xff, 0x00, 0xff }, },
-	{ biMushroomShore,        { 0xa0, 0x00, 0xff }, },
-	{ biBeach,                { 0xfa, 0xde, 0x55 }, },
-	{ biDesertHills,          { 0xd2, 0x5f, 0x12 }, },
-	{ biForestHills,          { 0x22, 0x55, 0x1c }, },
-	{ biTaigaHills,           { 0x16, 0x39, 0x33 }, },
-	{ biExtremeHillsEdge,     { 0x7f, 0x8f, 0x7f }, },
-	{ biJungle,               { 0x53, 0x7b, 0x09 }, },
-	{ biJungleHills,          { 0x2c, 0x42, 0x05 }, },
+} biomeColors[] = {
+	{
+		biOcean,
+		{0x00, 0x00, 0x70},
+	},
+	{
+		biPlains,
+		{0x8d, 0xb3, 0x60},
+	},
+	{
+		biDesert,
+		{0xfa, 0x94, 0x18},
+	},
+	{
+		biExtremeHills,
+		{0x60, 0x60, 0x60},
+	},
+	{
+		biForest,
+		{0x05, 0x66, 0x21},
+	},
+	{
+		biTaiga,
+		{0x0b, 0x66, 0x59},
+	},
+	{
+		biSwampland,
+		{0x2f, 0xff, 0xda},
+	},
+	{
+		biRiver,
+		{0x30, 0x30, 0xaf},
+	},
+	{
+		biHell,
+		{0x7f, 0x00, 0x00},
+	},
+	{
+		biSky,
+		{0x00, 0x7f, 0xff},
+	},
+	{
+		biFrozenOcean,
+		{0xa0, 0xa0, 0xdf},
+	},
+	{
+		biFrozenRiver,
+		{0xa0, 0xa0, 0xff},
+	},
+	{
+		biIcePlains,
+		{0xff, 0xff, 0xff},
+	},
+	{
+		biIceMountains,
+		{0xa0, 0xa0, 0xa0},
+	},
+	{
+		biMushroomIsland,
+		{0xff, 0x00, 0xff},
+	},
+	{
+		biMushroomShore,
+		{0xa0, 0x00, 0xff},
+	},
+	{
+		biBeach,
+		{0xfa, 0xde, 0x55},
+	},
+	{
+		biDesertHills,
+		{0xd2, 0x5f, 0x12},
+	},
+	{
+		biForestHills,
+		{0x22, 0x55, 0x1c},
+	},
+	{
+		biTaigaHills,
+		{0x16, 0x39, 0x33},
+	},
+	{
+		biExtremeHillsEdge,
+		{0x7f, 0x8f, 0x7f},
+	},
+	{
+		biJungle,
+		{0x53, 0x7b, 0x09},
+	},
+	{
+		biJungleHills,
+		{0x2c, 0x42, 0x05},
+	},
 
-	{ biJungleEdge,           { 0x62, 0x8b, 0x17 }, },
-	{ biDeepOcean,            { 0x00, 0x00, 0x30 }, },
-	{ biStoneBeach,           { 0xa2, 0xa2, 0x84 }, },
-	{ biColdBeach,            { 0xfa, 0xf0, 0xc0 }, },
-	{ biBirchForest,          { 0x30, 0x74, 0x44 }, },
-	{ biBirchForestHills,     { 0x1f, 0x5f, 0x32 }, },
-	{ biRoofedForest,         { 0x40, 0x51, 0x1a }, },
-	{ biColdTaiga,            { 0x31, 0x55, 0x4a }, },
-	{ biColdTaigaHills,       { 0x59, 0x7d, 0x72 }, },
-	{ biMegaTaiga,            { 0x59, 0x66, 0x51 }, },
-	{ biMegaTaigaHills,       { 0x59, 0x66, 0x59 }, },
-	{ biExtremeHillsPlus,     { 0x50, 0x70, 0x50 }, },
-	{ biSavanna,              { 0xbd, 0xb2, 0x5f }, },
-	{ biSavannaPlateau,       { 0xa7, 0x9d, 0x64 }, },
-	{ biMesa,                 { 0xd9, 0x45, 0x15 }, },
-	{ biMesaPlateauF,         { 0xb0, 0x97, 0x65 }, },
-	{ biMesaPlateau,          { 0xca, 0x8c, 0x65 }, },
+	{
+		biJungleEdge,
+		{0x62, 0x8b, 0x17},
+	},
+	{
+		biDeepOcean,
+		{0x00, 0x00, 0x30},
+	},
+	{
+		biStoneBeach,
+		{0xa2, 0xa2, 0x84},
+	},
+	{
+		biColdBeach,
+		{0xfa, 0xf0, 0xc0},
+	},
+	{
+		biBirchForest,
+		{0x30, 0x74, 0x44},
+	},
+	{
+		biBirchForestHills,
+		{0x1f, 0x5f, 0x32},
+	},
+	{
+		biRoofedForest,
+		{0x40, 0x51, 0x1a},
+	},
+	{
+		biColdTaiga,
+		{0x31, 0x55, 0x4a},
+	},
+	{
+		biColdTaigaHills,
+		{0x59, 0x7d, 0x72},
+	},
+	{
+		biMegaTaiga,
+		{0x59, 0x66, 0x51},
+	},
+	{
+		biMegaTaigaHills,
+		{0x59, 0x66, 0x59},
+	},
+	{
+		biExtremeHillsPlus,
+		{0x50, 0x70, 0x50},
+	},
+	{
+		biSavanna,
+		{0xbd, 0xb2, 0x5f},
+	},
+	{
+		biSavannaPlateau,
+		{0xa7, 0x9d, 0x64},
+	},
+	{
+		biMesa,
+		{0xd9, 0x45, 0x15},
+	},
+	{
+		biMesaPlateauF,
+		{0xb0, 0x97, 0x65},
+	},
+	{
+		biMesaPlateau,
+		{0xca, 0x8c, 0x65},
+	},
 
 	// M variants:
-	{ biSunflowerPlains,      { 0xb5, 0xdb, 0x88 }, },
-	{ biDesertM,              { 0xff, 0xbc, 0x40 }, },
-	{ biExtremeHillsM,        { 0x88, 0x88, 0x88 }, },
-	{ biFlowerForest,         { 0x2d, 0x8e, 0x49 }, },
-	{ biTaigaM,               { 0x33, 0x8e, 0x81 }, },
-	{ biSwamplandM,           { 0x07, 0xf9, 0xb2 }, },
-	{ biIcePlainsSpikes,      { 0xb4, 0xdc, 0xdc }, },
-	{ biJungleM,              { 0x7b, 0xa3, 0x31 }, },
-	{ biJungleEdgeM,          { 0x62, 0x8b, 0x17 }, },
-	{ biBirchForestM,         { 0x58, 0x9c, 0x6c }, },
-	{ biBirchForestHillsM,    { 0x47, 0x87, 0x5a }, },
-	{ biRoofedForestM,        { 0x68, 0x79, 0x42 }, },
-	{ biColdTaigaM,           { 0x24, 0x3f, 0x36 }, },
-	{ biMegaSpruceTaiga,      { 0x45, 0x4f, 0x3e }, },
-	{ biMegaSpruceTaigaHills, { 0x45, 0x4f, 0x4e }, },
-	{ biExtremeHillsPlusM,    { 0x78, 0x98, 0x78 }, },
-	{ biSavannaM,             { 0xe5, 0xda, 0x87 }, },
-	{ biSavannaPlateauM,      { 0xa7, 0x9d, 0x74 }, },
-	{ biMesaBryce,            { 0xff, 0x6d, 0x3d }, },
-	{ biMesaPlateauFM,        { 0xd8, 0xbf, 0x8d }, },
-	{ biMesaPlateauM,         { 0xf2, 0xb4, 0x8d }, },
-} ;
+	{
+		biSunflowerPlains,
+		{0xb5, 0xdb, 0x88},
+	},
+	{
+		biDesertM,
+		{0xff, 0xbc, 0x40},
+	},
+	{
+		biExtremeHillsM,
+		{0x88, 0x88, 0x88},
+	},
+	{
+		biFlowerForest,
+		{0x2d, 0x8e, 0x49},
+	},
+	{
+		biTaigaM,
+		{0x33, 0x8e, 0x81},
+	},
+	{
+		biSwamplandM,
+		{0x07, 0xf9, 0xb2},
+	},
+	{
+		biIcePlainsSpikes,
+		{0xb4, 0xdc, 0xdc},
+	},
+	{
+		biJungleM,
+		{0x7b, 0xa3, 0x31},
+	},
+	{
+		biJungleEdgeM,
+		{0x62, 0x8b, 0x17},
+	},
+	{
+		biBirchForestM,
+		{0x58, 0x9c, 0x6c},
+	},
+	{
+		biBirchForestHillsM,
+		{0x47, 0x87, 0x5a},
+	},
+	{
+		biRoofedForestM,
+		{0x68, 0x79, 0x42},
+	},
+	{
+		biColdTaigaM,
+		{0x24, 0x3f, 0x36},
+	},
+	{
+		biMegaSpruceTaiga,
+		{0x45, 0x4f, 0x3e},
+	},
+	{
+		biMegaSpruceTaigaHills,
+		{0x45, 0x4f, 0x4e},
+	},
+	{
+		biExtremeHillsPlusM,
+		{0x78, 0x98, 0x78},
+	},
+	{
+		biSavannaM,
+		{0xe5, 0xda, 0x87},
+	},
+	{
+		biSavannaPlateauM,
+		{0xa7, 0x9d, 0x74},
+	},
+	{
+		biMesaBryce,
+		{0xff, 0x6d, 0x3d},
+	},
+	{
+		biMesaPlateauFM,
+		{0xd8, 0xbf, 0x8d},
+	},
+	{
+		biMesaPlateauM,
+		{0xf2, 0xb4, 0x8d},
+	},
+};
 
 
 
@@ -96,7 +278,7 @@ static struct
 
 static class BiomeColorsInitializer
 {
-public:
+  public:
 	BiomeColorsInitializer(void)
 	{
 		// Reset all colors to gray:
@@ -125,12 +307,7 @@ public:
 // BiomeView:
 
 BiomeView::BiomeView(QWidget * parent) :
-	super(parent),
-	m_X(0),
-	m_Z(0),
-	m_Zoom(1),
-	m_IsMouseDragging(false),
-	m_MouseWheelDelta(0)
+	super(parent), m_X(0), m_Z(0), m_Zoom(1), m_IsMouseDragging(false), m_MouseWheelDelta(0)
 {
 	// Create the image used for undefined chunks:
 	int offset = 0;
@@ -227,7 +404,7 @@ void BiomeView::redraw()
 	int centerchunkx = floor(m_X / 16);
 	int centerchunkz = floor(m_Z / 16);
 	// and the center of the screen
-	int centerx = m_Image.width()  / 2;
+	int centerx = m_Image.width() / 2;
 	int centery = m_Image.height() / 2;
 	// and align for panning
 	centerx -= (m_X - centerchunkx * 16) * m_Zoom;
@@ -236,7 +413,7 @@ void BiomeView::redraw()
 	int startx = centerchunkx - centerx / chunksize - 1;
 	int startz = centerchunkz - centery / chunksize - 1;
 	// and the dimensions of the screen in blocks
-	int blockswide = m_Image.width()  / chunksize + 3;
+	int blockswide = m_Image.width() / chunksize + 3;
 	int blockstall = m_Image.height() / chunksize + 3;
 
 	for (int z = startz; z < startz + blockstall; z++)
@@ -302,7 +479,7 @@ void BiomeView::drawChunk(int a_ChunkX, int a_ChunkZ)
 	int centerchunkx = floor(m_X / 16);
 	int centerchunkz = floor(m_Z / 16);
 	// and the center chunk screen coordinates
-	int centerx = m_Image.width()  / 2;
+	int centerx = m_Image.width() / 2;
 	int centery = m_Image.height() / 2;
 	// which need to be shifted to account for panning inside that chunk
 	centerx -= (m_X - centerchunkx * 16) * m_Zoom;
@@ -360,23 +537,23 @@ void BiomeView::drawChunk(int a_ChunkX, int a_ChunkZ)
 	// Scale-blit the image:
 	for (int z = skipy; z < blockheight; z++, imgoffset += imgstride)
 	{
-		size_t srcoffset = static_cast<size_t>(std::floor((double)z / m_Zoom)) * 16;
+		size_t srcoffset = static_cast<size_t>(std::floor((double) z / m_Zoom)) * 16;
 		int imgxoffset = imgoffset;
 		for (int x = skipx; x < blockwidth; x++)
 		{
-			short biome = src[srcoffset + static_cast<size_t>(std::floor((double)x / m_Zoom))];
+			short biome = src[srcoffset + static_cast<size_t>(std::floor((double) x / m_Zoom))];
 			const uchar * color;
 			if (biome < 0)
 			{
-				static const uchar emptyBiome1[] = { 0x44, 0x44, 0x44, 0xff };
-				static const uchar emptyBiome2[] = { 0x88, 0x88, 0x88, 0xff };
+				static const uchar emptyBiome1[] = {0x44, 0x44, 0x44, 0xff};
+				static const uchar emptyBiome2[] = {0x88, 0x88, 0x88, 0xff};
 				color = ((x & 8) ^ (z & 8)) ? emptyBiome1 : emptyBiome2;
 			}
 			else
 			{
 				if (biome * 4 >= ARRAYCOUNT(biomeToColor))
 				{
-					static const uchar errorImage[] = { 0xff, 0x00, 0x00, 0xff };
+					static const uchar errorImage[] = {0xff, 0x00, 0x00, 0xff};
 					color = errorImage;
 				}
 				else
@@ -384,7 +561,7 @@ void BiomeView::drawChunk(int a_ChunkX, int a_ChunkZ)
 					color = biomeToColor + biome * 4;
 				}
 			}
-			bits[imgxoffset]     = color[0];
+			bits[imgxoffset] = color[0];
 			bits[imgxoffset + 1] = color[1];
 			bits[imgxoffset + 2] = color[2];
 			bits[imgxoffset + 3] = color[3];
@@ -456,7 +633,7 @@ void BiomeView::mouseMoveEvent(QMouseEvent * a_Event)
 	}
 
 	// Update the status bar info text:
-	int blockX = floor((a_Event->x() - width()  / 2) / m_Zoom + m_X);
+	int blockX = floor((a_Event->x() - width() / 2) / m_Zoom + m_X);
 	int blockZ = floor((a_Event->y() - height() / 2) / m_Zoom + m_Z);
 	int regionX, regionZ;
 	Region::blockToRegion(blockX, blockZ, regionX, regionZ);

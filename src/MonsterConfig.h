@@ -14,19 +14,15 @@ class cMonster;
 
 class cMonsterConfig
 {
-public:
+  public:
 	cMonsterConfig(void);
 	~cMonsterConfig();
 
 	void AssignAttributes(cMonster * a_Monster, const AString & a_Name);
 
-private:
+  private:
 	struct sAttributesStruct;
 	struct sMonsterConfigState;
 	sMonsterConfigState * m_pState;
 	void Initialize();
-} ;
-
-
-
-
+};

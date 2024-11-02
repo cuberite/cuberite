@@ -9,24 +9,18 @@
 
 
 
-class cBlockLadderHandler final :
-	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04> >
+class cBlockLadderHandler final : public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04>>
 {
 	using Super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x02, 0x05, 0x03, 0x04>>;
 
-public:
-
+  public:
 	using Super::Super;
 
 
 	/** Returns true if the ladder will be supported by the block through the given blockface. */
 	static bool CanBePlacedOn(const BLOCKTYPE a_BlockType, const eBlockFace a_BlockFace)
 	{
-		if (
-			(a_BlockFace == BLOCK_FACE_NONE) ||
-			(a_BlockFace == BLOCK_FACE_BOTTOM) ||
-			(a_BlockFace == BLOCK_FACE_TOP)
-		)
+		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_BlockFace == BLOCK_FACE_BOTTOM) || (a_BlockFace == BLOCK_FACE_TOP))
 		{
 			return false;
 		}
@@ -34,8 +28,7 @@ public:
 		return cBlockInfo::FullyOccupiesVoxel(a_BlockType);
 	}
 
-private:
-
+  private:
 	/** Converts the ladder block's meta to the block face of the neighbor to which the ladder is attached. */
 	static eBlockFace MetaDataToBlockFace(NIBBLETYPE a_MetaData)
 	{
@@ -71,8 +64,4 @@ private:
 		UNUSED(a_Meta);
 		return 0;
 	}
-} ;
-
-
-
-
+};

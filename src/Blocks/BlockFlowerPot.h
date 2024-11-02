@@ -5,17 +5,14 @@
 
 
 
-class cBlockFlowerPotHandler final :
-	public cBlockEntityHandler
+class cBlockFlowerPotHandler final : public cBlockEntityHandler
 {
 	using Super = cBlockEntityHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		return cItem(E_ITEM_FLOWER_POT, 1, 0);
@@ -30,8 +27,4 @@ private:
 		UNUSED(a_Meta);
 		return 0;
 	}
-} ;
-
-
-
-
+};

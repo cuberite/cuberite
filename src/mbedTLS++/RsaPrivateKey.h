@@ -21,7 +21,7 @@ class cRsaPrivateKey
 {
 	friend class cSslContext;
 
-public:
+  public:
 	/** Creates a new empty object, the key is not assigned */
 	cRsaPrivateKey(void);
 
@@ -42,7 +42,7 @@ public:
 	Returns the number of bytes decrypted, or negative number for error. */
 	int Decrypt(ContiguousByteBufferView a_EncryptedData, Byte * a_DecryptedData, size_t a_DecryptedMaxLength);
 
-protected:
+  protected:
 	/** The mbedTLS key context */
 	mbedtls_rsa_context m_Rsa;
 
@@ -52,11 +52,6 @@ protected:
 
 	/** Returns the internal context ptr. Only use in mbedTLS API calls. */
 	mbedtls_rsa_context * GetInternal(void) { return &m_Rsa; }
-} ;
+};
 
 typedef std::shared_ptr<cRsaPrivateKey> cRsaPrivateKeyPtr;
-
-
-
-
-

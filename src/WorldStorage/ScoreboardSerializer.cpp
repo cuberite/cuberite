@@ -13,7 +13,7 @@
 
 
 
-cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScoreboard * a_ScoreBoard):
+cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScoreboard * a_ScoreBoard) :
 	m_ScoreBoard(a_ScoreBoard)
 {
 	auto DataPath = fmt::format(FMT_STRING("{}{}data"), a_WorldName, cFile::PathSeparator());
@@ -77,7 +77,9 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 	a_Writer.BeginList("Objectives", TAG_Compound);
 
-	for (cScoreboard::cObjectiveMap::const_iterator it = m_ScoreBoard->m_Objectives.begin(); it != m_ScoreBoard->m_Objectives.end(); ++it)
+	for (cScoreboard::cObjectiveMap::const_iterator it = m_ScoreBoard->m_Objectives.begin();
+		 it != m_ScoreBoard->m_Objectives.end();
+		 ++it)
 	{
 		const cObjective & Objective = it->second;
 
@@ -95,11 +97,14 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 	a_Writer.BeginList("PlayerScores", TAG_Compound);
 
-	for (cScoreboard::cObjectiveMap::const_iterator it = m_ScoreBoard->m_Objectives.begin(); it != m_ScoreBoard->m_Objectives.end(); ++it)
+	for (cScoreboard::cObjectiveMap::const_iterator it = m_ScoreBoard->m_Objectives.begin();
+		 it != m_ScoreBoard->m_Objectives.end();
+		 ++it)
 	{
 		const cObjective & Objective = it->second;
 
-		for (cObjective::cScoreMap::const_iterator it2 = Objective.m_Scores.begin(); it2 != Objective.m_Scores.end(); ++it2)
+		for (cObjective::cScoreMap::const_iterator it2 = Objective.m_Scores.begin(); it2 != Objective.m_Scores.end();
+			 ++it2)
 		{
 			a_Writer.BeginCompound("");
 
@@ -116,13 +121,14 @@ void cScoreboardSerializer::SaveScoreboardToNBT(cFastNBTWriter & a_Writer)
 
 	a_Writer.BeginList("Teams", TAG_Compound);
 
-	for (cScoreboard::cTeamMap::const_iterator it = m_ScoreBoard->m_Teams.begin(); it != m_ScoreBoard->m_Teams.end(); ++it)
+	for (cScoreboard::cTeamMap::const_iterator it = m_ScoreBoard->m_Teams.begin(); it != m_ScoreBoard->m_Teams.end();
+		 ++it)
 	{
 		const cTeam & Team = it->second;
 
 		a_Writer.BeginCompound("");
 
-		a_Writer.AddByte("AllowFriendlyFire",     Team.AllowsFriendlyFire()      ? 1 : 0);
+		a_Writer.AddByte("AllowFriendlyFire", Team.AllowsFriendlyFire() ? 1 : 0);
 		a_Writer.AddByte("SeeFriendlyInvisibles", Team.CanSeeFriendlyInvisible() ? 1 : 0);
 
 		a_Writer.AddString("DisplayName", Team.GetDisplayName());
@@ -341,11 +347,3 @@ bool cScoreboardSerializer::LoadScoreboardFromNBT(const cParsedNBT & a_NBT)
 
 	return true;
 }
-
-
-
-
-
-
-
-

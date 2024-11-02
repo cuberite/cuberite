@@ -7,27 +7,47 @@
 
 namespace RedstoneBlockHandler
 {
-	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
-	{
-		UNUSED(a_Chunk);
-		UNUSED(a_Position);
-		UNUSED(a_BlockType);
-		UNUSED(a_QueryPosition);
-		UNUSED(IsLinked);
-		return IsLinked ? 0 : 15;
-	}
+static PowerLevel GetPowerDeliveredToPosition(
+	const cChunk & a_Chunk,
+	Vector3i a_Position,
+	BLOCKTYPE a_BlockType,
+	Vector3i a_QueryPosition,
+	BLOCKTYPE a_QueryBlockType,
+	bool IsLinked
+)
+{
+	UNUSED(a_Chunk);
+	UNUSED(a_Position);
+	UNUSED(a_BlockType);
+	UNUSED(a_QueryPosition);
+	UNUSED(IsLinked);
+	return IsLinked ? 0 : 15;
+}
 
-	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
-	{
-		// LOGD("Evaluating crimson the redstone block (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
-	}
+static void Update(
+	cChunk & a_Chunk,
+	cChunk & CurrentlyTicking,
+	Vector3i a_Position,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_Meta,
+	const PowerLevel Power
+)
+{
+	// LOGD("Evaluating crimson the redstone block (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+}
 
-	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
-	{
-		UNUSED(a_Chunk);
-		UNUSED(a_Position);
-		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
-		UNUSED(Callback);
-	}
-};
+static void ForValidSourcePositions(
+	const cChunk & a_Chunk,
+	Vector3i a_Position,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_Meta,
+	ForEachSourceCallback & Callback
+)
+{
+	UNUSED(a_Chunk);
+	UNUSED(a_Position);
+	UNUSED(a_BlockType);
+	UNUSED(a_Meta);
+	UNUSED(Callback);
+}
+};  // namespace RedstoneBlockHandler

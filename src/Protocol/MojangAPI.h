@@ -1,7 +1,8 @@
 
 // MojangAPI.h
 
-// Declares the cMojangAPI class representing the various API points provided by Mojang's webservices, and a cache for their results
+// Declares the cMojangAPI class representing the various API points provided by Mojang's webservices, and a cache for
+// their results
 
 
 
@@ -22,7 +23,7 @@ class cRankManager;
 
 namespace Json
 {
-	class Value;
+class Value;
 }
 
 
@@ -32,7 +33,7 @@ class cSettingsRepositoryInterface;
 // tolua_begin
 class cMojangAPI
 {
-public:
+  public:
 	// tolua_end
 
 	cMojangAPI(void);
@@ -47,7 +48,8 @@ public:
 	If a_UseOnlyCached is true, the function only consults the cached values.
 	If a_UseOnlyCached is false and the name is not found in the cache, it is looked up online, which is a blocking
 	operation, do not use this in world-tick thread!
-	If you have multiple names to resolve, use the GetUUIDsFromPlayerNames() function, it uses a single request for multiple names. */
+	If you have multiple names to resolve, use the GetUUIDsFromPlayerNames() function, it uses a single request for
+	multiple names. */
 	cUUID GetUUIDFromPlayerName(const AString & a_PlayerName, bool a_UseOnlyCached = false);
 
 	/** Converts a UUID into a playername.
@@ -78,7 +80,7 @@ public:
 	/** Sets the m_RankMgr that is used for name-uuid notifications. Accepts nullptr to remove the binding. */
 	void SetRankManager(cRankManager * a_RankManager) { m_RankMgr = a_RankManager; }
 
-protected:
+  protected:
 	/** The thread that periodically checks for stale data and re-queries it from the server. */
 	class cUpdateThread;
 
@@ -86,19 +88,15 @@ protected:
 	/** Holds data for a single player profile. */
 	struct sProfile
 	{
-		AString m_PlayerName;         // Case-correct playername
-		cUUID   m_UUID;               // Player UUID
-		AString m_Textures;           // The Textures field of the profile properties
+		AString m_PlayerName;  // Case-correct playername
+		cUUID m_UUID;  // Player UUID
+		AString m_Textures;  // The Textures field of the profile properties
 		AString m_TexturesSignature;  // The signature of the Textures field of the profile properties
-		Int64   m_DateTime;           // UNIXtime of the profile lookup
+		Int64 m_DateTime;  // UNIXtime of the profile lookup
 
 		/** Default constructor for the container's sake. */
 		sProfile(void) :
-			m_PlayerName(),
-			m_UUID(),
-			m_Textures(),
-			m_TexturesSignature(),
-			m_DateTime(time(nullptr))
+			m_PlayerName(), m_UUID(), m_Textures(), m_TexturesSignature(), m_DateTime(time(nullptr))
 		{
 		}
 
@@ -174,9 +172,9 @@ protected:
 	/** Saves the caches to a disk storage. */
 	void SaveCachesToDisk(void);
 
-	/** Makes sure all specified names are in the m_PlayerNameToUUID cache. Downloads any missing ones from Mojang API servers.
-	Names that are not valid are not added into the cache.
-	ASSUMEs that a_PlayerNames contains lowercased player names. */
+	/** Makes sure all specified names are in the m_PlayerNameToUUID cache. Downloads any missing ones from Mojang API
+	servers. Names that are not valid are not added into the cache. ASSUMEs that a_PlayerNames contains lowercased
+	player names. */
 	void CacheNamesToUUIDs(const AStringVector & a_PlayerNames);
 
 	/** Queries all the specified names and stores them into the m_PlayerNameToUUID cache.
@@ -189,18 +187,15 @@ protected:
 	UUIDs that are not valid will not be added into the cache. */
 	void CacheUUIDToProfile(const cUUID & a_UUID);
 
-	/** Queries the specified UUID's profile and stores it in the m_UUIDToProfile cache. If already present, updates the cache entry.
-	UUIDs that are not valid will not be added into the cache. */
+	/** Queries the specified UUID's profile and stores it in the m_UUIDToProfile cache. If already present, updates the
+	cache entry. UUIDs that are not valid will not be added into the cache. */
 	void QueryUUIDToProfile(const cUUID & a_UUID);
 
 	/** Called for each name-uuid pairing that is discovered.
 	If assigned, notifies the m_RankManager of the event. */
 	void NotifyNameUUID(const AString & a_PlayerName, const cUUID & a_PlayerUUID);
 
-	/** Updates the stale values in the DB from the Mojang servers. Called from the cUpdateThread, blocks on the HTTPS API calls. */
+	/** Updates the stale values in the DB from the Mojang servers. Called from the cUpdateThread, blocks on the HTTPS
+	 * API calls. */
 	void Update(void);
-} ;  // tolua_export
-
-
-
-
+};  // tolua_export

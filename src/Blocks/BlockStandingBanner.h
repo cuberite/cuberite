@@ -10,13 +10,11 @@
 
 
 
-class cBlockStandingBannerHandler final :
-	public cBlockEntityHandler
+class cBlockStandingBannerHandler final : public cBlockEntityHandler
 {
 	using Super = cBlockEntityHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
@@ -48,4 +46,4 @@ public:
 		UNUSED(a_Meta);
 		return 0;
 	}
-} ;
+};

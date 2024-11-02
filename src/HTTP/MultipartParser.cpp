@@ -13,8 +13,8 @@
 
 // Disable MSVC warnings:
 #if defined(_MSC_VER)
-	#pragma warning(push)
-	#pragma warning(disable:4355)  // 'this' : used in base member initializer list
+#pragma warning(push)
+#pragma warning(disable : 4355)  // 'this' : used in base member initializer list
 #endif
 
 
@@ -92,10 +92,7 @@ ThisIsIgnoredEpilogue";
 
 
 cMultipartParser::cMultipartParser(const AString & a_ContentType, cCallbacks & a_Callbacks) :
-	m_Callbacks(a_Callbacks),
-	m_IsValid(true),
-	m_EnvelopeParser(*this),
-	m_HasHadData(false)
+	m_Callbacks(a_Callbacks), m_IsValid(true), m_EnvelopeParser(*this), m_HasHadData(false)
 {
 	// Check that the content type is multipart:
 	AString ContentType(a_ContentType);
@@ -127,7 +124,8 @@ cMultipartParser::cMultipartParser(const AString & a_ContentType, cCallbacks & a
 		return;
 	}
 
-	// Set the envelope parser for parsing the body, so that our Parse() function parses the ignored prefix data as a body
+	// Set the envelope parser for parsing the body, so that our Parse() function parses the ignored prefix data as a
+	// body
 	m_EnvelopeParser.SetIsInHeaders(false);
 
 	// Append an initial CRLF to the incoming data, so that a body starting with the boundary line will get caught
@@ -203,8 +201,7 @@ void cMultipartParser::Parse(const char * a_Data, size_t a_Size)
 			}
 			return;
 		}
-		if (
-			(LineEnd - idxBoundary != m_Boundary.size()) &&  // Line length not equal to boundary
+		if ((LineEnd - idxBoundary != m_Boundary.size()) &&  // Line length not equal to boundary
 			(LineEnd - idxBoundary != m_Boundary.size() + 2)  // Line length not equal to boundary end
 		)
 		{
@@ -234,7 +231,8 @@ void cMultipartParser::Parse(const char * a_Data, size_t a_Size)
 			continue;
 		}
 
-		// It's a line, but not a boundary. It can be fully sent to the data receiver, since a boundary cannot cross lines
+		// It's a line, but not a boundary. It can be fully sent to the data receiver, since a boundary cannot cross
+		// lines
 		m_Callbacks.OnPartData(m_IncomingData.c_str(), LineEnd);
 		m_IncomingData.erase(0, LineEnd);
 	}  // while (true)
@@ -248,7 +246,3 @@ void cMultipartParser::OnHeaderLine(const AString & a_Key, const AString & a_Val
 {
 	m_Callbacks.OnPartHeader(a_Key, a_Value);
 }
-
-
-
-

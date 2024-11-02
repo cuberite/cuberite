@@ -7,18 +7,21 @@
 
 
 
-class cItemVinesHandler final  :
-	public cItemHandler
+class cItemVinesHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
+  private:
+	virtual bool CommitPlacement(
+		cPlayer & a_Player,
+		const cItem & a_HeldItem,
+		const Vector3i a_PlacePosition,
+		const eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPosition
+	) const override
 	{
 		BLOCKTYPE Block;
 		NIBBLETYPE Meta;
@@ -31,7 +34,7 @@ private:
 			case BLOCK_FACE_SOUTH: PlaceMeta = 0x4; break;
 			case BLOCK_FACE_WEST:  PlaceMeta = 0x8; break;
 			case BLOCK_FACE_EAST:  PlaceMeta = 0x2; break;
-			default: return false;
+			default:               return false;
 		}
 
 		if (Block == E_BLOCK_VINES)

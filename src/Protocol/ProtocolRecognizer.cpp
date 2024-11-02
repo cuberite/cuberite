@@ -38,8 +38,7 @@ struct TriedToJoinWithUnsupportedProtocolException : public std::runtime_error
 
 
 cMultiVersionProtocol::cMultiVersionProtocol() :
-	m_Buffer(32 KiB),
-	m_WaitingForData(true)
+	m_Buffer(32 KiB), m_WaitingForData(true)
 {
 }
 
@@ -51,25 +50,25 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 {
 	switch (a_ProtocolVersion)
 	{
-		case cProtocol::Version::v1_8_0:   return "1.8";
-		case cProtocol::Version::v1_9_0:   return "1.9";
-		case cProtocol::Version::v1_9_1:   return "1.9.1";
-		case cProtocol::Version::v1_9_2:   return "1.9.2";
-		case cProtocol::Version::v1_9_4:   return "1.9.4";
-		case cProtocol::Version::v1_10_0:  return "1.10";
-		case cProtocol::Version::v1_11_0:  return "1.11";
-		case cProtocol::Version::v1_11_1:  return "1.11.1";
-		case cProtocol::Version::v1_12:    return "1.12";
-		case cProtocol::Version::v1_12_1:  return "1.12.1";
-		case cProtocol::Version::v1_12_2:  return "1.12.2";
-		case cProtocol::Version::v1_13:    return "1.13";
-		case cProtocol::Version::v1_13_1:  return "1.13.1";
-		case cProtocol::Version::v1_13_2:  return "1.13.2";
-		case cProtocol::Version::v1_14:    return "1.14";
-		case cProtocol::Version::v1_14_1:  return "1.14.1";
-		case cProtocol::Version::v1_14_2:  return "1.14.2";
-		case cProtocol::Version::v1_14_3:  return "1.14.3";
-		case cProtocol::Version::v1_14_4:  return "1.14.4";
+		case cProtocol::Version::v1_8_0:  return "1.8";
+		case cProtocol::Version::v1_9_0:  return "1.9";
+		case cProtocol::Version::v1_9_1:  return "1.9.1";
+		case cProtocol::Version::v1_9_2:  return "1.9.2";
+		case cProtocol::Version::v1_9_4:  return "1.9.4";
+		case cProtocol::Version::v1_10_0: return "1.10";
+		case cProtocol::Version::v1_11_0: return "1.11";
+		case cProtocol::Version::v1_11_1: return "1.11.1";
+		case cProtocol::Version::v1_12:   return "1.12";
+		case cProtocol::Version::v1_12_1: return "1.12.1";
+		case cProtocol::Version::v1_12_2: return "1.12.2";
+		case cProtocol::Version::v1_13:   return "1.13";
+		case cProtocol::Version::v1_13_1: return "1.13.1";
+		case cProtocol::Version::v1_13_2: return "1.13.2";
+		case cProtocol::Version::v1_14:   return "1.14";
+		case cProtocol::Version::v1_14_1: return "1.14.1";
+		case cProtocol::Version::v1_14_2: return "1.14.2";
+		case cProtocol::Version::v1_14_3: return "1.14.3";
+		case cProtocol::Version::v1_14_4: return "1.14.4";
 	}
 
 	ASSERT(!"Unknown protocol version");
@@ -80,13 +79,18 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 
 
 
-void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle & a_Client, ContiguousByteBuffer & a_Data)
+void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(
+	cClientHandle & a_Client,
+	ContiguousByteBuffer & a_Data
+)
 {
-	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and MCS_PROTOCOL_VERSIONS macros in the header file
+	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and MCS_PROTOCOL_VERSIONS
+	// macros in the header file
 
 	/* Write all incoming data unmodified into m_Buffer.
 	Writing everything is always okay to do:
-	1. We can be sure protocol encryption hasn't started yet since m_Protocol hasn't been called, hence no decryption needs to take place
+	1. We can be sure protocol encryption hasn't started yet since m_Protocol hasn't been called, hence no decryption
+	needs to take place
 	2. The extra data are processed at the end of this function */
 	if (!m_Buffer.Write(a_Data.data(), a_Data.size()))
 	{
@@ -103,16 +107,14 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 	// Unlengthed protocol, ...
 
 	// Lengthed protocol, try if it has the entire initial handshake packet:
-	if (
-		UInt32 PacketLen;
+	if (UInt32 PacketLen;
 
 		// If not enough bytes for the packet length, keep waiting
 		!m_Buffer.ReadVarInt(PacketLen) ||
 
 		// If not enough bytes for the packet, keep waiting
 		// (More of a sanity check to make sure no one tries anything funny, since ReadXXX can wait for data themselves)
-		!m_Buffer.CanReadBytes(PacketLen)
-	)
+		!m_Buffer.CanReadBytes(PacketLen))
 	{
 		m_Buffer.ResetRead();
 		return;
@@ -138,7 +140,10 @@ void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle &
 
 
 
-void cMultiVersionProtocol::HandleIncomingDataInOldPingResponseStage(cClientHandle & a_Client, const ContiguousByteBufferView a_Data)
+void cMultiVersionProtocol::HandleIncomingDataInOldPingResponseStage(
+	cClientHandle & a_Client,
+	const ContiguousByteBufferView a_Data
+)
 {
 	if (!m_Buffer.Write(a_Data.data(), a_Data.size()))
 	{
@@ -151,11 +156,7 @@ void cMultiVersionProtocol::HandleIncomingDataInOldPingResponseStage(cClientHand
 	{
 		UInt32 PacketLen;
 		UInt32 PacketID;
-		if (
-			!m_Buffer.ReadVarInt32(PacketLen) ||
-			!m_Buffer.CanReadBytes(PacketLen) ||
-			!m_Buffer.ReadVarInt32(PacketID)
-		)
+		if (!m_Buffer.ReadVarInt32(PacketLen) || !m_Buffer.CanReadBytes(PacketLen) || !m_Buffer.ReadVarInt32(PacketID))
 		{
 			// Not enough data
 			m_Buffer.ResetRead();
@@ -209,7 +210,8 @@ void cMultiVersionProtocol::HandleIncomingData(cClientHandle & a_Client, Contigu
 void cMultiVersionProtocol::HandleOutgoingData(ContiguousByteBuffer & a_Data)
 {
 	// Normally only the protocol sends data, so outgoing data are only present when m_Protocol != nullptr.
-	// However, for unrecognised protocols we send data too, and that's when m_Protocol == nullptr. Check to avoid crashing (GH #5260).
+	// However, for unrecognised protocols we send data too, and that's when m_Protocol == nullptr. Check to avoid
+	// crashing (GH #5260).
 
 	if (m_Protocol != nullptr)
 	{
@@ -232,8 +234,8 @@ void cMultiVersionProtocol::SendDisconnect(cClientHandle & a_Client, const AStri
 	const AString Message = JsonUtils::SerializeSingleValueJsonObject("text", a_Reason);
 	const auto PacketID = GetPacketID(cProtocol::ePacketType::pktDisconnectDuringLogin);
 	cByteBuffer Out(
-		cByteBuffer::GetVarIntSize(PacketID) +
-		cByteBuffer::GetVarIntSize(static_cast<UInt32>(Message.size())) + Message.size()
+		cByteBuffer::GetVarIntSize(PacketID) + cByteBuffer::GetVarIntSize(static_cast<UInt32>(Message.size())) +
+		Message.size()
 	);
 
 	VERIFY(Out.WriteVarInt32(PacketID));
@@ -263,8 +265,11 @@ bool cMultiVersionProtocol::TryHandleHTTPRequest(cClientHandle & a_Client, Conti
 
 	if (Value == u8"GET / HTTP")
 	{
-		const auto Response = fmt::format(u8"HTTP/1.0 303 See Other\r\nLocation: {}\r\n\r\n", cRoot::Get()->GetServer()->GetCustomRedirectUrl());
-		a_Client.SendData({ reinterpret_cast<const std::byte *>(Response.data()), Response.size() });
+		const auto Response = fmt::format(
+			u8"HTTP/1.0 303 See Other\r\nLocation: {}\r\n\r\n",
+			cRoot::Get()->GetServer()->GetCustomRedirectUrl()
+		);
+		a_Client.SendData({reinterpret_cast<const std::byte *>(Response.data()), Response.size()});
 		a_Client.Destroy();
 		return true;
 	}
@@ -287,19 +292,19 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 	if (!m_Buffer.ReadVarInt(PacketType) || (PacketType != 0x00))
 	{
 		// Not an initial handshake packet, we don't know how to talk to them:
-		LOGD("Client \"%s\" uses an unsupported protocol (lengthed, initial packet %u)",
-			a_Client.GetIPString().c_str(), PacketType
+		LOGD(
+			"Client \"%s\" uses an unsupported protocol (lengthed, initial packet %u)",
+			a_Client.GetIPString().c_str(),
+			PacketType
 		);
 
-		throw TriedToJoinWithUnsupportedProtocolException("Your client isn't supported.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS);
+		throw TriedToJoinWithUnsupportedProtocolException(
+			"Your client isn't supported.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS
+		);
 	}
 
-	if (
-		!m_Buffer.ReadVarInt(ProtocolVersion) ||
-		!m_Buffer.ReadVarUTF8String(ServerAddress) ||
-		!m_Buffer.ReadBEUInt16(ServerPort) ||
-		!m_Buffer.ReadVarInt(NextStateValue)
-	)
+	if (!m_Buffer.ReadVarInt(ProtocolVersion) || !m_Buffer.ReadVarUTF8String(ServerAddress) ||
+		!m_Buffer.ReadBEUInt16(ServerPort) || !m_Buffer.ReadVarInt(NextStateValue))
 	{
 		// TryRecognizeProtocol guarantees that we will have as much
 		// data to read as the client claims in the protocol length field:
@@ -310,10 +315,13 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 	{
 		switch (NextStateValue)
 		{
-			case 1:  return cProtocol::State::Status;
-			case 2:  return cProtocol::State::Login;
-			case 3:  return cProtocol::State::Game;
-			default: throw TriedToJoinWithUnsupportedProtocolException("Your client isn't supported.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS);
+			case 1: return cProtocol::State::Status;
+			case 2: return cProtocol::State::Login;
+			case 3: return cProtocol::State::Game;
+			default:
+				throw TriedToJoinWithUnsupportedProtocolException(
+					"Your client isn't supported.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS
+				);
 		}
 	}();
 
@@ -325,38 +333,61 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 
 	switch (ProtocolVersion)
 	{
-		case static_cast<UInt32>(cProtocol::Version::v1_8_0):  return std::make_unique<cProtocol_1_8_0> (&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_9_0):  return std::make_unique<cProtocol_1_9_0> (&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_9_1):  return std::make_unique<cProtocol_1_9_1> (&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_9_2):  return std::make_unique<cProtocol_1_9_2> (&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_9_4):  return std::make_unique<cProtocol_1_9_4> (&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_10_0): return std::make_unique<cProtocol_1_10_0>(&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_11_0): return std::make_unique<cProtocol_1_11_0>(&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_11_1): return std::make_unique<cProtocol_1_11_1>(&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_12):   return std::make_unique<cProtocol_1_12>  (&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_12_1): return std::make_unique<cProtocol_1_12_1>(&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_12_2): return std::make_unique<cProtocol_1_12_2>(&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_13):   return std::make_unique<cProtocol_1_13>  (&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_13_1): return std::make_unique<cProtocol_1_13_1>(&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_13_2): return std::make_unique<cProtocol_1_13_2>(&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_14):   return std::make_unique<cProtocol_1_14>  (&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_14_1): return std::make_unique<cProtocol_1_14_1>(&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_14_2): return std::make_unique<cProtocol_1_14_2>(&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_14_3): return std::make_unique<cProtocol_1_14_3>(&a_Client, ServerAddress, NextState);
-		case static_cast<UInt32>(cProtocol::Version::v1_14_4): return std::make_unique<cProtocol_1_14_4>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_8_0):
+			return std::make_unique<cProtocol_1_8_0>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_9_0):
+			return std::make_unique<cProtocol_1_9_0>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_9_1):
+			return std::make_unique<cProtocol_1_9_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_9_2):
+			return std::make_unique<cProtocol_1_9_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_9_4):
+			return std::make_unique<cProtocol_1_9_4>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_10_0):
+			return std::make_unique<cProtocol_1_10_0>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_11_0):
+			return std::make_unique<cProtocol_1_11_0>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_11_1):
+			return std::make_unique<cProtocol_1_11_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_12):
+			return std::make_unique<cProtocol_1_12>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_12_1):
+			return std::make_unique<cProtocol_1_12_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_12_2):
+			return std::make_unique<cProtocol_1_12_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_13):
+			return std::make_unique<cProtocol_1_13>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_13_1):
+			return std::make_unique<cProtocol_1_13_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_13_2):
+			return std::make_unique<cProtocol_1_13_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14):
+			return std::make_unique<cProtocol_1_14>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_1):
+			return std::make_unique<cProtocol_1_14_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_2):
+			return std::make_unique<cProtocol_1_14_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_3):
+			return std::make_unique<cProtocol_1_14_3>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_4):
+			return std::make_unique<cProtocol_1_14_4>(&a_Client, ServerAddress, NextState);
 
 		default:
 		{
-			LOGD("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
-				a_Client.GetIPString(), ProtocolVersion, ProtocolVersion
+			LOGD(
+				"Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
+				a_Client.GetIPString(),
+				ProtocolVersion,
+				ProtocolVersion
 			);
 
 			if (NextState != cProtocol::State::Status)
 			{
-				throw TriedToJoinWithUnsupportedProtocolException(
-					fmt::format(FMT_STRING("Unsupported protocol version {}.\nTry connecting with Minecraft {}"),
-					ProtocolVersion, MCS_CLIENT_VERSIONS)
-				);
+				throw TriedToJoinWithUnsupportedProtocolException(fmt::format(
+					FMT_STRING("Unsupported protocol version {}.\nTry connecting with Minecraft {}"),
+					ProtocolVersion,
+					MCS_CLIENT_VERSIONS
+				));
 			}
 
 			// No cProtocol can handle the client:

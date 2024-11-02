@@ -8,15 +8,13 @@
 
 
 // tolua_begin
-class cFallingBlock :
-	public cEntity
+class cFallingBlock : public cEntity
 {
 	// tolua_end
 
 	using Super = cEntity;
 
-public:  // tolua_export
-
+  public:  // tolua_export
 	CLASS_PROTODEF(cFallingBlock)
 
 	/** Creates a new falling block.
@@ -25,7 +23,7 @@ public:  // tolua_export
 
 	// tolua_begin
 
-	BLOCKTYPE  GetBlockType(void) const { return m_BlockType; }
+	BLOCKTYPE GetBlockType(void) const { return m_BlockType; }
 	NIBBLETYPE GetBlockMeta(void) const { return m_BlockMeta; }
 
 	// tolua_end
@@ -34,11 +32,7 @@ public:  // tolua_export
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
-private:
-	BLOCKTYPE  m_BlockType;
+  private:
+	BLOCKTYPE m_BlockType;
 	NIBBLETYPE m_BlockMeta;
-} ;  // tolua_export
-
-
-
-
+};  // tolua_export

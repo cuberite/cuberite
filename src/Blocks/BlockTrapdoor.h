@@ -8,21 +8,16 @@
 
 
 
-class cBlockTrapdoorHandler final :
-	public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>
+class cBlockTrapdoorHandler final
+	: public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>
 {
 	using Super = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
-	virtual bool IsUseable(void) const override
-	{
-		return true;
-	}
+  private:
+	virtual bool IsUseable(void) const override { return true; }
 
 
 
@@ -46,7 +41,12 @@ private:
 		// Flip the ON bit on / off using the XOR bitwise operation
 		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockPos) ^ 0x04);
 		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, a_BlockPos, 0, a_Player.GetClientHandle());
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundParticleEffect(
+			EffectID::SFX_RANDOM_FENCE_GATE_OPEN,
+			a_BlockPos,
+			0,
+			a_Player.GetClientHandle()
+		);
 
 		return true;
 	}
@@ -96,7 +96,7 @@ private:
 		UNUSED(a_Meta);
 		switch (m_BlockType)
 		{
-			case E_BLOCK_TRAPDOOR: return 13;
+			case E_BLOCK_TRAPDOOR:      return 13;
 			case E_BLOCK_IRON_TRAPDOOR: return 6;
 			default:
 			{
@@ -106,7 +106,3 @@ private:
 		}
 	}
 };
-
-
-
-

@@ -20,8 +20,7 @@ class cBlockPluginInterface;
 
 class cItemHandler
 {
-public:
-
+  public:
 	friend class cItem;
 
 	/** Actions that may cause durability of an item may be lost, where the
@@ -34,7 +33,8 @@ public:
 		dlaBreakBlockInstant,
 	};
 
-	constexpr cItemHandler(int a_ItemType) : m_ItemType(a_ItemType)
+	constexpr cItemHandler(int a_ItemType) :
+		m_ItemType(a_ItemType)
 	{
 	}
 
@@ -44,7 +44,15 @@ public:
 	a_ClickedBlockFace is the face has been clicked to place this item.
 	a_CursorPosition is the position of the player's cursor within a_ClickedBlockFace.
 	If the block placement is refused inside this call, it will automatically revert the client-side changes. */
-	void OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, Vector3i a_ClickedPosition, BLOCKTYPE a_ClickedBlockType, NIBBLETYPE a_ClickedBlockMeta, eBlockFace a_ClickedBlockFace, Vector3i a_CursorPosition) const;
+	void OnPlayerPlace(
+		cPlayer & a_Player,
+		const cItem & a_HeldItem,
+		Vector3i a_ClickedPosition,
+		BLOCKTYPE a_ClickedBlockType,
+		NIBBLETYPE a_ClickedBlockMeta,
+		eBlockFace a_ClickedBlockFace,
+		Vector3i a_CursorPosition
+	) const;
 
 	/** Called when the player tries to use the item (right mouse button).
 	Descendants can return false to abort the usage (default behavior). */
@@ -64,7 +72,8 @@ public:
 		UNUSED(a_BlockFace);
 	}
 
-	/** Called every tick while the item is on the player's inventory (used by maps, for example) - For now, called only for equipped items */
+	/** Called every tick while the item is on the player's inventory (used by maps, for example) - For now, called only
+	 * for equipped items */
 	virtual void OnUpdate(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item) const
 	{
 		UNUSED(a_World);
@@ -74,7 +83,9 @@ public:
 
 	/** Called while the player digs a block using this item */
 	virtual bool OnDiggingBlock(
-		cWorld * a_World, cPlayer * a_Player, const cItem & a_HeldItem,
+		cWorld * a_World,
+		cPlayer * a_Player,
+		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
 	) const;
@@ -83,7 +94,7 @@ public:
 	virtual void OnEntityAttack(cPlayer * a_Attacker, cEntity * a_AttackedEntity) const;
 
 	/** Called after the player has eaten this item. */
-	virtual void OnFoodEaten(cWorld *a_World, cPlayer *a_Player, cItem *a_Item) const;
+	virtual void OnFoodEaten(cWorld * a_World, cPlayer * a_Player, cItem * a_Item) const;
 
 	/** Get the durability lost which the item will get, when a specified action
 	was performed. This is only relevant for uses where the damage taken may
@@ -95,15 +106,14 @@ public:
 
 	struct FoodInfo
 	{
-		int    FoodLevel;
+		int FoodLevel;
 		double Saturation;
 
 		constexpr FoodInfo(int a_FoodLevel, double a_Saturation) :
-			FoodLevel(a_FoodLevel),
-			Saturation(a_Saturation)
+			FoodLevel(a_FoodLevel), Saturation(a_Saturation)
 		{
 		}
-	} ;
+	};
 
 	/** Returns the FoodInfo for this item. (FoodRecovery and Saturation) */
 	virtual FoodInfo GetFoodInfo(const cItem * a_Item) const;
@@ -123,8 +133,8 @@ public:
 	/** Can the anvil repair this item, when a_Item is the second input? */
 	virtual bool CanRepairWithRawMaterial(short a_ItemType) const;
 
-	/** Returns whether this tool / item can harvest a specific block (e.g. iron pickaxe can harvest diamond ore, but wooden one can't).
-	Defaults to false unless overridden. */
+	/** Returns whether this tool / item can harvest a specific block (e.g. iron pickaxe can harvest diamond ore, but
+	wooden one can't). Defaults to false unless overridden. */
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) const;
 
 	/** Returns the strength to break a specific block.
@@ -132,8 +142,7 @@ public:
 	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) const;
 
 
-protected:
-
+  protected:
 	static const cItemHandler & For(int a_ItemType);
 
 	~cItemHandler() = default;
@@ -142,8 +151,14 @@ protected:
 
 	/** Performs the actual placement of this placeable item.
 	The descendant handler should call a_Player.PlaceBlock(s) supplying correct values for the newly placed block.
-	The default handler uses the stored block type and meta copied from the lowest 4 bits of the player's equipped item's damage value.
-	Handlers return what a_Player.PlaceBlock(s) returns, indicating whether the placement was successful. */
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, Vector3i a_PlacePosition, eBlockFace a_ClickedBlockFace, Vector3i a_CursorPosition) const;
+	The default handler uses the stored block type and meta copied from the lowest 4 bits of the player's equipped
+	item's damage value. Handlers return what a_Player.PlaceBlock(s) returns, indicating whether the placement was
+	successful. */
+	virtual bool CommitPlacement(
+		cPlayer & a_Player,
+		const cItem & a_HeldItem,
+		Vector3i a_PlacePosition,
+		eBlockFace a_ClickedBlockFace,
+		Vector3i a_CursorPosition
+	) const;
 };
-

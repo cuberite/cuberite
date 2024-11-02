@@ -27,7 +27,7 @@ using cMapCallback = cFunctionRef<bool(cMap &)>;
 /** Manages the in-game maps of a single world - Thread safe. */
 class cMapManager
 {
-public:
+  public:
 	// tolua_end
 
 	cMapManager(cWorld * a_World);
@@ -54,8 +54,7 @@ public:
 	void SaveMapData(void);
 
 
-private:
-
+  private:
 	typedef std::vector<cMap> cMapList;
 
 	cCriticalSection m_CS;
@@ -69,6 +68,3 @@ private:
 	unsigned int m_TicksUntilNextSave;
 
 };  // tolua_export
-
-
-

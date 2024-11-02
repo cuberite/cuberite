@@ -8,17 +8,14 @@
 
 
 
-class cItemTrapdoorHandler final  :
-	public cItemHandler
+class cItemTrapdoorHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
 	{
 		switch (a_BlockFace)
@@ -27,12 +24,18 @@ private:
 			case BLOCK_FACE_ZM: return 0x0;
 			case BLOCK_FACE_XP: return 0x3;
 			case BLOCK_FACE_XM: return 0x2;
-			default: UNREACHABLE("Unsupported block face");
+			default:            UNREACHABLE("Unsupported block face");
 		}
 	}
 
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
+	virtual bool CommitPlacement(
+		cPlayer & a_Player,
+		const cItem & a_HeldItem,
+		const Vector3i a_PlacePosition,
+		const eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPosition
+	) const override
 	{
 		NIBBLETYPE Meta;
 

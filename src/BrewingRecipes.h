@@ -13,7 +13,7 @@
 
 class cBrewingRecipes
 {
-public:
+  public:
 	cBrewingRecipes(void);
 
 	void ReloadRecipes(void);
@@ -43,7 +43,8 @@ public:
 
 	/** Returns true if the item is the fuel, false if not. */
 	bool IsFuel(const cItem & a_Item) const;
-private:
+
+  private:
 	using cRecipes = std::vector<std::unique_ptr<cBrewingRecipes::cRecipe>>;
 
 	void ClearRecipes(void);
@@ -56,6 +57,7 @@ private:
 	bool ParseItem(const AString & a_String, cItem & a_Item);
 
 	/** The collection of parsed recipes.
-	GetRecipeFrom may cache splash variants of recipes here but the observable behaviour is constant, so this should be mutable. */
+	GetRecipeFrom may cache splash variants of recipes here but the observable behaviour is constant, so this should be
+	mutable. */
 	mutable cRecipes m_Recipes;
 };

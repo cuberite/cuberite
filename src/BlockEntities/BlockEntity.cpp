@@ -29,7 +29,12 @@
 
 
 
-cBlockEntity::cBlockEntity(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta, const Vector3i a_Pos, cWorld * const a_World) :
+cBlockEntity::cBlockEntity(
+	const BLOCKTYPE a_BlockType,
+	const NIBBLETYPE a_BlockMeta,
+	const Vector3i a_Pos,
+	cWorld * const a_World
+) :
 	m_Pos(a_Pos),
 	m_RelX(a_Pos.x - cChunkDef::Width * FAST_FLOOR_DIV(a_Pos.x, cChunkDef::Width)),
 	m_RelZ(a_Pos.z - cChunkDef::Width * FAST_FLOOR_DIV(a_Pos.z, cChunkDef::Width)),
@@ -74,40 +79,51 @@ void cBlockEntity::CopyFrom(const cBlockEntity & a_Src)
 
 
 
-OwnedBlockEntity cBlockEntity::CreateByBlockType(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta, const Vector3i a_Pos, cWorld * const a_World)
+OwnedBlockEntity cBlockEntity::CreateByBlockType(
+	const BLOCKTYPE a_BlockType,
+	const NIBBLETYPE a_BlockMeta,
+	const Vector3i a_Pos,
+	cWorld * const a_World
+)
 {
 	switch (a_BlockType)
 	{
 		// Banners:
 		case E_BLOCK_STANDING_BANNER:
-		case E_BLOCK_WALL_BANNER:       return std::make_unique<cBannerEntity         >(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_WALL_BANNER:     return std::make_unique<cBannerEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
 
 		// Others:
-		case E_BLOCK_BEACON:            return std::make_unique<cBeaconEntity         >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_BED:               return std::make_unique<cBedEntity            >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_BREWING_STAND:     return std::make_unique<cBrewingstandEntity   >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_CHEST:             return std::make_unique<cChestEntity          >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_COMMAND_BLOCK:     return std::make_unique<cCommandBlockEntity   >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_DISPENSER:         return std::make_unique<cDispenserEntity      >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_DROPPER:           return std::make_unique<cDropperEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_ENCHANTMENT_TABLE: return std::make_unique<cEnchantingTableEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_ENDER_CHEST:       return std::make_unique<cEnderChestEntity     >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_END_PORTAL:        return std::make_unique<cEndPortalEntity      >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_FLOWER_POT:        return std::make_unique<cFlowerPotEntity      >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_FURNACE:           return std::make_unique<cFurnaceEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_HEAD:              return std::make_unique<cMobHeadEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_HOPPER:            return std::make_unique<cHopperEntity         >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_JUKEBOX:           return std::make_unique<cJukeboxEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_LIT_FURNACE:       return std::make_unique<cFurnaceEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_MOB_SPAWNER:       return std::make_unique<cMobSpawnerEntity     >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_NOTE_BLOCK:        return std::make_unique<cNoteEntity           >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_SIGN_POST:         return std::make_unique<cSignEntity           >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_TRAPPED_CHEST:     return std::make_unique<cChestEntity          >(a_BlockType, a_BlockMeta, a_Pos, a_World);
-		case E_BLOCK_WALLSIGN:          return std::make_unique<cSignEntity           >(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_BEACON:          return std::make_unique<cBeaconEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_BED:             return std::make_unique<cBedEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_BREWING_STAND:
+			return std::make_unique<cBrewingstandEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_CHEST: return std::make_unique<cChestEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_COMMAND_BLOCK:
+			return std::make_unique<cCommandBlockEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_DISPENSER: return std::make_unique<cDispenserEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_DROPPER:   return std::make_unique<cDropperEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_ENCHANTMENT_TABLE:
+			return std::make_unique<cEnchantingTableEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_ENDER_CHEST:   return std::make_unique<cEnderChestEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_END_PORTAL:    return std::make_unique<cEndPortalEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_FLOWER_POT:    return std::make_unique<cFlowerPotEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_FURNACE:       return std::make_unique<cFurnaceEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_HEAD:          return std::make_unique<cMobHeadEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_HOPPER:        return std::make_unique<cHopperEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_JUKEBOX:       return std::make_unique<cJukeboxEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_LIT_FURNACE:   return std::make_unique<cFurnaceEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_MOB_SPAWNER:   return std::make_unique<cMobSpawnerEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_NOTE_BLOCK:    return std::make_unique<cNoteEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_SIGN_POST:     return std::make_unique<cSignEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_TRAPPED_CHEST: return std::make_unique<cChestEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
+		case E_BLOCK_WALLSIGN:      return std::make_unique<cSignEntity>(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		default:
 		{
-			LOGD("%s: Requesting creation of an unknown block entity - block type %d (%s)",
-				__FUNCTION__, a_BlockType, ItemTypeToString(a_BlockType).c_str()
+			LOGD(
+				"%s: Requesting creation of an unknown block entity - block type %d (%s)",
+				__FUNCTION__,
+				a_BlockType,
+				ItemTypeToString(a_BlockType).c_str()
 			);
 			ASSERT(!"Requesting creation of an unknown block entity");
 			return nullptr;
@@ -119,9 +135,7 @@ OwnedBlockEntity cBlockEntity::CreateByBlockType(const BLOCKTYPE a_BlockType, co
 
 
 
-void cBlockEntity::Destroy()
-{
-}
+void cBlockEntity::Destroy() {}
 
 
 
@@ -177,9 +191,7 @@ void cBlockEntity::OnAddToWorld(cWorld & a_World, cChunk & a_Chunk)
 
 
 
-void cBlockEntity::OnRemoveFromWorld()
-{
-}
+void cBlockEntity::OnRemoveFromWorld() {}
 
 
 
@@ -187,7 +199,9 @@ void cBlockEntity::OnRemoveFromWorld()
 
 void cBlockEntity::SetPos(const Vector3i a_NewPos)
 {
-	ASSERT(m_World == nullptr);  // Cannot move block entities that represent world blocks (only use this for cBlockArea's BEs)
+	ASSERT(
+		m_World == nullptr
+	);  // Cannot move block entities that represent world blocks (only use this for cBlockArea's BEs)
 	m_Pos = a_NewPos;
 }
 

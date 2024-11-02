@@ -6,15 +6,12 @@
 
 
 
-class cBlockSlimeHandler final :
-	public cClearMetaOnDrop<cBlockHandler>
+class cBlockSlimeHandler final : public cClearMetaOnDrop<cBlockHandler>
 {
-public:
-
+  public:
 	using cClearMetaOnDrop<cBlockHandler>::cClearMetaOnDrop;
 
-private:
-
+  private:
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);

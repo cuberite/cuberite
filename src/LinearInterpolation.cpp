@@ -55,12 +55,7 @@ public:
 
 
 // Puts linearly interpolated values from one array into another array. 1D version
-void LinearInterpolate1DArray(
-	float * a_Src,
-	int a_SrcSizeX,
-	float * a_Dst,
-	int a_DstSizeX
-)
+void LinearInterpolate1DArray(float * a_Src, int a_SrcSizeX, float * a_Dst, int a_DstSizeX)
 {
 	a_Dst[0] = a_Src[0];
 	int DstSizeXm1 = a_DstSizeX - 1;
@@ -85,9 +80,11 @@ void LinearInterpolate1DArray(
 // Puts linearly interpolated values from one array into another array. 2D version
 void LinearInterpolate2DArray(
 	float * a_Src,
-	int a_SrcSizeX, int a_SrcSizeY,
+	int a_SrcSizeX,
+	int a_SrcSizeY,
 	float * a_Dst,
-	int a_DstSizeX, int a_DstSizeY
+	int a_DstSizeX,
+	int a_DstSizeY
 )
 {
 	ASSERT(a_DstSizeX > 0);
@@ -98,8 +95,8 @@ void LinearInterpolate2DArray(
 	// Calculate interpolation ratios and src indices along each axis:
 	float RatioX[MAX_INTERPOL_SIZEX];
 	float RatioY[MAX_INTERPOL_SIZEY];
-	int   SrcIdxX[MAX_INTERPOL_SIZEX];
-	int   SrcIdxY[MAX_INTERPOL_SIZEY];
+	int SrcIdxX[MAX_INTERPOL_SIZEX];
+	int SrcIdxY[MAX_INTERPOL_SIZEY];
 	for (int x = 1; x < a_DstSizeX; x++)
 	{
 		SrcIdxX[x] = x * (a_SrcSizeX - 1) / (a_DstSizeX - 1);
@@ -111,7 +108,8 @@ void LinearInterpolate2DArray(
 		RatioY[y] = (static_cast<float>(y * (a_SrcSizeY - 1)) / (a_DstSizeY - 1)) - SrcIdxY[y];
 	}
 
-	// Special values at the ends. Notice especially the last indices being (size - 2) with ratio set to 1, to avoid index overflow:
+	// Special values at the ends. Notice especially the last indices being (size - 2) with ratio set to 1, to avoid
+	// index overflow:
 	SrcIdxX[0] = 0;
 	RatioX[0] = 0;
 	SrcIdxY[0] = 0;
@@ -131,9 +129,9 @@ void LinearInterpolate2DArray(
 		for (int x = 0; x < a_DstSizeX; x++)
 		{
 			// The four src corners of the current "cell":
-			float LoXLoY = a_Src[SrcIdxX[x] +     idxLoY];
+			float LoXLoY = a_Src[SrcIdxX[x] + idxLoY];
 			float HiXLoY = a_Src[SrcIdxX[x] + 1 + idxLoY];
-			float LoXHiY = a_Src[SrcIdxX[x] +     idxHiY];
+			float LoXHiY = a_Src[SrcIdxX[x] + idxHiY];
 			float HiXHiY = a_Src[SrcIdxX[x] + 1 + idxHiY];
 
 			// Linear interpolation along the X axis:
@@ -153,9 +151,13 @@ void LinearInterpolate2DArray(
 
 void LinearInterpolate3DArray(
 	float * a_Src,
-	int a_SrcSizeX, int a_SrcSizeY, int a_SrcSizeZ,
+	int a_SrcSizeX,
+	int a_SrcSizeY,
+	int a_SrcSizeZ,
 	float * a_Dst,
-	int a_DstSizeX, int a_DstSizeY, int a_DstSizeZ
+	int a_DstSizeX,
+	int a_DstSizeY,
+	int a_DstSizeZ
 )
 {
 	ASSERT(a_DstSizeX > 0);
@@ -169,9 +171,9 @@ void LinearInterpolate3DArray(
 	float RatioX[MAX_INTERPOL_SIZEX];
 	float RatioY[MAX_INTERPOL_SIZEY];
 	float RatioZ[MAX_INTERPOL_SIZEZ];
-	int   SrcIdxX[MAX_INTERPOL_SIZEX];
-	int   SrcIdxY[MAX_INTERPOL_SIZEY];
-	int   SrcIdxZ[MAX_INTERPOL_SIZEZ];
+	int SrcIdxX[MAX_INTERPOL_SIZEX];
+	int SrcIdxY[MAX_INTERPOL_SIZEY];
+	int SrcIdxZ[MAX_INTERPOL_SIZEZ];
 	for (int x = 1; x < a_DstSizeX; x++)
 	{
 		SrcIdxX[x] = x * (a_SrcSizeX - 1) / (a_DstSizeX - 1);
@@ -188,19 +190,20 @@ void LinearInterpolate3DArray(
 		RatioZ[z] = (static_cast<float>(z * (a_SrcSizeZ - 1)) / (a_DstSizeZ - 1)) - SrcIdxZ[z];
 	}
 
-	// Special values at the ends. Notice especially the last indices being (size - 2) with ratio set to 1, to avoid index overflow:
+	// Special values at the ends. Notice especially the last indices being (size - 2) with ratio set to 1, to avoid
+	// index overflow:
 	SrcIdxX[0] = 0;
-	RatioX[0]  = 0;
+	RatioX[0] = 0;
 	SrcIdxY[0] = 0;
-	RatioY[0]  = 0;
+	RatioY[0] = 0;
 	SrcIdxZ[0] = 0;
-	RatioZ[0]  = 0;
+	RatioZ[0] = 0;
 	SrcIdxX[a_DstSizeX - 1] = a_SrcSizeX - 2;
-	RatioX[a_DstSizeX - 1]  = 1;
+	RatioX[a_DstSizeX - 1] = 1;
 	SrcIdxY[a_DstSizeY - 1] = a_SrcSizeY - 2;
-	RatioY[a_DstSizeY - 1]  = 1;
+	RatioY[a_DstSizeY - 1] = 1;
 	SrcIdxZ[a_DstSizeZ - 1] = a_SrcSizeZ - 2;
-	RatioZ[a_DstSizeZ - 1]  = 1;
+	RatioZ[a_DstSizeZ - 1] = 1;
 
 	// Output all the dst array values using the indices and ratios:
 	int idx = 0;
@@ -217,13 +220,13 @@ void LinearInterpolate3DArray(
 			for (int x = 0; x < a_DstSizeX; x++)
 			{
 				// The eight src corners of the current "cell":
-				float LoXLoYLoZ = a_Src[SrcIdxX[x] +     idxLoY + idxLoZ];
+				float LoXLoYLoZ = a_Src[SrcIdxX[x] + idxLoY + idxLoZ];
 				float HiXLoYLoZ = a_Src[SrcIdxX[x] + 1 + idxLoY + idxLoZ];
-				float LoXHiYLoZ = a_Src[SrcIdxX[x] +     idxHiY + idxLoZ];
+				float LoXHiYLoZ = a_Src[SrcIdxX[x] + idxHiY + idxLoZ];
 				float HiXHiYLoZ = a_Src[SrcIdxX[x] + 1 + idxHiY + idxLoZ];
-				float LoXLoYHiZ = a_Src[SrcIdxX[x] +     idxLoY + idxHiZ];
+				float LoXLoYHiZ = a_Src[SrcIdxX[x] + idxLoY + idxHiZ];
 				float HiXLoYHiZ = a_Src[SrcIdxX[x] + 1 + idxLoY + idxHiZ];
-				float LoXHiYHiZ = a_Src[SrcIdxX[x] +     idxHiY + idxHiZ];
+				float LoXHiYHiZ = a_Src[SrcIdxX[x] + idxHiY + idxHiZ];
 				float HiXHiYHiZ = a_Src[SrcIdxX[x] + 1 + idxHiY + idxHiZ];
 
 				// Linear interpolation along the Z axis:
@@ -243,8 +246,3 @@ void LinearInterpolate3DArray(
 		}  // for y
 	}  // for z
 }
-
-
-
-
-

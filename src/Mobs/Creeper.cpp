@@ -76,20 +76,16 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_GUNPOWDER);
 
 	// If the creeper was killed by a skeleton, add a random music disc drop:
-	if (
-		(a_Killer != nullptr) &&
-		a_Killer->IsProjectile() &&
+	if ((a_Killer != nullptr) && a_Killer->IsProjectile() &&
 		((static_cast<cProjectileEntity *>(a_Killer))->GetCreatorUniqueID() != cEntity::INVALID_ID))
 	{
 		auto ProjectileCreatorCallback = [](cEntity & a_Entity)
-			{
-				return (
-					a_Entity.IsMob() &&
-					((static_cast<cMonster &>(a_Entity)).GetMobType() == mtSkeleton)
-				);
-			};
+		{ return (a_Entity.IsMob() && ((static_cast<cMonster &>(a_Entity)).GetMobType() == mtSkeleton)); };
 
-		if (GetWorld()->DoWithEntityByID(static_cast<cProjectileEntity *>(a_Killer)->GetCreatorUniqueID(), ProjectileCreatorCallback))
+		if (GetWorld()->DoWithEntityByID(
+				static_cast<cProjectileEntity *>(a_Killer)->GetCreatorUniqueID(),
+				ProjectileCreatorCallback
+			))
 		{
 			AddRandomDropItem(a_Drops, 1, 1, static_cast<short>(m_World->GetTickRandomNumber(11) + E_ITEM_FIRST_DISC));
 		}
@@ -126,7 +122,12 @@ bool cCreeper::Attack(std::chrono::milliseconds a_Dt)
 
 	if (!m_bIsBlowing)
 	{
-		m_World->BroadcastSoundEffect("entity.creeper.primed", GetPosition(), 1.f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+		m_World->BroadcastSoundEffect(
+			"entity.creeper.primed",
+			GetPosition(),
+			1.f,
+			(0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64)
+		);
 		m_bIsBlowing = true;
 		m_World->BroadcastEntityMetadata(*this);
 
@@ -149,7 +150,12 @@ void cCreeper::OnRightClicked(cPlayer & a_Player)
 		{
 			a_Player.UseEquippedItem();
 		}
-		m_World->BroadcastSoundEffect("entity.creeper.primed", GetPosition(), 1.f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+		m_World->BroadcastSoundEffect(
+			"entity.creeper.primed",
+			GetPosition(),
+			1.f,
+			(0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64)
+		);
 		m_bIsBlowing = true;
 		m_World->BroadcastEntityMetadata(*this);
 		m_BurnedWithFlintAndSteel = true;

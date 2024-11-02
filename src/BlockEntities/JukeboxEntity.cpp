@@ -13,9 +13,8 @@
 
 
 
-cJukeboxEntity::cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
-	m_Record(0)
+cJukeboxEntity::cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) :
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World), m_Record(0)
 {
 	ASSERT(a_BlockType == E_BLOCK_JUKEBOX);
 }

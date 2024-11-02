@@ -28,7 +28,7 @@ class cCtrDrbgContext
 	friend class cRsaPrivateKey;
 	friend class cCryptoKey;
 
-public:
+  public:
 	/** Constructs the context with a new entropy context. */
 	cCtrDrbgContext(void);
 
@@ -43,7 +43,7 @@ public:
 	/** Returns true if the object is valid (has been initialized properly) */
 	bool IsValid(void) const { return m_IsValid; }
 
-protected:
+  protected:
 	/** The entropy source used for generating the random */
 	std::shared_ptr<cEntropyContext> m_EntropyContext;
 
@@ -56,8 +56,4 @@ protected:
 
 	/** Returns the internal context ptr. Only use in mbedTLS API calls. */
 	mbedtls_ctr_drbg_context * GetInternal(void) { return &m_CtrDrbg; }
-} ;
-
-
-
-
+};

@@ -10,24 +10,28 @@
 
 
 
-class cBlockFenceHandler final :
-	public cBlockHandler
+class cBlockFenceHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	// These are the min and max coordinates (X and Z) for a straight fence.
 	// 0.4 and 0.6 are really just guesses, but they seem pretty good.
 	// (0.4 to 0.6 is a fence that's 0.2 wide, down the center of the block)
 	static constexpr double MIN_COORD = 0.4;
 	static constexpr double MAX_COORD = 0.6;
 
-	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) const override
+	virtual cBoundingBox GetPlacementCollisionBox(
+		BLOCKTYPE a_XM,
+		BLOCKTYPE a_XP,
+		BLOCKTYPE a_YM,
+		BLOCKTYPE a_YP,
+		BLOCKTYPE a_ZM,
+		BLOCKTYPE a_ZP
+	) const override
 	{
 		bool XMSolid = cBlockInfo::IsSolid(a_XM);
 		bool XPSolid = cBlockInfo::IsSolid(a_XP);
@@ -144,19 +148,18 @@ private:
 
 
 
-	virtual bool IsUseable(void) const override
-	{
-		return true;
-	}
+	virtual bool IsUseable(void) const override { return true; }
 
 
 
 
 
 	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BLOCKTYPE a_OldBlockType,
+		NIBBLETYPE a_OldBlockMeta,
 		const cEntity * a_Digger
 	) const override
 	{
@@ -169,7 +172,3 @@ private:
 		}
 	}
 };
-
-
-
-

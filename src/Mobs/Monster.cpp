@@ -36,43 +36,42 @@ static const struct
 	const char * m_lcName;
 	const char * m_VanillaName;
 	const char * m_VanillaNameNBT;
-} g_MobTypeNames[] =
-{
-	{mtBat,            "bat",            "Bat",            "bat"},
-	{mtBlaze,          "blaze",          "Blaze",          "blaze"},
-	{mtCaveSpider,     "cavespider",     "CaveSpider",     "cave_spider"},
-	{mtChicken,        "chicken",        "Chicken",        "chicken"},
-	{mtCow,            "cow",            "Cow",            "cow"},
-	{mtCreeper,        "creeper",        "Creeper",        "creeper"},
-	{mtEnderman,       "enderman",       "Enderman",       "enderman"},
-	{mtEndermite,      "endermite",      "Endermite",      "endermite"},
-	{mtEnderDragon,    "enderdragon",    "EnderDragon",    "ender_dragon"},
-	{mtGhast,          "ghast",          "Ghast",          "ghast"},
-	{mtGiant,          "giant",          "Giant",          "giant"},
-	{mtGuardian,       "guardian",       "Guardian",       "guardian"},
-	{mtHorse,          "horse",          "EntityHorse",    "horse"},
-	{mtIronGolem,      "irongolem",      "VillagerGolem",  "iron_golem"},
-	{mtMagmaCube,      "magmacube",      "LavaSlime",      "magma_cube"},
-	{mtMooshroom,      "mooshroom",      "MushroomCow",    "mooshroom"},
-	{mtOcelot,         "ocelot",         "Ozelot",         "ocelot"},
-	{mtPig,            "pig",            "Pig",            "pig"},
-	{mtRabbit,         "rabbit",         "Rabbit",         "rabbit"},
-	{mtSheep,          "sheep",          "Sheep",          "sheep"},
-	{mtSilverfish,     "silverfish",     "Silverfish",     "silverfish"},
-	{mtSkeleton,       "skeleton",       "Skeleton",       "skeleton"},
-	{mtSlime,          "slime",          "Slime",          "slime"},
-	{mtSnowGolem,      "snowgolem",      "SnowMan",        "snow_golem"},
-	{mtSpider,         "spider",         "Spider",         "spider"},
-	{mtSquid,          "squid",          "Squid",          "squid"},
-	{mtVillager,       "villager",       "Villager",       "villager"},
-	{mtWitch,          "witch",          "Witch",          "witch"},
-	{mtWither,         "wither",         "WitherBoss",     "wither"},
+} g_MobTypeNames[] = {
+	{mtBat, "bat", "Bat", "bat"},
+	{mtBlaze, "blaze", "Blaze", "blaze"},
+	{mtCaveSpider, "cavespider", "CaveSpider", "cave_spider"},
+	{mtChicken, "chicken", "Chicken", "chicken"},
+	{mtCow, "cow", "Cow", "cow"},
+	{mtCreeper, "creeper", "Creeper", "creeper"},
+	{mtEnderman, "enderman", "Enderman", "enderman"},
+	{mtEndermite, "endermite", "Endermite", "endermite"},
+	{mtEnderDragon, "enderdragon", "EnderDragon", "ender_dragon"},
+	{mtGhast, "ghast", "Ghast", "ghast"},
+	{mtGiant, "giant", "Giant", "giant"},
+	{mtGuardian, "guardian", "Guardian", "guardian"},
+	{mtHorse, "horse", "EntityHorse", "horse"},
+	{mtIronGolem, "irongolem", "VillagerGolem", "iron_golem"},
+	{mtMagmaCube, "magmacube", "LavaSlime", "magma_cube"},
+	{mtMooshroom, "mooshroom", "MushroomCow", "mooshroom"},
+	{mtOcelot, "ocelot", "Ozelot", "ocelot"},
+	{mtPig, "pig", "Pig", "pig"},
+	{mtRabbit, "rabbit", "Rabbit", "rabbit"},
+	{mtSheep, "sheep", "Sheep", "sheep"},
+	{mtSilverfish, "silverfish", "Silverfish", "silverfish"},
+	{mtSkeleton, "skeleton", "Skeleton", "skeleton"},
+	{mtSlime, "slime", "Slime", "slime"},
+	{mtSnowGolem, "snowgolem", "SnowMan", "snow_golem"},
+	{mtSpider, "spider", "Spider", "spider"},
+	{mtSquid, "squid", "Squid", "squid"},
+	{mtVillager, "villager", "Villager", "villager"},
+	{mtWitch, "witch", "Witch", "witch"},
+	{mtWither, "wither", "WitherBoss", "wither"},
 	{mtWitherSkeleton, "witherskeleton", "WitherSkeleton", "wither_skeleton"},
-	{mtWolf,           "wolf",           "Wolf",           "wolf"},
-	{mtZombie,         "zombie",         "Zombie",         "zombie"},
-	{mtZombiePigman,   "zombiepigman",   "PigZombie",      "zombie_pigman"},
+	{mtWolf, "wolf", "Wolf", "wolf"},
+	{mtZombie, "zombie", "Zombie", "zombie"},
+	{mtZombiePigman, "zombiepigman", "PigZombie", "zombie_pigman"},
 	{mtZombieVillager, "zombievillager", "ZombieVillager", "zombie_villager"},
-} ;
+};
 
 
 
@@ -81,47 +80,56 @@ static const struct
 ////////////////////////////////////////////////////////////////////////////////
 // cMonster:
 
-cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height)
-	: Super(etMonster, a_Width, a_Height)
-	, m_EMState(IDLE)
-	, m_EMPersonality(AGGRESSIVE)
-	, m_PathFinder(a_Width, a_Height)
-	, m_PathfinderActivated(false)
-	, m_JumpCoolDown(0)
-	, m_IdleInterval(0)
-	, m_DestroyTimer(0)
-	, m_MobType(a_MobType)
-	, m_CustomName()
-	, m_CustomNameAlwaysVisible(false)
-	, m_SoundHurt(a_SoundHurt)
-	, m_SoundDeath(a_SoundDeath)
-	, m_SoundAmbient(a_SoundAmbient)
-	, m_AttackRate(3)
-	, m_AttackDamage(1)
-	, m_AttackRange(1)
-	, m_AttackCoolDownTicksLeft(0)
-	, m_SightDistance(25)
-	, m_DropChanceWeapon(0.085f)
-	, m_DropChanceHelmet(0.085f)
-	, m_DropChanceChestplate(0.085f)
-	, m_DropChanceLeggings(0.085f)
-	, m_DropChanceBoots(0.085f)
-	, m_CanPickUpLoot(true)
-	, m_TicksSinceLastDamaged(100)
-	, m_BurnsInDaylight(false)
-	, m_RelativeWalkSpeed(1)
-	, m_Age(1)
-	, m_AgingTimer(TPS * 60 * 20)  // about 20 minutes
-	, m_WasLastTargetAPlayer(false)
-	, m_LeashedTo(nullptr)
-	, m_LeashToPos(nullptr)
-	, m_IsLeashActionJustDone(false)
-	, m_CanBeLeashed(GetMobFamily() == eFamily::mfPassive)
-	, m_LovePartner(nullptr)
-	, m_LoveTimer(0)
-	, m_LoveCooldown(0)
-	, m_MatingTimer(0)
-	, m_Target(nullptr)
+cMonster::cMonster(
+	const AString & a_ConfigName,
+	eMonsterType a_MobType,
+	const AString & a_SoundHurt,
+	const AString & a_SoundDeath,
+	const AString & a_SoundAmbient,
+	float a_Width,
+	float a_Height
+) :
+	Super(etMonster, a_Width, a_Height),
+	m_EMState(IDLE),
+	m_EMPersonality(AGGRESSIVE),
+	m_PathFinder(a_Width, a_Height),
+	m_PathfinderActivated(false),
+	m_JumpCoolDown(0),
+	m_IdleInterval(0),
+	m_DestroyTimer(0),
+	m_MobType(a_MobType),
+	m_CustomName(),
+	m_CustomNameAlwaysVisible(false),
+	m_SoundHurt(a_SoundHurt),
+	m_SoundDeath(a_SoundDeath),
+	m_SoundAmbient(a_SoundAmbient),
+	m_AttackRate(3),
+	m_AttackDamage(1),
+	m_AttackRange(1),
+	m_AttackCoolDownTicksLeft(0),
+	m_SightDistance(25),
+	m_DropChanceWeapon(0.085f),
+	m_DropChanceHelmet(0.085f),
+	m_DropChanceChestplate(0.085f),
+	m_DropChanceLeggings(0.085f),
+	m_DropChanceBoots(0.085f),
+	m_CanPickUpLoot(true),
+	m_TicksSinceLastDamaged(100),
+	m_BurnsInDaylight(false),
+	m_RelativeWalkSpeed(1),
+	m_Age(1),
+	m_AgingTimer(TPS * 60 * 20)  // about 20 minutes
+	,
+	m_WasLastTargetAPlayer(false),
+	m_LeashedTo(nullptr),
+	m_LeashToPos(nullptr),
+	m_IsLeashActionJustDone(false),
+	m_CanBeLeashed(GetMobFamily() == eFamily::mfPassive),
+	m_LovePartner(nullptr),
+	m_LoveTimer(0),
+	m_LoveCooldown(0),
+	m_MatingTimer(0),
+	m_Target(nullptr)
 {
 	if (!a_ConfigName.empty())
 	{
@@ -189,17 +197,18 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 	{
 		if (DoesPosYRequireJump(FloorC(m_NextWayPointPosition.y)))
 		{
-			if (
-				(IsOnGround() && (GetSpeed().SqrLength() <= 0.5)) ||  // If walking on the ground, we need to slow down first, otherwise we miss the jump
-				IsInWater()
-			)
+			if ((IsOnGround() && (GetSpeed().SqrLength() <= 0.5)
+				) ||  // If walking on the ground, we need to slow down first, otherwise we miss the jump
+				IsInWater())
 			{
 				m_bOnGround = false;
 				m_JumpCoolDown = 20;
 				AddPosY(1.6);  // Jump!!
 				SetSpeedY(1);
 				SetSpeedX(3.2 * (m_NextWayPointPosition.x - GetPosition().x));  // Move forward in a preset speed.
-				SetSpeedZ(3.2 * (m_NextWayPointPosition.z - GetPosition().z));  // The numbers were picked based on trial and error
+				SetSpeedZ(
+					3.2 * (m_NextWayPointPosition.z - GetPosition().z)
+				);  // The numbers were picked based on trial and error
 			}
 		}
 	}
@@ -297,7 +306,9 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	HandleDaylightBurning(*Chunk, WouldBurnAt(GetPosition(), *Chunk));
 
 	bool a_IsFollowingPath = false;
-	if (m_PathfinderActivated && (GetMobType() != mtGhast))  // Pathfinder is currently disabled for ghasts, which have their own flying mechanism
+	if (m_PathfinderActivated &&
+		(GetMobType() != mtGhast
+		))  // Pathfinder is currently disabled for ghasts, which have their own flying mechanism
 	{
 		if (ReachedFinalDestination() || (m_LeashToPos != nullptr))
 		{
@@ -306,21 +317,26 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		else
 		{
 			// Note that m_NextWayPointPosition is actually returned by GetNextWayPoint)
-			switch (m_PathFinder.GetNextWayPoint(*Chunk, GetPosition(), &m_FinalDestination, &m_NextWayPointPosition, m_EMState == IDLE))
+			switch (m_PathFinder.GetNextWayPoint(
+				*Chunk,
+				GetPosition(),
+				&m_FinalDestination,
+				&m_NextWayPointPosition,
+				m_EMState == IDLE
+			))
 			{
 				case ePathFinderStatus::PATH_FOUND:
 				{
-					/* If I burn in daylight, and I won't burn where I'm standing, and I'll burn in my next position, and at least one of those is true:
+					/* If I burn in daylight, and I won't burn where I'm standing, and I'll burn in my next position,
+					and at least one of those is true:
 					1. I am idle
 					2. I was not hurt by a player recently.
 					Then STOP. */
-					if (
-						m_BurnsInDaylight && ((m_TicksSinceLastDamaged >= 100) || (m_EMState == IDLE)) &&
-						WouldBurnAt(m_NextWayPointPosition, *Chunk) &&
-						!WouldBurnAt(GetPosition(), *Chunk)
-					)
+					if (m_BurnsInDaylight && ((m_TicksSinceLastDamaged >= 100) || (m_EMState == IDLE)) &&
+						WouldBurnAt(m_NextWayPointPosition, *Chunk) && !WouldBurnAt(GetPosition(), *Chunk))
 					{
-						// If we burn in daylight, and we would burn at the next step, and we won't burn where we are right now, and we weren't provoked recently:
+						// If we burn in daylight, and we would burn at the next step, and we won't burn where we are
+						// right now, and we weren't provoked recently:
 						StopMovingToPosition();
 					}
 					else
@@ -337,7 +353,6 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				}
 				default:
 				{
-
 				}
 			}
 		}
@@ -402,11 +417,15 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cMonster::CalcLeashActions(std::chrono::milliseconds a_Dt)
 {
-	// This mob just spotted in the world and [m_LeashToPos not null] shows that should be leashed to a leash knot at m_LeashToPos.
-	// This keeps trying until knot is found. Leash knot may be in a different chunk that needn't or can't be loaded yet.
+	// This mob just spotted in the world and [m_LeashToPos not null] shows that should be leashed to a leash knot at
+	// m_LeashToPos. This keeps trying until knot is found. Leash knot may be in a different chunk that needn't or can't
+	// be loaded yet.
 	if (!IsLeashed() && (m_LeashToPos != nullptr))
 	{
-		auto LeashKnot = cLeashKnot::FindKnotAtPos(*m_World, { FloorC(m_LeashToPos->x), FloorC(m_LeashToPos->y), FloorC(m_LeashToPos->z) });
+		auto LeashKnot = cLeashKnot::FindKnotAtPos(
+			*m_World,
+			{FloorC(m_LeashToPos->x), FloorC(m_LeashToPos->y), FloorC(m_LeashToPos->z)}
+		);
 		if (LeashKnot != nullptr)
 		{
 			LeashTo(*LeashKnot);
@@ -419,9 +438,9 @@ void cMonster::CalcLeashActions(std::chrono::milliseconds a_Dt)
 		return;
 	}
 
-	static const double CloseFollowDistance = 1.8;   // The closest the mob will path towards the leashed to entity
-	static const double LeashNaturalLength  = 5.0;   // The closest the mob is actively pulled towards the entity
-	static const double LeashMaximumLength  = 10.0;  // Length where the leash breaks
+	static const double CloseFollowDistance = 1.8;  // The closest the mob will path towards the leashed to entity
+	static const double LeashNaturalLength = 5.0;  // The closest the mob is actively pulled towards the entity
+	static const double LeashMaximumLength = 10.0;  // Length where the leash breaks
 	static const double LeashSpringConstant = 20.0;  // How stiff the leash is
 
 	const auto LeashedToPos = m_LeashedTo->GetPosition();
@@ -460,7 +479,7 @@ void cMonster::CalcLeashActions(std::chrono::milliseconds a_Dt)
 	{
 		const Vector3d TargetBlock((LeashedToPos - Direction * CloseFollowDistance).Floor());
 		// Move to centre of target block face
-		MoveToPosition(TargetBlock + Vector3d{ 0.5, 0.0, 0.5 });
+		MoveToPosition(TargetBlock + Vector3d {0.5, 0.0, 0.5});
 	}
 }
 
@@ -583,12 +602,9 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPawn())
 	{
-		if (
-			(!a_TDI.Attacker->IsPlayer()) ||
-			(static_cast<cPlayer *>(a_TDI.Attacker)->CanMobsTarget())
-		)
+		if ((!a_TDI.Attacker->IsPlayer()) || (static_cast<cPlayer *>(a_TDI.Attacker)->CanMobsTarget()))
 		{
-			SetTarget(static_cast<cPawn*>(a_TDI.Attacker));
+			SetTarget(static_cast<cPawn *>(a_TDI.Attacker));
 		}
 		m_TicksSinceLastDamaged = 0;
 	}
@@ -716,7 +732,8 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 	}
 	else if (IsLeashed())
 	{
-		// Mob is already leashed but client anticipates the server action and draws a leash link, so we need to send current leash to cancel it
+		// Mob is already leashed but client anticipates the server action and draws a leash link, so we need to send
+		// current leash to cancel it
 		m_World->BroadcastLeashEntity(*this, *this->GetLeashedTo());
 	}
 	else if (CanBeLeashed() && (EquippedItem.m_ItemType == E_ITEM_LEASH))
@@ -747,28 +764,33 @@ void cMonster::CheckEventSeePlayer(cChunk & a_Chunk)
 	const auto MyHeadPosition = GetPosition().addedY(GetHeight());
 
 	// Enumerate all players within sight:
-	m_World->ForEachPlayer([this, &TargetPlayer, &ClosestDistance, MyHeadPosition](cPlayer & a_Player)
-	{
-		if (!a_Player.CanMobsTarget())
+	m_World->ForEachPlayer(
+		[this, &TargetPlayer, &ClosestDistance, MyHeadPosition](cPlayer & a_Player)
 		{
+			if (!a_Player.CanMobsTarget())
+			{
+				return false;
+			}
+
+			const auto TargetHeadPosition = a_Player.GetPosition().addedY(a_Player.GetHeight());
+			const auto TargetDistance = (TargetHeadPosition - MyHeadPosition).SqrLength();
+
+			// TODO: Currently all mobs see through lava, but only Nether-native mobs should be able to.
+			if ((TargetDistance < ClosestDistance) &&
+				cLineBlockTracer::LineOfSightTrace(
+					*GetWorld(),
+					MyHeadPosition,
+					TargetHeadPosition,
+					cLineBlockTracer::losAirWaterLava
+				))
+			{
+				TargetPlayer = &a_Player;
+				ClosestDistance = TargetDistance;
+			}
+
 			return false;
 		}
-
-		const auto TargetHeadPosition = a_Player.GetPosition().addedY(a_Player.GetHeight());
-		const auto TargetDistance = (TargetHeadPosition - MyHeadPosition).SqrLength();
-
-		// TODO: Currently all mobs see through lava, but only Nether-native mobs should be able to.
-		if (
-			(TargetDistance < ClosestDistance) &&
-			cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, cLineBlockTracer::losAirWaterLava)
-		)
-		{
-			TargetPlayer = &a_Player;
-			ClosestDistance = TargetDistance;
-		}
-
-		return false;
-	});
+	);
 
 	// Target him if suitable player found:
 	if (TargetPlayer != nullptr)
@@ -798,7 +820,7 @@ void cMonster::CheckEventLostPlayer(const std::chrono::milliseconds a_Dt)
 	}
 
 	// Check if the target is too far away:
-	if (!Target->GetBoundingBox().DoesIntersect({ GetPosition(), m_SightDistance * 2.0 }))
+	if (!Target->GetBoundingBox().DoesIntersect({GetPosition(), m_SightDistance * 2.0}))
 	{
 		EventLosePlayer();
 		return;
@@ -806,7 +828,12 @@ void cMonster::CheckEventLostPlayer(const std::chrono::milliseconds a_Dt)
 
 	const auto MyHeadPosition = GetPosition().addedY(GetHeight());
 	const auto TargetHeadPosition = Target->GetPosition().addedY(Target->GetHeight());
-	if (!cLineBlockTracer::LineOfSightTrace(*GetWorld(), MyHeadPosition, TargetHeadPosition, cLineBlockTracer::losAirWaterLava))
+	if (!cLineBlockTracer::LineOfSightTrace(
+			*GetWorld(),
+			MyHeadPosition,
+			TargetHeadPosition,
+			cLineBlockTracer::losAirWaterLava
+		))
 	{
 		if ((m_LoseSightAbandonTargetTimer += a_Dt) > std::chrono::seconds(4))
 		{
@@ -815,7 +842,8 @@ void cMonster::CheckEventLostPlayer(const std::chrono::milliseconds a_Dt)
 	}
 	else
 	{
-		// Subtract the amount of time we "handled" instead of setting to zero, so we don't ignore a large a_Dt of say, 8s:
+		// Subtract the amount of time we "handled" instead of setting to zero, so we don't ignore a large a_Dt of say,
+		// 8s:
 		m_LoseSightAbandonTargetTimer -= std::min(std::chrono::milliseconds(4000), m_LoseSightAbandonTargetTimer);
 	}
 }
@@ -869,7 +897,7 @@ void cMonster::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Dist.x = static_cast<double>(Random.RandInt(-5, 5));
 		Dist.z = static_cast<double>(Random.RandInt(-5, 5));
 
-		if ((Dist.SqrLength() > 2)  && (rem >= 3))
+		if ((Dist.SqrLength() > 2) && (rem >= 3))
 		{
 
 			Vector3d Destination(GetPosX() + Dist.x, GetPosition().y, GetPosZ() + Dist.z);
@@ -920,8 +948,10 @@ void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (GetTarget() != nullptr)
 	{
 		Vector3d newloc = GetPosition();
-		newloc.x = (GetTarget()->GetPosition().x < newloc.x)? (newloc.x + m_SightDistance): (newloc.x - m_SightDistance);
-		newloc.z = (GetTarget()->GetPosition().z < newloc.z)? (newloc.z + m_SightDistance): (newloc.z - m_SightDistance);
+		newloc.x =
+			(GetTarget()->GetPosition().x < newloc.x) ? (newloc.x + m_SightDistance) : (newloc.x - m_SightDistance);
+		newloc.z =
+			(GetTarget()->GetPosition().z < newloc.z) ? (newloc.z + m_SightDistance) : (newloc.z - m_SightDistance);
 		MoveToPosition(newloc);
 	}
 	else
@@ -936,7 +966,8 @@ void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cMonster::ResetAttackCooldown()
 {
-	m_AttackCoolDownTicksLeft = static_cast<int>(TPS * m_AttackRate);  // A second has 20 ticks, an attack rate of 1 means 1 hit every second
+	m_AttackCoolDownTicksLeft =
+		static_cast<int>(TPS * m_AttackRate);  // A second has 20 ticks, an attack rate of 1 means 1 hit every second
 }
 
 
@@ -1105,26 +1136,28 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 
 	switch (a_Type)
 	{
-		case mtBat:             return mfAmbient;
-		case mtBlaze:           return mfHostile;
-		case mtCat:             return mfPassive;
-		case mtCaveSpider:      return mfHostile;
-		case mtChicken:         return mfPassive;
-		case mtCod:             return mfWater;
-		case mtCow:             return mfPassive;
-		case mtCreeper:         return mfHostile;
-		case mtDolphin:         return mfWater;
-		case mtDonkey:          return mfPassive;
-		case mtDrowned:         return mfHostile;
-		case mtElderGuardian:   return mfHostile;
-		case mtEnderDragon:     return mfNoSpawn;
-		case mtEnderman:        return mfHostile;
-		case mtEndermite:       return mfHostile;
-		case mtEvoker:          return mfHostile;
-		case mtFox:             return mfPassive;
-		case mtGhast:           return mfHostile;
-		case mtGiant:           return mfNoSpawn;
-		case mtGuardian:        return mfWater;  // Just because they have special spawning conditions. TODO: If Watertemples have been added, this needs to be edited!
+		case mtBat:           return mfAmbient;
+		case mtBlaze:         return mfHostile;
+		case mtCat:           return mfPassive;
+		case mtCaveSpider:    return mfHostile;
+		case mtChicken:       return mfPassive;
+		case mtCod:           return mfWater;
+		case mtCow:           return mfPassive;
+		case mtCreeper:       return mfHostile;
+		case mtDolphin:       return mfWater;
+		case mtDonkey:        return mfPassive;
+		case mtDrowned:       return mfHostile;
+		case mtElderGuardian: return mfHostile;
+		case mtEnderDragon:   return mfNoSpawn;
+		case mtEnderman:      return mfHostile;
+		case mtEndermite:     return mfHostile;
+		case mtEvoker:        return mfHostile;
+		case mtFox:           return mfPassive;
+		case mtGhast:         return mfHostile;
+		case mtGiant:         return mfNoSpawn;
+		case mtGuardian:
+			return mfWater;  // Just because they have special spawning conditions. TODO: If Watertemples have been
+							 // added, this needs to be edited!
 		case mtHoglin:          return mfHostile;
 		case mtHorse:           return mfPassive;
 		case mtHusk:            return mfHostile;
@@ -1187,11 +1220,11 @@ cTickTime cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 {
 	switch (a_MobFamily)
 	{
-		case mfHostile:   return 40_tick;
-		case mfPassive:   return 40_tick;
-		case mfAmbient:   return 40_tick;
-		case mfWater:     return 400_tick;
-		case mfNoSpawn:   return -1_tick;
+		case mfHostile: return 40_tick;
+		case mfPassive: return 40_tick;
+		case mfAmbient: return 40_tick;
+		case mfWater:   return 400_tick;
+		case mfNoSpawn: return -1_tick;
 	}
 	UNREACHABLE("Unhandled mob family");
 }
@@ -1201,7 +1234,7 @@ cTickTime cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 
 
 /** Sets the target. */
-void cMonster::SetTarget (cPawn * a_NewTarget)
+void cMonster::SetTarget(cPawn * a_NewTarget)
 {
 	ASSERT((a_NewTarget == nullptr) || (IsTicking()));
 	if (m_Target == a_NewTarget)
@@ -1224,7 +1257,6 @@ void cMonster::SetTarget (cPawn * a_NewTarget)
 		m_Target->TargetingMe(this);
 		m_WasLastTargetAPlayer = m_Target->IsPlayer();
 	}
-
 }
 
 
@@ -1326,7 +1358,7 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 
 
 
-void cMonster::EngageLoveMode(cMonster *a_Partner)
+void cMonster::EngageLoveMode(cMonster * a_Partner)
 {
 	m_LovePartner = a_Partner;
 	m_MatingTimer = 50;  // about 3 seconds of mating
@@ -1343,7 +1375,8 @@ void cMonster::ResetLoveMode()
 	m_MatingTimer = 0;
 	m_LoveCooldown = TPS * 60 * 5;  // 5 minutes
 
-	// when an animal is in love mode, the client only stops sending the hearts if we let them know it's in cooldown, which is done with the "age" metadata
+	// when an animal is in love mode, the client only stops sending the hearts if we let them know it's in cooldown,
+	// which is done with the "age" metadata
 	m_World->BroadcastEntityMetadata(*this);
 }
 
@@ -1371,11 +1404,14 @@ void cMonster::LoveTick(void)
 
 			cMonster * Baby = nullptr;
 
-			m_World->DoWithEntityByID(BabyID, [&](cEntity & a_Entity)
-			{
-				Baby = static_cast<cMonster *>(&a_Entity);
-				return true;
-			});
+			m_World->DoWithEntityByID(
+				BabyID,
+				[&](cEntity & a_Entity)
+				{
+					Baby = static_cast<cMonster *>(&a_Entity);
+					return true;
+				}
+			);
 
 			if (Baby != nullptr)
 			{
@@ -1384,15 +1420,18 @@ void cMonster::LoveTick(void)
 
 			m_World->SpawnExperienceOrb(Pos.x, Pos.y, Pos.z, GetRandomProvider().RandInt(1, 6));
 
-			m_World->DoWithPlayerByUUID(m_Feeder, [&] (cPlayer & a_Player)
-			{
-				a_Player.GetStatistics().Custom[CustomStatistic::AnimalsBred]++;
-				if (GetMobType() == eMonsterType::mtCow)
+			m_World->DoWithPlayerByUUID(
+				m_Feeder,
+				[&](cPlayer & a_Player)
 				{
-					a_Player.AwardAchievement(CustomStatistic::AchBreedCow);
+					a_Player.GetStatistics().Custom[CustomStatistic::AnimalsBred]++;
+					if (GetMobType() == eMonsterType::mtCow)
+					{
+						a_Player.AwardAchievement(CustomStatistic::AchBreedCow);
+					}
+					return true;
 				}
-				return true;
-			});
+			);
 			m_LovePartner->ResetLoveMode();
 			ResetLoveMode();
 		}
@@ -1404,17 +1443,21 @@ void cMonster::LoveTick(void)
 		GetFollowedItems(FollowedItems);
 		if (FollowedItems.Size() > 0)
 		{
-			m_World->DoWithNearestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
-			{
-				const cItem & EquippedItem = a_Player.GetEquippedItem();
-				if (FollowedItems.ContainsType(EquippedItem))
+			m_World->DoWithNearestPlayer(
+				GetPosition(),
+				static_cast<float>(m_SightDistance),
+				[&](cPlayer & a_Player) -> bool
 				{
-					Vector3d PlayerPos = a_Player.GetPosition();
-					MoveToPosition(PlayerPos);
-				}
+					const cItem & EquippedItem = a_Player.GetEquippedItem();
+					if (FollowedItems.ContainsType(EquippedItem))
+					{
+						Vector3d PlayerPos = a_Player.GetPosition();
+						MoveToPosition(PlayerPos);
+					}
 
-				return true;
-			});
+					return true;
+				}
+			);
 		}
 	}
 
@@ -1423,36 +1466,39 @@ void cMonster::LoveTick(void)
 	{
 		if (m_LovePartner == nullptr)
 		{
-			m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8), [=](cEntity & a_Entity)
-			{
-				// If the entity is not a monster, don't breed with it
-				// Also, do not self-breed
-				if ((a_Entity.GetEntityType() != etMonster) || (&a_Entity == this))
+			m_World->ForEachEntityInBox(
+				cBoundingBox(GetPosition(), 8, 8),
+				[=](cEntity & a_Entity)
 				{
-					return false;
+					// If the entity is not a monster, don't breed with it
+					// Also, do not self-breed
+					if ((a_Entity.GetEntityType() != etMonster) || (&a_Entity == this))
+					{
+						return false;
+					}
+
+					auto & Me = static_cast<cMonster &>(*this);
+					auto & PotentialPartner = static_cast<cMonster &>(a_Entity);
+
+					// If the potential partner is not of the same species, don't breed with it
+					if (PotentialPartner.GetMobType() != Me.GetMobType())
+					{
+						return false;
+					}
+
+					// If the potential partner is not in love
+					// Or they already have a mate, do not breed with them
+					if ((!PotentialPartner.IsInLove()) || (PotentialPartner.GetPartner() != nullptr))
+					{
+						return false;
+					}
+
+					// All conditions met, let's breed!
+					PotentialPartner.EngageLoveMode(&Me);
+					Me.EngageLoveMode(&PotentialPartner);
+					return true;
 				}
-
-				auto & Me = static_cast<cMonster &>(*this);
-				auto & PotentialPartner = static_cast<cMonster &>(a_Entity);
-
-				// If the potential partner is not of the same species, don't breed with it
-				if (PotentialPartner.GetMobType() != Me.GetMobType())
-				{
-					return false;
-				}
-
-				// If the potential partner is not in love
-				// Or they already have a mate, do not breed with them
-				if ((!PotentialPartner.IsInLove()) || (PotentialPartner.GetPartner() != nullptr))
-				{
-					return false;
-				}
-
-				// All conditions met, let's breed!
-				PotentialPartner.EngageLoveMode(&Me);
-				Me.EngageLoveMode(&PotentialPartner);
-				return true;
-			});
+			);
 		}
 
 		m_LoveTimer--;
@@ -1495,10 +1541,10 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 	if (EquippedItem.m_ItemType == E_ITEM_SPAWN_EGG)
 	{
 		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(EquippedItem.m_ItemDamage);
-		if (
-			(MonsterType == m_MobType) &&
-			(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID)  // Spawning succeeded
-			)
+		if ((MonsterType == m_MobType) &&
+			(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID
+			)  // Spawning succeeded
+		)
 		{
 			if (!a_Player.IsGameModeCreative())
 			{
@@ -1515,7 +1561,13 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 
 
 
-void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth)
+void cMonster::AddRandomDropItem(
+	cItems & a_Drops,
+	unsigned int a_Min,
+	unsigned int a_Max,
+	short a_Item,
+	short a_ItemHealth
+)
 {
 	auto Count = GetRandomProvider().RandInt(a_Min, a_Max);
 	auto MaxStackSize = static_cast<unsigned int>(cItem(a_Item).GetMaxStackSize());
@@ -1669,11 +1721,10 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 		return false;
 	}
 
-	if (
-		(Chunk->GetBlock(Rel) != E_BLOCK_SOULSAND) &&   // Not on soulsand
-		(GetWorld()->GetTimeOfDay() < 13000_tick) &&    // Daytime
-		Chunk->IsWeatherSunnyAt(Rel.x, Rel.z) &&        // Not raining
-		!IsInWater()                                    // Isn't swimming
+	if ((Chunk->GetBlock(Rel) != E_BLOCK_SOULSAND) &&  // Not on soulsand
+		(GetWorld()->GetTimeOfDay() < 13000_tick) &&  // Daytime
+		Chunk->IsWeatherSunnyAt(Rel.x, Rel.z) &&  // Not raining
+		!IsInWater()  // Isn't swimming
 	)
 	{
 		int MobHeight = CeilC(a_Location.y + GetHeight()) - 1;  // The block Y coord of the mob's head
@@ -1683,8 +1734,8 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 		}
 		// Start with the highest block and scan down to just above the mob's head.
 		// If a non transparent is found, return false (do not burn). Otherwise return true.
-		// Note that this loop is not a performance concern as transparent blocks are rare and the loop almost always bailes out
-		// instantly.(An exception is e.g. standing under a long column of glass).
+		// Note that this loop is not a performance concern as transparent blocks are rare and the loop almost always
+		// bailes out instantly.(An exception is e.g. standing under a long column of glass).
 		int CurrentBlock = Chunk->GetHeight(Rel.x, Rel.z);
 		while (CurrentBlock > MobHeight)
 		{
@@ -1702,7 +1753,6 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 			--CurrentBlock;
 		}
 		return true;
-
 	}
 	return false;
 }

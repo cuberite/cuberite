@@ -12,11 +12,8 @@
 
 
 
-cItemGrid::cItemGrid(int a_Width, int a_Height):
-	m_Width(a_Width),
-	m_Height(a_Height),
-	m_Slots(a_Width * a_Height),
-	m_IsInTriggerListeners(false)
+cItemGrid::cItemGrid(int a_Width, int a_Height) :
+	m_Width(a_Width), m_Height(a_Height), m_Slots(a_Width * a_Height), m_IsInTriggerListeners(false)
 {
 }
 
@@ -35,10 +32,7 @@ bool cItemGrid::IsValidSlotNum(int a_SlotNum) const
 
 bool cItemGrid::IsValidSlotCoords(int a_X, int a_Y) const
 {
-	return (
-		(a_X >= 0) && (a_X < m_Width) &&
-		(a_Y >= 0) && (a_Y < m_Height)
-	);
+	return ((a_X >= 0) && (a_X < m_Width) && (a_Y >= 0) && (a_Y < m_Height));
 }
 
 
@@ -49,8 +43,13 @@ int cItemGrid::GetSlotNum(int a_X, int a_Y) const
 {
 	if (!IsValidSlotCoords(a_X, a_Y))
 	{
-		LOGWARNING("%s: coords out of range: (%d, %d) in grid of size (%d, %d)",
-			__FUNCTION__, a_X, a_Y, m_Width, m_Height
+		LOGWARNING(
+			"%s: coords out of range: (%d, %d) in grid of size (%d, %d)",
+			__FUNCTION__,
+			a_X,
+			a_Y,
+			m_Width,
+			m_Height
 		);
 		return -1;
 	}
@@ -65,9 +64,7 @@ void cItemGrid::GetSlotCoords(int a_SlotNum, int & a_X, int & a_Y) const
 {
 	if (!IsValidSlotNum(a_SlotNum))
 	{
-		LOGWARNING("%s: SlotNum out of range: %d in grid of range %d",
-			__FUNCTION__, a_SlotNum, m_Slots.size()
-		);
+		LOGWARNING("%s: SlotNum out of range: %d in grid of range %d", __FUNCTION__, a_SlotNum, m_Slots.size());
 		a_X = -1;
 		a_Y = -1;
 		return;
@@ -106,9 +103,7 @@ const cItem & cItemGrid::GetSlot(int a_SlotNum) const
 {
 	if (!IsValidSlotNum(a_SlotNum))
 	{
-		LOGWARNING("%s: Invalid slot number, %d out of %d slots",
-			__FUNCTION__, a_SlotNum, m_Slots.size()
-		);
+		LOGWARNING("%s: Invalid slot number, %d out of %d slots", __FUNCTION__, a_SlotNum, m_Slots.size());
 		a_SlotNum = 0;
 	}
 	return m_Slots.GetAt(a_SlotNum);
@@ -140,9 +135,7 @@ void cItemGrid::SetSlot(int a_SlotNum, const cItem & a_Item)
 {
 	if (!IsValidSlotNum(a_SlotNum))
 	{
-		LOGWARNING("%s: Invalid slot number %d out of %d slots",
-			__FUNCTION__, a_SlotNum, m_Slots.size()
-		);
+		LOGWARNING("%s: Invalid slot number %d out of %d slots", __FUNCTION__, a_SlotNum, m_Slots.size());
 		return;
 	}
 
@@ -179,9 +172,7 @@ void cItemGrid::EmptySlot(int a_SlotNum)
 {
 	if (!IsValidSlotNum(a_SlotNum))
 	{
-		LOGWARNING("%s: Invalid slot number %d out of %d slots",
-			__FUNCTION__, a_SlotNum, m_Slots.size()
-		);
+		LOGWARNING("%s: Invalid slot number %d out of %d slots", __FUNCTION__, a_SlotNum, m_Slots.size());
 		return;
 	}
 
@@ -204,9 +195,7 @@ bool cItemGrid::IsSlotEmpty(int a_SlotNum) const
 {
 	if (!IsValidSlotNum(a_SlotNum))
 	{
-		LOGWARNING("%s: Invalid slot number %d out of %d slots",
-			__FUNCTION__, a_SlotNum, m_Slots.size()
-		);
+		LOGWARNING("%s: Invalid slot number %d out of %d slots", __FUNCTION__, a_SlotNum, m_Slots.size());
 		return true;
 	}
 	return m_Slots.GetAt(a_SlotNum).IsEmpty();
@@ -284,9 +273,7 @@ char cItemGrid::AddItemToSlot(const cItem & a_ItemStack, int a_Slot, int a_Num, 
 {
 	if (!IsValidSlotNum(a_Slot))
 	{
-		LOGWARNING("%s: Invalid slot number %d out of %d slots",
-			__FUNCTION__, a_Slot, m_Slots.size()
-		);
+		LOGWARNING("%s: Invalid slot number %d out of %d slots", __FUNCTION__, a_Slot, m_Slots.size());
 		return 0;
 	}
 
@@ -317,9 +304,7 @@ char cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priori
 
 	if ((a_PrioritySlot != -1) && !IsValidSlotNum(a_PrioritySlot))
 	{
-		LOGWARNING("%s: Invalid slot number %d out of %d slots",
-			__FUNCTION__, a_PrioritySlot, m_Slots.size()
-		);
+		LOGWARNING("%s: Invalid slot number %d out of %d slots", __FUNCTION__, a_PrioritySlot, m_Slots.size());
 		a_PrioritySlot = -1;
 	}
 
@@ -329,13 +314,7 @@ char cItemGrid::AddItem(cItem & a_ItemStack, bool a_AllowNewStacks, int a_Priori
 	}
 
 	// Try prioritySlot first:
-	if (
-		(a_PrioritySlot != -1) &&
-		(
-			m_Slots[a_PrioritySlot].IsEmpty() ||
-			m_Slots[a_PrioritySlot].IsEqual(a_ItemStack)
-		)
-	)
+	if ((a_PrioritySlot != -1) && (m_Slots[a_PrioritySlot].IsEmpty() || m_Slots[a_PrioritySlot].IsEqual(a_ItemStack)))
 	{
 		NumLeft -= AddItemToSlot(a_ItemStack, a_PrioritySlot, NumLeft, MaxStack);
 	}
@@ -450,9 +429,8 @@ cItem * cItemGrid::FindItem(const cItem & a_RecipeItem)
 	for (int i = 0; i < m_Slots.size(); i++)
 	{
 		// Items are equal if none is greater the other
-		auto compare = cItem::sItemCompare{};
-		if (!compare(a_RecipeItem, m_Slots[i]) &&
-			!compare(m_Slots[i], a_RecipeItem))
+		auto compare = cItem::sItemCompare {};
+		if (!compare(a_RecipeItem, m_Slots[i]) && !compare(m_Slots[i], a_RecipeItem))
 		{
 			return &m_Slots[i];
 		}
@@ -469,8 +447,11 @@ char cItemGrid::ChangeSlotCount(int a_SlotNum, char a_AddToCount)
 {
 	if (!IsValidSlotNum(a_SlotNum))
 	{
-		LOGWARNING("%s: Invalid slot number %d out of %d slots, ignoring the call, returning -1",
-			__FUNCTION__, a_SlotNum, m_Slots.size()
+		LOGWARNING(
+			"%s: Invalid slot number %d out of %d slots, ignoring the call, returning -1",
+			__FUNCTION__,
+			a_SlotNum,
+			m_Slots.size()
 		);
 		return -1;
 	}
@@ -517,8 +498,11 @@ cItem cItemGrid::RemoveOneItem(int a_SlotNum)
 {
 	if (!IsValidSlotNum(a_SlotNum))
 	{
-		LOGWARNING("%s: Invalid slot number %d out of %d slots, ignoring the call, returning empty item",
-			__FUNCTION__, a_SlotNum, m_Slots.size()
+		LOGWARNING(
+			"%s: Invalid slot number %d out of %d slots, ignoring the call, returning empty item",
+			__FUNCTION__,
+			a_SlotNum,
+			m_Slots.size()
 		);
 		return cItem();
 	}
@@ -651,9 +635,7 @@ int cItemGrid::GetNextEmptySlot(int a_StartFrom) const
 {
 	if ((a_StartFrom != -1) && !IsValidSlotNum(a_StartFrom))
 	{
-		LOGWARNING("%s: Invalid slot number %d out of %d slots",
-			__FUNCTION__, a_StartFrom, m_Slots.size()
-		);
+		LOGWARNING("%s: Invalid slot number %d out of %d slots", __FUNCTION__, a_StartFrom, m_Slots.size());
 		a_StartFrom = -1;
 	}
 
@@ -675,9 +657,7 @@ int cItemGrid::GetNextUsedSlot(int a_StartFrom) const
 {
 	if ((a_StartFrom != -1) && !IsValidSlotNum(a_StartFrom))
 	{
-		LOGWARNING("%s: Invalid slot number %d out of %d slots",
-			__FUNCTION__, a_StartFrom, m_Slots.size()
-		);
+		LOGWARNING("%s: Invalid slot number %d out of %d slots", __FUNCTION__, a_StartFrom, m_Slots.size());
 		a_StartFrom = -1;
 	}
 
@@ -749,7 +729,12 @@ bool cItemGrid::DamageItem(int a_X, int a_Y, short a_Amount)
 
 
 
-void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, size_t a_CountLootProbabs, int a_NumSlots, int a_Seed)
+void cItemGrid::GenerateRandomLootWithBooks(
+	const cLootProbab * a_LootProbabs,
+	size_t a_CountLootProbabs,
+	int a_NumSlots,
+	int a_Seed
+)
 {
 	// Calculate the total weight:
 	int TotalProbab = 1;
@@ -769,12 +754,18 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, s
 
 		// Choose the enchantments
 		cWeightedEnchantments Enchantments;
-		cEnchantments::AddItemEnchantmentWeights(Enchantments, E_ITEM_BOOK, static_cast<unsigned>(24 + Noise.IntNoise2DInt(a_Seed, TotalProbab) % 7));
-		int NumEnchantments = Noise.IntNoise3DInt(TotalProbab, Rnd, a_Seed) % 5;  // The number of enchantments this book wil get.
+		cEnchantments::AddItemEnchantmentWeights(
+			Enchantments,
+			E_ITEM_BOOK,
+			static_cast<unsigned>(24 + Noise.IntNoise2DInt(a_Seed, TotalProbab) % 7)
+		);
+		int NumEnchantments =
+			Noise.IntNoise3DInt(TotalProbab, Rnd, a_Seed) % 5;  // The number of enchantments this book wil get.
 
 		for (int j = 0; j <= NumEnchantments; j++)
 		{
-			cEnchantments Enchantment = cEnchantments::SelectEnchantmentFromVector(Enchantments, Noise.IntNoise2DInt(NumEnchantments, i));
+			cEnchantments Enchantment =
+				cEnchantments::SelectEnchantmentFromVector(Enchantments, Noise.IntNoise2DInt(NumEnchantments, i));
 			CurrentLoot.m_Enchantments.Add(Enchantment);
 			cEnchantments::RemoveEnchantmentWeightFromVector(Enchantments, Enchantment);
 			cEnchantments::CheckEnchantmentConflictsFromVector(Enchantments, Enchantment);
@@ -788,7 +779,10 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, s
 				CurrentLoot = a_LootProbabs[j].m_Item;
 				if ((a_LootProbabs[j].m_MaxAmount - a_LootProbabs[j].m_MinAmount) > 0)
 				{
-					CurrentLoot.m_ItemCount = static_cast<char>(a_LootProbabs[j].m_MinAmount + (Rnd % (a_LootProbabs[j].m_MaxAmount - a_LootProbabs[j].m_MinAmount)));
+					CurrentLoot.m_ItemCount = static_cast<char>(
+						a_LootProbabs[j].m_MinAmount +
+						(Rnd % (a_LootProbabs[j].m_MaxAmount - a_LootProbabs[j].m_MinAmount))
+					);
 				}
 				else
 				{

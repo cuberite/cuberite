@@ -18,10 +18,7 @@ const size_t QUEUE_SKIP_LIMIT = 500;
 
 
 cChunkGeneratorThread::cChunkGeneratorThread(void) :
-	Super("Chunk Generator"),
-	m_Generator(nullptr),
-	m_PluginInterface(nullptr),
-	m_ChunkSink(nullptr)
+	Super("Chunk Generator"), m_Generator(nullptr), m_PluginInterface(nullptr), m_ChunkSink(nullptr)
 {
 }
 
@@ -38,7 +35,11 @@ cChunkGeneratorThread::~cChunkGeneratorThread()
 
 
 
-bool cChunkGeneratorThread::Initialize(cPluginInterface & a_PluginInterface, cChunkSink & a_ChunkSink, cIniFile & a_IniFile)
+bool cChunkGeneratorThread::Initialize(
+	cPluginInterface & a_PluginInterface,
+	cChunkSink & a_ChunkSink,
+	cIniFile & a_IniFile
+)
 {
 	m_PluginInterface = &a_PluginInterface;
 	m_ChunkSink = &a_ChunkSink;
@@ -83,7 +84,11 @@ void cChunkGeneratorThread::QueueGenerateChunk(
 		// Add to queue, issue a warning if too many:
 		if (m_Queue.size() >= QUEUE_WARNING_LIMIT)
 		{
-			LOGWARN("WARNING: Adding chunk %s to generation queue; Queue is too big! (%zu)", a_Coords.ToString().c_str(), m_Queue.size());
+			LOGWARN(
+				"WARNING: Adding chunk %s to generation queue; Queue is too big! (%zu)",
+				a_Coords.ToString().c_str(),
+				m_Queue.size()
+			);
 		}
 		m_Queue.emplace_back(a_Coords, a_ForceRegeneration, a_Callback);
 	}
@@ -156,7 +161,8 @@ void cChunkGeneratorThread::Execute(void)
 	// When the queue gets empty, the count is reset, so that waiting for the queue is not counted into the total time.
 	int NumChunksGenerated = 0;  // Number of chunks generated since the queue was last empty
 	clock_t GenerationStart = clock();  // Clock tick when the queue started to fill
-	clock_t LastReportTick = clock();  // Clock tick of the last report made (so that performance isn't reported too often)
+	clock_t LastReportTick =
+		clock();  // Clock tick of the last report made (so that performance isn't reported too often)
 
 	while (!m_ShouldTerminate)
 	{
@@ -199,8 +205,7 @@ void cChunkGeneratorThread::Execute(void)
 		{
 			LOG("Chunk generator performance: %.2f ch / sec (%d ch total)",
 				static_cast<double>(NumChunksGenerated) * CLOCKS_PER_SEC / (clock() - GenerationStart),
-				NumChunksGenerated
-			);
+				NumChunksGenerated);
 			LastReportTick = clock();
 		}
 
@@ -250,10 +255,10 @@ void cChunkGeneratorThread::DoGenerate(cChunkCoords a_Coords)
 	m_Generator->Generate(ChunkDesc);
 	m_PluginInterface->CallHookChunkGenerated(ChunkDesc);
 
-	#ifndef NDEBUG
-		// Verify that the generator has produced valid data:
-		ChunkDesc.VerifyHeightmap();
-	#endif
+#ifndef NDEBUG
+	// Verify that the generator has produced valid data:
+	ChunkDesc.VerifyHeightmap();
+#endif
 
 	m_ChunkSink->OnChunkGenerated(ChunkDesc);
 }

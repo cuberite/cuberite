@@ -18,15 +18,13 @@
 
 // tolua_begin
 
-class cMobHeadEntity :
-	public cBlockEntity
+class cMobHeadEntity : public cBlockEntity
 {
 	// tolua_end
 
 	using Super = cBlockEntity;
 
-public:  // tolua_export
-
+  public:  // tolua_export
 	/** Creates a new mob head entity at the specified block coords. a_World may be nullptr */
 	cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
@@ -60,20 +58,21 @@ public:  // tolua_export
 
 	/** Sets the player components for the mob heads with player type. */
 	void SetOwner(
-		const cUUID & a_OwnerUUID, const AString & a_OwnerName,
-		const AString & a_OwnerTexture, const AString & a_OwnerTextureSignature
+		const cUUID & a_OwnerUUID,
+		const AString & a_OwnerName,
+		const AString & a_OwnerTexture,
+		const AString & a_OwnerTextureSignature
 	);  // Exported in ManualBindings.cpp
 
 	/** Returns the player UUID of the mob head */
 	cUUID GetOwnerUUID(void) const { return m_OwnerUUID; }  // Exported in ManualBindings.cpp
 
-private:
-
+  private:
 	eMobHeadType m_Type;
 	eMobHeadRotation m_Rotation;
 
 	AString m_OwnerName;
-	cUUID   m_OwnerUUID;
+	cUUID m_OwnerUUID;
 	AString m_OwnerTexture;
 	AString m_OwnerTextureSignature;
 
@@ -82,4 +81,4 @@ private:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
-} ;  // tolua_export
+};  // tolua_export

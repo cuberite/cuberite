@@ -17,7 +17,12 @@ const double cNetherPortalScanner::AcrossOffset = 0.5;
 
 
 
-cNetherPortalScanner::cNetherPortalScanner(cEntity & a_MovingEntity, cWorld & a_DestinationWorld, Vector3d a_DestPosition, int a_MaxY) :
+cNetherPortalScanner::cNetherPortalScanner(
+	cEntity & a_MovingEntity,
+	cWorld & a_DestinationWorld,
+	Vector3d a_DestPosition,
+	int a_MaxY
+) :
 	m_EntityID(a_MovingEntity.GetUniqueID()),
 	m_SourceWorld(*a_MovingEntity.GetWorld()),
 	m_World(a_DestinationWorld),
@@ -50,9 +55,15 @@ void cNetherPortalScanner::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 {
 	class PortalSearchCallback : public cChunkDataCallback
 	{
-	public:
-
-		PortalSearchCallback(const int a_ChunkX, const int a_ChunkZ, bool & a_FoundPortal, Vector3i & a_PortalLoc, const Vector3d a_Position, const int a_MaxY) :
+	  public:
+		PortalSearchCallback(
+			const int a_ChunkX,
+			const int a_ChunkZ,
+			bool & a_FoundPortal,
+			Vector3i & a_PortalLoc,
+			const Vector3d a_Position,
+			const int a_MaxY
+		) :
 			m_ChunkX(a_ChunkX),
 			m_ChunkZ(a_ChunkZ),
 			m_FoundPortal(a_FoundPortal),
@@ -62,8 +73,7 @@ void cNetherPortalScanner::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 		{
 		}
 
-	private:
-
+	  private:
 		virtual void ChunkData(const ChunkBlockData & a_BlockData, const ChunkLightData &) override
 		{
 			for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
@@ -89,7 +99,11 @@ void cNetherPortalScanner::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 						continue;
 					}
 
-					Vector3d PortalLoc = Vector3d(Coordinate.x + m_ChunkX * cChunkDef::Width, Coordinate.y, Coordinate.z + m_ChunkZ * cChunkDef::Width);
+					Vector3d PortalLoc = Vector3d(
+						Coordinate.x + m_ChunkX * cChunkDef::Width,
+						Coordinate.y,
+						Coordinate.z + m_ChunkZ * cChunkDef::Width
+					);
 					if (!m_FoundPortal)
 					{
 						m_FoundPortal = true;
@@ -113,7 +127,7 @@ void cNetherPortalScanner::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 		const int m_MaxY;
 	} Callback(a_ChunkX, a_ChunkZ, m_FoundPortal, m_PortalLoc, m_Position, m_MaxY);
 
-	[[maybe_unused]] const bool Result = m_World.GetChunkData({ a_ChunkX, a_ChunkZ }, Callback);
+	[[maybe_unused]] const bool Result = m_World.GetChunkData({a_ChunkX, a_ChunkZ}, Callback);
 	ASSERT(Result);
 }
 
@@ -244,11 +258,11 @@ void cNetherPortalScanner::BuildNetherPortal(Vector3i a_Location, Direction a_Di
 			{
 				if (a_Direction == Direction::Y)
 				{
-					m_World.SetBlock({ x + i, y + k, z + j }, E_BLOCK_AIR, 0);
+					m_World.SetBlock({x + i, y + k, z + j}, E_BLOCK_AIR, 0);
 				}
 				else if (a_Direction == Direction::X)
 				{
-					m_World.SetBlock({ x + j, y + k, z + i }, E_BLOCK_AIR, 0);
+					m_World.SetBlock({x + j, y + k, z + i}, E_BLOCK_AIR, 0);
 				}
 			}
 		}
@@ -262,11 +276,11 @@ void cNetherPortalScanner::BuildNetherPortal(Vector3i a_Location, Direction a_Di
 			// +2 on the short axis because that's where we deposit the entity
 			if (a_Direction == Direction::Y)
 			{
-				m_World.SetBlock({ x + 2, y, z + j }, E_BLOCK_OBSIDIAN, 0);
+				m_World.SetBlock({x + 2, y, z + j}, E_BLOCK_OBSIDIAN, 0);
 			}
 			else if (a_Direction == Direction::X)
 			{
-				m_World.SetBlock({ x + j, y, z + 2 }, E_BLOCK_OBSIDIAN, 0);
+				m_World.SetBlock({x + j, y, z + 2}, E_BLOCK_OBSIDIAN, 0);
 			}
 		}
 	}
@@ -276,26 +290,26 @@ void cNetherPortalScanner::BuildNetherPortal(Vector3i a_Location, Direction a_Di
 	{
 		if (a_Direction == Direction::Y)
 		{
-			m_World.SetBlock({ x + 1, y + i, z }, E_BLOCK_OBSIDIAN, 0);
-			m_World.SetBlock({ x + 1, y + i, z + 3 }, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({x + 1, y + i, z}, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({x + 1, y + i, z + 3}, E_BLOCK_OBSIDIAN, 0);
 		}
 		else if (a_Direction == Direction::X)
 		{
-			m_World.SetBlock({ x, y + i, z + 1 }, E_BLOCK_OBSIDIAN, 0);
-			m_World.SetBlock({ x + 3, y + i, z + 1 }, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({x, y + i, z + 1}, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({x + 3, y + i, z + 1}, E_BLOCK_OBSIDIAN, 0);
 		}
 	}
 	for (int i = 0; i < PortalLength; i++)
 	{
 		if (a_Direction == Direction::Y)
 		{
-			m_World.SetBlock({ x + 1, y + 4, z + i }, E_BLOCK_OBSIDIAN, 0);
-			m_World.SetBlock({ x + 1, y, z + i }, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({x + 1, y + 4, z + i}, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({x + 1, y, z + i}, E_BLOCK_OBSIDIAN, 0);
 		}
 		else if (a_Direction == Direction::X)
 		{
-			m_World.SetBlock({ x + i, y + 4, z + 1 }, E_BLOCK_OBSIDIAN, 0);
-			m_World.SetBlock({ x + i, y, z + 1 }, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({x + i, y + 4, z + 1}, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({x + i, y, z + 1}, E_BLOCK_OBSIDIAN, 0);
 		}
 	}
 
@@ -357,4 +371,3 @@ void cNetherPortalScanner::OnDisabled(void)
 
 	delete this;
 }
-

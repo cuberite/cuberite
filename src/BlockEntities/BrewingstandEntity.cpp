@@ -11,7 +11,12 @@
 
 
 
-cBrewingstandEntity::cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+cBrewingstandEntity::cBrewingstandEntity(
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta,
+	Vector3i a_Pos,
+	cWorld * a_World
+) :
 	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_IsBrewing(false),
 	m_TimeBrewed(0),
@@ -240,7 +245,8 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		if (m_CurrentBrewingRecipes[i] != nullptr)
 		{
 			Recipe = m_CurrentBrewingRecipes[i];
-			if (Recipe->Ingredient.IsEqual(GetSlot(bsIngredient)) && Recipe->Input.IsEqual(GetSlot(static_cast<int>(i))))
+			if (Recipe->Ingredient.IsEqual(GetSlot(bsIngredient)) &&
+				Recipe->Input.IsEqual(GetSlot(static_cast<int>(i))))
 			{
 				Stop = false;
 				continue;
@@ -331,8 +337,3 @@ void cBrewingstandEntity::LoadRecipes(void)
 		}
 	}
 }
-
-
-
-
-

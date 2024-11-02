@@ -77,7 +77,8 @@ void cWither::KilledBy(TakeDamageInfo & a_TDI)
 	Super::KilledBy(a_TDI);
 
 	Vector3d Pos = GetPosition();
-	m_World->ForEachPlayer([=](cPlayer & a_Player)
+	m_World->ForEachPlayer(
+		[=](cPlayer & a_Player)
 		{
 			// TODO 2014-05-21 xdot: Vanilla minecraft uses an AABB check instead of a radius one
 			double Dist = (a_Player.GetPosition() - Pos).Length();
@@ -100,7 +101,16 @@ void cWither::SpawnOn(cClientHandle & a_Client)
 	Super::SpawnOn(a_Client);
 
 	// Purple boss bar with no divisions that darkens the sky:
-	a_Client.SendBossBarAdd(GetUniqueID(), cCompositeChat("Wither"), GetHealth() / GetMaxHealth(), BossBarColor::Purple, BossBarDivisionType::None, true, false, false);
+	a_Client.SendBossBarAdd(
+		GetUniqueID(),
+		cCompositeChat("Wither"),
+		GetHealth() / GetMaxHealth(),
+		BossBarColor::Purple,
+		BossBarDivisionType::None,
+		true,
+		false,
+		false
+	);
 }
 
 

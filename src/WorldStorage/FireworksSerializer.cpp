@@ -8,7 +8,11 @@
 
 
 
-void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFastNBTWriter & a_Writer, const ENUM_ITEM_TYPE a_Type)
+void cFireworkItem::WriteToNBTCompound(
+	const cFireworkItem & a_FireworkItem,
+	cFastNBTWriter & a_Writer,
+	const ENUM_ITEM_TYPE a_Type
+)
 {
 	switch (a_Type)
 	{
@@ -27,7 +31,11 @@ void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFa
 			}
 			if (!a_FireworkItem.m_FadeColours.empty())
 			{
-				a_Writer.AddIntArray("FadeColors", a_FireworkItem.m_FadeColours.data(), a_FireworkItem.m_FadeColours.size());
+				a_Writer.AddIntArray(
+					"FadeColors",
+					a_FireworkItem.m_FadeColours.data(),
+					a_FireworkItem.m_FadeColours.size()
+				);
 			}
 			a_Writer.EndCompound();
 			a_Writer.EndList();
@@ -46,7 +54,11 @@ void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFa
 			}
 			if (!a_FireworkItem.m_FadeColours.empty())
 			{
-				a_Writer.AddIntArray("FadeColors", a_FireworkItem.m_FadeColours.data(), a_FireworkItem.m_FadeColours.size());
+				a_Writer.AddIntArray(
+					"FadeColors",
+					a_FireworkItem.m_FadeColours.data(),
+					a_FireworkItem.m_FadeColours.size()
+				);
 			}
 			a_Writer.EndCompound();
 			break;
@@ -59,7 +71,12 @@ void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFa
 
 
 
-void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNBT & a_NBT, int a_TagIdx, const ENUM_ITEM_TYPE a_Type)
+void cFireworkItem::ParseFromNBT(
+	cFireworkItem & a_FireworkItem,
+	const cParsedNBT & a_NBT,
+	int a_TagIdx,
+	const ENUM_ITEM_TYPE a_Type
+)
 {
 	if (a_TagIdx < 0)
 	{
@@ -70,7 +87,8 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 	{
 		case E_ITEM_FIREWORK_STAR:
 		{
-			for (int explosiontag = a_NBT.GetFirstChild(a_TagIdx); explosiontag >= 0; explosiontag = a_NBT.GetNextSibling(explosiontag))
+			for (int explosiontag = a_NBT.GetFirstChild(a_TagIdx); explosiontag >= 0;
+				 explosiontag = a_NBT.GetNextSibling(explosiontag))
 			{
 				eTagType TagType = a_NBT.GetType(explosiontag);
 				if (TagType == TAG_Byte)  // Custon name tag
@@ -133,7 +151,8 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 		}
 		case E_ITEM_FIREWORK_ROCKET:
 		{
-			for (int fireworkstag = a_NBT.GetFirstChild(a_TagIdx); fireworkstag >= 0; fireworkstag = a_NBT.GetNextSibling(fireworkstag))
+			for (int fireworkstag = a_NBT.GetFirstChild(a_TagIdx); fireworkstag >= 0;
+				 fireworkstag = a_NBT.GetNextSibling(fireworkstag))
 			{
 				eTagType TagType = a_NBT.GetType(fireworkstag);
 				if (TagType == TAG_Byte)  // Custon name tag
@@ -165,7 +184,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 AString cFireworkItem::ColoursToString(const cFireworkItem & a_FireworkItem)
 {
 	AString Result;
-	for (const auto col: a_FireworkItem.m_Colours)
+	for (const auto col : a_FireworkItem.m_Colours)
 	{
 		Result.append(fmt::format(FMT_STRING("{};"), col));
 	}
@@ -198,7 +217,7 @@ void cFireworkItem::ColoursFromString(const AString & a_String, cFireworkItem & 
 AString cFireworkItem::FadeColoursToString(const cFireworkItem & a_FireworkItem)
 {
 	AString Result;
-	for (const auto col: a_FireworkItem.m_FadeColours)
+	for (const auto col : a_FireworkItem.m_FadeColours)
 	{
 		Result.append(fmt::format(FMT_STRING("{};"), col));
 	}
@@ -238,22 +257,22 @@ int cFireworkItem::GetVanillaColourCodeFromDye(NIBBLETYPE a_DyeMeta)
 
 	switch (a_DyeMeta)
 	{
-		case E_META_DYE_BLACK: return 0x1E1B1B;
-		case E_META_DYE_RED: return 0xB3312C;
-		case E_META_DYE_GREEN: return 0x3B511A;
-		case E_META_DYE_BROWN:  return 0x51301A;
-		case E_META_DYE_BLUE: return 0x253192;
-		case E_META_DYE_PURPLE: return 0x7B2FBE;
-		case E_META_DYE_CYAN: return 0x287697;
-		case E_META_DYE_LIGHTGRAY: return 0xABABAB;
-		case E_META_DYE_GRAY: return 0x434343;
-		case E_META_DYE_PINK: return 0xD88198;
+		case E_META_DYE_BLACK:      return 0x1E1B1B;
+		case E_META_DYE_RED:        return 0xB3312C;
+		case E_META_DYE_GREEN:      return 0x3B511A;
+		case E_META_DYE_BROWN:      return 0x51301A;
+		case E_META_DYE_BLUE:       return 0x253192;
+		case E_META_DYE_PURPLE:     return 0x7B2FBE;
+		case E_META_DYE_CYAN:       return 0x287697;
+		case E_META_DYE_LIGHTGRAY:  return 0xABABAB;
+		case E_META_DYE_GRAY:       return 0x434343;
+		case E_META_DYE_PINK:       return 0xD88198;
 		case E_META_DYE_LIGHTGREEN: return 0x41CD34;
-		case E_META_DYE_YELLOW: return 0xDECF2A;
-		case E_META_DYE_LIGHTBLUE: return 0x6689D3;
-		case E_META_DYE_MAGENTA: return 0xC354CD;
-		case E_META_DYE_ORANGE: return 0xEB8844;
-		case E_META_DYE_WHITE: return 0xF0F0F0;
-		default: ASSERT(!"Unhandled dye meta whilst trying to get colour code for fireworks!"); return 0;
+		case E_META_DYE_YELLOW:     return 0xDECF2A;
+		case E_META_DYE_LIGHTBLUE:  return 0x6689D3;
+		case E_META_DYE_MAGENTA:    return 0xC354CD;
+		case E_META_DYE_ORANGE:     return 0xEB8844;
+		case E_META_DYE_WHITE:      return 0xF0F0F0;
+		default:                    ASSERT(!"Unhandled dye meta whilst trying to get colour code for fireworks!"); return 0;
 	}
 }

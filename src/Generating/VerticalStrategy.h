@@ -19,7 +19,3 @@
 a_StrategyDesc is in the format "<StrategyClass>|<Params>". The params and the pipe may be omitted.
 If an unknown class is requested or the param parsing fails, nullptr is returned. */
 cPiece::cVerticalStrategyPtr CreateVerticalStrategyFromString(const AString & a_StrategyDesc, bool a_LogWarnings);
-
-
-
-

@@ -26,30 +26,34 @@ class cUUID;
 
 /** Macros used to read packets more easily */
 #define HANDLE_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		if (!ByteBuf.Proc(Var))\
-		{\
-			return;\
-		} \
-	} while (false)
+	Type Var;                                 \
+	do                                        \
+	{                                         \
+		if (!ByteBuf.Proc(Var))               \
+		{                                     \
+			return;                           \
+		}                                     \
+	}                                         \
+	while (false)
 
 
 
 
 
 #define HANDLE_PACKET_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		{ \
-			if (!ByteBuf.Proc(Var)) \
-			{ \
-				ByteBuf.CheckValid(); \
-				return false; \
-			} \
-			ByteBuf.CheckValid(); \
-		} \
-	} while (false)
+	Type Var;                                        \
+	do                                               \
+	{                                                \
+		{                                            \
+			if (!ByteBuf.Proc(Var))                  \
+			{                                        \
+				ByteBuf.CheckValid();                \
+				return false;                        \
+			}                                        \
+			ByteBuf.CheckValid();                    \
+		}                                            \
+	}                                                \
+	while (false)
 
 
 
@@ -58,7 +62,7 @@ class cUUID;
 /** Composes an individual packet in the protocol's m_OutPacketBuffer; sends it just before being destructed. */
 class cPacketizer
 {
-public:
+  public:
 	/** Starts serializing a new packet into the protocol's m_OutPacketBuffer.
 	Locks the protocol's m_CSPacket to avoid multithreading issues. */
 	cPacketizer(cProtocol & a_Protocol, cProtocol::ePacketType a_PacketType) :
@@ -73,87 +77,45 @@ public:
 	/** Sends the packet via the contained protocol's SendPacket() function. */
 	~cPacketizer();
 
-	inline void WriteBool(bool a_Value)
-	{
-		VERIFY(m_Out.WriteBool(a_Value));
-	}
+	inline void WriteBool(bool a_Value) { VERIFY(m_Out.WriteBool(a_Value)); }
 
-	inline void WriteBEUInt8(UInt8 a_Value)
-	{
-		VERIFY(m_Out.WriteBEUInt8(a_Value));
-	}
+	inline void WriteBEUInt8(UInt8 a_Value) { VERIFY(m_Out.WriteBEUInt8(a_Value)); }
 
 
-	inline void WriteBEInt8(Int8 a_Value)
-	{
-		VERIFY(m_Out.WriteBEInt8(a_Value));
-	}
+	inline void WriteBEInt8(Int8 a_Value) { VERIFY(m_Out.WriteBEInt8(a_Value)); }
 
 
-	inline void WriteBEInt16(Int16 a_Value)
-	{
-		VERIFY(m_Out.WriteBEInt16(a_Value));
-	}
+	inline void WriteBEInt16(Int16 a_Value) { VERIFY(m_Out.WriteBEInt16(a_Value)); }
 
 
-	inline void WriteBEUInt16(UInt16 a_Value)
-	{
-		VERIFY(m_Out.WriteBEUInt16(a_Value));
-	}
+	inline void WriteBEUInt16(UInt16 a_Value) { VERIFY(m_Out.WriteBEUInt16(a_Value)); }
 
 
-	inline void WriteBEInt32(Int32 a_Value)
-	{
-		VERIFY(m_Out.WriteBEInt32(a_Value));
-	}
+	inline void WriteBEInt32(Int32 a_Value) { VERIFY(m_Out.WriteBEInt32(a_Value)); }
 
 
-	inline void WriteBEUInt32(UInt32 a_Value)
-	{
-		VERIFY(m_Out.WriteBEUInt32(a_Value));
-	}
+	inline void WriteBEUInt32(UInt32 a_Value) { VERIFY(m_Out.WriteBEUInt32(a_Value)); }
 
 
-	inline void WriteBEInt64(Int64 a_Value)
-	{
-		VERIFY(m_Out.WriteBEInt64(a_Value));
-	}
+	inline void WriteBEInt64(Int64 a_Value) { VERIFY(m_Out.WriteBEInt64(a_Value)); }
 
 
-	inline void WriteBEUInt64(UInt64 a_Value)
-	{
-		VERIFY(m_Out.WriteBEUInt64(a_Value));
-	}
+	inline void WriteBEUInt64(UInt64 a_Value) { VERIFY(m_Out.WriteBEUInt64(a_Value)); }
 
 
-	inline void WriteBEFloat(float a_Value)
-	{
-		VERIFY(m_Out.WriteBEFloat(a_Value));
-	}
+	inline void WriteBEFloat(float a_Value) { VERIFY(m_Out.WriteBEFloat(a_Value)); }
 
 
-	inline void WriteBEDouble(double a_Value)
-	{
-		VERIFY(m_Out.WriteBEDouble(a_Value));
-	}
+	inline void WriteBEDouble(double a_Value) { VERIFY(m_Out.WriteBEDouble(a_Value)); }
 
 
-	inline void WriteVarInt32(UInt32 a_Value)
-	{
-		VERIFY(m_Out.WriteVarInt32(a_Value));
-	}
+	inline void WriteVarInt32(UInt32 a_Value) { VERIFY(m_Out.WriteVarInt32(a_Value)); }
 
 
-	inline void WriteString(const AString & a_Value)
-	{
-		VERIFY(m_Out.WriteVarUTF8String(a_Value));
-	}
+	inline void WriteString(const AString & a_Value) { VERIFY(m_Out.WriteVarUTF8String(a_Value)); }
 
 
-	inline void WriteBuf(const ContiguousByteBufferView a_Data)
-	{
-		VERIFY(m_Out.Write(a_Data.data(), a_Data.size()));
-	}
+	inline void WriteBuf(const ContiguousByteBufferView a_Data) { VERIFY(m_Out.Write(a_Data.data(), a_Data.size())); }
 
 
 	/** Writes the specified block position as a single encoded 64-bit BigEndian integer.
@@ -199,7 +161,7 @@ public:
 	Used for logging the packets. */
 	static AString PacketTypeToStr(cProtocol::ePacketType a_PacketType);
 
-protected:
+  protected:
 	/** The protocol instance in which the packet is being constructed. */
 	cProtocol & m_Protocol;
 
@@ -212,8 +174,4 @@ protected:
 	/** Type of the contained packet.
 	Used for logging purposes, the packet type is encoded into m_Out immediately in constructor. */
 	cProtocol::ePacketType m_PacketType;
-} ;
-
-
-
-
+};

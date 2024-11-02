@@ -17,7 +17,7 @@ class cBlockLadder: public cMetaRotator<cClearMetaOnDrop, ...>
 
 // MSVC generates warnings for the templated AssertIfNotMatched parameter conditions, so disable it:
 #ifdef _MSC_VER
-	#pragma warning(disable: 4127)  // Conditional expression is constant
+#pragma warning(disable : 4127)  // Conditional expression is constant
 #endif
 
 
@@ -25,23 +25,18 @@ class cBlockLadder: public cMetaRotator<cClearMetaOnDrop, ...>
 
 
 /** Mixin to clear the block's meta value when converting to a pickup. */
-template <class Base>
-class cClearMetaOnDrop :
-	public Base
+template <class Base> class cClearMetaOnDrop : public Base
 {
-public:
-
-	constexpr cClearMetaOnDrop(BLOCKTYPE a_BlockType):
+  public:
+	constexpr cClearMetaOnDrop(BLOCKTYPE a_BlockType) :
 		Base(a_BlockType)
 	{
 	}
 
-protected:
-
+  protected:
 	~cClearMetaOnDrop() = default;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Reset the meta to zero:
@@ -54,21 +49,26 @@ private:
 
 
 /** Mixin for rotations and reflections following the standard pattern of "apply mask, then use a switch".
-Inherit from this class providing your base class as Base, the BitMask for the direction bits in bitmask and the masked value for the directions in North, East, South, West.
-There is also an aptional parameter AssertIfNotMatched, set this if it is invalid for a block to exist in any other state. */
-template <class Base, NIBBLETYPE BitMask, NIBBLETYPE North, NIBBLETYPE East, NIBBLETYPE South, NIBBLETYPE West, bool AssertIfNotMatched = false>
-class cMetaRotator :
-	public Base
+Inherit from this class providing your base class as Base, the BitMask for the direction bits in bitmask and the masked
+value for the directions in North, East, South, West. There is also an aptional parameter AssertIfNotMatched, set this
+if it is invalid for a block to exist in any other state. */
+template <
+	class Base,
+	NIBBLETYPE BitMask,
+	NIBBLETYPE North,
+	NIBBLETYPE East,
+	NIBBLETYPE South,
+	NIBBLETYPE West,
+	bool AssertIfNotMatched = false>
+class cMetaRotator : public Base
 {
-public:
-
-	constexpr cMetaRotator(BLOCKTYPE a_BlockType):
+  public:
+	constexpr cMetaRotator(BLOCKTYPE a_BlockType) :
 		Base(a_BlockType)
 	{
 	}
 
-protected:
-
+  protected:
 	~cMetaRotator() = default;
 
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override
@@ -76,9 +76,9 @@ protected:
 		NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
 		switch (a_Meta & BitMask)
 		{
-			case South: return East  | OtherMeta;
+			case South: return East | OtherMeta;
 			case East:  return North | OtherMeta;
-			case North: return West  | OtherMeta;
+			case North: return West | OtherMeta;
 			case West:  return South | OtherMeta;
 		}
 		if (AssertIfNotMatched)
@@ -97,9 +97,9 @@ protected:
 		NIBBLETYPE OtherMeta = a_Meta & (~BitMask);
 		switch (a_Meta & BitMask)
 		{
-			case South: return West  | OtherMeta;
+			case South: return West | OtherMeta;
 			case West:  return North | OtherMeta;
-			case North: return East  | OtherMeta;
+			case North: return East | OtherMeta;
 			case East:  return South | OtherMeta;
 		}
 		if (AssertIfNotMatched)
@@ -155,15 +155,12 @@ template <
 	NIBBLETYPE East = 0x05,
 	NIBBLETYPE South = 0x03,
 	NIBBLETYPE West = 0x04,
-	bool AssertIfNotMatched = false
->
-class cYawRotator :
-	public cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>
+	bool AssertIfNotMatched = false>
+class cYawRotator : public cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>
 {
 	using Super = cMetaRotator<Base, BitMask, North, East, South, West, AssertIfNotMatched>;
 
-public:
-
+  public:
 	using Super::Super;
 
 
@@ -189,8 +186,7 @@ public:
 		}
 	}
 
-protected:
-
+  protected:
 	~cYawRotator() = default;
 };
 
@@ -208,26 +204,26 @@ template <
 	NIBBLETYPE South = 0x03,
 	NIBBLETYPE West = 0x04,
 	NIBBLETYPE Up = 0x00,
-	NIBBLETYPE Down = 0x01
->
-class cDisplacementYawRotator:
-	public cYawRotator<Base, BitMask, North, East, South, West>
+	NIBBLETYPE Down = 0x01>
+class cDisplacementYawRotator : public cYawRotator<Base, BitMask, North, East, South, West>
 {
 	using Super = cYawRotator<Base, BitMask, North, East, South, West>;
 
-public:
-
+  public:
 	using Super::Super;
 
 
 	/** Converts the placement position, eye position as returned by cPlayer::GetEyePosition(), and
-	rotation value as returned by cPlayer::GetYaw() to the appropriate metadata value for a block placed by a player facing that way. */
-	static NIBBLETYPE DisplacementYawToMetaData(const Vector3d a_PlacePosition, const Vector3d a_EyePosition, const double a_Rotation)
+	rotation value as returned by cPlayer::GetYaw() to the appropriate metadata value for a block placed by a player
+	facing that way. */
+	static NIBBLETYPE DisplacementYawToMetaData(
+		const Vector3d a_PlacePosition,
+		const Vector3d a_EyePosition,
+		const double a_Rotation
+	)
 	{
-		if (
-			const auto Displacement = a_EyePosition - a_PlacePosition.addedXZ(0.5, 0.5);
-			(std::abs(Displacement.x) < 2) && (std::abs(Displacement.z) < 2)
-		)
+		if (const auto Displacement = a_EyePosition - a_PlacePosition.addedXZ(0.5, 0.5);
+			(std::abs(Displacement.x) < 2) && (std::abs(Displacement.z) < 2))
 		{
 			if (Displacement.y > 2)
 			{
@@ -243,8 +239,7 @@ public:
 		return Super::YawToMetaData(a_Rotation);
 	}
 
-protected:
-
+  protected:
 	~cDisplacementYawRotator() = default;
 
 
@@ -254,7 +249,7 @@ protected:
 		switch (a_Meta & BitMask)
 		{
 			case Down: return Up | OtherMeta;  // Down -> Up
-			case Up: return Down | OtherMeta;  // Up -> Down
+			case Up:   return Down | OtherMeta;  // Up -> Down
 		}
 		// Not Facing Up or Down; No change.
 		return a_Meta;

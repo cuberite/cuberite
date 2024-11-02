@@ -7,17 +7,14 @@
 
 
 
-class cBlockSugarCaneHandler final :
-	public cBlockPlant<false>
+class cBlockSugarCaneHandler final : public cBlockPlant<false>
 {
 	using Super = cBlockPlant<false>;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		return cItem(E_ITEM_SUGARCANE, 1, 0);
@@ -41,13 +38,12 @@ private:
 			case E_BLOCK_FARMLAND:
 			case E_BLOCK_SAND:
 			{
-				static const Vector3i Coords[] =
-				{
-					{-1, -1,  0},
-					{ 1, -1,  0},
-					{ 0, -1, -1},
-					{ 0, -1,  1},
-				} ;
+				static const Vector3i Coords[] = {
+					{-1, -1, 0},
+					{1, -1, 0},
+					{0, -1, -1},
+					{0, -1, 1},
+				};
 				for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 				{
 					BLOCKTYPE BlockType;
@@ -91,18 +87,12 @@ private:
 	{
 		// Check the total height of the sugarcane blocks here:
 		int top = a_RelPos.y + 1;
-		while (
-			(top < cChunkDef::Height) &&
-			(a_Chunk.GetBlock({a_RelPos.x, top, a_RelPos.z}) == E_BLOCK_SUGARCANE)
-		)
+		while ((top < cChunkDef::Height) && (a_Chunk.GetBlock({a_RelPos.x, top, a_RelPos.z}) == E_BLOCK_SUGARCANE))
 		{
 			++top;
 		}
 		int bottom = a_RelPos.y - 1;
-		while (
-			(bottom > 0) &&
-			(a_Chunk.GetBlock({a_RelPos.x, bottom, a_RelPos.z}) == E_BLOCK_SUGARCANE)
-		)
+		while ((bottom > 0) && (a_Chunk.GetBlock({a_RelPos.x, bottom, a_RelPos.z}) == E_BLOCK_SUGARCANE))
 		{
 			--bottom;
 		}
@@ -133,8 +123,4 @@ private:
 		}
 		return paStay;
 	}
-} ;
-
-
-
-
+};

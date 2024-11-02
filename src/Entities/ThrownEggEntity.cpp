@@ -7,7 +7,7 @@
 
 
 
-cThrownEggEntity::cThrownEggEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
+cThrownEggEntity::cThrownEggEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed) :
 	Super(pkEgg, a_Creator, a_Pos, a_Speed, 0.25f, 0.25f)
 {
 }

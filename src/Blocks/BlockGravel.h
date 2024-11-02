@@ -7,15 +7,12 @@
 
 
 
-class cBlockGravelHandler final :
-	public cBlockHandler
+class cBlockGravelHandler final : public cBlockHandler
 {
-public:
-
+  public:
 	using cBlockHandler::cBlockHandler;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		if (ToolHasSilkTouch(a_Tool))
@@ -42,8 +39,4 @@ private:
 		UNUSED(a_Meta);
 		return 11;
 	}
-} ;
-
-
-
-
+};

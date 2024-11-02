@@ -21,9 +21,9 @@
 
 // Enable or disable detailed logging
 #if 0
-	#define FLUID_FLOG FLOGD
+#define FLUID_FLOG FLOGD
 #else
-	#define FLUID_FLOG(...)
+#define FLUID_FLOG(...)
 #endif
 
 
@@ -50,13 +50,15 @@ cFloodyFluidSimulator::cFloodyFluidSimulator(
 
 void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 {
-	FLUID_FLOG("Simulating block {0}: block {1}, meta {2}",
+	FLUID_FLOG(
+		"Simulating block {0}: block {1}, meta {2}",
 		a_Chunk->PositionToWorldPosition(a_RelX, a_RelY, a_RelZ),
 		a_Chunk->GetBlock(a_RelX, a_RelY, a_RelZ),
 		a_Chunk->GetMeta(a_RelX, a_RelY, a_RelZ)
 	);
 
-	BLOCKTYPE MyBlock; NIBBLETYPE MyMeta;
+	BLOCKTYPE MyBlock;
+	NIBBLETYPE MyMeta;
 	a_Chunk->GetBlockTypeMeta(a_RelX, a_RelY, a_RelZ, MyBlock, MyMeta);
 
 	if (!IsAnyFluidBlock(MyBlock))
@@ -111,12 +113,10 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 		}
 
 		// If source creation is on, check for it here:
-		if (
-			(m_NumNeighborsForSource > 0) &&    // Source creation is on
-			(MyMeta == m_Falloff) &&            // Only exactly one block away from a source (fast bail-out)
-			(
-				!IsPassableForFluid(Below) ||  // Only exactly 1 block deep
-				(Below == m_StationaryFluidBlock)  // Or a source block underneath
+		if ((m_NumNeighborsForSource > 0) &&  // Source creation is on
+			(MyMeta == m_Falloff) &&  // Only exactly one block away from a source (fast bail-out)
+			(!IsPassableForFluid(Below) ||  // Only exactly 1 block deep
+			 (Below == m_StationaryFluidBlock)  // Or a source block underneath
 			) &&
 			CheckNeighborsForSource(a_Chunk, a_RelX, a_RelY, a_RelZ)  // Did we create a source?
 		)
@@ -137,10 +137,10 @@ void cFloodyFluidSimulator::SimulateBlock(cChunk * a_Chunk, int a_RelX, int a_Re
 
 void cFloodyFluidSimulator::SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta)
 {
-	SpreadToNeighbor(a_Chunk, a_RelX - 1, a_RelY, a_RelZ,     a_NewMeta);
-	SpreadToNeighbor(a_Chunk, a_RelX + 1, a_RelY, a_RelZ,     a_NewMeta);
-	SpreadToNeighbor(a_Chunk, a_RelX,     a_RelY, a_RelZ - 1, a_NewMeta);
-	SpreadToNeighbor(a_Chunk, a_RelX,     a_RelY, a_RelZ + 1, a_NewMeta);
+	SpreadToNeighbor(a_Chunk, a_RelX - 1, a_RelY, a_RelZ, a_NewMeta);
+	SpreadToNeighbor(a_Chunk, a_RelX + 1, a_RelY, a_RelZ, a_NewMeta);
+	SpreadToNeighbor(a_Chunk, a_RelX, a_RelY, a_RelZ - 1, a_NewMeta);
+	SpreadToNeighbor(a_Chunk, a_RelX, a_RelY, a_RelZ + 1, a_NewMeta);
 }
 
 
@@ -165,25 +165,27 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, int a_RelX, int a
 	{
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
-		static const Vector3i Coords[] =
-		{
-			Vector3i( 1, 0,  0),
-			Vector3i(-1, 0,  0),
-			Vector3i( 0, 0,  1),
-			Vector3i( 0, 0, -1),
-		} ;
+		static const Vector3i Coords[] = {
+			Vector3i(1, 0, 0),
+			Vector3i(-1, 0, 0),
+			Vector3i(0, 0, 1),
+			Vector3i(0, 0, -1),
+		};
 		for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 		{
-			if (!a_Chunk->UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta))
+			if (!a_Chunk
+					 ->UnboundedRelGetBlock(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z, BlockType, BlockMeta))
 			{
 				continue;
 			}
 			if (IsAllowedBlock(BlockType) && IsHigherMeta(BlockMeta, a_MyMeta))
 			{
 				// This block is fed, no more processing needed
-				FLUID_FLOG("  Fed from {0}, type {1}, meta {2}",
-					a_Chunk->PositionToWorldPosition(a_RelX+ Coords[i].x, a_RelY, a_RelZ + Coords[i].z),
-					BlockType, BlockMeta
+				FLUID_FLOG(
+					"  Fed from {0}, type {1}, meta {2}",
+					a_Chunk->PositionToWorldPosition(a_RelX + Coords[i].x, a_RelY, a_RelZ + Coords[i].z),
+					BlockType,
+					BlockMeta
 				);
 				return false;
 			}
@@ -217,7 +219,13 @@ bool cFloodyFluidSimulator::CheckTributaries(cChunk * a_Chunk, int a_RelX, int a
 
 
 
-void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta)
+void cFloodyFluidSimulator::SpreadToNeighbor(
+	cChunk * a_NearChunk,
+	int a_RelX,
+	int a_RelY,
+	int a_RelZ,
+	NIBBLETYPE a_NewMeta
+)
 {
 	ASSERT(a_NewMeta <= 8);  // Invalid meta values
 	ASSERT(a_NewMeta > 0);  // Source blocks aren't spread
@@ -251,17 +259,14 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 		{
 			// Lava flowing into water, change to stone / cobblestone based on direction:
 			BLOCKTYPE NewBlock = (a_NewMeta == 8) ? E_BLOCK_STONE : E_BLOCK_COBBLESTONE;
-			FLUID_FLOG("  Lava flowing into water, turning water at rel {0} into {1}",
-				relPos, ItemTypeToString(NewBlock)
+			FLUID_FLOG(
+				"  Lava flowing into water, turning water at rel {0} into {1}",
+				relPos,
+				ItemTypeToString(NewBlock)
 			);
 			a_NearChunk->SetBlock(relPos, NewBlock, 0);
 
-			m_World.BroadcastSoundEffect(
-				"block.lava.extinguish",
-				absPos,
-				0.5f,
-				1.5f
-			);
+			m_World.BroadcastSoundEffect("block.lava.extinguish", absPos, 0.5f, 1.5f);
 			return;
 		}
 	}
@@ -271,17 +276,14 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 		{
 			// Water flowing into lava, change to cobblestone / obsidian based on dest block:
 			BLOCKTYPE NewBlock = (BlockMeta == 0) ? E_BLOCK_OBSIDIAN : E_BLOCK_COBBLESTONE;
-			FLUID_FLOG("  Water flowing into lava, turning lava at rel {0} into {1}",
-				relPos, ItemTypeToString(NewBlock)
+			FLUID_FLOG(
+				"  Water flowing into lava, turning lava at rel {0} into {1}",
+				relPos,
+				ItemTypeToString(NewBlock)
 			);
 			a_NearChunk->SetBlock(relPos, NewBlock, 0);
 
-			m_World.BroadcastSoundEffect(
-				"block.lava.extinguish",
-				absPos,
-				0.5f,
-				1.5f
-			);
+			m_World.BroadcastSoundEffect("block.lava.extinguish", absPos, 0.5f, 1.5f);
 			return;
 		}
 	}
@@ -318,13 +320,12 @@ bool cFloodyFluidSimulator::CheckNeighborsForSource(cChunk * a_Chunk, int a_RelX
 {
 	FLUID_FLOG("  Checking neighbors for source creation");
 
-	static const Vector3i NeighborCoords[] =
-	{
-		Vector3i(-1, 0,  0),
-		Vector3i( 1, 0,  0),
-		Vector3i( 0, 0, -1),
-		Vector3i( 0, 0,  1),
-	} ;
+	static const Vector3i NeighborCoords[] = {
+		Vector3i(-1, 0, 0),
+		Vector3i(1, 0, 0),
+		Vector3i(0, 0, -1),
+		Vector3i(0, 0, 1),
+	};
 
 	int NumNeeded = m_NumNeighborsForSource;
 	for (size_t i = 0; i < ARRAYCOUNT(NeighborCoords); i++)
@@ -375,14 +376,13 @@ bool cFloodyFluidSimulator::HardenBlock(cChunk * a_Chunk, Vector3i a_RelPos, BLO
 
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
-	static const Vector3i neighborOffsets[] =
-	{
-		Vector3i( 1, 0,  0),
-		Vector3i(-1, 0,  0),
-		Vector3i( 0, 0,  1),
-		Vector3i( 0, 0, -1),
+	static const Vector3i neighborOffsets[] = {
+		Vector3i(1, 0, 0),
+		Vector3i(-1, 0, 0),
+		Vector3i(0, 0, 1),
+		Vector3i(0, 0, -1),
 	};
-	for (const auto & ofs: neighborOffsets)
+	for (const auto & ofs : neighborOffsets)
 	{
 		if (!a_Chunk->UnboundedRelGetBlock(a_RelPos + ofs, BlockType, BlockMeta))
 		{
@@ -412,6 +412,3 @@ bool cFloodyFluidSimulator::HardenBlock(cChunk * a_Chunk, Vector3i a_RelPos, BLO
 
 	return false;
 }
-
-
-

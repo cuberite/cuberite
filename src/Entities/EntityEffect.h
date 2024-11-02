@@ -5,36 +5,35 @@ class cPawn;
 // tolua_begin
 class cEntityEffect
 {
-public:
-
+  public:
 	/** All types of entity effects (numbers correspond to protocol / storage types) */
 	enum eType
 	{
-		effNoEffect       = 0,
-		effSpeed          = 1,
-		effSlowness       = 2,
-		effHaste          = 3,
-		effMiningFatigue  = 4,
-		effStrength       = 5,
-		effInstantHealth  = 6,
-		effInstantDamage  = 7,
-		effJumpBoost      = 8,
-		effNausea         = 9,
-		effRegeneration   = 10,
-		effResistance     = 11,
+		effNoEffect = 0,
+		effSpeed = 1,
+		effSlowness = 2,
+		effHaste = 3,
+		effMiningFatigue = 4,
+		effStrength = 5,
+		effInstantHealth = 6,
+		effInstantDamage = 7,
+		effJumpBoost = 8,
+		effNausea = 9,
+		effRegeneration = 10,
+		effResistance = 11,
 		effFireResistance = 12,
 		effWaterBreathing = 13,
-		effInvisibility   = 14,
-		effBlindness      = 15,
-		effNightVision    = 16,
-		effHunger         = 17,
-		effWeakness       = 18,
-		effPoison         = 19,
-		effWither         = 20,
-		effHealthBoost    = 21,
-		effAbsorption     = 22,
-		effSaturation     = 23,
-	} ;
+		effInvisibility = 14,
+		effBlindness = 15,
+		effNightVision = 16,
+		effHunger = 17,
+		effWeakness = 18,
+		effPoison = 19,
+		effWither = 20,
+		effHealthBoost = 21,
+		effAbsorption = 22,
+		effSaturation = 23,
+	};
 
 	/** Returns the potion color (used by the client for visuals), based on the potion's damage value */
 	static int GetPotionColor(short a_ItemDamage);
@@ -44,7 +43,8 @@ public:
 	static cEntityEffect::eType GetPotionEffectType(short a_ItemDamage);
 
 
-	/** Retrieves the intensity level from the potion's damage value. Returns 0 for level I potions, 1 for level II potions. */
+	/** Retrieves the intensity level from the potion's damage value. Returns 0 for level I potions, 1 for level II
+	 * potions. */
 	static short GetPotionEffectIntensity(short a_ItemDamage);
 
 
@@ -71,7 +71,7 @@ public:
 
 	/** Creates an entity effect by copying another
 	@param a_OtherEffect      The other effect to copy */
-	cEntityEffect & operator =(cEntityEffect a_OtherEffect);
+	cEntityEffect & operator=(cEntityEffect a_OtherEffect);
 
 	virtual ~cEntityEffect(void) = default;
 
@@ -81,7 +81,12 @@ public:
 	@param a_Duration         How long this effect will last, in ticks
 	@param a_Intensity        How strong the effect will be applied
 	@param a_DistanceModifier The distance modifier for affecting potency, defaults to 1 */
-	static std::unique_ptr<cEntityEffect> CreateEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, double a_DistanceModifier);
+	static std::unique_ptr<cEntityEffect> CreateEntityEffect(
+		cEntityEffect::eType a_EffectType,
+		int a_Duration,
+		short a_Intensity,
+		double a_DistanceModifier
+	);
 
 	/** Returns how many ticks this effect has been active for */
 	int GetTicks(void) const { return m_Ticks; }
@@ -95,9 +100,9 @@ public:
 	/** Returns the distance modifier for affecting potency */
 	double GetDistanceModifier(void) const { return m_DistanceModifier; }
 
-	void SetTicks(int a_Ticks)                          { m_Ticks            = a_Ticks;            }
-	void SetDuration(int a_Duration)                    { m_Duration         = a_Duration;         }
-	void SetIntensity(short a_Intensity)                { m_Intensity        = a_Intensity;        }
+	void SetTicks(int a_Ticks) { m_Ticks = a_Ticks; }
+	void SetDuration(int a_Duration) { m_Duration = a_Duration; }
+	void SetIntensity(short a_Intensity) { m_Intensity = a_Intensity; }
 	void SetDistanceModifier(double a_DistanceModifier) { m_DistanceModifier = a_DistanceModifier; }
 
 	/** Called on each tick.
@@ -105,12 +110,12 @@ public:
 	virtual void OnTick(cPawn & a_Target);
 
 	/** Called when the effect is first added to an entity */
-	virtual void OnActivate(cPawn & a_Target) { }
+	virtual void OnActivate(cPawn & a_Target) {}
 
 	/** Called when the effect is removed from an entity */
-	virtual void OnDeactivate(cPawn & a_Target) { }
+	virtual void OnDeactivate(cPawn & a_Target) {}
 
-protected:
+  protected:
 	/** How many ticks this effect has been active for */
 	int m_Ticks;
 
@@ -128,14 +133,12 @@ protected:
 
 
 
-class cEntityEffectSpeed:
-	public cEntityEffect
+class cEntityEffectSpeed : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectSpeed(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectSpeed(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -149,14 +152,12 @@ public:
 
 
 
-class cEntityEffectSlowness:
-	public cEntityEffect
+class cEntityEffectSlowness : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectSlowness(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectSlowness(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -170,14 +171,12 @@ public:
 
 
 
-class cEntityEffectHaste:
-	public cEntityEffect
+class cEntityEffectHaste : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectHaste(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectHaste(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -187,14 +186,12 @@ public:
 
 
 
-class cEntityEffectMiningFatigue:
-	public cEntityEffect
+class cEntityEffectMiningFatigue : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectMiningFatigue(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectMiningFatigue(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -204,14 +201,12 @@ public:
 
 
 
-class cEntityEffectStrength:
-	public cEntityEffect
+class cEntityEffectStrength : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectStrength(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectStrength(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -221,14 +216,12 @@ public:
 
 
 
-class cEntityEffectInstantHealth:
-	public cEntityEffect
+class cEntityEffectInstantHealth : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectInstantHealth(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectInstantHealth(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -240,14 +233,12 @@ public:
 
 
 
-class cEntityEffectInstantDamage:
-	public cEntityEffect
+class cEntityEffectInstantDamage : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectInstantDamage(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectInstantDamage(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -259,14 +250,12 @@ public:
 
 
 
-class cEntityEffectJumpBoost:
-	public cEntityEffect
+class cEntityEffectJumpBoost : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectJumpBoost(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectJumpBoost(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -276,14 +265,12 @@ public:
 
 
 
-class cEntityEffectNausea:
-	public cEntityEffect
+class cEntityEffectNausea : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectNausea(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectNausea(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -293,14 +280,12 @@ public:
 
 
 
-class cEntityEffectRegeneration:
-	public cEntityEffect
+class cEntityEffectRegeneration : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectRegeneration(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectRegeneration(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -312,14 +297,12 @@ public:
 
 
 
-class cEntityEffectResistance:
-	public cEntityEffect
+class cEntityEffectResistance : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectResistance(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectResistance(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -329,14 +312,12 @@ public:
 
 
 
-class cEntityEffectFireResistance:
-	public cEntityEffect
+class cEntityEffectFireResistance : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectFireResistance(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectFireResistance(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -346,14 +327,12 @@ public:
 
 
 
-class cEntityEffectWaterBreathing:
-	public cEntityEffect
+class cEntityEffectWaterBreathing : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectWaterBreathing(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectWaterBreathing(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -363,22 +342,20 @@ public:
 
 
 
-class cEntityEffectInvisibility:
-	public cEntityEffect
+class cEntityEffectInvisibility : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectInvisibility(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectInvisibility(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
 
-	virtual void OnActivate  (cPawn & a_Target) override { BroadcastMetadata(a_Target); }
+	virtual void OnActivate(cPawn & a_Target) override { BroadcastMetadata(a_Target); }
 	virtual void OnDeactivate(cPawn & a_Target) override { BroadcastMetadata(a_Target); }
 
-private:
+  private:
 	static void BroadcastMetadata(cPawn & a_Target);
 };
 
@@ -386,14 +363,12 @@ private:
 
 
 
-class cEntityEffectBlindness:
-	public cEntityEffect
+class cEntityEffectBlindness : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectBlindness(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectBlindness(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -403,14 +378,12 @@ public:
 
 
 
-class cEntityEffectNightVision:
-	public cEntityEffect
+class cEntityEffectNightVision : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectNightVision(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectNightVision(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -420,14 +393,12 @@ public:
 
 
 
-class cEntityEffectHunger:
-	public cEntityEffect
+class cEntityEffectHunger : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectHunger(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectHunger(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -440,14 +411,12 @@ public:
 
 
 
-class cEntityEffectWeakness:
-	public cEntityEffect
+class cEntityEffectWeakness : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectWeakness(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectWeakness(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -460,14 +429,12 @@ public:
 
 
 
-class cEntityEffectPoison:
-	public cEntityEffect
+class cEntityEffectPoison : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectPoison(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectPoison(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -480,14 +447,12 @@ public:
 
 
 
-class cEntityEffectWither:
-	public cEntityEffect
+class cEntityEffectWither : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectWither(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectWither(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -500,14 +465,12 @@ public:
 
 
 
-class cEntityEffectHealthBoost:
-	public cEntityEffect
+class cEntityEffectHealthBoost : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectHealthBoost(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectHealthBoost(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -517,14 +480,12 @@ public:
 
 
 
-class cEntityEffectAbsorption:
-	public cEntityEffect
+class cEntityEffectAbsorption : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectAbsorption(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectAbsorption(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
@@ -534,21 +495,15 @@ public:
 
 
 
-class cEntityEffectSaturation:
-	public cEntityEffect
+class cEntityEffectSaturation : public cEntityEffect
 {
 	using Super = cEntityEffect;
 
-public:
-
-	cEntityEffectSaturation(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+  public:
+	cEntityEffectSaturation(int a_Duration, short a_Intensity, double a_DistanceModifier = 1) :
 		Super(a_Duration, a_Intensity, a_DistanceModifier)
 	{
 	}
 
 	virtual void OnTick(cPawn & a_Target) override;
 };
-
-
-
-

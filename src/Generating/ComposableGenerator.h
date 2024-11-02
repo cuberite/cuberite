@@ -1,7 +1,8 @@
 
 // ComposableGenerator.h
 
-// Declares the cComposableGenerator class representing the chunk generator that takes the composition approach to generating chunks
+// Declares the cComposableGenerator class representing the chunk generator that takes the composition approach to
+// generating chunks
 
 /*
 Generating works by composing several algorithms:
@@ -41,7 +42,7 @@ The output array is sequenced in the same way as the MapChunk packet's biome dat
 */
 class cBiomeGen
 {
-public:
+  public:
 	virtual ~cBiomeGen() {}  // Force a virtual destructor in descendants
 
 	/** Generates biomes for the given chunk */
@@ -55,12 +56,8 @@ public:
 	a_CacheOffByDefault gets set to whether the cache should be disabled by default.
 	Used in BiomeVisualiser, too.
 	Implemented in BioGen.cpp! */
-	static std::unique_ptr<cBiomeGen> CreateBiomeGen(
-		cIniFile & a_IniFile,
-		int a_Seed,
-		bool & a_CacheOffByDefault
-	);
-} ;
+	static std::unique_ptr<cBiomeGen> CreateBiomeGen(cIniFile & a_IniFile, int a_Seed, bool & a_CacheOffByDefault);
+};
 
 
 
@@ -70,14 +67,14 @@ public:
 A terrain shape generator takes chunk coords on input and outputs a 3D array of "shape" for that chunk. The shape here
 represents the distinction between air and solid; there's no representation of Water since that is added by the
 composition geenrator.
-The output array is indexed [y + 256 * z + 16 * 256 * x], so that it's fast to later compose a single column of the terrain,
-which is the dominant operation following the shape generation.
-The generator may request biome information from the underlying BiomeGen, it may even request information for
-other chunks than the one it's currently generating (neighbors - for averaging)
+The output array is indexed [y + 256 * z + 16 * 256 * x], so that it's fast to later compose a single column of the
+terrain, which is the dominant operation following the shape generation. The generator may request biome information
+from the underlying BiomeGen, it may even request information for other chunks than the one it's currently generating
+(neighbors - for averaging)
 */
 class cTerrainShapeGen
 {
-public:
+  public:
 	virtual ~cTerrainShapeGen() {}  // Force a virtual destructor in descendants
 
 	/** Generates the shape for the given chunk */
@@ -87,9 +84,9 @@ public:
 	virtual void InitializeShapeGen(cIniFile & a_IniFile) {}
 
 	/** Creates the correct TerrainShapeGen descendant based on the ini file settings and the seed provided.
-	a_BiomeGen is the underlying biome generator, some shape generators may depend on it providing additional biomes data around the chunk
-	a_CacheOffByDefault gets set to whether the cache should be disabled by default
-	Implemented in ShapeGen.cpp!
+	a_BiomeGen is the underlying biome generator, some shape generators may depend on it providing additional biomes
+	data around the chunk a_CacheOffByDefault gets set to whether the cache should be disabled by default Implemented in
+	ShapeGen.cpp!
 	*/
 	static std::unique_ptr<cTerrainShapeGen> CreateShapeGen(
 		cIniFile & a_IniFile,
@@ -97,7 +94,7 @@ public:
 		int a_Seed,
 		bool & a_CacheOffByDefault
 	);
-} ;
+};
 
 
 
@@ -109,7 +106,7 @@ consume the heightmap is wasteful, so this interface is used instead; it has a c
 that data is retained. */
 class cTerrainHeightGen
 {
-public:
+  public:
 	virtual ~cTerrainHeightGen() {}  // Force a virtual destructor in descendants
 
 	/** Retrieves the heightmap for the specified chunk. */
@@ -126,7 +123,11 @@ public:
 		auto chunkCoords = cChunkDef::BlockToChunk({a_BlockX, 0, a_BlockZ});
 		cChunkDef::HeightMap heightMap;
 		GenHeightMap(chunkCoords, heightMap);
-		return cChunkDef::GetHeight(heightMap, a_BlockX - chunkCoords.m_ChunkX * cChunkDef::Width, a_BlockZ - chunkCoords.m_ChunkZ * cChunkDef::Width);
+		return cChunkDef::GetHeight(
+			heightMap,
+			a_BlockX - chunkCoords.m_ChunkX * cChunkDef::Width,
+			a_BlockZ - chunkCoords.m_ChunkZ * cChunkDef::Width
+		);
 	}
 
 	/** Creates a cTerrainHeightGen descendant based on the INI file settings. */
@@ -136,7 +137,7 @@ public:
 		int a_Seed,
 		bool & a_CacheOffByDefault
 	);
-} ;
+};
 
 
 
@@ -149,7 +150,7 @@ but it may request information for other chunks than the one it's currently gene
 */
 class cTerrainCompositionGen
 {
-public:
+  public:
 	virtual ~cTerrainCompositionGen() {}  // Force a virtual destructor in descendants
 
 	/** Generates the chunk's composition into a_ChunkDesc, using the terrain shape provided in a_Shape.
@@ -160,15 +161,16 @@ public:
 	virtual void InitializeCompoGen(cIniFile & a_IniFile) {}
 
 	/** Creates the correct TerrainCompositionGen descendant based on the ini file settings and the seed provided.
-	a_BiomeGen is the underlying biome generator, some composition generators may depend on it providing additional biomes around the chunk
-	a_ShapeGen is the underlying shape generator, some composition generators may depend on it providing additional shape around the chunk. */
+	a_BiomeGen is the underlying biome generator, some composition generators may depend on it providing additional
+	biomes around the chunk a_ShapeGen is the underlying shape generator, some composition generators may depend on it
+	providing additional shape around the chunk. */
 	static std::unique_ptr<cTerrainCompositionGen> CreateCompositionGen(
 		cIniFile & a_IniFile,
 		cBiomeGen & a_BiomeGen,
 		cTerrainShapeGen & a_ShapeGen,
 		int a_Seed
 	);
-} ;
+};
 
 
 
@@ -183,23 +185,21 @@ no longer relevant, all structure generators are considered finishers now (#398)
 */
 class cFinishGen
 {
-public:
+  public:
 	virtual ~cFinishGen() {}  // Force a virtual destructor in descendants
 
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) = 0;
-} ;
+};
 
 
 
 
 
-class cComposableGenerator:
-	public cChunkGenerator
+class cComposableGenerator : public cChunkGenerator
 {
 	using Super = cChunkGenerator;
 
-public:
-
+  public:
 	cComposableGenerator();
 
 	// cChunkGenerator::cGenerator overrides:
@@ -212,8 +212,7 @@ public:
 	static void InitializeGeneratorDefaults(cIniFile & a_IniFile, eDimension a_Dimension);
 
 
-protected:
-
+  protected:
 	// The generator's composition:
 	/** The biome generator. */
 	std::unique_ptr<cBiomeGen> m_BiomeGen;
@@ -242,4 +241,4 @@ protected:
 
 	/** Reads the finishers from the ini and initializes m_FinishGens accordingly */
 	void InitFinishGens(cIniFile & a_IniFile);
-} ;
+};

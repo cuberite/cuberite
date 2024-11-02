@@ -10,9 +10,8 @@
 
 
 
-cBufferedSslContext::cBufferedSslContext(size_t a_BufferSize):
-	m_OutgoingData(a_BufferSize),
-	m_IncomingData(a_BufferSize)
+cBufferedSslContext::cBufferedSslContext(size_t a_BufferSize) :
+	m_OutgoingData(a_BufferSize), m_IncomingData(a_BufferSize)
 {
 }
 
@@ -87,7 +86,3 @@ int cBufferedSslContext::SendEncrypted(const unsigned char * a_Buffer, size_t a_
 	}
 	return static_cast<int>(a_NumBytes);
 }
-
-
-
-

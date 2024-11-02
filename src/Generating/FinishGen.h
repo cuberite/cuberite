@@ -26,56 +26,51 @@
 
 
 
-class cFinishGenSnow :
-	public cFinishGen
+class cFinishGenSnow : public cFinishGen
 {
-protected:
+  protected:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
-} ;
+};
 
 
 
 
 
-class cFinishGenIce :
-	public cFinishGen
+class cFinishGenIce : public cFinishGen
 {
-protected:
+  protected:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
-} ;
+};
 
 
 
 
 
-class cFinishGenNetherClumpFoliage :
-	public cFinishGen
+class cFinishGenNetherClumpFoliage : public cFinishGen
 {
-public:
+  public:
 	cFinishGenNetherClumpFoliage(int a_Seed) :
-		m_Noise(a_Seed),
-		m_Seed(a_Seed)
+		m_Noise(a_Seed), m_Seed(a_Seed)
 	{
 	}
 
-protected:
+  protected:
 	cNoise m_Noise;
-	int    m_Seed;
+	int m_Seed;
 
 	void TryPlaceClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_Block);
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
-} ;
+};
 
 
 
 
 
-class cFinishGenClumpTopBlock :
-	public cFinishGen
+class cFinishGenClumpTopBlock : public cFinishGen
 {
-public:
+  public:
 	// Contains the meta, type and weight for a clump block
 	struct FoliageInfo
 	{
@@ -84,10 +79,9 @@ public:
 		int m_Weight;
 
 		FoliageInfo(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, int a_Weight) :
-			m_BlockType(a_BlockType),
-			m_BlockMeta(a_BlockMeta),
-			m_Weight(a_Weight)
-		{}
+			m_BlockType(a_BlockType), m_BlockMeta(a_BlockMeta), m_Weight(a_Weight)
+		{
+		}
 	};
 
 	// Contains the minimum and maximum amount of clumps for a biome and it's blocks.
@@ -98,34 +92,34 @@ public:
 		std::vector<FoliageInfo> m_Blocks;
 
 		BiomeInfo() :
-			m_MinNumClumpsPerChunk(0),
-			m_MaxNumClumpsPerChunk(2),
-			m_Blocks()
-		{}
+			m_MinNumClumpsPerChunk(0), m_MaxNumClumpsPerChunk(2), m_Blocks()
+		{
+		}
 
 		BiomeInfo(int a_MinNumClumpsPerChunk, int a_MaxNumClumpsPerChunk, std::vector<FoliageInfo> a_Blocks) :
 			m_MinNumClumpsPerChunk(a_MinNumClumpsPerChunk),
 			m_MaxNumClumpsPerChunk(a_MaxNumClumpsPerChunk),
 			m_Blocks(std::move(a_Blocks))
-		{}
+		{
+		}
 	};
 
 
 	cFinishGenClumpTopBlock(int a_Seed, std::vector<BiomeInfo> a_BlockList) :
-		m_Noise(a_Seed),
-		m_FlowersPerBiome()
+		m_Noise(a_Seed), m_FlowersPerBiome()
 	{
 		std::swap(a_BlockList, m_FlowersPerBiome);
 	}
 
 	/** Parses a string and puts a vector with a length of biMaxVariantBiome in a_Output.
-	The format of the string is "<Biomes separated with a comma>;<Blocks separated with a comma>". This can also be repeated with a | */
+	The format of the string is "<Biomes separated with a comma>;<Blocks separated with a comma>". This can also be
+	repeated with a | */
 	static void ParseConfigurationString(const AString & a_String, std::vector<BiomeInfo> & a_Output);
 
 	/** Parses an inifile in search for all clumps */
 	static std::vector<BiomeInfo> ParseIniFile(cIniFile & a_IniFile, const AString & a_ClumpPrefix);
-protected:
 
+  protected:
 	cNoise m_Noise;
 	std::vector<BiomeInfo> m_FlowersPerBiome;
 
@@ -138,7 +132,14 @@ protected:
 	/** The maximum range a foliage can be placed from the center of the clump */
 	const int RANGE_FROM_CENTER = 5;
 
-	void TryPlaceFoliageClump(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, bool a_IsDoubleTall);
+	void TryPlaceFoliageClump(
+		cChunkDesc & a_ChunkDesc,
+		int a_RelX,
+		int a_RelZ,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta,
+		bool a_IsDoubleTall
+	);
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 };
 
@@ -146,35 +147,35 @@ protected:
 
 
 
-class cFinishGenGlowStone :
-	public cFinishGen
+class cFinishGenGlowStone : public cFinishGen
 {
-public:
+  public:
 	cFinishGenGlowStone(int a_Seed) :
-		m_Noise(a_Seed),
-		m_Seed(a_Seed)
+		m_Noise(a_Seed), m_Seed(a_Seed)
 	{
 	}
 
-protected:
+  protected:
 	cNoise m_Noise;
-	int    m_Seed;
+	int m_Seed;
 
 	void TryPlaceGlowstone(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelY, int a_RelZ, int a_Size, int a_NumStrings);
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
-} ;
+};
 
 
 
 
 
-class cFinishGenTallGrass :
-	public cFinishGen
+class cFinishGenTallGrass : public cFinishGen
 {
-public:
-	cFinishGenTallGrass(int a_Seed) : m_Noise(a_Seed), m_Seed(a_Seed) {}
+  public:
+	cFinishGenTallGrass(int a_Seed) :
+		m_Noise(a_Seed), m_Seed(a_Seed)
+	{
+	}
 
-protected:
+  protected:
 	cNoise m_Noise;
 	int m_Seed;
 
@@ -191,21 +192,19 @@ protected:
 
 
 
-class cFinishGenVines :
-	public cFinishGen
+class cFinishGenVines : public cFinishGen
 {
-public:
+  public:
 	cFinishGenVines(int a_Seed, int a_Level) :
-		m_Noise(a_Seed),
-		m_Level(a_Level)
+		m_Noise(a_Seed), m_Level(a_Level)
 	{
 	}
 
 	bool IsJungleVariant(EMCSBiome a_Biome);
 
-protected:
+  protected:
 	cNoise m_Noise;
-	int    m_Level;
+	int m_Level;
 
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 };
@@ -214,46 +213,47 @@ protected:
 
 
 
-class cFinishGenSoulsandRims :
-	public cFinishGen
+class cFinishGenSoulsandRims : public cFinishGen
 {
-public:
+  public:
 	cFinishGenSoulsandRims(int a_Seed) :
 		m_Noise(a_Seed)
 	{
 	}
 
-protected:
+  protected:
 	cNoise m_Noise;
 
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
-} ;
+};
 
 
 
 
 
-class cFinishGenSprinkleFoliage :
-	public cFinishGen
+class cFinishGenSprinkleFoliage : public cFinishGen
 {
-public:
-	cFinishGenSprinkleFoliage(int a_Seed, int a_MaxCactusHeight, int a_MaxSugarcaneHeight):
+  public:
+	cFinishGenSprinkleFoliage(int a_Seed, int a_MaxCactusHeight, int a_MaxSugarcaneHeight) :
 		m_Noise(a_Seed),
 		m_Seed(a_Seed),
 		m_MaxCactusHeight(a_MaxCactusHeight),
 		m_MaxSugarcaneHeight(a_MaxSugarcaneHeight)
 	{
 	}
-protected:
-	cNoise m_Noise;
-	int    m_Seed;
-	int    m_MaxCactusHeight;
-	int    m_MaxSugarcaneHeight;
 
-	/** Tries to place sugarcane at the coords specified, returns true if successful, updates the top variable (hence the & a_RefY) */
+  protected:
+	cNoise m_Noise;
+	int m_Seed;
+	int m_MaxCactusHeight;
+	int m_MaxSugarcaneHeight;
+
+	/** Tries to place sugarcane at the coords specified, returns true if successful, updates the top variable (hence
+	 * the & a_RefY) */
 	bool TryAddSugarcane(cChunkDesc & a_ChunkDesc, int a_RelX, HEIGHTTYPE & a_RelY, int a_RelZ);
 
-	/** Tries to place cactus at the coords specified, returns true if successful, updates the top variable (hence the & a_RefY) */
+	/** Tries to place cactus at the coords specified, returns true if successful, updates the top variable (hence the &
+	 * a_RefY) */
 	bool TryAddCactus(cChunkDesc & a_ChunkDesc, int a_RelX, HEIGHTTYPE & a_RelY, int a_RelZ);
 
 	// Returns true is the specified biome is a desert or its variant
@@ -261,7 +261,7 @@ protected:
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
-} ;
+};
 
 
 
@@ -271,10 +271,9 @@ protected:
 Used for:
 - Lilypads finisher
 - DeadBushes finisher */
-class cFinishGenSingleTopBlock :
-	public cFinishGen
+class cFinishGenSingleTopBlock : public cFinishGen
 {
-public:
+  public:
 	typedef std::vector<BLOCKTYPE> BlockList;
 	bool m_IsAllowedBelow[256];
 
@@ -283,12 +282,13 @@ public:
 
 
 	cFinishGenSingleTopBlock(
-		int a_Seed, BLOCKTYPE a_BlockType, BiomeList a_Biomes, int a_Amount,
+		int a_Seed,
+		BLOCKTYPE a_BlockType,
+		BiomeList a_Biomes,
+		int a_Amount,
 		BlockList a_AllowedBelow
 	) :
-		m_Noise(a_Seed),
-		m_BlockType(a_BlockType),
-		m_Amount(a_Amount)
+		m_Noise(a_Seed), m_BlockType(a_BlockType), m_Amount(a_Amount)
 	{
 		// Initialize all the block types.
 		for (size_t idx = 0; idx < ARRAYCOUNT(m_IsAllowedBelow); ++idx)
@@ -315,7 +315,7 @@ public:
 		}
 	}
 
-protected:
+  protected:
 	cNoise m_Noise;
 	BLOCKTYPE m_BlockType;
 
@@ -326,55 +326,47 @@ protected:
 	int GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap);
 
 	/** Returns true if the given biome is a biome that is allowed. */
-	inline bool IsAllowedBiome(EMCSBiome a_Biome)
-	{
-		return m_IsBiomeAllowed[a_Biome];
-	}
+	inline bool IsAllowedBiome(EMCSBiome a_Biome) { return m_IsBiomeAllowed[a_Biome]; }
 
 	/** Returns true if the given blocktype may be below m_BlockType */
-	inline bool IsAllowedBlockBelow(BLOCKTYPE a_BlockBelow)
-	{
-		return m_IsAllowedBelow[a_BlockBelow];
-	}
+	inline bool IsAllowedBlockBelow(BLOCKTYPE a_BlockBelow) { return m_IsAllowedBelow[a_BlockBelow]; }
 
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
-} ;
+};
 
 
 
 
 
-class cFinishGenBottomLava :
-	public cFinishGen
+class cFinishGenBottomLava : public cFinishGen
 {
-public:
+  public:
 	cFinishGenBottomLava(int a_Level) :
 		m_Level(a_Level)
 	{
 	}
 
 	int GetLevel(void) const { return m_Level; }
-protected:
+
+  protected:
 	int m_Level;
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
-} ;
+};
 
 
 
 
 
-class cFinishGenPreSimulator :
-	public cFinishGen
+class cFinishGenPreSimulator : public cFinishGen
 {
-public:
+  public:
 	cFinishGenPreSimulator(bool a_PreSimulateFallingBlocks, bool a_PreSimulateWater, bool a_PreSimulateLava);
 
-protected:
-
+  protected:
 	bool m_PreSimulateFallingBlocks;
 	bool m_PreSimulateWater;
 	bool m_PreSimulateLava;
@@ -386,39 +378,37 @@ protected:
 	- if all surroundings are of the same fluid, makes it stationary; otherwise makes it flowing (excl. top)
 	- all fluid on the chunk's edge is made flowing */
 	void StationarizeFluid(
-		cChunkDef::BlockTypes & a_BlockTypes,    // Block types to read and change
-		cChunkDef::HeightMap & a_HeightMap,      // Height map to read
+		cChunkDef::BlockTypes & a_BlockTypes,  // Block types to read and change
+		cChunkDef::HeightMap & a_HeightMap,  // Height map to read
 		BLOCKTYPE a_Fluid,
 		BLOCKTYPE a_StationaryFluid
 	);
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
-} ;
+};
 
 
 
 
 
-class cFinishGenFluidSprings :
-	public cFinishGen
+class cFinishGenFluidSprings : public cFinishGen
 {
-public:
+  public:
 	cFinishGenFluidSprings(int a_Seed, BLOCKTYPE a_Fluid, cIniFile & a_IniFile, eDimension a_Dimension);
 
-protected:
-
-	cNoise         m_Noise;
+  protected:
+	cNoise m_Noise;
 	cProbabDistrib m_HeightDistribution;
-	BLOCKTYPE      m_Fluid;
-	int            m_Chance;  ///< Chance, [0..100], that a spring will be generated in a chunk
+	BLOCKTYPE m_Fluid;
+	int m_Chance;  ///< Chance, [0..100], that a spring will be generated in a chunk
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 	/** Tries to place a spring at the specified coords, checks neighbors. Returns true if successful. */
 	bool TryPlaceSpring(cChunkDesc & a_ChunkDesc, int x, int y, int z);
-} ;
+};
 
 
 
@@ -426,15 +416,12 @@ protected:
 
 /** This class populates generated chunks with packs of biome-dependant animals
 Animals: cows, sheep, pigs, mooshrooms, squid, horses, wolves, ocelots */
-class cFinishGenPassiveMobs :
-	public cFinishGen
+class cFinishGenPassiveMobs : public cFinishGen
 {
-public:
-
+  public:
 	cFinishGenPassiveMobs(int a_Seed, cIniFile & a_IniFile, eDimension a_Dimension);
 
-protected:
-
+  protected:
 	/** The noise used as the source of randomness */
 	cNoise m_Noise;
 
@@ -445,13 +432,14 @@ protected:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-	/** Returns false if an animal cannot spawn at given coords, else adds it to the chunk's entity list and returns true */
+	/** Returns false if an animal cannot spawn at given coords, else adds it to the chunk's entity list and returns
+	 * true */
 	bool TrySpawnAnimals(cChunkDesc & a_ChunkDesc, int x, int y, int z, eMonsterType AnimalToSpawn);
 
 	/** Picks a random animal from biome-dependant list for a random position in the chunk.
 	Returns the chosen mob type, or mtInvalid if no mob chosen. */
 	eMonsterType GetRandomMob(cChunkDesc & a_ChunkDesc);
-} ;
+};
 
 
 
@@ -460,28 +448,23 @@ protected:
 /** Base class for generators that have an ore list attached to them.
 Provides the storage and parsing for the ore list, as well as the generic plumbing for generating individual ores.
 Descendants should override GenerateOre() to provide the specific ore generation technique.
-Note that this class uses the "Nest" terminology for individual packs of ore, it doesn't imply any shape or algorithm. */
-class cFinishGenOres:
-	public cFinishGen
+Note that this class uses the "Nest" terminology for individual packs of ore, it doesn't imply any shape or algorithm.
+*/
+class cFinishGenOres : public cFinishGen
 {
 	using Super = cFinishGen;
 
-public:
-
+  public:
 	struct OreInfo
 	{
-		BLOCKTYPE  m_BlockType;  // The type of the nest.
+		BLOCKTYPE m_BlockType;  // The type of the nest.
 		NIBBLETYPE m_BlockMeta;  // The block meta
-		int        m_MaxHeight;  // The highest possible a nest can occur
-		int        m_NumNests;   // How many nests per chunk
-		int        m_NestSize;   // The amount of blocks a nest can have.
+		int m_MaxHeight;  // The highest possible a nest can occur
+		int m_NumNests;  // How many nests per chunk
+		int m_NestSize;  // The amount of blocks a nest can have.
 
 		OreInfo() :
-			m_BlockType(0),
-			m_BlockMeta(0),
-			m_MaxHeight(0),
-			m_NumNests(0),
-			m_NestSize(0)
+			m_BlockType(0), m_BlockMeta(0), m_MaxHeight(0), m_NumNests(0), m_NestSize(0)
 		{
 		}
 
@@ -497,9 +480,8 @@ public:
 
 	typedef std::vector<OreInfo> OreInfos;
 
-	cFinishGenOres(int a_Seed, const OreInfos & a_OreInfos):
-		m_Noise(a_Seed),
-		m_OreInfos(a_OreInfos)
+	cFinishGenOres(int a_Seed, const OreInfos & a_OreInfos) :
+		m_Noise(a_Seed), m_OreInfos(a_OreInfos)
 	{
 	}
 
@@ -512,7 +494,8 @@ public:
 	/** Returns a vector of OreInfo structures describing the default Nether ores, usable in the constructor. */
 	static const OreInfos & DefaultNetherOres(void);
 
-	/** Returns a vector of OreInfo structures describing the default Overworld non-ore pockets (dirt, diorite etc), usable in the constructor. */
+	/** Returns a vector of OreInfo structures describing the default Overworld non-ore pockets (dirt, diorite etc),
+	 * usable in the constructor. */
 	static const OreInfos & DefaultNaturalPatches(void);
 
 	/** Parses the parameter string into OreInfos array.
@@ -528,7 +511,7 @@ public:
 	/** (Re-)sets the seed used by the internal generating mechanisms. */
 	void SetSeed(int a_Seed);
 
-protected:
+  protected:
 	/** The noise used for generating. */
 	cNoise m_Noise;
 
@@ -537,11 +520,15 @@ protected:
 
 
 	/** Generates a single ore in the specified chunk image.
-	a_Seq is the sequencing number (used as a complement to seed to make each ore in the same chunk have different nests) */
+	a_Seq is the sequencing number (used as a complement to seed to make each ore in the same chunk have different
+	nests) */
 	virtual void GenerateOre(
 		cChunkDesc & a_ChunkDesc,
-		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
-		int a_MaxHeight, int a_NumNests, int a_NestSize,
+		BLOCKTYPE a_OreType,
+		NIBBLETYPE a_OreMeta,
+		int a_MaxHeight,
+		int a_NumNests,
+		int a_NestSize,
 		int a_Seq
 	) = 0;
 
@@ -552,64 +539,71 @@ protected:
 
 
 
-class cFinishGenOreNests:
-	public cFinishGenOres
+class cFinishGenOreNests : public cFinishGenOres
 {
 	using Super = cFinishGenOres;
 
-public:
-
-	cFinishGenOreNests(int a_Seed, const OreInfos & a_OreInfos):
+  public:
+	cFinishGenOreNests(int a_Seed, const OreInfos & a_OreInfos) :
 		Super(a_Seed, a_OreInfos)
-	{}
+	{
+	}
 
-protected:
-
+  protected:
 	// cFinishGenOreClumps overrides:
 	virtual void GenerateOre(
 		cChunkDesc & a_ChunkDesc,
-		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
-		int a_MaxHeight, int a_NumNests, int a_NestSize,
+		BLOCKTYPE a_OreType,
+		NIBBLETYPE a_OreMeta,
+		int a_MaxHeight,
+		int a_NumNests,
+		int a_NestSize,
 		int a_Seq
 	) override;
-} ;
+};
 
 
 
 
 
-class cFinishGenOrePockets:
-	public cFinishGenOres
+class cFinishGenOrePockets : public cFinishGenOres
 {
 	using Super = cFinishGenOres;
 
-public:
-
-	cFinishGenOrePockets(int a_Seed, const OreInfos & a_OreInfos):
+  public:
+	cFinishGenOrePockets(int a_Seed, const OreInfos & a_OreInfos) :
 		Super(a_Seed, a_OreInfos)
-	{}
+	{
+	}
 
 	/** Reads the configuration from the specified INI file.
-	a_GenName is the name of the generator (this class may be used for OrePockets and DirtPockets, each has a different default). */
+	a_GenName is the name of the generator (this class may be used for OrePockets and DirtPockets, each has a different
+	default). */
 	void Initialize(cIniFile & a_IniFile, const AString & a_GenName);
 
-protected:
-
+  protected:
 	// cFinishGenOreClumps overrides:
 	virtual void GenerateOre(
 		cChunkDesc & a_ChunkDesc,
-		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
-		int a_MaxNestHeight, int a_NumNests, int a_NestSize,
+		BLOCKTYPE a_OreType,
+		NIBBLETYPE a_OreMeta,
+		int a_MaxNestHeight,
+		int a_NumNests,
+		int a_NestSize,
 		int a_Seq
 	) override;
 
-	/** Calculates the pockets for the specified chunk and imprints them into the specified ChunkDesc (not necessarily the same chunk).
-	a_Seq is the sequence number of the ore, to provide another source of randomness. */
+	/** Calculates the pockets for the specified chunk and imprints them into the specified ChunkDesc (not necessarily
+	the same chunk). a_Seq is the sequence number of the ore, to provide another source of randomness. */
 	void imprintChunkOrePockets(
-		int a_ChunkX, int a_ChunkZ,
+		int a_ChunkX,
+		int a_ChunkZ,
 		cChunkDesc & a_ChunkDesc,
-		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta,
-		int a_MaxHeight, int a_NumNests, int a_NestSize,
+		BLOCKTYPE a_OreType,
+		NIBBLETYPE a_OreMeta,
+		int a_MaxHeight,
+		int a_NumNests,
+		int a_NestSize,
 		int a_Seq
 	);
 
@@ -618,16 +612,24 @@ protected:
 	a_Seq is the sequence number of the ore, to provide another source of randomness. */
 	void imprintPocket(
 		cChunkDesc & a_ChunkDesc,
-		int a_MinPocketX, int a_PocketY, int a_MinPocketZ,
-		int a_NestSize, int a_Seq,
-		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta
+		int a_MinPocketX,
+		int a_PocketY,
+		int a_MinPocketZ,
+		int a_NestSize,
+		int a_Seq,
+		BLOCKTYPE a_OreType,
+		NIBBLETYPE a_OreMeta
 	);
 
 	/** Imprints a single sphere of the specified ore at the specified coords. */
 	void imprintSphere(
 		cChunkDesc & a_ChunkDesc,
-		double a_SphereX, double a_SphereY, double a_SphereZ, double a_Radius,
-		BLOCKTYPE a_OreType, NIBBLETYPE a_OreMeta
+		double a_SphereX,
+		double a_SphereY,
+		double a_SphereZ,
+		double a_Radius,
+		BLOCKTYPE a_OreType,
+		NIBBLETYPE a_OreMeta
 	);
 };
 
@@ -635,13 +637,12 @@ protected:
 
 
 
-class cFinishGenForestRocks:
-	public cFinishGen
+class cFinishGenForestRocks : public cFinishGen
 {
-public:
+  public:
 	cFinishGenForestRocks(int a_Seed, cIniFile & a_IniFile);
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-private:
+  private:
 	cNoise m_Noise;
 };

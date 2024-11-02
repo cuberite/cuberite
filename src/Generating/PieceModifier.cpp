@@ -18,10 +18,9 @@ static const int SEED_OFFSET = 135 * 13;
 
 ////////////////////////////////////////////////////////////////////////////////
 /** A modifier which is pseudo-randomly replacing blocks to other types and metas. */
-class cPieceModifierRandomizeBlocks:
-	public cPiece::cPieceModifier
+class cPieceModifierRandomizeBlocks : public cPiece::cPieceModifier
 {
-public:
+  public:
 	cPieceModifierRandomizeBlocks(void) :
 		m_Seed()
 	{
@@ -44,7 +43,11 @@ public:
 				BLOCKTYPE blockType = static_cast<BLOCKTYPE>(BlockStringToType(blocksToReplace[i]));
 				if ((blockType == E_BLOCK_AIR) && !NoCaseCompare(blocksToReplace[i], "Air"))
 				{
-					CONDWARNING(a_LogWarnings, "Cannot parse block type from string \"%s\"!", blocksToReplace[i].c_str());
+					CONDWARNING(
+						a_LogWarnings,
+						"Cannot parse block type from string \"%s\"!",
+						blocksToReplace[i].c_str()
+					);
 					return false;
 				}
 				m_BlocksToReplace[blockType] = 1;
@@ -97,7 +100,7 @@ public:
 		{
 			AString block = BlocksToRandomize[i];
 
-			cRandomizedBlock Block{};
+			cRandomizedBlock Block {};
 
 			if (isMultiMeta)
 			{
@@ -107,9 +110,12 @@ public:
 					auto sqBrEnd = block.find(']');
 					if (sqBrEnd != block.size() - 1)
 					{
-						CONDWARNING(a_LogWarnings, "If present, block meta params must be at the end of block to randomize definition \"%s\"!", block.c_str());
+						CONDWARNING(
+							a_LogWarnings,
+							"If present, block meta params must be at the end of block to randomize definition \"%s\"!",
+							block.c_str()
+						);
 						return false;
-
 					}
 					AString metaParamsStr = block.substr(sqBrStart + 1, block.size() - sqBrStart - 2);
 
@@ -125,7 +131,6 @@ public:
 					Block.m_MaxNoiseMeta = metaParamsInt[3];
 
 					block = block.substr(0, sqBrStart);
-
 				}
 				// No meta randomization for this block
 			}
@@ -142,19 +147,14 @@ public:
 			if ((BlockType != E_BLOCK_AIR) && !NoCaseCompare(BlockParams[0], "Air"))
 			{
 				// Failed to parse block type
-				CONDWARNING(
-					a_LogWarnings, "Cannot parse block type from string \"%s\"!",
-					BlockParams[0].c_str());
+				CONDWARNING(a_LogWarnings, "Cannot parse block type from string \"%s\"!", BlockParams[0].c_str());
 				return false;
 			}
 
 			if (!StringToInteger(BlockParams[1], BlockWeight))
 			{
 				// Failed to parse the crop weight:
-				CONDWARNING(
-					a_LogWarnings,
-					"Cannot parse block weight from string \"%s\"!",
-					BlockParams[1].c_str());
+				CONDWARNING(a_LogWarnings, "Cannot parse block weight from string \"%s\"!", BlockParams[1].c_str());
 				return false;
 			}
 
@@ -188,7 +188,12 @@ public:
 			if (!StringToInteger(MetaParams[i], Value))
 			{
 				// Failed to parse meta parameter from string:
-				CONDWARNING(a_LogWarnings, "Cannot parse meta param from string \"%s\", meta: %s!", MetaParams[i].c_str(), a_Meta.c_str());
+				CONDWARNING(
+					a_LogWarnings,
+					"Cannot parse meta param from string \"%s\", meta: %s!",
+					MetaParams[i].c_str(),
+					a_Meta.c_str()
+				);
 				return false;
 			}
 
@@ -237,7 +242,9 @@ public:
 		{
 			if (m_BlocksToReplace.count(BlockTypes[i]))
 			{
-				float BlockRnd = PieceNoise.IntNoise2DInRange(a_PieceRot, static_cast<int>(i), 0.0F, static_cast<float>(m_AllWeights));
+				float BlockRnd =
+					PieceNoise
+						.IntNoise2DInRange(a_PieceRot, static_cast<int>(i), 0.0F, static_cast<float>(m_AllWeights));
 
 				int weightDelta = 0;
 				for (auto & blockToRnd : m_BlocksToRandomize)
@@ -250,7 +257,16 @@ public:
 						// Per block meta params
 						if (blockToRnd.m_MinMeta < blockToRnd.m_MaxMeta)
 						{
-							int BlockMetaRnd = std::clamp(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot*2, static_cast<int>(i), static_cast<float>(blockToRnd.m_MinNoiseMeta), static_cast<float>(blockToRnd.m_MaxNoiseMeta))), blockToRnd.m_MinMeta, blockToRnd.m_MaxMeta);
+							int BlockMetaRnd = std::clamp(
+								static_cast<int>(PieceNoise.IntNoise2DInRange(
+									a_PieceRot * 2,
+									static_cast<int>(i),
+									static_cast<float>(blockToRnd.m_MinNoiseMeta),
+									static_cast<float>(blockToRnd.m_MaxNoiseMeta)
+								)),
+								blockToRnd.m_MinMeta,
+								blockToRnd.m_MaxMeta
+							);
 							BlockMetas[i] = static_cast<NIBBLETYPE>(BlockMetaRnd);
 						}
 						else if ((blockToRnd.m_MaxMeta > -1) && (blockToRnd.m_MaxMeta == blockToRnd.m_MinMeta))
@@ -265,7 +281,16 @@ public:
 				// All blocks meta params
 				if (m_MaxMeta > m_MinMeta)
 				{
-					int BlockMetaRnd = std::clamp(static_cast<int>(PieceNoise.IntNoise2DInRange(a_PieceRot * 2, static_cast<int>(i), static_cast<float>(m_MinNoiseMeta), static_cast<float>(m_MaxNoiseMeta))), m_MinMeta, m_MaxMeta);
+					int BlockMetaRnd = std::clamp(
+						static_cast<int>(PieceNoise.IntNoise2DInRange(
+							a_PieceRot * 2,
+							static_cast<int>(i),
+							static_cast<float>(m_MinNoiseMeta),
+							static_cast<float>(m_MaxNoiseMeta)
+						)),
+						m_MinMeta,
+						m_MaxMeta
+					);
 					BlockMetas[i] = static_cast<NIBBLETYPE>(BlockMetaRnd);
 				}
 				else if ((m_MaxMeta > -1) && (m_MaxMeta == m_MinMeta))
@@ -277,11 +302,9 @@ public:
 		}  // for i - BlockTypes[]
 	}
 
-	virtual void AssignSeed(int a_Seed) override
-	{
-		m_Seed = a_Seed + SEED_OFFSET;
-	}
-protected:
+	virtual void AssignSeed(int a_Seed) override { m_Seed = a_Seed + SEED_OFFSET; }
+
+  protected:
 	int m_Seed;
 	int m_AllWeights = 0;
 
@@ -312,14 +335,22 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // CreatePieceModifierFromString:
 
-bool CreatePieceModifierFromString(const AString & a_Definition, std::shared_ptr<cPiece::cPieceModifiers> & a_Modifiers, bool a_LogWarnings)
+bool CreatePieceModifierFromString(
+	const AString & a_Definition,
+	std::shared_ptr<cPiece::cPieceModifiers> & a_Modifiers,
+	bool a_LogWarnings
+)
 {
 
 	auto idxCurlyStart = a_Definition.find('{');
 	auto idxCurlyFirstEnd = a_Definition.find('}');
 	if ((idxCurlyStart == AString::npos) && (idxCurlyFirstEnd == AString::npos))
 	{
-		CONDWARNING(a_LogWarnings, "Piece metadata \"Modifiers\" needs at least one valid modifier definition \"%s\"!", a_Definition.c_str());
+		CONDWARNING(
+			a_LogWarnings,
+			"Piece metadata \"Modifiers\" needs at least one valid modifier definition \"%s\"!",
+			a_Definition.c_str()
+		);
 		return false;
 	}
 
@@ -381,7 +412,3 @@ bool CreatePieceModifierFromString(const AString & a_Definition, std::shared_ptr
 
 	return true;
 }
-
-
-
-

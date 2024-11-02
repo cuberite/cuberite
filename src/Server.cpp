@@ -31,13 +31,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cServerListenCallbacks:
 
-class cServerListenCallbacks:
-	public cNetwork::cListenCallbacks
+class cServerListenCallbacks : public cNetwork::cListenCallbacks
 {
 	cServer & m_Server;
 	UInt16 m_Port;
 
-	virtual cTCPLink::cCallbacksPtr OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort) override
+	virtual cTCPLink::cCallbacksPtr OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort)
+		override
 	{
 		return m_Server.OnConnectionAccepted(a_RemoteIPAddress);
 	}
@@ -49,10 +49,9 @@ class cServerListenCallbacks:
 		LOGWARNING("Cannot listen on port %d: %d (%s).", m_Port, a_ErrorCode, a_ErrorMsg.c_str());
 	}
 
-public:
-	cServerListenCallbacks(cServer & a_Server, UInt16 a_Port):
-		m_Server(a_Server),
-		m_Port(a_Port)
+  public:
+	cServerListenCallbacks(cServer & a_Server, UInt16 a_Port) :
+		m_Server(a_Server), m_Port(a_Port)
 	{
 	}
 };
@@ -65,8 +64,7 @@ public:
 // cServer::cTickThread:
 
 cServer::cTickThread::cTickThread(cServer & a_Server) :
-	Super("Server Ticker"),
-	m_Server(a_Server)
+	Super("Server Ticker"), m_Server(a_Server)
 {
 }
 
@@ -161,7 +159,8 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 	m_ResourcePackUrl = a_Settings.GetValueSet("Server", "ResourcePackUrl", "");
 	m_CustomRedirectUrl = a_Settings.GetValueSet("Server", "CustomRedirectUrl", "https://youtu.be/dQw4w9WgXcQ");
 
-	m_FaviconData = Base64Encode(cFile::ReadWholeFile(AString("favicon.png")));  // Will return empty string if file nonexistant; client doesn't mind
+	m_FaviconData = Base64Encode(cFile::ReadWholeFile(AString("favicon.png"))
+	);  // Will return empty string if file nonexistant; client doesn't mind
 
 	if (m_bIsConnected)
 	{
@@ -199,18 +198,21 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 
 	if (m_ShouldAllowBungeeCord && m_ShouldAuthenticate)
 	{
-		LOGWARNING("WARNING: BungeeCord is allowed and server set to online mode. This is unsafe and will not work properly. Disable either authentication or BungeeCord in settings.ini.");
+		LOGWARNING("WARNING: BungeeCord is allowed and server set to online mode. This is unsafe and will not work "
+				   "properly. Disable either authentication or BungeeCord in settings.ini.");
 	}
 
 	if (m_ShouldAllowBungeeCord && m_ProxySharedSecret.empty())
 	{
-		LOGWARNING("WARNING: There is not a Proxy Forward Secret set up, and any proxy server can forward a player to this server unless closed from the internet.");
+		LOGWARNING("WARNING: There is not a Proxy Forward Secret set up, and any proxy server can forward a player to "
+				   "this server unless closed from the internet.");
 	}
 
 	m_ShouldAllowMultiWorldTabCompletion = a_Settings.GetValueSetB("Server", "AllowMultiWorldTabCompletion", true);
 	m_ShouldLimitPlayerBlockChanges = a_Settings.GetValueSetB("AntiCheat", "LimitPlayerBlockChanges", true);
 
-	const auto ClientViewDistance = a_Settings.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
+	const auto ClientViewDistance =
+		a_Settings.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
 	if (ClientViewDistance < cClientHandle::MIN_VIEW_DISTANCE)
 	{
 		m_ClientViewDistance = cClientHandle::MIN_VIEW_DISTANCE;
@@ -379,7 +381,8 @@ void cServer::TickClients(float a_Dt)
 			Client->ServerTick(a_Dt);
 			if (Client->IsDestroyed())
 			{
-				// Delete the client later, when CS is not held, to avoid deadlock: https://forum.cuberite.org/thread-374.html
+				// Delete the client later, when CS is not held, to avoid deadlock:
+				// https://forum.cuberite.org/thread-374.html
 				RemoveClients.push_back(std::move(Client));
 				itr = m_Clients.erase(itr);
 				continue;
@@ -399,7 +402,7 @@ void cServer::TickClients(float a_Dt)
 
 bool cServer::Start(void)
 {
-	for (const auto & port: m_Ports)
+	for (const auto & port : m_Ports)
 	{
 		UInt16 PortNum;
 		if (!StringToInteger(port, PortNum))
@@ -430,10 +433,7 @@ bool cServer::Command(cClientHandle & a_Client, AString & a_Cmd)
 {
 	bool Res = cRoot::Get()->DoWithPlayerByUUID(
 		a_Client.GetUUID(),
-		[&](cPlayer & a_Player)
-		{
-			return cRoot::Get()->GetPluginManager()->CallHookChat(a_Player, a_Cmd);
-		}
+		[&](cPlayer & a_Player) { return cRoot::Get()->GetPluginManager()->CallHookChat(a_Player, a_Cmd); }
 	);
 	return Res;
 }
@@ -475,7 +475,8 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		return;
 	}
 
-	// "stop" and "restart" are handled in cRoot::ExecuteConsoleCommand, our caller, due to its access to controlling variables
+	// "stop" and "restart" are handled in cRoot::ExecuteConsoleCommand, our caller, due to its access to controlling
+	// variables
 
 	// "help" and "reload" are to be handled by Cuberite, so that they work no matter what
 	if (split[0] == "help")
@@ -516,8 +517,11 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	{
 		if (split.size() > 1)
 		{
-			cPluginManager::Get()->RefreshPluginList();  // Refresh the plugin list, so that if the plugin was added just now, it is loadable
-			a_Output.OutLn(cPluginManager::Get()->LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin");
+			cPluginManager::Get()->RefreshPluginList(
+			);  // Refresh the plugin list, so that if the plugin was added just now, it is loadable
+			a_Output.OutLn(
+				cPluginManager::Get()->LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin"
+			);
 		}
 		else
 		{
@@ -542,9 +546,11 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	}
 	if (split[0] == "destroyentities")
 	{
-		cRoot::Get()->ForEachWorld([](cWorld & a_World)
+		cRoot::Get()->ForEachWorld(
+			[](cWorld & a_World)
 			{
-				a_World.ForEachEntity([](cEntity & a_Entity)
+				a_World.ForEachEntity(
+					[](cEntity & a_Entity)
 					{
 						if (!a_Entity.IsPlayer())
 						{
@@ -595,16 +601,23 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 	typedef std::pair<AString, AString> AStringPair;
 	typedef std::vector<AStringPair> AStringPairs;
 
-	class cCallback :
-		public cPluginManager::cCommandEnumCallback
+	class cCallback : public cPluginManager::cCommandEnumCallback
 	{
-	public:
-		cCallback(void) : m_MaxLen(0) {}
-
-		virtual bool Command(const AString & a_Command, const cPlugin * a_Plugin, const AString & a_Permission, const AString & a_HelpString) override
+	  public:
+		cCallback(void) :
+			m_MaxLen(0)
 		{
-		UNUSED(a_Plugin);
-		UNUSED(a_Permission);
+		}
+
+		virtual bool Command(
+			const AString & a_Command,
+			const cPlugin * a_Plugin,
+			const AString & a_Permission,
+			const AString & a_HelpString
+		) override
+		{
+			UNUSED(a_Plugin);
+			UNUSED(a_Permission);
 			if (!a_HelpString.empty())
 			{
 				m_Commands.push_back(AStringPair(a_Command, a_HelpString));
@@ -621,7 +634,8 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 	} Callback;
 	cPluginManager::Get()->ForEachConsoleCommand(Callback);
 	std::sort(Callback.m_Commands.begin(), Callback.m_Commands.end());
-	for (AStringPairs::const_iterator itr = Callback.m_Commands.begin(), end = Callback.m_Commands.end(); itr != end; ++itr)
+	for (AStringPairs::const_iterator itr = Callback.m_Commands.begin(), end = Callback.m_Commands.end(); itr != end;
+		 ++itr)
 	{
 		const AStringPair & cmd = *itr;
 		// Output the commands and their help strings, with all the commands aligned to the same width
@@ -635,9 +649,9 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 
 void cServer::BindBuiltInConsoleCommands(void)
 {
-	// Create an empty handler - the actual handling for the commands is performed before they are handed off to cPluginManager
-	class cEmptyHandler:
-		public cPluginManager::cCommandHandler
+	// Create an empty handler - the actual handling for the commands is performed before they are handed off to
+	// cPluginManager
+	class cEmptyHandler : public cPluginManager::cCommandHandler
 	{
 		virtual bool ExecuteCommand(
 			const AStringVector & a_Split,
@@ -653,14 +667,14 @@ void cServer::BindBuiltInConsoleCommands(void)
 
 	// Register internal commands:
 	cPluginManager * PlgMgr = cPluginManager::Get();
-	PlgMgr->BindConsoleCommand("help",            nullptr, handler, "Shows the available commands");
-	PlgMgr->BindConsoleCommand("reload",          nullptr, handler, "Reloads all plugins");
-	PlgMgr->BindConsoleCommand("reloadweb",       nullptr, handler, "Reloads the webadmin configuration");
-	PlgMgr->BindConsoleCommand("restart",         nullptr, handler, "Restarts the server cleanly");
-	PlgMgr->BindConsoleCommand("stop",            nullptr, handler, "Stops the server cleanly");
-	PlgMgr->BindConsoleCommand("chunkstats",      nullptr, handler, "Displays detailed chunk memory statistics");
-	PlgMgr->BindConsoleCommand("load",            nullptr, handler, "Adds and enables the specified plugin");
-	PlgMgr->BindConsoleCommand("unload",          nullptr, handler, "Disables the specified plugin");
+	PlgMgr->BindConsoleCommand("help", nullptr, handler, "Shows the available commands");
+	PlgMgr->BindConsoleCommand("reload", nullptr, handler, "Reloads all plugins");
+	PlgMgr->BindConsoleCommand("reloadweb", nullptr, handler, "Reloads the webadmin configuration");
+	PlgMgr->BindConsoleCommand("restart", nullptr, handler, "Restarts the server cleanly");
+	PlgMgr->BindConsoleCommand("stop", nullptr, handler, "Stops the server cleanly");
+	PlgMgr->BindConsoleCommand("chunkstats", nullptr, handler, "Displays detailed chunk memory statistics");
+	PlgMgr->BindConsoleCommand("load", nullptr, handler, "Adds and enables the specified plugin");
+	PlgMgr->BindConsoleCommand("unload", nullptr, handler, "Disables the specified plugin");
 	PlgMgr->BindConsoleCommand("destroyentities", nullptr, handler, "Destroys all entities in all worlds");
 }
 
@@ -671,7 +685,7 @@ void cServer::BindBuiltInConsoleCommands(void)
 void cServer::Shutdown(void)
 {
 	// Stop listening on all sockets:
-	for (const auto & srv: m_ServerHandles)
+	for (const auto & srv : m_ServerHandles)
 	{
 		srv->Close();
 	}
@@ -719,7 +733,12 @@ void cServer::AuthenticateUser(int a_ClientID, AString && a_Username, const cUUI
 	// Check max players condition within lock (expect server and authenticator thread to both call here)
 	if (GetNumPlayers() >= GetMaxPlayers())
 	{
-		KickUser(a_ClientID, "The server is currently full :(" "\n" "Try again later?");
+		KickUser(
+			a_ClientID,
+			"The server is currently full :("
+			"\n"
+			"Try again later?"
+		);
 		return;
 	}
 
@@ -771,16 +790,13 @@ void cServer::TickQueuedTasks(void)
 		// Partition everything to be executed by returning false to move to end
 		// of list if time reached
 		auto MoveBeginIterator = std::partition(
-			m_Tasks.begin(), m_Tasks.end(),
-			[this](const decltype(m_Tasks)::value_type & a_Task)
-			{
-				return a_Task.first >= m_UpTime;
-			});
+			m_Tasks.begin(),
+			m_Tasks.end(),
+			[this](const decltype(m_Tasks)::value_type & a_Task) { return a_Task.first >= m_UpTime; }
+		);
 
 		// Cut all the due tasks from m_Tasks into Tasks:
-		Tasks.insert(
-			Tasks.end(), std::make_move_iterator(MoveBeginIterator),
-			std::make_move_iterator(m_Tasks.end()));
+		Tasks.insert(Tasks.end(), std::make_move_iterator(MoveBeginIterator), std::make_move_iterator(m_Tasks.end()));
 		m_Tasks.erase(MoveBeginIterator, m_Tasks.end());
 	}
 

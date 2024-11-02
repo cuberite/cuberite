@@ -9,16 +9,14 @@
 
 
 // tolua_begin
-class cEnderChestEntity :
-	public cBlockEntity,
-	public cBlockEntityWindowOwner
+class cEnderChestEntity : public cBlockEntity,
+						  public cBlockEntityWindowOwner
 {
 	// tolua_end
 
 	using Super = cBlockEntity;
 
-public:  // tolua_export
-
+  public:  // tolua_export
 	cEnderChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	// cBlockEntity overrides:
@@ -31,4 +29,4 @@ public:  // tolua_export
 
 	/** Opens a new enderchest window for this enderchest */
 	void OpenNewWindow(void);
-} ;  // tolua_export
+};  // tolua_export

@@ -9,19 +9,14 @@
 
 
 
-class cBlockComparatorHandler final :
-	public cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>
+class cBlockComparatorHandler final : public cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>
 {
 	using Super = cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>;
 
-public:
-
+  public:
 	using Super::Super;
 
-	inline static bool IsInSubtractionMode(NIBBLETYPE a_Meta)
-	{
-		return ((a_Meta & 0x4) == 0x4);
-	}
+	inline static bool IsInSubtractionMode(NIBBLETYPE a_Meta) { return ((a_Meta & 0x4) == 0x4); }
 
 	inline static Vector3i GetFrontCoordinate(Vector3i a_Position, NIBBLETYPE a_Meta)
 	{
@@ -99,8 +94,7 @@ public:
 		return a_Position;
 	}
 
-private:
-
+  private:
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
@@ -143,10 +137,7 @@ private:
 
 
 
-	virtual bool IsUseable(void) const override
-	{
-		return true;
-	}
+	virtual bool IsUseable(void) const override { return true; }
 
 
 
@@ -201,8 +192,4 @@ private:
 		UNUSED(a_Meta);
 		return 11;
 	}
-} ;
-
-
-
-
+};

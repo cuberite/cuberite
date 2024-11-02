@@ -19,13 +19,11 @@
 
 
 
-class cBlockFarmlandHandler final :
-	public cBlockHandler
+class cBlockFarmlandHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 	/** Turns farmland into dirt.
@@ -79,7 +77,8 @@ public:
 				Entity.SetPosY(GroundHeight);
 
 				return false;
-			});
+			}
+		);
 
 		a_Chunk.SetBlock(a_RelPos, E_BLOCK_DIRT, 0);
 	}
@@ -88,8 +87,7 @@ public:
 
 
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		return cItem(E_BLOCK_DIRT, 1, 0);
@@ -124,7 +122,8 @@ private:
 		}
 
 		// Farmland too dry. If nothing is growing on top, turn back to dirt:
-		auto UpperBlock = cChunkDef::IsValidHeight(a_RelPos.addedY(1)) ? a_Chunk.GetBlock(a_RelPos.addedY(1)) : E_BLOCK_AIR;
+		auto UpperBlock =
+			cChunkDef::IsValidHeight(a_RelPos.addedY(1)) ? a_Chunk.GetBlock(a_RelPos.addedY(1)) : E_BLOCK_AIR;
 		switch (UpperBlock)
 		{
 			case E_BLOCK_BEETROOTS:
@@ -150,7 +149,8 @@ private:
 
 
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor)
+		const override
 	{
 		// Don't care about any neighbor but the one above us (fix recursion loop in #2213):
 		if (a_WhichNeighbor != BLOCK_FACE_YP)
@@ -171,11 +171,14 @@ private:
 		{
 			// Until the fix above is done, this line should also suffice:
 			// a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_DIRT, 0);
-			a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & Chunk)
-			{
-				TurnToDirt(Chunk, a_BlockPos);
-				return true;
-			});
+			a_ChunkInterface.DoWithChunkAt(
+				a_BlockPos,
+				[&](cChunk & Chunk)
+				{
+					TurnToDirt(Chunk, a_BlockPos);
+					return true;
+				}
+			);
 		}
 	}
 
@@ -183,7 +186,8 @@ private:
 
 
 
-	/** Returns true if there's either a water source block close enough to hydrate the specified position, or it's raining there. */
+	/** Returns true if there's either a water source block close enough to hydrate the specified position, or it's
+	 * raining there. */
 	static bool IsWaterInNear(const cChunk & a_Chunk, const Vector3i a_RelPos)
 	{
 		if (a_Chunk.IsWeatherWetAt(a_RelPos.addedY(1)))
@@ -224,12 +228,8 @@ private:
 	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const override
 	{
 		return (
-			(a_Plant == E_BLOCK_BEETROOTS) ||
-			(a_Plant == E_BLOCK_CROPS) ||
-			(a_Plant == E_BLOCK_CARROTS) ||
-			(a_Plant == E_BLOCK_POTATOES) ||
-			(a_Plant == E_BLOCK_MELON_STEM) ||
-			(a_Plant == E_BLOCK_PUMPKIN_STEM)
+			(a_Plant == E_BLOCK_BEETROOTS) || (a_Plant == E_BLOCK_CROPS) || (a_Plant == E_BLOCK_CARROTS) ||
+			(a_Plant == E_BLOCK_POTATOES) || (a_Plant == E_BLOCK_MELON_STEM) || (a_Plant == E_BLOCK_PUMPKIN_STEM)
 		);
 	}
-} ;
+};

@@ -10,10 +10,8 @@
 
 
 
-cItemFrame::cItemFrame(eBlockFace a_BlockFace, Vector3d a_Pos):
-	Super(etItemFrame, a_BlockFace, a_Pos),
-	m_Item(E_BLOCK_AIR),
-	m_ItemRotation(0)
+cItemFrame::cItemFrame(eBlockFace a_BlockFace, Vector3d a_Pos) :
+	Super(etItemFrame, a_BlockFace, a_Pos), m_Item(E_BLOCK_AIR), m_ItemRotation(0)
 {
 }
 
@@ -95,7 +93,7 @@ void cItemFrame::OnRightClicked(cPlayer & a_Player)
 	}
 
 	GetWorld()->BroadcastEntityMetadata(*this);  // Update clients
-	GetParentChunk()->MarkDirty();               // Mark chunk dirty to save rotation or item
+	GetParentChunk()->MarkDirty();  // Mark chunk dirty to save rotation or item
 }
 
 

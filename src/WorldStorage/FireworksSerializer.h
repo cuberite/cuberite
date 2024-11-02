@@ -25,12 +25,9 @@ class cParsedNBT;
 
 class cFireworkItem
 {
-public:
+  public:
 	cFireworkItem(void) :
-		m_HasFlicker(false),
-		m_HasTrail(false),
-		m_Type(0),
-		m_FlightTimeInTicks(0)
+		m_HasFlicker(false), m_HasTrail(false), m_Type(0), m_FlightTimeInTicks(0)
 	{
 	}
 
@@ -56,22 +53,27 @@ public:
 
 	inline bool IsEqualTo(const cFireworkItem & a_Item) const
 	{
-		return
-			(
-			(m_FlightTimeInTicks == a_Item.m_FlightTimeInTicks) &&
-			(m_HasFlicker == a_Item.m_HasFlicker) &&
-			(m_HasTrail == a_Item.m_HasTrail) &&
-			(m_Type == a_Item.m_Type) &&
-			(m_Colours == a_Item.m_Colours) &&
+		return (
+			(m_FlightTimeInTicks == a_Item.m_FlightTimeInTicks) && (m_HasFlicker == a_Item.m_HasFlicker) &&
+			(m_HasTrail == a_Item.m_HasTrail) && (m_Type == a_Item.m_Type) && (m_Colours == a_Item.m_Colours) &&
 			(m_FadeColours == a_Item.m_FadeColours)
-			);
+		);
 	}
 
 	/** Writes firework NBT data to a Writer object */
-	static void WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFastNBTWriter & a_Writer, const ENUM_ITEM_TYPE a_Type);
+	static void WriteToNBTCompound(
+		const cFireworkItem & a_FireworkItem,
+		cFastNBTWriter & a_Writer,
+		const ENUM_ITEM_TYPE a_Type
+	);
 
 	/** Reads NBT data from a NBT object and populates a FireworkItem with it */
-	static void ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNBT & a_NBT, int a_TagIdx, const ENUM_ITEM_TYPE a_Type);
+	static void ParseFromNBT(
+		cFireworkItem & a_FireworkItem,
+		const cParsedNBT & a_NBT,
+		int a_TagIdx,
+		const ENUM_ITEM_TYPE a_Type
+	);
 
 	/** Converts the firework's vector of colours into a string of values separated by a semicolon */
 	static AString ColoursToString(const cFireworkItem & a_FireworkItem);

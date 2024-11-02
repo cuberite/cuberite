@@ -1,7 +1,8 @@
 
 // LineBlockTracer.cpp
 
-// Implements the cLineBlockTracer class representing a cBlockTracer that traces along a straight line between two points
+// Implements the cLineBlockTracer class representing a cBlockTracer that traces along a straight line between two
+// points
 
 #include "Globals.h"
 #include "LineBlockTracer.h"
@@ -15,13 +16,7 @@
 
 
 cLineBlockTracer::cLineBlockTracer(cWorld & a_World, cCallbacks & a_Callbacks) :
-	Super(a_World, a_Callbacks),
-	m_Start(),
-	m_End(),
-	m_Diff(),
-	m_Dir(),
-	m_Current(),
-	m_CurrentFace(BLOCK_FACE_NONE)
+	Super(a_World, a_Callbacks), m_Start(), m_End(), m_Diff(), m_Dir(), m_Current(), m_CurrentFace(BLOCK_FACE_NONE)
 {
 }
 
@@ -29,7 +24,12 @@ cLineBlockTracer::cLineBlockTracer(cWorld & a_World, cCallbacks & a_Callbacks) :
 
 
 
-bool cLineBlockTracer::Trace(cWorld & a_World, cBlockTracer::cCallbacks & a_Callbacks, const Vector3d a_Start, const Vector3d a_End)
+bool cLineBlockTracer::Trace(
+	cWorld & a_World,
+	cBlockTracer::cCallbacks & a_Callbacks,
+	const Vector3d a_Start,
+	const Vector3d a_End
+)
 {
 	cLineBlockTracer Tracer(a_World, a_Callbacks);
 	return Tracer.Trace(a_Start, a_End);
@@ -41,20 +41,24 @@ bool cLineBlockTracer::Trace(cWorld & a_World, cBlockTracer::cCallbacks & a_Call
 
 bool cLineBlockTracer::LineOfSightTrace(cWorld & a_World, const Vector3d & a_Start, const Vector3d & a_End, int a_Sight)
 {
-	static class LineOfSightCallbacks:
-		public cLineBlockTracer::cCallbacks
+	static class LineOfSightCallbacks : public cLineBlockTracer::cCallbacks
 	{
 		bool m_IsAirOpaque;
 		bool m_IsWaterOpaque;
 		bool m_IsLavaOpaque;
-	public:
-		LineOfSightCallbacks(bool a_IsAirOpaque, bool a_IsWaterOpaque, bool a_IsLavaOpaque):
-			m_IsAirOpaque(a_IsAirOpaque),
-			m_IsWaterOpaque(a_IsWaterOpaque),
-			m_IsLavaOpaque(a_IsLavaOpaque)
-		{}
 
-		virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	  public:
+		LineOfSightCallbacks(bool a_IsAirOpaque, bool a_IsWaterOpaque, bool a_IsLavaOpaque) :
+			m_IsAirOpaque(a_IsAirOpaque), m_IsWaterOpaque(a_IsWaterOpaque), m_IsLavaOpaque(a_IsLavaOpaque)
+		{
+		}
+
+		virtual bool OnNextBlock(
+			Vector3i a_BlockPos,
+			BLOCKTYPE a_BlockType,
+			NIBBLETYPE a_BlockMeta,
+			eBlockFace a_EntryFace
+		) override
 		{
 			switch (a_BlockType)
 			{
@@ -63,14 +67,10 @@ bool cLineBlockTracer::LineOfSightTrace(cWorld & a_World, const Vector3d & a_Sta
 				case E_BLOCK_STATIONARY_LAVA:  return m_IsLavaOpaque;
 				case E_BLOCK_STATIONARY_WATER: return m_IsWaterOpaque;
 				case E_BLOCK_WATER:            return m_IsWaterOpaque;
-				default: return true;
+				default:                       return true;
 			}
 		}
-	} callbacks(
-		(a_Sight & losAir) == 0,
-		(a_Sight & losWater) == 0,
-		(a_Sight & losLava) == 0
-	);
+	} callbacks((a_Sight & losAir) == 0, (a_Sight & losWater) == 0, (a_Sight & losLava) == 0);
 	return Trace(a_World, callbacks, a_Start, a_End);
 }
 
@@ -80,16 +80,23 @@ bool cLineBlockTracer::LineOfSightTrace(cWorld & a_World, const Vector3d & a_Sta
 
 bool cLineBlockTracer::FirstSolidHitTrace(
 	cWorld & a_World,
-	const Vector3d & a_Start, const Vector3d & a_End,
+	const Vector3d & a_Start,
+	const Vector3d & a_End,
 	Vector3d & a_HitCoords,
-	Vector3i & a_HitBlockCoords, eBlockFace & a_HitBlockFace
+	Vector3i & a_HitBlockCoords,
+	eBlockFace & a_HitBlockFace
 )
 {
-	class cSolidHitCallbacks:
-		public cCallbacks
+	class cSolidHitCallbacks : public cCallbacks
 	{
-	public:
-		cSolidHitCallbacks(const Vector3d & a_CBStart, const Vector3d & a_CBEnd, Vector3d & a_CBHitCoords, Vector3i & a_CBHitBlockCoords, eBlockFace & a_CBHitBlockFace):
+	  public:
+		cSolidHitCallbacks(
+			const Vector3d & a_CBStart,
+			const Vector3d & a_CBEnd,
+			Vector3d & a_CBHitCoords,
+			Vector3i & a_CBHitBlockCoords,
+			eBlockFace & a_CBHitBlockFace
+		) :
 			m_Start(a_CBStart),
 			m_End(a_CBEnd),
 			m_HitCoords(a_CBHitCoords),
@@ -98,7 +105,12 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 		{
 		}
 
-		virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+		virtual bool OnNextBlock(
+			Vector3i a_BlockPos,
+			BLOCKTYPE a_BlockType,
+			NIBBLETYPE a_BlockMeta,
+			eBlockFace a_EntryFace
+		) override
 		{
 			if (!cBlockInfo::IsSolid(a_BlockType))
 			{
@@ -109,7 +121,8 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 			m_HitBlockCoords = a_BlockPos;
 			m_HitBlockFace = a_EntryFace;
 			cBoundingBox bb(a_BlockPos, a_BlockPos + Vector3i(1, 1, 1));  // Bounding box of the block hit
-			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
+			double LineCoeff =
+				0;  // Used to calculate where along the line an intersection with the bounding box occurs
 			eBlockFace Face;  // Face hit
 			if (!bb.CalcLineIntersection(m_Start, m_End, LineCoeff, Face))
 			{
@@ -120,7 +133,7 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 			return true;
 		}
 
-	protected:
+	  protected:
 		const Vector3d & m_Start;
 		const Vector3d & m_End;
 		Vector3d & m_HitCoords;
@@ -169,7 +182,7 @@ bool cLineBlockTracer::Trace(const Vector3d a_Start, const Vector3d a_End)
 
 	m_Current = m_Start.Floor();
 
-	m_Diff = m_End -  m_Start;
+	m_Diff = m_End - m_Start;
 
 	// The actual trace is handled with ChunkMapCS locked by calling our ChunkCallback for the specified chunk
 	int BlockX = FloorC(m_Start.x);
@@ -268,9 +281,18 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 	// Based on the wall hit, adjust the current coords
 	switch (Direction)
 	{
-		case dirX:    m_Current.x += m_Dir.x; m_CurrentFace = (m_Dir.x > 0) ? BLOCK_FACE_XM : BLOCK_FACE_XP; break;
-		case dirY:    m_Current.y += m_Dir.y; m_CurrentFace = (m_Dir.y > 0) ? BLOCK_FACE_YM : BLOCK_FACE_YP; break;
-		case dirZ:    m_Current.z += m_Dir.z; m_CurrentFace = (m_Dir.z > 0) ? BLOCK_FACE_ZM : BLOCK_FACE_ZP; break;
+		case dirX:
+			m_Current.x += m_Dir.x;
+			m_CurrentFace = (m_Dir.x > 0) ? BLOCK_FACE_XM : BLOCK_FACE_XP;
+			break;
+		case dirY:
+			m_Current.y += m_Dir.y;
+			m_CurrentFace = (m_Dir.y > 0) ? BLOCK_FACE_YM : BLOCK_FACE_YP;
+			break;
+		case dirZ:
+			m_Current.z += m_Dir.z;
+			m_CurrentFace = (m_Dir.z > 0) ? BLOCK_FACE_ZM : BLOCK_FACE_ZP;
+			break;
 		case dirNONE: return false;
 	}
 	return true;
@@ -282,7 +304,9 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 
 bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 {
-	ASSERT((m_Current.y >= 0) && (m_Current.y < cChunkDef::Height));  // This should be provided by FixStartAboveWorld() / FixStartBelowWorld()
+	ASSERT(
+		(m_Current.y >= 0) && (m_Current.y < cChunkDef::Height)
+	);  // This should be provided by FixStartAboveWorld() / FixStartBelowWorld()
 
 	// This is the actual line tracing loop.
 	for (;;)
@@ -341,6 +365,3 @@ bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 		}
 	}
 }
-
-
-

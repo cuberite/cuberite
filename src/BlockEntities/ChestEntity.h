@@ -15,8 +15,7 @@ class cClientHandle;
 
 
 // tolua_begin
-class cChestEntity :
-	public cBlockEntityWithItems
+class cChestEntity : public cBlockEntityWithItems
 {
 	// tolua_end
 
@@ -24,13 +23,12 @@ class cChestEntity :
 
 	// tolua_begin
 
-public:
-
+  public:
 	enum
 	{
 		ContentsHeight = 3,
-		ContentsWidth  = 9,
-	} ;
+		ContentsWidth = 9,
+	};
 
 	// tolua_end
 
@@ -52,8 +50,7 @@ public:
 	/** Sets the number of players who currently have this chest open */
 	void SetNumberOfPlayers(int a_NumActivePlayers) { m_NumActivePlayers = a_NumActivePlayers; }
 
-private:
-
+  private:
 	/** Number of players who currently have this chest open */
 	int m_NumActivePlayers;
 
@@ -78,4 +75,4 @@ private:
 
 	/** cItemGrid::cListener overrides: */
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override;
-} ;  // tolua_export
+};  // tolua_export

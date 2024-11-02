@@ -66,7 +66,9 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// Spectators cannot push entities around
 	if ((!IsPlayer()) || (!static_cast<cPlayer *>(this)->IsGameModeSpectator()))
 	{
-		m_World->ForEachEntityInBox(GetBoundingBox(), [=](cEntity & a_Entity)
+		m_World->ForEachEntityInBox(
+			GetBoundingBox(),
+			[=](cEntity & a_Entity)
 			{
 				if (a_Entity.GetUniqueID() == GetUniqueID())
 				{
@@ -74,7 +76,8 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				}
 
 				// we only push other mobs, boats and minecarts
-				if ((a_Entity.GetEntityType() != etMonster) && (a_Entity.GetEntityType() != etMinecart) && (a_Entity.GetEntityType() != etBoat))
+				if ((a_Entity.GetEntityType() != etMonster) && (a_Entity.GetEntityType() != etMinecart) &&
+					(a_Entity.GetEntityType() != etBoat))
 				{
 					return false;
 				}
@@ -183,10 +186,16 @@ void cPawn::HandleAir(void)
 
 
 
-void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, short a_Intensity, double a_DistanceModifier)
+void cPawn::AddEntityEffect(
+	cEntityEffect::eType a_EffectType,
+	int a_Duration,
+	short a_Intensity,
+	double a_DistanceModifier
+)
 {
 	// Check if the plugins allow the addition:
-	if (cPluginManager::Get()->CallHookEntityAddEffect(*this, a_EffectType, a_Duration, a_Intensity, a_DistanceModifier))
+	if (cPluginManager::Get()
+			->CallHookEntityAddEffect(*this, a_EffectType, a_Duration, a_Intensity, a_DistanceModifier))
 	{
 		// A plugin disallows the addition, bail out.
 		return;
@@ -206,7 +215,10 @@ void cPawn::AddEntityEffect(cEntityEffect::eType a_EffectType, int a_Duration, s
 		ExistingEffect->second->OnDeactivate(*this);
 	}
 
-	auto Res = m_EntityEffects.emplace(a_EffectType, cEntityEffect::CreateEntityEffect(a_EffectType, a_Duration, a_Intensity, a_DistanceModifier));
+	auto Res = m_EntityEffects.emplace(
+		a_EffectType,
+		cEntityEffect::CreateEntityEffect(a_EffectType, a_Duration, a_Intensity, a_DistanceModifier)
+	);
 	m_World->BroadcastEntityEffect(*this, a_EffectType, a_Intensity, a_Duration);
 	cEntityEffect * Effect = Res.first->second.get();
 	Effect->OnActivate(*this);
@@ -270,12 +282,15 @@ void cPawn::NoLongerTargetingMe(cMonster * a_Monster)
 		cMonster * Monster = *i;
 		if (Monster == a_Monster)
 		{
-			ASSERT(Monster->GetTarget() != this);  // The monster is notifying us it is no longer targeting us, assert if that's a lie
+			ASSERT(
+				Monster->GetTarget() != this
+			);  // The monster is notifying us it is no longer targeting us, assert if that's a lie
 			m_TargetingMe.erase(i);
 			return;
 		}
 	}
-	ASSERT(false);  // If this happens, something is wrong. Perhaps the monster never called TargetingMe() or called NoLongerTargetingMe() twice.
+	ASSERT(false);  // If this happens, something is wrong. Perhaps the monster never called TargetingMe() or called
+					// NoLongerTargetingMe() twice.
 }
 
 
@@ -316,14 +331,17 @@ void cPawn::HandleFalling(void)
 	will slow players down enough to have multiple updates that keep them alive)
 	- Slime blocks reverse falling velocity, unless it's a crouching player, in which case they act as standard blocks.
 	They also reset the topmost point of the damage calculation with each bounce,
-	so if the block is removed while the player is bouncing or crouches after a bounce, the last bounce's zenith is considered as fall damage.
+	so if the block is removed while the player is bouncing or crouches after a bounce, the last bounce's zenith is
+	considered as fall damage.
 
 	With this in mind, we first check the block at the player's feet, then the one below that (because fences),
 	and decide which behaviour we want to go with.
 	*/
-	const auto BlockAtFoot = (cChunkDef::IsValidHeight(POS_TOINT)) ? GetWorld()->GetBlock(POS_TOINT) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
+	const auto BlockAtFoot =
+		(cChunkDef::IsValidHeight(POS_TOINT)) ? GetWorld()->GetBlock(POS_TOINT) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
 
-	/* We initialize these with what the foot is really IN, because for sampling we will move down with the epsilon above */
+	/* We initialize these with what the foot is really IN, because for sampling we will move down with the epsilon
+	 * above */
 	bool IsFootInWater = IsBlockWater(BlockAtFoot);
 	bool IsFootOnSlimeBlock = false;
 
@@ -331,22 +349,21 @@ void cPawn::HandleFalling(void)
 	static const struct
 	{
 		int x, z;
-	} CrossSampleCoords[] =
-	{
-		{ 0, 0 },
-		{ 1, 0 },
-		{ -1, 0 },
-		{ 0, 1 },
-		{ 0, -1 },
+	} CrossSampleCoords[] = {
+		{0, 0},
+		{1, 0},
+		{-1, 0},
+		{0, 1},
+		{0, -1},
 	};
 
 	/* The blocks we're interested in relative to the player to account for larger than 1 blocks.
 	This can be extended to do additional checks in case there are blocks that are represented as one block
 	in memory but have a hitbox larger than 1 (like fences) */
-	static const Vector3i BlockSampleOffsets[] =
-	{
-		{ 0, 0, 0 },  // TODO: something went wrong here (offset 0?)
-		{ 0, -1, 0 },  // Potentially causes mis-detection (IsFootInWater) when player stands on block diagonal to water (i.e. on side of pool)
+	static const Vector3i BlockSampleOffsets[] = {
+		{0, 0, 0},  // TODO: something went wrong here (offset 0?)
+		{0, -1, 0},  // Potentially causes mis-detection (IsFootInWater) when player stands on block diagonal to water
+					 // (i.e. on side of pool)
 	};
 
 	/* Here's the rough outline of how this mechanism works:
@@ -355,10 +372,11 @@ void cPawn::HandleFalling(void)
 	bool OnGround = false;
 	for (size_t i = 0; i < ARRAYCOUNT(CrossSampleCoords); i++)
 	{
-		/* We calculate from the player's position, one of the cross-offsets above, and we move it down slightly so it's beyond inaccuracy.
-		The added advantage of this method is that if the player is simply standing on the floor,
-		the point will move into the next block, and the floor() will retrieve that instead of air. */
-		Vector3d CrossTestPosition = GetPosition() + Vector3d(CrossSampleCoords[i].x * HalfWidth, -EPS, CrossSampleCoords[i].z * HalfWidth);
+		/* We calculate from the player's position, one of the cross-offsets above, and we move it down slightly so it's
+		beyond inaccuracy. The added advantage of this method is that if the player is simply standing on the floor, the
+		point will move into the next block, and the floor() will retrieve that instead of air. */
+		Vector3d CrossTestPosition =
+			GetPosition() + Vector3d(CrossSampleCoords[i].x * HalfWidth, -EPS, CrossSampleCoords[i].z * HalfWidth);
 
 		/* We go through the blocks that we consider "relevant" */
 		for (size_t j = 0; j < ARRAYCOUNT(BlockSampleOffsets); j++)
@@ -373,15 +391,18 @@ void cPawn::HandleFalling(void)
 			BLOCKTYPE BlockType = GetWorld()->GetBlock(BlockTestPosition);
 			NIBBLETYPE BlockMeta = GetWorld()->GetBlockMeta(BlockTestPosition);
 
-			/* we do the cross-shaped sampling to check for water / liquids, but only on our level because water blocks are never bigger than unit voxels */
+			/* we do the cross-shaped sampling to check for water / liquids, but only on our level because water blocks
+			 * are never bigger than unit voxels */
 			if (j == 0)
 			{
 				IsFootInWater |= IsBlockWater(BlockType);
 				IsFootOnSlimeBlock |= (BlockType == E_BLOCK_SLIME_BLOCK);
 			}
 
-			/* If the block is solid, and the blockhandler confirms the block to be inside, we're officially on the ground. */
-			if ((cBlockInfo::IsSolid(BlockType)) && (cBlockHandler::For(BlockType).IsInsideBlock(CrossTestPosition - BlockTestPosition, BlockMeta)))
+			/* If the block is solid, and the blockhandler confirms the block to be inside, we're officially on the
+			 * ground. */
+			if ((cBlockInfo::IsSolid(BlockType)) &&
+				(cBlockHandler::For(BlockType).IsInsideBlock(CrossTestPosition - BlockTestPosition, BlockMeta)))
 			{
 				OnGround = true;
 			}
@@ -418,14 +439,16 @@ void cPawn::HandleFalling(void)
 	NOTE: this will only work in some cases; should be done in HandlePhysics() */
 	if (IsFootOnSlimeBlock && ShouldBounceOnSlime)
 	{
-		// TODO: doesn't work too well, causes dissatisfactory experience for players on slime blocks - SetSpeedY(-GetSpeedY());
+		// TODO: doesn't work too well, causes dissatisfactory experience for players on slime blocks -
+		// SetSpeedY(-GetSpeedY());
 	}
 
 	// TODO: put player speed into GetSpeedY, and use that.
 	// If flying, climbing, swimming, or going up...
 	if (FallDamageAbsorbed || ((GetPosition() - m_LastPosition).y > 0))
 	{
-		// ...update the ground height to have the highest position of the player (i.e. jumping up adds to the eventual fall damage)
+		// ...update the ground height to have the highest position of the player (i.e. jumping up adds to the eventual
+		// fall damage)
 		m_LastGroundHeight = GetPosY();
 	}
 
@@ -435,7 +458,8 @@ void cPawn::HandleFalling(void)
 		auto Damage = static_cast<int>(FallHeight - 3.0);
 
 		const auto Below = POS_TOINT.addedY(-1);
-		const auto BlockBelow = (cChunkDef::IsValidHeight(Below)) ? GetWorld()->GetBlock(Below) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
+		const auto BlockBelow =
+			(cChunkDef::IsValidHeight(Below)) ? GetWorld()->GetBlock(Below) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
 
 		if ((Damage > 0) && !FallDamageAbsorbed)
 		{
@@ -454,10 +478,13 @@ void cPawn::HandleFalling(void)
 			GetWorld()->BroadcastParticleEffect(
 				"blockdust",
 				GetPosition(),
-				{ 0, 0, 0 },
-				(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) + 0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
-				static_cast<int>((Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f),  // Map damage (1 - 15) to particle quantity (20 - 50)
-				{ { BlockBelow, 0 } }
+				{0, 0, 0},
+				(Damage - 1.f) * ((0.3f - 0.1f) / (15.f - 1.f)) +
+					0.1f,  // Map damage (1 - 15) to particle speed (0.1 - 0.3)
+				static_cast<int>(
+					(Damage - 1.f) * ((50.f - 20.f) / (15.f - 1.f)) + 20.f
+				),  // Map damage (1 - 15) to particle quantity (20 - 50)
+				{{BlockBelow, 0}}
 			);
 
 			TakeDamage(dtFalling, nullptr, Damage, static_cast<float>(Damage), 0);
@@ -487,7 +514,11 @@ void cPawn::HandleFalling(void)
 
 
 
-void cPawn::HandleFarmlandTrampling(const double a_FallHeight, const BLOCKTYPE a_BlockAtFoot, const BLOCKTYPE a_BlockBelow)
+void cPawn::HandleFarmlandTrampling(
+	const double a_FallHeight,
+	const BLOCKTYPE a_BlockAtFoot,
+	const BLOCKTYPE a_BlockBelow
+)
 {
 	// No trampling if FallHeight <= 0.6875
 	if (a_FallHeight <= 0.6875)
@@ -541,11 +572,14 @@ void cPawn::HandleFarmlandTrampling(const double a_FallHeight, const BLOCKTYPE a
 
 	if (ShouldTrample)
 	{
-		GetWorld()->DoWithChunkAt(AbsPos, [&](cChunk & Chunk)
-		{
-			cBlockFarmlandHandler::TurnToDirt(Chunk, AbsPos);
-			return true;
-		});
+		GetWorld()->DoWithChunkAt(
+			AbsPos,
+			[&](cChunk & Chunk)
+			{
+				cBlockFarmlandHandler::TurnToDirt(Chunk, AbsPos);
+				return true;
+			}
+		);
 	}
 }
 
@@ -565,7 +599,7 @@ void cPawn::OnRemoveFromWorld(cWorld & a_World)
 
 void cPawn::StopEveryoneFromTargetingMe()
 {
-	std::vector<cMonster*>::iterator i = m_TargetingMe.begin();
+	std::vector<cMonster *>::iterator i = m_TargetingMe.begin();
 	while (i != m_TargetingMe.end())
 	{
 		cMonster * Monster = *i;
@@ -585,7 +619,7 @@ std::map<cEntityEffect::eType, cEntityEffect *> cPawn::GetEntityEffects() const
 	std::map<cEntityEffect::eType, cEntityEffect *> Effects;
 	for (auto & Effect : m_EntityEffects)
 	{
-		Effects.insert({ Effect.first, Effect.second.get() });
+		Effects.insert({Effect.first, Effect.second.get()});
 	}
 	return Effects;
 }
@@ -649,13 +683,20 @@ bool cPawn::DeductTotem(const eDamageType a_DamageType)
 
 
 
-bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const Vector3i a_MinBoxCorner, const Vector3i a_MaxBoxCorner)
+bool cPawn::FindTeleportDestination(
+	cWorld & a_World,
+	const int a_HeightRequired,
+	const unsigned int a_NumTries,
+	Vector3d & a_Destination,
+	const Vector3i a_MinBoxCorner,
+	const Vector3i a_MaxBoxCorner
+)
 {
 	/*
 	Algorithm:
 	Choose random destination.
-	Seek downwards, regardless of distance until the block is made of movement-blocking material: https://minecraft.wiki/w/Materials
-	Succeeds if no liquid or solid blocks prevents from standing at destination.
+	Seek downwards, regardless of distance until the block is made of movement-blocking material:
+	https://minecraft.wiki/w/Materials Succeeds if no liquid or solid blocks prevents from standing at destination.
 	*/
 	auto & Random = GetRandomProvider();
 
@@ -707,16 +748,36 @@ bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired
 
 
 
-bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const cBoundingBox a_BoundingBox)
+bool cPawn::FindTeleportDestination(
+	cWorld & a_World,
+	const int a_HeightRequired,
+	const unsigned int a_NumTries,
+	Vector3d & a_Destination,
+	const cBoundingBox a_BoundingBox
+)
 {
-	return FindTeleportDestination(a_World, a_HeightRequired, a_NumTries, a_Destination, a_BoundingBox.GetMin(), a_BoundingBox.GetMax());
+	return FindTeleportDestination(
+		a_World,
+		a_HeightRequired,
+		a_NumTries,
+		a_Destination,
+		a_BoundingBox.GetMin(),
+		a_BoundingBox.GetMax()
+	);
 }
 
 
 
 
 
-bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, Vector3i a_Centre, const int a_HalfCubeWidth)
+bool cPawn::FindTeleportDestination(
+	cWorld & a_World,
+	const int a_HeightRequired,
+	const unsigned int a_NumTries,
+	Vector3d & a_Destination,
+	Vector3i a_Centre,
+	const int a_HalfCubeWidth
+)
 {
 	Vector3i MinCorner(a_Centre.x - a_HalfCubeWidth, a_Centre.y - a_HalfCubeWidth, a_Centre.z - a_HalfCubeWidth);
 	Vector3i MaxCorner(a_Centre.x + a_HalfCubeWidth, a_Centre.y + a_HalfCubeWidth, a_Centre.z + a_HalfCubeWidth);

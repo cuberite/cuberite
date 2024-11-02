@@ -49,30 +49,30 @@ void cNetworkSingleton::Initialise(void)
 	// Start the lookup thread
 	m_LookupThread.Start();
 
-	// Windows: initialize networking:
-	#ifdef _WIN32
-		WSADATA wsaData;
-		memset(&wsaData, 0, sizeof(wsaData));
-		int res = WSAStartup (MAKEWORD(2, 2), &wsaData);
-		if (res != 0)
-		{
-			int err = WSAGetLastError();
-			LOGWARNING("WSAStartup failed: %d, WSAGLE = %d (%s)", res, err, evutil_socket_error_to_string(err));
-			exit(1);
-		}
-	#endif  // _WIN32
+// Windows: initialize networking:
+#ifdef _WIN32
+	WSADATA wsaData;
+	memset(&wsaData, 0, sizeof(wsaData));
+	int res = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (res != 0)
+	{
+		int err = WSAGetLastError();
+		LOGWARNING("WSAStartup failed: %d, WSAGLE = %d (%s)", res, err, evutil_socket_error_to_string(err));
+		exit(1);
+	}
+#endif  // _WIN32
 
 	// Initialize LibEvent logging:
 	event_set_log_callback(LogCallback);
 
-	// Initialize threading:
-	#if defined(EVTHREAD_USE_WINDOWS_THREADS_IMPLEMENTED)
-		evthread_use_windows_threads();
-	#elif defined(EVTHREAD_USE_PTHREADS_IMPLEMENTED)
-		evthread_use_pthreads();
-	#else
-		#error No threading implemented for EVTHREAD
-	#endif
+// Initialize threading:
+#if defined(EVTHREAD_USE_WINDOWS_THREADS_IMPLEMENTED)
+	evthread_use_windows_threads();
+#elif defined(EVTHREAD_USE_PTHREADS_IMPLEMENTED)
+	evthread_use_pthreads();
+#else
+#error No threading implemented for EVTHREAD
+#endif
 
 	// Create the main event_base:
 	event_config * config = event_config_new();
@@ -88,7 +88,8 @@ void cNetworkSingleton::Initialise(void)
 	// Create the event loop thread:
 	m_HasTerminated = false;
 	m_EventLoopThread = std::thread(RunEventLoop, this);
-	m_StartupEvent.Wait();  // Wait for the LibEvent loop to actually start running (otherwise calling Terminate too soon would hang, see #3228)
+	m_StartupEvent.Wait();  // Wait for the LibEvent loop to actually start running (otherwise calling Terminate too
+							// soon would hang, see #3228)
 }
 
 
@@ -133,7 +134,8 @@ void cNetworkSingleton::Terminate(void)
 	libevent_global_shutdown();
 
 	// Set the HasTerminated flag:
-	// (Only set the flag after everything has been removed, to avoid the random failures in the Google-test, caused by links terminating after this flag was set)
+	// (Only set the flag after everything has been removed, to avoid the random failures in the Google-test, caused by
+	// links terminating after this flag was set)
 	m_HasTerminated = true;
 }
 
@@ -145,10 +147,10 @@ void cNetworkSingleton::LogCallback(int a_Severity, const char * a_Msg)
 {
 	switch (a_Severity)
 	{
-		case _EVENT_LOG_DEBUG: LOGD      ("LibEvent: %s", a_Msg); break;
-		case _EVENT_LOG_MSG:   LOG       ("LibEvent: %s", a_Msg); break;
+		case _EVENT_LOG_DEBUG: LOGD("LibEvent: %s", a_Msg); break;
+		case _EVENT_LOG_MSG:   LOG("LibEvent: %s", a_Msg); break;
 		case _EVENT_LOG_WARN:  LOGWARNING("LibEvent: %s", a_Msg); break;
-		case _EVENT_LOG_ERR:   LOGERROR  ("LibEvent: %s", a_Msg); break;
+		case _EVENT_LOG_ERR:   LOGERROR("LibEvent: %s", a_Msg); break;
 		default:
 		{
 			LOGWARNING("LibEvent: Unknown log severity (%d): %s", a_Severity, a_Msg);
@@ -164,7 +166,7 @@ void cNetworkSingleton::LogCallback(int a_Severity, const char * a_Msg)
 void cNetworkSingleton::RunEventLoop(cNetworkSingleton * a_Self)
 {
 	auto timer = evtimer_new(a_Self->m_EventBase, SignalizeStartup, a_Self);
-	timeval timeout{};  // Zero timeout - execute immediately
+	timeval timeout {};  // Zero timeout - execute immediately
 	evtimer_add(timer, &timeout);
 	event_base_loop(a_Self->m_EventBase, EVLOOP_NO_EXIT_ON_EMPTY);
 	event_free(timer);
@@ -238,7 +240,3 @@ void cNetworkSingleton::RemoveServer(const cServerHandle * a_Server)
 		}
 	}  // for itr - m_Servers[]
 }
-
-
-
-

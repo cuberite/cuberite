@@ -25,42 +25,36 @@ static TIMECAPS g_Resolution;
 
 namespace SleepResolutionBooster
 {
-	static void Register()
+static void Register()
+{
+	// Default sleep resolution on Windows isn't accurate enough (GH #5140) so try to boost it:
+	if ((timeGetDevCaps(&g_Resolution, sizeof(g_Resolution)) == MMSYSERR_NOERROR) &&
+		(timeBeginPeriod(g_Resolution.wPeriodMin) == MMSYSERR_NOERROR))
 	{
-		// Default sleep resolution on Windows isn't accurate enough (GH #5140) so try to boost it:
-		if (
-			(timeGetDevCaps(&g_Resolution, sizeof(g_Resolution)) == MMSYSERR_NOERROR) &&
-			(timeBeginPeriod(g_Resolution.wPeriodMin) == MMSYSERR_NOERROR)
-		)
-		{
-			return;
-		}
-
-		// Max < Min sentinel for failure, to prevent bogus timeEndPeriod calls:
-		g_Resolution.wPeriodMax = 0;
-		g_Resolution.wPeriodMin = 1;
+		return;
 	}
 
-	static void Unregister()
+	// Max < Min sentinel for failure, to prevent bogus timeEndPeriod calls:
+	g_Resolution.wPeriodMax = 0;
+	g_Resolution.wPeriodMin = 1;
+}
+
+static void Unregister()
+{
+	if (g_Resolution.wPeriodMax >= g_Resolution.wPeriodMin)
 	{
-		if (g_Resolution.wPeriodMax >= g_Resolution.wPeriodMin)
-		{
-			timeEndPeriod(g_Resolution.wPeriodMin);
-		}
+		timeEndPeriod(g_Resolution.wPeriodMin);
 	}
-};
+}
+};  // namespace SleepResolutionBooster
 
 #else
 
 namespace SleepResolutionBooster
 {
-	static void Register()
-	{
-	}
+static void Register() {}
 
-	static void Unregister()
-	{
-	}
-};
+static void Unregister() {}
+};  // namespace SleepResolutionBooster
 
 #endif

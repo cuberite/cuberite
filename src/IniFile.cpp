@@ -27,9 +27,9 @@
 #include "IniFile.h"
 
 #if defined(WIN32)
-	#define iniEOL endl
+#define iniEOL endl
 #else
-	#define iniEOL '\r' << endl
+#define iniEOL '\r' << endl
 #endif
 
 using namespace std;
@@ -55,8 +55,8 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 	// Normally you would use ifstream, but the SGI CC compiler has
 	// a few bugs with ifstream. So ... fstream used.
 	fstream f;
-	AString   line;
-	AString   keyname, valuename, value;
+	AString line;
+	AString keyname, valuename, value;
 	AString::size_type pLeft, pRight;
 	bool IsFromExampleRedirect = false;
 
@@ -132,10 +132,7 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 		{
 			case '[':
 			{
-				if (
-					((pRight = line.find_last_of("]")) != AString::npos) &&
-					(pRight > pLeft)
-					)
+				if (((pRight = line.find_last_of("]")) != AString::npos) && (pRight > pLeft))
 				{
 					keyname = line.substr(pLeft + 1, pRight - pLeft - 1);
 					AddKeyName(keyname);
@@ -335,7 +332,8 @@ int cIniFile::GetNumValues(const AString & keyname) const
 
 AString cIniFile::GetValueName(const int keyID, const int valueID) const
 {
-	if ((keyID < static_cast<int>(m_Keys.size())) && (valueID < static_cast<int>(m_Keys[static_cast<size_t>(keyID)].m_Names.size())))
+	if ((keyID < static_cast<int>(m_Keys.size())) &&
+		(valueID < static_cast<int>(m_Keys[static_cast<size_t>(keyID)].m_Names.size())))
 	{
 		return m_Keys[static_cast<size_t>(keyID)].m_Names[static_cast<size_t>(valueID)];
 	}
@@ -396,7 +394,8 @@ void cIniFile::AddValueF(const AString & a_KeyName, const AString & a_ValueName,
 
 bool cIniFile::SetValue(const int keyID, const int valueID, const AString & value)
 {
-	if ((static_cast<size_t>(keyID) >= m_Keys.size()) || (static_cast<size_t>(valueID) >= m_Keys[static_cast<size_t>(keyID)].m_Names.size()))
+	if ((static_cast<size_t>(keyID) >= m_Keys.size()) ||
+		(static_cast<size_t>(valueID) >= m_Keys[static_cast<size_t>(keyID)].m_Names.size()))
 	{
 		return false;
 	}
@@ -408,7 +407,12 @@ bool cIniFile::SetValue(const int keyID, const int valueID, const AString & valu
 
 
 
-bool cIniFile::SetValue(const AString & a_KeyName, const AString & a_ValueName, const AString & a_Value, const bool a_CreateIfNotExists)
+bool cIniFile::SetValue(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const AString & a_Value,
+	const bool a_CreateIfNotExists
+)
 {
 	int keyID = FindKey(a_KeyName);
 	if (keyID == noID)
@@ -442,7 +446,12 @@ bool cIniFile::SetValue(const AString & a_KeyName, const AString & a_ValueName, 
 
 
 
-bool cIniFile::SetValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value, const bool a_CreateIfNotExists)
+bool cIniFile::SetValueI(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	const int a_Value,
+	const bool a_CreateIfNotExists
+)
 {
 	return SetValue(a_KeyName, a_ValueName, fmt::format(FMT_STRING("{}"), a_Value), a_CreateIfNotExists);
 }
@@ -451,7 +460,12 @@ bool cIniFile::SetValueI(const AString & a_KeyName, const AString & a_ValueName,
 
 
 
-bool cIniFile::SetValueI(const AString & a_Keyname, const AString & a_ValueName, const Int64 a_Value, const bool a_CreateIfNotExists)
+bool cIniFile::SetValueI(
+	const AString & a_Keyname,
+	const AString & a_ValueName,
+	const Int64 a_Value,
+	const bool a_CreateIfNotExists
+)
 {
 	return SetValue(a_Keyname, a_ValueName, fmt::format(FMT_STRING("{}"), a_Value), a_CreateIfNotExists);
 }
@@ -460,7 +474,12 @@ bool cIniFile::SetValueI(const AString & a_Keyname, const AString & a_ValueName,
 
 
 
-bool cIniFile::SetValueF(const AString & a_KeyName, const AString & a_ValueName, double const a_Value, const bool a_CreateIfNotExists)
+bool cIniFile::SetValueF(
+	const AString & a_KeyName,
+	const AString & a_ValueName,
+	double const a_Value,
+	const bool a_CreateIfNotExists
+)
 {
 	return SetValue(a_KeyName, a_ValueName, fmt::format(FMT_STRING("{}"), a_Value), a_CreateIfNotExists);
 }
@@ -471,7 +490,8 @@ bool cIniFile::SetValueF(const AString & a_KeyName, const AString & a_ValueName,
 
 AString cIniFile::GetValue(const int keyID, const int valueID, const AString & defValue) const
 {
-	if ((keyID < static_cast<int>(m_Keys.size())) && (valueID < static_cast<int>(m_Keys[static_cast<size_t>(keyID)].m_Names.size())))
+	if ((keyID < static_cast<int>(m_Keys.size())) &&
+		(valueID < static_cast<int>(m_Keys[static_cast<size_t>(keyID)].m_Names.size())))
 	{
 		return m_Keys[static_cast<size_t>(keyID)].m_Values[static_cast<size_t>(valueID)];
 	}
@@ -585,7 +605,8 @@ Int64 cIniFile::GetValueSetI(const AString & keyname, const AString & valuename,
 
 bool cIniFile::DeleteValueByID(const int keyID, const int valueID)
 {
-	if ((keyID < static_cast<int>(m_Keys.size())) && (valueID < static_cast<int>(m_Keys[static_cast<size_t>(keyID)].m_Names.size())))
+	if ((keyID < static_cast<int>(m_Keys.size())) &&
+		(valueID < static_cast<int>(m_Keys[static_cast<size_t>(keyID)].m_Names.size())))
 	{
 		// This looks strange, but is neccessary.
 		vector<AString>::iterator npos = m_Keys[static_cast<size_t>(keyID)].m_Names.begin() + valueID;
@@ -631,7 +652,7 @@ bool cIniFile::DeleteKey(const AString & keyname)
 	}
 
 	vector<AString>::iterator npos = m_Names.begin() + keyID;
-	vector<key>::iterator    kpos = m_Keys.begin() + keyID;
+	vector<key>::iterator kpos = m_Keys.begin() + keyID;
 	m_Names.erase(npos, npos + 1);
 	m_Keys.erase(kpos, kpos + 1);
 
@@ -740,7 +761,10 @@ bool cIniFile::AddKeyComment(const int keyID, const AString & comment)
 {
 	if (keyID < static_cast<int>(m_Keys.size()))
 	{
-		m_Keys[static_cast<size_t>(keyID)].m_Comments.resize(m_Keys[static_cast<size_t>(keyID)].m_Comments.size() + 1, comment);
+		m_Keys[static_cast<size_t>(keyID)].m_Comments.resize(
+			m_Keys[static_cast<size_t>(keyID)].m_Comments.size() + 1,
+			comment
+		);
 		return true;
 	}
 	return false;
@@ -766,7 +790,8 @@ bool cIniFile::AddKeyComment(const AString & keyname, const AString & comment)
 
 AString cIniFile::GetKeyComment(const int keyID, const int commentID) const
 {
-	if ((keyID < static_cast<int>(m_Keys.size())) && (commentID < static_cast<int>(m_Keys[static_cast<size_t>(keyID)].m_Comments.size())))
+	if ((keyID < static_cast<int>(m_Keys.size())) &&
+		(commentID < static_cast<int>(m_Keys[static_cast<size_t>(keyID)].m_Comments.size())))
 	{
 		return m_Keys[static_cast<size_t>(keyID)].m_Comments[static_cast<size_t>(commentID)];
 	}
@@ -793,7 +818,8 @@ AString cIniFile::GetKeyComment(const AString & keyname, const int commentID) co
 
 bool cIniFile::DeleteKeyComment(const int keyID, const int commentID)
 {
-	if ((keyID < static_cast<int>(m_Keys.size())) && (commentID < static_cast<int>(m_Keys[static_cast<size_t>(keyID)].m_Comments.size())))
+	if ((keyID < static_cast<int>(m_Keys.size())) &&
+		(commentID < static_cast<int>(m_Keys[static_cast<size_t>(keyID)].m_Comments.size())))
 	{
 		vector<AString>::iterator cpos = m_Keys[static_cast<size_t>(keyID)].m_Comments.begin() + commentID;
 		m_Keys[static_cast<size_t>(keyID)].m_Comments.erase(cpos, cpos + 1);
@@ -870,7 +896,7 @@ AString cIniFile::CheckCase(const AString & s) const
 void cIniFile::RemoveBom(AString & a_line) const
 {
 	// The BOM sequence for UTF-8 is 0xEF, 0xBB, 0xBF
-	static unsigned const char BOM[] = { 0xEF, 0xBB, 0xBF };
+	static unsigned const char BOM[] = {0xEF, 0xBB, 0xBF};
 
 	// The BOM sequence, if present, is always th e first three characters of the input.
 	const AString ref = a_line.substr(0, 3);
@@ -911,7 +937,10 @@ std::vector<std::pair<AString, AString>> cIniFile::GetValues(AString a_keyName)
 	}
 	for (size_t valueID = 0; valueID < m_Keys[static_cast<size_t>(keyID)].m_Names.size(); ++valueID)
 	{
-		ret.emplace_back(m_Keys[static_cast<size_t>(keyID)].m_Names[valueID], m_Keys[static_cast<size_t>(keyID)].m_Values[valueID]);
+		ret.emplace_back(
+			m_Keys[static_cast<size_t>(keyID)].m_Names[valueID],
+			m_Keys[static_cast<size_t>(keyID)].m_Values[valueID]
+		);
 	}
 	return ret;
 }
@@ -962,6 +991,3 @@ AStringVector ReadUpgradeIniPorts(
 
 	return Ports;
 }
-
-
-

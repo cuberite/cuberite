@@ -1,7 +1,8 @@
 
 // TransferEncodingParser.cpp
 
-// Implements the cTransferEncodingParser class and its descendants representing the parsers for the various transfer encodings (chunked etc.)
+// Implements the cTransferEncodingParser class and its descendants representing the parsers for the various transfer
+// encodings (chunked etc.)
 
 #include "Globals.h"
 #include "TransferEncodingParser.h"
@@ -14,34 +15,29 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cChunkedTEParser:
 
-class cChunkedTEParser:
-	public cTransferEncodingParser,
-	public cEnvelopeParser::cCallbacks
+class cChunkedTEParser : public cTransferEncodingParser,
+						 public cEnvelopeParser::cCallbacks
 {
 	using Super = cTransferEncodingParser;
 
-public:
-
-	cChunkedTEParser(Super::cCallbacks & a_Callbacks):
-		Super(a_Callbacks),
-		m_State(psChunkLength),
-		m_ChunkDataLengthLeft(0),
-		m_TrailerParser(*this)
+  public:
+	cChunkedTEParser(Super::cCallbacks & a_Callbacks) :
+		Super(a_Callbacks), m_State(psChunkLength), m_ChunkDataLengthLeft(0), m_TrailerParser(*this)
 	{
 	}
 
 
-protected:
+  protected:
 	enum eState
 	{
-		psChunkLength,         ///< Parsing the chunk length hex number
+		psChunkLength,  ///< Parsing the chunk length hex number
 		psChunkLengthTrailer,  ///< Any trailer (chunk extension) specified after the chunk length
-		psChunkLengthLF,       ///< The LF character after the CR character terminating the chunk length
-		psChunkData,           ///< Relaying chunk data
-		psChunkDataCR,         ///< Skipping the extra CR character after chunk data
-		psChunkDataLF,         ///< Skipping the extra LF character after chunk data
-		psTrailer,             ///< Received an empty chunk, parsing the trailer (through the envelope parser)
-		psFinished,            ///< The parser has finished parsing, either successfully or with an error
+		psChunkLengthLF,  ///< The LF character after the CR character terminating the chunk length
+		psChunkData,  ///< Relaying chunk data
+		psChunkDataCR,  ///< Skipping the extra CR character after chunk data
+		psChunkDataLF,  ///< Skipping the extra LF character after chunk data
+		psTrailer,  ///< Received an empty chunk, parsing the trailer (through the envelope parser)
+		psFinished,  ///< The parser has finished parsing, either successfully or with an error
 	};
 
 	/** The current state of the parser (parsing chunk length / chunk data). */
@@ -69,7 +65,8 @@ protected:
 	size_t ParseChunkLength(const char * a_Data, size_t a_Size)
 	{
 		// Expected input: <hexnumber>[;<trailer>]<CR><LF>
-		// Only the hexnumber is parsed into m_ChunkDataLengthLeft, the rest is postponed into psChunkLengthTrailer or psChunkLengthLF
+		// Only the hexnumber is parsed into m_ChunkDataLengthLeft, the rest is postponed into psChunkLengthTrailer or
+		// psChunkLengthLF
 		for (size_t i = 0; i < a_Size; i++)
 		{
 			switch (a_Data[i])
@@ -85,7 +82,8 @@ protected:
 				case '8':
 				case '9':
 				{
-					m_ChunkDataLengthLeft = m_ChunkDataLengthLeft * 16 + static_cast<decltype(m_ChunkDataLengthLeft)>(a_Data[i] - '0');
+					m_ChunkDataLengthLeft =
+						m_ChunkDataLengthLeft * 16 + static_cast<decltype(m_ChunkDataLengthLeft)>(a_Data[i] - '0');
 					break;
 				}
 				case 'a':
@@ -95,7 +93,8 @@ protected:
 				case 'e':
 				case 'f':
 				{
-					m_ChunkDataLengthLeft = m_ChunkDataLengthLeft * 16 + static_cast<decltype(m_ChunkDataLengthLeft)>(a_Data[i] - 'a' + 10);
+					m_ChunkDataLengthLeft =
+						m_ChunkDataLengthLeft * 16 + static_cast<decltype(m_ChunkDataLengthLeft)>(a_Data[i] - 'a' + 10);
 					break;
 				}
 				case 'A':
@@ -105,7 +104,8 @@ protected:
 				case 'E':
 				case 'F':
 				{
-					m_ChunkDataLengthLeft = m_ChunkDataLengthLeft * 16 + static_cast<decltype(m_ChunkDataLengthLeft)>(a_Data[i] - 'A' + 10);
+					m_ChunkDataLengthLeft =
+						m_ChunkDataLengthLeft * 16 + static_cast<decltype(m_ChunkDataLengthLeft)>(a_Data[i] - 'A' + 10);
 					break;
 				}
 				case '\r':
@@ -247,8 +247,8 @@ protected:
 
 
 	/** Parses the incoming data, the current state is psChunkDataCR.
-	The trailer is normally a set of "Header: Value" lines, terminated by an empty line. Use the m_TrailerParser for that.
-	Returns the number of bytes consumed from the input, or AString::npos on error (calls the Error handler). */
+	The trailer is normally a set of "Header: Value" lines, terminated by an empty line. Use the m_TrailerParser for
+	that. Returns the number of bytes consumed from the input, or AString::npos on error (calls the Error handler). */
 	size_t ParseTrailer(const char * a_Data, size_t a_Size)
 	{
 		auto res = m_TrailerParser.Parse(a_Data, a_Size);
@@ -273,14 +273,14 @@ protected:
 			size_t consumed = 0;
 			switch (m_State)
 			{
-				case psChunkLength:        consumed = ParseChunkLength       (a_Data, a_Size); break;
+				case psChunkLength:        consumed = ParseChunkLength(a_Data, a_Size); break;
 				case psChunkLengthTrailer: consumed = ParseChunkLengthTrailer(a_Data, a_Size); break;
-				case psChunkLengthLF:      consumed = ParseChunkLengthLF     (a_Data, a_Size); break;
-				case psChunkData:          consumed = ParseChunkData         (a_Data, a_Size); break;
-				case psChunkDataCR:        consumed = ParseChunkDataCR       (a_Data, a_Size); break;
-				case psChunkDataLF:        consumed = ParseChunkDataLF       (a_Data, a_Size); break;
-				case psTrailer:            consumed = ParseTrailer           (a_Data, a_Size); break;
-				case psFinished:           consumed = 0;                                       break;  // Not supposed to happen, but Clang complains without it
+				case psChunkLengthLF:      consumed = ParseChunkLengthLF(a_Data, a_Size); break;
+				case psChunkData:          consumed = ParseChunkData(a_Data, a_Size); break;
+				case psChunkDataCR:        consumed = ParseChunkDataCR(a_Data, a_Size); break;
+				case psChunkDataLF:        consumed = ParseChunkDataLF(a_Data, a_Size); break;
+				case psTrailer:            consumed = ParseTrailer(a_Data, a_Size); break;
+				case psFinished:           consumed = 0; break;  // Not supposed to happen, but Clang complains without it
 			}
 			if (consumed == AString::npos)
 			{
@@ -296,7 +296,10 @@ protected:
 	{
 		if (m_State != psFinished)
 		{
-			Error(fmt::format(FMT_STRING("ChunkedTransferEncoding: Finish signal received before the data stream ended (state: {})"), m_State));
+			Error(fmt::format(
+				FMT_STRING("ChunkedTransferEncoding: Finish signal received before the data stream ended (state: {})"),
+				m_State
+			));
 		}
 		m_State = psFinished;
 	}
@@ -316,21 +319,18 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cIdentityTEParser:
 
-class cIdentityTEParser:
-	public cTransferEncodingParser
+class cIdentityTEParser : public cTransferEncodingParser
 {
 	using Super = cTransferEncodingParser;
 
-public:
-
-	cIdentityTEParser(cCallbacks & a_Callbacks, size_t a_ContentLength):
-		Super(a_Callbacks),
-		m_BytesLeft(a_ContentLength)
+  public:
+	cIdentityTEParser(cCallbacks & a_Callbacks, size_t a_ContentLength) :
+		Super(a_Callbacks), m_BytesLeft(a_ContentLength)
 	{
 	}
 
 
-protected:
+  protected:
 	/** How many bytes of content are left before the message ends. */
 	size_t m_BytesLeft;
 
@@ -390,7 +390,3 @@ cTransferEncodingParserPtr cTransferEncodingParser::Create(
 	}
 	return nullptr;
 }
-
-
-
-

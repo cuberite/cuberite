@@ -21,14 +21,15 @@ typedef std::shared_ptr<cIniFile> cIniFilePtr;
 /** Abstract interface for getting biome data for chunks. */
 class ChunkSource
 {
-public:
+  public:
 	virtual ~ChunkSource() {}
 
 	/** Fills the a_DestChunk with the biomes for the specified coords.
 	It is expected to be thread-safe and re-entrant. Usually QThread::idealThreadCount() threads are used. */
 	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, Chunk & a_DestChunk) = 0;
 
-	/** Forces a fresh reload of the source. Useful mainly for the generator, whose underlying definition file may have been changed. */
+	/** Forces a fresh reload of the source. Useful mainly for the generator, whose underlying definition file may have
+	 * been changed. */
 	virtual void reload() = 0;
 };
 
@@ -36,11 +37,9 @@ public:
 
 
 
-
-class BioGenSource :
-	public ChunkSource
+class BioGenSource : public ChunkSource
 {
-public:
+  public:
 	/** Constructs a new BioGenSource based on the biome generator that is defined in the specified world.ini file. */
 	BioGenSource(cIniFilePtr a_IniFile);
 
@@ -48,7 +47,7 @@ public:
 	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, Chunk & a_DestChunk) override;
 	virtual void reload(void) override;
 
-protected:
+  protected:
 	/** The world.ini contents from which the generator is created and re-created on reload(). */
 	cIniFilePtr m_IniFile;
 
@@ -82,10 +81,9 @@ protected:
 
 
 
-class AnvilSource :
-	public ChunkSource
+class AnvilSource : public ChunkSource
 {
-public:
+  public:
 	/** Constructs a new AnvilSource based on the world path. */
 	AnvilSource(QString a_WorldRegionFolder);
 
@@ -93,7 +91,7 @@ public:
 	virtual void getChunkBiomes(int a_ChunkX, int a_ChunkZ, Chunk & a_DestChunk) override;
 	virtual void reload() override;
 
-protected:
+  protected:
 	class AnvilFile;
 	typedef std::shared_ptr<AnvilFile> AnvilFilePtr;
 
@@ -119,9 +117,4 @@ protected:
 	/** Returns the file object that contains the specified chunk.
 	The file is taken from the cache if available there, otherwise it is created anew. */
 	AnvilFilePtr getAnvilFile(int a_ChunkX, int a_ChunkZ);
-
 };
-
-
-
-

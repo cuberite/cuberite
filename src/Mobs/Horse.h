@@ -8,14 +8,12 @@
 
 
 
-class cHorse:
-	public cPassiveMonster,
-	public cEntityWindowOwner
+class cHorse : public cPassiveMonster,
+			   public cEntityWindowOwner
 {
 	using Super = cPassiveMonster;
 
-public:
-
+  public:
 	cHorse(int Type, int Color, int Style, int TameTimes);
 
 	CLASS_PROTODEF(cHorse)
@@ -27,16 +25,16 @@ public:
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
-	bool IsSaddled      (void) const  {return !m_Saddle.IsEmpty(); }
-	bool IsChested      (void) const  {return m_bHasChest; }
-	bool IsEating       (void) const  {return m_bIsEating; }
-	bool IsRearing      (void) const  {return m_bIsRearing; }
-	bool IsMthOpen      (void) const  {return m_bIsMouthOpen; }
-	bool IsTame         (void) const override {return m_bIsTame; }
-	int  GetHorseType   (void) const  {return m_Type; }
-	int  GetHorseColor  (void) const  {return m_Color; }
-	int  GetHorseStyle  (void) const  {return m_Style; }
-	int  GetHorseArmour (void) const;
+	bool IsSaddled(void) const { return !m_Saddle.IsEmpty(); }
+	bool IsChested(void) const { return m_bHasChest; }
+	bool IsEating(void) const { return m_bIsEating; }
+	bool IsRearing(void) const { return m_bIsRearing; }
+	bool IsMthOpen(void) const { return m_bIsMouthOpen; }
+	bool IsTame(void) const override { return m_bIsTame; }
+	int GetHorseType(void) const { return m_Type; }
+	int GetHorseColor(void) const { return m_Color; }
+	int GetHorseStyle(void) const { return m_Style; }
+	int GetHorseArmour(void) const;
 
 	/** Set the horse's saddle to the given item.
 	@param a_SaddleItem should be either a saddle or empty. */
@@ -46,8 +44,8 @@ public:
 	@param a_SaddleItem should be either a type of horse armor or empty. */
 	void SetHorseArmor(cItem a_ArmorItem);
 
-	const cItem & GetHorseSaddle()    const { return m_Saddle; }
-	const cItem & GetHorseArmorItem() const { return m_Armor;  }
+	const cItem & GetHorseSaddle() const { return m_Saddle; }
+	const cItem & GetHorseArmorItem() const { return m_Armor; }
 
 	virtual void GetBreedingItems(cItems & a_Items) override
 	{
@@ -57,12 +55,10 @@ public:
 
 	void PlayerOpenWindow(cPlayer & a_Player);
 
-private:
-
+  private:
 	bool m_bHasChest, m_bIsEating, m_bIsRearing, m_bIsMouthOpen, m_bIsTame;
 	int m_Type, m_Color, m_Style, m_TimesToTame, m_TameAttemptTimes, m_RearTickCount;
 	float m_MaxSpeed;
 	cItem m_Saddle;
 	cItem m_Armor;
-
-} ;
+};

@@ -10,9 +10,8 @@
 
 
 
-cNoteEntity::cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
-	m_Note(0)
+cNoteEntity::cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) :
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World), m_Note(0)
 {
 	ASSERT(a_BlockType == E_BLOCK_NOTE_BLOCK);
 }
@@ -246,12 +245,7 @@ void cNoteEntity::MakeSound(void)
 
 	m_World->BroadcastBlockAction(m_Pos, static_cast<Byte>(Instrument), static_cast<Byte>(m_Note), E_BLOCK_NOTE_BLOCK);
 
-	m_World->BroadcastSoundEffect(
-		SampleName,
-		m_Pos,
-		3.0f,
-		PitchFromNote(m_Note)
-	);
+	m_World->BroadcastSoundEffect(SampleName, m_Pos, 3.0f, PitchFromNote(m_Note));
 }
 
 
@@ -292,16 +286,16 @@ float cNoteEntity::PitchFromNote(unsigned char a_Pitch)
 	// So 2 ^ ((m_Note - 12) / 12)
 	switch (a_Pitch)
 	{
-		case 0: return 0.5f;
-		case 1: return 0.5297315471796477f;
-		case 2: return 0.5612310241546865f;
-		case 3: return 0.5946035575013605f;
-		case 4: return 0.6299605249474366f;
-		case 5: return 0.6674199270850172f;
-		case 6: return 0.7071067811865476f;
-		case 7: return 0.7491535384383408f;
-		case 8: return 0.7937005259840998f;
-		case 9: return 0.8408964152537145f;
+		case 0:  return 0.5f;
+		case 1:  return 0.5297315471796477f;
+		case 2:  return 0.5612310241546865f;
+		case 3:  return 0.5946035575013605f;
+		case 4:  return 0.6299605249474366f;
+		case 5:  return 0.6674199270850172f;
+		case 6:  return 0.7071067811865476f;
+		case 7:  return 0.7491535384383408f;
+		case 8:  return 0.7937005259840998f;
+		case 9:  return 0.8408964152537145f;
 		case 10: return 0.8908987181403393f;
 		case 11: return 0.9438743126816935f;
 		case 12: return 1.0f;

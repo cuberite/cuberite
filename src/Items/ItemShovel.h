@@ -12,13 +12,11 @@
 
 
 
-class cItemShovelHandler final:
-	public cItemHandler
+class cItemShovelHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 

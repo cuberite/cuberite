@@ -13,24 +13,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cBlockingSslClientSocketConnectCallbacks:
 
-class cBlockingSslClientSocketConnectCallbacks:
-	public cNetwork::cConnectCallbacks
+class cBlockingSslClientSocketConnectCallbacks : public cNetwork::cConnectCallbacks
 {
 	/** The socket object that is using this instance of the callbacks. */
 	cBlockingSslClientSocket & m_Socket;
 
-	virtual void OnConnected(cTCPLink & a_Link) override
-	{
-		m_Socket.OnConnected();
-	}
+	virtual void OnConnected(cTCPLink & a_Link) override { m_Socket.OnConnected(); }
 
-	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
-	{
-		m_Socket.OnConnectError(a_ErrorMsg);
-	}
+	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override { m_Socket.OnConnectError(a_ErrorMsg); }
 
-public:
-	cBlockingSslClientSocketConnectCallbacks(cBlockingSslClientSocket & a_Socket):
+  public:
+	cBlockingSslClientSocketConnectCallbacks(cBlockingSslClientSocket & a_Socket) :
 		m_Socket(a_Socket)
 	{
 	}
@@ -43,15 +36,11 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // cBlockingSslClientSocketLinkCallbacks:
 
-class cBlockingSslClientSocketLinkCallbacks:
-	public cTCPLink::cCallbacks
+class cBlockingSslClientSocketLinkCallbacks : public cTCPLink::cCallbacks
 {
 	cBlockingSslClientSocket & m_Socket;
 
-	virtual void OnLinkCreated(cTCPLinkPtr a_Link) override
-	{
-		m_Socket.SetLink(a_Link);
-	}
+	virtual void OnLinkCreated(cTCPLinkPtr a_Link) override { m_Socket.SetLink(a_Link); }
 
 
 	virtual void OnReceivedData(const char * a_Data, size_t a_Length) override
@@ -60,20 +49,13 @@ class cBlockingSslClientSocketLinkCallbacks:
 	}
 
 
-	virtual void OnRemoteClosed(void) override
-	{
-		m_Socket.OnDisconnected();
-	}
+	virtual void OnRemoteClosed(void) override { m_Socket.OnDisconnected(); }
 
 
-	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
-	{
-		m_Socket.OnDisconnected();
-	}
+	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override { m_Socket.OnDisconnected(); }
 
-public:
-
-	cBlockingSslClientSocketLinkCallbacks(cBlockingSslClientSocket & a_Socket):
+  public:
+	cBlockingSslClientSocketLinkCallbacks(cBlockingSslClientSocket & a_Socket) :
 		m_Socket(a_Socket)
 	{
 	}
@@ -87,8 +69,7 @@ public:
 // cBlockingSslClientSocket:
 
 cBlockingSslClientSocket::cBlockingSslClientSocket(void) :
-	m_Ssl(*this),
-	m_IsConnected(false)
+	m_Ssl(*this), m_IsConnected(false)
 {
 	// Nothing needed yet
 }
@@ -109,10 +90,12 @@ bool cBlockingSslClientSocket::Connect(const AString & a_ServerName, UInt16 a_Po
 
 	// Connect the underlying socket:
 	m_ServerName = a_ServerName;
-	if (!cNetwork::Connect(a_ServerName, a_Port,
-		std::make_shared<cBlockingSslClientSocketConnectCallbacks>(*this),
-		std::make_shared<cBlockingSslClientSocketLinkCallbacks>(*this))
-	)
+	if (!cNetwork::Connect(
+			a_ServerName,
+			a_Port,
+			std::make_shared<cBlockingSslClientSocketConnectCallbacks>(*this),
+			std::make_shared<cBlockingSslClientSocketLinkCallbacks>(*this)
+		))
 	{
 		return false;
 	}
@@ -169,8 +152,10 @@ void cBlockingSslClientSocket::SetExpectedPeerName(AString a_ExpectedPeerName)
 	if (!m_ExpectedPeerName.empty())
 	{
 		LOGWARNING(
-			"SSL: Trying to set multiple expected peer names, only the last one will be used. %s overwriting the previous %s",
-			a_ExpectedPeerName, m_ExpectedPeerName
+			"SSL: Trying to set multiple expected peer names, only the last one will be used. %s overwriting the "
+			"previous %s",
+			a_ExpectedPeerName,
+			m_ExpectedPeerName
 		);
 	}
 
@@ -214,7 +199,7 @@ bool cBlockingSslClientSocket::Send(const void * a_Data, size_t a_NumBytes)
 		int res = m_Ssl.WritePlain(Data, a_NumBytes);
 		if (res < 0)
 		{
-			ASSERT(res != MBEDTLS_ERR_SSL_WANT_READ);   // This should never happen with callback-based SSL
+			ASSERT(res != MBEDTLS_ERR_SSL_WANT_READ);  // This should never happen with callback-based SSL
 			ASSERT(res != MBEDTLS_ERR_SSL_WANT_WRITE);  // This should never happen with callback-based SSL
 			m_LastErrorText = fmt::format(FMT_STRING("Data cannot be written to SSL context: -0x{:x}"), -res);
 			return false;
@@ -369,7 +354,3 @@ void cBlockingSslClientSocket::OnDisconnected(void)
 	m_Socket.reset();
 	m_Event.Set();
 }
-
-
-
-

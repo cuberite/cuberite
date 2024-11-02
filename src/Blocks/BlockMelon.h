@@ -7,17 +7,14 @@
 
 
 
-class cBlockMelonHandler final :
-	public cBlockHandler
+class cBlockMelonHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		const auto DropNum = FortuneDiscreteRandom(3, 7, ToolFortuneLevel(a_Tool), 9);
@@ -33,8 +30,4 @@ private:
 		UNUSED(a_Meta);
 		return 19;
 	}
-} ;
-
-
-
-
+};

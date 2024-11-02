@@ -20,33 +20,29 @@ The functions are invoked to add all affected blocks and their direct neighbors 
 The simulator may update its internal state based on this call. */
 class cSimulator
 {
-public:
-
-	cSimulator(cWorld & a_World)
-		: m_World(a_World)
+  public:
+	cSimulator(cWorld & a_World) :
+		m_World(a_World)
 	{
 	}
 
 	virtual ~cSimulator() {}
 
 	/** Contains offsets for direct adjacents of any position. */
-	static constexpr std::array<Vector3i, 6> AdjacentOffsets
-	{
-		{
-			{  1,  0,  0 },
-			{ -1,  0,  0 },
-			{  0,  1,  0 },
-			{  0, -1,  0 },
-			{  0,  0,  1 },
-			{  0,  0, -1 },
-		}
-	};
+	static constexpr std::array<Vector3i, 6> AdjacentOffsets {{
+		{1, 0, 0},
+		{-1, 0, 0},
+		{0, 1, 0},
+		{0, -1, 0},
+		{0, 0, 1},
+		{0, 0, -1},
+	}};
 
-	/** For a given offset from a position, return the offsets that represent the adjacents of the newly offset position, excluding the old position. */
+	/** For a given offset from a position, return the offsets that represent the adjacents of the newly offset
+	 * position, excluding the old position. */
 	static std::array<Vector3i, 5> GetLinkedOffsets(Vector3i Offset);
 
-protected:
-
+  protected:
 	friend class cChunk;  // Calls AddBlock() in its WakeUpSimulators() function, to speed things up
 	friend class cSimulatorManager;  // Class reponsible for dispatching calls to the various slave Simulators
 
@@ -65,8 +61,9 @@ protected:
 	/** Called to simulate a single block, synthesised by the simulator manager.
 	The position represents the adjacents of the block that was actually changed, with the offset used given.
 	Simulators may use this information to update additional blocks that were affected by the change, or queue
-	farther, extra-adjacents blocks to be updated. The simulator manager calls this overload after the 3-argument WakeUp. */
+	farther, extra-adjacents blocks to be updated. The simulator manager calls this overload after the 3-argument
+	WakeUp. */
 	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BLOCKTYPE a_Block);
 
 	cWorld & m_World;
-} ;
+};

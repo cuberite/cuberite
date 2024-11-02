@@ -19,15 +19,14 @@ implements the functions Delete() and Combine(). An example is given in
 cQueueFuncs and is used as the default behavior. */
 
 /** This empty struct allows for the callback functions to be inlined */
-template <class T>
-struct cQueueFuncs
+template <class T> struct cQueueFuncs
 {
-public:
-
+  public:
 	/** Called when an Item is deleted from the queue without being returned */
 	static void Delete(T) {}
 
-	/** Called when an Item is inserted with EnqueueItemIfNotPresent and there is another equal value already inserted */
+	/** Called when an Item is inserted with EnqueueItemIfNotPresent and there is another equal value already inserted
+	 */
 	static void Combine(T & a_existing, const T & a_new)
 	{
 		UNUSED(a_existing);
@@ -39,8 +38,7 @@ public:
 
 
 
-template <class ItemType, class Funcs = cQueueFuncs<ItemType> >
-class cQueue
+template <class ItemType, class Funcs = cQueueFuncs<ItemType>> class cQueue
 {
 	// The actual storage type for the queue
 	typedef typename std::list<ItemType> QueueType;
@@ -48,7 +46,7 @@ class cQueue
 	// Make iterator an alias for the QueueType's iterator
 	typedef typename QueueType::iterator iterator;
 
-public:
+  public:
 	cQueue() {}
 	~cQueue() {}
 
@@ -62,7 +60,8 @@ public:
 	}
 
 
-	/** Enqueues an item in the queue if not already present (as determined by operator ==). Blocks other threads from accessing the queue. */
+	/** Enqueues an item in the queue if not already present (as determined by operator ==). Blocks other threads from
+	 * accessing the queue. */
 	void EnqueueItemIfNotPresent(ItemType a_Item)
 	{
 		cCSLock Lock(m_CS);
@@ -164,8 +163,7 @@ public:
 
 
 	/** Removes all items for which the predicate returns true. */
-	template <class Predicate>
-	void RemoveIf(Predicate a_Predicate)
+	template <class Predicate> void RemoveIf(Predicate a_Predicate)
 	{
 		cCSLock Lock(m_CS);
 		for (auto itr = m_Contents.begin(); itr != m_Contents.end();)
@@ -185,7 +183,7 @@ public:
 		}  // for itr - m_Contents[]
 	}
 
-private:
+  private:
 	/** The contents of the queue */
 	QueueType m_Contents;
 
@@ -198,7 +196,3 @@ private:
 	/** Event that is signalled when an item is removed (both dequeued or erased) */
 	cEvent m_evtRemoved;
 };
-
-
-
-

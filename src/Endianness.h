@@ -1,7 +1,7 @@
 
 #pragma once
 
-#undef  ntohll
+#undef ntohll
 #define ntohll(x) (((static_cast<UInt64>(ntohl(static_cast<UInt32>(x)))) << 32) + ntohl(x >> 32))
 
 
@@ -12,8 +12,8 @@
 inline UInt64 HostToNetwork8(const void * a_Value)
 {
 	UInt64 buf;
-	memcpy( &buf, a_Value, sizeof( buf));
-	buf = (( ( static_cast<UInt64>(htonl(static_cast<UInt32>(buf)))) << 32) + htonl(buf >> 32));
+	memcpy(&buf, a_Value, sizeof(buf));
+	buf = (((static_cast<UInt64>(htonl(static_cast<UInt32>(buf)))) << 32) + htonl(buf >> 32));
 	return buf;
 }
 
@@ -24,8 +24,8 @@ inline UInt64 HostToNetwork8(const void * a_Value)
 inline UInt32 HostToNetwork4(const void * a_Value)
 {
 	UInt32 buf;
-	memcpy( &buf, a_Value, sizeof( buf));
-	buf = ntohl( buf);
+	memcpy(&buf, a_Value, sizeof(buf));
+	buf = ntohl(buf);
 	return buf;
 }
 
@@ -80,7 +80,3 @@ inline float NetworkToHostFloat4(const void * a_Value)
 	memcpy(&x, &buf, sizeof(float));
 	return x;
 }
-
-
-
-

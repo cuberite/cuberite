@@ -24,13 +24,11 @@ typedef std::shared_ptr<cUDPEndpointImpl> cUDPEndpointImplPtr;
 
 
 
-class cUDPEndpointImpl:
-	public cUDPEndpoint
+class cUDPEndpointImpl : public cUDPEndpoint
 {
 	using Super = cUDPEndpoint;
 
-public:
-
+  public:
 	/** Creates a new instance of the endpoint, with the specified callbacks.
 	Tries to open on the specified port; if it fails, the endpoint is left in the "closed" state.
 	If a_Port is 0, the OS is free to assign any port number it likes to the endpoint. */
@@ -45,7 +43,7 @@ public:
 	virtual bool Send(const AString & a_Payload, const AString & a_Host, UInt16 a_Port) override;
 	virtual void EnableBroadcasts(void) override;
 
-protected:
+  protected:
 	/** The local port on which the endpoint is open.
 	If this is zero, it means the endpoint is closed - either opening has failed, or it has been closed explicitly. */
 	UInt16 m_Port;
@@ -68,7 +66,8 @@ protected:
 
 	/** Creates and opens the socket on the specified port.
 	If a_Port is 0, the OS is free to assign any port number it likes to the endpoint.
-	If the opening fails, the OnError() callback is called and the endpoint is left "closed" (IsOpen() returns false). */
+	If the opening fails, the OnError() callback is called and the endpoint is left "closed" (IsOpen() returns false).
+  */
 	void Open(UInt16 a_Port);
 
 	/** The callback that LibEvent calls when an event occurs on one of the sockets.
@@ -78,7 +77,3 @@ protected:
 	/** The callback that is called when an event occurs on one of the sockets. */
 	void Callback(evutil_socket_t a_Socket, short a_What);
 };
-
-
-
-

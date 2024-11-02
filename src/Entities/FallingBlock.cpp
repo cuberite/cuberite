@@ -11,10 +11,8 @@
 
 
 
-cFallingBlock::cFallingBlock(Vector3d a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta):
-	Super(etFallingBlock, a_Position, 0.98f, 0.98f),
-	m_BlockType(a_BlockType),
-	m_BlockMeta(a_BlockMeta)
+cFallingBlock::cFallingBlock(Vector3d a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
+	Super(etFallingBlock, a_Position, 0.98f, 0.98f), m_BlockType(a_BlockType), m_BlockMeta(a_BlockMeta)
 {
 	SetGravity(-16.0f);
 	SetAirDrag(0.02f);
@@ -57,8 +55,16 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	BLOCKTYPE BlockBelow = a_Chunk.GetBlock(BlockX - a_Chunk.GetPosX() * cChunkDef::Width, BlockY, BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width);
-	NIBBLETYPE BelowMeta = a_Chunk.GetMeta(BlockX - a_Chunk.GetPosX() * cChunkDef::Width, BlockY, BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width);
+	BLOCKTYPE BlockBelow = a_Chunk.GetBlock(
+		BlockX - a_Chunk.GetPosX() * cChunkDef::Width,
+		BlockY,
+		BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width
+	);
+	NIBBLETYPE BelowMeta = a_Chunk.GetMeta(
+		BlockX - a_Chunk.GetPosX() * cChunkDef::Width,
+		BlockY,
+		BlockZ - a_Chunk.GetPosZ() * cChunkDef::Width
+	);
 	if (cSandSimulator::DoesBreakFallingThrough(BlockBelow, BelowMeta))
 	{
 		// Fallen onto a block that breaks this into pickups (e. g. half-slab)
@@ -99,12 +105,9 @@ void cFallingBlock::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	AddPosition(GetSpeed() * MilliDt);
 
 	// If not static (one billionth precision) broadcast movement
-	if ((fabs(GetSpeedX()) > std::numeric_limits<double>::epsilon()) || (fabs(GetSpeedZ()) > std::numeric_limits<double>::epsilon()))
+	if ((fabs(GetSpeedX()) > std::numeric_limits<double>::epsilon()) ||
+		(fabs(GetSpeedZ()) > std::numeric_limits<double>::epsilon()))
 	{
 		BroadcastMovementUpdate();
 	}
 }
-
-
-
-

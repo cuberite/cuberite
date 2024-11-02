@@ -17,10 +17,12 @@ void cMobProximityCounter::CollectMob(cEntity & a_Monster, cChunk & a_Chunk, dou
 	if (it == m_MonsterToDistance.end())
 	{
 		sDistanceAndChunk newDistanceAndChunk(a_Distance, a_Chunk);
-		std::pair<tMonsterToDistance::iterator, bool> result = m_MonsterToDistance.insert(tMonsterToDistance::value_type(&a_Monster, newDistanceAndChunk));
+		std::pair<tMonsterToDistance::iterator, bool> result =
+			m_MonsterToDistance.insert(tMonsterToDistance::value_type(&a_Monster, newDistanceAndChunk));
 		if (!result.second)
 		{
-			ASSERT(!"A collected Monster was not found inside distance map using find(), but insert() said there already is a key for it");
+			ASSERT(!"A collected Monster was not found inside distance map using find(), but insert() said there "
+					"already is a key for it");
 		}
 	}
 	else
@@ -33,7 +35,6 @@ void cMobProximityCounter::CollectMob(cEntity & a_Monster, cChunk & a_Chunk, dou
 	}
 
 	m_EligibleForSpawnChunks.insert(&a_Chunk);
-
 }
 
 
@@ -44,7 +45,9 @@ void cMobProximityCounter::convertMaps()
 {
 	for (tMonsterToDistance::const_iterator itr = m_MonsterToDistance.begin(); itr != m_MonsterToDistance.end(); ++itr)
 	{
-		m_DistanceToMonster.insert(tDistanceToMonster::value_type(itr->second.m_Distance, sMonsterAndChunk(*itr->first, *itr->second.m_Chunk)));
+		m_DistanceToMonster.insert(
+			tDistanceToMonster::value_type(itr->second.m_Distance, sMonsterAndChunk(*itr->first, *itr->second.m_Chunk))
+		);
 	}
 }
 
@@ -52,14 +55,17 @@ void cMobProximityCounter::convertMaps()
 
 
 
-cMobProximityCounter::sIterablePair cMobProximityCounter::getMobWithinThosesDistances(double a_DistanceMin, double a_DistanceMax)
+cMobProximityCounter::sIterablePair cMobProximityCounter::getMobWithinThosesDistances(
+	double a_DistanceMin,
+	double a_DistanceMax
+)
 {
 	sIterablePair toReturn;
 	toReturn.m_Count = 0;
 	toReturn.m_Begin = m_DistanceToMonster.end();
 	toReturn.m_End = m_DistanceToMonster.end();
 
-	a_DistanceMin *= a_DistanceMin;// this is because is use square distance
+	a_DistanceMin *= a_DistanceMin;  // this is because is use square distance
 	a_DistanceMax *= a_DistanceMax;
 
 	if (m_DistanceToMonster.empty())
@@ -87,7 +93,7 @@ cMobProximityCounter::sIterablePair cMobProximityCounter::getMobWithinThosesDist
 			}
 			else
 			{
-				toReturn.m_Count ++;
+				toReturn.m_Count++;
 			}
 		}
 	}

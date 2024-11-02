@@ -7,17 +7,14 @@
 
 
 
-class cBlockSeaLanternHandler final :
-	public cBlockHandler
+class cBlockSeaLanternHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Drop self only when using silk-touch:
@@ -30,4 +27,4 @@ private:
 		const auto DropNum = FortuneDiscreteRandom(2, 3, ToolFortuneLevel(a_Tool), 5);
 		return cItem(E_ITEM_PRISMARINE_CRYSTALS, DropNum);
 	}
-} ;
+};

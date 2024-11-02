@@ -13,9 +13,8 @@
 
 
 
-cBeaconWindow::cBeaconWindow(cBeaconEntity * a_Beacon):
-	cWindow(wtBeacon, "Beacon"),
-	m_Beacon(a_Beacon)
+cBeaconWindow::cBeaconWindow(cBeaconEntity * a_Beacon) :
+	cWindow(wtBeacon, "Beacon"), m_Beacon(a_Beacon)
 {
 	m_SlotAreas.push_back(new cSlotAreaBeacon(m_Beacon, *this));
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
@@ -26,33 +25,39 @@ cBeaconWindow::cBeaconWindow(cBeaconEntity * a_Beacon):
 
 
 
-void cBeaconWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
+void cBeaconWindow::DistributeStack(
+	cItem & a_ItemStack,
+	int a_Slot,
+	cPlayer & a_Player,
+	cSlotArea * a_ClickedArea,
+	bool a_ShouldApply
+)
 {
 	cSlotAreas AreasInOrder;
 
 	if (a_ClickedArea == m_SlotAreas[0])
 	{
 		// Beacon Area
-		AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
-		AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
+		AreasInOrder.push_back(m_SlotAreas[2]); /* Hotbar    */
+		AreasInOrder.push_back(m_SlotAreas[1]); /* Inventory */
 		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
 	}
 	else
 	{
 		if (cSlotAreaBeacon::IsPlaceableItem(a_ItemStack.m_ItemType) && (a_ItemStack.m_ItemCount == 1))
 		{
-			AreasInOrder.push_back(m_SlotAreas[0]);  /* Beacon */
+			AreasInOrder.push_back(m_SlotAreas[0]); /* Beacon */
 		}
 
 		if (a_ClickedArea == m_SlotAreas[1])
 		{
 			// Inventory Area
-			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar */
+			AreasInOrder.push_back(m_SlotAreas[2]); /* Hotbar */
 		}
 		else
 		{
 			// Hotbar Area
-			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
+			AreasInOrder.push_back(m_SlotAreas[1]); /* Inventory */
 		}
 		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 	}
@@ -70,7 +75,3 @@ void cBeaconWindow::OpenedByPlayer(cPlayer & a_Player)
 	a_Player.GetClientHandle()->SendWindowProperty(*this, 1, static_cast<short>(m_Beacon->GetPrimaryEffect()));
 	a_Player.GetClientHandle()->SendWindowProperty(*this, 2, static_cast<short>(m_Beacon->GetSecondaryEffect()));
 }
-
-
-
-

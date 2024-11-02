@@ -10,7 +10,7 @@
 
 
 
-cAesCfb128Encryptor::cAesCfb128Encryptor(void):
+cAesCfb128Encryptor::cAesCfb128Encryptor(void) :
 	m_IsValid(false)
 {
 	mbedtls_aes_init(&m_Aes);
@@ -46,5 +46,12 @@ void cAesCfb128Encryptor::Init(const Byte a_Key[16], const Byte a_IV[16])
 void cAesCfb128Encryptor::ProcessData(std::byte * const a_PlainIn, const size_t a_Length)
 {
 	ASSERT(IsValid());  // Must Init() first
-	mbedtls_aes_crypt_cfb8(&m_Aes, MBEDTLS_AES_ENCRYPT, a_Length, m_IV, reinterpret_cast<const unsigned char *>(a_PlainIn), reinterpret_cast<unsigned char *>(a_PlainIn));
+	mbedtls_aes_crypt_cfb8(
+		&m_Aes,
+		MBEDTLS_AES_ENCRYPT,
+		a_Length,
+		m_IV,
+		reinterpret_cast<const unsigned char *>(a_PlainIn),
+		reinterpret_cast<unsigned char *>(a_PlainIn)
+	);
 }

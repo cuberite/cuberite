@@ -9,7 +9,7 @@
 
 
 
-cArrowEntity::cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
+cArrowEntity::cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed) :
 	Super(pkArrow, a_Creator, a_Pos, a_Speed, 0.5f, 0.5f),
 	m_PickupState(psNoPickup),
 	m_DamageCoeff(2),
@@ -20,8 +20,12 @@ cArrowEntity::cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed
 	SetMass(0.1);
 	SetGravity(-20.0f);
 
-	FLOGD("Created arrow {0} with speed {1:.02f} and rot {{{2:.02f}, {3:.02f}}}",
-		m_UniqueID, GetSpeed(), GetYaw(), GetPitch()
+	FLOGD(
+		"Created arrow {0} with speed {1:.02f} and rot {{{2:.02f}, {3:.02f}}}",
+		m_UniqueID,
+		GetSpeed(),
+		GetYaw(),
+		GetPitch()
 	);
 }
 
@@ -81,7 +85,12 @@ void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 	m_HitBlockPos = (a_HitPos + (Speed / 100000)).Floor();
 
 	// Broadcast arrow hit sound
-	m_World->BroadcastSoundEffect("entity.arrow.hit", m_HitBlockPos, 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+	m_World->BroadcastSoundEffect(
+		"entity.arrow.hit",
+		m_HitBlockPos,
+		0.5f,
+		static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64)
+	);
 
 	// Trigger any buttons that were hit
 	// Wooden buttons will be depressed by the arrow
@@ -129,7 +138,12 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 	}
 
 	// Broadcast successful hit sound
-	GetWorld()->BroadcastSoundEffect("entity.arrow.hit", GetPosition(), 0.5, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+	GetWorld()->BroadcastSoundEffect(
+		"entity.arrow.hit",
+		GetPosition(),
+		0.5,
+		static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64)
+	);
 
 	Destroy();
 }
@@ -154,7 +168,12 @@ void cArrowEntity::CollectedBy(cPlayer & a_Dest)
 		}
 
 		GetWorld()->BroadcastCollectEntity(*this, a_Dest, 1);
-		GetWorld()->BroadcastSoundEffect("entity.item.pickup", GetPosition(), 0.3f, (1.2f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+		GetWorld()->BroadcastSoundEffect(
+			"entity.item.pickup",
+			GetPosition(),
+			0.3f,
+			(1.2f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64)
+		);
 		m_bIsCollected = true;
 	}
 }

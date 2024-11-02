@@ -21,23 +21,20 @@ Declares the 1.11 protocol classes:
 
 
 
-class cProtocol_1_11_0:
-	public cProtocol_1_10_0
+class cProtocol_1_11_0 : public cProtocol_1_10_0
 {
 	using Super = cProtocol_1_10_0;
 
-public:
-
+  public:
 	using Super::Super;
 
-protected:
-
-	virtual void SendCollectEntity    (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) override;
-	virtual void SendEntityAnimation  (const cEntity & a_Entity, EntityAnimation a_Animation) override;
-	virtual void SendHideTitle        (void) override;
-	virtual void SendResetTitle       (void) override;
-	virtual void SendSpawnMob         (const cMonster & a_Mob) override;
-	virtual void SendTitleTimes       (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
+  protected:
+	virtual void SendCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) override;
+	virtual void SendEntityAnimation(const cEntity & a_Entity, EntityAnimation a_Animation) override;
+	virtual void SendHideTitle(void) override;
+	virtual void SendResetTitle(void) override;
+	virtual void SendSpawnMob(const cMonster & a_Mob) override;
+	virtual void SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
 	virtual void SendUpdateBlockEntity(cBlockEntity & a_BlockEntity) override;
 
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
@@ -55,16 +52,13 @@ protected:
 
 
 
-class cProtocol_1_11_1:
-	public cProtocol_1_11_0
+class cProtocol_1_11_1 : public cProtocol_1_11_0
 {
 	using Super = cProtocol_1_11_0;
 
-public:
-
+  public:
 	using Super::Super;
 
-protected:
-
+  protected:
 	virtual Version GetProtocolVersion() const override;
 };

@@ -8,13 +8,11 @@
 
 
 
-class cItemBoatHandler final:
-	public cItemHandler
+class cItemBoatHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 
@@ -37,19 +35,23 @@ public:
 		}
 
 		// Find the actual placement position by tracing line of sight until non-air block:
-		class cCallbacks:
-			public cBlockTracer::cCallbacks
+		class cCallbacks : public cBlockTracer::cCallbacks
 		{
-		public:
+		  public:
 			Vector3d m_Pos;
 			bool m_HasFound;
 
-			cCallbacks():
+			cCallbacks() :
 				m_HasFound(false)
 			{
 			}
 
-			virtual bool OnNextBlock(Vector3i a_CBBlockPos, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
+			virtual bool OnNextBlock(
+				Vector3i a_CBBlockPos,
+				BLOCKTYPE a_CBBlockType,
+				NIBBLETYPE a_CBBlockMeta,
+				eBlockFace a_CBEntryFace
+			) override
 			{
 				if (a_CBBlockType != E_BLOCK_AIR)
 				{
@@ -81,7 +83,10 @@ public:
 		}
 
 		// Spawn block at water level
-		if (a_World->SpawnBoat(Callbacks.m_Pos + Vector3d(0.5, 1, 0.5), cBoat::ItemToMaterial(a_Player->GetEquippedItem())) == cEntity::INVALID_ID)
+		if (a_World->SpawnBoat(
+				Callbacks.m_Pos + Vector3d(0.5, 1, 0.5),
+				cBoat::ItemToMaterial(a_Player->GetEquippedItem())
+			) == cEntity::INVALID_ID)
 		{
 			return false;
 		}
@@ -94,4 +99,4 @@ public:
 
 		return true;
 	}
-} ;
+};

@@ -1,7 +1,8 @@
 
 // OctavedNoise.h
 
-// Implements the cOctavedNoise class template representing a noise generator that layers several octaves of another noise
+// Implements the cOctavedNoise class template representing a noise generator that layers several octaves of another
+// noise
 
 
 
@@ -13,11 +14,10 @@
 
 
 
-template <typename N>
-class cOctavedNoise
+template <typename N> class cOctavedNoise
 {
-public:
-	cOctavedNoise(int a_Seed = 0):
+  public:
+	cOctavedNoise(int a_Seed = 0) :
 		m_Seed(a_Seed)
 	{
 	}
@@ -27,7 +27,7 @@ public:
 	void SetSeed(int a_Seed)
 	{
 		m_Seed = a_Seed;
-		for (auto oct: m_Octaves)
+		for (auto oct : m_Octaves)
 		{
 			oct->SetSeed(a_Seed);
 		}
@@ -43,11 +43,14 @@ public:
 
 	/** Fills a 2D array with the values of the noise. */
 	void Generate2D(
-		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
-		int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
-		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-		NOISE_DATATYPE * a_Workspace = nullptr           ///< Workspace that this function can use and trash.
+		NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
+		int a_SizeX,
+		int a_SizeY,  ///< Count of the array, in each direction
+		NOISE_DATATYPE a_StartX,
+		NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+		NOISE_DATATYPE a_StartY,
+		NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+		NOISE_DATATYPE * a_Workspace = nullptr  ///< Workspace that this function can use and trash.
 	) const
 	{
 		// Check that state is alright:
@@ -70,9 +73,13 @@ public:
 		{
 			const cOctave & FirstOctave = m_Octaves.front();
 			FirstOctave.m_Noise.Generate2D(
-				a_Workspace, a_SizeX, a_SizeY,
-				a_StartX * FirstOctave.m_Frequency, a_EndX * FirstOctave.m_Frequency,
-				a_StartY * FirstOctave.m_Frequency, a_EndY * FirstOctave.m_Frequency
+				a_Workspace,
+				a_SizeX,
+				a_SizeY,
+				a_StartX * FirstOctave.m_Frequency,
+				a_EndX * FirstOctave.m_Frequency,
+				a_StartY * FirstOctave.m_Frequency,
+				a_EndY * FirstOctave.m_Frequency
 			);
 			NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
 			for (int i = 0; i < ArrayCount; i++)
@@ -86,9 +93,13 @@ public:
 		{
 			// Generate the noise for the octave:
 			itr->m_Noise.Generate2D(
-				a_Workspace, a_SizeX, a_SizeY,
-				a_StartX * itr->m_Frequency, a_EndX * itr->m_Frequency,
-				a_StartY * itr->m_Frequency, a_EndY * itr->m_Frequency
+				a_Workspace,
+				a_SizeX,
+				a_SizeY,
+				a_StartX * itr->m_Frequency,
+				a_EndX * itr->m_Frequency,
+				a_StartY * itr->m_Frequency,
+				a_EndY * itr->m_Frequency
 			);
 			// Add it into the output:
 			NOISE_DATATYPE Amplitude = itr->m_Amplitude;
@@ -102,12 +113,18 @@ public:
 
 	/** Fills a 3D array with the values of the noise. */
 	void Generate3D(
-		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
-		int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Count of the array, in each direction
-		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ,  ///< Noise-space coords of the array in the Z direction
-		NOISE_DATATYPE * a_Workspace = nullptr           ///< Workspace that this function can use and trash, same size as a_Array
+		NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
+		int a_SizeX,
+		int a_SizeY,
+		int a_SizeZ,  ///< Count of the array, in each direction
+		NOISE_DATATYPE a_StartX,
+		NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+		NOISE_DATATYPE a_StartY,
+		NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+		NOISE_DATATYPE a_StartZ,
+		NOISE_DATATYPE a_EndZ,  ///< Noise-space coords of the array in the Z direction
+		NOISE_DATATYPE * a_Workspace =
+			nullptr  ///< Workspace that this function can use and trash, same size as a_Array
 	) const
 	{
 		// Check that state is alright:
@@ -130,10 +147,16 @@ public:
 		{
 			const cOctave & FirstOctave = m_Octaves.front();
 			FirstOctave.m_Noise.Generate3D(
-				a_Workspace, a_SizeX, a_SizeY, a_SizeZ,
-				a_StartX * FirstOctave.m_Frequency, a_EndX * FirstOctave.m_Frequency,
-				a_StartY * FirstOctave.m_Frequency, a_EndY * FirstOctave.m_Frequency,
-				a_StartZ * FirstOctave.m_Frequency, a_EndZ * FirstOctave.m_Frequency
+				a_Workspace,
+				a_SizeX,
+				a_SizeY,
+				a_SizeZ,
+				a_StartX * FirstOctave.m_Frequency,
+				a_EndX * FirstOctave.m_Frequency,
+				a_StartY * FirstOctave.m_Frequency,
+				a_EndY * FirstOctave.m_Frequency,
+				a_StartZ * FirstOctave.m_Frequency,
+				a_EndZ * FirstOctave.m_Frequency
 			);
 			NOISE_DATATYPE Amplitude = FirstOctave.m_Amplitude;
 			for (int i = 0; i < ArrayCount; i++)
@@ -147,10 +170,16 @@ public:
 		{
 			// Generate the noise for the octave:
 			itr->m_Noise.Generate3D(
-				a_Workspace, a_SizeX, a_SizeY, a_SizeZ,
-				a_StartX * itr->m_Frequency, a_EndX * itr->m_Frequency,
-				a_StartY * itr->m_Frequency, a_EndY * itr->m_Frequency,
-				a_StartZ * itr->m_Frequency, a_EndZ * itr->m_Frequency
+				a_Workspace,
+				a_SizeX,
+				a_SizeY,
+				a_SizeZ,
+				a_StartX * itr->m_Frequency,
+				a_EndX * itr->m_Frequency,
+				a_StartY * itr->m_Frequency,
+				a_EndY * itr->m_Frequency,
+				a_StartZ * itr->m_Frequency,
+				a_EndZ * itr->m_Frequency
 			);
 			// Add it into the output:
 			NOISE_DATATYPE Amplitude = itr->m_Amplitude;
@@ -161,11 +190,11 @@ public:
 		}  // for itr - m_Octaves[]
 	}
 
-protected:
+  protected:
 	/** Stores information and state for one octave of the noise. */
 	class cOctave
 	{
-	public:
+	  public:
 		N m_Noise;
 
 		/** Coord multiplier. */
@@ -175,12 +204,10 @@ protected:
 		NOISE_DATATYPE m_Amplitude;
 
 		cOctave(int a_Seed, NOISE_DATATYPE a_Frequency, NOISE_DATATYPE a_Amplitude) :
-			m_Noise(a_Seed),
-			m_Frequency(a_Frequency),
-			m_Amplitude(a_Amplitude)
+			m_Noise(a_Seed), m_Frequency(a_Frequency), m_Amplitude(a_Amplitude)
 		{
 		}
-	} ;
+	};
 	typedef std::vector<cOctave> cOctaves;
 
 
@@ -190,7 +217,3 @@ protected:
 	/** The octaves that compose this noise. */
 	cOctaves m_Octaves;
 };
-
-
-
-

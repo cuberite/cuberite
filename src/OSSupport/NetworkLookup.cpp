@@ -41,7 +41,7 @@ void cNetworkLookup::Stop()
 {
 	m_ShouldTerminate = true;
 	m_WorkQueue.Clear();
-	m_WorkQueue.EnqueueItem([](){});  // Dummy work to wake up the thread
+	m_WorkQueue.EnqueueItem([]() {});  // Dummy work to wake up the thread
 	cIsThread::Stop();
 }
 
@@ -58,6 +58,3 @@ void cNetworkLookup::Execute()
 		Work();
 	}
 }
-
-
-

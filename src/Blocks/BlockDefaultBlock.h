@@ -5,10 +5,8 @@
 
 
 
-class cDefaultBlockHandler final :
-	public cBlockHandler
+class cDefaultBlockHandler final : public cBlockHandler
 {
-public:
-
+  public:
 	using cBlockHandler::cBlockHandler;
 };

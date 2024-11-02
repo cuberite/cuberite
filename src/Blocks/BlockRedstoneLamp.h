@@ -7,19 +7,16 @@
 
 
 
-class cBlockRedstoneLampHandler final :
-	public cBlockHandler
+class cBlockRedstoneLampHandler final : public cBlockHandler
 {
-public:
-
+  public:
 	using cBlockHandler::cBlockHandler;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Always drop the Off variant:
-		return(cItem(E_BLOCK_REDSTONE_LAMP_OFF, 1, 0));
+		return (cItem(E_BLOCK_REDSTONE_LAMP_OFF, 1, 0));
 	}
 
 
@@ -32,7 +29,3 @@ private:
 		return 15;
 	}
 };
-
-
-
-

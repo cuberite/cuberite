@@ -18,7 +18,7 @@
 
 
 
-constexpr char DEFAULT_AUTH_SERVER[]  = "sessionserver.mojang.com";
+constexpr char DEFAULT_AUTH_SERVER[] = "sessionserver.mojang.com";
 constexpr char DEFAULT_AUTH_ADDRESS[] = "/session/minecraft/hasJoined?username=%USERNAME%&serverId=%SERVERID%";
 
 
@@ -26,10 +26,7 @@ constexpr char DEFAULT_AUTH_ADDRESS[] = "/session/minecraft/hasJoined?username=%
 
 
 cAuthenticator::cAuthenticator(void) :
-	Super("Authenticator"),
-	m_Server(DEFAULT_AUTH_SERVER),
-	m_Address(DEFAULT_AUTH_ADDRESS),
-	m_ShouldAuthenticate(true)
+	Super("Authenticator"), m_Server(DEFAULT_AUTH_SERVER), m_Address(DEFAULT_AUTH_ADDRESS), m_ShouldAuthenticate(true)
 {
 }
 
@@ -48,18 +45,16 @@ cAuthenticator::~cAuthenticator()
 
 void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 {
-	m_Server             = a_Settings.GetValueSet ("Authentication", "Server", DEFAULT_AUTH_SERVER);
-	m_Address            = a_Settings.GetValueSet ("Authentication", "Address", DEFAULT_AUTH_ADDRESS);
+	m_Server = a_Settings.GetValueSet("Authentication", "Server", DEFAULT_AUTH_SERVER);
+	m_Address = a_Settings.GetValueSet("Authentication", "Address", DEFAULT_AUTH_ADDRESS);
 	m_ShouldAuthenticate = a_Settings.GetValueSetB("Authentication", "Authenticate", true);
 
 	// prepend https:// if missing
 	constexpr std::string_view HttpPrefix = "http://";
 	constexpr std::string_view HttpsPrefix = "https://";
 
-	if (
-		(std::string_view(m_Server).substr(0, HttpPrefix.size()) != HttpPrefix) &&
-		(std::string_view(m_Server).substr(0, HttpsPrefix.size()) != HttpsPrefix)
-	)
+	if ((std::string_view(m_Server).substr(0, HttpPrefix.size()) != HttpPrefix) &&
+		(std::string_view(m_Server).substr(0, HttpsPrefix.size()) != HttpsPrefix))
 	{
 		m_Server = "https://" + m_Server;
 	}
@@ -68,7 +63,14 @@ void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 		auto [IsSuccessful, ErrorMessage] = cUrlParser::Validate(m_Server);
 		if (!IsSuccessful)
 		{
-			LOGWARNING("%s %d: Supplied invalid URL for configuration value [Authentication: Server]: \"%s\", using default! Error: %s", __FUNCTION__, __LINE__, m_Server.c_str(), ErrorMessage.c_str());
+			LOGWARNING(
+				"%s %d: Supplied invalid URL for configuration value [Authentication: Server]: \"%s\", using default! "
+				"Error: %s",
+				__FUNCTION__,
+				__LINE__,
+				m_Server.c_str(),
+				ErrorMessage.c_str()
+			);
 			m_Server = DEFAULT_AUTH_SERVER;
 		}
 	}
@@ -77,7 +79,14 @@ void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 		auto [IsSuccessful, ErrorMessage] = cUrlParser::Validate(m_Server);
 		if (!IsSuccessful)
 		{
-			LOGWARNING("%s %d: Supplied invalid URL for configuration value [Authentication: Address]: \"%s\", using default! Error: %s", __FUNCTION__, __LINE__, m_Address.c_str(), ErrorMessage.c_str());
+			LOGWARNING(
+				"%s %d: Supplied invalid URL for configuration value [Authentication: Address]: \"%s\", using default! "
+				"Error: %s",
+				__FUNCTION__,
+				__LINE__,
+				m_Address.c_str(),
+				ErrorMessage.c_str()
+			);
 			m_Address = DEFAULT_AUTH_ADDRESS;
 		}
 	}
@@ -87,7 +96,11 @@ void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 
 
 
-void cAuthenticator::Authenticate(int a_ClientID, const std::string_view a_Username, const std::string_view a_ServerHash)
+void cAuthenticator::Authenticate(
+	int a_ClientID,
+	const std::string_view a_Username,
+	const std::string_view a_ServerHash
+)
 {
 	if (!m_ShouldAuthenticate)
 	{
@@ -173,7 +186,12 @@ void cAuthenticator::Execute(void)
 
 
 
-bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, cUUID & a_UUID, Json::Value & a_Properties) const
+bool cAuthenticator::AuthWithYggdrasil(
+	AString & a_UserName,
+	const AString & a_ServerId,
+	cUUID & a_UUID,
+	Json::Value & a_Properties
+) const
 {
 	LOGD("Trying to authenticate user %s", a_UserName.c_str());
 
@@ -218,7 +236,8 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 
 #ifdef ENABLE_PROPERTIES
 
-/* In case we want to export this function to the plugin API later - don't forget to add the relevant INI configuration lines for DEFAULT_PROPERTIES_ADDRESS */
+/* In case we want to export this function to the plugin API later - don't forget to add the relevant INI configuration
+ * lines for DEFAULT_PROPERTIES_ADDRESS */
 
 #define DEFAULT_PROPERTIES_ADDRESS "/session/minecraft/profile/%UUID%"
 
@@ -254,7 +273,3 @@ bool cAuthenticator::GetPlayerProperties(const AString & a_UUID, Json::Value & a
 	return true;
 }
 #endif
-
-
-
-

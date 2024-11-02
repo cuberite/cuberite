@@ -7,17 +7,14 @@
 
 
 
-class cBlockCommandBlockHandler final :
-	public cBlockEntityHandler
+class cBlockCommandBlockHandler final : public cBlockEntityHandler
 {
 	using Super = cBlockEntityHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Don't allow as a pickup:
@@ -33,8 +30,4 @@ private:
 		UNUSED(a_Meta);
 		return 10;
 	}
-} ;
-
-
-
-
+};

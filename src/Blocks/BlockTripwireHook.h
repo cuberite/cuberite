@@ -7,13 +7,12 @@
 
 
 
-class cBlockTripwireHookHandler final :
-	public cMetaRotator<cClearMetaOnDrop<cBlockHandler>, 0x03, 0x02, 0x03, 0x00, 0x01>
+class cBlockTripwireHookHandler final
+	: public cMetaRotator<cClearMetaOnDrop<cBlockHandler>, 0x03, 0x02, 0x03, 0x00, 0x01>
 {
 	using Super = cMetaRotator<cClearMetaOnDrop<cBlockHandler>, 0x03, 0x02, 0x03, 0x00, 0x01>;
 
-public:
-
+  public:
 	using Super::Super;
 
 	inline static eBlockFace MetadataToDirection(NIBBLETYPE a_Meta)
@@ -24,12 +23,11 @@ public:
 			case 0x3: return BLOCK_FACE_XP;
 			case 0x2: return BLOCK_FACE_ZM;
 			case 0x0: return BLOCK_FACE_ZP;
-			default: ASSERT(!"Unhandled tripwire hook metadata!"); return BLOCK_FACE_NONE;
+			default:  ASSERT(!"Unhandled tripwire hook metadata!"); return BLOCK_FACE_NONE;
 		}
 	}
 
-private:
-
+  private:
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
 		const auto RearPosition = AddFaceDirection(a_Position, MetadataToDirection(a_Meta), true);
@@ -53,7 +51,3 @@ private:
 		return 0;
 	}
 };
-
-
-
-

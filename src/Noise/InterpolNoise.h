@@ -1,7 +1,8 @@
 
 // InterpolNoise.h
 
-// Implements the cInterpolNoise class template representing a noise that interpolates the values between integer coords from a single set of neighbors
+// Implements the cInterpolNoise class template representing a noise that interpolates the values between integer coords
+// from a single set of neighbors
 
 
 
@@ -20,17 +21,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cInterpolCell2D:
 
-template <typename T>
-class cInterpolCell2D
+template <typename T> class cInterpolCell2D
 {
-public:
+  public:
 	cInterpolCell2D(
-		const cNoise & a_Noise,    ///< Noise to use for generating the random values
+		const cNoise & a_Noise,  ///< Noise to use for generating the random values
 		NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
-		int a_SizeX, int a_SizeY,  ///< Count of the array, in each direction
+		int a_SizeX,
+		int a_SizeY,  ///< Count of the array, in each direction
 		const NOISE_DATATYPE * a_FracX,  ///< Pointer to the array that stores the X fractional values
-		const NOISE_DATATYPE * a_FracY   ///< Pointer to the attay that stores the Y fractional values
-	):
+		const NOISE_DATATYPE * a_FracY  ///< Pointer to the attay that stores the Y fractional values
+	) :
 		m_Noise(a_Noise),
 		m_WorkRnds(&m_Workspace1),
 		m_CurFloorX(0),
@@ -45,10 +46,7 @@ public:
 
 
 	/** Generates part of the output noise array using the current m_WorkRnds[] values */
-	void Generate(
-		int a_FromX, int a_ToX,
-		int a_FromY, int a_ToY
-	)
+	void Generate(int a_FromX, int a_ToX, int a_FromY, int a_ToY)
 	{
 		for (int y = a_FromY; y < a_ToY; y++)
 		{
@@ -70,8 +68,8 @@ public:
 	{
 		m_CurFloorX = a_FloorX;
 		m_CurFloorY = a_FloorY;
-		(*m_WorkRnds)[0][0] = m_Noise.IntNoise2D(m_CurFloorX,     m_CurFloorY);
-		(*m_WorkRnds)[0][1] = m_Noise.IntNoise2D(m_CurFloorX,     m_CurFloorY + 1);
+		(*m_WorkRnds)[0][0] = m_Noise.IntNoise2D(m_CurFloorX, m_CurFloorY);
+		(*m_WorkRnds)[0][1] = m_Noise.IntNoise2D(m_CurFloorX, m_CurFloorY + 1);
 		(*m_WorkRnds)[1][0] = m_Noise.IntNoise2D(m_CurFloorX + 1, m_CurFloorY);
 		(*m_WorkRnds)[1][1] = m_Noise.IntNoise2D(m_CurFloorX + 1, m_CurFloorY + 1);
 	}
@@ -112,7 +110,7 @@ public:
 		m_CurFloorY = a_NewFloorY;
 	}
 
-protected:
+  protected:
 	typedef NOISE_DATATYPE Workspace[2][2];
 
 	/** The noise used for generating the values at integral coords. */
@@ -139,7 +137,7 @@ protected:
 	/** Arrays holding the fractional values of the coords in each direction. */
 	const NOISE_DATATYPE * m_FracX;
 	const NOISE_DATATYPE * m_FracY;
-} ;
+};
 
 
 
@@ -150,20 +148,21 @@ protected:
 
 /** Holds a cache of the last calculated integral noise values and interpolates between them en masse.
 Provides a massive optimization for cInterpolNoise.
-Works by calculating multiple noise values (that have the same integral noise coords) at once. The underlying noise values
-needn't be recalculated for these values, only the interpolation is done within the unit cube. */
-template <typename T>
-class cInterpolCell3D
+Works by calculating multiple noise values (that have the same integral noise coords) at once. The underlying noise
+values needn't be recalculated for these values, only the interpolation is done within the unit cube. */
+template <typename T> class cInterpolCell3D
 {
-public:
+  public:
 	cInterpolCell3D(
-		const cNoise & a_Noise,                 ///< Noise to use for generating the random values
-		NOISE_DATATYPE * a_Array,               ///< Array to generate into [x + a_SizeX * y]
-		int a_SizeX, int a_SizeY, int a_SizeZ,  ///< Count of the array, in each direction
-		const NOISE_DATATYPE * a_FracX,         ///< Pointer to the array that stores the X fractional values
-		const NOISE_DATATYPE * a_FracY,         ///< Pointer to the attay that stores the Y fractional values
-		const NOISE_DATATYPE * a_FracZ          ///< Pointer to the array that stores the Z fractional values
-	):
+		const cNoise & a_Noise,  ///< Noise to use for generating the random values
+		NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
+		int a_SizeX,
+		int a_SizeY,
+		int a_SizeZ,  ///< Count of the array, in each direction
+		const NOISE_DATATYPE * a_FracX,  ///< Pointer to the array that stores the X fractional values
+		const NOISE_DATATYPE * a_FracY,  ///< Pointer to the attay that stores the Y fractional values
+		const NOISE_DATATYPE * a_FracZ  ///< Pointer to the array that stores the Z fractional values
+	) :
 		m_Noise(a_Noise),
 		m_WorkRnds(&m_Workspace1),
 		m_CurFloorX(0),
@@ -181,11 +180,7 @@ public:
 
 
 	/** Generates part of the output array using current m_WorkRnds[]. */
-	void Generate(
-		int a_FromX, int a_ToX,
-		int a_FromY, int a_ToY,
-		int a_FromZ, int a_ToZ
-	)
+	void Generate(int a_FromX, int a_ToX, int a_FromY, int a_ToY, int a_FromZ, int a_ToZ)
 	{
 		for (int z = a_FromZ; z < a_ToZ; z++)
 		{
@@ -221,14 +216,21 @@ public:
 		m_CurFloorX = a_FloorX;
 		m_CurFloorY = a_FloorY;
 		m_CurFloorZ = a_FloorZ;
-		(*m_WorkRnds)[0][0][0] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX,     m_CurFloorY,     m_CurFloorZ));
-		(*m_WorkRnds)[0][0][1] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX,     m_CurFloorY,     m_CurFloorZ + 1));
-		(*m_WorkRnds)[0][1][0] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX,     m_CurFloorY + 1, m_CurFloorZ));
-		(*m_WorkRnds)[0][1][1] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX,     m_CurFloorY + 1, m_CurFloorZ + 1));
-		(*m_WorkRnds)[1][0][0] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY,     m_CurFloorZ));
-		(*m_WorkRnds)[1][0][1] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY,     m_CurFloorZ + 1));
-		(*m_WorkRnds)[1][1][0] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY + 1, m_CurFloorZ));
-		(*m_WorkRnds)[1][1][1] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY + 1, m_CurFloorZ + 1));
+		(*m_WorkRnds)[0][0][0] = static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX, m_CurFloorY, m_CurFloorZ));
+		(*m_WorkRnds)[0][0][1] =
+			static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX, m_CurFloorY, m_CurFloorZ + 1));
+		(*m_WorkRnds)[0][1][0] =
+			static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX, m_CurFloorY + 1, m_CurFloorZ));
+		(*m_WorkRnds)[0][1][1] =
+			static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX, m_CurFloorY + 1, m_CurFloorZ + 1));
+		(*m_WorkRnds)[1][0][0] =
+			static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY, m_CurFloorZ));
+		(*m_WorkRnds)[1][0][1] =
+			static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY, m_CurFloorZ + 1));
+		(*m_WorkRnds)[1][1][0] =
+			static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY + 1, m_CurFloorZ));
+		(*m_WorkRnds)[1][1][1] =
+			static_cast<NOISE_DATATYPE>(m_Noise.IntNoise3D(m_CurFloorX + 1, m_CurFloorY + 1, m_CurFloorZ + 1));
 	}
 
 
@@ -275,7 +277,7 @@ public:
 		m_CurFloorZ = a_NewFloorZ;
 	}
 
-protected:
+  protected:
 	typedef NOISE_DATATYPE Workspace[2][2][2];
 
 	/** The noise used for generating the values at integral coords. */
@@ -303,7 +305,7 @@ protected:
 	const NOISE_DATATYPE * m_FracX;
 	const NOISE_DATATYPE * m_FracY;
 	const NOISE_DATATYPE * m_FracZ;
-} ;
+};
 
 
 
@@ -312,32 +314,31 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cInterpolNoise:
 
-template <typename T>
-class cInterpolNoise
+template <typename T> class cInterpolNoise
 {
 	/** Maximum size, for each direction, of the generated array. */
 	static const int MAX_SIZE = 256;
 
-public:
-	cInterpolNoise(int a_Seed):
+  public:
+	cInterpolNoise(int a_Seed) :
 		m_Noise(a_Seed)
 	{
 	}
 
 
 	/** Sets a new seed for the generators. Relays the seed to the underlying noise. */
-	void SetSeed(int a_Seed)
-	{
-		m_Noise.SetSeed(a_Seed);
-	}
+	void SetSeed(int a_Seed) { m_Noise.SetSeed(a_Seed); }
 
 
 	/** Fills a 2D array with the values of the noise. */
 	void Generate2D(
-		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y]
-		int a_SizeX, int a_SizeY,                        ///< Count of the array, in each direction
-		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY   ///< Noise-space coords of the array in the Y direction
+		NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y]
+		int a_SizeX,
+		int a_SizeY,  ///< Count of the array, in each direction
+		NOISE_DATATYPE a_StartX,
+		NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+		NOISE_DATATYPE a_StartY,
+		NOISE_DATATYPE a_EndY  ///< Noise-space coords of the array in the Y direction
 	) const
 	{
 		ASSERT(a_SizeX > 0);
@@ -384,11 +385,16 @@ public:
 
 	/** Fills a 3D array with the values of the noise. */
 	void Generate3D(
-		NOISE_DATATYPE * a_Array,                        ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
-		int a_SizeX, int a_SizeY, int a_SizeZ,           ///< Count of the array, in each direction
-		NOISE_DATATYPE a_StartX, NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
-		NOISE_DATATYPE a_StartY, NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
-		NOISE_DATATYPE a_StartZ, NOISE_DATATYPE a_EndZ   ///< Noise-space coords of the array in the Z direction
+		NOISE_DATATYPE * a_Array,  ///< Array to generate into [x + a_SizeX * y + a_SizeX * a_SizeY * z]
+		int a_SizeX,
+		int a_SizeY,
+		int a_SizeZ,  ///< Count of the array, in each direction
+		NOISE_DATATYPE a_StartX,
+		NOISE_DATATYPE a_EndX,  ///< Noise-space coords of the array in the X direction
+		NOISE_DATATYPE a_StartY,
+		NOISE_DATATYPE a_EndY,  ///< Noise-space coords of the array in the Y direction
+		NOISE_DATATYPE a_StartZ,
+		NOISE_DATATYPE a_EndZ  ///< Noise-space coords of the array in the Z direction
 	) const
 	{
 		// Check params:
@@ -417,11 +423,7 @@ public:
 		CalcFloorFrac(a_SizeY, a_StartY, a_EndY, FloorY, FracY, SameY, NumSameY);
 		CalcFloorFrac(a_SizeZ, a_StartZ, a_EndZ, FloorZ, FracZ, SameZ, NumSameZ);
 
-		cInterpolCell3D<T> Cell(
-			m_Noise, a_Array,
-			a_SizeX, a_SizeY, a_SizeZ,
-			FracX, FracY, FracZ
-		);
+		cInterpolCell3D<T> Cell(m_Noise, a_Array, a_SizeX, a_SizeY, a_SizeZ, FracX, FracY, FracZ);
 
 		Cell.InitWorkRnds(FloorX[0], FloorY[0], FloorZ[0]);
 
@@ -461,8 +463,7 @@ public:
 		}  // for z
 	}
 
-protected:
-
+  protected:
 	/** The noise used for the underlying value generation. */
 	cNoise m_Noise;
 
@@ -474,9 +475,12 @@ protected:
 	a_NumSame will receive the count of a_Same elements (total count of different integral parts). */
 	void CalcFloorFrac(
 		int a_Size,
-		NOISE_DATATYPE a_Start, NOISE_DATATYPE a_End,
-		int * a_Floor, NOISE_DATATYPE * a_Frac,
-		int * a_Same, int & a_NumSame
+		NOISE_DATATYPE a_Start,
+		NOISE_DATATYPE a_End,
+		int * a_Floor,
+		NOISE_DATATYPE * a_Frac,
+		int * a_Same,
+		int & a_NumSame
 	) const
 	{
 		ASSERT(a_Size > 0);
@@ -528,6 +532,3 @@ struct Interp5Deg
 };
 
 typedef cInterpolNoise<Interp5Deg> cInterp5DegNoise;
-
-
-

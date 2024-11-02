@@ -22,13 +22,12 @@
 
 
 
-class cDistortedHeightmap :
-	public cTerrainShapeGen
+class cDistortedHeightmap : public cTerrainShapeGen
 {
-public:
+  public:
 	cDistortedHeightmap(int a_Seed, cBiomeGen & a_BiomeGen);
 
-protected:
+  protected:
 	typedef cChunkDef::BiomeMap BiomeNeighbors[3][3];
 
 	// Linear upscaling step sizes, must be divisors of cChunkDef::Width and cChunkDef::Height, respectively:
@@ -37,9 +36,9 @@ protected:
 	static const int INTERPOL_Z = 8;
 
 	// Linear upscaling buffer dimensions, calculated from the step sizes:
-	static const int DIM_X = 1 +  (17 / INTERPOL_X);
+	static const int DIM_X = 1 + (17 / INTERPOL_X);
 	static const int DIM_Y = 1 + (257 / INTERPOL_Y);
-	static const int DIM_Z = 1 +  (17 / INTERPOL_Z);
+	static const int DIM_Z = 1 + (17 / INTERPOL_Z);
 
 	cPerlinNoise m_NoiseDistortX;
 	cPerlinNoise m_NoiseDistortZ;
@@ -69,14 +68,15 @@ protected:
 	{
 		NOISE_DATATYPE m_DistortAmpX;
 		NOISE_DATATYPE m_DistortAmpZ;
-	} ;
+	};
 	static const sGenParam m_GenParam[256];
 
 	// Distortion amplitudes for each direction, before linear upscaling
 	NOISE_DATATYPE m_DistortAmpX[DIM_X * DIM_Z];
 	NOISE_DATATYPE m_DistortAmpZ[DIM_X * DIM_Z];
 
-	/** True if Initialize() has been called. Used to initialize-once even with multiple init entrypoints (HeiGen / CompoGen). */
+	/** True if Initialize() has been called. Used to initialize-once even with multiple init entrypoints (HeiGen /
+	 * CompoGen). */
 	bool m_IsInitialized;
 
 
@@ -93,7 +93,13 @@ protected:
 	void UpdateDistortAmps(void);
 
 	/** Calculates the X and Z distortion amplitudes based on the neighbors' biomes. */
-	void GetDistortAmpsAt(BiomeNeighbors & a_Neighbors, int a_RelX, int a_RelZ, NOISE_DATATYPE & a_DistortAmpX, NOISE_DATATYPE & a_DistortAmpZ);
+	void GetDistortAmpsAt(
+		BiomeNeighbors & a_Neighbors,
+		int a_RelX,
+		int a_RelZ,
+		NOISE_DATATYPE & a_DistortAmpX,
+		NOISE_DATATYPE & a_DistortAmpZ
+	);
 
 	/** Reads the settings from the ini file. Skips reading if already initialized. */
 	void Initialize(cIniFile & a_IniFile);
@@ -102,4 +108,4 @@ protected:
 	// cTerrainShapeGen overrides:
 	virtual void GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape) override;
 	virtual void InitializeShapeGen(cIniFile & a_IniFile) override;
-} ;
+};

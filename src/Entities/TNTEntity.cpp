@@ -9,8 +9,7 @@
 
 
 cTNTEntity::cTNTEntity(Vector3d a_Pos, unsigned a_FuseTicks) :
-	Super(etTNT, a_Pos, 0.98f, 0.98f),
-	m_FuseTicks(a_FuseTicks)
+	Super(etTNT, a_Pos, 0.98f, 0.98f), m_FuseTicks(a_FuseTicks)
 {
 	SetGravity(-16.0f);
 	SetAirDrag(0.02f);
@@ -68,7 +67,3 @@ void cTNTEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Explode();
 	}
 }
-
-
-
-

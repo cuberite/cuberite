@@ -58,12 +58,8 @@ bool cCuboid::IsCompletelyInside(const cCuboid & a_Outer) const
 	ASSERT(a_Outer.IsSorted());
 
 	return (
-		(p1.x >= a_Outer.p1.x) &&
-		(p2.x <= a_Outer.p2.x) &&
-		(p1.y >= a_Outer.p1.y) &&
-		(p2.y <= a_Outer.p2.y) &&
-		(p1.z >= a_Outer.p1.z) &&
-		(p2.z <= a_Outer.p2.z)
+		(p1.x >= a_Outer.p1.x) && (p2.x <= a_Outer.p2.x) && (p1.y >= a_Outer.p1.y) && (p2.y <= a_Outer.p2.y) &&
+		(p1.z >= a_Outer.p1.z) && (p2.z <= a_Outer.p2.z)
 	);
 }
 
@@ -192,11 +188,7 @@ void cCuboid::ClampZ(int a_MinZ, int a_MaxZ)
 
 bool cCuboid::IsSorted(void) const
 {
-	return (
-		(p1.x <= p2.x) &&
-		(p1.y <= p2.y) &&
-		(p1.z <= p2.z)
-	);
+	return ((p1.x <= p2.x) && (p1.y <= p2.y) && (p1.z <= p2.z));
 }
 
 
@@ -232,7 +224,3 @@ void cCuboid::Engulf(Vector3i a_Point)
 		p2.z = a_Point.z;
 	}
 }
-
-
-
-

@@ -8,7 +8,7 @@
 // tolua_begin
 class cChatColor
 {
-public:
+  public:
 	static const char * Delimiter;
 
 	/** @deprecated use ChatColor::Delimiter instead */

@@ -16,20 +16,15 @@ for entities / players in motion to close their windows when they get too far aw
 /** Base class for the window owning */
 class cWindowOwner
 {
-public:
+  public:
 	cWindowOwner() :
 		m_Window(nullptr)
 	{
 	}
 
-	virtual ~cWindowOwner()
-	{
-	}
+	virtual ~cWindowOwner() {}
 
-	void CloseWindow(void)
-	{
-		m_Window = nullptr;
-	}
+	void CloseWindow(void) { m_Window = nullptr; }
 
 	void OpenWindow(cWindow * a_Window)
 	{
@@ -37,15 +32,12 @@ public:
 		m_Window->SetOwner(this);
 	}
 
-	cWindow * GetWindow(void) const
-	{
-		return m_Window;
-	}
+	cWindow * GetWindow(void) const { return m_Window; }
 
 	/** Returns the block position at which the element owning the window is */
 	virtual Vector3i GetBlockPos(void) = 0;
 
-private:
+  private:
 	cWindow * m_Window;
 };
 
@@ -54,10 +46,9 @@ private:
 
 
 /** Window owner that is associated with a block entity (chest, furnace, ...) */
-class cBlockEntityWindowOwner :
-	public cWindowOwner
+class cBlockEntityWindowOwner : public cWindowOwner
 {
-public:
+  public:
 	cBlockEntityWindowOwner(cBlockEntity * a_BlockEntity) :
 		m_BlockEntity(a_BlockEntity)
 	{
@@ -68,7 +59,7 @@ public:
 		return Vector3i(m_BlockEntity->GetPosX(), m_BlockEntity->GetPosY(), m_BlockEntity->GetPosZ());
 	}
 
-private:
+  private:
 	cBlockEntity * m_BlockEntity;
 };
 
@@ -77,24 +68,16 @@ private:
 
 
 /** Window owner that is associated with an entity (chest minecart etc.) */
-class cEntityWindowOwner :
-	public cWindowOwner
+class cEntityWindowOwner : public cWindowOwner
 {
-public:
+  public:
 	cEntityWindowOwner(cEntity * a_Entity) :
 		m_Entity(a_Entity)
 	{
 	}
 
-	virtual Vector3i GetBlockPos(void) override
-	{
-		return m_Entity->GetPosition().Floor();
-	}
+	virtual Vector3i GetBlockPos(void) override { return m_Entity->GetPosition().Floor(); }
 
-private:
+  private:
 	cEntity * m_Entity;
 };
-
-
-
-

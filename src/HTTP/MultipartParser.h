@@ -15,13 +15,12 @@
 
 
 
-class cMultipartParser :
-	protected cEnvelopeParser::cCallbacks
+class cMultipartParser : protected cEnvelopeParser::cCallbacks
 {
-public:
+  public:
 	class cCallbacks
 	{
-	public:
+	  public:
 		// Force a virtual destructor in descendants:
 		virtual ~cCallbacks() {}
 
@@ -36,7 +35,7 @@ public:
 
 		/** Called when the current part ends */
 		virtual void OnPartEnd(void) = 0;
-	} ;
+	};
 
 	/** Creates the parser, expects to find the boundary in a_ContentType */
 	cMultipartParser(const AString & a_ContentType, cCallbacks & a_Callbacks);
@@ -44,7 +43,7 @@ public:
 	/** Parses more incoming data */
 	void Parse(const char * a_Data, size_t a_Size);
 
-protected:
+  protected:
 	/** The callbacks to call for various parsing events */
 	cCallbacks & m_Callbacks;
 
@@ -60,20 +59,18 @@ protected:
 	/** The boundary, excluding both the initial "--" and the terminating CRLF */
 	AString m_Boundary;
 
-	/** Set to true if some data for the current part has already been signalized to m_Callbacks. Used for proper CRLF inserting. */
+	/** Set to true if some data for the current part has already been signalized to m_Callbacks. Used for proper CRLF
+	 * inserting. */
 	bool m_HasHadData;
 
 
 	/** Parse one line of incoming data. The CRLF has already been stripped from a_Data / a_Size */
 	void ParseLine(const char * a_Data, size_t a_Size);
 
-	/** Parse one line of incoming data in the headers section of a part. The CRLF has already been stripped from a_Data / a_Size */
+	/** Parse one line of incoming data in the headers section of a part. The CRLF has already been stripped from a_Data
+	 * / a_Size */
 	void ParseHeaderLine(const char * a_Data, size_t a_Size);
 
 	// cEnvelopeParser overrides:
 	virtual void OnHeaderLine(const AString & a_Key, const AString & a_Value) override;
-} ;
-
-
-
-
+};

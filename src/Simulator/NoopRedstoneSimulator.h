@@ -7,14 +7,12 @@
 
 
 
-class cRedstoneNoopSimulator final :
-	public cRedstoneSimulator
+class cRedstoneNoopSimulator final : public cRedstoneSimulator
 {
 	using Super = cRedstoneSimulator;
 
-public:
-
-	cRedstoneNoopSimulator(cWorld & a_World):
+  public:
+	cRedstoneNoopSimulator(cWorld & a_World) :
 		Super(a_World)
 	{
 	}
@@ -33,8 +31,5 @@ public:
 		UNUSED(a_Chunk);
 	}
 
-	virtual cRedstoneSimulatorChunkData * CreateChunkData() override
-	{
-		return nullptr;
-	}
-} ;
+	virtual cRedstoneSimulatorChunkData * CreateChunkData() override { return nullptr; }
+};

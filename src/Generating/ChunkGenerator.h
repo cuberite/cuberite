@@ -19,7 +19,7 @@ The cChunkGeneratorThread uses this interface to generate chunks for a single wo
 Ths calls to generate chunks are synchronous - they don't return until the chunk is fully generated. */
 class cChunkGenerator
 {
-public:
+  public:
 	virtual ~cChunkGenerator() {}  // Force a virtual destructor
 
 	/** Called to initialize the generator on server startup.
@@ -47,15 +47,10 @@ public:
 	static std::unique_ptr<cChunkGenerator> CreateFromIniFile(cIniFile & a_IniFile);
 
 
-protected:
-
+  protected:
 	/** The main seed, read from the INI file, used for the entire generator. */
 	int m_Seed;
 
 	/** The dimension, read from the INI file. */
 	eDimension m_Dimension;
 };
-
-
-
-

@@ -24,7 +24,7 @@ as side effect 2 : it also know the caps for mobs number and can compare census 
 */
 class cMobCensus
 {
-public:
+  public:
 	/** Returns the nested proximity counter */
 	cMobProximityCounter & GetProximityCounter(void);
 
@@ -41,7 +41,7 @@ public:
 	/** log the results of census to server console */
 	void Logd(void);
 
-protected :
+  protected:
 	cMobProximityCounter m_ProximityCounter;
 	cMobFamilyCollecter m_MobFamilyCollecter;
 
@@ -52,8 +52,4 @@ protected :
 
 	/** Returns the cap multiplier value of the given monster family */
 	static int GetCapMultiplier(cMonster::eFamily a_MobFamily);
-} ;
-
-
-
-
+};

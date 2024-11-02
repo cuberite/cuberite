@@ -34,16 +34,18 @@ using MiniDumpWriteDumpFunction = decltype(&MiniDumpWriteDump);
 
 static HINSTANCE m_DbgHelp;
 static MiniDumpWriteDumpFunction s_WriteMiniDump;  // The function in dbghlp DLL that creates dump files
-static wchar_t s_DumpFileName[MAX_PATH];  // Filename of the dump file; hes to be created before the dump handler kicks in
-static char s_ExceptionStack[128 * 1024];  // Substitute stack, just in case the handler kicks in because of "insufficient stack space"
+static wchar_t
+	s_DumpFileName[MAX_PATH];  // Filename of the dump file; hes to be created before the dump handler kicks in
+static char s_ExceptionStack[128 * 1024];  // Substitute stack, just in case the handler kicks in because of
+										   // "insufficient stack space"
 static MINIDUMP_TYPE s_DumpFlags = MiniDumpNormal;  // By default dump only the stack and some helpers
 
 
 
 
 
-/** This function gets called just before the "program executed an illegal instruction and will be terminated" or similar.
-Its purpose is to create the crashdump using the dbghlp DLLs */
+/** This function gets called just before the "program executed an illegal instruction and will be terminated" or
+similar. Its purpose is to create the crashdump using the dbghlp DLLs */
 static LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a_ExceptionInfo)
 {
 	char * newStack = &s_ExceptionStack[sizeof(s_ExceptionStack) - 1];
@@ -51,19 +53,28 @@ static LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a
 
 	// Use the substitute stack:
 	_asm
-	{
+		{
 		mov oldStack, esp
 		mov esp, newStack
-	}
+		}
 
-	MINIDUMP_EXCEPTION_INFORMATION  ExcInformation;
+	MINIDUMP_EXCEPTION_INFORMATION ExcInformation;
 	ExcInformation.ThreadId = GetCurrentThreadId();
 	ExcInformation.ExceptionPointers = a_ExceptionInfo;
 	ExcInformation.ClientPointers = 0;
 
 	// Write the dump file:
-	HANDLE dumpFile = CreateFile(s_DumpFileName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-	s_WriteMiniDump(GetCurrentProcess(), GetCurrentProcessId(), dumpFile, s_DumpFlags, (a_ExceptionInfo) ? &ExcInformation : nullptr, nullptr, nullptr);
+	HANDLE dumpFile =
+		CreateFile(s_DumpFileName, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	s_WriteMiniDump(
+		GetCurrentProcess(),
+		GetCurrentProcessId(),
+		dumpFile,
+		s_DumpFlags,
+		(a_ExceptionInfo) ? &ExcInformation : nullptr,
+		nullptr,
+		nullptr
+	);
 	CloseHandle(dumpFile);
 
 	// Revert to old stack:
@@ -81,64 +92,58 @@ static LONG WINAPI LastChanceExceptionFilter(__in struct _EXCEPTION_POINTERS * a
 
 namespace MiniDumpWriter
 {
-	static void Register()
+static void Register()
+{
+	// Magic code to produce dump-files on Windows if the server crashes:
+
+	m_DbgHelp = LoadLibrary(L"DBGHELP.DLL");
+	if (m_DbgHelp == INVALID_HANDLE_VALUE)
 	{
-		// Magic code to produce dump-files on Windows if the server crashes:
-
-		m_DbgHelp = LoadLibrary(L"DBGHELP.DLL");
-		if (m_DbgHelp == INVALID_HANDLE_VALUE)
-		{
-			return;
-		}
-
-		s_WriteMiniDump = (MiniDumpWriteDumpFunction)GetProcAddress(m_DbgHelp, "MiniDumpWriteDump");
-		if (s_WriteMiniDump != nullptr)
-		{
-			ASSERT(swprintf(s_DumpFileName, ARRAYCOUNT(s_DumpFileName), L"crash_mcs_%x.dmp", GetCurrentProcessId()) > 0);
-			SetUnhandledExceptionFilter(LastChanceExceptionFilter);
-		}
-
-		// End of dump-file magic
+		return;
 	}
 
-	static void AddDumpFlags(const MiniDumpFlags a_Flags)
+	s_WriteMiniDump = (MiniDumpWriteDumpFunction) GetProcAddress(m_DbgHelp, "MiniDumpWriteDump");
+	if (s_WriteMiniDump != nullptr)
 	{
-		switch (a_Flags)
-		{
-			case MiniDumpFlags::WithDataSegments:
-			{
-				s_DumpFlags = static_cast<MINIDUMP_TYPE>(s_DumpFlags | MINIDUMP_TYPE::MiniDumpWithDataSegs);
-				break;
-			}
-			case MiniDumpFlags::WithFullMemory:
-			{
-				s_DumpFlags = static_cast<MINIDUMP_TYPE>(s_DumpFlags | MINIDUMP_TYPE::MiniDumpWithFullMemory);
-				break;
-			}
-		}
+		ASSERT(swprintf(s_DumpFileName, ARRAYCOUNT(s_DumpFileName), L"crash_mcs_%x.dmp", GetCurrentProcessId()) > 0);
+		SetUnhandledExceptionFilter(LastChanceExceptionFilter);
 	}
 
-	static void Unregister()
+	// End of dump-file magic
+}
+
+static void AddDumpFlags(const MiniDumpFlags a_Flags)
+{
+	switch (a_Flags)
 	{
-		FreeLibrary(m_DbgHelp);
+		case MiniDumpFlags::WithDataSegments:
+		{
+			s_DumpFlags = static_cast<MINIDUMP_TYPE>(s_DumpFlags | MINIDUMP_TYPE::MiniDumpWithDataSegs);
+			break;
+		}
+		case MiniDumpFlags::WithFullMemory:
+		{
+			s_DumpFlags = static_cast<MINIDUMP_TYPE>(s_DumpFlags | MINIDUMP_TYPE::MiniDumpWithFullMemory);
+			break;
+		}
 	}
-};
+}
+
+static void Unregister()
+{
+	FreeLibrary(m_DbgHelp);
+}
+};  // namespace MiniDumpWriter
 
 #else
 
 namespace MiniDumpWriter
 {
-	static void Register()
-	{
-	}
+static void Register() {}
 
-	static void AddDumpFlags(const MiniDumpFlags)
-	{
-	}
+static void AddDumpFlags(const MiniDumpFlags) {}
 
-	static void Unregister()
-	{
-	}
-};
+static void Unregister() {}
+};  // namespace MiniDumpWriter
 
 #endif

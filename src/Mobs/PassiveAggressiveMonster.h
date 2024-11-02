@@ -7,13 +7,11 @@
 
 
 
-class cPassiveAggressiveMonster:
-	public cAggressiveMonster
+class cPassiveAggressiveMonster : public cAggressiveMonster
 {
 	using Super = cAggressiveMonster;
 
-public:
-
+  public:
 	cPassiveAggressiveMonster(
 		const AString & a_ConfigName,
 		eMonsterType a_MobType,
@@ -26,8 +24,4 @@ public:
 
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void EventSeePlayer(cPlayer *, cChunk & a_Chunk) override;
-} ;
-
-
-
-
+};

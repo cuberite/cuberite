@@ -9,13 +9,11 @@
 
 
 
-class cItemSpawnEggHandler final:
-	public cItemHandler
+class cItemSpawnEggHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 	virtual bool OnItemUse(
@@ -40,9 +38,9 @@ public:
 		}
 
 		auto MonsterType = ItemDamageToMonsterType(a_HeldItem.m_ItemDamage);
-		if (
-			(MonsterType != mtInvalidType) &&  // Valid monster type
-			(a_World->SpawnMob(PlacementPos.x + 0.5, PlacementPos.y, PlacementPos.z + 0.5, MonsterType, false) != cEntity::INVALID_ID))  // Spawning succeeded
+		if ((MonsterType != mtInvalidType) &&  // Valid monster type
+			(a_World->SpawnMob(PlacementPos.x + 0.5, PlacementPos.y, PlacementPos.z + 0.5, MonsterType, false) !=
+			 cEntity::INVALID_ID))  // Spawning succeeded
 		{
 			if (!a_Player->IsGameModeCreative())
 			{
@@ -94,7 +92,7 @@ public:
 			case E_META_SPAWN_EGG_ZOMBIE:          return mtZombie;
 			case E_META_SPAWN_EGG_ZOMBIE_PIGMAN:   return mtZombiePigman;
 			case E_META_SPAWN_EGG_ZOMBIE_VILLAGER: return mtZombieVillager;
-			default: return mtInvalidType;
+			default:                               return mtInvalidType;
 		}
 	}
-} ;
+};

@@ -17,15 +17,13 @@
 
 // tolua_begin
 
-class cCommandBlockEntity :
-	public cBlockEntity
+class cCommandBlockEntity : public cBlockEntity
 {
 	// tolua_end
 
 	using Super = cBlockEntity;
 
-public:  // tolua_export
-
+  public:  // tolua_export
 	/** Creates a new empty command block entity */
 	cCommandBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
@@ -58,8 +56,7 @@ public:  // tolua_export
 
 	// tolua_end
 
-private:
-
+  private:
 	/** Executes the associated command */
 	void Execute();
 
@@ -70,4 +67,4 @@ private:
 	AString m_LastOutput;
 
 	NIBBLETYPE m_Result;
-} ;  // tolua_export
+};  // tolua_export

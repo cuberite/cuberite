@@ -15,17 +15,14 @@
 
 
 
-class cNoopFluidSimulator final :
-	public cFluidSimulator
+class cNoopFluidSimulator final : public cFluidSimulator
 {
 	using Super = cFluidSimulator;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override
 	{
 		UNUSED(a_Dt);
@@ -41,4 +38,4 @@ private:
 	}
 
 	virtual cFluidSimulatorData * CreateChunkData(void) override { return nullptr; }
-} ;
+};

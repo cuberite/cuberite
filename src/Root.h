@@ -32,12 +32,12 @@ class cUUID;
 class BlockTypePalette;
 class ProtocolPalettes;
 
-using cPlayerListCallback =  cFunctionRef<bool(cPlayer &)>;
-using cWorldListCallback  =  cFunctionRef<bool(cWorld  &)>;
+using cPlayerListCallback = cFunctionRef<bool(cPlayer &)>;
+using cWorldListCallback = cFunctionRef<bool(cWorld &)>;
 
 namespace Json
 {
-	class Value;
+class Value;
 }
 
 
@@ -48,7 +48,7 @@ namespace Json
 // tolua_begin
 class cRoot
 {
-public:
+  public:
 	static cRoot * Get() { return s_Root; }
 	// tolua_end
 
@@ -69,7 +69,7 @@ public:
 
 	// tolua_begin
 	cServer * GetServer(void) { return m_Server; }
-	cWorld *  GetDefaultWorld(void);
+	cWorld * GetDefaultWorld(void);
 
 	/** Returns a pointer to the world specified. If no world of that name exists, returns a nullptr. */
 	cWorld * GetWorld(const AString & a_WorldName);
@@ -77,7 +77,9 @@ public:
 	/** Returns the up time of the server in seconds */
 	int GetServerUpTime(void)
 	{
-		return static_cast<int>(std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - m_StartTime).count());
+		return static_cast<int>(
+			std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - m_StartTime).count()
+		);
 	}
 	// tolua_end
 
@@ -91,8 +93,11 @@ public:
 
 	cCraftingRecipes * GetCraftingRecipes(void) { return m_CraftingRecipes; }  // tolua_export
 	cRecipeMapper * GetRecipeMapper(void) { return m_RecipeMapper.get(); }
-	cFurnaceRecipe *   GetFurnaceRecipe  (void) { return m_FurnaceRecipe; }    // Exported in ManualBindings.cpp with quite a different signature
-	cBrewingRecipes *  GetBrewingRecipes (void) { return m_BrewingRecipes.get(); }    // Exported in ManualBindings.cpp
+	cFurnaceRecipe * GetFurnaceRecipe(void)
+	{
+		return m_FurnaceRecipe;
+	}  // Exported in ManualBindings.cpp with quite a different signature
+	cBrewingRecipes * GetBrewingRecipes(void) { return m_BrewingRecipes.get(); }  // Exported in ManualBindings.cpp
 
 	/** Returns the (read-write) storage for registered block types. */
 	// BlockTypeRegistry & GetBlockTypeRegistry() { return m_BlockTypeRegistry; }
@@ -107,11 +112,11 @@ public:
 	/** The current time where the startup of the server has been completed */
 	std::chrono::steady_clock::time_point m_StartTime;
 
-	cWebAdmin *        GetWebAdmin       (void) { return m_WebAdmin; }         // tolua_export
-	cPluginManager *   GetPluginManager  (void) { return m_PluginManager; }    // tolua_export
-	cAuthenticator &   GetAuthenticator  (void) { return m_Authenticator; }
-	cMojangAPI &       GetMojangAPI      (void) { return *m_MojangAPI; }
-	cRankManager *     GetRankManager    (void) { return m_RankManager.get(); }
+	cWebAdmin * GetWebAdmin(void) { return m_WebAdmin; }  // tolua_export
+	cPluginManager * GetPluginManager(void) { return m_PluginManager; }  // tolua_export
+	cAuthenticator & GetAuthenticator(void) { return m_Authenticator; }
+	cMojangAPI & GetMojangAPI(void) { return *m_MojangAPI; }
+	cRankManager * GetRankManager(void) { return m_RankManager.get(); }
 
 	/** Queues a console command for execution through the cServer class.
 	The command will be executed in the tick thread
@@ -136,7 +141,8 @@ public:
 	/** Saves all chunks in all worlds */
 	void SaveAllChunks(void);  // tolua_export
 
-	/** Saves all chunks in all worlds synchronously (waits until dirty chunks have been sent to the ChunkStorage queue before returning) */
+	/** Saves all chunks in all worlds synchronously (waits until dirty chunks have been sent to the ChunkStorage queue
+	 * before returning) */
 	void SaveAllChunksNow(void);
 
 	/** Sets whether saving chunks is enabled in all worlds (overrides however the worlds were already set) */
@@ -146,10 +152,16 @@ public:
 	bool ForEachPlayer(cPlayerListCallback a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Finds a player from a partial or complete player name and calls the callback - case-insensitive */
-	bool FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallback a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+	bool FindAndDoWithPlayer(
+		const AString & a_PlayerName,
+		cPlayerListCallback a_Callback
+	);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Finds the player over his uuid and calls the callback */
-	bool DoWithPlayerByUUID(const cUUID & a_PlayerUUID, cPlayerListCallback a_Callback);  // >> EXPORTED IN MANUALBINDINGS <<
+	bool DoWithPlayerByUUID(
+		const cUUID & a_PlayerUUID,
+		cPlayerListCallback a_Callback
+	);  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Finds the player using it's complete username and calls the callback */
 	bool DoWithPlayer(const AString & a_PlayerName, cPlayerListCallback a_Callback);
@@ -164,19 +176,21 @@ public:
 	void BroadcastPlayerListsRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr);
 
 	/** Broadcast playerlist header and footer through all worlds */
-	void BroadcastPlayerListsHeaderFooter(const cCompositeChat & a_Header, const cCompositeChat & a_Footer);  // tolua_export
+	// tolua_begin
+	void BroadcastPlayerListsHeaderFooter(const cCompositeChat & a_Header, const cCompositeChat & a_Footer);
+	// tolua_end
 
 	// tolua_begin
 
 	/** Sends a chat message to all connected clients (in all worlds) */
-	void BroadcastChat       (const AString & a_Message, eMessageType a_ChatPrefix = mtCustom);
-	void BroadcastChat       (const cCompositeChat & a_Message);
-	void BroadcastChatDeath  (const AString & a_Message) { BroadcastChat(a_Message, mtDeath); }
+	void BroadcastChat(const AString & a_Message, eMessageType a_ChatPrefix = mtCustom);
+	void BroadcastChat(const cCompositeChat & a_Message);
+	void BroadcastChatDeath(const AString & a_Message) { BroadcastChat(a_Message, mtDeath); }
 	void BroadcastChatFailure(const AString & a_Message) { BroadcastChat(a_Message, mtFailure); }
-	void BroadcastChatFatal  (const AString & a_Message) { BroadcastChat(a_Message, mtFailure); }
-	void BroadcastChatInfo   (const AString & a_Message) { BroadcastChat(a_Message, mtInformation); }
-	void BroadcastChatJoin   (const AString & a_Message) { BroadcastChat(a_Message, mtJoin); }
-	void BroadcastChatLeave  (const AString & a_Message) { BroadcastChat(a_Message, mtLeave); }
+	void BroadcastChatFatal(const AString & a_Message) { BroadcastChat(a_Message, mtFailure); }
+	void BroadcastChatInfo(const AString & a_Message) { BroadcastChat(a_Message, mtInformation); }
+	void BroadcastChatJoin(const AString & a_Message) { BroadcastChat(a_Message, mtJoin); }
+	void BroadcastChatLeave(const AString & a_Message) { BroadcastChat(a_Message, mtLeave); }
 	void BroadcastChatSuccess(const AString & a_Message) { BroadcastChat(a_Message, mtSuccess); }
 	void BroadcastChatWarning(const AString & a_Message) { BroadcastChat(a_Message, mtWarning); }
 
@@ -191,8 +205,7 @@ public:
 
 	// tolua_end
 
-private:
-
+  private:
 	/** States that the global cRoot can be in.
 	You can transition freely between Run and Restart, but the server unconditionally terminates in Stop. */
 	enum class NextState
@@ -215,17 +228,17 @@ private:
 
 	static cEvent s_StopEvent;
 
-	cServer *        m_Server;
+	cServer * m_Server;
 	cMonsterConfig * m_MonsterConfig;
 
 	cCraftingRecipes * m_CraftingRecipes;
 	std::unique_ptr<cRecipeMapper> m_RecipeMapper;
-	cFurnaceRecipe *   m_FurnaceRecipe;
+	cFurnaceRecipe * m_FurnaceRecipe;
 	std::unique_ptr<cBrewingRecipes> m_BrewingRecipes;
-	cWebAdmin *        m_WebAdmin;
-	cPluginManager *   m_PluginManager;
-	cAuthenticator     m_Authenticator;
-	cMojangAPI *       m_MojangAPI;
+	cWebAdmin * m_WebAdmin;
+	cPluginManager * m_PluginManager;
+	cAuthenticator m_Authenticator;
+	cMojangAPI * m_MojangAPI;
 
 	std::unique_ptr<cRankManager> m_RankManager;
 

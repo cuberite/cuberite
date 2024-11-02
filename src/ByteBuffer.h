@@ -30,8 +30,7 @@ their own synchronization.
 */
 class cByteBuffer
 {
-public:
-
+  public:
 	cByteBuffer(size_t a_BufferSize);
 	~cByteBuffer();
 
@@ -44,7 +43,8 @@ public:
 	/** Returns the number of bytes that are currently in the ringbuffer. Note GetReadableBytes() */
 	size_t GetUsedSpace(void) const;
 
-	/** Returns the number of bytes that are currently available for reading (may be less than UsedSpace due to some data having been read already) */
+	/** Returns the number of bytes that are currently available for reading (may be less than UsedSpace due to some
+	 * data having been read already) */
 	size_t GetReadableSpace(void) const;
 
 	/** Returns the current data start index. For debugging purposes. */
@@ -63,28 +63,29 @@ public:
 	bool CanWriteBytes(size_t a_Count) const;
 
 	// Read the specified datatype and advance the read pointer; return true if successfully read:
-	bool ReadBEInt8         (Int8 & a_Value);
-	bool ReadBEInt16        (Int16 & a_Value);
-	bool ReadBEInt32        (Int32 & a_Value);
-	bool ReadBEInt64        (Int64 & a_Value);
-	bool ReadBEUInt8        (UInt8 & a_Value);
-	bool ReadBEUInt16       (UInt16 & a_Value);
-	bool ReadBEUInt32       (UInt32 & a_Value);
-	bool ReadBEUInt64       (UInt64 & a_Value);
-	bool ReadBEFloat        (float & a_Value);
-	bool ReadBEDouble       (double & a_Value);
-	bool ReadBool           (bool & a_Value);
-	bool ReadVarInt32       (UInt32 & a_Value);
-	bool ReadVarInt64       (UInt64 & a_Value);
-	bool ReadVarUTF8String  (AString & a_Value);  // string length as VarInt, then string as UTF-8
-	bool ReadLEInt          (int & a_Value);
-	bool ReadXYZPosition64  (int & a_BlockX, int & a_BlockY, int & a_BlockZ);
-	bool ReadXYZPosition64  (Vector3i & a_Position);
-	bool ReadXZYPosition64  (int & a_BlockX, int & a_BlockY, int & a_BlockZ);
-	bool ReadXZYPosition64  (Vector3i & a_Position);
-	bool ReadUUID           (cUUID & a_Value);
+	bool ReadBEInt8(Int8 & a_Value);
+	bool ReadBEInt16(Int16 & a_Value);
+	bool ReadBEInt32(Int32 & a_Value);
+	bool ReadBEInt64(Int64 & a_Value);
+	bool ReadBEUInt8(UInt8 & a_Value);
+	bool ReadBEUInt16(UInt16 & a_Value);
+	bool ReadBEUInt32(UInt32 & a_Value);
+	bool ReadBEUInt64(UInt64 & a_Value);
+	bool ReadBEFloat(float & a_Value);
+	bool ReadBEDouble(double & a_Value);
+	bool ReadBool(bool & a_Value);
+	bool ReadVarInt32(UInt32 & a_Value);
+	bool ReadVarInt64(UInt64 & a_Value);
+	bool ReadVarUTF8String(AString & a_Value);  // string length as VarInt, then string as UTF-8
+	bool ReadLEInt(int & a_Value);
+	bool ReadXYZPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ);
+	bool ReadXYZPosition64(Vector3i & a_Position);
+	bool ReadXZYPosition64(int & a_BlockX, int & a_BlockY, int & a_BlockZ);
+	bool ReadXZYPosition64(Vector3i & a_Position);
+	bool ReadUUID(cUUID & a_Value);
 
-	/** Reads VarInt, assigns it to anything that can be assigned from an UInt64 (unsigned short, char, Byte, double, ...) */
+	/** Reads VarInt, assigns it to anything that can be assigned from an UInt64 (unsigned short, char, Byte, double,
+	 * ...) */
 	template <typename T> bool ReadVarInt(T & a_Value)
 	{
 		UInt64 v;
@@ -97,24 +98,24 @@ public:
 	}
 
 	// Write the specified datatype; return true if successfully written
-	bool WriteBEInt8         (Int8   a_Value);
-	bool WriteBEInt8         (std::byte a_Value);
-	bool WriteBEInt16        (Int16  a_Value);
-	bool WriteBEInt32        (Int32  a_Value);
-	bool WriteBEInt64        (Int64  a_Value);
-	bool WriteBEUInt8        (UInt8  a_Value);
-	bool WriteBEUInt16       (UInt16 a_Value);
-	bool WriteBEUInt32       (UInt32 a_Value);
-	bool WriteBEUInt64       (UInt64 a_Value);
-	bool WriteBEFloat        (float  a_Value);
-	bool WriteBEDouble       (double a_Value);
-	bool WriteBool           (bool   a_Value);
-	bool WriteVarInt32       (UInt32 a_Value);
-	bool WriteVarInt64       (UInt64 a_Value);
-	bool WriteVarUTF8String  (const AString & a_Value);  // string length as VarInt, then string as UTF-8
-	bool WriteLEInt32        (Int32 a_Value);
-	bool WriteXYZPosition64  (Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ);
-	bool WriteXZYPosition64  (Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ);
+	bool WriteBEInt8(Int8 a_Value);
+	bool WriteBEInt8(std::byte a_Value);
+	bool WriteBEInt16(Int16 a_Value);
+	bool WriteBEInt32(Int32 a_Value);
+	bool WriteBEInt64(Int64 a_Value);
+	bool WriteBEUInt8(UInt8 a_Value);
+	bool WriteBEUInt16(UInt16 a_Value);
+	bool WriteBEUInt32(UInt32 a_Value);
+	bool WriteBEUInt64(UInt64 a_Value);
+	bool WriteBEFloat(float a_Value);
+	bool WriteBEDouble(double a_Value);
+	bool WriteBool(bool a_Value);
+	bool WriteVarInt32(UInt32 a_Value);
+	bool WriteVarInt64(UInt64 a_Value);
+	bool WriteVarUTF8String(const AString & a_Value);  // string length as VarInt, then string as UTF-8
+	bool WriteLEInt32(Int32 a_Value);
+	bool WriteXYZPosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ);
+	bool WriteXZYPosition64(Int32 a_BlockX, Int32 a_BlockY, Int32 a_BlockZ);
 
 	/** Reads a_Count bytes into a_Buffer; returns true if successful */
 	bool ReadBuf(void * a_Buffer, size_t a_Count);
@@ -143,7 +144,8 @@ public:
 	/** Restarts next reading operation at the start of the ringbuffer */
 	void ResetRead(void);
 
-	/** Re-reads the data that has been read since the last commit to the current readpos. Used by ProtoProxy to duplicate communication */
+	/** Re-reads the data that has been read since the last commit to the current readpos. Used by ProtoProxy to
+	 * duplicate communication */
 	void ReadAgain(ContiguousByteBuffer & a_Out);
 
 	/** Checks if the internal state is valid (read and write positions in the correct bounds) using ASSERTs */
@@ -152,21 +154,20 @@ public:
 	/** Gets the number of bytes that are needed to represent the given VarInt */
 	static size_t GetVarIntSize(UInt32 a_Value);
 
-protected:
-
+  protected:
 	std::byte * m_Buffer;
 	size_t m_BufferSize;  // Total size of the ringbuffer
 
 	size_t m_DataStart;  // Where the data starts in the ringbuffer
-	size_t m_WritePos;   // Where the data ends in the ringbuffer
-	size_t m_ReadPos;    // Where the next read will start in the ringbuffer
+	size_t m_WritePos;  // Where the data ends in the ringbuffer
+	size_t m_ReadPos;  // Where the next read will start in the ringbuffer
 
-	#ifndef NDEBUG
-		/** The ID of the thread currently accessing the object.
-		Used for checking that only one thread accesses the object at a time, via cSingleThreadAccessChecker. */
-		mutable std::thread::id m_ThreadID;
-	#endif
+#ifndef NDEBUG
+	/** The ID of the thread currently accessing the object.
+	Used for checking that only one thread accesses the object at a time, via cSingleThreadAccessChecker. */
+	mutable std::thread::id m_ThreadID;
+#endif
 
 	/** Advances the m_ReadPos by a_Count bytes */
 	void AdvanceReadPos(size_t a_Count);
-} ;
+};

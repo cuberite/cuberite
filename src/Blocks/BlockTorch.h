@@ -13,13 +13,11 @@
 
 
 
-class cBlockTorchBaseHandler :
-	public cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>
+class cBlockTorchBaseHandler : public cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>
 {
 	using Super = cMetaRotator<cBlockHandler, 0x7, 0x4, 0x1, 0x3, 0x2>;
 
-public:
-
+  public:
 	using Super::Super;
 
 
@@ -37,16 +35,11 @@ public:
 		{
 			switch (a_BlockFace)
 			{
-				case eBlockFace::BLOCK_FACE_YP:
-					return (a_BlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
-				case eBlockFace::BLOCK_FACE_XP:
-					return ((a_BlockMeta & 0b11) == E_BLOCK_STAIRS_XP);
-				case eBlockFace::BLOCK_FACE_XM:
-					return ((a_BlockMeta & 0b11) == E_BLOCK_STAIRS_XM);
-				case eBlockFace::BLOCK_FACE_ZP:
-					return ((a_BlockMeta & 0b11) == E_BLOCK_STAIRS_ZP);
-				case eBlockFace::BLOCK_FACE_ZM:
-					return ((a_BlockMeta & 0b11) == E_BLOCK_STAIRS_ZM);
+				case eBlockFace::BLOCK_FACE_YP: return (a_BlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
+				case eBlockFace::BLOCK_FACE_XP: return ((a_BlockMeta & 0b11) == E_BLOCK_STAIRS_XP);
+				case eBlockFace::BLOCK_FACE_XM: return ((a_BlockMeta & 0b11) == E_BLOCK_STAIRS_XM);
+				case eBlockFace::BLOCK_FACE_ZP: return ((a_BlockMeta & 0b11) == E_BLOCK_STAIRS_ZP);
+				case eBlockFace::BLOCK_FACE_ZM: return ((a_BlockMeta & 0b11) == E_BLOCK_STAIRS_ZM);
 				default:
 				{
 					return false;
@@ -88,12 +81,10 @@ public:
 		}
 	}
 
-protected:
-
+  protected:
 	~cBlockTorchBaseHandler() = default;
 
-private:
-
+  private:
 	/** Converts the torch block's meta to the block face of the neighbor to which the torch is attached. */
 	inline static eBlockFace MetaDataToBlockFace(NIBBLETYPE a_MetaData)
 	{
@@ -142,19 +133,17 @@ private:
 		UNUSED(a_Meta);
 		return 0;
 	}
-} ;
+};
 
 
 
 
 
-class cBlockTorchHandler final :
-	public cClearMetaOnDrop<cBlockTorchBaseHandler>
+class cBlockTorchHandler final : public cClearMetaOnDrop<cBlockTorchBaseHandler>
 {
 	using Super = cClearMetaOnDrop<cBlockTorchBaseHandler>;
 
-public:
-
+  public:
 	using Super::Super;
 };
 
@@ -162,21 +151,18 @@ public:
 
 
 
-class cBlockRedstoneTorchHandler final :
-	public cBlockTorchBaseHandler
+class cBlockRedstoneTorchHandler final : public cBlockTorchBaseHandler
 {
 	using Super = cBlockTorchBaseHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Always drop the ON torch, meta 0:
-		return { E_BLOCK_REDSTONE_TORCH_ON };
+		return {E_BLOCK_REDSTONE_TORCH_ON};
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override

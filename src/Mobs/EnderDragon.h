@@ -7,13 +7,11 @@
 
 
 
-class cEnderDragon:
-	public cAggressiveMonster
+class cEnderDragon : public cAggressiveMonster
 {
 	using Super = cAggressiveMonster;
 
-public:
-
+  public:
 	cEnderDragon();
 
 	CLASS_PROTODEF(cEnderDragon)
@@ -21,4 +19,4 @@ public:
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual void SpawnOn(cClientHandle & a_Client) override;
-} ;
+};

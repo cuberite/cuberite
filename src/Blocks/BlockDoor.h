@@ -13,13 +13,11 @@
 
 
 
-class cBlockDoorHandler final :
-	public cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>
+class cBlockDoorHandler final : public cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>
 {
 	using Super = cYawRotator<cBlockHandler, 0x03, 0x03, 0x00, 0x01, 0x02>;
 
-public:
-
+  public:
 	using Super::Super;
 
 	/** Returns true if door can be placed on the specified block type. */
@@ -120,12 +118,13 @@ public:
 		}
 	}
 
-private:
-
+  private:
 	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BLOCKTYPE a_OldBlockType,
+		NIBBLETYPE a_OldBlockMeta,
 		const cEntity * a_Digger
 	) const override;
 
@@ -147,10 +146,17 @@ private:
 	) const override;
 
 	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override;
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta)  const override;
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta)  const override;
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta)  const override;
-	virtual cBoundingBox GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) const override;
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) const override;
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) const override;
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) const override;
+	virtual cBoundingBox GetPlacementCollisionBox(
+		BLOCKTYPE a_XM,
+		BLOCKTYPE a_XP,
+		BLOCKTYPE a_YM,
+		BLOCKTYPE a_YP,
+		BLOCKTYPE a_ZM,
+		BLOCKTYPE a_ZP
+	) const override;
 
 
 
@@ -179,10 +185,7 @@ private:
 
 
 
-	virtual bool IsUseable(void) const override
-	{
-		return true;
-	}
+	virtual bool IsUseable(void) const override { return true; }
 
 
 
@@ -256,13 +259,13 @@ private:
 		UNUSED(a_Meta);
 		switch (m_BlockType)
 		{
-			case E_BLOCK_OAK_DOOR: return 13;
-			case E_BLOCK_SPRUCE_DOOR: return 34;
-			case E_BLOCK_BIRCH_DOOR: return 2;
-			case E_BLOCK_JUNGLE_DOOR: return 10;
+			case E_BLOCK_OAK_DOOR:      return 13;
+			case E_BLOCK_SPRUCE_DOOR:   return 34;
+			case E_BLOCK_BIRCH_DOOR:    return 2;
+			case E_BLOCK_JUNGLE_DOOR:   return 10;
 			case E_BLOCK_DARK_OAK_DOOR: return 26;
-			case E_BLOCK_ACACIA_DOOR: return 15;
-			case E_BLOCK_IRON_DOOR: return 6;
+			case E_BLOCK_ACACIA_DOOR:   return 15;
+			case E_BLOCK_IRON_DOOR:     return 6;
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in door handler!");
@@ -270,8 +273,4 @@ private:
 			}
 		}
 	}
-} ;
-
-
-
-
+};

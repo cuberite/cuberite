@@ -13,10 +13,8 @@
 
 
 
-cMobHeadEntity::cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
-	m_Type(SKULL_TYPE_SKELETON),
-	m_Rotation(SKULL_ROTATION_NORTH)
+cMobHeadEntity::cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) :
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World), m_Type(SKULL_TYPE_SKELETON), m_Rotation(SKULL_ROTATION_NORTH)
 {
 	ASSERT(a_BlockType == E_BLOCK_HEAD);
 }
@@ -30,7 +28,7 @@ void cMobHeadEntity::SetType(const eMobHeadType & a_Type)
 	if ((!m_OwnerName.empty()) && (a_Type != SKULL_TYPE_PLAYER))
 	{
 		m_OwnerName = m_OwnerTexture = m_OwnerTextureSignature = "";
-		m_OwnerUUID = cUUID{};
+		m_OwnerUUID = cUUID {};
 	}
 	m_Type = a_Type;
 }
@@ -74,7 +72,12 @@ void cMobHeadEntity::SetOwner(const cPlayer & a_Owner)
 
 
 
-void cMobHeadEntity::SetOwner(const cUUID & a_OwnerUUID, const AString & a_OwnerName, const AString & a_OwnerTexture, const AString & a_OwnerTextureSignature)
+void cMobHeadEntity::SetOwner(
+	const cUUID & a_OwnerUUID,
+	const AString & a_OwnerName,
+	const AString & a_OwnerTexture,
+	const AString & a_OwnerTextureSignature
+)
 {
 	if (m_Type != SKULL_TYPE_PLAYER)
 	{

@@ -10,7 +10,7 @@
 
 
 
-cLuaUDPEndpoint::cLuaUDPEndpoint(cLuaState::cTableRefPtr && a_Callbacks):
+cLuaUDPEndpoint::cLuaUDPEndpoint(cLuaState::cTableRefPtr && a_Callbacks) :
 	m_Callbacks(std::move(a_Callbacks))
 {
 }
@@ -165,7 +165,12 @@ void cLuaUDPEndpoint::Terminated(void)
 
 
 
-void cLuaUDPEndpoint::OnReceivedData(const char * a_Data, size_t a_NumBytes, const AString & a_RemotePeer, UInt16 a_RemotePort)
+void cLuaUDPEndpoint::OnReceivedData(
+	const char * a_Data,
+	size_t a_NumBytes,
+	const AString & a_RemotePeer,
+	UInt16 a_RemotePort
+)
 {
 	m_Callbacks->CallTableFn("OnReceivedData", this, AString(a_Data, a_NumBytes), a_RemotePeer, a_RemotePort);
 }
@@ -182,7 +187,3 @@ void cLuaUDPEndpoint::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 	// Terminate all processing on the endpoint:
 	Terminated();
 }
-
-
-
-

@@ -48,255 +48,255 @@ Implements the 1.12 protocol classes:
 
 namespace Metadata_1_12
 {
-	enum MetadataIndex
-	{
-		// Entity
-		ENTITY_FLAGS,
-		ENTITY_AIR,
-		ENTITY_CUSTOM_NAME,
-		ENTITY_CUSTOM_NAME_VISIBLE,
-		ENTITY_SILENT,
-		ENTITY_NO_GRAVITY,
-		_ENTITY_NEXT,  // Used by descendants
+enum MetadataIndex
+{
+	// Entity
+	ENTITY_FLAGS,
+	ENTITY_AIR,
+	ENTITY_CUSTOM_NAME,
+	ENTITY_CUSTOM_NAME_VISIBLE,
+	ENTITY_SILENT,
+	ENTITY_NO_GRAVITY,
+	_ENTITY_NEXT,  // Used by descendants
 
-		// Potion
-		POTION_THROWN = _ENTITY_NEXT,
+	// Potion
+	POTION_THROWN = _ENTITY_NEXT,
 
-		// FallingBlock
-		FALLING_BLOCK_POSITION = _ENTITY_NEXT,
+	// FallingBlock
+	FALLING_BLOCK_POSITION = _ENTITY_NEXT,
 
-		// AreaEffectCloud
-		AREA_EFFECT_CLOUD_RADIUS = _ENTITY_NEXT,
-		AREA_EFFECT_CLOUD_COLOR,
-		AREA_EFFECT_CLOUD_SINGLE_POINT_EFFECT,
-		AREA_EFFECT_CLOUD_PARTICLE_ID,
-		AREA_EFFECT_CLOUD_PARTICLE_PARAMETER1,
-		AREA_EFFECT_CLOUD_PARTICLE_PARAMETER2,
+	// AreaEffectCloud
+	AREA_EFFECT_CLOUD_RADIUS = _ENTITY_NEXT,
+	AREA_EFFECT_CLOUD_COLOR,
+	AREA_EFFECT_CLOUD_SINGLE_POINT_EFFECT,
+	AREA_EFFECT_CLOUD_PARTICLE_ID,
+	AREA_EFFECT_CLOUD_PARTICLE_PARAMETER1,
+	AREA_EFFECT_CLOUD_PARTICLE_PARAMETER2,
 
-		// Arrow
-		ARROW_CRITICAL = _ENTITY_NEXT,
-		_ARROW_NEXT,
+	// Arrow
+	ARROW_CRITICAL = _ENTITY_NEXT,
+	_ARROW_NEXT,
 
-		// TippedArrow
-		TIPPED_ARROW_COLOR = _ARROW_NEXT,
+	// TippedArrow
+	TIPPED_ARROW_COLOR = _ARROW_NEXT,
 
-		// Boat
-		BOAT_LAST_HIT_TIME = _ENTITY_NEXT,
-		BOAT_FORWARD_DIRECTION,
-		BOAT_DAMAGE_TAKEN,
-		BOAT_TYPE,
-		BOAT_RIGHT_PADDLE_TURNING,
-		BOAT_LEFT_PADDLE_TURNING,
+	// Boat
+	BOAT_LAST_HIT_TIME = _ENTITY_NEXT,
+	BOAT_FORWARD_DIRECTION,
+	BOAT_DAMAGE_TAKEN,
+	BOAT_TYPE,
+	BOAT_RIGHT_PADDLE_TURNING,
+	BOAT_LEFT_PADDLE_TURNING,
 
-		// EnderCrystal
-		ENDER_CRYSTAL_BEAM_TARGET = _ENTITY_NEXT,
-		ENDER_CRYSTAL_SHOW_BOTTOM,
+	// EnderCrystal
+	ENDER_CRYSTAL_BEAM_TARGET = _ENTITY_NEXT,
+	ENDER_CRYSTAL_SHOW_BOTTOM,
 
-		// Fireball
-		_FIREBALL_NEXT = _ENTITY_NEXT,
+	// Fireball
+	_FIREBALL_NEXT = _ENTITY_NEXT,
 
-		// WitherSkull
-		WITHER_SKULL_INVULNERABLE = _FIREBALL_NEXT,
+	// WitherSkull
+	WITHER_SKULL_INVULNERABLE = _FIREBALL_NEXT,
 
-		// Fireworks
-		FIREWORK_INFO = _ENTITY_NEXT,
-		FIREWORK_BOOSTED_ENTITY_ID,  // 1.11.1 only
+	// Fireworks
+	FIREWORK_INFO = _ENTITY_NEXT,
+	FIREWORK_BOOSTED_ENTITY_ID,  // 1.11.1 only
 
-		// Hanging
-		_HANGING_NEXT = _ENTITY_NEXT,
+	// Hanging
+	_HANGING_NEXT = _ENTITY_NEXT,
 
-		// ItemFrame
-		ITEM_FRAME_ITEM = _HANGING_NEXT,
-		ITEM_FRAME_ROTATION,
+	// ItemFrame
+	ITEM_FRAME_ITEM = _HANGING_NEXT,
+	ITEM_FRAME_ROTATION,
 
-		// Item
-		ITEM_ITEM = _ENTITY_NEXT,
+	// Item
+	ITEM_ITEM = _ENTITY_NEXT,
 
-		// Living
-		LIVING_ACTIVE_HAND = _ENTITY_NEXT,
-		LIVING_HEALTH,
-		LIVING_POTION_EFFECT_COLOR,
-		LIVING_POTION_EFFECT_AMBIENT,
-		LIVING_NUMBER_OF_ARROWS,
-		_LIVING_NEXT,
+	// Living
+	LIVING_ACTIVE_HAND = _ENTITY_NEXT,
+	LIVING_HEALTH,
+	LIVING_POTION_EFFECT_COLOR,
+	LIVING_POTION_EFFECT_AMBIENT,
+	LIVING_NUMBER_OF_ARROWS,
+	_LIVING_NEXT,
 
-		// Player
-		PLAYER_ADDITIONAL_HEARTHS = _LIVING_NEXT,
-		PLAYER_SCORE,
-		PLAYER_DISPLAYED_SKIN_PARTS,
-		PLAYER_MAIN_HAND,
+	// Player
+	PLAYER_ADDITIONAL_HEARTHS = _LIVING_NEXT,
+	PLAYER_SCORE,
+	PLAYER_DISPLAYED_SKIN_PARTS,
+	PLAYER_MAIN_HAND,
 
-		// ArmorStand
-		ARMOR_STAND_STATUS = _LIVING_NEXT,
-		ARMOR_STAND_HEAD_ROTATION,
-		ARMOR_STAND_BODY_ROTATION,
-		ARMOR_STAND_LEFT_ARM_ROTATION,
-		ARMOR_STAND_RIGHT_ARM_ROTATION,
-		ARMOR_STAND_LEFT_LEG_ROTATION,
-		ARMOR_STAND_RIGHT_LEG_ROTATION,
+	// ArmorStand
+	ARMOR_STAND_STATUS = _LIVING_NEXT,
+	ARMOR_STAND_HEAD_ROTATION,
+	ARMOR_STAND_BODY_ROTATION,
+	ARMOR_STAND_LEFT_ARM_ROTATION,
+	ARMOR_STAND_RIGHT_ARM_ROTATION,
+	ARMOR_STAND_LEFT_LEG_ROTATION,
+	ARMOR_STAND_RIGHT_LEG_ROTATION,
 
-		// Insentient
-		INSENTIENT_STATUS = _LIVING_NEXT,
-		_INSENTIENT_NEXT,
+	// Insentient
+	INSENTIENT_STATUS = _LIVING_NEXT,
+	_INSENTIENT_NEXT,
 
-		// Ambient
-		_AMBIENT_NEXT = _INSENTIENT_NEXT,
+	// Ambient
+	_AMBIENT_NEXT = _INSENTIENT_NEXT,
 
-		// Bat
-		BAT_HANGING = _AMBIENT_NEXT,
+	// Bat
+	BAT_HANGING = _AMBIENT_NEXT,
 
-		// Creature
-		_CREATURE_NEXT = _INSENTIENT_NEXT,
+	// Creature
+	_CREATURE_NEXT = _INSENTIENT_NEXT,
 
-		// Ageable
-		AGEABLE_BABY = _CREATURE_NEXT,
-		_AGEABLE_NEXT,
+	// Ageable
+	AGEABLE_BABY = _CREATURE_NEXT,
+	_AGEABLE_NEXT,
 
-		// PolarBear
-		POLAR_BEAR_STANDING = _AGEABLE_NEXT,
+	// PolarBear
+	POLAR_BEAR_STANDING = _AGEABLE_NEXT,
 
-		// Animal
-		_ANIMAL_NEXT = _AGEABLE_NEXT,
+	// Animal
+	_ANIMAL_NEXT = _AGEABLE_NEXT,
 
-		// Abstract horse
-		ABSTRACT_HORSE_STATUS = _ANIMAL_NEXT,
-		ABSTRACT_HORSE_OWNER,
-		_ABSTRACT_HORSE_NEXT,
+	// Abstract horse
+	ABSTRACT_HORSE_STATUS = _ANIMAL_NEXT,
+	ABSTRACT_HORSE_OWNER,
+	_ABSTRACT_HORSE_NEXT,
 
-		// Horse
-		HORSE_VARIANT = _ABSTRACT_HORSE_NEXT,
-		HORSE_ARMOR,
+	// Horse
+	HORSE_VARIANT = _ABSTRACT_HORSE_NEXT,
+	HORSE_ARMOR,
 
-		// Chested horse
-		CHESTED_HORSE_CHESTED = _ABSTRACT_HORSE_NEXT,
-		_CHESTED_HORSE_NEXT,
+	// Chested horse
+	CHESTED_HORSE_CHESTED = _ABSTRACT_HORSE_NEXT,
+	_CHESTED_HORSE_NEXT,
 
-		// Llama
-		LLAMA_STRENGTH = _CHESTED_HORSE_NEXT,
-		LLAMA_CARPET_COLOR,
-		LLAMA_VARIANT,
+	// Llama
+	LLAMA_STRENGTH = _CHESTED_HORSE_NEXT,
+	LLAMA_CARPET_COLOR,
+	LLAMA_VARIANT,
 
-		// Pig
-		PIG_HAS_SADDLE = _ANIMAL_NEXT,
-		PIG_TOTAL_CARROT_ON_A_STICK_BOOST,  // 1.11.1 only
+	// Pig
+	PIG_HAS_SADDLE = _ANIMAL_NEXT,
+	PIG_TOTAL_CARROT_ON_A_STICK_BOOST,  // 1.11.1 only
 
-		// Rabbit
-		RABBIT_TYPE = _ANIMAL_NEXT,
+	// Rabbit
+	RABBIT_TYPE = _ANIMAL_NEXT,
 
-		// Sheep
-		SHEEP_STATUS = _ANIMAL_NEXT,
+	// Sheep
+	SHEEP_STATUS = _ANIMAL_NEXT,
 
-		// TameableAnimal
-		TAMEABLE_ANIMAL_STATUS = _ANIMAL_NEXT,
-		TAMEABLE_ANIMAL_OWNER,
-		_TAMEABLE_NEXT,
+	// TameableAnimal
+	TAMEABLE_ANIMAL_STATUS = _ANIMAL_NEXT,
+	TAMEABLE_ANIMAL_OWNER,
+	_TAMEABLE_NEXT,
 
-		// Ocelot
-		OCELOT_TYPE = _TAMEABLE_NEXT,
+	// Ocelot
+	OCELOT_TYPE = _TAMEABLE_NEXT,
 
-		// Wolf
-		WOLF_DAMAGE_TAKEN = _TAMEABLE_NEXT,
-		WOLF_BEGGING,
-		WOLF_COLLAR_COLOR,
+	// Wolf
+	WOLF_DAMAGE_TAKEN = _TAMEABLE_NEXT,
+	WOLF_BEGGING,
+	WOLF_COLLAR_COLOR,
 
-		// Villager
-		VILLAGER_PROFESSION = _AGEABLE_NEXT,
+	// Villager
+	VILLAGER_PROFESSION = _AGEABLE_NEXT,
 
-		// Golem
-		_GOLEM_NEXT = _CREATURE_NEXT,
+	// Golem
+	_GOLEM_NEXT = _CREATURE_NEXT,
 
-		// IronGolem
-		IRON_GOLEM_PLAYER_CREATED = _GOLEM_NEXT,
+	// IronGolem
+	IRON_GOLEM_PLAYER_CREATED = _GOLEM_NEXT,
 
-		// Shulker
-		SHULKER_FACING_DIRECTION = _GOLEM_NEXT,
-		SHULKER_ATTACHMENT_FALLING_BLOCK_POSITION,
-		SHULKER_SHIELD_HEIGHT,
+	// Shulker
+	SHULKER_FACING_DIRECTION = _GOLEM_NEXT,
+	SHULKER_ATTACHMENT_FALLING_BLOCK_POSITION,
+	SHULKER_SHIELD_HEIGHT,
 
-		// Monster
-		_MONSTER_NEXT = _CREATURE_NEXT,
+	// Monster
+	_MONSTER_NEXT = _CREATURE_NEXT,
 
-		// Blaze
-		BLAZE_ON_FIRE = _MONSTER_NEXT,
+	// Blaze
+	BLAZE_ON_FIRE = _MONSTER_NEXT,
 
-		// Creeper
-		CREEPER_STATE = _MONSTER_NEXT,
-		CREEPER_POWERED,
-		CREEPER_IGNITED,
+	// Creeper
+	CREEPER_STATE = _MONSTER_NEXT,
+	CREEPER_POWERED,
+	CREEPER_IGNITED,
 
-		// Guardian
-		GUARDIAN_STATUS = _MONSTER_NEXT,
-		GUARDIAN_TARGET,
+	// Guardian
+	GUARDIAN_STATUS = _MONSTER_NEXT,
+	GUARDIAN_TARGET,
 
-		// Abstract Skeleton
-		ABSTRACT_SKELETON_ARMS_SWINGING = _MONSTER_NEXT,
+	// Abstract Skeleton
+	ABSTRACT_SKELETON_ARMS_SWINGING = _MONSTER_NEXT,
 
-		// Spider
-		SPIDER_CLIMBING = _MONSTER_NEXT,
+	// Spider
+	SPIDER_CLIMBING = _MONSTER_NEXT,
 
-		// Witch
-		WITCH_AGGRESIVE = _MONSTER_NEXT,
+	// Witch
+	WITCH_AGGRESIVE = _MONSTER_NEXT,
 
-		// Wither
-		WITHER_FIRST_HEAD_TARGET = _MONSTER_NEXT,
-		WITHER_SECOND_HEAD_TARGET,
-		WITHER_THIRD_HEAD_TARGET,
-		WITHER_INVULNERABLE_TIMER,
+	// Wither
+	WITHER_FIRST_HEAD_TARGET = _MONSTER_NEXT,
+	WITHER_SECOND_HEAD_TARGET,
+	WITHER_THIRD_HEAD_TARGET,
+	WITHER_INVULNERABLE_TIMER,
 
-		// Zombie
-		ZOMBIE_IS_BABY = _MONSTER_NEXT,
-		ZOMBIE_UNUSED,  // Was type
-		ZOMBIE_HANDS_RISED_UP,
-		_ZOMBIE_NEXT,
+	// Zombie
+	ZOMBIE_IS_BABY = _MONSTER_NEXT,
+	ZOMBIE_UNUSED,  // Was type
+	ZOMBIE_HANDS_RISED_UP,
+	_ZOMBIE_NEXT,
 
-		// Zombie villager
-		ZOMBIE_VILLAGER_CONVERTING = _ZOMBIE_NEXT,
-		ZOMBIE_VILLAGER_PROFESSION,
+	// Zombie villager
+	ZOMBIE_VILLAGER_CONVERTING = _ZOMBIE_NEXT,
+	ZOMBIE_VILLAGER_PROFESSION,
 
-		// Enderman
-		ENDERMAN_CARRIED_BLOCK = _MONSTER_NEXT,
-		ENDERMAN_SCREAMING,
+	// Enderman
+	ENDERMAN_CARRIED_BLOCK = _MONSTER_NEXT,
+	ENDERMAN_SCREAMING,
 
-		// Evocation illager
-		EVOKER_SPELL = _MONSTER_NEXT,
+	// Evocation illager
+	EVOKER_SPELL = _MONSTER_NEXT,
 
-		// Vex
-		VEX_FLAGS = _MONSTER_NEXT,
+	// Vex
+	VEX_FLAGS = _MONSTER_NEXT,
 
-		// Vindication illager
-		VINDICATOR_FLAGS = _MONSTER_NEXT,
+	// Vindication illager
+	VINDICATOR_FLAGS = _MONSTER_NEXT,
 
-		// EnderDragon
-		ENDER_DRAGON_DRAGON_PHASE = _INSENTIENT_NEXT,
+	// EnderDragon
+	ENDER_DRAGON_DRAGON_PHASE = _INSENTIENT_NEXT,
 
-		// Flying
-		_FLYING_NEXT = _INSENTIENT_NEXT,
+	// Flying
+	_FLYING_NEXT = _INSENTIENT_NEXT,
 
-		// Ghast
-		GHAST_ATTACKING = _FLYING_NEXT,
+	// Ghast
+	GHAST_ATTACKING = _FLYING_NEXT,
 
-		// Slime
-		SLIME_SIZE = _INSENTIENT_NEXT,
+	// Slime
+	SLIME_SIZE = _INSENTIENT_NEXT,
 
-		// Minecart
-		MINECART_SHAKING_POWER = _ENTITY_NEXT,
-		MINECART_SHAKING_DIRECTION,
-		MINECART_SHAKING_MULTIPLIER,
-		MINECART_BLOCK_ID_META,
-		MINECART_BLOCK_Y,
-		MINECART_SHOW_BLOCK,
-		_MINECART_NEXT,
+	// Minecart
+	MINECART_SHAKING_POWER = _ENTITY_NEXT,
+	MINECART_SHAKING_DIRECTION,
+	MINECART_SHAKING_MULTIPLIER,
+	MINECART_BLOCK_ID_META,
+	MINECART_BLOCK_Y,
+	MINECART_SHOW_BLOCK,
+	_MINECART_NEXT,
 
-		// MinecartCommandBlock
-		MINECART_COMMAND_BLOCK_COMMAND = _MINECART_NEXT,
-		MINECART_COMMAND_BLOCK_LAST_OUTPUT,
+	// MinecartCommandBlock
+	MINECART_COMMAND_BLOCK_COMMAND = _MINECART_NEXT,
+	MINECART_COMMAND_BLOCK_LAST_OUTPUT,
 
-		// MinecartFurnace
-		MINECART_FURNACE_POWERED = _MINECART_NEXT,
+	// MinecartFurnace
+	MINECART_FURNACE_POWERED = _MINECART_NEXT,
 
-		// TNTPrimed
-		TNT_PRIMED_FUSE_TIME = _ENTITY_NEXT,
-	};
+	// TNTPrimed
+	TNT_PRIMED_FUSE_TIME = _ENTITY_NEXT,
+};
 }
 
 #ifdef __clang__
@@ -1014,7 +1014,7 @@ UInt32 cProtocol_1_12::GetPacketID(cProtocol::ePacketType a_Packet) const
 		case pktUpdateHealth:        return 0x40;
 		case pktUpdateScore:         return 0x44;
 
-		default: return Super::GetPacketID(a_Packet);
+		default:                     return Super::GetPacketID(a_Packet);
 	}
 }
 
@@ -1024,10 +1024,11 @@ UInt32 cProtocol_1_12::GetPacketID(cProtocol::ePacketType a_Packet) const
 
 void cProtocol_1_12::HandleCraftRecipe(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8,  WindowID);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt,  UInt32, RecipeID);
-	HANDLE_READ(a_ByteBuffer, ReadBool,    bool,   MakeAll);
-	auto CuberiteRecipeId = cRoot::Get()->GetRecipeMapper()->GetCuberiteRecipeId(RecipeID, m_Client->GetProtocolVersion());
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, WindowID);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, RecipeID);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, MakeAll);
+	auto CuberiteRecipeId =
+		cRoot::Get()->GetRecipeMapper()->GetCuberiteRecipeId(RecipeID, m_Client->GetProtocolVersion());
 	if (CuberiteRecipeId.has_value())
 	{
 		m_Client->HandleCraftRecipe(CuberiteRecipeId.value());
@@ -1063,9 +1064,9 @@ signed char cProtocol_1_12::GetProtocolEntityStatus(EntityAnimation a_Animation)
 {
 	switch (a_Animation)
 	{
-		case EntityAnimation::PawnBurns: return 37;
+		case EntityAnimation::PawnBurns:  return 37;
 		case EntityAnimation::PawnDrowns: return 36;
-		default: return Super::GetProtocolEntityStatus(a_Animation);
+		default:                          return Super::GetProtocolEntityStatus(a_Animation);
 	}
 }
 
@@ -1209,7 +1210,7 @@ UInt32 cProtocol_1_12_1::GetPacketID(ePacketType a_Packet) const
 		case pktTimeUpdate:             return 0x47;
 		case pktTitle:                  return 0x48;
 
-		default: return Super::GetPacketID(a_Packet);
+		default:                        return Super::GetPacketID(a_Packet);
 	}
 }
 
@@ -1315,10 +1316,7 @@ cProtocol::Version cProtocol_1_12_2::GetProtocolVersion() const
 void cProtocol_1_12_2::HandlePacketKeepAlive(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, KeepAliveID);
-	if (
-		(KeepAliveID <= std::numeric_limits<UInt32>::max()) &&
-		(KeepAliveID >= 0)
-	)
+	if ((KeepAliveID <= std::numeric_limits<UInt32>::max()) && (KeepAliveID >= 0))
 	{
 		// The server will only send a UInt32 so any value out of that range shouldn't keep the client alive.
 		m_Client->HandleKeepAlive(static_cast<UInt32>(KeepAliveID));
@@ -1334,7 +1332,11 @@ void cProtocol_1_12_2::SendKeepAlive(UInt32 a_PingID)
 	// Drop the packet if the protocol is not in the Game state yet (caused a client crash):
 	if (m_State != 3)
 	{
-		LOGWARNING("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class prevented the packet.", m_State);
+		LOGWARNING(
+			"Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class "
+			"prevented the packet.",
+			m_State
+		);
 		return;
 	}
 
@@ -1350,7 +1352,8 @@ void cProtocol_1_12_2::SendUnlockRecipe(UInt32 a_RecipeID)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	auto ProtocolRecipeId = cRoot::Get()->GetRecipeMapper()->GetProtocolRecipeId(a_RecipeID, m_Client->GetProtocolVersion());
+	auto ProtocolRecipeId =
+		cRoot::Get()->GetRecipeMapper()->GetProtocolRecipeId(a_RecipeID, m_Client->GetProtocolVersion());
 	if (ProtocolRecipeId.has_value())
 	{
 		cPacketizer Pkt(*this, pktUnlockRecipe);
@@ -1370,7 +1373,8 @@ void cProtocol_1_12_2::SendInitRecipes(UInt32 a_RecipeID)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	auto ProtocolRecipeId = cRoot::Get()->GetRecipeMapper()->GetProtocolRecipeId(a_RecipeID, m_Client->GetProtocolVersion());
+	auto ProtocolRecipeId =
+		cRoot::Get()->GetRecipeMapper()->GetProtocolRecipeId(a_RecipeID, m_Client->GetProtocolVersion());
 	if (!ProtocolRecipeId.has_value())
 	{
 		return;

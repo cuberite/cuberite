@@ -15,16 +15,14 @@ class cByteBuffer;
 
 class CircularBufferCompressor
 {
-public:
-
+  public:
 	ContiguousByteBufferView GetView() const;
 
 	Compression::Result Compress();
 	void ReadFrom(cByteBuffer & Buffer);
 	void ReadFrom(cByteBuffer & Buffer, size_t Size);
 
-private:
-
+  private:
 	Compression::Compressor m_Compressor;
 	std::basic_string<std::byte> m_ContiguousIntermediate;
 };
@@ -35,15 +33,13 @@ private:
 
 class CircularBufferExtractor
 {
-public:
-
+  public:
 	ContiguousByteBufferView GetView() const;
 
 	Compression::Result Extract(size_t UncompressedSize);
 	void ReadFrom(cByteBuffer & Buffer, size_t Size);
 
-private:
-
+  private:
 	Compression::Extractor m_Extractor;
 	std::basic_string<std::byte> m_ContiguousIntermediate;
 };

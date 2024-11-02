@@ -15,20 +15,27 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cRoughRavine:
 
-class cRoughRavine:
-	public cGridStructGen::cStructure
+class cRoughRavine : public cGridStructGen::cStructure
 {
 	using Super = cGridStructGen::cStructure;
 
-public:
-
+  public:
 	cRoughRavine(
-		int a_Seed, size_t a_Size,
-		float a_CenterWidth, float a_Roughness,
-		float a_FloorHeightEdge1,   float a_FloorHeightEdge2,   float a_FloorHeightCenter,
-		float a_CeilingHeightEdge1, float a_CeilingHeightEdge2, float a_CeilingHeightCenter,
-		int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ
-	):
+		int a_Seed,
+		size_t a_Size,
+		float a_CenterWidth,
+		float a_Roughness,
+		float a_FloorHeightEdge1,
+		float a_FloorHeightEdge2,
+		float a_FloorHeightCenter,
+		float a_CeilingHeightEdge1,
+		float a_CeilingHeightEdge2,
+		float a_CeilingHeightCenter,
+		int a_GridX,
+		int a_GridZ,
+		int a_OriginX,
+		int a_OriginZ
+	) :
 		Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 		m_Seed(a_Seed + 100),
 		m_Noise(a_Seed + 100),
@@ -40,12 +47,19 @@ public:
 		m_DefPoints.resize(Max + 1);
 		int rnd = m_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) / 7;
 		float Len = static_cast<float>(a_Size);
-		float Angle = static_cast<float>(rnd);  // Angle is in radians, will be wrapped in the "sin" and "cos" operations
+		float Angle =
+			static_cast<float>(rnd);  // Angle is in radians, will be wrapped in the "sin" and "cos" operations
 		float OfsX = sinf(Angle) * Len;
 		float OfsZ = cosf(Angle) * Len;
-		m_DefPoints[0].Set   (a_OriginX - OfsX, a_OriginZ - OfsZ, 1,             a_CeilingHeightEdge1,  a_FloorHeightEdge1);
-		m_DefPoints[Half].Set(static_cast<float>(a_OriginX), static_cast<float>(a_OriginZ), a_CenterWidth, a_CeilingHeightCenter, a_FloorHeightCenter);
-		m_DefPoints[Max].Set (a_OriginX + OfsX, a_OriginZ + OfsZ, 1,             a_CeilingHeightEdge2,  a_FloorHeightEdge2);
+		m_DefPoints[0].Set(a_OriginX - OfsX, a_OriginZ - OfsZ, 1, a_CeilingHeightEdge1, a_FloorHeightEdge1);
+		m_DefPoints[Half].Set(
+			static_cast<float>(a_OriginX),
+			static_cast<float>(a_OriginZ),
+			a_CenterWidth,
+			a_CeilingHeightCenter,
+			a_FloorHeightCenter
+		);
+		m_DefPoints[Max].Set(a_OriginX + OfsX, a_OriginZ + OfsZ, 1, a_CeilingHeightEdge2, a_FloorHeightEdge2);
 
 		// Calculate the points in between, recursively:
 		SubdivideLine(0, Half);
@@ -55,7 +69,7 @@ public:
 		InitPerHeightRadius(a_GridX, a_GridZ);
 	}
 
-protected:
+  protected:
 	struct sRavineDefPoint
 	{
 		float m_X;
@@ -100,7 +114,7 @@ protected:
 		float MidX = (p1.m_X + p2.m_X) / 2;
 		float MidZ = (p1.m_Z + p2.m_Z) / 2;
 		float MidR = (p1.m_Radius + p2.m_Radius) / 2 + 0.1f;
-		float MidT = (p1.m_Top    + p2.m_Top)    / 2;
+		float MidT = (p1.m_Top + p2.m_Top) / 2;
 		float MidB = (p1.m_Bottom + p2.m_Bottom) / 2;
 
 		// Adjust the midpoint by a small amount of perpendicular vector in a random one of its two directions:
@@ -162,12 +176,10 @@ protected:
 		int BlockEndZ = BlockStartZ + cChunkDef::Width;
 		for (sRavineDefPoints::const_iterator itr = m_DefPoints.begin(), end = m_DefPoints.end(); itr != end; ++itr)
 		{
-			if (
-				(ceilf (itr->m_X + itr->m_Radius + 2) < BlockStartX) ||
+			if ((ceilf(itr->m_X + itr->m_Radius + 2) < BlockStartX) ||
 				(floorf(itr->m_X - itr->m_Radius - 2) > BlockEndX) ||
-				(ceilf (itr->m_Z + itr->m_Radius + 2) < BlockStartZ) ||
-				(floorf(itr->m_Z - itr->m_Radius - 2) > BlockEndZ)
-			)
+				(ceilf(itr->m_Z + itr->m_Radius + 2) < BlockStartZ) ||
+				(floorf(itr->m_Z - itr->m_Radius - 2) > BlockEndZ))
 			{
 				// Cannot intersect, bail out early
 				continue;
@@ -175,41 +187,44 @@ protected:
 
 			// Carve out a cylinder around the xz point, up to (m_Radius + 2) in diameter, from Bottom to Top:
 			// On each height level, use m_PerHeightRadius[] to modify the actual radius used
-			// EnlargedRadiusSq is the square of the radius enlarged by the maximum m_PerHeightRadius offset - anything outside it will never be touched.
+			// EnlargedRadiusSq is the square of the radius enlarged by the maximum m_PerHeightRadius offset - anything
+			// outside it will never be touched.
 			float RadiusSq = (itr->m_Radius + 2) * (itr->m_Radius + 2);
 			float DifX = BlockStartX - itr->m_X;  // substitution for faster calc
 			float DifZ = BlockStartZ - itr->m_Z;  // substitution for faster calc
-			for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
-			{
-				#ifndef NDEBUG
-				// DEBUG: Make the roughravine shapepoints visible on a single layer (so that we can see with Minutor what's going on)
-				if ((FloorC(DifX + x) == 0) && (FloorC(DifZ + z) == 0))
+			for (int x = 0; x < cChunkDef::Width; x++)
+				for (int z = 0; z < cChunkDef::Width; z++)
 				{
-					a_ChunkDesc.SetBlockType(x, 4, z, E_BLOCK_LAPIS_ORE);
-				}
-				#endif  // !NDEBUG
+#ifndef NDEBUG
+					// DEBUG: Make the roughravine shapepoints visible on a single layer (so that we can see with
+					// Minutor what's going on)
+					if ((FloorC(DifX + x) == 0) && (FloorC(DifZ + z) == 0))
+					{
+						a_ChunkDesc.SetBlockType(x, 4, z, E_BLOCK_LAPIS_ORE);
+					}
+#endif  // !NDEBUG
 
-				// If the column is outside the enlarged radius, bail out completely
-				float DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);
-				if (DistSq > RadiusSq)
-				{
-					continue;
-				}
-
-				int Top = std::min(CeilC(itr->m_Top), +cChunkDef::Height);
-				for (int y = std::max(FloorC(itr->m_Bottom), 1); y <= Top; y++)
-				{
-					if ((itr->m_Radius + m_PerHeightRadius[y]) * (itr->m_Radius + m_PerHeightRadius[y]) < DistSq)
+					// If the column is outside the enlarged radius, bail out completely
+					float DistSq = (DifX + x) * (DifX + x) + (DifZ + z) * (DifZ + z);
+					if (DistSq > RadiusSq)
 					{
 						continue;
 					}
 
-					if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlockType(x, y, z)))
+					int Top = std::min(CeilC(itr->m_Top), +cChunkDef::Height);
+					for (int y = std::max(FloorC(itr->m_Bottom), 1); y <= Top; y++)
 					{
-						a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
-					}
-				}  // for y
-			}  // for x, z - a_BlockTypes
+						if ((itr->m_Radius + m_PerHeightRadius[y]) * (itr->m_Radius + m_PerHeightRadius[y]) < DistSq)
+						{
+							continue;
+						}
+
+						if (cBlockInfo::CanBeTerraformed(a_ChunkDesc.GetBlockType(x, y, z)))
+						{
+							a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
+						}
+					}  // for y
+				}  // for x, z - a_BlockTypes
 		}  // for itr - m_Points[]
 	}
 };
@@ -223,14 +238,22 @@ protected:
 
 cRoughRavines::cRoughRavines(
 	int a_Seed,
-	int a_MaxSize, int a_MinSize,
-	float a_MaxCenterWidth, float a_MinCenterWidth,
-	float a_MaxRoughness,   float a_MinRoughness,
-	float a_MaxFloorHeightEdge,     float a_MinFloorHeightEdge,
-	float a_MaxFloorHeightCenter,   float a_MinFloorHeightCenter,
-	float a_MaxCeilingHeightEdge,   float a_MinCeilingHeightEdge,
-	float a_MaxCeilingHeightCenter, float a_MinCeilingHeightCenter,
-	int a_GridSize, int a_MaxOffset
+	int a_MaxSize,
+	int a_MinSize,
+	float a_MaxCenterWidth,
+	float a_MinCenterWidth,
+	float a_MaxRoughness,
+	float a_MinRoughness,
+	float a_MaxFloorHeightEdge,
+	float a_MinFloorHeightEdge,
+	float a_MaxFloorHeightCenter,
+	float a_MinFloorHeightCenter,
+	float a_MaxCeilingHeightEdge,
+	float a_MinCeilingHeightEdge,
+	float a_MaxCeilingHeightCenter,
+	float a_MinCeilingHeightCenter,
+	int a_GridSize,
+	int a_MaxOffset
 ) :
 	Super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSize, a_MaxSize, 64),
 	m_MaxSize(a_MaxSize),
@@ -276,26 +299,39 @@ cRoughRavines::cRoughRavines(
 cGridStructGen::cStructurePtr cRoughRavines::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
 {
 	// Pick a random value for each of the ravine's parameters:
-	size_t Size = static_cast<size_t>(m_MinSize + (m_Noise.IntNoise2DInt(a_GridX, a_GridZ) / 7) % (m_MaxSize - m_MinSize));  // Random int from m_MinSize to m_MaxSize
-	float CenterWidth         = m_Noise.IntNoise2DInRange(a_GridX + 10, a_GridZ, m_MinCenterWidth,         m_MaxCenterWidth);
-	float Roughness           = m_Noise.IntNoise2DInRange(a_GridX + 20, a_GridZ, m_MinRoughness,           m_MaxRoughness);
-	float FloorHeightEdge1    = m_Noise.IntNoise2DInRange(a_GridX + 30, a_GridZ, m_MinFloorHeightEdge,     m_MaxFloorHeightEdge);
-	float FloorHeightEdge2    = m_Noise.IntNoise2DInRange(a_GridX + 40, a_GridZ, m_MinFloorHeightEdge,     m_MaxFloorHeightEdge);
-	float FloorHeightCenter   = m_Noise.IntNoise2DInRange(a_GridX + 50, a_GridZ, m_MinFloorHeightCenter,   m_MaxFloorHeightCenter);
-	float CeilingHeightEdge1  = m_Noise.IntNoise2DInRange(a_GridX + 60, a_GridZ, m_MinCeilingHeightEdge,   m_MaxCeilingHeightEdge);
-	float CeilingHeightEdge2  = m_Noise.IntNoise2DInRange(a_GridX + 70, a_GridZ, m_MinCeilingHeightEdge,   m_MaxCeilingHeightEdge);
-	float CeilingHeightCenter = m_Noise.IntNoise2DInRange(a_GridX + 80, a_GridZ, m_MinCeilingHeightCenter, m_MaxCeilingHeightCenter);
+	size_t Size = static_cast<size_t>(
+		m_MinSize + (m_Noise.IntNoise2DInt(a_GridX, a_GridZ) / 7) % (m_MaxSize - m_MinSize)
+	);  // Random int from m_MinSize to m_MaxSize
+	float CenterWidth = m_Noise.IntNoise2DInRange(a_GridX + 10, a_GridZ, m_MinCenterWidth, m_MaxCenterWidth);
+	float Roughness = m_Noise.IntNoise2DInRange(a_GridX + 20, a_GridZ, m_MinRoughness, m_MaxRoughness);
+	float FloorHeightEdge1 =
+		m_Noise.IntNoise2DInRange(a_GridX + 30, a_GridZ, m_MinFloorHeightEdge, m_MaxFloorHeightEdge);
+	float FloorHeightEdge2 =
+		m_Noise.IntNoise2DInRange(a_GridX + 40, a_GridZ, m_MinFloorHeightEdge, m_MaxFloorHeightEdge);
+	float FloorHeightCenter =
+		m_Noise.IntNoise2DInRange(a_GridX + 50, a_GridZ, m_MinFloorHeightCenter, m_MaxFloorHeightCenter);
+	float CeilingHeightEdge1 =
+		m_Noise.IntNoise2DInRange(a_GridX + 60, a_GridZ, m_MinCeilingHeightEdge, m_MaxCeilingHeightEdge);
+	float CeilingHeightEdge2 =
+		m_Noise.IntNoise2DInRange(a_GridX + 70, a_GridZ, m_MinCeilingHeightEdge, m_MaxCeilingHeightEdge);
+	float CeilingHeightCenter =
+		m_Noise.IntNoise2DInRange(a_GridX + 80, a_GridZ, m_MinCeilingHeightCenter, m_MaxCeilingHeightCenter);
 
 	// Create a ravine:
 	return cStructurePtr(new cRoughRavine(
 		m_Seed,
-		Size, CenterWidth, Roughness,
-		FloorHeightEdge1,   FloorHeightEdge2,   FloorHeightCenter,
-		CeilingHeightEdge1, CeilingHeightEdge2, CeilingHeightCenter,
-		a_GridX, a_GridZ, a_OriginX, a_OriginZ
+		Size,
+		CenterWidth,
+		Roughness,
+		FloorHeightEdge1,
+		FloorHeightEdge2,
+		FloorHeightCenter,
+		CeilingHeightEdge1,
+		CeilingHeightEdge2,
+		CeilingHeightCenter,
+		a_GridX,
+		a_GridZ,
+		a_OriginX,
+		a_OriginZ
 	));
 }
-
-
-
-

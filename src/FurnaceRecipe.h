@@ -13,7 +13,7 @@ class cItem;
 
 class cFurnaceRecipe
 {
-public:
+  public:
 	cFurnaceRecipe(void);
 	~cFurnaceRecipe();
 
@@ -42,7 +42,7 @@ public:
 	/** Returns the amount of time that the specified fuel burns, in ticks */
 	int GetBurnTime(const cItem & a_Fuel) const;
 
-private:
+  private:
 	void ClearRecipes(void);
 
 	/** Parses the fuel contained in the line, adds it to m_pState's fuels.
@@ -59,7 +59,3 @@ private:
 	struct sFurnaceRecipeState;
 	sFurnaceRecipeState * m_pState;
 };
-
-
-
-

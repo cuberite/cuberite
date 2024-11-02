@@ -10,9 +10,8 @@
 
 
 
-cLuaNameLookup::cLuaNameLookup(const AString & a_Query, cLuaState::cTableRefPtr && a_Callbacks):
-	m_Callbacks(std::move(a_Callbacks)),
-	m_Query(a_Query)
+cLuaNameLookup::cLuaNameLookup(const AString & a_Query, cLuaState::cTableRefPtr && a_Callbacks) :
+	m_Callbacks(std::move(a_Callbacks)), m_Query(a_Query)
 {
 }
 
@@ -42,7 +41,3 @@ void cLuaNameLookup::OnFinished(void)
 {
 	m_Callbacks->CallTableFn("OnFinished", m_Query);
 }
-
-
-
-

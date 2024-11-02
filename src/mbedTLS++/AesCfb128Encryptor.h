@@ -18,8 +18,7 @@
 /** Encrypts data using the AES / CFB (128) algorithm */
 class cAesCfb128Encryptor
 {
-public:
-
+  public:
 	cAesCfb128Encryptor(void);
 	~cAesCfb128Encryptor();
 
@@ -32,8 +31,7 @@ public:
 	/** Returns true if the object has been initialized with the Key / IV */
 	bool IsValid(void) const { return m_IsValid; }
 
-protected:
-
+  protected:
 	mbedtls_aes_context m_Aes;
 
 	/** The InitialVector, used by the CFB mode encryption */
@@ -41,4 +39,4 @@ protected:
 
 	/** Indicates whether the object has been initialized with the Key / IV */
 	bool m_IsValid;
-} ;
+};

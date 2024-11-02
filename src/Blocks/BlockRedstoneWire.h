@@ -9,17 +9,14 @@
 
 
 
-class cBlockRedstoneWireHandler final :
-	public cBlockHandler
+class cBlockRedstoneWireHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
 		if (a_Position.y <= 0)
@@ -69,8 +66,4 @@ private:
 		UNUSED(a_Meta);
 		return 0;
 	}
-} ;
-
-
-
-
+};

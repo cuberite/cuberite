@@ -16,15 +16,15 @@
 
 namespace UDPEndpointImplHelper
 {
-	static bool IsValidSocket(evutil_socket_t a_Socket)
-	{
+static bool IsValidSocket(evutil_socket_t a_Socket)
+{
 #ifdef _WIN32
-		return (a_Socket != INVALID_SOCKET);
+	return (a_Socket != INVALID_SOCKET);
 #else  // _WIN32
-		return (a_Socket >= 0);
+	return (a_Socket >= 0);
 #endif  // else _WIN32
-	}
 }
+}  // namespace UDPEndpointImplHelper
 
 
 
@@ -37,8 +37,8 @@ static void ConvertIPv4ToMappedIPv6(sockaddr_in & a_SrcAddr, sockaddr_in6 & a_Ds
 	a_DstAddr.sin6_family = AF_INET6;
 	a_DstAddr.sin6_addr.s6_addr[10] = 0xff;
 	a_DstAddr.sin6_addr.s6_addr[11] = 0xff;
-	a_DstAddr.sin6_addr.s6_addr[12] = static_cast<Byte>((a_SrcAddr.sin_addr.s_addr >>  0) & 0xff);
-	a_DstAddr.sin6_addr.s6_addr[13] = static_cast<Byte>((a_SrcAddr.sin_addr.s_addr >>  8) & 0xff);
+	a_DstAddr.sin6_addr.s6_addr[12] = static_cast<Byte>((a_SrcAddr.sin_addr.s_addr >> 0) & 0xff);
+	a_DstAddr.sin6_addr.s6_addr[13] = static_cast<Byte>((a_SrcAddr.sin_addr.s_addr >> 8) & 0xff);
 	a_DstAddr.sin6_addr.s6_addr[14] = static_cast<Byte>((a_SrcAddr.sin_addr.s_addr >> 16) & 0xff);
 	a_DstAddr.sin6_addr.s6_addr[15] = static_cast<Byte>((a_SrcAddr.sin_addr.s_addr >> 24) & 0xff);
 	a_DstAddr.sin6_port = a_SrcAddr.sin_port;
@@ -54,11 +54,16 @@ static void ConvertIPv4ToMappedIPv6(sockaddr_in & a_SrcAddr, sockaddr_in6 & a_Ds
 /** A hostname-to-IP resolver callback that sends the data stored within to the resolved IP address.
 This is used for sending UDP datagrams to hostnames, so that the cUDPEndpoint::Send() doesn't block.
 Instead an instance of this callback is queued for resolving and the data is sent once the IP is resolved. */
-class cUDPSendAfterLookup:
-	public cNetwork::cResolveNameCallbacks
+class cUDPSendAfterLookup : public cNetwork::cResolveNameCallbacks
 {
-public:
-	cUDPSendAfterLookup(const AString & a_Data, UInt16 a_Port, evutil_socket_t a_MainSock, evutil_socket_t a_SecondSock, bool a_IsMainSockIPv6):
+  public:
+	cUDPSendAfterLookup(
+		const AString & a_Data,
+		UInt16 a_Port,
+		evutil_socket_t a_MainSock,
+		evutil_socket_t a_SecondSock,
+		bool a_IsMainSockIPv6
+	) :
 		m_Data(a_Data),
 		m_Port(a_Port),
 		m_MainSock(a_MainSock),
@@ -69,7 +74,7 @@ public:
 	{
 	}
 
-protected:
+  protected:
 	/** The data to send after the hostname is resolved. */
 	AString m_Data;
 
@@ -137,20 +142,41 @@ protected:
 		{
 			if (m_HasIPv6)
 			{
-				sendto(m_MainSock, m_Data.data(), m_Data.size(), 0, reinterpret_cast<const sockaddr *>(&m_AddrIPv6), static_cast<socklen_t>(sizeof(m_AddrIPv6)));
+				sendto(
+					m_MainSock,
+					m_Data.data(),
+					m_Data.size(),
+					0,
+					reinterpret_cast<const sockaddr *>(&m_AddrIPv6),
+					static_cast<socklen_t>(sizeof(m_AddrIPv6))
+				);
 			}
 			else if (m_HasIPv4)
 			{
 				// If the secondary socket is valid, it is an IPv4 socket, so use that:
 				if (m_SecondSock != -1)
 				{
-					sendto(m_SecondSock, m_Data.data(), m_Data.size(), 0, reinterpret_cast<const sockaddr *>(&m_AddrIPv4), static_cast<socklen_t>(sizeof(m_AddrIPv4)));
+					sendto(
+						m_SecondSock,
+						m_Data.data(),
+						m_Data.size(),
+						0,
+						reinterpret_cast<const sockaddr *>(&m_AddrIPv4),
+						static_cast<socklen_t>(sizeof(m_AddrIPv4))
+					);
 				}
 				else
 				{
 					// Need an address conversion from IPv4 to IPv6-mapped-IPv4:
 					ConvertIPv4ToMappedIPv6(m_AddrIPv4, m_AddrIPv6);
-					sendto(m_MainSock, m_Data.data(), m_Data.size(), 0, reinterpret_cast<const sockaddr *>(&m_AddrIPv6), static_cast<socklen_t>(sizeof(m_AddrIPv6)));
+					sendto(
+						m_MainSock,
+						m_Data.data(),
+						m_Data.size(),
+						0,
+						reinterpret_cast<const sockaddr *>(&m_AddrIPv6),
+						static_cast<socklen_t>(sizeof(m_AddrIPv6))
+					);
 				}
 			}
 			else
@@ -167,7 +193,14 @@ protected:
 				LOGD("UDP endpoint queued sendto: Name not resolved to IPv4 for an IPv4-only socket");
 				return;
 			}
-			sendto(m_MainSock, m_Data.data(), m_Data.size(), 0, reinterpret_cast<const sockaddr *>(&m_AddrIPv4), static_cast<socklen_t>(sizeof(m_AddrIPv4)));
+			sendto(
+				m_MainSock,
+				m_Data.data(),
+				m_Data.size(),
+				0,
+				reinterpret_cast<const sockaddr *>(&m_AddrIPv4),
+				static_cast<socklen_t>(sizeof(m_AddrIPv4))
+			);
 		}
 	}
 
@@ -184,7 +217,7 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cUDPEndpointImpl:
 
-cUDPEndpointImpl::cUDPEndpointImpl(UInt16 a_Port, cUDPEndpoint::cCallbacks & a_Callbacks):
+cUDPEndpointImpl::cUDPEndpointImpl(UInt16 a_Port, cUDPEndpoint::cCallbacks & a_Callbacks) :
 	Super(a_Callbacks),
 	m_Port(0),
 	m_MainSock(-1),
@@ -270,7 +303,8 @@ bool cUDPEndpointImpl::Send(const AString & a_Payload, const AString & a_Host, U
 	if (evutil_parse_sockaddr_port(a_Host.c_str(), reinterpret_cast<sockaddr *>(&sa), &salen) != 0)
 	{
 		// a_Host is a hostname, we need to do a lookup first:
-		auto queue = std::make_shared<cUDPSendAfterLookup>(a_Payload, a_Port, m_MainSock, m_SecondarySock, m_IsMainSockIPv6);
+		auto queue =
+			std::make_shared<cUDPSendAfterLookup>(a_Payload, a_Port, m_MainSock, m_SecondarySock, m_IsMainSockIPv6);
 		return cNetwork::HostnameToIP(a_Host, queue);
 	}
 
@@ -287,19 +321,40 @@ bool cUDPEndpointImpl::Send(const AString & a_Payload, const AString & a_Host, U
 				if (UDPEndpointImplHelper::IsValidSocket(m_SecondarySock))
 				{
 					// The secondary socket, which is always IPv4, is present:
-					NumSent = static_cast<int>(sendto(m_SecondarySock, a_Payload.data(), a_Payload.size(), 0, reinterpret_cast<const sockaddr *>(&sa), static_cast<socklen_t>(salen)));
+					NumSent = static_cast<int>(sendto(
+						m_SecondarySock,
+						a_Payload.data(),
+						a_Payload.size(),
+						0,
+						reinterpret_cast<const sockaddr *>(&sa),
+						static_cast<socklen_t>(salen)
+					));
 				}
 				else
 				{
 					// Need to convert IPv4 to IPv6 address before sending:
 					sockaddr_in6 IPv6;
 					ConvertIPv4ToMappedIPv6(*reinterpret_cast<sockaddr_in *>(&sa), IPv6);
-					NumSent = static_cast<int>(sendto(m_MainSock, a_Payload.data(), a_Payload.size(), 0, reinterpret_cast<const sockaddr *>(&IPv6), static_cast<socklen_t>(sizeof(IPv6))));
+					NumSent = static_cast<int>(sendto(
+						m_MainSock,
+						a_Payload.data(),
+						a_Payload.size(),
+						0,
+						reinterpret_cast<const sockaddr *>(&IPv6),
+						static_cast<socklen_t>(sizeof(IPv6))
+					));
 				}
 			}
 			else
 			{
-				NumSent = static_cast<int>(sendto(m_MainSock, a_Payload.data(), a_Payload.size(), 0, reinterpret_cast<const sockaddr *>(&sa), static_cast<socklen_t>(salen)));
+				NumSent = static_cast<int>(sendto(
+					m_MainSock,
+					a_Payload.data(),
+					a_Payload.size(),
+					0,
+					reinterpret_cast<const sockaddr *>(&sa),
+					static_cast<socklen_t>(salen)
+				));
 			}
 			break;
 		}
@@ -307,7 +362,14 @@ bool cUDPEndpointImpl::Send(const AString & a_Payload, const AString & a_Host, U
 		case AF_INET6:
 		{
 			reinterpret_cast<sockaddr_in6 *>(&sa)->sin6_port = htons(a_Port);
-			NumSent = static_cast<int>(sendto(m_MainSock, a_Payload.data(), a_Payload.size(), 0, reinterpret_cast<const sockaddr *>(&sa), static_cast<socklen_t>(salen)));
+			NumSent = static_cast<int>(sendto(
+				m_MainSock,
+				a_Payload.data(),
+				a_Payload.size(),
+				0,
+				reinterpret_cast<const sockaddr *>(&sa),
+				static_cast<socklen_t>(salen)
+			));
 			break;
 		}
 		default:
@@ -332,7 +394,13 @@ void cUDPEndpointImpl::EnableBroadcasts(void)
 	int broadcastInt = 1;
 	char broadcastChar = 1;
 	// (Note that Windows uses const char * for option values, while Linux uses const void *)
-	if (setsockopt(m_MainSock, SOL_SOCKET, SO_BROADCAST, reinterpret_cast<const char *>(&broadcastInt), sizeof(broadcastInt)) == -1)
+	if (setsockopt(
+			m_MainSock,
+			SOL_SOCKET,
+			SO_BROADCAST,
+			reinterpret_cast<const char *>(&broadcastInt),
+			sizeof(broadcastInt)
+		) == -1)
 	{
 		if (setsockopt(m_MainSock, SOL_SOCKET, SO_BROADCAST, &broadcastChar, sizeof(broadcastChar)) == -1)
 		{
@@ -347,7 +415,12 @@ void cUDPEndpointImpl::EnableBroadcasts(void)
 			if (setsockopt(m_SecondarySock, SOL_SOCKET, SO_BROADCAST, &broadcastChar, sizeof(broadcastChar)) == -1)
 			{
 				int err = EVUTIL_SOCKET_ERROR();
-				LOGWARNING("Cannot enable broadcasts on port %d (secondary): %d (%s)", m_Port, err, evutil_socket_error_to_string(err));
+				LOGWARNING(
+					"Cannot enable broadcasts on port %d (secondary): %d (%s)",
+					m_Port,
+					err,
+					evutil_socket_error_to_string(err)
+				);
 			}
 		}
 		return;
@@ -356,10 +429,21 @@ void cUDPEndpointImpl::EnableBroadcasts(void)
 	// Enable broadcasts on the secondary socket, if opened (use int, it worked for primary):
 	if (UDPEndpointImplHelper::IsValidSocket(m_SecondarySock))
 	{
-		if (setsockopt(m_SecondarySock, SOL_SOCKET, SO_BROADCAST, reinterpret_cast<const char *>(&broadcastInt), sizeof(broadcastInt)) == -1)
+		if (setsockopt(
+				m_SecondarySock,
+				SOL_SOCKET,
+				SO_BROADCAST,
+				reinterpret_cast<const char *>(&broadcastInt),
+				sizeof(broadcastInt)
+			) == -1)
 		{
 			int err = EVUTIL_SOCKET_ERROR();
-			LOGWARNING("Cannot enable broadcasts on port %d (secondary): %d (%s)", m_Port, err, evutil_socket_error_to_string(err));
+			LOGWARNING(
+				"Cannot enable broadcasts on port %d (secondary): %d (%s)",
+				m_Port,
+				err,
+				evutil_socket_error_to_string(err)
+			);
 		}
 	}
 }
@@ -392,8 +476,14 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 		if (!UDPEndpointImplHelper::IsValidSocket(m_MainSock))
 		{
 			err = EVUTIL_SOCKET_ERROR();
-			m_Callbacks.OnError(err, fmt::format(FMT_STRING("Cannot create UDP socket for port {}: {} ({})"),
-				a_Port, err, evutil_socket_error_to_string(err))
+			m_Callbacks.OnError(
+				err,
+				fmt::format(
+					FMT_STRING("Cannot create UDP socket for port {}: {} ({})"),
+					a_Port,
+					err,
+					evutil_socket_error_to_string(err)
+				)
 			);
 			return;
 		}
@@ -403,8 +493,9 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 		{
 			err = EVUTIL_SOCKET_ERROR();
 			LOG("UDP Port %d cannot be made reusable: %d (%s). Restarting the server might not work.",
-				a_Port, err, evutil_socket_error_to_string(err)
-			);
+				a_Port,
+				err,
+				evutil_socket_error_to_string(err));
 		}
 
 		// Bind to all interfaces:
@@ -415,8 +506,14 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 		if (bind(m_MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
 		{
 			err = EVUTIL_SOCKET_ERROR();
-			m_Callbacks.OnError(err, fmt::format(FMT_STRING("Cannot bind UDP port {}: {} ({})"),
-				a_Port, err, evutil_socket_error_to_string(err))
+			m_Callbacks.OnError(
+				err,
+				fmt::format(
+					FMT_STRING("Cannot bind UDP port {}: {} ({})"),
+					a_Port,
+					err,
+					evutil_socket_error_to_string(err)
+				)
 			);
 			evutil_closesocket(m_MainSock);
 			return;
@@ -426,22 +523,24 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 	{
 		// IPv6 socket created, switch it into "dualstack" mode:
 		UInt32 Zero = 0;
-		#ifdef _WIN32
-			// WinXP doesn't support this feature, so if the setting fails, create another socket later on:
-			int res = setsockopt(m_MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
-			err = EVUTIL_SOCKET_ERROR();
-			NeedsTwoSockets = ((res == SOCKET_ERROR) && (err == WSAENOPROTOOPT));
-		#else
+#ifdef _WIN32
+		// WinXP doesn't support this feature, so if the setting fails, create another socket later on:
+		int res =
 			setsockopt(m_MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
-		#endif
+		err = EVUTIL_SOCKET_ERROR();
+		NeedsTwoSockets = ((res == SOCKET_ERROR) && (err == WSAENOPROTOOPT));
+#else
+		setsockopt(m_MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
+#endif
 
 		// Allow the port to be reused right after the socket closes:
 		if (evutil_make_listen_socket_reuseable(m_MainSock) != 0)
 		{
-			err  = EVUTIL_SOCKET_ERROR();
+			err = EVUTIL_SOCKET_ERROR();
 			LOG("UDP Port %d cannot be made reusable: %d (%s). Restarting the server might not work.",
-				a_Port, err, evutil_socket_error_to_string(err)
-			);
+				a_Port,
+				err,
+				evutil_socket_error_to_string(err));
 		}
 
 		// Bind to all interfaces:
@@ -452,8 +551,14 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 		if (bind(m_MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
 		{
 			err = EVUTIL_SOCKET_ERROR();
-			m_Callbacks.OnError(err, fmt::format(FMT_STRING("Cannot bind to UDP port {}: {} ({})"),
-				a_Port, err, evutil_socket_error_to_string(err))
+			m_Callbacks.OnError(
+				err,
+				fmt::format(
+					FMT_STRING("Cannot bind to UDP port {}: {} ({})"),
+					a_Port,
+					err,
+					evutil_socket_error_to_string(err)
+				)
 			);
 			evutil_closesocket(m_MainSock);
 			return;
@@ -462,13 +567,20 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 	if (evutil_make_socket_nonblocking(m_MainSock) != 0)
 	{
 		err = EVUTIL_SOCKET_ERROR();
-		m_Callbacks.OnError(err, fmt::format(FMT_STRING("Cannot make socket on UDP port {} nonblocking: {} ({})"),
-			a_Port, err, evutil_socket_error_to_string(err))
+		m_Callbacks.OnError(
+			err,
+			fmt::format(
+				FMT_STRING("Cannot make socket on UDP port {} nonblocking: {} ({})"),
+				a_Port,
+				err,
+				evutil_socket_error_to_string(err)
+			)
 		);
 		evutil_closesocket(m_MainSock);
 		return;
 	}
-	m_MainEvent = event_new(cNetworkSingleton::Get().GetEventBase(), m_MainSock, EV_READ | EV_PERSIST, RawCallback, this);
+	m_MainEvent =
+		event_new(cNetworkSingleton::Get().GetEventBase(), m_MainSock, EV_READ | EV_PERSIST, RawCallback, this);
 	event_add(m_MainEvent, nullptr);
 
 	// Read the actual port number on which the socket is listening:
@@ -507,7 +619,12 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 	{
 		// Don't report as an error, the primary socket is working
 		err = EVUTIL_SOCKET_ERROR();
-		LOGD("Socket creation failed for secondary UDP socket for port %d: %d, %s", m_Port, err, evutil_socket_error_to_string(err));
+		LOGD(
+			"Socket creation failed for secondary UDP socket for port %d: %d, %s",
+			m_Port,
+			err,
+			evutil_socket_error_to_string(err)
+		);
 		return;
 	}
 
@@ -516,8 +633,11 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 	{
 		// Don't report as an error, the primary socket is working
 		err = EVUTIL_SOCKET_ERROR();
-		LOGD("UDP Port %d cannot be made reusable (second socket): %d (%s). Restarting the server might not work.",
-			a_Port, err, evutil_socket_error_to_string(err)
+		LOGD(
+			"UDP Port %d cannot be made reusable (second socket): %d (%s). Restarting the server might not work.",
+			a_Port,
+			err,
+			evutil_socket_error_to_string(err)
 		);
 		evutil_closesocket(m_SecondarySock);
 		m_SecondarySock = -1;
@@ -529,7 +649,11 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 	{
 		// Don't report as an error, the primary socket is working
 		err = EVUTIL_SOCKET_ERROR();
-		LOGD("evutil_make_socket_nonblocking() failed for secondary UDP socket: %d, %s", err, evutil_socket_error_to_string(err));
+		LOGD(
+			"evutil_make_socket_nonblocking() failed for secondary UDP socket: %d, %s",
+			err,
+			evutil_socket_error_to_string(err)
+		);
 		evutil_closesocket(m_SecondarySock);
 		m_SecondarySock = -1;
 		return;
@@ -550,7 +674,8 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 		return;
 	}
 
-	m_SecondaryEvent = event_new(cNetworkSingleton::Get().GetEventBase(), m_SecondarySock, EV_READ | EV_PERSIST, RawCallback, this);
+	m_SecondaryEvent =
+		event_new(cNetworkSingleton::Get().GetEventBase(), m_SecondarySock, EV_READ | EV_PERSIST, RawCallback, this);
 	event_add(m_SecondaryEvent, nullptr);
 }
 
@@ -621,7 +746,3 @@ cUDPEndpointPtr cNetwork::CreateUDPEndpoint(UInt16 a_Port, cUDPEndpoint::cCallba
 {
 	return std::make_shared<cUDPEndpointImpl>(a_Port, a_Callbacks);
 }
-
-
-
-

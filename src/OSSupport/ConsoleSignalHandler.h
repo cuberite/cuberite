@@ -33,14 +33,13 @@ static void NonCtrlHandler(int a_Signal)
 		{
 			PrintStackTrace();
 
-			LOGERROR(
-				"Failure report: \n\n"
-				"  :(   | Cuberite has encountered an error and needs to close\n"
-				"       | SIGSEGV: Segmentation fault\n"
-				"       |\n"
+			LOGERROR("Failure report: \n\n"
+					 "  :(   | Cuberite has encountered an error and needs to close\n"
+					 "       | SIGSEGV: Segmentation fault\n"
+					 "       |\n"
 #ifdef BUILD_ID
-				"       | Cuberite " BUILD_SERIES_NAME " (id: " BUILD_ID ")\n"
-				"       | from commit " BUILD_COMMIT_ID "\n"
+					 "       | Cuberite " BUILD_SERIES_NAME " (id: " BUILD_ID ")\n"
+					 "       | from commit " BUILD_COMMIT_ID "\n"
 #endif
 			);
 
@@ -54,14 +53,13 @@ static void NonCtrlHandler(int a_Signal)
 		{
 			PrintStackTrace();
 
-			LOGERROR(
-				"Failure report: \n\n"
-				"  :(   | Cuberite has encountered an error and needs to close\n"
-				"       | SIGABRT: Server self-terminated due to an internal fault\n"
-				"       |\n"
+			LOGERROR("Failure report: \n\n"
+					 "  :(   | Cuberite has encountered an error and needs to close\n"
+					 "       | SIGABRT: Server self-terminated due to an internal fault\n"
+					 "       |\n"
 #ifdef BUILD_ID
-				"       | Cuberite " BUILD_SERIES_NAME " (id: " BUILD_ID ")\n"
-				"       | from commit " BUILD_COMMIT_ID "\n"
+					 "       | Cuberite " BUILD_SERIES_NAME " (id: " BUILD_ID ")\n"
+					 "       | from commit " BUILD_COMMIT_ID "\n"
 #endif
 			);
 
@@ -110,21 +108,21 @@ static BOOL CtrlHandler(DWORD fdwCtrlType)
 
 namespace ConsoleSignalHandler
 {
-	static void Register()
-	{
-		std::signal(SIGSEGV, NonCtrlHandler);
-		std::signal(SIGTERM, NonCtrlHandler);
-		std::signal(SIGINT, NonCtrlHandler);
-		std::signal(SIGABRT, NonCtrlHandler);
+static void Register()
+{
+	std::signal(SIGSEGV, NonCtrlHandler);
+	std::signal(SIGTERM, NonCtrlHandler);
+	std::signal(SIGINT, NonCtrlHandler);
+	std::signal(SIGABRT, NonCtrlHandler);
 #ifdef SIGABRT_COMPAT
-		std::signal(SIGABRT_COMPAT, NonCtrlHandler);
+	std::signal(SIGABRT_COMPAT, NonCtrlHandler);
 #endif
 #ifdef SIGPIPE
-		std::signal(SIGPIPE, SIG_IGN);  // Ignore (PR #2487).
+	std::signal(SIGPIPE, SIG_IGN);  // Ignore (PR #2487).
 #endif
 
 #ifdef _WIN32
-		SetConsoleCtrlHandler(reinterpret_cast<PHANDLER_ROUTINE>(CtrlHandler), TRUE);
+	SetConsoleCtrlHandler(reinterpret_cast<PHANDLER_ROUTINE>(CtrlHandler), TRUE);
 #endif
-	}
-};
+}
+};  // namespace ConsoleSignalHandler

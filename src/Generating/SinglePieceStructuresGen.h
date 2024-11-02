@@ -18,12 +18,11 @@ This uses the cGridStructGen to generate the structures on the map
 This is similar to the Piece Structure Generator but only placing one possible structure
 The Exported cubeset MUST have all possible structures as start structures or the server crashes on generation
 else it isn't accessible from the m_Piecepool. */
-class cSinglePieceStructuresGen :
-	public cFinishGen
+class cSinglePieceStructuresGen : public cFinishGen
 {
-using Super = cFinishGen;
+	using Super = cFinishGen;
 
-public:
+  public:
 	cSinglePieceStructuresGen(int a_Seed);
 
 	/** Initializes the generator based on the specified prefab sets.
@@ -36,7 +35,7 @@ public:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-protected:
+  protected:
 	/** The generator doing the work for a single prefab set.
 	Forward-declared so that its implementation changes don't affect the header. */
 	class cGen;

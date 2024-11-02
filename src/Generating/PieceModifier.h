@@ -15,7 +15,11 @@
 
 
 
-bool CreatePieceModifierFromString(const AString & a_Definition, std::shared_ptr<cPiece::cPieceModifiers> & a_Modifiers, bool a_LogWarnings);
+bool CreatePieceModifierFromString(
+	const AString & a_Definition,
+	std::shared_ptr<cPiece::cPieceModifiers> & a_Modifiers,
+	bool a_LogWarnings
+);
 
 
 
@@ -24,7 +28,7 @@ bool CreatePieceModifierFromString(const AString & a_Definition, std::shared_ptr
 /** Used to store block type, meta, weight and some more params */
 class cRandomizedBlock
 {
-public:
+  public:
 	BLOCKTYPE m_Type;
 
 	int m_Weight;

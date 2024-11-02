@@ -19,8 +19,7 @@ The Writer is expected to be set up so that the serializer can write the chunk's
 Provides a single static entry point that does all the work, through a hidden worker class in the CPP file. */
 class NBTChunkSerializer
 {
-public:
-
+  public:
 	/** Serializes the chunk into the specified writer. The chunk must be present. */
 	static void Serialize(const cWorld & aWorld, cChunkCoords aCoords, cFastNBTWriter & aWriter);
 };

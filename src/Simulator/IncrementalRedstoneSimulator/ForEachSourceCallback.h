@@ -9,8 +9,7 @@
 
 class ForEachSourceCallback
 {
-public:
-
+  public:
 	ForEachSourceCallback(const cChunk & Chunk, Vector3i Position, BLOCKTYPE CurrentBlock);
 
 	/** Callback invoked for each potential source position of the redstone component. */
@@ -22,11 +21,15 @@ public:
 	// The maximum power level of all source locations.
 	PowerLevel Power;
 
-private:
-
-	/** Asks redstone handlers adjacent to a solid block how much power they will deliver to the querying position, via the solid block.
-	Both QueryPosition and SolidBlockPosition are relative to Chunk. */
-	static PowerLevel QueryLinkedPower(const cChunk & Chunk, Vector3i QueryPosition, BLOCKTYPE QueryBlock, Vector3i SolidBlockPosition);
+  private:
+	/** Asks redstone handlers adjacent to a solid block how much power they will deliver to the querying position, via
+	the solid block. Both QueryPosition and SolidBlockPosition are relative to Chunk. */
+	static PowerLevel QueryLinkedPower(
+		const cChunk & Chunk,
+		Vector3i QueryPosition,
+		BLOCKTYPE QueryBlock,
+		Vector3i SolidBlockPosition
+	);
 
 	const cChunk & m_Chunk;
 	const Vector3i m_Position;

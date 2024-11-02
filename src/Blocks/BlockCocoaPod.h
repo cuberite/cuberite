@@ -7,13 +7,11 @@
 
 
 
-class cBlockCocoaPodHandler final :
-	public cBlockHandler
+class cBlockCocoaPodHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 	static NIBBLETYPE BlockFaceToMeta(eBlockFace a_BlockFace)
@@ -34,8 +32,7 @@ public:
 		UNREACHABLE("Unsupported block face");
 	}
 
-private:
-
+  private:
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
 		// Check that we're attached to a jungle log block:
@@ -124,8 +121,4 @@ private:
 		UNUSED(a_Meta);
 		return 34;
 	}
-} ;
-
-
-
-
+};

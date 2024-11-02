@@ -42,14 +42,14 @@ bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 		{
 			if (m_IsTame)
 			{
-				if ((static_cast<cPlayer*>(currTarget)->GetUUID() == m_OwnerUUID))
+				if ((static_cast<cPlayer *>(currTarget)->GetUUID() == m_OwnerUUID))
 				{
 					SetTarget(PreviousTarget);  // Do not attack owner
 				}
 				else
 				{
 					SetIsSitting(false);
-					NotifyAlliesOfFight(static_cast<cPawn*>(a_TDI.Attacker));
+					NotifyAlliesOfFight(static_cast<cPawn *>(a_TDI.Attacker));
 				}
 			}
 			else
@@ -60,7 +60,7 @@ bool cWolf::DoTakeDamage(TakeDamageInfo & a_TDI)
 		else if (m_IsTame)
 		{
 			SetIsSitting(false);
-			NotifyAlliesOfFight(static_cast<cPawn*>(a_TDI.Attacker));
+			NotifyAlliesOfFight(static_cast<cPawn *>(a_TDI.Attacker));
 		}
 	}
 
@@ -80,7 +80,9 @@ void cWolf::NotifyAlliesOfFight(cPawn * a_Opponent)
 	}
 	m_NotificationCooldown = 15;
 
-	m_World->DoWithPlayerByUUID(m_OwnerUUID, [=](cPlayer & a_Player)
+	m_World->DoWithPlayerByUUID(
+		m_OwnerUUID,
+		[=](cPlayer & a_Player)
 		{
 			a_Player.NotifyNearbyWolves(a_Opponent, false);
 			return false;
@@ -105,9 +107,8 @@ bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 		}
 	}
 
-	NotifyAlliesOfFight(static_cast<cPawn*>(GetTarget()));
+	NotifyAlliesOfFight(static_cast<cPawn *>(GetTarget()));
 	return Super::Attack(a_Dt);
-
 }
 
 
@@ -116,10 +117,7 @@ bool cWolf::Attack(std::chrono::milliseconds a_Dt)
 
 void cWolf::ReceiveNearbyFightInfo(const cUUID & a_PlayerID, cPawn * a_Opponent, bool a_IsPlayerInvolved)
 {
-	if (
-		(a_Opponent == nullptr) || IsSitting() || (!IsTame()) ||
-		(!a_Opponent->IsPawn()) || (a_PlayerID != m_OwnerUUID)
-	)
+	if ((a_Opponent == nullptr) || IsSitting() || (!IsTame()) || (!a_Opponent->IsPawn()) || (a_PlayerID != m_OwnerUUID))
 	{
 		return;
 	}
@@ -156,8 +154,6 @@ void cWolf::ReceiveNearbyFightInfo(const cUUID & a_PlayerID, cPawn * a_Opponent,
 	}
 
 	SetTarget(a_Opponent);
-
-
 }
 
 
@@ -263,9 +259,9 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 	if ((EquippedItemType == E_ITEM_SPAWN_EGG) && (!IsTame()))
 	{
 		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(EquippedItem.m_ItemDamage);
-		if (
-			(MonsterType == m_MobType) &&
-			(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID))  // Spawning succeeded
+		if ((MonsterType == m_MobType) &&
+			(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID
+			))  // Spawning succeeded
 		{
 			if (!a_Player.IsGameModeCreative())
 			{
@@ -305,47 +301,51 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (GetTarget() == nullptr)
 	{
-		m_World->DoWithNearestPlayer(GetPosition(), static_cast<float>(m_SightDistance), [&](cPlayer & a_Player) -> bool
-		{
-			switch (a_Player.GetEquippedItem().m_ItemType)
+		m_World->DoWithNearestPlayer(
+			GetPosition(),
+			static_cast<float>(m_SightDistance),
+			[&](cPlayer & a_Player) -> bool
 			{
-				case E_ITEM_BONE:
-				case E_ITEM_RAW_BEEF:
-				case E_ITEM_STEAK:
-				case E_ITEM_RAW_CHICKEN:
-				case E_ITEM_COOKED_CHICKEN:
-				case E_ITEM_ROTTEN_FLESH:
-				case E_ITEM_RAW_PORKCHOP:
-				case E_ITEM_COOKED_PORKCHOP:
+				switch (a_Player.GetEquippedItem().m_ItemType)
 				{
-					if (!IsBegging())
+					case E_ITEM_BONE:
+					case E_ITEM_RAW_BEEF:
+					case E_ITEM_STEAK:
+					case E_ITEM_RAW_CHICKEN:
+					case E_ITEM_COOKED_CHICKEN:
+					case E_ITEM_ROTTEN_FLESH:
+					case E_ITEM_RAW_PORKCHOP:
+					case E_ITEM_COOKED_PORKCHOP:
 					{
-						SetIsBegging(true);
-						m_World->BroadcastEntityMetadata(*this);
+						if (!IsBegging())
+						{
+							SetIsBegging(true);
+							m_World->BroadcastEntityMetadata(*this);
+						}
+
+						m_FinalDestination = a_Player.GetPosition();  // So that we will look at a player holding food
+
+						// Don't move to the player if the wolf is sitting.
+						if (!IsSitting())
+						{
+							MoveToPosition(a_Player.GetPosition());
+						}
+
+						break;
 					}
-
-					m_FinalDestination = a_Player.GetPosition();  // So that we will look at a player holding food
-
-					// Don't move to the player if the wolf is sitting.
-					if (!IsSitting())
+					default:
 					{
-						MoveToPosition(a_Player.GetPosition());
+						if (IsBegging())
+						{
+							SetIsBegging(false);
+							m_World->BroadcastEntityMetadata(*this);
+						}
 					}
-
-					break;
 				}
-				default:
-				{
-					if (IsBegging())
-					{
-						SetIsBegging(false);
-						m_World->BroadcastEntityMetadata(*this);
-					}
-				}
+
+				return true;
 			}
-
-			return true;
-		});
+		);
 	}
 	else
 	{

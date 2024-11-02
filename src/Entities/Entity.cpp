@@ -34,7 +34,7 @@ static UInt32 GetNextUniqueID(void)
 ////////////////////////////////////////////////////////////////////////////////
 // cEntity:
 
-cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, float a_Width, float a_Height):
+cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, float a_Width, float a_Height) :
 	m_UniqueID(GetNextUniqueID()),
 	m_Health(1),
 	m_MaxHealth(1),
@@ -69,7 +69,7 @@ cEntity::cEntity(eEntityType a_EntityType, Vector3d a_Pos, float a_Width, float 
 	m_Rot(0.0, 0.0, 0.0),
 	m_Position(a_Pos),
 	m_WaterSpeed(0, 0, 0),
-	m_Mass (0.001),  // Default 1g
+	m_Mass(0.001),  // Default 1g
 	m_Width(a_Width),
 	m_Height(a_Height),
 	m_InvulnerableTicks(0)
@@ -251,18 +251,23 @@ void cEntity::Destroy()
 	}
 
 	auto ParentChunkCoords = cChunkDef::BlockToChunk(GetPosition());
-	m_World->QueueTask([this, ParentChunkCoords](cWorld & a_World)
-	{
-		LOGD("Destroying entity #%i (%s) from chunk (%d, %d)",
-			this->GetUniqueID(), this->GetClass(),
-			ParentChunkCoords.m_ChunkX, ParentChunkCoords.m_ChunkZ
-		);
-		UNUSED(ParentChunkCoords);  // Non Debug mode only
+	m_World->QueueTask(
+		[this, ParentChunkCoords](cWorld & a_World)
+		{
+			LOGD(
+				"Destroying entity #%i (%s) from chunk (%d, %d)",
+				this->GetUniqueID(),
+				this->GetClass(),
+				ParentChunkCoords.m_ChunkX,
+				ParentChunkCoords.m_ChunkZ
+			);
+			UNUSED(ParentChunkCoords);  // Non Debug mode only
 
-		// Make sure that RemoveEntity returned a valid smart pointer
-		// Also, not storing the returned pointer means automatic destruction
-		VERIFY(a_World.RemoveEntity(*this));
-	});
+			// Make sure that RemoveEntity returned a valid smart pointer
+			// Also, not storing the returned pointer means automatic destruction
+			VERIFY(a_World.RemoveEntity(*this));
+		}
+	);
 }
 
 
@@ -295,12 +300,14 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 
 void cEntity::TakeDamage(eDamageType a_DamageType, UInt32 a_AttackerID, int a_RawDamage, double a_KnockbackAmount)
 {
-	m_World->DoWithEntityByID(a_AttackerID, [=](cEntity & a_Attacker)
+	m_World->DoWithEntityByID(
+		a_AttackerID,
+		[=](cEntity & a_Attacker)
 		{
 			cPawn * Attacker;
 			if (a_Attacker.IsPawn())
 			{
-				Attacker = static_cast<cPawn*>(&a_Attacker);
+				Attacker = static_cast<cPawn *>(&a_Attacker);
 			}
 			else
 			{
@@ -317,7 +324,13 @@ void cEntity::TakeDamage(eDamageType a_DamageType, UInt32 a_AttackerID, int a_Ra
 
 
 
-void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, float a_FinalDamage, double a_KnockbackAmount)
+void cEntity::TakeDamage(
+	eDamageType a_DamageType,
+	cEntity * a_Attacker,
+	int a_RawDamage,
+	float a_FinalDamage,
+	double a_KnockbackAmount
+)
 {
 	TakeDamageInfo TDI;
 	TDI.DamageType = a_DamageType;
@@ -358,7 +371,8 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 	}
 
 	// Apply slight height to knockback
-	Vector3d FinalKnockback = Vector3d(Heading.x * a_KnockbackAmount, Heading.y + KnockbackHeight, Heading.z * a_KnockbackAmount);
+	Vector3d FinalKnockback =
+		Vector3d(Heading.x * a_KnockbackAmount, Heading.y + KnockbackHeight, Heading.z * a_KnockbackAmount);
 
 	TDI.Knockback = FinalKnockback;
 	DoTakeDamage(TDI);
@@ -502,7 +516,8 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 						// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
 						// increasing the max duration by 0.5 seconds each level.
 						// Ref: https://minecraft.wiki/w/Enchanting#Bane_of_Arthropods
-						int Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks.
+						int Duration =
+							20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks.
 						Monster->AddEntityEffect(cEntityEffect::effSlowness, Duration, 4);
 
 						break;
@@ -552,7 +567,8 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		}
 
 		unsigned int ThornsLevel = 0;
-		const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+		const cItem ArmorItems[] =
+			{GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots()};
 		for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
 		{
 			const cItem & Item = ArmorItems[i];
@@ -571,7 +587,8 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			}
 		}
 
-		Player->GetStatistics().Custom[CustomStatistic::DamageDealt] += FloorC<StatisticsManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5);
+		Player->GetStatistics().Custom[CustomStatistic::DamageDealt] +=
+			FloorC<StatisticsManager::StatValue>(a_TDI.FinalDamage * 10 + 0.5);
 	}
 
 	m_Health -= a_TDI.FinalDamage;
@@ -583,15 +600,18 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		SetSpeed(a_TDI.Knockback);
 	}
 
-	m_World->BroadcastEntityAnimation(*this, [&a_TDI]
-	{
-		switch (a_TDI.DamageType)
+	m_World->BroadcastEntityAnimation(
+		*this,
+		[&a_TDI]
 		{
-			case eDamageType::dtBurning: return EntityAnimation::PawnBurns;
-			case eDamageType::dtDrowning: return EntityAnimation::PawnDrowns;
-			default: return EntityAnimation::PawnHurts;
-		}
-	}());
+			switch (a_TDI.DamageType)
+			{
+				case eDamageType::dtBurning:  return EntityAnimation::PawnBurns;
+				case eDamageType::dtDrowning: return EntityAnimation::PawnDrowns;
+				default:                      return EntityAnimation::PawnHurts;
+			}
+		}()
+	);
 
 	m_InvulnerableTicks = 10;
 
@@ -665,7 +685,8 @@ bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 	{
 		case dtOnFire:
 		case dtSuffocating:
-		case dtDrowning:  // TODO: This one could be a special case - in various MC versions (PC vs XBox) it is and isn't armor-protected
+		case dtDrowning:  // TODO: This one could be a special case - in various MC versions (PC vs XBox) it is and
+						  // isn't armor-protected
 		case dtEnderPearl:
 		case dtStarving:
 		case dtInVoid:
@@ -702,7 +723,8 @@ float cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageTyp
 {
 	int TotalEPF = 0;
 
-	const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+	const cItem ArmorItems[] =
+		{GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots()};
 	for (size_t i = 0; i < ARRAYCOUNT(ArmorItems); i++)
 	{
 		const cItem & Item = ArmorItems[i];
@@ -712,7 +734,8 @@ float cEntity::GetEnchantmentCoverAgainst(const cEntity * a_Attacker, eDamageTyp
 			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchProtection)) * 1;
 		}
 
-		if ((a_DamageType == dtBurning) || (a_DamageType == dtFireContact) || (a_DamageType == dtLavaContact) || (a_DamageType == dtMagmaContact))
+		if ((a_DamageType == dtBurning) || (a_DamageType == dtFireContact) || (a_DamageType == dtLavaContact) ||
+			(a_DamageType == dtMagmaContact))
 		{
 			TotalEPF += static_cast<int>(Item.m_Enchantments.GetLevel(cEnchantments::enchFireProtection)) * 2;
 		}
@@ -745,7 +768,8 @@ float cEntity::GetEnchantmentBlastKnockbackReduction()
 {
 	UInt32 MaxLevel = 0;
 
-	const cItem ArmorItems[] = { GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots() };
+	const cItem ArmorItems[] =
+		{GetEquippedHelmet(), GetEquippedChestplate(), GetEquippedLeggings(), GetEquippedBoots()};
 
 	for (auto & Item : ArmorItems)
 	{
@@ -782,27 +806,36 @@ float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Da
 	int Toughness = 0;
 	switch (GetEquippedHelmet().m_ItemType)
 	{
-		case E_ITEM_LEATHER_CAP:    ArmorValue += 1; break;
-		case E_ITEM_GOLD_HELMET:    ArmorValue += 2; break;
-		case E_ITEM_CHAIN_HELMET:   ArmorValue += 2; break;
-		case E_ITEM_IRON_HELMET:    ArmorValue += 2; break;
-		case E_ITEM_DIAMOND_HELMET: ArmorValue += 3; Toughness += 2; break;
+		case E_ITEM_LEATHER_CAP:  ArmorValue += 1; break;
+		case E_ITEM_GOLD_HELMET:  ArmorValue += 2; break;
+		case E_ITEM_CHAIN_HELMET: ArmorValue += 2; break;
+		case E_ITEM_IRON_HELMET:  ArmorValue += 2; break;
+		case E_ITEM_DIAMOND_HELMET:
+			ArmorValue += 3;
+			Toughness += 2;
+			break;
 	}
 	switch (GetEquippedChestplate().m_ItemType)
 	{
-		case E_ITEM_LEATHER_TUNIC:      ArmorValue += 3; break;
-		case E_ITEM_GOLD_CHESTPLATE:    ArmorValue += 5; break;
-		case E_ITEM_CHAIN_CHESTPLATE:   ArmorValue += 5; break;
-		case E_ITEM_IRON_CHESTPLATE:    ArmorValue += 6; break;
-		case E_ITEM_DIAMOND_CHESTPLATE: ArmorValue += 8; Toughness += 2; break;
+		case E_ITEM_LEATHER_TUNIC:    ArmorValue += 3; break;
+		case E_ITEM_GOLD_CHESTPLATE:  ArmorValue += 5; break;
+		case E_ITEM_CHAIN_CHESTPLATE: ArmorValue += 5; break;
+		case E_ITEM_IRON_CHESTPLATE:  ArmorValue += 6; break;
+		case E_ITEM_DIAMOND_CHESTPLATE:
+			ArmorValue += 8;
+			Toughness += 2;
+			break;
 	}
 	switch (GetEquippedLeggings().m_ItemType)
 	{
-		case E_ITEM_LEATHER_PANTS:    ArmorValue += 2; break;
-		case E_ITEM_GOLD_LEGGINGS:    ArmorValue += 3; break;
-		case E_ITEM_CHAIN_LEGGINGS:   ArmorValue += 4; break;
-		case E_ITEM_IRON_LEGGINGS:    ArmorValue += 5; break;
-		case E_ITEM_DIAMOND_LEGGINGS: ArmorValue += 6; Toughness += 2; break;
+		case E_ITEM_LEATHER_PANTS:  ArmorValue += 2; break;
+		case E_ITEM_GOLD_LEGGINGS:  ArmorValue += 3; break;
+		case E_ITEM_CHAIN_LEGGINGS: ArmorValue += 4; break;
+		case E_ITEM_IRON_LEGGINGS:  ArmorValue += 5; break;
+		case E_ITEM_DIAMOND_LEGGINGS:
+			ArmorValue += 6;
+			Toughness += 2;
+			break;
 	}
 	switch (GetEquippedBoots().m_ItemType)
 	{
@@ -810,7 +843,10 @@ float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Da
 		case E_ITEM_GOLD_BOOTS:    ArmorValue += 1; break;
 		case E_ITEM_CHAIN_BOOTS:   ArmorValue += 1; break;
 		case E_ITEM_IRON_BOOTS:    ArmorValue += 2; break;
-		case E_ITEM_DIAMOND_BOOTS: ArmorValue += 3; Toughness += 2; break;
+		case E_ITEM_DIAMOND_BOOTS:
+			ArmorValue += 3;
+			Toughness += 2;
+			break;
 	}
 
 	// TODO: Special armor cases, such as wool, saddles, dog's collar
@@ -868,11 +904,8 @@ void cEntity::KilledBy(TakeDamageInfo & a_TDI)
 	}
 
 	// Drop loot, unless the attacker was a creative mode player:
-	if (
-		(a_TDI.Attacker == nullptr) ||
-		!a_TDI.Attacker->IsPlayer() ||
-		!static_cast<cPlayer *>(a_TDI.Attacker)->IsGameModeCreative()
-	)
+	if ((a_TDI.Attacker == nullptr) || !a_TDI.Attacker->IsPlayer() ||
+		!static_cast<cPlayer *>(a_TDI.Attacker)->IsGameModeCreative())
 	{
 		cItems Drops;
 		GetDrops(Drops, a_TDI.Attacker);
@@ -955,27 +988,22 @@ void cEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 
 		// Handle cactus damage or destruction:
-		if (
-			IsMob() || IsPickup() ||
-			(IsPlayer() && !((static_cast<cPlayer *>(this))->IsGameModeCreative() || (static_cast<cPlayer *>(this))->IsGameModeSpectator()))
-		)
+		if (IsMob() || IsPickup() ||
+			(IsPlayer() &&
+			 !((static_cast<cPlayer *>(this))->IsGameModeCreative() ||
+			   (static_cast<cPlayer *>(this))->IsGameModeSpectator())))
 		{
 			DetectCacti();
 		}
 
 		// Handle magma block damage
-		if
-		(
-			IsOnGround() &&
-			(
-				(IsMob() && !static_cast<cPawn *>(this)->IsFireproof()) ||
-				(
-					IsPlayer() && !((static_cast<cPlayer *>(this))->IsGameModeCreative() || (static_cast<cPlayer *>(this))->IsGameModeSpectator())
-					&& !static_cast<cPlayer *>(this)->IsFireproof()
-					&& !static_cast<cPlayer *>(this)->HasEntityEffect(cEntityEffect::effFireResistance)
-				)
-			)
-		)
+		if (IsOnGround() &&
+			((IsMob() && !static_cast<cPawn *>(this)->IsFireproof()) ||
+			 (IsPlayer() &&
+			  !((static_cast<cPlayer *>(this))->IsGameModeCreative() ||
+				(static_cast<cPlayer *>(this))->IsGameModeSpectator()) &&
+			  !static_cast<cPlayer *>(this)->IsFireproof() &&
+			  !static_cast<cPlayer *>(this)->HasEntityEffect(cEntityEffect::effFireResistance))))
 		{
 			DetectMagma();
 		}
@@ -1022,7 +1050,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	int RelBlockX = BlockX - (NextChunk->GetPosX() * cChunkDef::Width);
 	int RelBlockZ = BlockZ - (NextChunk->GetPosZ() * cChunkDef::Width);
-	BLOCKTYPE BlockIn = NextChunk->GetBlock( RelBlockX, BlockY, RelBlockZ);
+	BLOCKTYPE BlockIn = NextChunk->GetBlock(RelBlockX, BlockY, RelBlockZ);
 	BLOCKTYPE BlockBelow = (BlockY > 0) ? NextChunk->GetBlock(RelBlockX, BlockY - 1, RelBlockZ) : E_BLOCK_AIR;
 	if (!cBlockInfo::IsSolid(BlockIn))  // Making sure we are not inside a solid block
 	{
@@ -1042,18 +1070,22 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		static const struct
 		{
 			int x, y, z;
-		} gCrossCoords[] =
-		{
-			{ 1, 0,  0},
-			{-1, 0,  0},
-			{ 0, 0,  1},
-			{ 0, 0, -1},
-		} ;
+		} gCrossCoords[] = {
+			{1, 0, 0},
+			{-1, 0, 0},
+			{0, 0, 1},
+			{0, 0, -1},
+		};
 
 		bool IsNoAirSurrounding = true;
 		for (size_t i = 0; i < ARRAYCOUNT(gCrossCoords); i++)
 		{
-			if (!NextChunk->UnboundedRelGetBlockType(RelBlockX + gCrossCoords[i].x, BlockY, RelBlockZ + gCrossCoords[i].z, GotBlock))
+			if (!NextChunk->UnboundedRelGetBlockType(
+					RelBlockX + gCrossCoords[i].x,
+					BlockY,
+					RelBlockZ + gCrossCoords[i].z,
+					GotBlock
+				))
 			{
 				// The pickup is too close to an unloaded chunk, bail out of any physics handling
 				return;
@@ -1123,8 +1155,8 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		ApplyFriction(NextSpeed, 0.7, static_cast<float>(DtSec.count()));
 	}
 
-	// Adjust X and Z speed for COBWEB temporary. This speed modification should be handled inside block handlers since we
-	// might have different speed modifiers according to terrain.
+	// Adjust X and Z speed for COBWEB temporary. This speed modification should be handled inside block handlers since
+	// we might have different speed modifiers according to terrain.
 	if (BlockIn == E_BLOCK_COBWEB)
 	{
 		NextSpeed.x *= 0.25;
@@ -1137,16 +1169,16 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	m_WaterSpeed *= 0.9;  // Reduce speed each tick
 
 	auto AdjustSpeed = [](double & a_WaterSpeed, float a_WaterDir)
+	{
+		if (std::abs(a_WaterDir) > (0.05f / 0.4f))
 		{
-			if (std::abs(a_WaterDir) > (0.05f / 0.4f))
-			{
-				a_WaterSpeed = 0.4 * a_WaterDir;
-			}
-			else if (std::abs(a_WaterSpeed) < 0.05)
-			{
-				a_WaterSpeed = 0.0;
-			}
-		};
+			a_WaterSpeed = 0.4 * a_WaterDir;
+		}
+		else if (std::abs(a_WaterSpeed) < 0.05)
+		{
+			a_WaterSpeed = 0.0;
+		}
+	};
 	AdjustSpeed(m_WaterSpeed.x, WaterDir.x);
 	AdjustSpeed(m_WaterSpeed.z, WaterDir.z);
 
@@ -1158,7 +1190,14 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		Vector3i HitBlockCoords;
 		eBlockFace HitBlockFace;
 		Vector3d wantNextPos = NextPos + NextSpeed * DtSec.count();
-		auto isHit = cLineBlockTracer::FirstSolidHitTrace(*GetWorld(), NextPos, wantNextPos, HitCoords, HitBlockCoords, HitBlockFace);
+		auto isHit = cLineBlockTracer::FirstSolidHitTrace(
+			*GetWorld(),
+			NextPos,
+			wantNextPos,
+			HitCoords,
+			HitBlockCoords,
+			HitBlockFace
+		);
 		if (isHit)
 		{
 			// Set our position to where the block was hit:
@@ -1375,7 +1414,7 @@ void cEntity::DetectCacti(void)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				if (GetWorld()->GetBlock({ x, y, z }) == E_BLOCK_CACTUS)
+				if (GetWorld()->GetBlock({x, y, z}) == E_BLOCK_CACTUS)
 				{
 					TakeDamage(dtCactusContact, nullptr, 1, 0);
 					return;
@@ -1404,7 +1443,7 @@ void cEntity::DetectMagma(void)
 		{
 			for (int y = MinY; y <= MaxY; y++)
 			{
-				if (GetWorld()->GetBlock({ x, y, z }) == E_BLOCK_MAGMA)
+				if (GetWorld()->GetBlock({x, y, z}) == E_BLOCK_MAGMA)
 				{
 					TakeDamage(dtMagmaContact, nullptr, 1, 0);
 					return;
@@ -1452,7 +1491,8 @@ bool cEntity::DetectPortal()
 					return false;
 				}
 
-				if (IsPlayer() && !(static_cast<cPlayer *>(this))->IsGameModeCreative() && (m_PortalCooldownData.m_TicksDelayed != 80))
+				if (IsPlayer() && !(static_cast<cPlayer *>(this))->IsGameModeCreative() &&
+					(m_PortalCooldownData.m_TicksDelayed != 80))
 				{
 					// Delay teleportation for four seconds if the entity is a non-creative player
 					m_PortalCooldownData.m_TicksDelayed++;
@@ -1475,8 +1515,14 @@ bool cEntity::DetectPortal()
 					TargetPos.z *= 8.0;
 
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
-					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimNether).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
+					ASSERT(
+						TargetWorld != nullptr
+					);  // The linkage checker should have prevented this at startup. See cWorld::start()
+					LOGD(
+						"Jumping %s -> %s",
+						DimensionToString(dimNether).c_str(),
+						DimensionToString(TargetWorld->GetDimension()).c_str()
+					);
 					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, cChunkDef::Height);
 					return true;
 				}
@@ -1495,8 +1541,14 @@ bool cEntity::DetectPortal()
 					TargetPos.z /= 8.0;
 
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedNetherWorldName());
-					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
+					ASSERT(
+						TargetWorld != nullptr
+					);  // The linkage checker should have prevented this at startup. See cWorld::start()
+					LOGD(
+						"Jumping %s -> %s",
+						DimensionToString(dimOverworld).c_str(),
+						DimensionToString(TargetWorld->GetDimension()).c_str()
+					);
 					new cNetherPortalScanner(*this, *TargetWorld, TargetPos, (cChunkDef::Height / 2));
 					return true;
 				}
@@ -1525,8 +1577,14 @@ bool cEntity::DetectPortal()
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedOverworldName());
-					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimEnd).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
+					ASSERT(
+						TargetWorld != nullptr
+					);  // The linkage checker should have prevented this at startup. See cWorld::start()
+					LOGD(
+						"Jumping %s -> %s",
+						DimensionToString(dimEnd).c_str(),
+						DimensionToString(TargetWorld->GetDimension()).c_str()
+					);
 
 					if (IsPlayer())
 					{
@@ -1550,11 +1608,16 @@ bool cEntity::DetectPortal()
 					m_PortalCooldownData.m_ShouldPreventTeleportation = true;
 
 					cWorld * TargetWorld = cRoot::Get()->GetWorld(GetWorld()->GetLinkedEndWorldName());
-					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
-					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
+					ASSERT(
+						TargetWorld != nullptr
+					);  // The linkage checker should have prevented this at startup. See cWorld::start()
+					LOGD(
+						"Jumping %s -> %s",
+						DimensionToString(dimOverworld).c_str(),
+						DimensionToString(TargetWorld->GetDimension()).c_str()
+					);
 					return MoveToWorld(*TargetWorld, false);
 				}
-
 			}
 			default: break;
 		}
@@ -1588,10 +1651,14 @@ void cEntity::DoMoveToWorld(const sWorldChangeInfo & a_WorldChangeInfo)
 		return;
 	}
 
-	LOGD("Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
-		GetUniqueID(), GetClass(),
-		m_World->GetName(), a_WorldChangeInfo.m_NewWorld->GetName(),
-		GetChunkX(), GetChunkZ()
+	LOGD(
+		"Warping entity #%i (%s) from world \"%s\" to \"%s\". Source chunk: (%d, %d) ",
+		GetUniqueID(),
+		GetClass(),
+		m_World->GetName(),
+		a_WorldChangeInfo.m_NewWorld->GetName(),
+		GetChunkX(),
+		GetChunkZ()
 	);
 
 	// Stop ticking, in preperation for detaching from this world.
@@ -1626,7 +1693,7 @@ bool cEntity::MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_SetPo
 
 	// Create new world change info
 	// (The last warp command always takes precedence)
-	m_WorldChangeInfo = { &a_World,  a_NewPosition, a_SetPortalCooldown };
+	m_WorldChangeInfo = {&a_World, a_NewPosition, a_SetPortalCooldown};
 
 	if (OldWorld != nullptr)
 	{
@@ -1644,8 +1711,8 @@ bool cEntity::MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_SetPo
 	The last invocation takes effect
 
 	As of writing, cWorld ticks entities, clients, and then processes tasks
-	We may call MoveToWorld (any number of times - consider multiple /portal commands within a tick) in the first and second stages
-	Queue a task onto the third stage to invoke DoMoveToWorld ONCE with the last given destination world
+	We may call MoveToWorld (any number of times - consider multiple /portal commands within a tick) in the first and
+	second stages Queue a task onto the third stage to invoke DoMoveToWorld ONCE with the last given destination world
 	Store entity IDs in case client tick found the player disconnected and immediately destroys the object
 
 	After the move begins, no further calls to MoveToWorld is possible since neither the client nor entity is ticked
@@ -1676,7 +1743,11 @@ bool cEntity::MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_SetPo
 
 bool cEntity::MoveToWorld(cWorld & a_World, bool a_ShouldSendRespawn)
 {
-	return MoveToWorld(a_World, a_ShouldSendRespawn, Vector3i(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ()));
+	return MoveToWorld(
+		a_World,
+		a_ShouldSendRespawn,
+		Vector3i(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ())
+	);
 }
 
 
@@ -1692,7 +1763,12 @@ bool cEntity::MoveToWorld(const AString & a_WorldName, bool a_ShouldSendRespawn)
 		return false;
 	}
 
-	return MoveToWorld(*World, Vector3i(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()), false, a_ShouldSendRespawn);
+	return MoveToWorld(
+		*World,
+		Vector3i(World->GetSpawnX(), World->GetSpawnY(), World->GetSpawnZ()),
+		false,
+		a_ShouldSendRespawn
+	);
 }
 
 
@@ -1801,7 +1877,8 @@ void cEntity::HandleAir(void)
 	// See if the entity is /submerged/ water (head is in water)
 	// Get the type of block the entity is standing in:
 
-	int RespirationLevel = static_cast<int>(GetEquippedHelmet().m_Enchantments.GetLevel(cEnchantments::enchRespiration));
+	int RespirationLevel =
+		static_cast<int>(GetEquippedHelmet().m_Enchantments.GetLevel(cEnchantments::enchRespiration));
 
 	if (IsHeadInWater())
 	{
@@ -1846,7 +1923,6 @@ void cEntity::HandleAir(void)
 		{
 			m_AirTickTimer = DROWNING_TICKS + (RespirationLevel * 15 * 20);
 		}
-
 	}
 }
 
@@ -1952,8 +2028,10 @@ void cEntity::TeleportToEntity(cEntity & a_Entity)
 
 void cEntity::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 {
-	//  ask the plugins to allow teleport to the new position.
-	if (!cRoot::Get()->GetPluginManager()->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
+	// ask the plugins to allow teleport to the new position.
+	if (!cRoot::Get()
+			 ->GetPluginManager()
+			 ->CallHookEntityTeleport(*this, m_LastPosition, Vector3d(a_PosX, a_PosY, a_PosZ)))
 	{
 		SetPosition({a_PosX, a_PosY, a_PosZ});
 	}
@@ -2080,10 +2158,7 @@ bool cEntity::IsA(const char * a_ClassName) const
 
 bool cEntity::IsAttachedTo(const cEntity * a_Entity) const
 {
-	return (
-		(m_AttachedTo != nullptr) &&
-		(a_Entity->GetUniqueID() == m_AttachedTo->GetUniqueID())
-	);
+	return ((m_AttachedTo != nullptr) && (a_Entity->GetUniqueID() == m_AttachedTo->GetUniqueID()));
 }
 
 
@@ -2338,9 +2413,7 @@ void cEntity::BroadcastLeashedMobs()
 
 
 
-void cEntity::OnDetach()
-{
-}
+void cEntity::OnDetach() {}
 
 
 
@@ -2365,7 +2438,10 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 		}
 		else
 		{
-			Name = NamespaceSerializer::PrettifyEntityName(AString(NamespaceSerializer::From(Monster->GetMobType())), Monster->IsTame());
+			Name = NamespaceSerializer::PrettifyEntityName(
+				AString(NamespaceSerializer::From(Monster->GetMobType())),
+				Monster->IsTame()
+			);
 		}
 	}
 	else
@@ -2377,32 +2453,33 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 	if (a_TDI.Attacker == nullptr)
 	{
 		const AString DamageText = [&]
+		{
+			switch (a_TDI.DamageType)
 			{
-				switch (a_TDI.DamageType)
-				{
-					case dtRangedAttack:    return "was shot";
-					case dtLightning:       return "was plasmified by lightining";
-					case dtFalling:         return GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard";
-					case dtDrowning:        return "drowned";
-					case dtSuffocating:     return GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block";
-					case dtStarving:        return "forgot the importance of food";
-					case dtCactusContact:   return "was impaled on a cactus";
-					case dtMagmaContact:    return "discovered the floor was lava";
-					case dtLavaContact:     return "was melted by lava";
-					case dtPoisoning:       return "died from septicaemia";
-					case dtWithering:       return "is a husk of their former selves";
-					case dtOnFire:          return "forgot to stop, drop, and roll";
-					case dtFireContact:     return "burnt themselves to death";
-					case dtInVoid:          return "somehow fell out of the world";
-					case dtPotionOfHarming: return "was magicked to death";
-					case dtEnderPearl:      return "misused an ender pearl";
-					case dtAdmin:           return "was administrator'd";
-					case dtExplosion:       return "blew up";
-					case dtAttack:          return "was attacked by thin air";
-					case dtEnvironment:     return "played too much dress up";  // This is not vanilla - added a own pun
-				}
-				UNREACHABLE("Unsupported damage type");
-			}();
+				case dtRangedAttack: return "was shot";
+				case dtLightning:    return "was plasmified by lightining";
+				case dtFalling:      return GetRandomProvider().RandBool() ? "fell to death" : "hit the ground too hard";
+				case dtDrowning:     return "drowned";
+				case dtSuffocating:
+					return GetRandomProvider().RandBool() ? "git merge'd into a block" : "fused with a block";
+				case dtStarving:        return "forgot the importance of food";
+				case dtCactusContact:   return "was impaled on a cactus";
+				case dtMagmaContact:    return "discovered the floor was lava";
+				case dtLavaContact:     return "was melted by lava";
+				case dtPoisoning:       return "died from septicaemia";
+				case dtWithering:       return "is a husk of their former selves";
+				case dtOnFire:          return "forgot to stop, drop, and roll";
+				case dtFireContact:     return "burnt themselves to death";
+				case dtInVoid:          return "somehow fell out of the world";
+				case dtPotionOfHarming: return "was magicked to death";
+				case dtEnderPearl:      return "misused an ender pearl";
+				case dtAdmin:           return "was administrator'd";
+				case dtExplosion:       return "blew up";
+				case dtAttack:          return "was attacked by thin air";
+				case dtEnvironment:     return "played too much dress up";  // This is not vanilla - added a own pun
+			}
+			UNREACHABLE("Unsupported damage type");
+		}();
 		auto DeathMessage = fmt::format(FMT_STRING("{} {}"), Name, DamageText);
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
 		if (!DeathMessage.empty())
@@ -2431,7 +2508,10 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 		}
 		else
 		{
-			AString KillerName = NamespaceSerializer::PrettifyEntityName(AString(NamespaceSerializer::From(Monster->GetMobType())), Monster->IsTame());
+			AString KillerName = NamespaceSerializer::PrettifyEntityName(
+				AString(NamespaceSerializer::From(Monster->GetMobType())),
+				Monster->IsTame()
+			);
 			DeathMessage = fmt::format(FMT_STRING("{0} was killed by a {1}"), Name, KillerName);
 		}
 

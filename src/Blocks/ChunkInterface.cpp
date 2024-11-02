@@ -83,7 +83,13 @@ bool cChunkInterface::UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_Blo
 
 
 
-bool cChunkInterface::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback)
+bool cChunkInterface::ForEachChunkInRect(
+	int a_MinChunkX,
+	int a_MaxChunkX,
+	int a_MinChunkZ,
+	int a_MaxChunkZ,
+	cChunkDataCallback & a_Callback
+)
 {
 	return m_ChunkMap->ForEachChunkInRect(a_MinChunkX, a_MaxChunkX, a_MinChunkZ, a_MaxChunkZ, a_Callback);
 }
@@ -92,7 +98,13 @@ bool cChunkInterface::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a
 
 
 
-bool cChunkInterface::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
+bool cChunkInterface::WriteBlockArea(
+	cBlockArea & a_Area,
+	int a_MinBlockX,
+	int a_MinBlockY,
+	int a_MinBlockZ,
+	int a_DataTypes
+)
 {
 	return m_ChunkMap->WriteBlockArea(a_Area, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);
 }

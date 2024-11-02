@@ -1,7 +1,8 @@
 
 // ChunkDesc.h
 
-// Declares the cChunkDesc class representing the chunk description used while generating a chunk. This class is also exported to Lua for HOOK_CHUNK_GENERATING.
+// Declares the cChunkDesc class representing the chunk description used while generating a chunk. This class is also
+// exported to Lua for HOOK_CHUNK_GENERATING.
 
 
 
@@ -26,7 +27,7 @@ class cBlockArea;
 // tolua_begin
 class cChunkDesc
 {
-public:
+  public:
 	// tolua_end
 
 	/** The datatype used to represent the entire chunk worth of shape.
@@ -55,8 +56,8 @@ public:
 
 	// tolua_begin
 
-	void       FillBlocks(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	void       SetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void FillBlocks(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void SetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
 	// tolua_end
 	/** Returns the BlockType and BlockMeta at the specified coords.
@@ -64,18 +65,18 @@ public:
 	void GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	// tolua_begin
 
-	void       SetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType);
-	BLOCKTYPE  GetBlockType(int a_RelX, int a_RelY, int a_RelZ) const;
+	void SetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType);
+	BLOCKTYPE GetBlockType(int a_RelX, int a_RelY, int a_RelZ) const;
 
-	void       SetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_BlockMeta);
+	void SetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_BlockMeta);
 	NIBBLETYPE GetBlockMeta(int a_RelX, int a_RelY, int a_RelZ) const;
 
-	void       SetBiome(int a_RelX, int a_RelZ, EMCSBiome a_BiomeID);
-	EMCSBiome  GetBiome(int a_RelX, int a_RelZ) const;
+	void SetBiome(int a_RelX, int a_RelZ, EMCSBiome a_BiomeID);
+	EMCSBiome GetBiome(int a_RelX, int a_RelZ) const;
 
 	// These operate on the heightmap, so they could get out of sync with the data
 	// Use UpdateHeightmap() to re-calculate heightmap from the block data
-	void       SetHeight(int a_RelX, int a_RelZ, HEIGHTTYPE a_Height);
+	void SetHeight(int a_RelX, int a_RelZ, HEIGHTTYPE a_Height);
 	HEIGHTTYPE GetHeight(int a_RelX, int a_RelZ) const;
 
 	// tolua_end
@@ -117,11 +118,26 @@ public:
 	void SetUseDefaultFinish(bool a_bUseDefaultFinish);
 	bool IsUsingDefaultFinish(void) const;
 
-	/** Writes the block area into the chunk, with its origin set at the specified relative coords. Area's data overwrite everything in the chunk. */
-	void WriteBlockArea(const cBlockArea & a_BlockArea, int a_RelX, int a_RelY, int a_RelZ, cBlockArea::eMergeStrategy a_MergeStrategy = cBlockArea::msOverwrite);
+	/** Writes the block area into the chunk, with its origin set at the specified relative coords. Area's data
+	 * overwrite everything in the chunk. */
+	void WriteBlockArea(
+		const cBlockArea & a_BlockArea,
+		int a_RelX,
+		int a_RelY,
+		int a_RelZ,
+		cBlockArea::eMergeStrategy a_MergeStrategy = cBlockArea::msOverwrite
+	);
 
 	/** Reads an area from the chunk into a cBlockArea, blocktypes and blockmetas */
-	void ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ);
+	void ReadBlockArea(
+		cBlockArea & a_Dest,
+		int a_MinRelX,
+		int a_MaxRelX,
+		int a_MinRelY,
+		int a_MaxRelY,
+		int a_MinRelZ,
+		int a_MaxRelZ
+	);
 
 	/** Returns the maximum height value in the heightmap. */
 	HEIGHTTYPE GetMaxHeight(void) const;
@@ -131,91 +147,131 @@ public:
 
 	/** Fills the relative cuboid with specified block; allows cuboid out of range of this chunk */
 	void FillRelCuboid(
-		int a_MinX, int a_MaxX,
-		int a_MinY, int a_MaxY,
-		int a_MinZ, int a_MaxZ,
-		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+		int a_MinX,
+		int a_MaxX,
+		int a_MinY,
+		int a_MaxY,
+		int a_MinZ,
+		int a_MaxZ,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta
 	);
 
 	/** Fills the relative cuboid with specified block; allows cuboid out of range of this chunk */
 	void FillRelCuboid(const cCuboid & a_RelCuboid, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
 		FillRelCuboid(
-			a_RelCuboid.p1.x, a_RelCuboid.p2.x,
-			a_RelCuboid.p1.y, a_RelCuboid.p2.y,
-			a_RelCuboid.p1.z, a_RelCuboid.p2.z,
-			a_BlockType, a_BlockMeta
+			a_RelCuboid.p1.x,
+			a_RelCuboid.p2.x,
+			a_RelCuboid.p1.y,
+			a_RelCuboid.p2.y,
+			a_RelCuboid.p1.z,
+			a_RelCuboid.p2.z,
+			a_BlockType,
+			a_BlockMeta
 		);
 	}
 
 	/** Replaces the specified src blocks in the cuboid by the dst blocks; allows cuboid out of range of this chunk */
 	void ReplaceRelCuboid(
-		int a_MinX, int a_MaxX,
-		int a_MinY, int a_MaxY,
-		int a_MinZ, int a_MaxZ,
-		BLOCKTYPE a_SrcType, NIBBLETYPE a_SrcMeta,
-		BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta
+		int a_MinX,
+		int a_MaxX,
+		int a_MinY,
+		int a_MaxY,
+		int a_MinZ,
+		int a_MaxZ,
+		BLOCKTYPE a_SrcType,
+		NIBBLETYPE a_SrcMeta,
+		BLOCKTYPE a_DstType,
+		NIBBLETYPE a_DstMeta
 	);
 
 	/** Replaces the specified src blocks in the cuboid by the dst blocks; allows cuboid out of range of this chunk */
 	void ReplaceRelCuboid(
 		const cCuboid & a_RelCuboid,
-		BLOCKTYPE a_SrcType, NIBBLETYPE a_SrcMeta,
-		BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta
+		BLOCKTYPE a_SrcType,
+		NIBBLETYPE a_SrcMeta,
+		BLOCKTYPE a_DstType,
+		NIBBLETYPE a_DstMeta
 	)
 	{
 		ReplaceRelCuboid(
-			a_RelCuboid.p1.x, a_RelCuboid.p2.x,
-			a_RelCuboid.p1.y, a_RelCuboid.p2.y,
-			a_RelCuboid.p1.z, a_RelCuboid.p2.z,
-			a_SrcType, a_SrcMeta,
-			a_DstType, a_DstMeta
+			a_RelCuboid.p1.x,
+			a_RelCuboid.p2.x,
+			a_RelCuboid.p1.y,
+			a_RelCuboid.p2.y,
+			a_RelCuboid.p1.z,
+			a_RelCuboid.p2.z,
+			a_SrcType,
+			a_SrcMeta,
+			a_DstType,
+			a_DstMeta
 		);
 	}
 
-	/** Replaces the blocks in the cuboid by the dst blocks if they are considered non-floor (air, water); allows cuboid out of range of this chunk */
+	/** Replaces the blocks in the cuboid by the dst blocks if they are considered non-floor (air, water); allows cuboid
+	 * out of range of this chunk */
 	void FloorRelCuboid(
-		int a_MinX, int a_MaxX,
-		int a_MinY, int a_MaxY,
-		int a_MinZ, int a_MaxZ,
-		BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta
+		int a_MinX,
+		int a_MaxX,
+		int a_MinY,
+		int a_MaxY,
+		int a_MinZ,
+		int a_MaxZ,
+		BLOCKTYPE a_DstType,
+		NIBBLETYPE a_DstMeta
 	);
 
-	/** Replaces the blocks in the cuboid by the dst blocks if they are considered non-floor (air, water); allows cuboid out of range of this chunk */
-	void FloorRelCuboid(
-		const cCuboid & a_RelCuboid,
-		BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta
-	)
+	/** Replaces the blocks in the cuboid by the dst blocks if they are considered non-floor (air, water); allows cuboid
+	 * out of range of this chunk */
+	void FloorRelCuboid(const cCuboid & a_RelCuboid, BLOCKTYPE a_DstType, NIBBLETYPE a_DstMeta)
 	{
 		FloorRelCuboid(
-			a_RelCuboid.p1.x, a_RelCuboid.p2.x,
-			a_RelCuboid.p1.y, a_RelCuboid.p2.y,
-			a_RelCuboid.p1.z, a_RelCuboid.p2.z,
-			a_DstType, a_DstMeta
+			a_RelCuboid.p1.x,
+			a_RelCuboid.p2.x,
+			a_RelCuboid.p1.y,
+			a_RelCuboid.p2.y,
+			a_RelCuboid.p1.z,
+			a_RelCuboid.p2.z,
+			a_DstType,
+			a_DstMeta
 		);
 	}
 
 	/** Fills the relative cuboid with specified block with a random chance; allows cuboid out of range of this chunk */
 	void RandomFillRelCuboid(
-		int a_MinX, int a_MaxX,
-		int a_MinY, int a_MaxY,
-		int a_MinZ, int a_MaxZ,
-		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
-		int a_RandomSeed, int a_ChanceOutOf10k
+		int a_MinX,
+		int a_MaxX,
+		int a_MinY,
+		int a_MaxY,
+		int a_MinZ,
+		int a_MaxZ,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta,
+		int a_RandomSeed,
+		int a_ChanceOutOf10k
 	);
 
 	/** Fills the relative cuboid with specified block with a random chance; allows cuboid out of range of this chunk */
 	void RandomFillRelCuboid(
-		const cCuboid & a_RelCuboid, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
-		int a_RandomSeed, int a_ChanceOutOf10k
+		const cCuboid & a_RelCuboid,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta,
+		int a_RandomSeed,
+		int a_ChanceOutOf10k
 	)
 	{
 		RandomFillRelCuboid(
-			a_RelCuboid.p1.x, a_RelCuboid.p2.x,
-			a_RelCuboid.p1.y, a_RelCuboid.p2.y,
-			a_RelCuboid.p1.z, a_RelCuboid.p2.z,
-			a_BlockType, a_BlockMeta,
-			a_RandomSeed, a_ChanceOutOf10k
+			a_RelCuboid.p1.x,
+			a_RelCuboid.p2.x,
+			a_RelCuboid.p1.y,
+			a_RelCuboid.p2.y,
+			a_RelCuboid.p1.z,
+			a_RelCuboid.p2.z,
+			a_BlockType,
+			a_BlockMeta,
+			a_RandomSeed,
+			a_ChanceOutOf10k
 		);
 	}
 
@@ -231,42 +287,48 @@ public:
 	// tolua_end
 
 	// Accessors used by cChunkGenerator::Generator descendants:
-	inline cChunkDef::BiomeMap &     GetBiomeMap              (void) { return m_BiomeMap; }
-	inline cChunkDef::BlockTypes &   GetBlockTypes            (void) { return *(reinterpret_cast<cChunkDef::BlockTypes *>(m_BlockArea.GetBlockTypes())); }
+	inline cChunkDef::BiomeMap & GetBiomeMap(void) { return m_BiomeMap; }
+	inline cChunkDef::BlockTypes & GetBlockTypes(void)
+	{
+		return *(reinterpret_cast<cChunkDef::BlockTypes *>(m_BlockArea.GetBlockTypes()));
+	}
 	// CANNOT, different compression!
-	// inline cChunkDef::BlockNibbles & GetBlockMetas            (void) { return *((cChunkDef::BlockNibbles *)m_BlockArea.GetBlockMetas()); }
-	inline BlockNibbleBytes &        GetBlockMetasUncompressed(void) { return *(reinterpret_cast<BlockNibbleBytes *>(m_BlockArea.GetBlockMetas())); }
-	inline cChunkDef::HeightMap &    GetHeightMap             (void) { return m_HeightMap; }
-	inline cEntityList &             GetEntities              (void) { return m_Entities; }
-	inline cBlockEntities &          GetBlockEntities         (void) { return m_BlockEntities; }
+	// inline cChunkDef::BlockNibbles & GetBlockMetas            (void) { return *((cChunkDef::BlockNibbles
+	// *)m_BlockArea.GetBlockMetas()); }
+	inline BlockNibbleBytes & GetBlockMetasUncompressed(void)
+	{
+		return *(reinterpret_cast<BlockNibbleBytes *>(m_BlockArea.GetBlockMetas()));
+	}
+	inline cChunkDef::HeightMap & GetHeightMap(void) { return m_HeightMap; }
+	inline cEntityList & GetEntities(void) { return m_Entities; }
+	inline cBlockEntities & GetBlockEntities(void) { return m_BlockEntities; }
 
-	inline const cChunkDef::BiomeMap &     GetBiomeMap()   const { return m_BiomeMap; }
-	inline const cChunkDef::BlockTypes &   GetBlockTypes() const { return *(reinterpret_cast<cChunkDef::BlockTypes *>(m_BlockArea.GetBlockTypes())); }
-	inline const cChunkDef::HeightMap &    GetHeightMap()  const { return m_HeightMap; }
+	inline const cChunkDef::BiomeMap & GetBiomeMap() const { return m_BiomeMap; }
+	inline const cChunkDef::BlockTypes & GetBlockTypes() const
+	{
+		return *(reinterpret_cast<cChunkDef::BlockTypes *>(m_BlockArea.GetBlockTypes()));
+	}
+	inline const cChunkDef::HeightMap & GetHeightMap() const { return m_HeightMap; }
 
 	/** Compresses the metas from the BlockArea format (1 meta per byte) into regular format (2 metas per byte) */
 	void CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas);
 
-	#ifndef NDEBUG
+#ifndef NDEBUG
 	/** Verifies that the heightmap corresponds to blocktype contents; if not, asserts on that column */
 	void VerifyHeightmap(void);
-	#endif  // !NDEBUG
+#endif  // !NDEBUG
 
-private:
+  private:
 	cChunkCoords m_Coords;
 
-	cChunkDef::BiomeMap     m_BiomeMap;
-	cBlockArea              m_BlockArea;
-	cChunkDef::HeightMap    m_HeightMap;
-	cEntityList             m_Entities;
-	cBlockEntities          m_BlockEntities;  // Individual block entities are NOT owned by this object!
+	cChunkDef::BiomeMap m_BiomeMap;
+	cBlockArea m_BlockArea;
+	cChunkDef::HeightMap m_HeightMap;
+	cEntityList m_Entities;
+	cBlockEntities m_BlockEntities;  // Individual block entities are NOT owned by this object!
 
 	bool m_bUseDefaultBiomes;
 	bool m_bUseDefaultHeight;
 	bool m_bUseDefaultComposition;
 	bool m_bUseDefaultFinish;
-} ;  // tolua_export
-
-
-
-
+};  // tolua_export

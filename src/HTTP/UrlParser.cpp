@@ -155,11 +155,8 @@ std::pair<bool, AString> cUrlParser::Parse(
 	}
 
 	// Parse the Authority part into individual components:
-	auto res = ParseAuthorityPart(
-		a_Url.substr(authStart, idxFirstSlash - authStart),
-		a_Username, a_Password,
-		a_Host, a_Port
-	);
+	auto res =
+		ParseAuthorityPart(a_Url.substr(authStart, idxFirstSlash - authStart), a_Username, a_Password, a_Host, a_Port);
 	if (!res.first)
 	{
 		return res;
@@ -205,7 +202,3 @@ std::pair<bool, AString> cUrlParser::Validate(const AString & a_Url)
 	UInt16 Port;
 	return Parse(a_Url, UrlScheme, UrlUsername, UrlPassword, UrlHost, Port, UrlPath, UrlQuery, UrlFragment);
 }
-
-
-
-

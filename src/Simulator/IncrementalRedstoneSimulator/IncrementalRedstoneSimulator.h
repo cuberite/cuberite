@@ -7,17 +7,14 @@
 
 
 
-class cIncrementalRedstoneSimulator final :
-	public cRedstoneSimulator
+class cIncrementalRedstoneSimulator final : public cRedstoneSimulator
 {
 	using Super = cRedstoneSimulator;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	/** Returns if a redstone device is always ticked due to influence by its environment */
 	static bool IsAlwaysTicked(BLOCKTYPE a_Block);
 
@@ -31,4 +28,4 @@ private:
 	virtual cRedstoneSimulatorChunkData * CreateChunkData() override;
 	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
 	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BLOCKTYPE a_Block) override;
-} ;
+};

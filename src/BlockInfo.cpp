@@ -556,15 +556,15 @@ NIBBLETYPE cBlockInfo::GetSpreadLightFalloff(const BLOCKTYPE Block)
 		case E_BLOCK_WALLSIGN:
 		case E_BLOCK_WALL_BANNER:
 		case E_BLOCK_WOODEN_BUTTON:
-		case E_BLOCK_WOODEN_PRESSURE_PLATE: return 1;
+		case E_BLOCK_WOODEN_PRESSURE_PLATE:         return 1;
 
 		// Light in ice and water disappears faster:
 		case E_BLOCK_ICE:
 		case E_BLOCK_STATIONARY_WATER:
-		case E_BLOCK_WATER: return 3;
+		case E_BLOCK_WATER:                         return 3;
 
 		// Light does not pass through anything else (note: including tilled farmland, stairs, and slabs):
-		default: return 15;
+		default:                                    return 15;
 	}
 }
 
@@ -594,8 +594,8 @@ bool cBlockInfo::CanBeTerraformed(const BLOCKTYPE Block)
 		case E_BLOCK_SANDSTONE:
 		case E_BLOCK_SOULSAND:
 		case E_BLOCK_STAINED_CLAY:
-		case E_BLOCK_STONE: return true;
-		default: return false;
+		case E_BLOCK_STONE:                return true;
+		default:                           return false;
 	}
 }
 
@@ -708,8 +708,8 @@ bool cBlockInfo::FullyOccupiesVoxel(const BLOCKTYPE Block)
 		case E_BLOCK_STRUCTURE_BLOCK:
 		case E_BLOCK_WHITE_GLAZED_TERRACOTTA:
 		case E_BLOCK_WOOL:
-		case E_BLOCK_YELLOW_GLAZED_TERRACOTTA: return true;
-		default: return false;
+		case E_BLOCK_YELLOW_GLAZED_TERRACOTTA:     return true;
+		default:                                   return false;
 	}
 }
 
@@ -835,8 +835,8 @@ bool cBlockInfo::IsPistonBreakable(const BLOCKTYPE Block)
 		case E_BLOCK_WHITE_SHULKER_BOX:
 		case E_BLOCK_WOODEN_BUTTON:
 		case E_BLOCK_WOODEN_PRESSURE_PLATE:
-		case E_BLOCK_YELLOW_SHULKER_BOX: return true;
-		default: return false;
+		case E_BLOCK_YELLOW_SHULKER_BOX:            return true;
+		default:                                    return false;
 	}
 }
 
@@ -852,8 +852,8 @@ bool cBlockInfo::IsRainBlocker(const BLOCKTYPE Block)
 		case E_BLOCK_SIGN_POST:
 		case E_BLOCK_STANDING_BANNER:
 		case E_BLOCK_WALLSIGN:
-		case E_BLOCK_WALL_BANNER: return true;
-		default: return IsSolid(Block);
+		case E_BLOCK_WALL_BANNER:     return true;
+		default:                      return IsSolid(Block);
 	}
 }
 
@@ -868,7 +868,7 @@ bool cBlockInfo::IsSkylightDispersant(const BLOCKTYPE Block)
 	{
 		case E_BLOCK_COBWEB:
 		case E_BLOCK_LEAVES: return true;
-		default: return GetSpreadLightFalloff(Block) > 1;
+		default:             return GetSpreadLightFalloff(Block) > 1;
 	}
 }
 
@@ -879,8 +879,7 @@ bool cBlockInfo::IsSkylightDispersant(const BLOCKTYPE Block)
 bool cBlockInfo::IsSnowable(BLOCKTYPE a_BlockType)
 {
 	return (
-		(a_BlockType == E_BLOCK_ICE) ||
-		(a_BlockType == E_BLOCK_LEAVES) ||
+		(a_BlockType == E_BLOCK_ICE) || (a_BlockType == E_BLOCK_LEAVES) ||
 		(!IsTransparent(a_BlockType) && (a_BlockType != E_BLOCK_PACKED_ICE))
 	);
 }
@@ -949,8 +948,8 @@ bool cBlockInfo::IsSolid(const BLOCKTYPE Block)
 		case E_BLOCK_WALL_BANNER:
 		case E_BLOCK_WATER:
 		case E_BLOCK_WOODEN_BUTTON:
-		case E_BLOCK_WOODEN_PRESSURE_PLATE: return false;
-		default: return true;
+		case E_BLOCK_WOODEN_PRESSURE_PLATE:         return false;
+		default:                                    return true;
 	}
 }
 
@@ -1122,8 +1121,8 @@ bool cBlockInfo::IsTransparent(const BLOCKTYPE Block)
 		case E_BLOCK_WOODEN_BUTTON:
 		case E_BLOCK_WOODEN_PRESSURE_PLATE:
 		case E_BLOCK_WOODEN_SLAB:
-		case E_BLOCK_YELLOW_SHULKER_BOX: return true;
-		default: return false;
+		case E_BLOCK_YELLOW_SHULKER_BOX:            return true;
+		default:                                    return false;
 	}
 }
 
@@ -1141,8 +1140,8 @@ bool cBlockInfo::IsUseableBySpectator(const BLOCKTYPE Block)
 		case E_BLOCK_CHEST:
 		case E_BLOCK_DISPENSER:
 		case E_BLOCK_DROPPER:
-		case E_BLOCK_HOPPER: return true;
-		default: return false;
+		case E_BLOCK_HOPPER:        return true;
+		default:                    return false;
 	}
 }
 
@@ -1160,23 +1159,25 @@ float cBlockInfo::GetBlockHeight(const BLOCKTYPE Block)
 		case E_BLOCK_BED:                 return 0.5625;  // 9 pixels
 		case E_BLOCK_BIRCH_FENCE:         return 1.5;
 		case E_BLOCK_BIRCH_FENCE_GATE:    return 1.5;
-		case E_BLOCK_CAKE:                return 0.5;     // 8 pixels
+		case E_BLOCK_CAKE:                return 0.5;  // 8 pixels
 		case E_BLOCK_DARK_OAK_FENCE:      return 1.5;
 		case E_BLOCK_DARK_OAK_FENCE_GATE: return 1.5;
-		case E_BLOCK_ENCHANTMENT_TABLE:   return 0.75;    // 12 pixels
-		// case E_BLOCK_FARMLAND:         return 0.9375;  // prevents trampling for mobs (#2015) and older clients (MC-85162)
-		case E_BLOCK_FENCE:               return 1.5;
-		case E_BLOCK_JUNGLE_FENCE:        return 1.5;
-		case E_BLOCK_JUNGLE_FENCE_GATE:   return 1.5;
-		case E_BLOCK_OAK_FENCE_GATE:      return 1.5;
-		case E_BLOCK_PURPUR_SLAB:         return 0.5;
-		case E_BLOCK_RED_SANDSTONE_SLAB:  return 0.5;
-		case E_BLOCK_SNOW:                return 0.125;   // one layer is 1 / 8 (2 pixels) tall
-		case E_BLOCK_SPRUCE_FENCE:        return 1.5;
-		case E_BLOCK_SPRUCE_FENCE_GATE:   return 1.5;
-		case E_BLOCK_STONE_SLAB:          return 0.5;
-		case E_BLOCK_WOODEN_SLAB:         return 0.5;
-		default:                          return 1;
+		case E_BLOCK_ENCHANTMENT_TABLE:
+			return 0.75;  // 12 pixels
+		// case E_BLOCK_FARMLAND:         return 0.9375;  // prevents trampling for mobs (#2015) and older clients
+		// (MC-85162)
+		case E_BLOCK_FENCE:              return 1.5;
+		case E_BLOCK_JUNGLE_FENCE:       return 1.5;
+		case E_BLOCK_JUNGLE_FENCE_GATE:  return 1.5;
+		case E_BLOCK_OAK_FENCE_GATE:     return 1.5;
+		case E_BLOCK_PURPUR_SLAB:        return 0.5;
+		case E_BLOCK_RED_SANDSTONE_SLAB: return 0.5;
+		case E_BLOCK_SNOW:               return 0.125;  // one layer is 1 / 8 (2 pixels) tall
+		case E_BLOCK_SPRUCE_FENCE:       return 1.5;
+		case E_BLOCK_SPRUCE_FENCE_GATE:  return 1.5;
+		case E_BLOCK_STONE_SLAB:         return 0.5;
+		case E_BLOCK_WOODEN_SLAB:        return 0.5;
+		default:                         return 1;
 	}
 }
 

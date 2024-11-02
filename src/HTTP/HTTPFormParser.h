@@ -21,21 +21,21 @@ class cHTTPIncomingRequest;
 
 
 
-class cHTTPFormParser :
-	public std::map<AString, AString>,
-	public cMultipartParser::cCallbacks
+class cHTTPFormParser : public std::map<AString, AString>,
+						public cMultipartParser::cCallbacks
 {
-public:
+  public:
 	enum eKind
 	{
-		fpkURL,             ///< The form has been transmitted as parameters to a GET request
-		fpkFormUrlEncoded,  ///< The form has been POSTed or PUT, with Content-Type of "application/x-www-form-urlencoded"
-		fpkMultipart,       ///< The form has been POSTed or PUT, with Content-Type of "multipart/form-data"
-	} ;
+		fpkURL,  ///< The form has been transmitted as parameters to a GET request
+		fpkFormUrlEncoded,  ///< The form has been POSTed or PUT, with Content-Type of
+							///< "application/x-www-form-urlencoded"
+		fpkMultipart,  ///< The form has been POSTed or PUT, with Content-Type of "multipart/form-data"
+	};
 
 	class cCallbacks
 	{
-	public:
+	  public:
 		// Force a virtual destructor in descendants:
 		virtual ~cCallbacks() {}
 
@@ -47,7 +47,7 @@ public:
 
 		/** Called when the current file part has ended in the form data */
 		virtual void OnFileEnd(cHTTPFormParser & a_Parser) = 0;
-	} ;
+	};
 
 
 	/** Creates a parser that is tied to a request and notifies of various events using a callback mechanism */
@@ -66,8 +66,7 @@ public:
 	/** Returns true if the headers suggest the request has form data parseable by this class */
 	static bool HasFormData(const cHTTPIncomingRequest & a_Request);
 
-protected:
-
+  protected:
 	/** The callbacks to call for incoming file data */
 	cCallbacks & m_Callbacks;
 
@@ -77,7 +76,8 @@ protected:
 	/** Buffer for the incoming data until it's parsed */
 	AString m_IncomingData;
 
-	/** True if the information received so far is a valid form; set to false on first problem. Further parsing is skipped when false. */
+	/** True if the information received so far is a valid form; set to false on first problem. Further parsing is
+	 * skipped when false. */
 	bool m_IsValid;
 
 	/** The parser for the multipart data, if used */
@@ -103,12 +103,8 @@ protected:
 	void ParseFormUrlEncoded(void);
 
 	// cMultipartParser::cCallbacks overrides:
-	virtual void OnPartStart (void) override;
+	virtual void OnPartStart(void) override;
 	virtual void OnPartHeader(const AString & a_Key, const AString & a_Value) override;
-	virtual void OnPartData  (const char * a_Data, size_t a_Size) override;
-	virtual void OnPartEnd   (void) override;
-} ;
-
-
-
-
+	virtual void OnPartData(const char * a_Data, size_t a_Size) override;
+	virtual void OnPartEnd(void) override;
+};

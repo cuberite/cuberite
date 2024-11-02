@@ -16,24 +16,24 @@
 
 
 
-class cEnderChestWindow:
-	public cWindow
+class cEnderChestWindow : public cWindow
 {
 	using Super = cWindow;
 
-public:
-
+  public:
 	cEnderChestWindow(cEnderChestEntity * a_EnderChest);
 
 	virtual ~cEnderChestWindow() override;
 
-	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
+	virtual void DistributeStack(
+		cItem & a_ItemStack,
+		int a_Slot,
+		cPlayer & a_Player,
+		cSlotArea * a_ClickedArea,
+		bool a_ShouldApply
+	) override;
 
-protected:
+  protected:
 	cWorld * m_World;
 	Vector3i m_BlockPos;  // Position of the enderchest, for the window-close packet
 };
-
-
-
-

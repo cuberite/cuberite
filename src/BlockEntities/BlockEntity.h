@@ -23,12 +23,10 @@ using cBlockEntities = std::unordered_map<size_t, OwnedBlockEntity>;
 // tolua_begin
 class cBlockEntity
 {
-protected:
-
+  protected:
 	cBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
-public:
-
+  public:
 	// tolua_end
 
 	virtual ~cBlockEntity() = default;  // force a virtual destructor in all descendants
@@ -38,7 +36,8 @@ public:
 	OwnedBlockEntity Clone(Vector3i a_Pos);
 
 	/** Returns the contents of this block entity that it would drop if broken.
-	Note that the block handler will usually handle pickups for the block itself, in addition to any items returned here. */
+	Note that the block handler will usually handle pickups for the block itself, in addition to any items returned
+	here. */
 	virtual cItems ConvertToPickups() const;
 
 	/** Copies all properties of a_Src into this entity, except for its m_World and location.
@@ -49,7 +48,12 @@ public:
 	/** Creates a new block entity for the specified block type at the specified absolute pos.
 	If a_World is valid, then the entity is created bound to that world
 	Returns nullptr for unknown block types. */
-	static OwnedBlockEntity CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World = nullptr);
+	static OwnedBlockEntity CreateByBlockType(
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta,
+		Vector3i a_Pos,
+		cWorld * a_World = nullptr
+	);
 
 	/** Called when this block entity's associated block is destroyed.
 	It is guaranteed that this function is called before OnRemoveFromWorld. */
@@ -71,13 +75,14 @@ public:
 	virtual void SendTo(cClientHandle & a_Client) = 0;
 
 	/** Updates the internally stored position.
-	Note that this should not ever be used for world-contained block entities, it is meant only for when BEs in a cBlockArea are manipulated.
-	Asserts that the block entity is not assigned to a world. */
+	Note that this should not ever be used for world-contained block entities, it is meant only for when BEs in a
+	cBlockArea are manipulated. Asserts that the block entity is not assigned to a world. */
 	void SetPos(Vector3i a_NewPos);
 
 	void SetWorld(cWorld * a_World);
 
-	/** Ticks the entity; returns true if the chunk should be marked as dirty as a result of this ticking. By default does nothing. */
+	/** Ticks the entity; returns true if the chunk should be marked as dirty as a result of this ticking. By default
+	 * does nothing. */
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 
 	/** Called when a player uses this entity; should open the UI window.
@@ -107,8 +112,7 @@ public:
 	// tolua_end
 
 
-protected:
-
+  protected:
 	/** Position in absolute block coordinates */
 	Vector3i m_Pos;
 
@@ -124,4 +128,4 @@ protected:
 	NIBBLETYPE m_BlockMeta;
 
 	cWorld * m_World;
-} ;  // tolua_export
+};  // tolua_export

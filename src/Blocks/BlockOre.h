@@ -8,21 +8,17 @@
 
 
 
-class cBlockOreHandler :
-	public cBlockHandler
+class cBlockOreHandler : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-protected:
-
+  protected:
 	~cBlockOreHandler() = default;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// If using silk-touch, drop self rather than the resource:
@@ -31,15 +27,15 @@ private:
 			switch (m_BlockType)
 			{
 				// If it was a glowing redstone ore, drop a normal redstone ore:
-				case E_BLOCK_REDSTONE_ORE_GLOWING:   return cItem(E_BLOCK_REDSTONE_ORE);
-				default:                             return cItem(m_BlockType);
+				case E_BLOCK_REDSTONE_ORE_GLOWING: return cItem(E_BLOCK_REDSTONE_ORE);
+				default:                           return cItem(m_BlockType);
 			}
 		}
 
 		const auto FortuneLevel = ToolFortuneLevel(a_Tool);
 
 		if ((m_BlockType == E_BLOCK_REDSTONE_ORE) || (m_BlockType == E_BLOCK_REDSTONE_ORE_GLOWING))
-		{   // Redstone follows the discrete random distribution, unlike other ores
+		{  // Redstone follows the discrete random distribution, unlike other ores
 			const auto DropNum = FortuneDiscreteRandom(4, 5, FortuneLevel);
 			return cItem(E_ITEM_REDSTONE_DUST, DropNum);
 		}
@@ -48,12 +44,12 @@ private:
 		const auto DropMult = std::max(static_cast<char>(1), FloorC<char>(Random.RandReal(FortuneLevel + 2.0)));
 		switch (m_BlockType)
 		{
-			case E_BLOCK_LAPIS_ORE:            return cItem(E_ITEM_DYE, DropMult * Random.RandInt<char>(4, 9), 4);
-			case E_BLOCK_DIAMOND_ORE:          return cItem(E_ITEM_DIAMOND, DropMult);
-			case E_BLOCK_EMERALD_ORE:          return cItem(E_ITEM_EMERALD, DropMult);
-			case E_BLOCK_COAL_ORE:             return cItem(E_ITEM_COAL, DropMult);
-			case E_BLOCK_NETHER_QUARTZ_ORE:    return cItem(E_ITEM_NETHER_QUARTZ, DropMult);
-			case E_BLOCK_CLAY:                 return cItem(E_ITEM_CLAY, 4);
+			case E_BLOCK_LAPIS_ORE:         return cItem(E_ITEM_DYE, DropMult * Random.RandInt<char>(4, 9), 4);
+			case E_BLOCK_DIAMOND_ORE:       return cItem(E_ITEM_DIAMOND, DropMult);
+			case E_BLOCK_EMERALD_ORE:       return cItem(E_ITEM_EMERALD, DropMult);
+			case E_BLOCK_COAL_ORE:          return cItem(E_ITEM_COAL, DropMult);
+			case E_BLOCK_NETHER_QUARTZ_ORE: return cItem(E_ITEM_NETHER_QUARTZ, DropMult);
+			case E_BLOCK_CLAY:              return cItem(E_ITEM_CLAY, 4);
 			default:
 			{
 				return cItem(m_BlockType);
@@ -66,9 +62,11 @@ private:
 
 
 	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BLOCKTYPE a_OldBlockType,
+		NIBBLETYPE a_OldBlockMeta,
 		const cEntity * a_Digger
 	) const override
 	{
@@ -140,16 +138,14 @@ private:
 			a_WorldInterface.SpawnSplitExperienceOrbs(Vector3d(0.5, 0.5, 0.5) + a_BlockPos, Reward);
 		}
 	}
-} ;
+};
 
 
 
 
 
-class cDefaultOreHandler final :
-	public cBlockOreHandler
+class cDefaultOreHandler final : public cBlockOreHandler
 {
-public:
-
+  public:
 	using cBlockOreHandler::cBlockOreHandler;
 };

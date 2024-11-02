@@ -1,7 +1,8 @@
 
 // PrefabStructure.h
 
-// Declares the cPrefabStructure class representing a cGridStructGen::cStructure descendant based on placed cPrefab instances
+// Declares the cPrefabStructure class representing a cGridStructGen::cStructure descendant based on placed cPrefab
+// instances
 
 
 
@@ -16,21 +17,21 @@
 
 
 
-class cPrefabStructure:
-	public cGridStructGen::cStructure
+class cPrefabStructure : public cGridStructGen::cStructure
 {
 	using Super = cGridStructGen::cStructure;
 
-public:
-
+  public:
 	cPrefabStructure(
-		int a_GridX, int a_GridZ,
-		int a_OriginX, int a_OriginZ,
+		int a_GridX,
+		int a_GridZ,
+		int a_OriginX,
+		int a_OriginZ,
 		cPlacedPieces && a_Pieces,
 		cTerrainHeightGen & a_HeightGen
 	);
 
-protected:
+  protected:
 	/** The pieces placed by the generator. */
 	cPlacedPieces m_Pieces;
 

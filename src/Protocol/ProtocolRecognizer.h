@@ -19,38 +19,31 @@
 protocol version instance and redirects everything to it. */
 class cMultiVersionProtocol
 {
-public:
-
+  public:
 	cMultiVersionProtocol();
 
 	/** Translates protocol version number into protocol version text: 49 -> "1.4.4" */
 	static AString GetVersionTextFromInt(cProtocol::Version a_ProtocolVersion);
 
 	/** Returns if we contain a concrete protocol corresponding to the client's protocol version. */
-	bool VersionRecognitionSuccessful()
-	{
-		return m_Protocol != nullptr;
-	}
+	bool VersionRecognitionSuccessful() { return m_Protocol != nullptr; }
 
 	/** Convenience overload to enable redirecting sends to the underlying implementation. */
-	auto & operator->()
-	{
-		return m_Protocol;
-	}
+	auto & operator->() { return m_Protocol; }
 
-	/** Directs incoming protocol data along the correct pathway, depending on the state of the version recognition process.
-	The protocol modifies the provided buffer in-place. */
+	/** Directs incoming protocol data along the correct pathway, depending on the state of the version recognition
+	process. The protocol modifies the provided buffer in-place. */
 	void HandleIncomingData(cClientHandle & a_Client, ContiguousByteBuffer & a_Data);
 
-	/** Allows the protocol (if any) to do a final pass on outgiong data, possibly modifying the provided buffer in-place. */
+	/** Allows the protocol (if any) to do a final pass on outgiong data, possibly modifying the provided buffer
+	 * in-place. */
 	void HandleOutgoingData(ContiguousByteBuffer & a_Data);
 
 	/** Sends a disconnect to the client as a result of a recognition error.
 	This function can be used to disconnect before any protocol has been recognised. */
 	void SendDisconnect(cClientHandle & a_Client, const AString & a_Reason);
 
-private:
-
+  private:
 	/** Handles data reception in a newly-created client handle that doesn't yet have a known protocol.
 	a_Data contains a view of data that were just received.
 	Tries to recognize a protocol, populate m_Protocol, and transitions to another mode depending on success. */
@@ -88,4 +81,4 @@ private:
 
 	/** If we're still waiting for data required for version recognition to arrive. */
 	bool m_WaitingForData;
-} ;
+};

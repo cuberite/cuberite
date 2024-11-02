@@ -6,39 +6,39 @@ enum class CustomStatistic
 	// tolua_end
 
 	/* Achievements */
-	AchOpenInventory,     /* Taking Inventory     */
-	AchMineWood,          /* Getting Wood         */
-	AchBuildWorkBench,    /* Benchmarking         */
-	AchBuildPickaxe,      /* Time to Mine!        */
-	AchBuildFurnace,      /* Hot Topic            */
-	AchAcquireIron,       /* Acquire Hardware     */
-	AchBuildHoe,          /* Time to Farm!        */
-	AchMakeBread,         /* Bake Bread           */
-	AchBakeCake,          /* The Lie              */
+	AchOpenInventory, /* Taking Inventory     */
+	AchMineWood, /* Getting Wood         */
+	AchBuildWorkBench, /* Benchmarking         */
+	AchBuildPickaxe, /* Time to Mine!        */
+	AchBuildFurnace, /* Hot Topic            */
+	AchAcquireIron, /* Acquire Hardware     */
+	AchBuildHoe, /* Time to Farm!        */
+	AchMakeBread, /* Bake Bread           */
+	AchBakeCake, /* The Lie              */
 	AchBuildBetterPickaxe, /* Getting an Upgrade   */
-	AchCookFish,          /* Delicious Fish       */
-	AchOnARail,           /* On A Rail            */
-	AchBuildSword,        /* Time to Strike!      */
-	AchKillEnemy,         /* Monster Hunter       */
-	AchKillCow,           /* Cow Tipper           */
-	AchFlyPig,            /* When Pigs Fly        */
-	AchSnipeSkeleton,     /* Sniper Duel          */
-	AchDiamonds,          /* DIAMONDS!            */
-	AchPortal,            /* We Need to Go Deeper */
-	AchGhast,             /* Return to Sender     */
-	AchBlazeRod,          /* Into Fire            */
-	AchPotion,            /* Local Brewery        */
-	AchTheEnd,            /* The End?             */
-	AchTheEnd2,           /* The End.             */
-	AchEnchantments,      /* Enchanter            */
-	AchOverkill,          /* Overkill             */
-	AchBookcase,          /* Librarian            */
-	AchExploreAllBiomes,  /* Adventuring Time     */
-	AchSpawnWither,       /* The Beginning?       */
-	AchKillWither,        /* The Beginning.       */
-	AchFullBeacon,        /* Beaconator           */
-	AchBreedCow,          /* Repopulation         */
-	AchDiamondsToYou,     /* Diamonds to you!     */
+	AchCookFish, /* Delicious Fish       */
+	AchOnARail, /* On A Rail            */
+	AchBuildSword, /* Time to Strike!      */
+	AchKillEnemy, /* Monster Hunter       */
+	AchKillCow, /* Cow Tipper           */
+	AchFlyPig, /* When Pigs Fly        */
+	AchSnipeSkeleton, /* Sniper Duel          */
+	AchDiamonds, /* DIAMONDS!            */
+	AchPortal, /* We Need to Go Deeper */
+	AchGhast, /* Return to Sender     */
+	AchBlazeRod, /* Into Fire            */
+	AchPotion, /* Local Brewery        */
+	AchTheEnd, /* The End?             */
+	AchTheEnd2, /* The End.             */
+	AchEnchantments, /* Enchanter            */
+	AchOverkill, /* Overkill             */
+	AchBookcase, /* Librarian            */
+	AchExploreAllBiomes, /* Adventuring Time     */
+	AchSpawnWither, /* The Beginning?       */
+	AchKillWither, /* The Beginning.       */
+	AchFullBeacon, /* Beaconator           */
+	AchBreedCow, /* Repopulation         */
+	AchDiamondsToYou, /* Diamonds to you!     */
 
 	// tolua_begin
 

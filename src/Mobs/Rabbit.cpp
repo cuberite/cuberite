@@ -10,9 +10,12 @@
 
 
 cRabbit::cRabbit(void) :
-	cRabbit(static_cast<eRabbitType>(GetRandomProvider().RandInt<UInt8>(
-		static_cast<UInt8>(eRabbitType::SaltAndPepper)  // Max possible Rabbit-Type
-	)), 0)
+	cRabbit(
+		static_cast<eRabbitType>(GetRandomProvider().RandInt<UInt8>(
+			static_cast<UInt8>(eRabbitType::SaltAndPepper)  // Max possible Rabbit-Type
+		)),
+		0
+	)
 {
 }
 
@@ -49,4 +52,3 @@ void cRabbit::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	RareDrops.Add(cItem(E_ITEM_RABBITS_FOOT));
 	AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
 }
-

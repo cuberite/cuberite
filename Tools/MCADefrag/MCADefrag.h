@@ -20,16 +20,14 @@
 
 
 
-
 class cMCADefrag
 {
-public:
-
+  public:
 	enum
 	{
 		MAX_COMPRESSED_CHUNK_DATA_SIZE = (1 MiB),
-		MAX_RAW_CHUNK_DATA_SIZE        = (100 MiB),
-	} ;
+		MAX_RAW_CHUNK_DATA_SIZE = (100 MiB),
+	};
 
 	cMCADefrag(void);
 
@@ -40,26 +38,22 @@ public:
 	/** Runs the entire app. */
 	void Run(void);
 
-protected:
-
+  protected:
 	/** A single thread processing MCA files from the queue */
-	class cThread :
-		public cIsThread
+	class cThread : public cIsThread
 	{
 		typedef cIsThread super;
 
-	public:
-
+	  public:
 		cThread(cMCADefrag & a_Parent);
 
-	protected:
-
+	  protected:
 		/** The compression methods, as specified by the MCA compression method byte. */
 		enum
 		{
 			COMPRESSION_GZIP = 1,
 			COMPRESSION_ZLIB = 2,
-		} ;
+		};
 
 
 		cMCADefrag & m_Parent;
@@ -127,7 +121,7 @@ protected:
 
 		// cIsThread overrides:
 		virtual void Execute(void) override;
-	} ;
+	};
 
 	typedef std::list<cThread *> cThreads;
 
@@ -154,4 +148,4 @@ protected:
 	/** Retrieves one file from the queue (and removes it from the queue).
 	Returns an empty string when queue empty. */
 	AString GetNextFileName(void);
-} ;
+};

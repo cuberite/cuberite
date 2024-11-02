@@ -14,10 +14,10 @@ using cX509CertPtr = std::shared_ptr<cX509Cert>;
 
 enum class eSslAuthMode
 {
-	None = 0,      // MBEDTLS_SSL_VERIFY_NONE
+	None = 0,  // MBEDTLS_SSL_VERIFY_NONE
 	Optional = 1,  // MBEDTLS_SSL_VERIFY_OPTIONAL
 	Required = 2,  // MBEDTLS_SSL_VERIFY_REQUIRED
-	Unset = 3,     // MBEDTLS_SSL_VERIFY_UNSET
+	Unset = 3,  // MBEDTLS_SSL_VERIFY_UNSET
 };
 
 
@@ -25,7 +25,8 @@ enum class eSslAuthMode
 class cSslConfig
 {
 	friend class cSslContext;
-public:
+
+  public:
 	/** Type of the SSL debug callback.
 	Parameters are:
 		void *       Opaque context for the callback
@@ -33,7 +34,7 @@ public:
 		const char * File name
 		int          Line number
 		const char * Message */
-	using cDebugCallback = void(*)(void *, int, const char *, int, const char *);
+	using cDebugCallback = void (*)(void *, int, const char *, int, const char *);
 
 	/** Type of the SSL certificate verify callback.
 	Parameters are:
@@ -41,7 +42,7 @@ public:
 		mbedtls_x509_crt * Current cert
 		int                Cert chain depth
 		uint32_t *         Verification flags */
-	using cVerifyCallback = int(*)(void *, mbedtls_x509_crt *, int, uint32_t *);
+	using cVerifyCallback = int (*)(void *, mbedtls_x509_crt *, int, uint32_t *);
 
 	cSslConfig();
 	~cSslConfig();
@@ -79,8 +80,7 @@ public:
 	/** Returns the default config for server connections. */
 	static std::shared_ptr<const cSslConfig> GetDefaultServerConfig();
 
-private:
-
+  private:
 	/** Returns a pointer to the wrapped mbedtls representation. */
 	const mbedtls_ssl_config * GetInternal() const { return &m_Config; }
 

@@ -16,13 +16,13 @@ enum
 	PROGRESSBAR_FUEL = 0,
 	PROGRESSBAR_SMELTING = 2,
 	PROGRESSBAR_SMELTING_CONFIRM = 3,
-} ;
+};
 
 
 
 
 
-cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) :
 	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_CurrentRecipe(nullptr),
 	m_IsCooking(a_BlockType == E_BLOCK_LIT_FURNACE),
@@ -255,10 +255,10 @@ void cFurnaceEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	ASSERT(a_ItemGrid == &m_Contents);
 	switch (a_SlotNum)
 	{
-		case fsInput:  UpdateInput();  break;
-		case fsFuel:   UpdateFuel();   break;
+		case fsInput:  UpdateInput(); break;
+		case fsFuel:   UpdateFuel(); break;
 		case fsOutput: UpdateOutput(); break;
-		default: ASSERT(!"Invalid furnace slot update!"); break;
+		default:       ASSERT(!"Invalid furnace slot update!"); break;
 	}
 }
 
@@ -398,7 +398,10 @@ void cFurnaceEntity::UpdateProgressBars(bool a_ForceUpdate)
 	BroadcastProgress(PROGRESSBAR_FUEL, static_cast<short>(CurFuel));
 
 	int CurCook = (m_NeedCookTime > 0) ? (200 * m_TimeCooked / m_NeedCookTime) : 0;
-	BroadcastProgress(PROGRESSBAR_SMELTING_CONFIRM, 200);  // Post 1.8, Mojang requires a random packet with an ID of three and value of 200. Wat. Wat. Wat.
+	BroadcastProgress(
+		PROGRESSBAR_SMELTING_CONFIRM,
+		200
+	);  // Post 1.8, Mojang requires a random packet with an ID of three and value of 200. Wat. Wat. Wat.
 	BroadcastProgress(PROGRESSBAR_SMELTING, static_cast<short>(CurCook));
 }
 
@@ -414,7 +417,8 @@ void cFurnaceEntity::SetIsCooking(bool a_IsCooking)
 	}
 	m_IsCooking = a_IsCooking;
 
-	// Only light the furnace as it is extinguished only when the fuel runs out, not when cooking stops - handled in this::Tick()
+	// Only light the furnace as it is extinguished only when the fuel runs out, not when cooking stops - handled in
+	// this::Tick()
 	if (m_IsCooking)
 	{
 		m_BlockType = E_BLOCK_LIT_FURNACE;

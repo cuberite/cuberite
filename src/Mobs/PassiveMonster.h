@@ -8,13 +8,11 @@
 
 
 
-class cPassiveMonster:
-	public cMonster
+class cPassiveMonster : public cMonster
 {
 	using Super = cMonster;
 
-public:
-
+  public:
 	cPassiveMonster(
 		const AString & a_ConfigName,
 		eMonsterType a_MobType,

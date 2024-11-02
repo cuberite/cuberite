@@ -26,11 +26,11 @@ cStatistics::cStats::cStats(void) :
 	m_MinChunkZ(0x7fffffff),
 	m_MaxChunkZ(0x80000000)
 {
-	memset(m_BiomeCounts,          0, sizeof(m_BiomeCounts));
-	memset(m_BlockCounts,          0, sizeof(m_BlockCounts));
+	memset(m_BiomeCounts, 0, sizeof(m_BiomeCounts));
+	memset(m_BlockCounts, 0, sizeof(m_BlockCounts));
 	memset(m_PerHeightBlockCounts, 0, sizeof(m_PerHeightBlockCounts));
-	memset(m_PerHeightSpawners,    0, sizeof(m_PerHeightSpawners));
-	memset(m_SpawnerEntity,        0, sizeof(m_SpawnerEntity));
+	memset(m_PerHeightSpawners, 0, sizeof(m_PerHeightSpawners));
+	memset(m_SpawnerEntity, 0, sizeof(m_SpawnerEntity));
 }
 
 
@@ -100,9 +100,7 @@ void cStatistics::cStats::UpdateCoordsRange(int a_ChunkX, int a_ChunkZ)
 ////////////////////////////////////////////////////////////////////////////////
 // cStatistics:
 
-cStatistics::cStatistics(void)
-{
-}
+cStatistics::cStatistics(void) {}
 
 
 
@@ -137,9 +135,7 @@ bool cStatistics::OnBiomes(const unsigned char * a_BiomeData)
 
 
 
-
-bool cStatistics::OnSection
-(
+bool cStatistics::OnSection(
 	unsigned char a_Y,
 	const BLOCKTYPE * a_BlockTypes,
 	const NIBBLETYPE * a_BlockAdditional,
@@ -156,7 +152,7 @@ bool cStatistics::OnSection
 
 	for (int y = 0; y < 16; y++)
 	{
-		int Height = (int)a_Y * 16 + y;
+		int Height = (int) a_Y * 16 + y;
 		for (int z = 0; z < 16; z++)
 		{
 			for (int x = 0; x < 16; x++)
@@ -209,9 +205,14 @@ bool cStatistics::OnEmptySection(unsigned char a_Y)
 
 bool cStatistics::OnEntity(
 	const AString & a_EntityType,
-	double a_PosX, double a_PosY, double a_PosZ,
-	double a_SpeedX, double a_SpeedY, double a_SpeedZ,
-	float a_Yaw, float a_Pitch,
+	double a_PosX,
+	double a_PosY,
+	double a_PosZ,
+	double a_SpeedX,
+	double a_SpeedY,
+	double a_SpeedZ,
+	float a_Yaw,
+	float a_Pitch,
 	float a_FallDistance,
 	short a_FireTicksLeft,
 	short a_AirTicks,
@@ -233,7 +234,9 @@ bool cStatistics::OnEntity(
 
 bool cStatistics::OnTileEntity(
 	const AString & a_EntityType,
-	int a_PosX, int a_PosY, int a_PosZ,
+	int a_PosX,
+	int a_PosY,
+	int a_PosZ,
 	cParsedNBT & a_NBT,
 	int a_NBTTag
 )
@@ -252,11 +255,7 @@ bool cStatistics::OnTileEntity(
 
 
 
-bool cStatistics::OnTileTick(
-	int a_BlockType,
-	int a_TicksLeft,
-	int a_PosX, int a_PosY, int a_PosZ
-)
+bool cStatistics::OnTileTick(int a_BlockType, int a_TicksLeft, int a_PosX, int a_PosY, int a_PosZ)
 {
 	m_Stats.m_NumTileTicks += 1;
 	return false;
@@ -326,7 +325,11 @@ cStatisticsFactory::~cStatisticsFactory()
 		}
 	}
 	UInt64 ExpTotalBlocks = m_CombinedStats.m_BlockNumChunks * 16LL * 16LL * 256LL;
-	LOG("  BlockIDs processed for %llu chunks, %llu blocks (exp %llu; %s)", m_CombinedStats.m_BlockNumChunks, TotalBlocks, ExpTotalBlocks, (TotalBlocks == ExpTotalBlocks) ? "match" : "failed");
+	LOG("  BlockIDs processed for %llu chunks, %llu blocks (exp %llu; %s)",
+		m_CombinedStats.m_BlockNumChunks,
+		TotalBlocks,
+		ExpTotalBlocks,
+		(TotalBlocks == ExpTotalBlocks) ? "match" : "failed");
 
 	// Save statistics:
 	LOG("  Saving statistics into files:");
@@ -354,7 +357,7 @@ void cStatisticsFactory::JoinResults(void)
 {
 	for (cCallbacks::iterator itr = m_Callbacks.begin(), end = m_Callbacks.end(); itr != end; ++itr)
 	{
-		m_CombinedStats.Add(((cStatistics *)(*itr))->GetStats());
+		m_CombinedStats.Add(((cStatistics *) (*itr))->GetStats());
 	}  // for itr - m_Callbacks[]
 }
 
@@ -370,7 +373,8 @@ void cStatisticsFactory::SaveBiomes(void)
 		LOG("Cannot write to file Biomes.xls. Statistics not written.");
 		return;
 	}
-	double TotalColumns = (double)(m_CombinedStats.m_BiomeNumChunks) * 16 * 16 / 100;  // Total number of columns processed; convert into percent
+	double TotalColumns = (double) (m_CombinedStats.m_BiomeNumChunks) * 16 * 16 /
+		100;  // Total number of columns processed; convert into percent
 	if (TotalColumns < 1)
 	{
 		// Avoid division by zero
@@ -379,7 +383,14 @@ void cStatisticsFactory::SaveBiomes(void)
 	for (int i = 0; i <= 255; i++)
 	{
 		AString Line;
-		Printf(Line, "%s\t%d\t%llu\t%.05f\n", GetBiomeString(i), i, m_CombinedStats.m_BiomeCounts[i], ((double)(m_CombinedStats.m_BiomeCounts[i])) / TotalColumns);
+		Printf(
+			Line,
+			"%s\t%d\t%llu\t%.05f\n",
+			GetBiomeString(i),
+			i,
+			m_CombinedStats.m_BiomeCounts[i],
+			((double) (m_CombinedStats.m_BiomeCounts[i])) / TotalColumns
+		);
 		f.Write(Line.c_str(), Line.length());
 	}
 }
@@ -396,7 +407,8 @@ void cStatisticsFactory::SaveBlockTypes(void)
 		LOG("Cannot write to file Biomes.xls. Statistics not written.");
 		return;
 	}
-	double TotalBlocks = ((double)(m_CombinedStats.m_BlockNumChunks)) * 16 * 16 * 256 / 100;  // Total number of blocks processed; convert into percent
+	double TotalBlocks = ((double) (m_CombinedStats.m_BlockNumChunks)) * 16 * 16 * 256 /
+		100;  // Total number of blocks processed; convert into percent
 	if (TotalBlocks < 1)
 	{
 		// Avoid division by zero
@@ -410,7 +422,7 @@ void cStatisticsFactory::SaveBlockTypes(void)
 			Count += m_CombinedStats.m_BlockCounts[Biome][i];
 		}
 		AString Line;
-		Printf(Line, "%s\t%d\t%llu\t%.08f\n", GetBlockTypeString(i), i, Count, ((double)Count) / TotalBlocks);
+		Printf(Line, "%s\t%d\t%llu\t%.08f\n", GetBlockTypeString(i), i, Count, ((double) Count) / TotalBlocks);
 		f.Write(Line.c_str(), Line.length());
 	}
 }
@@ -548,7 +560,6 @@ void cStatisticsFactory::SaveBiomeBlockTypes(void)
 
 
 
-
 void cStatisticsFactory::SaveStatistics(void)
 {
 	cFile f;
@@ -559,11 +570,20 @@ void cStatisticsFactory::SaveStatistics(void)
 	}
 
 	int Elapsed = (clock() - m_BeginTick) / CLOCKS_PER_SEC;
-	f.Printf("Time elapsed: %d seconds (%d hours, %d minutes and %d seconds)\n", Elapsed, Elapsed / 3600, (Elapsed / 60) % 60, Elapsed % 60);
+	f.Printf(
+		"Time elapsed: %d seconds (%d hours, %d minutes and %d seconds)\n",
+		Elapsed,
+		Elapsed / 3600,
+		(Elapsed / 60) % 60,
+		Elapsed % 60
+	);
 	f.Printf("Total chunks processed: %llu\n", m_CombinedStats.m_TotalChunks);
 	if (Elapsed > 0)
 	{
-		f.Printf("Chunk processing speed: %.02f chunks per second\n", (double)(m_CombinedStats.m_TotalChunks) / Elapsed);
+		f.Printf(
+			"Chunk processing speed: %.02f chunks per second\n",
+			(double) (m_CombinedStats.m_TotalChunks) / Elapsed
+		);
 	}
 	f.Printf("Biomes counted for %llu chunks.\n", m_CombinedStats.m_BiomeNumChunks);
 	f.Printf("Blocktypes counted for %llu chunks.\n", m_CombinedStats.m_BlockNumChunks);
@@ -593,7 +613,12 @@ void cStatisticsFactory::SaveSpawners(void)
 	f.Printf("Entity type\tTotal count\tCount per chunk\n");
 	for (int i = 0; i < entMax; i++)
 	{
-		f.Printf("%s\t%llu\t%0.4f\n", GetEntityTypeString((eEntityType)i), m_CombinedStats.m_SpawnerEntity[i], (double)(m_CombinedStats.m_SpawnerEntity[i]) / m_CombinedStats.m_BlockNumChunks);
+		f.Printf(
+			"%s\t%llu\t%0.4f\n",
+			GetEntityTypeString((eEntityType) i),
+			m_CombinedStats.m_SpawnerEntity[i],
+			(double) (m_CombinedStats.m_SpawnerEntity[i]) / m_CombinedStats.m_BlockNumChunks
+		);
 	}
 }
 
@@ -614,7 +639,7 @@ void cStatisticsFactory::SavePerHeightSpawners(void)
 	f.Printf("Height\tTotal");
 	for (int i = 0; i < entMax; i++)
 	{
-		f.Printf("\t%s", GetEntityTypeString((eEntityType)i));
+		f.Printf("\t%s", GetEntityTypeString((eEntityType) i));
 	}
 	f.Printf("\n");
 

@@ -19,17 +19,10 @@ using PowerLevel = unsigned char;
 
 class cIncrementalRedstoneSimulatorChunkData final : public cRedstoneSimulatorChunkData
 {
-public:
+  public:
+	void WakeUp(const Vector3i & a_Position) { m_ActiveBlocks.push(a_Position); }
 
-	void WakeUp(const Vector3i & a_Position)
-	{
-		m_ActiveBlocks.push(a_Position);
-	}
-
-	auto & GetActiveBlocks()
-	{
-		return m_ActiveBlocks;
-	}
+	auto & GetActiveBlocks() { return m_ActiveBlocks; }
 
 	PowerLevel GetCachedPowerData(const Vector3i Position) const
 	{
@@ -74,8 +67,7 @@ public:
 	/** Adjust From-relative coordinates into To-relative coordinates. */
 	inline static Vector3i RebaseRelativePosition(const cChunk & From, const cChunk & To, const Vector3i Position)
 	{
-		return
-		{
+		return {
 			Position.x + (From.GetPosX() - To.GetPosX()) * cChunkDef::Width,
 			Position.y,
 			Position.z + (From.GetPosZ() - To.GetPosZ()) * cChunkDef::Width
@@ -93,8 +85,7 @@ public:
 	/** Structure storing position of mechanism + it's delay ticks (countdown) & if to power on. */
 	std::unordered_map<Vector3i, std::pair<int, bool>, VectorHasher<int>> m_MechanismDelays;
 
-private:
-
+  private:
 	std::stack<Vector3i, std::vector<Vector3i>> m_ActiveBlocks;
 
 	// TODO: map<Vector3i, int> -> Position of torch + it's heat level

@@ -60,11 +60,7 @@ void cBlaze::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (m_IsCharging)
 	{
 		m_ChargeTimer++;
-		if (
-			(m_ChargeTimer == 5) ||
-			(m_ChargeTimer == 10) ||
-			(m_ChargeTimer == 15)
-		)
+		if ((m_ChargeTimer == 5) || (m_ChargeTimer == 10) || (m_ChargeTimer == 15))
 		{
 			Vector3d Speed = GetLookVector() * 20;
 			Speed.y = Speed.y + 1;

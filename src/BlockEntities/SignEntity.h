@@ -16,16 +16,15 @@
 
 // tolua_begin
 
-class cSignEntity :
-	public cBlockEntity
+class cSignEntity : public cBlockEntity
 {
 	// tolua_end
 
 	using Super = cBlockEntity;
 
-public:  // tolua_export
-
-	/** Creates a new empty sign entity at the specified block coords and block type (wall or standing). a_World may be nullptr */
+  public:  // tolua_export
+	/** Creates a new empty sign entity at the specified block coords and block type (wall or standing). a_World may be
+	 * nullptr */
 	cSignEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	// tolua_begin
@@ -46,7 +45,6 @@ public:  // tolua_export
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 
-private:
-
+  private:
 	std::array<AString, 4> m_Line;
-} ;  // tolua_export
+};  // tolua_export

@@ -17,24 +17,23 @@
 
 
 
-class cMinecart :
-	public cEntity
+class cMinecart : public cEntity
 {
 	using Super = cEntity;
 
-public:
+  public:
 	CLASS_PROTODEF(cMinecart)
 
 	/** Minecart payload, values correspond to packet subtype */
 	enum ePayload
 	{
-		mpNone    = 0,  // Empty minecart, ridable by player or mobs
-		mpChest   = 1,  // Minecart-with-chest, can store a grid of 3 * 8 items
+		mpNone = 0,  // Empty minecart, ridable by player or mobs
+		mpChest = 1,  // Minecart-with-chest, can store a grid of 3 * 8 items
 		mpFurnace = 2,  // Minecart-with-furnace, can be powered
-		mpTNT     = 3,  // Minecart-with-TNT, can be blown up with activator rail
-		mpHopper  = 5,  // Minecart-with-hopper, can be hopper
+		mpTNT = 3,  // Minecart-with-TNT, can be blown up with activator rail
+		mpHopper = 5,  // Minecart-with-hopper, can be hopper
 		// TODO: Spawner minecarts, (and possibly any block in a minecart with NBT editing)
-	} ;
+	};
 
 	// cEntity overrides:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
@@ -46,8 +45,7 @@ public:
 	int LastDamage(void) const { return m_LastDamage; }
 	ePayload GetPayload(void) const { return m_Payload; }
 
-protected:
-
+  protected:
 	ePayload m_Payload;
 	int m_LastDamage;
 	Vector3i m_DetectorRailPosition;
@@ -59,7 +57,8 @@ protected:
 	cMinecart(ePayload a_Payload, Vector3d a_Pos);
 
 	/** Handles physics on normal rails
-	For each tick, slow down on flat rails, speed up or slow down on ascending / descending rails (depending on direction), and turn on curved rails. */
+	For each tick, slow down on flat rails, speed up or slow down on ascending / descending rails (depending on
+	direction), and turn on curved rails. */
 	void HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt);
 
 	/** Handles powered rail physics
@@ -78,7 +77,8 @@ protected:
 	/** Snaps a mincecart to a rail's axis, resetting its speed
 		For curved rails, it changes the cart's direction as well as snapping it to axis */
 	void SnapToRail(NIBBLETYPE a_RailMeta);
-	/** Tests if a solid block is in front of a cart, and stops the cart (and returns true) if so; returns false if no obstruction */
+	/** Tests if a solid block is in front of a cart, and stops the cart (and returns true) if so; returns false if no
+	 * obstruction */
 	bool TestBlockCollision(NIBBLETYPE a_RailMeta);
 	/** Tests if there is a block at the specified position which is impassable to minecarts */
 	bool IsSolidBlockAtPosition(Vector3i a_Offset);
@@ -87,21 +87,20 @@ protected:
 
 	bool IsBlockCollisionAtOffset(Vector3i a_Offset);
 
-	/** Tests if this mincecart's bounding box is intersecting another entity's bounding box (collision) and pushes mincecart away if necessary */
+	/** Tests if this mincecart's bounding box is intersecting another entity's bounding box (collision) and pushes
+	 * mincecart away if necessary */
 	bool TestEntityCollision(NIBBLETYPE a_RailMeta);
-} ;
+};
 
 
 
 
 
-class cRideableMinecart final :
-	public cMinecart
+class cRideableMinecart final : public cMinecart
 {
 	using Super = cMinecart;
 
-public:
-
+  public:
 	CLASS_PROTODEF(cRideableMinecart)
 
 	cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, int a_ContentHeight);
@@ -113,25 +112,22 @@ public:
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
-protected:
-
+  protected:
 	cItem m_Content;
 	int m_ContentHeight;
-} ;
+};
 
 
 
 
 
-class cMinecartWithChest final :
-	public cMinecart,
-	public cItemGrid::cListener,
-	public cEntityWindowOwner
+class cMinecartWithChest final : public cMinecart,
+								 public cItemGrid::cListener,
+								 public cEntityWindowOwner
 {
 	using Super = cMinecart;
 
-public:
-
+  public:
 	CLASS_PROTODEF(cMinecartWithChest)
 
 	cMinecartWithChest(Vector3d a_Pos);
@@ -146,8 +142,7 @@ public:
 	void SetSlot(int a_Idx, const cItem & a_Item) { m_Contents.SetSlot(a_Idx, a_Item); }
 
 
-protected:
-
+  protected:
 	cItemGrid m_Contents;
 	void OpenNewWindow(void);
 
@@ -171,19 +166,17 @@ protected:
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
-} ;
+};
 
 
 
 
 
-class cMinecartWithFurnace final :
-	public cMinecart
+class cMinecartWithFurnace final : public cMinecart
 {
 	using Super = cMinecart;
 
-public:
-
+  public:
 	CLASS_PROTODEF(cMinecartWithFurnace)
 
 	cMinecartWithFurnace(Vector3d a_Pos);
@@ -194,59 +187,56 @@ public:
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 	// Set functions.
-	void SetIsFueled(bool a_IsFueled, int a_FueledTimeLeft = -1) {m_IsFueled = a_IsFueled; m_FueledTimeLeft = a_FueledTimeLeft;}
+	void SetIsFueled(bool a_IsFueled, int a_FueledTimeLeft = -1)
+	{
+		m_IsFueled = a_IsFueled;
+		m_FueledTimeLeft = a_FueledTimeLeft;
+	}
 
 	// Get functions.
-	int  GetFueledTimeLeft(void) const {return m_FueledTimeLeft; }
-	bool IsFueled (void)         const {return m_IsFueled;}
+	int GetFueledTimeLeft(void) const { return m_FueledTimeLeft; }
+	bool IsFueled(void) const { return m_IsFueled; }
 
-private:
-
+  private:
 	int m_FueledTimeLeft;
 	bool m_IsFueled;
-
-} ;
-
+};
 
 
 
 
-class cMinecartWithTNT final :
-	public cMinecart
+
+class cMinecartWithTNT final : public cMinecart
 {
 	using Super = cMinecart;
 
-public:
-
+  public:
 	CLASS_PROTODEF(cMinecartWithTNT)
 
 	cMinecartWithTNT(Vector3d a_Pos);
 	void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
-private:
+  private:
 	int m_TNTFuseTicksLeft;
 	bool m_isTNTFused = false;
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	void HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt) override;
-} ;
+};
 
 
 
 
 
-class cMinecartWithHopper final :
-	public cMinecart
+class cMinecartWithHopper final : public cMinecart
 {
 	using Super = cMinecart;
 
-public:
-
+  public:
 	CLASS_PROTODEF(cMinecartWithHopper)
 
 	cMinecartWithHopper(Vector3d a_Pos);
 
-private:
-
+  private:
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-} ;
+};

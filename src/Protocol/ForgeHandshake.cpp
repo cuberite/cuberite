@@ -16,37 +16,36 @@
 /** Discriminator byte values prefixing the FML|HS packets to determine their type. */
 namespace Discriminator
 {
-	static const Int8 ServerHello = 0;
-	static const Int8 ClientHello = 1;
-	static const Int8 ModList = 2;
-	static const Int8 RegistryData = 3;
-	// static const Int8 HandshakeReset = -2;
-	static const Int8 HandshakeAck = -1;
-}
+static const Int8 ServerHello = 0;
+static const Int8 ClientHello = 1;
+static const Int8 ModList = 2;
+static const Int8 RegistryData = 3;
+// static const Int8 HandshakeReset = -2;
+static const Int8 HandshakeAck = -1;
+}  // namespace Discriminator
 
 /** Client handshake state phases. */
 namespace ClientPhase
 {
-	static const Int8 WAITINGSERVERDATA = 2;
-	static const Int8 WAITINGSERVERCOMPLETE = 3;
-	static const Int8 PENDINGCOMPLETE = 4;
-	static const Int8 COMPLETE = 5;
-}
+static const Int8 WAITINGSERVERDATA = 2;
+static const Int8 WAITINGSERVERCOMPLETE = 3;
+static const Int8 PENDINGCOMPLETE = 4;
+static const Int8 COMPLETE = 5;
+}  // namespace ClientPhase
 
 /** Server handshake state phases. */
 namespace ServerPhase
 {
-	static const auto WAITINGCACK = std::byte(2);
-	static const auto COMPLETE = std::byte(3);
-}
+static const auto WAITINGCACK = std::byte(2);
+static const auto COMPLETE = std::byte(3);
+}  // namespace ServerPhase
 
 
 
 
 
 cForgeHandshake::cForgeHandshake() :
-	IsForgeClient(false),
-	m_Errored(false)
+	IsForgeClient(false), m_Errored(false)
 {
 }
 
@@ -80,7 +79,7 @@ void cForgeHandshake::AugmentServerListPing(cClientHandle & a_Client, Json::Valu
 	Modinfo["type"] = "FML";
 
 	Json::Value ModList(Json::arrayValue);
-	for (auto & item: Mods)
+	for (auto & item : Mods)
 	{
 		Json::Value Mod;
 		Mod["modid"] = item.first;
@@ -100,11 +99,11 @@ void cForgeHandshake::BeginForgeHandshake(cClientHandle & a_Client)
 {
 	ASSERT(IsForgeClient);
 
-	static const std::array<std::string_view, 5> Channels{{ "FML|HS", "FML", "FML|MP", "FML", "FORGE" }};
+	static const std::array<std::string_view, 5> Channels {{"FML|HS", "FML", "FML|MP", "FML", "FORGE"}};
 	ContiguousByteBuffer ChannelsString;
-	for (auto & Channel: Channels)
+	for (auto & Channel : Channels)
 	{
-		ChannelsString.append({ reinterpret_cast<const std::byte *>(Channel.data()), Channel.size() });
+		ChannelsString.append({reinterpret_cast<const std::byte *>(Channel.data()), Channel.size()});
 		ChannelsString.push_back(std::byte(0));
 	}
 
@@ -186,7 +185,10 @@ void cForgeHandshake::HandleClientHello(cClientHandle & a_Client, const Contiguo
 		LOGD("Received ClientHello with FML protocol version %d", FmlProtocolVersion);
 		if (FmlProtocolVersion != 2)
 		{
-			SetError(fmt::format(FMT_STRING("Unsupported FML client protocol version received in ClientHello: {}"), FmlProtocolVersion));
+			SetError(fmt::format(
+				FMT_STRING("Unsupported FML client protocol version received in ClientHello: {}"),
+				FmlProtocolVersion
+			));
 		}
 	}
 	else
@@ -205,7 +207,7 @@ void cForgeHandshake::HandleModList(cClientHandle & a_Client, const ContiguousBy
 
 	auto ClientMods = ParseModList(a_Data.substr(1));
 	AString ClientModsString;
-	for (auto & item: ClientMods)
+	for (auto & item : ClientMods)
 	{
 		ClientModsString.append(fmt::format(FMT_STRING("{}@{}, "), item.first, item.second));
 	}
@@ -232,9 +234,9 @@ void cForgeHandshake::HandleModList(cClientHandle & a_Client, const ContiguousBy
 
 	Buf.WriteBEInt8(Discriminator::ModList);
 	Buf.WriteVarInt32(static_cast<UInt32>(ModCount));
-	for (const auto & item: ServerMods)
+	for (const auto & item : ServerMods)
 	{
-		Buf.WriteVarUTF8String(item.first);   // name
+		Buf.WriteVarUTF8String(item.first);  // name
 		Buf.WriteVarUTF8String(item.second);  // version
 	}
 
@@ -331,7 +333,9 @@ void cForgeHandshake::DataReceived(cClientHandle & a_Client, const ContiguousByt
 {
 	if (!IsForgeClient)
 	{
-		SetError(fmt::format(FMT_STRING("Received unexpected Forge data from non-Forge client ({} bytes)"), a_Data.size()));
+		SetError(
+			fmt::format(FMT_STRING("Received unexpected Forge data from non-Forge client ({} bytes)"), a_Data.size())
+		);
 		return;
 	}
 	if (m_Errored)

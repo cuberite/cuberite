@@ -5,15 +5,12 @@
 
 
 
-class cBlockAirHandler final :
-	public cBlockHandler
+class cBlockAirHandler final : public cBlockHandler
 {
-public:
-
+  public:
 	using cBlockHandler::cBlockHandler;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Don't drop anything:

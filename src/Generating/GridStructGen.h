@@ -1,7 +1,8 @@
 
 // GridStructGen.h
 
-// Declares the cGridStructGen class representing a common base class for structure generators that place structures in a semi-random grid
+// Declares the cGridStructGen class representing a common base class for structure generators that place structures in
+// a semi-random grid
 
 
 
@@ -41,14 +42,13 @@ The descendant must use a specific cStructure descendant to provide the actual s
 The structure must provide the DrawIntoChunk() function that generates the structure into the chunk data, and
 can override the GetCacheCost() function that returns the cost of that structure in the cache.
 */
-class cGridStructGen :
-	public cFinishGen
+class cGridStructGen : public cFinishGen
 {
-public:
+  public:
 	/** Represents a single structure that occupies the grid point. Knows how to draw itself into a chunk. */
 	class cStructure
 	{
-	public:
+	  public:
 		/** The grid point for which the structure is generated. */
 		int m_GridX, m_GridZ;
 
@@ -57,11 +57,8 @@ public:
 
 
 		/** Creates a structure that has its origin set at the specified coords. */
-		cStructure (int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) :
-			m_GridX(a_GridX),
-			m_GridZ(a_GridZ),
-			m_OriginX(a_OriginX),
-			m_OriginZ(a_OriginZ)
+		cStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) :
+			m_GridX(a_GridX), m_GridZ(a_GridZ), m_OriginX(a_OriginX), m_OriginZ(a_OriginZ)
 		{
 		}
 
@@ -73,16 +70,19 @@ public:
 
 		/** Returns the cost of keeping this structure in the cache */
 		virtual size_t GetCacheCost(void) const { return 1; }
-	} ;
+	};
 	typedef std::shared_ptr<cStructure> cStructurePtr;
 	typedef std::list<cStructurePtr> cStructurePtrs;
 
 
 	cGridStructGen(
 		int a_Seed,
-		int a_GridSizeX, int a_GridSizeZ,
-		int a_MaxOffsetX, int a_MaxOffsetZ,
-		int a_MaxStructureSizeX, int a_MaxStructureSizeZ,
+		int a_GridSizeX,
+		int a_GridSizeZ,
+		int a_MaxOffsetX,
+		int a_MaxOffsetZ,
+		int a_MaxStructureSizeX,
+		int a_MaxStructureSizeZ,
 		size_t a_MaxCacheSize
 	);
 
@@ -97,12 +97,13 @@ public:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-protected:
+  protected:
 	/** Base seed of the world for which the generator generates chunk. */
 	int m_BaseSeed;
 
 	/** Seed for generating grid offsets and also available for descendants.
-	Calculated from m_BaseSeed by adding the SeedOffset parameter loaded from the cubeset file (if applicable); otherwise the same as m_BaseSeed. */
+	Calculated from m_BaseSeed by adding the SeedOffset parameter loaded from the cubeset file (if applicable);
+	otherwise the same as m_BaseSeed. */
 	int m_Seed;
 
 	/** The noise used for generating grid offsets. */
@@ -149,9 +150,4 @@ protected:
 	// Functions for the descendants to override:
 	/** Create a new structure at the specified gridpoint */
 	virtual cStructurePtr CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ) = 0;
-} ;
-
-
-
-
-
+};

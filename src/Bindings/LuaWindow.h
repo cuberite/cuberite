@@ -29,17 +29,23 @@ This object needs extra care with its lifetime management:
 	removes the reference when the last player closes the window.
 */
 // tolua_begin
-class cLuaWindow :
-	public cWindow
+class cLuaWindow : public cWindow
 	// tolua_end
-	, public cItemGrid::cListener
+	,
+				   public cItemGrid::cListener
 {  // tolua_export
 	using Super = cWindow;
 
-public:
+  public:
 	/** Create a window of the specified type, with a slot grid of a_SlotsX * a_SlotsY size.
 	Exported in ManualBindings.cpp */
-	cLuaWindow(cLuaState & a_LuaState, cWindow::WindowType a_WindowType, int a_SlotsX, int a_SlotsY, const AString & a_Title);
+	cLuaWindow(
+		cLuaState & a_LuaState,
+		cWindow::WindowType a_WindowType,
+		int a_SlotsX,
+		int a_SlotsY,
+		const AString & a_Title
+	);
 
 	// tolua_begin
 	virtual ~cLuaWindow() override;
@@ -59,8 +65,7 @@ public:
 	/** Sets the Lua callback function to call when a slot is changed */
 	void SetOnSlotChanged(cLuaState::cCallbackPtr && a_OnSlotChanged);
 
-protected:
-
+  protected:
 	/** Contents of the non-inventory part */
 	cItemGrid m_Contents;
 
@@ -88,19 +93,22 @@ protected:
 	// cWindow overrides:
 	virtual void OpenedByPlayer(cPlayer & a_Player) override;
 	virtual void Clicked(
-		cPlayer & a_Player, int a_WindowID,
-		short a_SlotNum, eClickAction a_ClickAction,
+		cPlayer & a_Player,
+		int a_WindowID,
+		short a_SlotNum,
+		eClickAction a_ClickAction,
 		const cItem & a_ClickedItem
 	) override;
 	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse) override;
 	virtual void Destroy(void) override;
-	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
+	virtual void DistributeStack(
+		cItem & a_ItemStack,
+		int a_Slot,
+		cPlayer & a_Player,
+		cSlotArea * a_ClickedArea,
+		bool a_ShouldApply
+	) override;
 
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
-} ;  // tolua_export
-
-
-
-
-
+};  // tolua_export

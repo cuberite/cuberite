@@ -12,9 +12,7 @@
 
 
 
-cServer::cServer(void)
-{
-}
+cServer::cServer(void) {}
 
 
 
@@ -24,24 +22,24 @@ int cServer::Init(UInt16 a_ListenPort, UInt16 a_ConnectPort)
 {
 	m_ConnectPort = a_ConnectPort;
 
-	#ifdef _WIN32
-		WSAData wsa;
-		int res = WSAStartup(0x0202, &wsa);
-		if (res != 0)
-		{
-			LOGERROR("Cannot initialize WinSock: %d", res);
-			return res;
-		}
-	#endif  // _WIN32
+#ifdef _WIN32
+	WSAData wsa;
+	int res = WSAStartup(0x0202, &wsa);
+	if (res != 0)
+	{
+		LOGERROR("Cannot initialize WinSock: %d", res);
+		return res;
+	}
+#endif  // _WIN32
 
 	m_ListenSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (m_ListenSocket < 0)
 	{
-		#ifdef _WIN32
-			int err = WSAGetLastError();
-		#else
-			int err = errno;
-		#endif
+#ifdef _WIN32
+		int err = WSAGetLastError();
+#else
+		int err = errno;
+#endif
 		LOGERROR("Failed to create listener socket: %d", err);
 		return err;
 	}
@@ -52,25 +50,29 @@ int cServer::Init(UInt16 a_ListenPort, UInt16 a_ConnectPort)
 	local.sin_port = htons(a_ListenPort);
 	if (bind(m_ListenSocket, reinterpret_cast<const sockaddr *>(&local), sizeof(local)) != 0)
 	{
-		#ifdef _WIN32
-			int err = WSAGetLastError();
-		#else
-			int err = errno;
-		#endif
+#ifdef _WIN32
+		int err = WSAGetLastError();
+#else
+		int err = errno;
+#endif
 		LOGERROR("Failed to bind listener socket: %d", err);
 		return err;
 	}
 	if (listen(m_ListenSocket, 1) != 0)
 	{
-		#ifdef _WIN32
-			int err = WSAGetLastError();
-		#else
-			int err = errno;
-		#endif
+#ifdef _WIN32
+		int err = WSAGetLastError();
+#else
+		int err = errno;
+#endif
 		printf("Failed to listen on socket: %d\n", err);
 		return err;
 	}
-	LOGINFO("Listening for client connections on port %d, connecting to server at localhost:%d", a_ListenPort, a_ConnectPort);
+	LOGINFO(
+		"Listening for client connections on port %d, connecting to server at localhost:%d",
+		a_ListenPort,
+		a_ConnectPort
+	);
 
 	LOGINFO("Generating protocol encryption keypair...");
 	m_PrivateKey.Generate();

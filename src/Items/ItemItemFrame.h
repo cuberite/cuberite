@@ -9,13 +9,11 @@
 
 
 
-class cItemItemFrameHandler final:
-	public cItemHandler
+class cItemItemFrameHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 
@@ -32,7 +30,8 @@ public:
 	) const override
 	{
 		// Can only place on a side face:
-		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_YP) || (a_ClickedBlockFace == BLOCK_FACE_YM))
+		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_YP) ||
+			(a_ClickedBlockFace == BLOCK_FACE_YM))
 		{
 			return false;
 		}
@@ -67,7 +66,3 @@ public:
 		return true;
 	}
 };
-
-
-
-

@@ -22,8 +22,7 @@ class cClientHandle;
 
 class cForgeHandshake
 {
-public:
-
+  public:
 	/** True if the client advertised itself as a Forge client. */
 	bool IsForgeClient;
 
@@ -41,8 +40,7 @@ public:
 	/** Process received data from the client advancing the Forge handshake. */
 	void DataReceived(cClientHandle & a_Client, ContiguousByteBufferView a_Data);
 
-private:
-
+  private:
 	/** True if the Forge handshake is in an errored state. */
 	bool m_Errored;
 

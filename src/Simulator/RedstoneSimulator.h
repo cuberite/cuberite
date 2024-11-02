@@ -9,24 +9,19 @@
 
 class cRedstoneSimulatorChunkData
 {
-public:
-
-	virtual ~cRedstoneSimulatorChunkData()
-	{
-	}
+  public:
+	virtual ~cRedstoneSimulatorChunkData() {}
 };
 
 
 
 
 
-class cRedstoneSimulator:
-	public cSimulator
+class cRedstoneSimulator : public cSimulator
 {
 	using Super = cSimulator;
 
-public:
-
+  public:
 	using Super::Super;
 
 	virtual cRedstoneSimulatorChunkData * CreateChunkData() = 0;

@@ -66,10 +66,7 @@ static const UInt32 CompressionThreshold = 256;  // After how large a packet sho
 // cProtocol_1_8_0:
 
 cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_ServerAddress, State a_State) :
-	Super(a_Client),
-	m_State(a_State),
-	m_ServerAddress(a_ServerAddress),
-	m_IsEncrypted(false)
+	Super(a_Client), m_State(a_State), m_ServerAddress(a_ServerAddress), m_IsEncrypted(false)
 {
 	AStringVector Params;
 	SplitZeroTerminatedStrings(a_ServerAddress, Params);
@@ -88,8 +85,8 @@ cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_Ser
 			if (cRoot::Get()->GetServer()->ShouldAllowBungeeCord())
 			{
 				// BungeeCord handling:
-				// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress field:
-				// hostname\00ip-address\00uuid\00profile-properties-as-json
+				// If BC is setup with ip_forward == true, it sends additional data in the login packet's ServerAddress
+				// field: hostname\00ip-address\00uuid\00profile-properties-as-json
 
 				LOGD("Player at %s connected via BungeeCord", Params[1].c_str());
 
@@ -109,13 +106,15 @@ cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_Ser
 			}
 			else
 			{
-				LOG("BungeeCord is disabled, but client sent additional data, set AllowBungeeCord=1 if you want to allow it");
+				LOG("BungeeCord is disabled, but client sent additional data, set AllowBungeeCord=1 if you want to "
+					"allow it");
 			}
 		}
 		else
 		{
 			LOG("Unknown additional data sent in server address (BungeeCord/FML?): %zu parameters", Params.size());
-			// TODO: support FML + BungeeCord? (what parameters does it send in that case?) https://github.com/SpigotMC/BungeeCord/issues/899
+			// TODO: support FML + BungeeCord? (what parameters does it send in that case?)
+			// https://github.com/SpigotMC/BungeeCord/issues/899
 		}
 	}
 
@@ -126,14 +125,16 @@ cProtocol_1_8_0::cProtocol_1_8_0(cClientHandle * a_Client, const AString & a_Ser
 		cFile::CreateFolder("CommLogs");
 		AString IP(a_Client->GetIPString());
 		ReplaceString(IP, ":", "_");
-		auto FileName = fmt::format(FMT_STRING("CommLogs/{:x}_{}__{}.log"),
+		auto FileName = fmt::format(
+			FMT_STRING("CommLogs/{:x}_{}__{}.log"),
 			static_cast<unsigned>(time(nullptr)),
 			sCounter++,
 			IP.c_str()
 		);
 		if (!m_CommLogFile.Open(FileName, cFile::fmWrite))
 		{
-			LOG("Cannot log communication to file, the log file \"%s\" cannot be opened for writing.", FileName.c_str());
+			LOG("Cannot log communication to file, the log file \"%s\" cannot be opened for writing.",
+				FileName.c_str());
 		}
 	}
 }
@@ -245,7 +246,16 @@ void cProtocol_1_8_0::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlo
 
 
 
-void cProtocol_1_8_0::SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog)
+void cProtocol_1_8_0::SendBossBarAdd(
+	UInt32 a_UniqueID,
+	const cCompositeChat & a_Title,
+	float a_FractionFilled,
+	BossBarColor a_Color,
+	BossBarDivisionType a_DivisionType,
+	bool a_DarkenSky,
+	bool a_PlayEndMusic,
+	bool a_CreateFog
+)
 {
 	// No such packet here
 }
@@ -281,7 +291,11 @@ void cProtocol_1_8_0::SendBossBarUpdateHealth(UInt32 a_UniqueID, float a_Fractio
 
 
 
-void cProtocol_1_8_0::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_Color, BossBarDivisionType a_DivisionType)
+void cProtocol_1_8_0::SendBossBarUpdateStyle(
+	UInt32 a_UniqueID,
+	BossBarColor a_Color,
+	BossBarDivisionType a_DivisionType
+)
 {
 	// No such packet here
 }
@@ -344,16 +358,18 @@ void cProtocol_1_8_0::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type
 	// Send the json string to the client:
 	cPacketizer Pkt(*this, pktChatRaw);
 	Pkt.WriteString(a_MessageRaw);
-	Pkt.WriteBEInt8([a_Type]() -> signed char
-	{
-		switch (a_Type)
+	Pkt.WriteBEInt8(
+		[a_Type]() -> signed char
 		{
-			case eChatType::ctChatBox: return 0;
-			case eChatType::ctSystem: return 1;
-			case eChatType::ctAboveActionBar: return 2;
-		}
-		UNREACHABLE("Unsupported chat type");
-	}());
+			switch (a_Type)
+			{
+				case eChatType::ctChatBox:        return 0;
+				case eChatType::ctSystem:         return 1;
+				case eChatType::ctAboveActionBar: return 2;
+			}
+			UNREACHABLE("Unsupported chat type");
+		}()
+	);
 }
 
 
@@ -444,10 +460,7 @@ void cProtocol_1_8_0::SendDisconnect(const AString & a_Reason)
 		}
 		default:
 		{
-			FLOGERROR(
-				"Tried to send disconnect in invalid game state {0}",
-				static_cast<int>(m_State)
-			);
+			FLOGERROR("Tried to send disconnect in invalid game state {0}", static_cast<int>(m_State));
 		}
 	}
 }
@@ -582,12 +595,8 @@ void cProtocol_1_8_0::SendEntityPosition(const cEntity & a_Entity)
 	const auto Delta = (a_Entity.GetPosition() * 32).Floor() - (a_Entity.GetLastSentPosition() * 32).Floor();
 
 	// Ensure that the delta has enough precision and is within range of a BEInt8:
-	if (
-		Delta.HasNonZeroLength() &&
-		cByteBuffer::CanBEInt8Represent(Delta.x) &&
-		cByteBuffer::CanBEInt8Represent(Delta.y) &&
-		cByteBuffer::CanBEInt8Represent(Delta.z)
-	)
+	if (Delta.HasNonZeroLength() && cByteBuffer::CanBEInt8Represent(Delta.x) &&
+		cByteBuffer::CanBEInt8Represent(Delta.y) && cByteBuffer::CanBEInt8Represent(Delta.z))
 	{
 		const auto Move = static_cast<Vector3<Int8>>(Delta);
 
@@ -782,7 +791,11 @@ void cProtocol_1_8_0::SendKeepAlive(UInt32 a_PingID)
 	// Drop the packet if the protocol is not in the Game state yet (caused a client crash):
 	if (m_State != 3)
 	{
-		LOGWARNING("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class prevented the packet.", m_State);
+		LOGWARNING(
+			"Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class "
+			"prevented the packet.",
+			m_State
+		);
 		return;
 	}
 
@@ -829,7 +842,9 @@ void cProtocol_1_8_0::SendLogin(const cPlayer & a_Player, const cWorld & a_World
 		cServer * Server = cRoot::Get()->GetServer();
 		cPacketizer Pkt(*this, pktJoinGame);
 		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
-		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));  // Hardcore flag bit 4
+		Pkt.WriteBEUInt8(
+			static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0)
+		);  // Hardcore flag bit 4
 		Pkt.WriteBEInt8(static_cast<Int8>(a_World.GetDimension()));
 		Pkt.WriteBEUInt8(2);  // TODO: Difficulty (set to Normal)
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<size_t>(Server->GetMaxPlayers(), 0, 255)));
@@ -906,7 +921,8 @@ void cProtocol_1_8_0::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Da
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetDecorators().size()));
 	for (const auto & Decorator : a_Map.GetDecorators())
 	{
-		Pkt.WriteBEUInt8(static_cast<Byte>((static_cast<Int32>(Decorator.GetType()) << 4) | (Decorator.GetRot() & 0xF)));
+		Pkt.WriteBEUInt8(static_cast<Byte>((static_cast<Int32>(Decorator.GetType()) << 4) | (Decorator.GetRot() & 0xF))
+		);
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelX()));
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelZ()));
 	}
@@ -960,7 +976,13 @@ void cProtocol_1_8_0::SendPlayerAbilities(void)
 
 
 
-void cProtocol_1_8_0::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount)
+void cProtocol_1_8_0::SendParticleEffect(
+	const AString & a_ParticleName,
+	Vector3f a_Src,
+	Vector3f a_Offset,
+	float a_ParticleData,
+	int a_ParticleAmount
+)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -981,7 +1003,14 @@ void cProtocol_1_8_0::SendParticleEffect(const AString & a_ParticleName, Vector3
 
 
 
-void cProtocol_1_8_0::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
+void cProtocol_1_8_0::SendParticleEffect(
+	const AString & a_ParticleName,
+	Vector3f a_Src,
+	Vector3f a_Offset,
+	float a_ParticleData,
+	int a_ParticleAmount,
+	std::array<int, 2> a_Data
+)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -1135,19 +1164,26 @@ void cProtocol_1_8_0::SendPlayerListUpdatePing()
 
 	const auto World = m_Client->GetPlayer()->GetWorld();
 	Pkt.WriteVarInt32(static_cast<UInt32>(World->GetPlayerCount()));
-	World->ForEachPlayer([&Pkt](cPlayer & a_Player)
-	{
-		Pkt.WriteUUID(a_Player.GetUUID());
-		Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
-		return false;
-	});
+	World->ForEachPlayer(
+		[&Pkt](cPlayer & a_Player)
+		{
+			Pkt.WriteUUID(a_Player.GetUUID());
+			Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
+			return false;
+		}
+	);
 }
 
 
 
 
 
-void cProtocol_1_8_0::SendPlayerMoveLook (const Vector3d a_Pos, const float a_Yaw, const float a_Pitch, const bool a_IsRelative)
+void cProtocol_1_8_0::SendPlayerMoveLook(
+	const Vector3d a_Pos,
+	const float a_Yaw,
+	const float a_Pitch,
+	const bool a_IsRelative
+)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -1177,7 +1213,12 @@ void cProtocol_1_8_0::SendPlayerMoveLook (const Vector3d a_Pos, const float a_Ya
 void cProtocol_1_8_0::SendPlayerMoveLook(void)
 {
 	cPlayer * Player = m_Client->GetPlayer();
-	SendPlayerMoveLook(Player->GetPosition(), static_cast<float>(Player->GetYaw()), static_cast<float>(Player->GetPitch()), false);
+	SendPlayerMoveLook(
+		Player->GetPosition(),
+		static_cast<float>(Player->GetYaw()),
+		static_cast<float>(Player->GetPitch()),
+		false
+	);
 }
 
 
@@ -1211,7 +1252,9 @@ void cProtocol_1_8_0::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteUUID(a_Player.GetUUID());
 	Vector3d LastSentPos = a_Player.GetLastSentPosition();
 	Pkt.WriteFPInt(LastSentPos.x);
-	Pkt.WriteFPInt(LastSentPos.y + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
+	Pkt.WriteFPInt(
+		LastSentPos.y + 0.001
+	);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
 	Pkt.WriteFPInt(LastSentPos.z);
 	Pkt.WriteByteAngle(a_Player.GetYaw());
 	Pkt.WriteByteAngle(a_Player.GetPitch());
@@ -1313,7 +1356,12 @@ void cProtocol_1_8_0::SendScoreboardObjective(const AString & a_Name, const AStr
 
 
 
-void cProtocol_1_8_0::SendScoreUpdate(const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode)
+void cProtocol_1_8_0::SendScoreUpdate(
+	const AString & a_Objective,
+	const AString & a_Player,
+	cObjective::Score a_Score,
+	Byte a_Mode
+)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -1567,7 +1615,11 @@ void cProtocol_1_8_0::SendTitleTimes(int a_FadeInTicks, int a_DisplayTicks, int 
 
 
 
-void cProtocol_1_8_0::SendTimeUpdate(const cTickTimeLong a_WorldAge, const cTickTimeLong a_WorldDate, const bool a_DoDaylightCycle)
+void cProtocol_1_8_0::SendTimeUpdate(
+	const cTickTimeLong a_WorldAge,
+	const cTickTimeLong a_WorldDate,
+	const bool a_DoDaylightCycle
+)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -1624,15 +1676,15 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 			break;
 		}
 
-		case E_BLOCK_MOB_SPAWNER:       Action = 1;  break;  // Update mob spawner spinny mob thing
-		case E_BLOCK_COMMAND_BLOCK:     Action = 2;  break;  // Update command block text
-		case E_BLOCK_BEACON:            Action = 3;  break;  // Update beacon entity
-		case E_BLOCK_HEAD:              Action = 4;  break;  // Update mobhead entity
-		case E_BLOCK_FLOWER_POT:        Action = 5;  break;  // Update flower pot
+		case E_BLOCK_MOB_SPAWNER:     Action = 1; break;  // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK:   Action = 2; break;  // Update command block text
+		case E_BLOCK_BEACON:          Action = 3; break;  // Update beacon entity
+		case E_BLOCK_HEAD:            Action = 4; break;  // Update mobhead entity
+		case E_BLOCK_FLOWER_POT:      Action = 5; break;  // Update flower pot
 		case E_BLOCK_WALL_BANNER:
-		case E_BLOCK_STANDING_BANNER:   Action = 6;  break;  // Update banner
+		case E_BLOCK_STANDING_BANNER: Action = 6; break;  // Update banner
 
-		default: return;  // Block entities change between versions
+		default:                      return;  // Block entities change between versions
 	}
 
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
@@ -1649,14 +1701,20 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 
 
 
-void cProtocol_1_8_0::SendUpdateSign(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+void cProtocol_1_8_0::SendUpdateSign(
+	Vector3i a_BlockPos,
+	const AString & a_Line1,
+	const AString & a_Line2,
+	const AString & a_Line3,
+	const AString & a_Line4
+)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktUpdateSign);
 	Pkt.WriteXYZPosition64(a_BlockPos);
 
-	AString Lines[] = { a_Line1, a_Line2, a_Line3, a_Line4 };
+	AString Lines[] = {a_Line1, a_Line2, a_Line3, a_Line4};
 	for (size_t i = 0; i < ARRAYCOUNT(Lines); i++)
 	{
 		Pkt.WriteString(JsonUtils::SerializeSingleValueJsonObject("text", Lines[i]));
@@ -1810,10 +1868,7 @@ void cProtocol_1_8_0::CompressPacket(CircularBufferCompressor & a_Packet, Contig
 		const UInt32 DataSize = 0;
 		const auto PacketSize = static_cast<UInt32>(cByteBuffer::GetVarIntSize(DataSize) + Uncompressed.size());
 
-		cByteBuffer LengthHeaderBuffer(
-			cByteBuffer::GetVarIntSize(PacketSize) +
-			cByteBuffer::GetVarIntSize(DataSize)
-		);
+		cByteBuffer LengthHeaderBuffer(cByteBuffer::GetVarIntSize(PacketSize) + cByteBuffer::GetVarIntSize(DataSize));
 
 		LengthHeaderBuffer.WriteVarInt32(PacketSize);
 		LengthHeaderBuffer.WriteVarInt32(DataSize);
@@ -1845,10 +1900,7 @@ void cProtocol_1_8_0::CompressPacket(CircularBufferCompressor & a_Packet, Contig
 	const UInt32 DataSize = static_cast<UInt32>(Uncompressed.size());
 	const auto PacketSize = static_cast<UInt32>(cByteBuffer::GetVarIntSize(DataSize) + Compressed.size());
 
-	cByteBuffer LengthHeaderBuffer(
-		cByteBuffer::GetVarIntSize(PacketSize) +
-		cByteBuffer::GetVarIntSize(DataSize)
-	);
+	cByteBuffer LengthHeaderBuffer(cByteBuffer::GetVarIntSize(PacketSize) + cByteBuffer::GetVarIntSize(DataSize));
 
 	LengthHeaderBuffer.WriteVarInt32(PacketSize);
 	LengthHeaderBuffer.WriteVarInt32(DataSize);
@@ -1877,7 +1929,7 @@ eBlockFace cProtocol_1_8_0::FaceIntToBlockFace(const Int32 a_BlockFace)
 		case BLOCK_FACE_YP: return BLOCK_FACE_YP;
 		case BLOCK_FACE_ZM: return BLOCK_FACE_ZM;
 		case BLOCK_FACE_ZP: return BLOCK_FACE_ZP;
-		default: return BLOCK_FACE_NONE;
+		default:            return BLOCK_FACE_NONE;
 	}
 }
 
@@ -1965,7 +2017,8 @@ UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType) const
 		case pktWindowProperty:         return 0x31;
 		default:
 		{
-			LOG("Unhandled outgoing packet type: %s (0x%02x)", cPacketizer::PacketTypeToStr(a_PacketType), a_PacketType);
+			LOG("Unhandled outgoing packet type: %s (0x%02x)", cPacketizer::PacketTypeToStr(a_PacketType), a_PacketType
+			);
 			ASSERT(!"Unhandled outgoing packet type");
 			return 0;
 		}
@@ -1980,12 +2033,12 @@ unsigned char cProtocol_1_8_0::GetProtocolEntityAnimation(const EntityAnimation 
 {
 	switch (a_Animation)
 	{
-		case EntityAnimation::EntityGetsCriticalHit: return 4;
+		case EntityAnimation::EntityGetsCriticalHit:        return 4;
 		case EntityAnimation::EntityGetsMagicalCriticalHit: return 5;
-		case EntityAnimation::PlayerLeavesBed: return 2;
-		case EntityAnimation::PlayerMainHandSwings: return 0;
-		case EntityAnimation::PlayerOffHandSwings: return 0;
-		default: return static_cast<unsigned char>(-1);
+		case EntityAnimation::PlayerLeavesBed:              return 2;
+		case EntityAnimation::PlayerMainHandSwings:         return 0;
+		case EntityAnimation::PlayerOffHandSwings:          return 0;
+		default:                                            return static_cast<unsigned char>(-1);
 	}
 }
 
@@ -1997,36 +2050,36 @@ signed char cProtocol_1_8_0::GetProtocolEntityStatus(const EntityAnimation a_Ani
 {
 	switch (a_Animation)
 	{
-		case EntityAnimation::AnimalFallsInLove: return 18;
-		case EntityAnimation::FireworkRocketExplodes: return 17;
-		case EntityAnimation::GuardianAttacks: return 21;
-		case EntityAnimation::HorseTamingFails: return 6;
-		case EntityAnimation::HorseTamingSucceeds: return 7;
-		case EntityAnimation::IronGolemAttacks: return 4;
-		case EntityAnimation::IronGolemOffersGift: return 11;
+		case EntityAnimation::AnimalFallsInLove:          return 18;
+		case EntityAnimation::FireworkRocketExplodes:     return 17;
+		case EntityAnimation::GuardianAttacks:            return 21;
+		case EntityAnimation::HorseTamingFails:           return 6;
+		case EntityAnimation::HorseTamingSucceeds:        return 7;
+		case EntityAnimation::IronGolemAttacks:           return 4;
+		case EntityAnimation::IronGolemOffersGift:        return 11;
 		case EntityAnimation::MinecartSpawnerDelayResets: return 1;
-		case EntityAnimation::MinecartTNTIgnites: return 10;
-		case EntityAnimation::MobSpawns: return 20;
-		case EntityAnimation::OcelotTrusts: return 6;
-		case EntityAnimation::OcelotDistrusts: return 7;
-		case EntityAnimation::PawnBerryBushPricks: return 2;
-		case EntityAnimation::PawnBurns: return 2;
-		case EntityAnimation::PawnDies: return 3;
-		case EntityAnimation::PawnDrowns: return 2;
-		case EntityAnimation::PawnHurts: return 2;
-		case EntityAnimation::PawnThornsPricks: return 2;
-		case EntityAnimation::PlayerFinishesEating: return 9;
-		case EntityAnimation::RabbitJumps: return 1;
-		case EntityAnimation::SheepEatsGrass: return 10;
-		case EntityAnimation::VillagerKisses: return 12;
-		case EntityAnimation::VillagerShowsAnger: return 13;
-		case EntityAnimation::VillagerShowsHappiness: return 14;
-		case EntityAnimation::WitchMagicks: return 15;
-		case EntityAnimation::WolfShakesWater: return 8;
-		case EntityAnimation::WolfTamingFails: return 6;
-		case EntityAnimation::WolfTamingSucceeds: return 7;
+		case EntityAnimation::MinecartTNTIgnites:         return 10;
+		case EntityAnimation::MobSpawns:                  return 20;
+		case EntityAnimation::OcelotTrusts:               return 6;
+		case EntityAnimation::OcelotDistrusts:            return 7;
+		case EntityAnimation::PawnBerryBushPricks:        return 2;
+		case EntityAnimation::PawnBurns:                  return 2;
+		case EntityAnimation::PawnDies:                   return 3;
+		case EntityAnimation::PawnDrowns:                 return 2;
+		case EntityAnimation::PawnHurts:                  return 2;
+		case EntityAnimation::PawnThornsPricks:           return 2;
+		case EntityAnimation::PlayerFinishesEating:       return 9;
+		case EntityAnimation::RabbitJumps:                return 1;
+		case EntityAnimation::SheepEatsGrass:             return 10;
+		case EntityAnimation::VillagerKisses:             return 12;
+		case EntityAnimation::VillagerShowsAnger:         return 13;
+		case EntityAnimation::VillagerShowsHappiness:     return 14;
+		case EntityAnimation::WitchMagicks:               return 15;
+		case EntityAnimation::WolfShakesWater:            return 8;
+		case EntityAnimation::WolfTamingFails:            return 6;
+		case EntityAnimation::WolfTamingSucceeds:         return 7;
 		case EntityAnimation::ZombieVillagerCureFinishes: return 16;
-		default: return -1;
+		default:                                          return -1;
 	}
 }
 
@@ -2039,52 +2092,52 @@ UInt32 cProtocol_1_8_0::GetProtocolMobType(const eMonsterType a_MobType) const
 	switch (a_MobType)
 	{
 		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
-		case mtInvalidType:           return 53;
-		case mtBat:                   return 65;
-		case mtBlaze:                 return 61;
-		case mtCaveSpider:            return 59;
-		case mtChicken:               return 93;
-		case mtCow:                   return 92;
-		case mtCreeper:               return 50;
-		case mtEnderDragon:           return 63;
-		case mtEnderman:              return 58;
-		case mtEndermite:             return 67;
-		case mtGhast:                 return 56;
-		case mtGiant:                 return 53;
-		case mtGuardian:              return 68;
-		case mtHorse:                 return 100;
-		case mtIronGolem:             return 99;
-		case mtMagmaCube:             return 62;
-		case mtMooshroom:             return 96;
-		case mtOcelot:                return 98;
-		case mtPig:                   return 90;
-		case mtRabbit:                return 101;
-		case mtSheep:                 return 91;
-		case mtSilverfish:            return 60;
-		case mtSkeleton:              return 51;
-		case mtSlime:                 return 55;
-		case mtSnowGolem:             return 97;
-		case mtSpider:                return 52;
-		case mtSquid:                 return 94;
-		case mtVillager:              return 120;
-		case mtWitch:                 return 66;
-		case mtWither:                return 64;
-		case mtWitherSkeleton:        return 51;
-		case mtWolf:                  return 95;
-		case mtZombie:                return 54;
-		case mtZombiePigman:          return 57;
-		case mtZombieVillager:        return 27;
+		case mtInvalidType:    return 53;
+		case mtBat:            return 65;
+		case mtBlaze:          return 61;
+		case mtCaveSpider:     return 59;
+		case mtChicken:        return 93;
+		case mtCow:            return 92;
+		case mtCreeper:        return 50;
+		case mtEnderDragon:    return 63;
+		case mtEnderman:       return 58;
+		case mtEndermite:      return 67;
+		case mtGhast:          return 56;
+		case mtGiant:          return 53;
+		case mtGuardian:       return 68;
+		case mtHorse:          return 100;
+		case mtIronGolem:      return 99;
+		case mtMagmaCube:      return 62;
+		case mtMooshroom:      return 96;
+		case mtOcelot:         return 98;
+		case mtPig:            return 90;
+		case mtRabbit:         return 101;
+		case mtSheep:          return 91;
+		case mtSilverfish:     return 60;
+		case mtSkeleton:       return 51;
+		case mtSlime:          return 55;
+		case mtSnowGolem:      return 97;
+		case mtSpider:         return 52;
+		case mtSquid:          return 94;
+		case mtVillager:       return 120;
+		case mtWitch:          return 66;
+		case mtWither:         return 64;
+		case mtWitherSkeleton: return 51;
+		case mtWolf:           return 95;
+		case mtZombie:         return 54;
+		case mtZombiePigman:   return 57;
+		case mtZombieVillager: return 27;
 
 		// Mobs that get replaced with another because they were added later
-		case mtCat:                   return GetProtocolMobType(mtOcelot);
-		case mtDonkey:                return GetProtocolMobType(mtHorse);
-		case mtMule:                  return GetProtocolMobType(mtHorse);
-		case mtSkeletonHorse:         return GetProtocolMobType(mtHorse);
-		case mtZombieHorse:           return GetProtocolMobType(mtHorse);
-		case mtStray:                 return GetProtocolMobType(mtSkeleton);
-		case mtHusk:                  return GetProtocolMobType(mtZombie);
+		case mtCat:            return GetProtocolMobType(mtOcelot);
+		case mtDonkey:         return GetProtocolMobType(mtHorse);
+		case mtMule:           return GetProtocolMobType(mtHorse);
+		case mtSkeletonHorse:  return GetProtocolMobType(mtHorse);
+		case mtZombieHorse:    return GetProtocolMobType(mtHorse);
+		case mtStray:          return GetProtocolMobType(mtSkeleton);
+		case mtHusk:           return GetProtocolMobType(mtZombie);
 
-		default:                      return 0;
+		default:               return 0;
 	}
 }
 
@@ -2110,7 +2163,7 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 			switch (a_PacketType)
 			{
 				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
-				case 0x01: HandlePacketStatusPing   (a_ByteBuffer); return true;
+				case 0x01: HandlePacketStatusPing(a_ByteBuffer); return true;
 			}
 			break;
 		}
@@ -2119,7 +2172,7 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 		{
 			switch (a_PacketType)
 			{
-				case 0x00: HandlePacketLoginStart             (a_ByteBuffer); return true;
+				case 0x00: HandlePacketLoginStart(a_ByteBuffer); return true;
 				case 0x01: HandlePacketLoginEncryptionResponse(a_ByteBuffer); return true;
 			}
 			break;
@@ -2129,32 +2182,32 @@ bool cProtocol_1_8_0::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTy
 		{
 			switch (a_PacketType)
 			{
-				case 0x00: HandlePacketKeepAlive              (a_ByteBuffer); return true;
-				case 0x01: HandlePacketChatMessage            (a_ByteBuffer); return true;
-				case 0x02: HandlePacketUseEntity              (a_ByteBuffer); return true;
-				case 0x03: HandlePacketPlayer                 (a_ByteBuffer); return true;
-				case 0x04: HandlePacketPlayerPos              (a_ByteBuffer); return true;
-				case 0x05: HandlePacketPlayerLook             (a_ByteBuffer); return true;
-				case 0x06: HandlePacketPlayerPosLook          (a_ByteBuffer); return true;
-				case 0x07: HandlePacketBlockDig               (a_ByteBuffer); return true;
-				case 0x08: HandlePacketBlockPlace             (a_ByteBuffer); return true;
-				case 0x09: HandlePacketSlotSelect             (a_ByteBuffer); return true;
-				case 0x0a: HandlePacketAnimation              (a_ByteBuffer); return true;
-				case 0x0b: HandlePacketEntityAction           (a_ByteBuffer); return true;
-				case 0x0c: HandlePacketSteerVehicle           (a_ByteBuffer); return true;
-				case 0x0d: HandlePacketWindowClose            (a_ByteBuffer); return true;
-				case 0x0e: HandlePacketWindowClick            (a_ByteBuffer); return true;
-				case 0x0f:  // Confirm transaction - not used in MCS
+				case 0x00: HandlePacketKeepAlive(a_ByteBuffer); return true;
+				case 0x01: HandlePacketChatMessage(a_ByteBuffer); return true;
+				case 0x02: HandlePacketUseEntity(a_ByteBuffer); return true;
+				case 0x03: HandlePacketPlayer(a_ByteBuffer); return true;
+				case 0x04: HandlePacketPlayerPos(a_ByteBuffer); return true;
+				case 0x05: HandlePacketPlayerLook(a_ByteBuffer); return true;
+				case 0x06: HandlePacketPlayerPosLook(a_ByteBuffer); return true;
+				case 0x07: HandlePacketBlockDig(a_ByteBuffer); return true;
+				case 0x08: HandlePacketBlockPlace(a_ByteBuffer); return true;
+				case 0x09: HandlePacketSlotSelect(a_ByteBuffer); return true;
+				case 0x0a: HandlePacketAnimation(a_ByteBuffer); return true;
+				case 0x0b: HandlePacketEntityAction(a_ByteBuffer); return true;
+				case 0x0c: HandlePacketSteerVehicle(a_ByteBuffer); return true;
+				case 0x0d: HandlePacketWindowClose(a_ByteBuffer); return true;
+				case 0x0e: HandlePacketWindowClick(a_ByteBuffer); return true;
+				case 0x0f: // Confirm transaction - not used in MCS
 				case 0x10: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
-				case 0x11: HandlePacketEnchantItem            (a_ByteBuffer); return true;
-				case 0x12: HandlePacketUpdateSign             (a_ByteBuffer); return true;
-				case 0x13: HandlePacketPlayerAbilities        (a_ByteBuffer); return true;
-				case 0x14: HandlePacketTabComplete            (a_ByteBuffer); return true;
-				case 0x15: HandlePacketClientSettings         (a_ByteBuffer); return true;
-				case 0x16: HandlePacketClientStatus           (a_ByteBuffer); return true;
-				case 0x17: HandlePacketPluginMessage          (a_ByteBuffer); return true;
-				case 0x18: HandlePacketSpectate               (a_ByteBuffer); return true;
-				case 0x19: HandlePacketResourcePackStatus     (a_ByteBuffer); return true;
+				case 0x11: HandlePacketEnchantItem(a_ByteBuffer); return true;
+				case 0x12: HandlePacketUpdateSign(a_ByteBuffer); return true;
+				case 0x13: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
+				case 0x14: HandlePacketTabComplete(a_ByteBuffer); return true;
+				case 0x15: HandlePacketClientSettings(a_ByteBuffer); return true;
+				case 0x16: HandlePacketClientStatus(a_ByteBuffer); return true;
+				case 0x17: HandlePacketPluginMessage(a_ByteBuffer); return true;
+				case 0x18: HandlePacketSpectate(a_ByteBuffer); return true;
+				case 0x19: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
 			}
 			break;
 		}
@@ -2316,7 +2369,8 @@ void cProtocol_1_8_0::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		Pkt.WriteVarInt32(static_cast<UInt32>(PubKeyDer.size()));
 		Pkt.WriteBuf(PubKeyDer);
 		Pkt.WriteVarInt32(4);
-		Pkt.WriteBEInt32(static_cast<int>(reinterpret_cast<intptr_t>(this)));  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
+		Pkt.WriteBEInt32(static_cast<int>(reinterpret_cast<intptr_t>(this))
+		);  // Using 'this' as the cryptographic nonce, so that we don't have to generate one each time :)
 		return;
 	}
 
@@ -2401,10 +2455,10 @@ void cProtocol_1_8_0::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_8_0::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Locale);
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   ViewDistance);
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   ChatFlags);
-	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    ChatColors);
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,       UInt8,   SkinParts);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, ViewDistance);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, ChatFlags);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, ChatColors);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, SkinParts);
 
 	m_Client->SetLocale(Locale);
 	m_Client->SetViewDistance(ViewDistance);
@@ -2465,9 +2519,9 @@ void cProtocol_1_8_0::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBu
 
 void cProtocol_1_8_0::HandlePacketEntityAction(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadVarInt,  UInt32, PlayerID);
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8,  Action);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt,  UInt32, JumpBoost);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, PlayerID);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Action);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, JumpBoost);
 
 	if (PlayerID != m_Client->GetPlayer()->GetUniqueID())
 	{
@@ -2535,7 +2589,7 @@ void cProtocol_1_8_0::HandlePacketPlayerLook(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Yaw);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Pitch);
-	HANDLE_READ(a_ByteBuffer, ReadBool,    bool,  IsOnGround);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, IsOnGround);
 
 	m_Client->HandlePlayerLook(Yaw, Pitch, IsOnGround);
 }
@@ -2549,7 +2603,7 @@ void cProtocol_1_8_0::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosX);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosY);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosZ);
-	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, IsOnGround);
 
 	m_Client->HandlePlayerMove({PosX, PosY, PosZ}, IsOnGround);
 }
@@ -2563,9 +2617,9 @@ void cProtocol_1_8_0::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosX);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosY);
 	HANDLE_READ(a_ByteBuffer, ReadBEDouble, double, PosZ);
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Yaw);
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat,  float,  Pitch);
-	HANDLE_READ(a_ByteBuffer, ReadBool,     bool,   IsOnGround);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Yaw);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Pitch);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, IsOnGround);
 
 	m_Client->HandlePlayerMoveLook({PosX, PosY, PosZ}, Yaw, Pitch, IsOnGround);
 }
@@ -2623,7 +2677,7 @@ void cProtocol_1_8_0::HandlePacketSlotSelect(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_8_0::HandlePacketSpectate(cByteBuffer &a_ByteBuffer)
+void cProtocol_1_8_0::HandlePacketSpectate(cByteBuffer & a_ByteBuffer)
 {
 	cUUID playerUUID;
 	if (!a_ByteBuffer.ReadUUID(playerUUID))
@@ -2665,7 +2719,7 @@ void cProtocol_1_8_0::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_8_0::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Text);
-	HANDLE_READ(a_ByteBuffer, ReadBool,          bool,    HasPosition);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, HasPosition);
 
 	if (HasPosition)
 	{
@@ -2758,11 +2812,11 @@ void cProtocol_1_8_0::HandlePacketEnchantItem(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_8_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 {
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  WindowID);
-	HANDLE_READ(a_ByteBuffer, ReadBEInt16,  Int16,  SlotNum);
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  Button);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, WindowID);
+	HANDLE_READ(a_ByteBuffer, ReadBEInt16, Int16, SlotNum);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Button);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt16, UInt16, TransactionID);
-	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  Mode);
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Mode);
 
 	cItem Item;
 	ReadItem(a_ByteBuffer, Item);
@@ -2774,35 +2828,39 @@ void cProtocol_1_8_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 	eClickAction Action;
 	switch ((Mode << 8) | Button)
 	{
-		case 0x0000: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caLeftClick  : caLeftClickOutside;  break;
+		case 0x0000: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caLeftClick : caLeftClickOutside; break;
 		case 0x0001: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caRightClick : caRightClickOutside; break;
-		case 0x0100: Action = caShiftLeftClick;  break;
+		case 0x0100: Action = caShiftLeftClick; break;
 		case 0x0101: Action = caShiftRightClick; break;
-		case 0x0200: Action = caNumber1;         break;
-		case 0x0201: Action = caNumber2;         break;
-		case 0x0202: Action = caNumber3;         break;
-		case 0x0203: Action = caNumber4;         break;
-		case 0x0204: Action = caNumber5;         break;
-		case 0x0205: Action = caNumber6;         break;
-		case 0x0206: Action = caNumber7;         break;
-		case 0x0207: Action = caNumber8;         break;
-		case 0x0208: Action = caNumber9;         break;
-		case 0x0302: Action = caMiddleClick;     break;
-		case 0x0400: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftClickOutsideHoldNothing  : caDropKey;     break;
+		case 0x0200: Action = caNumber1; break;
+		case 0x0201: Action = caNumber2; break;
+		case 0x0202: Action = caNumber3; break;
+		case 0x0203: Action = caNumber4; break;
+		case 0x0204: Action = caNumber5; break;
+		case 0x0205: Action = caNumber6; break;
+		case 0x0206: Action = caNumber7; break;
+		case 0x0207: Action = caNumber8; break;
+		case 0x0208: Action = caNumber9; break;
+		case 0x0302: Action = caMiddleClick; break;
+		case 0x0400: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftClickOutsideHoldNothing : caDropKey; break;
 		case 0x0401: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightClickOutsideHoldNothing : caCtrlDropKey; break;
-		case 0x0500: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftPaintBegin               : caUnknown;     break;
-		case 0x0501: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caLeftPaintProgress            : caUnknown;     break;
-		case 0x0502: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftPaintEnd                 : caUnknown;     break;
-		case 0x0504: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightPaintBegin              : caUnknown;     break;
-		case 0x0505: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caRightPaintProgress           : caUnknown;     break;
-		case 0x0506: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightPaintEnd                : caUnknown;     break;
-		case 0x0508: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caMiddlePaintBegin             : caUnknown;     break;
-		case 0x0509: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caMiddlePaintProgress          : caUnknown;     break;
-		case 0x050a: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caMiddlePaintEnd               : caUnknown;     break;
+		case 0x0500: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftPaintBegin : caUnknown; break;
+		case 0x0501: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caLeftPaintProgress : caUnknown; break;
+		case 0x0502: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caLeftPaintEnd : caUnknown; break;
+		case 0x0504: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightPaintBegin : caUnknown; break;
+		case 0x0505: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caRightPaintProgress : caUnknown; break;
+		case 0x0506: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caRightPaintEnd : caUnknown; break;
+		case 0x0508: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caMiddlePaintBegin : caUnknown; break;
+		case 0x0509: Action = (SlotNum != SLOT_NUM_OUTSIDE) ? caMiddlePaintProgress : caUnknown; break;
+		case 0x050a: Action = (SlotNum == SLOT_NUM_OUTSIDE) ? caMiddlePaintEnd : caUnknown; break;
 		case 0x0600: Action = caDblClick; break;
 		default:
 		{
-			LOGWARNING("Unhandled window click mode / button combination: %d (0x%x)", (Mode << 8) | Button, (Mode << 8) | Button);
+			LOGWARNING(
+				"Unhandled window click mode / button combination: %d (0x%x)",
+				(Mode << 8) | Button,
+				(Mode << 8) | Button
+			);
 			Action = caUnknown;
 			break;
 		}
@@ -2858,7 +2916,10 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 			}
 			default:
 			{
-				LOGD("Player \"%s\" sent an invalid command block edit type - hacked client?", m_Client->GetUsername().c_str());
+				LOGD(
+					"Player \"%s\" sent an invalid command block edit type - hacked client?",
+					m_Client->GetUsername().c_str()
+				);
 				return;
 			}
 		}
@@ -2889,7 +2950,11 @@ void cProtocol_1_8_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, con
 		HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Brand);
 
 		m_Client->SetClientBrand(Brand);
-		m_Client->SendPluginMessage("MC|Brand", "\x08""Cuberite");  // Send back our brand, including the length.
+		m_Client->SendPluginMessage(
+			"MC|Brand",
+			"\x08"
+			"Cuberite"
+		);  // Send back our brand, including the length.
 	}
 	else if (a_Channel == "ItemName")
 	{
@@ -2917,8 +2982,12 @@ void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 	{
 		AString HexDump;
 		CreateHexDump(HexDump, a_Metadata.data(), std::max<size_t>(a_Metadata.size(), 1024), 16);
-		LOGWARNING("Cannot parse NBT item metadata: %s at (%zu / %zu bytes)\n%s",
-			NBT.GetErrorCode().message().c_str(), NBT.GetErrorPos(), a_Metadata.size(), HexDump.c_str()
+		LOGWARNING(
+			"Cannot parse NBT item metadata: %s at (%zu / %zu bytes)\n%s",
+			NBT.GetErrorCode().message().c_str(),
+			NBT.GetErrorPos(),
+			a_Metadata.size(),
+			HexDump.c_str()
 		);
 		return;
 	}
@@ -2941,15 +3010,19 @@ void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 			{
 				if (TagName == "display")  // Custom name and lore tag
 				{
-					for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0; displaytag = NBT.GetNextSibling(displaytag))
+					for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0;
+						 displaytag = NBT.GetNextSibling(displaytag))
 					{
-						if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name"))  // Custon name tag
+						if ((NBT.GetType(displaytag) == TAG_String) &&
+							(NBT.GetName(displaytag) == "Name"))  // Custon name tag
 						{
 							a_Item.m_CustomName = NBT.GetString(displaytag);
 						}
-						else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore"))  // Lore tag
+						else if ((NBT.GetType(displaytag) == TAG_List) &&
+								 (NBT.GetName(displaytag) == "Lore"))  // Lore tag
 						{
-							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag))  // Loop through array of strings
+							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0;
+								 loretag = NBT.GetNextSibling(loretag))  // Loop through array of strings
 							{
 								a_Item.m_LoreTable.push_back(NBT.GetString(loretag));
 							}
@@ -2962,7 +3035,12 @@ void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 				}
 				else if ((TagName == "Fireworks") || (TagName == "Explosion"))
 				{
-					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+					cFireworkItem::ParseFromNBT(
+						a_Item.m_FireworkItem,
+						NBT,
+						tag,
+						static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType)
+					);
 				}
 				break;
 			}
@@ -2995,10 +3073,10 @@ bool cProtocol_1_8_0::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_
 	}
 	a_Item.m_ItemType = ItemType;
 
-	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8,  Int8,  ItemCount);
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8, Int8, ItemCount);
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemDamage);
 
-	a_Item.m_ItemCount  = ItemCount;
+	a_Item.m_ItemCount = ItemCount;
 	a_Item.m_ItemDamage = ItemDamage;
 	if (ItemCount <= 0)
 	{
@@ -3006,7 +3084,8 @@ bool cProtocol_1_8_0::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_
 	}
 
 	ContiguousByteBuffer Metadata;
-	if (!a_ByteBuffer.ReadSome(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes) || Metadata.empty() || (Metadata[0] == std::byte(0)))
+	if (!a_ByteBuffer.ReadSome(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes) || Metadata.empty() ||
+		(Metadata[0] == std::byte(0)))
 	{
 		// No metadata
 		return true;
@@ -3085,14 +3164,19 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 		ASSERT(PacketData.size() > 0);
 		CreateHexDump(Hex, PacketData.data(), PacketData.size(), 16);
 		m_CommLogFile.Write(fmt::format(
-			FMT_STRING("Outgoing packet: type {} (translated to 0x{:02x}), length {} (0x{:04x}), state {}. Payload (incl. type):\n{}\n"),
-			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
-			PacketData.size(), PacketData.size(), m_State, Hex
+			FMT_STRING("Outgoing packet: type {} (translated to 0x{:02x}), length {} (0x{:04x}), state {}. Payload "
+					   "(incl. type):\n{}\n"),
+			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()),
+			GetPacketID(a_Pkt.GetPacketType()),
+			PacketData.size(),
+			PacketData.size(),
+			m_State,
+			Hex
 		));
 		/*
 		// Useful for debugging a new protocol:
-		LOGD("Outgoing packet: type %s (translated to 0x%02x), length %u (0x%04x), state %d. Payload (incl. type):\n%s\n",
-			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
+		LOGD("Outgoing packet: type %s (translated to 0x%02x), length %u (0x%04x), state %d. Payload (incl.
+		type):\n%s\n", cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
 			PacketLen, PacketLen, m_State, Hex
 		);
 		//*/
@@ -3136,7 +3220,10 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			a_Writer.AddString("CustomName", "@");
 			if (!CommandBlockEntity.GetLastOutput().empty())
 			{
-				a_Writer.AddString("LastOutput", JsonUtils::SerializeSingleValueJsonObject("text", CommandBlockEntity.GetLastOutput()));
+				a_Writer.AddString(
+					"LastOutput",
+					JsonUtils::SerializeSingleValueJsonObject("text", CommandBlockEntity.GetLastOutput())
+				);
 			}
 			break;
 		}
@@ -3154,16 +3241,16 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 
 			// The new Block Entity format for a Mob Head. See: https://minecraft.wiki/w/Head#Block_entity
 			a_Writer.BeginCompound("Owner");
-				a_Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
-				a_Writer.AddString("Name", MobHeadEntity.GetOwnerName());
-				a_Writer.BeginCompound("Properties");
-					a_Writer.BeginList("textures", TAG_Compound);
-						a_Writer.BeginCompound("");
-							a_Writer.AddString("Signature", MobHeadEntity.GetOwnerTextureSignature());
-							a_Writer.AddString("Value", MobHeadEntity.GetOwnerTexture());
-						a_Writer.EndCompound();
-					a_Writer.EndList();
-				a_Writer.EndCompound();
+			a_Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
+			a_Writer.AddString("Name", MobHeadEntity.GetOwnerName());
+			a_Writer.BeginCompound("Properties");
+			a_Writer.BeginList("textures", TAG_Compound);
+			a_Writer.BeginCompound("");
+			a_Writer.AddString("Signature", MobHeadEntity.GetOwnerTextureSignature());
+			a_Writer.AddString("Value", MobHeadEntity.GetOwnerTexture());
+			a_Writer.EndCompound();
+			a_Writer.EndList();
+			a_Writer.EndCompound();
 			a_Writer.EndCompound();
 			break;
 		}
@@ -3265,11 +3352,16 @@ void cProtocol_1_8_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 			Health: 1 | 3 - (1 - 3) = 5
 			*/
 			auto & Minecart = static_cast<const cMinecart &>(a_Entity);
-			a_Pkt.WriteBEInt32(static_cast<Int32>((((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * Minecart.LastDamage()) * 4));
+			a_Pkt.WriteBEInt32(static_cast<Int32>(
+				(((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) *
+				 Minecart.LastDamage()) *
+				4
+			));
 			a_Pkt.WriteBEUInt8(0x52);
 			a_Pkt.WriteBEInt32(1);  // Shaking direction, doesn't seem to affect anything
 			a_Pkt.WriteBEUInt8(0x73);
-			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));  // Damage taken / shake effect multiplyer
+			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10)
+			);  // Damage taken / shake effect multiplyer
 
 			if (Minecart.GetPayload() == cMinecart::mpNone)
 			{
@@ -3355,10 +3447,13 @@ void cProtocol_1_8_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity &
 
 		a_Pkt.WriteBEInt32(1);  // Count.
 		a_Pkt.WriteString("generic.movementSpeed");
-		a_Pkt.WriteBEDouble(0.1 * Player.GetNormalMaxSpeed());  // The default game speed is 0.1, multiply that value by the relative speed.
+		a_Pkt.WriteBEDouble(
+			0.1 * Player.GetNormalMaxSpeed()
+		);  // The default game speed is 0.1, multiply that value by the relative speed.
 
 		// It seems the modifiers aren't conditionally activated; their effects are applied immediately!
-		// We have to keep on re-sending this packet when the client notifies us of sprint start and end, and so on. Strange.
+		// We have to keep on re-sending this packet when the client notifies us of sprint start and end, and so on.
+		// Strange.
 
 		if (Player.IsSprinting())
 		{
@@ -3407,7 +3502,9 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 	a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
 
-	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid())
+	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() &&
+		(a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR) &&
+		!a_Item.m_ItemColor.IsValid())
 	{
 		a_Pkt.WriteBEInt8(0);
 		return;
@@ -3452,7 +3549,11 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	}
 	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
 	{
-		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+		cFireworkItem::WriteToNBTCompound(
+			a_Item.m_FireworkItem,
+			Writer,
+			static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType)
+		);
 	}
 	Writer.Finish();
 
@@ -3812,15 +3913,13 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousBy
 			CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
 			m_CommLogFile.Write(fmt::format(
 				FMT_STRING("Incoming data, {0} (0x{0:x}) unparsed bytes already present in buffer:\n{1}\n"),
-				AllData.size(), Hex
+				AllData.size(),
+				Hex
 			));
 		}
 		AString Hex;
 		CreateHexDump(Hex, a_Data.data(), a_Data.size(), 16);
-		m_CommLogFile.Write(fmt::format(
-			FMT_STRING("Incoming data: {0} (0x{0:x}) bytes: \n{1}\n"),
-			a_Data.size(), Hex
-		));
+		m_CommLogFile.Write(fmt::format(FMT_STRING("Incoming data: {0} (0x{0:x}) bytes: \n{1}\n"), a_Data.size(), Hex));
 		m_CommLogFile.Flush();
 	}
 
@@ -3860,7 +3959,8 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousBy
 				return;
 			}
 
-			NumBytesRead -= static_cast<UInt32>(a_Buffer.GetReadableSpace());  // How many bytes has the UncompressedSize taken up?
+			NumBytesRead -=
+				static_cast<UInt32>(a_Buffer.GetReadableSpace());  // How many bytes has the UncompressedSize taken up?
 			ASSERT(PacketLen > NumBytesRead);
 			PacketLen -= NumBytesRead;
 
@@ -3905,7 +4005,8 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousBy
 		CreateHexDump(Hex, AllData.data(), AllData.size(), 16);
 		m_CommLogFile.Write(fmt::format(
 			FMT_STRING("There are {0} (0x{0:x}) bytes of non-parse-able data left in the buffer:\n{1}"),
-			a_Buffer.GetReadableSpace(), Hex
+			a_Buffer.GetReadableSpace(),
+			Hex
 		));
 		m_CommLogFile.Flush();
 	}
@@ -3922,11 +4023,11 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity) const
 	switch (a_Entity.GetEntityType())
 	{
 		case Type::etEnderCrystal: return 51;
-		case Type::etPickup: return 2;
+		case Type::etPickup:       return 2;
 		case Type::etFallingBlock: return 70;
-		case Type::etMinecart: return 10;
-		case Type::etBoat: return 1;
-		case Type::etTNT: return 50;
+		case Type::etMinecart:     return 10;
+		case Type::etBoat:         return 1;
+		case Type::etTNT:          return 50;
 		case Type::etProjectile:
 		{
 			using PType = cProjectileEntity::eKind;
@@ -3934,21 +4035,21 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity) const
 
 			switch (Projectile.GetProjectileKind())
 			{
-				case PType::pkArrow: return 60;
-				case PType::pkSnowball: return 61;
-				case PType::pkEgg: return 62;
+				case PType::pkArrow:         return 60;
+				case PType::pkSnowball:      return 61;
+				case PType::pkEgg:           return 62;
 				case PType::pkGhastFireball: return 63;
-				case PType::pkFireCharge: return 64;
-				case PType::pkEnderPearl: return 65;
-				case PType::pkExpBottle: return 75;
-				case PType::pkSplashPotion: return 73;
-				case PType::pkFirework: return 76;
-				case PType::pkWitherSkull: return 66;
+				case PType::pkFireCharge:    return 64;
+				case PType::pkEnderPearl:    return 65;
+				case PType::pkExpBottle:     return 75;
+				case PType::pkSplashPotion:  return 73;
+				case PType::pkFirework:      return 76;
+				case PType::pkWitherSkull:   return 66;
 			}
 
 			break;
 		}
-		case Type::etFloater: return 90;
+		case Type::etFloater:   return 90;
 		case Type::etItemFrame: return 71;
 		case Type::etLeashKnot: return 77;
 
@@ -3957,7 +4058,7 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity) const
 		case Type::etPlayer:
 		case Type::etMonster:
 		case Type::etExpOrb:
-		case Type::etPainting: break;
+		case Type::etPainting:  break;
 	}
 	UNREACHABLE("Unhandled entity kind");
 }
@@ -3968,58 +4069,56 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity) const
 
 int cProtocol_1_8_0::GetProtocolParticleID(const AString & a_ParticleName) const
 {
-	static const std::unordered_map<AString, int> ParticleMap
-	{
-		// Initialize the ParticleMap:
-		{ "explode",          0 },
-		{ "largeexplode",     1 },
-		{ "hugeexplosion",    2 },
-		{ "fireworksspark",   3 },
-		{ "bubble",           4 },
-		{ "splash",           5 },
-		{ "wake",             6 },
-		{ "suspended",        7 },
-		{ "depthsuspend",     8 },
-		{ "crit",             9 },
-		{ "magiccrit",        10 },
-		{ "smoke",            11 },
-		{ "largesmoke",       12 },
-		{ "spell",            13 },
-		{ "instantspell",     14 },
-		{ "mobspell",         15 },
-		{ "mobspellambient",  16 },
-		{ "witchmagic",       17 },
-		{ "dripwater",        18 },
-		{ "driplava",         19 },
-		{ "angryvillager",    20 },
-		{ "happyvillager",    21 },
-		{ "townaura",         22 },
-		{ "note",             23 },
-		{ "portal",           24 },
-		{ "enchantmenttable", 25 },
-		{ "flame",            26 },
-		{ "lava",             27 },
-		{ "footstep",         28 },
-		{ "cloud",            29 },
-		{ "reddust",          30 },
-		{ "snowballpoof",     31 },
-		{ "snowshovel",       32 },
-		{ "slime",            33 },
-		{ "heart",            34 },
-		{ "barrier",          35 },
-		{ "iconcrack",        36 },
-		{ "blockcrack",       37 },
-		{ "blockdust",        38 },
-		{ "droplet",          39 },
-		{ "take",             40 },
-		{ "mobappearance",    41 },
-		{ "dragonbreath",     42 },
-		{ "endrod",           43 },
-		{ "damageindicator",  44 },
-		{ "sweepattack",      45 },
-		{ "fallingdust",      46 },
-		{ "totem",            47 },
-		{ "spit",             48 }
+	static const std::unordered_map<AString, int> ParticleMap {// Initialize the ParticleMap:
+															   {"explode", 0},
+															   {"largeexplode", 1},
+															   {"hugeexplosion", 2},
+															   {"fireworksspark", 3},
+															   {"bubble", 4},
+															   {"splash", 5},
+															   {"wake", 6},
+															   {"suspended", 7},
+															   {"depthsuspend", 8},
+															   {"crit", 9},
+															   {"magiccrit", 10},
+															   {"smoke", 11},
+															   {"largesmoke", 12},
+															   {"spell", 13},
+															   {"instantspell", 14},
+															   {"mobspell", 15},
+															   {"mobspellambient", 16},
+															   {"witchmagic", 17},
+															   {"dripwater", 18},
+															   {"driplava", 19},
+															   {"angryvillager", 20},
+															   {"happyvillager", 21},
+															   {"townaura", 22},
+															   {"note", 23},
+															   {"portal", 24},
+															   {"enchantmenttable", 25},
+															   {"flame", 26},
+															   {"lava", 27},
+															   {"footstep", 28},
+															   {"cloud", 29},
+															   {"reddust", 30},
+															   {"snowballpoof", 31},
+															   {"snowshovel", 32},
+															   {"slime", 33},
+															   {"heart", 34},
+															   {"barrier", 35},
+															   {"iconcrack", 36},
+															   {"blockcrack", 37},
+															   {"blockdust", 38},
+															   {"droplet", 39},
+															   {"take", 40},
+															   {"mobappearance", 41},
+															   {"dragonbreath", 42},
+															   {"endrod", 43},
+															   {"damageindicator", 44},
+															   {"sweepattack", 45},
+															   {"fallingdust", 46},
+															   {"totem", 47},
+															   {"spit", 48}
 	};
 
 	const auto ParticleName = StrToLower(a_ParticleName);
@@ -4043,39 +4142,39 @@ const char * cProtocol_1_8_0::GetProtocolStatisticName(const CustomStatistic a_S
 	switch (a_Statistic)
 	{
 		// V1.8 Achievements
-		case CustomStatistic::AchOpenInventory:        return "achievement.openInventory";
-		case CustomStatistic::AchMineWood:             return "achievement.mineWood";
-		case CustomStatistic::AchBuildWorkBench:       return "achievement.buildWorkBench";
-		case CustomStatistic::AchBuildPickaxe:         return "achievement.buildPickaxe";
-		case CustomStatistic::AchBuildFurnace:         return "achievement.buildFurnace";
-		case CustomStatistic::AchAcquireIron:          return "achievement.acquireIron";
-		case CustomStatistic::AchBuildHoe:             return "achievement.buildHoe";
-		case CustomStatistic::AchMakeBread:            return "achievement.makeBread";
-		case CustomStatistic::AchBakeCake:             return "achievement.bakeCake";
-		case CustomStatistic::AchBuildBetterPickaxe:   return "achievement.buildBetterPickaxe";
-		case CustomStatistic::AchCookFish:             return "achievement.cookFish";
-		case CustomStatistic::AchOnARail:              return "achievement.onARail";
-		case CustomStatistic::AchBuildSword:           return "achievement.buildSword";
-		case CustomStatistic::AchKillEnemy:            return "achievement.killEnemy";
-		case CustomStatistic::AchKillCow:              return "achievement.killCow";
-		case CustomStatistic::AchFlyPig:               return "achievement.flyPig";
-		case CustomStatistic::AchSnipeSkeleton:        return "achievement.snipeSkeleton";
-		case CustomStatistic::AchDiamonds:             return "achievement.diamonds";
-		case CustomStatistic::AchPortal:               return "achievement.portal";
-		case CustomStatistic::AchGhast:                return "achievement.ghast";
-		case CustomStatistic::AchBlazeRod:             return "achievement.blazeRod";
-		case CustomStatistic::AchPotion:               return "achievement.potion";
-		case CustomStatistic::AchTheEnd:               return "achievement.theEnd";
-		case CustomStatistic::AchTheEnd2:              return "achievement.theEnd2";
-		case CustomStatistic::AchEnchantments:         return "achievement.enchantments";
-		case CustomStatistic::AchOverkill:             return "achievement.overkill";
-		case CustomStatistic::AchBookcase:             return "achievement.bookcase";
-		case CustomStatistic::AchExploreAllBiomes:     return "achievement.exploreAllBiomes";
-		case CustomStatistic::AchSpawnWither:          return "achievement.spawnWither";
-		case CustomStatistic::AchKillWither:           return "achievement.killWither";
-		case CustomStatistic::AchFullBeacon:           return "achievement.fullBeacon";
-		case CustomStatistic::AchBreedCow:             return "achievement.breedCow";
-		case CustomStatistic::AchDiamondsToYou:        return "achievement.diamondsToYou";
+		case CustomStatistic::AchOpenInventory:          return "achievement.openInventory";
+		case CustomStatistic::AchMineWood:               return "achievement.mineWood";
+		case CustomStatistic::AchBuildWorkBench:         return "achievement.buildWorkBench";
+		case CustomStatistic::AchBuildPickaxe:           return "achievement.buildPickaxe";
+		case CustomStatistic::AchBuildFurnace:           return "achievement.buildFurnace";
+		case CustomStatistic::AchAcquireIron:            return "achievement.acquireIron";
+		case CustomStatistic::AchBuildHoe:               return "achievement.buildHoe";
+		case CustomStatistic::AchMakeBread:              return "achievement.makeBread";
+		case CustomStatistic::AchBakeCake:               return "achievement.bakeCake";
+		case CustomStatistic::AchBuildBetterPickaxe:     return "achievement.buildBetterPickaxe";
+		case CustomStatistic::AchCookFish:               return "achievement.cookFish";
+		case CustomStatistic::AchOnARail:                return "achievement.onARail";
+		case CustomStatistic::AchBuildSword:             return "achievement.buildSword";
+		case CustomStatistic::AchKillEnemy:              return "achievement.killEnemy";
+		case CustomStatistic::AchKillCow:                return "achievement.killCow";
+		case CustomStatistic::AchFlyPig:                 return "achievement.flyPig";
+		case CustomStatistic::AchSnipeSkeleton:          return "achievement.snipeSkeleton";
+		case CustomStatistic::AchDiamonds:               return "achievement.diamonds";
+		case CustomStatistic::AchPortal:                 return "achievement.portal";
+		case CustomStatistic::AchGhast:                  return "achievement.ghast";
+		case CustomStatistic::AchBlazeRod:               return "achievement.blazeRod";
+		case CustomStatistic::AchPotion:                 return "achievement.potion";
+		case CustomStatistic::AchTheEnd:                 return "achievement.theEnd";
+		case CustomStatistic::AchTheEnd2:                return "achievement.theEnd2";
+		case CustomStatistic::AchEnchantments:           return "achievement.enchantments";
+		case CustomStatistic::AchOverkill:               return "achievement.overkill";
+		case CustomStatistic::AchBookcase:               return "achievement.bookcase";
+		case CustomStatistic::AchExploreAllBiomes:       return "achievement.exploreAllBiomes";
+		case CustomStatistic::AchSpawnWither:            return "achievement.spawnWither";
+		case CustomStatistic::AchKillWither:             return "achievement.killWither";
+		case CustomStatistic::AchFullBeacon:             return "achievement.fullBeacon";
+		case CustomStatistic::AchBreedCow:               return "achievement.breedCow";
+		case CustomStatistic::AchDiamondsToYou:          return "achievement.diamondsToYou";
 
 		// V1.8 stats
 		case CustomStatistic::AnimalsBred:               return "stat.animalsBred";
@@ -4131,7 +4230,7 @@ const char * cProtocol_1_8_0::GetProtocolStatisticName(const CustomStatistic a_S
 		case CustomStatistic::AviateOneCm:               return "stat.aviateOneCm";
 		case CustomStatistic::SleepInBed:                return "stat.sleepInBed";
 		case CustomStatistic::SneakTime:                 return "stat.sneakTime";
-		default:                                   return "";
+		default:                                         return "";
 	}
 }
 
@@ -4160,8 +4259,12 @@ void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
 		AString PacketDataHex;
 		CreateHexDump(PacketDataHex, PacketData.data(), PacketData.size(), 16);
 		m_CommLogFile.Write(fmt::format(
-			FMT_STRING("Next incoming packet is type {0} (0x{0:x}), length {1} (0x{1:x}) at state {2}. Payload:\n{3}\n"),
-			PacketType, a_Buffer.GetUsedSpace(), m_State, PacketDataHex
+			FMT_STRING("Next incoming packet is type {0} (0x{0:x}), length {1} (0x{1:x}) at state {2}. Payload:\n{3}\n"
+			),
+			PacketType,
+			a_Buffer.GetUsedSpace(),
+			m_State,
+			PacketDataHex
 		));
 	}
 
@@ -4194,8 +4297,13 @@ void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
 	if (a_Buffer.GetReadableSpace() != 0)
 	{
 		// Read more or less than packet length, report as error
-		LOGWARNING("Protocol 1.8: Wrong number of bytes read for packet 0x%x, state %d. Read %zu bytes, packet contained %u bytes",
-			PacketType, m_State, a_Buffer.GetUsedSpace() - a_Buffer.GetReadableSpace(), a_Buffer.GetUsedSpace()
+		LOGWARNING(
+			"Protocol 1.8: Wrong number of bytes read for packet 0x%x, state %d. Read %zu bytes, packet contained %u "
+			"bytes",
+			PacketType,
+			m_State,
+			a_Buffer.GetUsedSpace() - a_Buffer.GetReadableSpace(),
+			a_Buffer.GetUsedSpace()
 		);
 
 		// Put a message in the comm log:

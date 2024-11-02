@@ -1,7 +1,8 @@
 
 // PieceGeneratorBFSTree.cpp
 
-// Implements the cPieceGeneratorBFSTree class for generating structures composed of individual "pieces" in a simple tree
+// Implements the cPieceGeneratorBFSTree class for generating structures composed of individual "pieces" in a simple
+// tree
 /*
 The generator keeps a pool of currently-open connectors, chooses one at random and tries to place a piece on it,
 thus possibly extending the pool of open connectors with the new piece's ones (like breadth-first search).
@@ -19,10 +20,8 @@ thus possibly extending the pool of open connectors with the new piece's ones (l
 ////////////////////////////////////////////////////////////////////////////////
 // cPieceGeneratorBFSTree:
 
-cPieceGeneratorBFSTree::cPieceGeneratorBFSTree(cPiecePool & a_PiecePool, int a_Seed):
-	m_PiecePool(a_PiecePool),
-	m_Noise(a_Seed),
-	m_Seed(a_Seed)
+cPieceGeneratorBFSTree::cPieceGeneratorBFSTree(cPiecePool & a_PiecePool, int a_Seed) :
+	m_PiecePool(a_PiecePool), m_Noise(a_Seed), m_Seed(a_Seed)
 {
 }
 
@@ -30,7 +29,11 @@ cPieceGeneratorBFSTree::cPieceGeneratorBFSTree(cPiecePool & a_PiecePool, int a_S
 
 
 
-cPlacedPiecePtr cPieceGeneratorBFSTree::PlaceStartingPiece(int a_BlockX, int a_BlockZ, cFreeConnectors & a_OutConnectors)
+cPlacedPiecePtr cPieceGeneratorBFSTree::PlaceStartingPiece(
+	int a_BlockX,
+	int a_BlockZ,
+	cFreeConnectors & a_OutConnectors
+)
 {
 	m_PiecePool.Reset();
 	int rnd = m_Noise.IntNoise2DInt(a_BlockX, a_BlockZ) / 7;
@@ -109,7 +112,10 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 	int WantedConnectorType = -a_Connector.m_Type;
 	cPieces AvailablePieces = m_PiecePool.GetPiecesWithConnector(WantedConnectorType);
 	Connections.reserve(AvailablePieces.size());
-	Vector3i ConnPos = cPiece::cConnector::AddDirection(a_Connector.m_Pos, a_Connector.m_Direction);  // The position at which the new connector should be placed - 1 block away from the current connector
+	Vector3i ConnPos = cPiece::cConnector::AddDirection(
+		a_Connector.m_Pos,
+		a_Connector.m_Direction
+	);  // The position at which the new connector should be placed - 1 block away from the current connector
 	int WeightTotal = 0;
 	for (cPieces::iterator itrP = AvailablePieces.begin(), endP = AvailablePieces.end(); itrP != endP; ++itrP)
 	{
@@ -130,7 +136,8 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 				continue;
 			}
 			// This is a same-type connector, find out how to rotate to it:
-			int NumCCWRotations = cPiece::cConnector::GetNumCCWRotationsToFit(a_Connector.m_Direction, itrC->m_Direction);
+			int NumCCWRotations =
+				cPiece::cConnector::GetNumCCWRotationsToFit(a_Connector.m_Direction, itrC->m_Direction);
 			if ((NumCCWRotations < 0) || !(*itrP)->CanRotateCCW(NumCCWRotations))
 			{
 				// Doesn't support this rotation
@@ -138,7 +145,8 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 			}
 
 			// Check if the piece's VerticalLimit allows this connection:
-			if ((verticalLimit != nullptr) && (!verticalLimit->CanBeAtHeight(ConnPos.x, ConnPos.z, ConnPos.y - itrC->m_Pos.y)))
+			if ((verticalLimit != nullptr) &&
+				(!verticalLimit->CanBeAtHeight(ConnPos.x, ConnPos.z, ConnPos.y - itrC->m_Pos.y)))
 			{
 				continue;
 			}
@@ -163,7 +171,8 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 	// Choose a random connection from the list, based on the weights:
 	int rnd = (m_Noise.IntNoise3DInt(a_Connector.m_Pos.x, a_Connector.m_Pos.y, a_Connector.m_Pos.z) / 7) % WeightTotal;
 	size_t ChosenIndex = 0;
-	for (cConnections::const_iterator itr = Connections.begin(), end = Connections.end(); itr != end; ++itr, ++ChosenIndex)
+	for (cConnections::const_iterator itr = Connections.begin(), end = Connections.end(); itr != end;
+		 ++itr, ++ChosenIndex)
 	{
 		rnd -= itr->m_Weight;
 		if (rnd <= 0)
@@ -188,7 +197,10 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 			// This is the connector through which we have been connected to the parent, don't add
 			continue;
 		}
-		a_OutConnectors.emplace_back(PlacedPiece.get(), Conn.m_Piece->RotateMoveConnector(*itr, Conn.m_NumCCWRotations, ConnPos.x, ConnPos.y, ConnPos.z));
+		a_OutConnectors.emplace_back(
+			PlacedPiece.get(),
+			Conn.m_Piece->RotateMoveConnector(*itr, Conn.m_NumCCWRotations, ConnPos.x, ConnPos.y, ConnPos.z)
+		);
 	}
 	a_OutPieces.push_back(std::move(PlacedPiece));
 
@@ -290,18 +302,26 @@ void cPieceGeneratorBFSTree::PlacePieces(int a_BlockX, int a_BlockZ, int a_MaxDe
 
 //*
 // DEBUG:
-void cPieceGeneratorBFSTree::DebugConnectorPool(const cPieceGeneratorBFSTree::cFreeConnectors & a_ConnectorPool, size_t a_NumProcessed)
+void cPieceGeneratorBFSTree::DebugConnectorPool(
+	const cPieceGeneratorBFSTree::cFreeConnectors & a_ConnectorPool,
+	size_t a_NumProcessed
+)
 {
 	fmt::print("  Connector pool: {0} items\n", a_ConnectorPool.size() - a_NumProcessed);
 	size_t idx = 0;
 
 	typedef cPieceGeneratorBFSTree::cFreeConnectors::difference_type difType;
 
-	for (auto itr = a_ConnectorPool.cbegin() + static_cast<difType>(a_NumProcessed), end = a_ConnectorPool.cend(); itr != end; ++itr, ++idx)
+	for (auto itr = a_ConnectorPool.cbegin() + static_cast<difType>(a_NumProcessed), end = a_ConnectorPool.cend();
+		 itr != end;
+		 ++itr, ++idx)
 	{
-		fmt::print("    {0}: {{{1}, {2}, {3}}}, type {4}, direction {5}, depth {6}\n",
+		fmt::print(
+			"    {0}: {{{1}, {2}, {3}}}, type {4}, direction {5}, depth {6}\n",
 			idx,
-			itr->m_Connector.m_Pos.x, itr->m_Connector.m_Pos.y, itr->m_Connector.m_Pos.z,
+			itr->m_Connector.m_Pos.x,
+			itr->m_Connector.m_Pos.y,
+			itr->m_Connector.m_Pos.z,
 			itr->m_Connector.m_Type,
 			cPiece::cConnector::DirectionToString(itr->m_Connector.m_Direction),
 			itr->m_Piece->GetDepth()
@@ -317,11 +337,13 @@ void cPieceGeneratorBFSTree::DebugConnectorPool(const cPieceGeneratorBFSTree::cF
 ////////////////////////////////////////////////////////////////////////////////
 // cPieceGeneratorBFSTree::cConnection:
 
-cPieceGeneratorBFSTree::cConnection::cConnection(cPiece & a_Piece, cPiece::cConnector & a_Connector, int a_NumCCWRotations, int a_Weight) :
-	m_Piece(&a_Piece),
-	m_Connector(a_Connector),
-	m_NumCCWRotations(a_NumCCWRotations),
-	m_Weight(a_Weight)
+cPieceGeneratorBFSTree::cConnection::cConnection(
+	cPiece & a_Piece,
+	cPiece::cConnector & a_Connector,
+	int a_NumCCWRotations,
+	int a_Weight
+) :
+	m_Piece(&a_Piece), m_Connector(a_Connector), m_NumCCWRotations(a_NumCCWRotations), m_Weight(a_Weight)
 {
 }
 
@@ -333,11 +355,6 @@ cPieceGeneratorBFSTree::cConnection::cConnection(cPiece & a_Piece, cPiece::cConn
 // cPieceGeneratorBFSTree::cFreeConnector:
 
 cPieceGeneratorBFSTree::cFreeConnector::cFreeConnector(cPlacedPiece * a_Piece, const cPiece::cConnector & a_Connector) :
-	m_Piece(a_Piece),
-	m_Connector(a_Connector)
+	m_Piece(a_Piece), m_Connector(a_Connector)
 {
 }
-
-
-
-

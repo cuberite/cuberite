@@ -5,13 +5,11 @@
 
 
 
-class cItemMinecartHandler final:
-	public cItemHandler
+class cItemMinecartHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 
@@ -66,5 +64,4 @@ public:
 		}
 		return true;
 	}
-
-} ;
+};

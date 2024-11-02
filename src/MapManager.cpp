@@ -20,8 +20,7 @@
 
 
 cMapManager::cMapManager(cWorld * a_World) :
-	m_World(a_World),
-	m_TicksUntilNextSave(MAP_DATA_SAVE_INTERVAL)
+	m_World(a_World), m_TicksUntilNextSave(MAP_DATA_SAVE_INTERVAL)
 {
 	ASSERT(m_World != nullptr);
 }
@@ -182,8 +181,3 @@ void cMapManager::SaveMapData(void)
 		}
 	}
 }
-
-
-
-
-

@@ -8,10 +8,7 @@
 
 
 cPlugin::cPlugin(const AString & a_FolderName) :
-	m_Status(cPluginManager::psDisabled),
-	m_Name(a_FolderName),
-	m_Version(0),
-	m_FolderName(a_FolderName)
+	m_Status(cPluginManager::psDisabled), m_Name(a_FolderName), m_Version(0), m_FolderName(a_FolderName)
 {
 }
 
@@ -57,7 +54,3 @@ void cPlugin::SetLoadError(const AString & a_LoadError)
 	m_Status = cPluginManager::psError;
 	m_LoadError = a_LoadError;
 }
-
-
-
-

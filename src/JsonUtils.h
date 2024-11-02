@@ -17,4 +17,4 @@ bool ParseString(const AString & a_JsonStr, Json::Value & a_Root, AString * a_Er
 /** Creates a Json string representing an object with the specified single value. */
 extern AString SerializeSingleValueJsonObject(const AString & a_Key, const AString & a_Value);
 
-}
+}  // namespace JsonUtils

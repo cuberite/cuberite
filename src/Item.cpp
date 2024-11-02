@@ -13,7 +13,7 @@
 
 
 
-cItem::cItem():
+cItem::cItem() :
 	m_ItemType(E_ITEM_EMPTY),
 	m_ItemCount(0),
 	m_ItemDamage(0),
@@ -35,14 +35,14 @@ cItem::cItem(
 	const AString & a_Enchantments,
 	const AString & a_CustomName,
 	const AStringVector & a_LoreTable
-):
-	m_ItemType    (a_ItemType),
-	m_ItemCount   (a_ItemCount),
-	m_ItemDamage  (a_ItemDamage),
+) :
+	m_ItemType(a_ItemType),
+	m_ItemCount(a_ItemCount),
+	m_ItemDamage(a_ItemDamage),
 	m_Enchantments(a_Enchantments),
-	m_CustomName  (a_CustomName),
-	m_LoreTable   (a_LoreTable),
-	m_RepairCost  (0),
+	m_CustomName(a_CustomName),
+	m_LoreTable(a_LoreTable),
+	m_RepairCost(0),
 	m_FireworkItem(),
 	m_ItemColor()
 {
@@ -119,58 +119,58 @@ short cItem::GetMaxDamage(void) const
 {
 	switch (m_ItemType)
 	{
-		case E_ITEM_BOW:             return 384;
-		case E_ITEM_CHAIN_BOOTS:     return 196;
-		case E_ITEM_CHAIN_CHESTPLATE:return 241;
-		case E_ITEM_CHAIN_HELMET:    return 166;
-		case E_ITEM_CHAIN_LEGGINGS:  return 226;
-		case E_ITEM_DIAMOND_AXE:     return 1561;
-		case E_ITEM_DIAMOND_BOOTS:   return 430;
+		case E_ITEM_BOW:                return 384;
+		case E_ITEM_CHAIN_BOOTS:        return 196;
+		case E_ITEM_CHAIN_CHESTPLATE:   return 241;
+		case E_ITEM_CHAIN_HELMET:       return 166;
+		case E_ITEM_CHAIN_LEGGINGS:     return 226;
+		case E_ITEM_DIAMOND_AXE:        return 1561;
+		case E_ITEM_DIAMOND_BOOTS:      return 430;
 		case E_ITEM_DIAMOND_CHESTPLATE: return 529;
-		case E_ITEM_DIAMOND_HELMET:  return 364;
-		case E_ITEM_DIAMOND_HOE:     return 1561;
-		case E_ITEM_DIAMOND_LEGGINGS:return 496;
-		case E_ITEM_DIAMOND_PICKAXE: return 1561;
-		case E_ITEM_DIAMOND_SHOVEL:  return 1561;
-		case E_ITEM_DIAMOND_SWORD:   return 1561;
-		case E_ITEM_ELYTRA:          return 432;
-		case E_ITEM_FLINT_AND_STEEL: return 64;
-		case E_ITEM_FISHING_ROD:     return 65;
-		case E_ITEM_GOLD_AXE:        return 32;
-		case E_ITEM_GOLD_BOOTS:      return 92;
-		case E_ITEM_GOLD_CHESTPLATE: return 113;
-		case E_ITEM_GOLD_HELMET:     return 78;
-		case E_ITEM_GOLD_HOE:        return 32;
-		case E_ITEM_GOLD_LEGGINGS:   return 106;
-		case E_ITEM_GOLD_PICKAXE:    return 32;
-		case E_ITEM_GOLD_SHOVEL:     return 32;
-		case E_ITEM_GOLD_SWORD:      return 32;
-		case E_ITEM_IRON_AXE:        return 250;
-		case E_ITEM_IRON_BOOTS:      return 196;
-		case E_ITEM_IRON_CHESTPLATE: return 241;
-		case E_ITEM_IRON_HELMET:     return 166;
-		case E_ITEM_IRON_HOE:        return 250;
-		case E_ITEM_IRON_LEGGINGS:   return 226;
-		case E_ITEM_IRON_PICKAXE:    return 250;
-		case E_ITEM_IRON_SHOVEL:     return 250;
-		case E_ITEM_IRON_SWORD:      return 250;
-		case E_ITEM_LEATHER_BOOTS:   return 66;
-		case E_ITEM_LEATHER_CAP:     return 55;
-		case E_ITEM_LEATHER_PANTS:   return 76;
-		case E_ITEM_LEATHER_TUNIC:   return 81;
-		case E_ITEM_SHEARS:          return 250;
-		case E_ITEM_STONE_AXE:       return 131;
-		case E_ITEM_STONE_HOE:       return 131;
-		case E_ITEM_STONE_PICKAXE:   return 131;
-		case E_ITEM_STONE_SHOVEL:    return 131;
-		case E_ITEM_STONE_SWORD:     return 131;
-		case E_ITEM_WOODEN_AXE:      return 59;
-		case E_ITEM_WOODEN_HOE:      return 59;
-		case E_ITEM_WOODEN_PICKAXE:  return 59;
-		case E_ITEM_WOODEN_SHOVEL:   return 59;
-		case E_ITEM_WOODEN_SWORD:    return 59;
+		case E_ITEM_DIAMOND_HELMET:     return 364;
+		case E_ITEM_DIAMOND_HOE:        return 1561;
+		case E_ITEM_DIAMOND_LEGGINGS:   return 496;
+		case E_ITEM_DIAMOND_PICKAXE:    return 1561;
+		case E_ITEM_DIAMOND_SHOVEL:     return 1561;
+		case E_ITEM_DIAMOND_SWORD:      return 1561;
+		case E_ITEM_ELYTRA:             return 432;
+		case E_ITEM_FLINT_AND_STEEL:    return 64;
+		case E_ITEM_FISHING_ROD:        return 65;
+		case E_ITEM_GOLD_AXE:           return 32;
+		case E_ITEM_GOLD_BOOTS:         return 92;
+		case E_ITEM_GOLD_CHESTPLATE:    return 113;
+		case E_ITEM_GOLD_HELMET:        return 78;
+		case E_ITEM_GOLD_HOE:           return 32;
+		case E_ITEM_GOLD_LEGGINGS:      return 106;
+		case E_ITEM_GOLD_PICKAXE:       return 32;
+		case E_ITEM_GOLD_SHOVEL:        return 32;
+		case E_ITEM_GOLD_SWORD:         return 32;
+		case E_ITEM_IRON_AXE:           return 250;
+		case E_ITEM_IRON_BOOTS:         return 196;
+		case E_ITEM_IRON_CHESTPLATE:    return 241;
+		case E_ITEM_IRON_HELMET:        return 166;
+		case E_ITEM_IRON_HOE:           return 250;
+		case E_ITEM_IRON_LEGGINGS:      return 226;
+		case E_ITEM_IRON_PICKAXE:       return 250;
+		case E_ITEM_IRON_SHOVEL:        return 250;
+		case E_ITEM_IRON_SWORD:         return 250;
+		case E_ITEM_LEATHER_BOOTS:      return 66;
+		case E_ITEM_LEATHER_CAP:        return 55;
+		case E_ITEM_LEATHER_PANTS:      return 76;
+		case E_ITEM_LEATHER_TUNIC:      return 81;
+		case E_ITEM_SHEARS:             return 250;
+		case E_ITEM_STONE_AXE:          return 131;
+		case E_ITEM_STONE_HOE:          return 131;
+		case E_ITEM_STONE_PICKAXE:      return 131;
+		case E_ITEM_STONE_SHOVEL:       return 131;
+		case E_ITEM_STONE_SWORD:        return 131;
+		case E_ITEM_WOODEN_AXE:         return 59;
+		case E_ITEM_WOODEN_HOE:         return 59;
+		case E_ITEM_WOODEN_PICKAXE:     return 59;
+		case E_ITEM_WOODEN_SHOVEL:      return 59;
+		case E_ITEM_WOODEN_SWORD:       return 59;
 
-		default: return 0;
+		default:                        return 0;
 	}
 }
 
@@ -292,9 +292,15 @@ void cItem::FromJson(const Json::Value & a_Value)
 		int red = a_Value.get("Color_Red", -1).asInt();
 		int green = a_Value.get("Color_Green", -1).asInt();
 		int blue = a_Value.get("Color_Blue", -1).asInt();
-		if ((red > -1) && (red < static_cast<int>(cColor::COLOR_LIMIT)) && (green > -1) && (green < static_cast<int>(cColor::COLOR_LIMIT)) && (blue > -1) && (blue < static_cast<int>(cColor::COLOR_LIMIT)))
+		if ((red > -1) && (red < static_cast<int>(cColor::COLOR_LIMIT)) && (green > -1) &&
+			(green < static_cast<int>(cColor::COLOR_LIMIT)) && (blue > -1) &&
+			(blue < static_cast<int>(cColor::COLOR_LIMIT)))
 		{
-			m_ItemColor.SetColor(static_cast<unsigned char>(red), static_cast<unsigned char>(green), static_cast<unsigned char>(blue));
+			m_ItemColor.SetColor(
+				static_cast<unsigned char>(red),
+				static_cast<unsigned char>(green),
+				static_cast<unsigned char>(blue)
+			);
 		}
 		else if ((red != -1) || (blue != -1) || (green != -1))
 		{
@@ -321,14 +327,9 @@ void cItem::FromJson(const Json::Value & a_Value)
 
 bool cItem::IsEnchantable(short a_ItemType, bool a_FromBook)
 {
-	if (
-		ItemCategory::IsAxe(a_ItemType) ||
-		ItemCategory::IsSword(a_ItemType) ||
-		ItemCategory::IsShovel(a_ItemType) ||
-		ItemCategory::IsPickaxe(a_ItemType) ||
-		(a_FromBook && ItemCategory::IsHoe(a_ItemType)) ||
-		ItemCategory::IsArmor(a_ItemType)
-	)
+	if (ItemCategory::IsAxe(a_ItemType) || ItemCategory::IsSword(a_ItemType) || ItemCategory::IsShovel(a_ItemType) ||
+		ItemCategory::IsPickaxe(a_ItemType) || (a_FromBook && ItemCategory::IsHoe(a_ItemType)) ||
+		ItemCategory::IsArmor(a_ItemType))
 	{
 		return true;
 	}
@@ -365,60 +366,60 @@ unsigned cItem::GetEnchantability()
 		case E_ITEM_WOODEN_PICKAXE:
 		case E_ITEM_WOODEN_SHOVEL:
 		case E_ITEM_WOODEN_AXE:
-		case E_ITEM_WOODEN_HOE: return 15;
+		case E_ITEM_WOODEN_HOE:         return 15;
 
 		case E_ITEM_LEATHER_CAP:
 		case E_ITEM_LEATHER_TUNIC:
 		case E_ITEM_LEATHER_PANTS:
-		case E_ITEM_LEATHER_BOOTS: return 15;
+		case E_ITEM_LEATHER_BOOTS:      return 15;
 
 		case E_ITEM_STONE_SWORD:
 		case E_ITEM_STONE_PICKAXE:
 		case E_ITEM_STONE_SHOVEL:
 		case E_ITEM_STONE_AXE:
-		case E_ITEM_STONE_HOE: return 5;
+		case E_ITEM_STONE_HOE:          return 5;
 
 		case E_ITEM_IRON_HELMET:
 		case E_ITEM_IRON_CHESTPLATE:
 		case E_ITEM_IRON_LEGGINGS:
-		case E_ITEM_IRON_BOOTS: return 9;
+		case E_ITEM_IRON_BOOTS:         return 9;
 
 		case E_ITEM_IRON_SWORD:
 		case E_ITEM_IRON_PICKAXE:
 		case E_ITEM_IRON_SHOVEL:
 		case E_ITEM_IRON_AXE:
-		case E_ITEM_IRON_HOE: return 14;
+		case E_ITEM_IRON_HOE:           return 14;
 
 		case E_ITEM_CHAIN_HELMET:
 		case E_ITEM_CHAIN_CHESTPLATE:
 		case E_ITEM_CHAIN_LEGGINGS:
-		case E_ITEM_CHAIN_BOOTS: return 12;
+		case E_ITEM_CHAIN_BOOTS:        return 12;
 
 		case E_ITEM_DIAMOND_HELMET:
 		case E_ITEM_DIAMOND_CHESTPLATE:
 		case E_ITEM_DIAMOND_LEGGINGS:
-		case E_ITEM_DIAMOND_BOOTS: return 10;
+		case E_ITEM_DIAMOND_BOOTS:      return 10;
 
 		case E_ITEM_DIAMOND_SWORD:
 		case E_ITEM_DIAMOND_PICKAXE:
 		case E_ITEM_DIAMOND_SHOVEL:
 		case E_ITEM_DIAMOND_AXE:
-		case E_ITEM_DIAMOND_HOE: return 10;
+		case E_ITEM_DIAMOND_HOE:        return 10;
 
 		case E_ITEM_GOLD_HELMET:
 		case E_ITEM_GOLD_CHESTPLATE:
 		case E_ITEM_GOLD_LEGGINGS:
-		case E_ITEM_GOLD_BOOTS: return 25;
+		case E_ITEM_GOLD_BOOTS:         return 25;
 
 		case E_ITEM_GOLD_SWORD:
 		case E_ITEM_GOLD_PICKAXE:
 		case E_ITEM_GOLD_SHOVEL:
 		case E_ITEM_GOLD_AXE:
-		case E_ITEM_GOLD_HOE: return 22;
+		case E_ITEM_GOLD_HOE:           return 22;
 
 		case E_ITEM_FISHING_ROD:
 		case E_ITEM_BOW:
-		case E_ITEM_BOOK: return 1;
+		case E_ITEM_BOOK:               return 1;
 	}
 
 	return 0;
@@ -441,7 +442,8 @@ bool cItem::EnchantByXPLevels(unsigned a_NumXPLevels, MTRand & a_Random)
 		return false;
 	}
 
-	const auto ModifiedEnchantmentLevel = a_NumXPLevels + a_Random.RandInt(Enchantability / 4) + a_Random.RandInt(Enchantability / 4) + 1;
+	const auto ModifiedEnchantmentLevel =
+		a_NumXPLevels + a_Random.RandInt(Enchantability / 4) + a_Random.RandInt(Enchantability / 4) + 1;
 	const auto RandomBonus = 1.0F + (a_Random.RandReal() + a_Random.RandReal() - 1.0F) * 0.15F;
 	const auto FinalEnchantmentLevel = static_cast<unsigned>(ModifiedEnchantmentLevel * RandomBonus + 0.5F);
 
@@ -554,8 +556,7 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 	// as of July 2017 (Minecraft 1.12).
 
 	// Hand tool enchantments
-	static const std::set<int> SwordEnchantments =
-	{
+	static const std::set<int> SwordEnchantments = {
 		cEnchantments::enchBaneOfArthropods,
 		cEnchantments::enchFireAspect,
 		cEnchantments::enchKnockback,
@@ -564,8 +565,7 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 		cEnchantments::enchSmite,
 		cEnchantments::enchUnbreaking
 	};
-	static const std::set<int> AxeEnchantments =
-	{
+	static const std::set<int> AxeEnchantments = {
 		cEnchantments::enchBaneOfArthropods,
 		cEnchantments::enchEfficiency,
 		cEnchantments::enchFortune,
@@ -574,34 +574,17 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 		cEnchantments::enchSmite,
 		cEnchantments::enchUnbreaking
 	};
-	static const std::set<int> ToolEnchantments =
-	{
+	static const std::set<int> ToolEnchantments = {
 		cEnchantments::enchEfficiency,
 		cEnchantments::enchFortune,
 		cEnchantments::enchSilkTouch,
 		cEnchantments::enchUnbreaking
 	};
-	static const std::set<int> ShearEnchantments =
-	{
-		cEnchantments::enchEfficiency,
-		cEnchantments::enchUnbreaking
-	};
+	static const std::set<int> ShearEnchantments = {cEnchantments::enchEfficiency, cEnchantments::enchUnbreaking};
 	static const std::set<int> BowEnchantments =
-	{
-		cEnchantments::enchFlame,
-		cEnchantments::enchInfinity,
-		cEnchantments::enchPower,
-		cEnchantments::enchPunch
-	};
-	static const std::set<int> FishingEnchantments =
-	{
-		cEnchantments::enchLuckOfTheSea,
-		cEnchantments::enchLure
-	};
-	static const std::set<int> MiscEnchantments =
-	{
-		cEnchantments::enchUnbreaking
-	};
+		{cEnchantments::enchFlame, cEnchantments::enchInfinity, cEnchantments::enchPower, cEnchantments::enchPunch};
+	static const std::set<int> FishingEnchantments = {cEnchantments::enchLuckOfTheSea, cEnchantments::enchLure};
+	static const std::set<int> MiscEnchantments = {cEnchantments::enchUnbreaking};
 
 	if (ItemCategory::IsSword(m_ItemType))
 	{
@@ -627,14 +610,14 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 	{
 		return FishingEnchantments.count(a_EnchantmentID) > 0;
 	}
-	if (ItemCategory::IsHoe(m_ItemType) || (m_ItemType == E_ITEM_FLINT_AND_STEEL) || (m_ItemType == E_ITEM_CARROT_ON_STICK) || (m_ItemType == E_ITEM_SHIELD))
+	if (ItemCategory::IsHoe(m_ItemType) || (m_ItemType == E_ITEM_FLINT_AND_STEEL) ||
+		(m_ItemType == E_ITEM_CARROT_ON_STICK) || (m_ItemType == E_ITEM_SHIELD))
 	{
 		return MiscEnchantments.count(a_EnchantmentID) > 0;
 	}
 
 	// Armor enchantments
-	static const std::set<int> ArmorEnchantments =
-	{
+	static const std::set<int> ArmorEnchantments = {
 		cEnchantments::enchBlastProtection,
 		cEnchantments::enchFireProtection,
 		cEnchantments::enchProjectileProtection,
@@ -642,13 +625,8 @@ bool cItem::CanHaveEnchantment(int a_EnchantmentID)
 		cEnchantments::enchThorns,
 		cEnchantments::enchUnbreaking
 	};
-	static const std::set<int> HatOnlyEnchantments =
-	{
-		cEnchantments::enchAquaAffinity,
-		cEnchantments::enchRespiration
-	};
-	static const std::set<int> BootOnlyEnchantments =
-	{
+	static const std::set<int> HatOnlyEnchantments = {cEnchantments::enchAquaAffinity, cEnchantments::enchRespiration};
+	static const std::set<int> BootOnlyEnchantments = {
 		cEnchantments::enchDepthStrider,
 		cEnchantments::enchFeatherFalling
 	};
@@ -716,7 +694,11 @@ cItem * cItems::Get(int a_Idx)
 {
 	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
 	{
-		LOGWARNING("cItems: Attempt to get an out-of-bounds item at index %d; there are currently %zu items. Returning a nil.", a_Idx, size());
+		LOGWARNING(
+			"cItems: Attempt to get an out-of-bounds item at index %d; there are currently %zu items. Returning a nil.",
+			a_Idx,
+			size()
+		);
 		return nullptr;
 	}
 	return &at(static_cast<size_t>(a_Idx));
@@ -730,7 +712,11 @@ void cItems::Set(int a_Idx, const cItem & a_Item)
 {
 	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
 	{
-		LOGWARNING("cItems: Attempt to set an item at an out-of-bounds index %d; there are currently %zu items. Not setting.", a_Idx, size());
+		LOGWARNING(
+			"cItems: Attempt to set an item at an out-of-bounds index %d; there are currently %zu items. Not setting.",
+			a_Idx,
+			size()
+		);
 		return;
 	}
 	at(static_cast<size_t>(a_Idx)) = a_Item;
@@ -744,7 +730,11 @@ void cItems::Delete(int a_Idx)
 {
 	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
 	{
-		LOGWARNING("cItems: Attempt to delete an item at an out-of-bounds index %d; there are currently %zu items. Ignoring.", a_Idx, size());
+		LOGWARNING(
+			"cItems: Attempt to delete an item at an out-of-bounds index %d; there are currently %zu items. Ignoring.",
+			a_Idx,
+			size()
+		);
 		return;
 	}
 	erase(begin() + a_Idx);
@@ -758,7 +748,11 @@ void cItems::Set(int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDama
 {
 	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
 	{
-		LOGWARNING("cItems: Attempt to set an item at an out-of-bounds index %d; there are currently %zu items. Not setting.", a_Idx, size());
+		LOGWARNING(
+			"cItems: Attempt to set an item at an out-of-bounds index %d; there are currently %zu items. Not setting.",
+			a_Idx,
+			size()
+		);
 		return;
 	}
 	at(static_cast<size_t>(a_Idx)) = cItem(a_ItemType, a_ItemCount, a_ItemDamage);

@@ -13,7 +13,7 @@
 
 
 
-cLuaTCPLink::cLuaTCPLink(cLuaState::cTableRefPtr && a_Callbacks):
+cLuaTCPLink::cLuaTCPLink(cLuaState::cTableRefPtr && a_Callbacks) :
 	m_Callbacks(std::move(a_Callbacks))
 {
 }
@@ -22,9 +22,8 @@ cLuaTCPLink::cLuaTCPLink(cLuaState::cTableRefPtr && a_Callbacks):
 
 
 
-cLuaTCPLink::cLuaTCPLink(cLuaState::cTableRefPtr && a_Callbacks, cLuaServerHandleWPtr a_ServerHandle):
-	m_Callbacks(std::move(a_Callbacks)),
-	m_Server(std::move(a_ServerHandle))
+cLuaTCPLink::cLuaTCPLink(cLuaState::cTableRefPtr && a_Callbacks, cLuaServerHandleWPtr a_ServerHandle) :
+	m_Callbacks(std::move(a_Callbacks)), m_Server(std::move(a_ServerHandle))
 {
 }
 
@@ -223,19 +222,19 @@ AString cLuaTCPLink::StartTLSServer(
 	auto link = m_Link;
 	if (link != nullptr)
 	{
-	// Create the peer cert:
-	auto OwnCert = std::make_shared<cX509Cert>();
-	int res = OwnCert->Parse(a_OwnCertData.data(), a_OwnCertData.size());
-	if (res != 0)
-	{
-		return fmt::format(FMT_STRING("Cannot parse server certificate: -0x{:x}"), -res);
-	}
-	auto OwnPrivKey = std::make_shared<cCryptoKey>();
-	res = OwnPrivKey->ParsePrivate(a_OwnPrivKeyData.data(), a_OwnPrivKeyData.size(), a_OwnPrivKeyPassword);
-	if (res != 0)
-	{
-		return fmt::format(FMT_STRING("Cannot parse server private key: -0x{:x}"), -res);
-	}
+		// Create the peer cert:
+		auto OwnCert = std::make_shared<cX509Cert>();
+		int res = OwnCert->Parse(a_OwnCertData.data(), a_OwnCertData.size());
+		if (res != 0)
+		{
+			return fmt::format(FMT_STRING("Cannot parse server certificate: -0x{:x}"), -res);
+		}
+		auto OwnPrivKey = std::make_shared<cCryptoKey>();
+		res = OwnPrivKey->ParsePrivate(a_OwnPrivKeyData.data(), a_OwnPrivKeyData.size(), a_OwnPrivKeyPassword);
+		if (res != 0)
+		{
+			return fmt::format(FMT_STRING("Cannot parse server private key: -0x{:x}"), -res);
+		}
 
 		return link->StartTLSServer(OwnCert, OwnPrivKey, a_StartTLSData);
 	}
@@ -263,7 +262,7 @@ void cLuaTCPLink::Terminated(void)
 
 	// If the link is still open, close it:
 	{
-		auto link= m_Link;
+		auto link = m_Link;
 		if (link != nullptr)
 		{
 			link->Close();
@@ -337,8 +336,3 @@ void cLuaTCPLink::OnRemoteClosed(void)
 	// Terminate all processing on the link:
 	Terminated();
 }
-
-
-
-
-

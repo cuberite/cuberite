@@ -1,8 +1,9 @@
 // PiecePool.cpp
 
 // Implements the cPiecePool class representing a pool of cPieces - "parts" of a structure, used in piece-generators
-// A cPiece is a single static part of a structure that can rotate around the Y axis, has connectors to other pieces and knows how to draw itself into the world.
-// The pool manages the pieces and provides lists of its pieces matching criteria, and provides relative weights for the random distribution of pieces.
+// A cPiece is a single static part of a structure that can rotate around the Y axis, has connectors to other pieces and
+// knows how to draw itself into the world. The pool manages the pieces and provides lists of its pieces matching
+// criteria, and provides relative weights for the random distribution of pieces.
 
 #include "Globals.h"
 #include "PiecePool.h"
@@ -104,7 +105,13 @@ Vector3i cPiece::RotatePos(const Vector3i & a_Pos, int a_NumCCWRotations) const
 
 
 
-cPiece::cConnector cPiece::RotateMoveConnector(const cConnector & a_Connector, int a_NumCCWRotations, int a_MoveX, int a_MoveY, int a_MoveZ) const
+cPiece::cConnector cPiece::RotateMoveConnector(
+	const cConnector & a_Connector,
+	int a_NumCCWRotations,
+	int a_MoveX,
+	int a_MoveY,
+	int a_MoveZ
+) const
 {
 	cPiece::cConnector res(a_Connector);
 
@@ -184,9 +191,7 @@ cCuboid cPiece::RotateMoveHitBox(int a_NumCCWRotations, int a_MoveX, int a_MoveY
 // cPiece::cConnector:
 
 cPiece::cConnector::cConnector(int a_X, int a_Y, int a_Z, int a_Type, eDirection a_Direction) :
-	m_Pos(a_X, a_Y, a_Z),
-	m_Type(a_Type),
-	m_Direction(a_Direction)
+	m_Pos(a_X, a_Y, a_Z), m_Type(a_Type), m_Direction(a_Direction)
 {
 }
 
@@ -195,9 +200,7 @@ cPiece::cConnector::cConnector(int a_X, int a_Y, int a_Z, int a_Type, eDirection
 
 
 cPiece::cConnector::cConnector(const Vector3i & a_Pos, int a_Type, eDirection a_Direction) :
-	m_Pos(a_Pos),
-	m_Type(a_Type),
-	m_Direction(a_Direction)
+	m_Pos(a_Pos), m_Type(a_Type), m_Direction(a_Direction)
 {
 }
 
@@ -209,20 +212,20 @@ Vector3i cPiece::cConnector::AddDirection(const Vector3i & a_Pos, eDirection a_D
 {
 	switch (a_Direction)
 	{
-		case dirXM:       return Vector3i(a_Pos.x - 1, a_Pos.y,     a_Pos.z);
-		case dirXP:       return Vector3i(a_Pos.x + 1, a_Pos.y,     a_Pos.z);
-		case dirYM:       return Vector3i(a_Pos.x,     a_Pos.y - 1, a_Pos.z);
-		case dirYP:       return Vector3i(a_Pos.x,     a_Pos.y + 1, a_Pos.z);
-		case dirZM:       return Vector3i(a_Pos.x,     a_Pos.y,     a_Pos.z - 1);
-		case dirZP:       return Vector3i(a_Pos.x,     a_Pos.y,     a_Pos.z + 1);
-		case dirYM_XM_ZM: return Vector3i(a_Pos.x,     a_Pos.y - 1, a_Pos.z);
-		case dirYM_XM_ZP: return Vector3i(a_Pos.x,     a_Pos.y - 1, a_Pos.z);
-		case dirYM_XP_ZM: return Vector3i(a_Pos.x,     a_Pos.y - 1, a_Pos.z);
-		case dirYM_XP_ZP: return Vector3i(a_Pos.x,     a_Pos.y - 1, a_Pos.z);
-		case dirYP_XM_ZM: return Vector3i(a_Pos.x,     a_Pos.y + 1, a_Pos.z);
-		case dirYP_XM_ZP: return Vector3i(a_Pos.x,     a_Pos.y + 1, a_Pos.z);
-		case dirYP_XP_ZM: return Vector3i(a_Pos.x,     a_Pos.y + 1, a_Pos.z);
-		case dirYP_XP_ZP: return Vector3i(a_Pos.x,     a_Pos.y + 1, a_Pos.z);
+		case dirXM:       return Vector3i(a_Pos.x - 1, a_Pos.y, a_Pos.z);
+		case dirXP:       return Vector3i(a_Pos.x + 1, a_Pos.y, a_Pos.z);
+		case dirYM:       return Vector3i(a_Pos.x, a_Pos.y - 1, a_Pos.z);
+		case dirYP:       return Vector3i(a_Pos.x, a_Pos.y + 1, a_Pos.z);
+		case dirZM:       return Vector3i(a_Pos.x, a_Pos.y, a_Pos.z - 1);
+		case dirZP:       return Vector3i(a_Pos.x, a_Pos.y, a_Pos.z + 1);
+		case dirYM_XM_ZM: return Vector3i(a_Pos.x, a_Pos.y - 1, a_Pos.z);
+		case dirYM_XM_ZP: return Vector3i(a_Pos.x, a_Pos.y - 1, a_Pos.z);
+		case dirYM_XP_ZM: return Vector3i(a_Pos.x, a_Pos.y - 1, a_Pos.z);
+		case dirYM_XP_ZP: return Vector3i(a_Pos.x, a_Pos.y - 1, a_Pos.z);
+		case dirYP_XM_ZM: return Vector3i(a_Pos.x, a_Pos.y + 1, a_Pos.z);
+		case dirYP_XM_ZP: return Vector3i(a_Pos.x, a_Pos.y + 1, a_Pos.z);
+		case dirYP_XP_ZM: return Vector3i(a_Pos.x, a_Pos.y + 1, a_Pos.z);
+		case dirYP_XP_ZP: return Vector3i(a_Pos.x, a_Pos.y + 1, a_Pos.z);
 	}
 	UNREACHABLE("Unsupported connector direction");
 }
@@ -372,23 +375,23 @@ int cPiece::cConnector::GetNumCCWRotationsToFit(eDirection a_FixedDir, eDirectio
 	// Translation of direction - direction -> number of CCW rotations needed:
 	// You need DirectionRotationTable[fixed][rot] CCW turns to connect rot to fixed (they are opposite)
 	// -1 if not possible
-	static const int DirectionRotationTable[14][14] =
-	{
-		/*              YM, YP, ZM, ZP, XM, XP, YM-XM-ZM, YM-XM-ZP, YM-XP-ZM, YM-XP-ZP, YP-XM-ZM, YP-XM-ZP, YP-XP-ZM, YP-XP-ZP */
-		/* YM */       { 0, -1, -1, -1, -1, -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1},
-		/* YP */       {-1, -1, -1, -1, -1, -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1},
-		/* ZM */       {-1, -1,  2,  0,  1,  3,       -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1},
-		/* ZP */       {-1, -1,  0,  2,  3,  1,       -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1},
-		/* XM */       {-1, -1,  3,  1,  2,  0,       -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1},
-		/* XP */       {-1, -1,  1,  3,  0,  2,       -1,       -1,       -1,       -1,       -1,       -1,       -1,       -1},
-		/* YM-XM-ZM */ {-1, -1, -1, -1, -1, -1,       -1,       -1,       -1,       -1,        0,        3,        1,        2},
-		/* YM-XM-ZP */ {-1, -1, -1, -1, -1, -1,       -1,       -1,       -1,       -1,        1,        0,        2,        3},
-		/* YM-XP-ZM */ {-1, -1, -1, -1, -1, -1,       -1,       -1,       -1,       -1,        3,        2,        0,        1},
-		/* YM-XP-ZP */ {-1, -1, -1, -1, -1, -1,       -1,       -1,       -1,       -1,        2,        1,        3,        0},
-		/* YP-XM-ZM */ {-1, -1, -1, -1, -1, -1,        0,        3,        1,        2,       -1,       -1,       -1,       -1},
-		/* YP-XM-ZP */ {-1, -1, -1, -1, -1, -1,        1,        0,        2,        3,       -1,       -1,       -1,       -1},
-		/* YP-XP-ZM */ {-1, -1, -1, -1, -1, -1,        3,        2,        0,        1,       -1,       -1,       -1,       -1},
-		/* YP-XP-ZP */ {-1, -1, -1, -1, -1, -1,        2,        1,        3,        0,       -1,       -1,       -1,       -1},
+	static const int DirectionRotationTable[14][14] = {
+		/*              YM, YP, ZM, ZP, XM, XP, YM-XM-ZM, YM-XM-ZP, YM-XP-ZM, YM-XP-ZP, YP-XM-ZM, YP-XM-ZP, YP-XP-ZM,
+		   YP-XP-ZP */
+		/* YM */ {0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+		/* YP */ {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
+		/* ZM */ {-1, -1, 2, 0, 1, 3, -1, -1, -1, -1, -1, -1, -1, -1},
+		/* ZP */ {-1, -1, 0, 2, 3, 1, -1, -1, -1, -1, -1, -1, -1, -1},
+		/* XM */ {-1, -1, 3, 1, 2, 0, -1, -1, -1, -1, -1, -1, -1, -1},
+		/* XP */ {-1, -1, 1, 3, 0, 2, -1, -1, -1, -1, -1, -1, -1, -1},
+		/* YM-XM-ZM */ {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, 3, 1, 2},
+		/* YM-XM-ZP */ {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, 0, 2, 3},
+		/* YM-XP-ZM */ {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 3, 2, 0, 1},
+		/* YM-XP-ZP */ {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 2, 1, 3, 0},
+		/* YP-XM-ZM */ {-1, -1, -1, -1, -1, -1, 0, 3, 1, 2, -1, -1, -1, -1},
+		/* YP-XM-ZP */ {-1, -1, -1, -1, -1, -1, 1, 0, 2, 3, -1, -1, -1, -1},
+		/* YP-XP-ZM */ {-1, -1, -1, -1, -1, -1, 3, 2, 0, 1, -1, -1, -1, -1},
+		/* YP-XP-ZP */ {-1, -1, -1, -1, -1, -1, 2, 1, 3, 0, -1, -1, -1, -1},
 	};
 
 	return DirectionRotationTable[a_FixedDir][a_RotatingDir];
@@ -417,8 +420,7 @@ bool cPiece::cConnector::StringToDirection(const AString & a_Value, eDirection &
 	{
 		const char * m_String;
 		eDirection m_Value;
-	} StringDirections[] =
-	{
+	} StringDirections[] = {
 		{"x-", dirXM},
 		{"x+", dirXP},
 		{"y-", dirYM},
@@ -465,7 +467,12 @@ bool cPiece::cConnector::StringToDirection(const AString & a_Value, eDirection &
 ////////////////////////////////////////////////////////////////////////////////
 // cPlacedPiece:
 
-cPlacedPiece::cPlacedPiece(const cPlacedPiece * a_Parent, const cPiece & a_Piece, const Vector3i & a_Coords, int a_NumCCWRotations) :
+cPlacedPiece::cPlacedPiece(
+	const cPlacedPiece * a_Parent,
+	const cPiece & a_Piece,
+	const Vector3i & a_Coords,
+	int a_NumCCWRotations
+) :
 	m_Parent(a_Parent),
 	m_Piece(&a_Piece),
 	m_Coords(a_Coords),
@@ -506,7 +513,3 @@ void cPlacedPiece::MoveToGroundBy(int a_OffsetY)
 	m_Coords.y += a_OffsetY;
 	m_HasBeenMovedToGround = true;
 }
-
-
-
-

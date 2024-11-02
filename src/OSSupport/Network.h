@@ -14,7 +14,7 @@
 
 
 #ifdef __FreeBSD__
-	#include <netinet/in.h>
+#include <netinet/in.h>
 #endif
 
 
@@ -42,15 +42,16 @@ class cTCPLink
 {
 	friend class cNetwork;
 
-public:
+  public:
 	class cCallbacks
 	{
-	public:
+	  public:
 		// Force a virtual destructor for all descendants:
 		virtual ~cCallbacks() {}
 
 		/** Called when the cTCPLink for the connection is created.
-		The callback may store the cTCPLink instance for later use, but it should remove it in OnError(), OnRemoteClosed() or right after Close(). */
+		The callback may store the cTCPLink instance for later use, but it should remove it in OnError(),
+		OnRemoteClosed() or right after Close(). */
 		virtual void OnLinkCreated(cTCPLinkPtr a_Link) = 0;
 
 		/** Called when there's data incoming from the remote peer. */
@@ -62,7 +63,8 @@ public:
 		virtual void OnRemoteClosed(void) = 0;
 
 		/** Called when the TLS handshake has been completed and communication can continue regularly.
-		Has an empty default implementation, so that link callback descendants don't need to specify TLS handlers when they don't use TLS at all. */
+		Has an empty default implementation, so that link callback descendants don't need to specify TLS handlers when
+		they don't use TLS at all. */
 		virtual void OnTlsHandshakeCompleted(void) {}
 
 		/** Called when an error is detected on the connection. */
@@ -75,15 +77,14 @@ public:
 	virtual ~cTCPLink() {}
 
 	/** Queues the specified data for sending to the remote peer.
-	Returns true on success, false on failure. Note that this success or failure only reports the queue status, not the actual data delivery. */
+	Returns true on success, false on failure. Note that this success or failure only reports the queue status, not the
+	actual data delivery. */
 	virtual bool Send(const void * a_Data, size_t a_Length) = 0;
 
 	/** Queues the specified data for sending to the remote peer.
-	Returns true on success, false on failure. Note that this success or failure only reports the queue status, not the actual data delivery. */
-	bool Send(const AString & a_Data)
-	{
-		return Send(a_Data.data(), a_Data.size());
-	}
+	Returns true on success, false on failure. Note that this success or failure only reports the queue status, not the
+	actual data delivery. */
+	bool Send(const AString & a_Data) { return Send(a_Data.data(), a_Data.size()); }
 
 	/** Returns the IP address of the local endpoint of the connection. */
 	virtual AString GetLocalIP(void) const = 0;
@@ -134,13 +135,13 @@ public:
 	/** Returns the callbacks that are used. */
 	cCallbacksPtr GetCallbacks(void) const { return m_Callbacks; }
 
-protected:
+  protected:
 	/** Callbacks to be used for the various situations. */
 	cCallbacksPtr m_Callbacks;
 
 
 	/** Creates a new link, with the specified callbacks. */
-	cTCPLink(cCallbacksPtr a_Callbacks):
+	cTCPLink(cCallbacksPtr a_Callbacks) :
 		m_Callbacks(std::move(a_Callbacks))
 	{
 	}
@@ -154,8 +155,8 @@ protected:
 class cServerHandle
 {
 	friend class cNetwork;
-public:
 
+  public:
 	// Force a virtual destructor for all descendants:
 	virtual ~cServerHandle() {}
 
@@ -174,11 +175,11 @@ public:
 /** Interface that provides methods available on UDP communication endpoints. */
 class cUDPEndpoint
 {
-public:
+  public:
 	/** Interface for the callbacks for events that can happen on the endpoint. */
 	class cCallbacks
 	{
-	public:
+	  public:
 		// Force a virtual destructor in all descendants:
 		virtual ~cCallbacks() {}
 
@@ -186,7 +187,12 @@ public:
 		virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) = 0;
 
 		/** Called when there is an incoming datagram from a remote host. */
-		virtual void OnReceivedData(const char * a_Data, size_t a_Size, const AString & a_RemoteHost, UInt16 a_RemotePort) = 0;
+		virtual void OnReceivedData(
+			const char * a_Data,
+			size_t a_Size,
+			const AString & a_RemoteHost,
+			UInt16 a_RemotePort
+		) = 0;
 	};
 
 
@@ -211,13 +217,13 @@ public:
 	Without this call, sending to a broadcast address using Send() may fail. */
 	virtual void EnableBroadcasts(void) = 0;
 
-protected:
+  protected:
 	/** The callbacks used for various events on the endpoint. */
 	cCallbacks & m_Callbacks;
 
 
 	/** Creates a new instance of an endpoint, with the specified callbacks. */
-	cUDPEndpoint(cCallbacks & a_Callbacks):
+	cUDPEndpoint(cCallbacks & a_Callbacks) :
 		m_Callbacks(a_Callbacks)
 	{
 	}
@@ -231,11 +237,11 @@ typedef std::shared_ptr<cUDPEndpoint> cUDPEndpointPtr;
 
 class cNetwork
 {
-public:
+  public:
 	/** Callbacks used for connecting to other servers as a client. */
 	class cConnectCallbacks
 	{
-	public:
+	  public:
 		// Force a virtual destructor for all descendants:
 		virtual ~cConnectCallbacks() {}
 
@@ -252,7 +258,7 @@ public:
 	/** Callbacks used when listening for incoming connections as a server. */
 	class cListenCallbacks
 	{
-	public:
+	  public:
 		// Force a virtual destructor for all descendants:
 		virtual ~cListenCallbacks() {}
 
@@ -260,7 +266,10 @@ public:
 		Returns the link callbacks that the server should use for the newly created link.
 		If a nullptr is returned, the connection is dropped immediately;
 		otherwise a new cTCPLink instance is created and OnAccepted() is called. */
-		virtual cTCPLink::cCallbacksPtr OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort) = 0;
+		virtual cTCPLink::cCallbacksPtr OnIncomingConnection(
+			const AString & a_RemoteIPAddress,
+			UInt16 a_RemotePort
+		) = 0;
 
 		/** Called when the TCP server created with Listen() creates a new link for an incoming connection.
 		Provides the newly created Link that can be used for communication.
@@ -276,7 +285,7 @@ public:
 	/** Callbacks used when resolving names to IPs. */
 	class cResolveNameCallbacks
 	{
-	public:
+	  public:
 		// Force a virtual destructor for all descendants:
 		virtual ~cResolveNameCallbacks() {}
 
@@ -310,11 +319,10 @@ public:
 
 
 	/** Queues a TCP connection to be made to the specified host.
-	Calls one the connection callbacks (success, error) when the connection is successfully established, or upon failure.
-	The a_LinkCallbacks is passed to the newly created cTCPLink.
-	Returns true if queueing was successful, false on failure to queue.
-	Note that the return value doesn't report the success of the actual connection; the connection is established asynchronously in the background.
-	Implemented in TCPLinkImpl.cpp. */
+	Calls one the connection callbacks (success, error) when the connection is successfully established, or upon
+	failure. The a_LinkCallbacks is passed to the newly created cTCPLink. Returns true if queueing was successful, false
+	on failure to queue. Note that the return value doesn't report the success of the actual connection; the connection
+	is established asynchronously in the background. Implemented in TCPLinkImpl.cpp. */
 	static bool Connect(
 		const AString & a_Host,
 		UInt16 a_Port,
@@ -328,32 +336,23 @@ public:
 	A cTCPLink with the specified link callbacks is created for each connection.
 	Returns a cServerHandle that can be used to query the operation status and close the server.
 	Implemented in ServerHandleImpl.cpp. */
-	static cServerHandlePtr Listen(
-		UInt16 a_Port,
-		cListenCallbacksPtr a_ListenCallbacks
-	);
+	static cServerHandlePtr Listen(UInt16 a_Port, cListenCallbacksPtr a_ListenCallbacks);
 
 
 	/** Queues a DNS query to resolve the specified hostname to IP address.
 	Calls one of the callbacks when the resolving succeeds, or when it fails.
 	Returns true if queueing was successful, false if not.
-	Note that the return value doesn't report the success of the actual lookup; the lookup happens asynchronously on the background.
-	Implemented in HostnameLookup.cpp. */
-	static bool HostnameToIP(
-		const AString & a_Hostname,
-		cResolveNameCallbacksPtr a_Callbacks
-	);
+	Note that the return value doesn't report the success of the actual lookup; the lookup happens asynchronously on the
+	background. Implemented in HostnameLookup.cpp. */
+	static bool HostnameToIP(const AString & a_Hostname, cResolveNameCallbacksPtr a_Callbacks);
 
 
 	/** Queues a DNS query to resolve the specified IP address to a hostname.
 	Calls one of the callbacks when the resolving succeeds, or when it fails.
 	Returns true if queueing was successful, false if not.
-	Note that the return value doesn't report the success of the actual lookup; the lookup happens asynchronously on the background.
-	Implemented in IPLookup.cpp. */
-	static bool IPToHostName(
-		const AString & a_IP,
-		cResolveNameCallbacksPtr a_Callbacks
-	);
+	Note that the return value doesn't report the success of the actual lookup; the lookup happens asynchronously on the
+	background. Implemented in IPLookup.cpp. */
+	static bool IPToHostName(const AString & a_IP, cResolveNameCallbacksPtr a_Callbacks);
 
 	/** Opens up an UDP endpoint for sending and receiving UDP datagrams on the specified port.
 	If a_Port is 0, the OS is free to assign any port number it likes to the endpoint.
@@ -363,6 +362,3 @@ public:
 	/** Returns all local IP addresses for network interfaces currently available. */
 	static AStringVector EnumLocalIPAddresses(void);
 };
-
-
-

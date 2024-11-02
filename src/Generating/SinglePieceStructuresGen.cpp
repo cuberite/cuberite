@@ -9,17 +9,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cSinglePieceStructuresGen::cGen
 
-class cSinglePieceStructuresGen::cGen :
-	public cGridStructGen
+class cSinglePieceStructuresGen::cGen : public cGridStructGen
 {
 	using Super = cGridStructGen;
-public:
-	cGen(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel, const AString & a_Name):
-		Super(a_Seed),
-		m_BiomeGen(a_BiomeGen),
-		m_HeightGen(a_HeightGen),
-		m_SeaLevel(a_SeaLevel),
-		m_Name(a_Name)
+
+  public:
+	cGen(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel, const AString & a_Name) :
+		Super(a_Seed), m_BiomeGen(a_BiomeGen), m_HeightGen(a_HeightGen), m_SeaLevel(a_SeaLevel), m_Name(a_Name)
 	{
 	}
 
@@ -38,8 +34,11 @@ public:
 		}
 		if (NoCaseCompare(m_PiecePool.GetIntendedUse(), "SinglePieceStructures") != 0)
 		{
-			LOGWARNING("SinglePieceStructures generator: File %s is intended for use in \"%s\", rather than single piece structures. Loading the file, but the generator may behave unexpectedly.",
-				a_FileName.c_str(), m_PiecePool.GetIntendedUse().c_str()
+			LOGWARNING(
+				"SinglePieceStructures generator: File %s is intended for use in \"%s\", rather than single piece "
+				"structures. Loading the file, but the generator may behave unexpectedly.",
+				a_FileName.c_str(),
+				m_PiecePool.GetIntendedUse().c_str()
 			);
 		}
 		m_PiecePool.AssignGens(m_Seed, m_BiomeGen, m_HeightGen, m_SeaLevel);
@@ -71,7 +70,14 @@ public:
 		}
 		cPlacedPieces OutPiece;
 		OutPiece.push_back(GetPiece(a_OriginX, a_OriginZ));
-		return std::make_shared<cPrefabStructure>(a_GridX, a_GridZ, a_OriginX, a_OriginZ, std::move(OutPiece), m_HeightGen);
+		return std::make_shared<cPrefabStructure>(
+			a_GridX,
+			a_GridZ,
+			a_OriginX,
+			a_OriginZ,
+			std::move(OutPiece),
+			m_HeightGen
+		);
 	}
 
 
@@ -126,15 +132,17 @@ public:
 		int BlockY = StartingPiece->GetStartingPieceHeight(a_BlockX, a_BlockZ);
 		ASSERT(BlockY >= 0);  // The vertical strategy should have been provided and should give valid coords
 
-		cPlacedPiece * Piece = new cPlacedPiece(nullptr, *StartingPiece, Vector3i(a_BlockX, BlockY, a_BlockZ), Rotation);
+		cPlacedPiece * Piece =
+			new cPlacedPiece(nullptr, *StartingPiece, Vector3i(a_BlockX, BlockY, a_BlockZ), Rotation);
 		return cPlacedPiecePtr(Piece);
 	}
 
-protected:
+  protected:
 	/** The underlying biome generator that defines whether the structure is created or not */
 	cBiomeGen & m_BiomeGen;
 
-	/** The underlying height generator, used to position the prefabs crossing chunk borders if they are set to FitGround. */
+	/** The underlying height generator, used to position the prefabs crossing chunk borders if they are set to
+	 * FitGround. */
 	cTerrainHeightGen & m_HeightGen;
 
 	/** The world's sea level, if available. Used for some cVerticalStrategy descendants. */
@@ -160,13 +168,19 @@ cSinglePieceStructuresGen::cSinglePieceStructuresGen(int a_Seed) :
 
 
 
-bool cSinglePieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaLevel, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen)
+bool cSinglePieceStructuresGen::Initialize(
+	const AString & a_Prefabs,
+	int a_SeaLevel,
+	cBiomeGen & a_BiomeGen,
+	cTerrainHeightGen & a_HeightGen
+)
 {
 	// Load each piecepool:
 	auto Structures = StringSplitAndTrim(a_Prefabs, "|");
-	for (const auto & S: Structures)
+	for (const auto & S : Structures)
 	{
-		auto FileName = fmt::format(FMT_STRING("Prefabs{0}SinglePieceStructures{0}{1}.cubeset"), cFile::PathSeparator(), S);
+		auto FileName =
+			fmt::format(FMT_STRING("Prefabs{0}SinglePieceStructures{0}{1}.cubeset"), cFile::PathSeparator(), S);
 		if (!cFile::IsFile(FileName))
 		{
 			FileName.append(".gz");
@@ -187,7 +201,10 @@ bool cSinglePieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaL
 	// Report a warning if no generators available:
 	if (m_Gens.empty())
 	{
-		LOGWARNING("The PieceStructures generator was asked to generate \"%s\", but none of the prefabs are valid.", a_Prefabs);
+		LOGWARNING(
+			"The PieceStructures generator was asked to generate \"%s\", but none of the prefabs are valid.",
+			a_Prefabs
+		);
 		return false;
 	}
 	return true;
@@ -199,7 +216,7 @@ bool cSinglePieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaL
 
 void cSinglePieceStructuresGen::GenFinish(cChunkDesc & a_Chunk)
 {
-	for (auto & Gen: m_Gens)
+	for (auto & Gen : m_Gens)
 	{
 		Gen->GenFinish(a_Chunk);
 	}

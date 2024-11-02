@@ -7,14 +7,12 @@
 
 
 
-class cItemPoisonousPotatoHandler final:
-	public cItemFoodHandler
+class cItemPoisonousPotatoHandler final : public cItemFoodHandler
 {
 	using Super = cItemFoodHandler;
 
-public:
-
-	constexpr cItemPoisonousPotatoHandler(int a_ItemType):
+  public:
+	constexpr cItemPoisonousPotatoHandler(int a_ItemType) :
 		Super(a_ItemType, FoodInfo(2, 1.2))
 	{
 	}
@@ -33,5 +31,4 @@ public:
 
 		return true;
 	}
-
 };

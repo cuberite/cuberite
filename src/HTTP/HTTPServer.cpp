@@ -1,7 +1,8 @@
 
 // HTTPServer.cpp
 
-// Implements the cHTTPServer class representing a HTTP webserver that uses cListenThread and cSocketThreads for processing
+// Implements the cHTTPServer class representing a HTTP webserver that uses cListenThread and cSocketThreads for
+// processing
 
 #include "Globals.h"
 #include "HTTPServer.h"
@@ -17,8 +18,8 @@
 
 // Disable MSVC warnings:
 #if defined(_MSC_VER)
-	#pragma warning(push)
-	#pragma warning(disable:4355)  // 'this' : used in base member initializer list
+#pragma warning(push)
+#pragma warning(disable : 4355)  // 'this' : used in base member initializer list
 #endif
 
 
@@ -28,17 +29,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cHTTPServerListenCallbacks:
 
-class cHTTPServerListenCallbacks:
-	public cNetwork::cListenCallbacks
+class cHTTPServerListenCallbacks : public cNetwork::cListenCallbacks
 {
-public:
-	cHTTPServerListenCallbacks(cHTTPServer & a_HTTPServer, UInt16 a_Port):
-		m_HTTPServer(a_HTTPServer),
-		m_Port(a_Port)
+  public:
+	cHTTPServerListenCallbacks(cHTTPServer & a_HTTPServer, UInt16 a_Port) :
+		m_HTTPServer(a_HTTPServer), m_Port(a_Port)
 	{
 	}
 
-protected:
+  protected:
 	/** The HTTP server instance that we're attached to. */
 	cHTTPServer & m_HTTPServer;
 
@@ -46,7 +45,8 @@ protected:
 	UInt16 m_Port;
 
 	// cNetwork::cListenCallbacks overrides:
-	virtual cTCPLink::cCallbacksPtr OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort) override
+	virtual cTCPLink::cCallbacksPtr OnIncomingConnection(const AString & a_RemoteIPAddress, UInt16 a_RemotePort)
+		override
 	{
 		return m_HTTPServer.OnIncomingConnection(a_RemoteIPAddress, a_RemotePort);
 	}
@@ -86,7 +86,7 @@ bool cHTTPServer::Initialize(void)
 {
 	// Read the HTTPS cert + key:
 	AString CertFile = cFile::ReadWholeFile("webadmin/httpscert.crt");
-	AString KeyFile  = cFile::ReadWholeFile("webadmin/httpskey.pem");
+	AString KeyFile = cFile::ReadWholeFile("webadmin/httpskey.pem");
 	if (!CertFile.empty() && !KeyFile.empty())
 	{
 		auto Cert = std::make_shared<cX509Cert>();
@@ -118,7 +118,8 @@ bool cHTTPServer::Initialize(void)
 	if (m_SslConfig == nullptr)
 	{
 		LOGWARNING("WebServer: The server will run in unsecured HTTP mode.");
-		LOGINFO("Put a valid HTTPS certificate in file 'webadmin/httpscert.crt' and its corresponding private key to 'webadmin/httpskey.pem' (without any password) to enable HTTPS support");
+		LOGINFO("Put a valid HTTPS certificate in file 'webadmin/httpscert.crt' and its corresponding private key to "
+				"'webadmin/httpskey.pem' (without any password) to enable HTTPS support");
 	}
 	else
 	{
@@ -155,7 +156,7 @@ bool cHTTPServer::Start(cCallbacks & a_Callbacks, const AStringVector & a_Ports)
 
 	// Inform the admin about the ports opened:
 	AString reportPorts;
-	for (const auto & port: ports)
+	for (const auto & port : ports)
 	{
 		if (!reportPorts.empty())
 		{
@@ -214,7 +215,12 @@ void cHTTPServer::NewRequest(cHTTPServerConnection & a_Connection, cHTTPIncoming
 
 
 
-void cHTTPServer::RequestBody(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request, const void * a_Data, size_t a_Size)
+void cHTTPServer::RequestBody(
+	cHTTPServerConnection & a_Connection,
+	cHTTPIncomingRequest & a_Request,
+	const void * a_Data,
+	size_t a_Size
+)
 {
 	m_Callbacks->OnRequestBody(a_Connection, a_Request, static_cast<const char *>(a_Data), a_Size);
 }
@@ -227,7 +233,3 @@ void cHTTPServer::RequestFinished(cHTTPServerConnection & a_Connection, cHTTPInc
 {
 	m_Callbacks->OnRequestFinished(a_Connection, a_Request);
 }
-
-
-
-

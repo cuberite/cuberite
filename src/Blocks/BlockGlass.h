@@ -7,15 +7,12 @@
 
 
 
-class cBlockGlassHandler final :
-	public cBlockHandler
+class cBlockGlassHandler final : public cBlockHandler
 {
-public:
-
+  public:
 	using cBlockHandler::cBlockHandler;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Only drop self when mined with silk-touch:
@@ -35,8 +32,4 @@ private:
 		UNUSED(a_Meta);
 		return 0;
 	}
-} ;
-
-
-
-
+};

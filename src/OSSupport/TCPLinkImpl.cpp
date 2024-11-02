@@ -17,9 +17,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cTCPLinkImpl:
 
-cTCPLinkImpl::cTCPLinkImpl(const std::string & a_Host, cTCPLink::cCallbacksPtr a_LinkCallbacks):
+cTCPLinkImpl::cTCPLinkImpl(const std::string & a_Host, cTCPLink::cCallbacksPtr a_LinkCallbacks) :
 	Super(std::move(a_LinkCallbacks)),
-	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), -1, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE | BEV_OPT_DEFER_CALLBACKS | BEV_OPT_UNLOCK_CALLBACKS)),
+	m_BufferEvent(bufferevent_socket_new(
+		cNetworkSingleton::Get().GetEventBase(),
+		-1,
+		BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE | BEV_OPT_DEFER_CALLBACKS | BEV_OPT_UNLOCK_CALLBACKS
+	)),
 	m_LocalPort(0),
 	m_RemoteHost(a_Host),
 	m_RemotePort(0),
@@ -37,9 +41,13 @@ cTCPLinkImpl::cTCPLinkImpl(
 	cServerHandleImplPtr a_Server,
 	const sockaddr * a_Address,
 	socklen_t a_AddrLen
-):
+) :
 	Super(std::move(a_LinkCallbacks)),
-	m_BufferEvent(bufferevent_socket_new(cNetworkSingleton::Get().GetEventBase(), a_Socket, BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE | BEV_OPT_DEFER_CALLBACKS | BEV_OPT_UNLOCK_CALLBACKS)),
+	m_BufferEvent(bufferevent_socket_new(
+		cNetworkSingleton::Get().GetEventBase(),
+		a_Socket,
+		BEV_OPT_CLOSE_ON_FREE | BEV_OPT_THREADSAFE | BEV_OPT_DEFER_CALLBACKS | BEV_OPT_UNLOCK_CALLBACKS
+	)),
 	m_Server(std::move(a_Server)),
 	m_LocalPort(0),
 	m_RemotePort(0),
@@ -66,32 +74,34 @@ cTCPLinkImpl::~cTCPLinkImpl()
 
 
 
-cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTCPLink::cCallbacksPtr a_LinkCallbacks, cNetwork::cConnectCallbacksPtr a_ConnectCallbacks)
+cTCPLinkImplPtr cTCPLinkImpl::Connect(
+	const AString & a_Host,
+	UInt16 a_Port,
+	cTCPLink::cCallbacksPtr a_LinkCallbacks,
+	cNetwork::cConnectCallbacksPtr a_ConnectCallbacks
+)
 {
 	ASSERT(a_LinkCallbacks != nullptr);
 	ASSERT(a_ConnectCallbacks != nullptr);
 
 	// Create a new link:
-	cTCPLinkImplPtr res{new cTCPLinkImpl(a_Host, std::move(a_LinkCallbacks))};  // Cannot use std::make_shared here, constructor is not accessible
+	cTCPLinkImplPtr res {new cTCPLinkImpl(a_Host, std::move(a_LinkCallbacks))
+	};  // Cannot use std::make_shared here, constructor is not accessible
 	res->m_ConnectCallbacks = std::move(a_ConnectCallbacks);
 	cNetworkSingleton::Get().AddLink(res);
 	res->m_Callbacks->OnLinkCreated(res);
 	res->Enable(res);
 
 	// Callback to connect after performing lookup:
-	class cHostnameCallback :
-		public cNetwork::cResolveNameCallbacks
+	class cHostnameCallback : public cNetwork::cResolveNameCallbacks
 	{
 		cTCPLinkImplPtr m_Link;
 		UInt16 m_Port;
 		bool m_IsConnecting;
 
-	public:
-
-		cHostnameCallback(cTCPLinkImplPtr a_Link, UInt16 a_ConnectPort):
-			m_Link(std::move(a_Link)),
-			m_Port(a_ConnectPort),
-			m_IsConnecting(false)
+	  public:
+		cHostnameCallback(cTCPLinkImplPtr a_Link, UInt16 a_ConnectPort) :
+			m_Link(std::move(a_Link)), m_Port(a_ConnectPort), m_IsConnecting(false)
 		{
 		}
 
@@ -135,13 +145,9 @@ cTCPLinkImplPtr cTCPLinkImpl::Connect(const AString & a_Host, UInt16 a_Port, cTC
 		}
 
 		// Don't need to do anything for these
-		virtual void OnFinished() override
-		{
-		}
+		virtual void OnFinished() override {}
 
-		virtual void OnNameResolved(const AString & a_Name, const AString & a_IP) override
-		{
-		}
+		virtual void OnNameResolved(const AString & a_Name, const AString & a_IP) override {}
 	};
 
 	// Schedule the host query
@@ -242,11 +248,7 @@ void cTCPLinkImpl::Close(void)
 
 
 
-AString cTCPLinkImpl::StartTLSClient(
-	cX509CertPtr a_OwnCert,
-	cCryptoKeyPtr a_OwnPrivKey,
-	cX509CertPtr a_TrustedRootCAs
-)
+AString cTCPLinkImpl::StartTLSClient(cX509CertPtr a_OwnCert, cCryptoKeyPtr a_OwnPrivKey, cX509CertPtr a_TrustedRootCAs)
 {
 	// Check preconditions:
 	if (m_TlsContext != nullptr)
@@ -298,11 +300,7 @@ AString cTCPLinkImpl::StartTLSClient(
 
 
 
-AString cTCPLinkImpl::StartTLSServer(
-	cX509CertPtr a_OwnCert,
-	cCryptoKeyPtr a_OwnPrivKey,
-	const AString & a_StartTLSData
-)
+AString cTCPLinkImpl::StartTLSServer(cX509CertPtr a_OwnCert, cCryptoKeyPtr a_OwnPrivKey, const AString & a_StartTLSData)
 {
 	// Check preconditions:
 	if (m_TlsContext != nullptr)
@@ -529,11 +527,11 @@ void cTCPLinkImpl::UpdateRemoteAddress(void)
 
 void cTCPLinkImpl::DoActualShutdown(void)
 {
-	#ifdef _WIN32
-		shutdown(bufferevent_getfd(m_BufferEvent), SD_SEND);
-	#else
-		shutdown(bufferevent_getfd(m_BufferEvent), SHUT_WR);
-	#endif
+#ifdef _WIN32
+	shutdown(bufferevent_getfd(m_BufferEvent), SD_SEND);
+#else
+	shutdown(bufferevent_getfd(m_BufferEvent), SHUT_WR);
+#endif
 	bufferevent_disable(m_BufferEvent, EV_WRITE);
 }
 
@@ -563,7 +561,7 @@ void cTCPLinkImpl::ReceivedCleartextData(const char * a_Data, size_t a_Length)
 ////////////////////////////////////////////////////////////////////////////////
 // cTCPLinkImpl::cLinkTlsContext:
 
-cTCPLinkImpl::cLinkTlsContext::cLinkTlsContext(cTCPLinkImpl & a_Link):
+cTCPLinkImpl::cLinkTlsContext::cLinkTlsContext(cTCPLinkImpl & a_Link) :
 	m_Link(a_Link)
 {
 }
@@ -724,11 +722,7 @@ bool cNetwork::Connect(
 )
 {
 	// Add a connection request to the queue:
-	cTCPLinkImplPtr Conn = cTCPLinkImpl::Connect(a_Host, a_Port, std::move(a_LinkCallbacks), std::move(a_ConnectCallbacks));
+	cTCPLinkImplPtr Conn =
+		cTCPLinkImpl::Connect(a_Host, a_Port, std::move(a_LinkCallbacks), std::move(a_ConnectCallbacks));
 	return (Conn != nullptr);
 }
-
-
-
-
-

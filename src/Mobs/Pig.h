@@ -7,13 +7,11 @@
 
 
 
-class cPig:
-	public cPassiveMonster
+class cPig : public cPassiveMonster
 {
 	using Super = cPassiveMonster;
 
-public:
-
+  public:
 	cPig();
 
 	CLASS_PROTODEF(cPig)
@@ -25,19 +23,10 @@ public:
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
-	virtual void GetFollowedItems(cItems & a_Items) override
-	{
-		a_Items.Add(E_ITEM_CARROT);
-	}
+	virtual void GetFollowedItems(cItems & a_Items) override { a_Items.Add(E_ITEM_CARROT); }
 
 	bool IsSaddled(void) const { return m_bIsSaddled; }
 
-private:
-
+  private:
 	bool m_bIsSaddled;
-
-} ;
-
-
-
-
+};

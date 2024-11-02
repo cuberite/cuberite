@@ -10,14 +10,12 @@ class cWorldInterface;
 
 
 // tolua_begin
-class cLeashKnot :
-	public cHangingEntity
+class cLeashKnot : public cHangingEntity
 {
 	// tolua_end
 	using Super = cHangingEntity;
 
-public:  // tolua_export
-
+  public:  // tolua_export
 	CLASS_PROTODEF(cLeashKnot)
 
 	cLeashKnot(eBlockFace a_BlockFace, Vector3d a_Pos);
@@ -27,12 +25,13 @@ public:  // tolua_export
 
 	void SetShouldSelfDestroy() { m_ShouldSelfDestroy = true; }
 
-	/** Returns the leash knot entity representing the knot at the specified position. Returns nullptr if there's no knot. */
+	/** Returns the leash knot entity representing the knot at the specified position. Returns nullptr if there's no
+	 * knot. */
 	static cLeashKnot * FindKnotAtPos(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos);
 
-private:
-
-	/** When a fence is destroyed, the knot on it gets destroyed after a while. This flag turns on the countdown to self destroy. */
+  private:
+	/** When a fence is destroyed, the knot on it gets destroyed after a while. This flag turns on the countdown to self
+	 * destroy. */
 	bool m_ShouldSelfDestroy;
 	int m_TicksToSelfDestroy;
 
@@ -43,7 +42,3 @@ private:
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 };  // tolua_export
-
-
-
-

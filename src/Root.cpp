@@ -9,23 +9,23 @@
 
 // OS-specific headers:
 #if defined(_WIN32)
-	#include <psapi.h>
+#include <psapi.h>
 #elif defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
-	#include <signal.h>
-	#if defined(__linux__)
-		#include <fstream>
+#include <signal.h>
+#if defined(__linux__)
+#include <fstream>
 
-		#if !defined(__GLIBC__)
-			#include <sys/select.h>
-		#endif
-	#elif defined(__APPLE__)
-		#include <mach/mach.h>
-	#elif defined(__FreeBSD__)
-		#include <kvm.h>
-		#include <fcntl.h>
-		#include <sys/sysctl.h>
-		#include <sys/user.h>
-	#endif
+#if !defined(__GLIBC__)
+#include <sys/select.h>
+#endif
+#elif defined(__APPLE__)
+#include <mach/mach.h>
+#elif defined(__FreeBSD__)
+#include <kvm.h>
+#include <fcntl.h>
+#include <sys/sysctl.h>
+#include <sys/user.h>
+#endif
 #endif
 
 #include "Server.h"
@@ -56,16 +56,16 @@
 
 
 #ifdef __clang__
-	#pragma clang diagnostic push
-	#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wglobal-constructors"
 #endif
 
-decltype(cRoot::s_Root)      cRoot::s_Root;
+decltype(cRoot::s_Root) cRoot::s_Root;
 decltype(cRoot::s_NextState) cRoot::s_NextState;
 decltype(cRoot::s_StopEvent) cRoot::s_StopEvent;
 
 #ifdef __clang__
-	#pragma clang diagnostic pop
+#pragma clang diagnostic pop
 #endif
 
 
@@ -106,7 +106,7 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	auto consoleAttachment = cLogger::GetInstance().AttachListener(std::move(consoleLogListener));
 
 	cLogger::cAttachment fileAttachment;
-	if (!a_OverridesRepo.HasValue("Server","DisableLogFile"))
+	if (!a_OverridesRepo.HasValue("Server", "DisableLogFile"))
 	{
 		auto fileLogListenerRet = MakeFileListener();
 		if (!fileLogListenerRet.first)
@@ -134,9 +134,9 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOG("Reading server config...");
 
 	m_SettingsFilename = "settings.ini";
-	if (a_OverridesRepo.HasValue("Server","ConfigFile"))
+	if (a_OverridesRepo.HasValue("Server", "ConfigFile"))
 	{
-		m_SettingsFilename = a_OverridesRepo.GetValue("Server","ConfigFile");
+		m_SettingsFilename = a_OverridesRepo.GetValue("Server", "ConfigFile");
 	}
 
 	auto IniFile = std::make_unique<cIniFile>();
@@ -146,19 +146,26 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	{
 		LOGWARN("Regenerating settings.ini, all settings will be reset");
 		IniFile->AddHeaderComment(" This is the main server configuration");
-		IniFile->AddHeaderComment(" Most of the settings here can be configured using the webadmin interface, if enabled in webadmin.ini");
+		IniFile->AddHeaderComment(
+			" Most of the settings here can be configured using the webadmin interface, if enabled in webadmin.ini"
+		);
 	}
 
 	auto settingsRepo = std::make_unique<cOverridesSettingsRepository>(std::move(IniFile), a_OverridesRepo);
 
 	LOG("Starting server...");
 
-	// cClientHandle::FASTBREAK_PERCENTAGE = settingsRepo->GetValueSetI("AntiCheat", "FastBreakPercentage", 97) / 100.0f;
-	cClientHandle::FASTBREAK_PERCENTAGE = 0;  // AntiCheat disabled due to bugs. We will enabled it once they are fixed. See #3506.
+	// cClientHandle::FASTBREAK_PERCENTAGE = settingsRepo->GetValueSetI("AntiCheat", "FastBreakPercentage", 97) /
+	// 100.0f;
+	cClientHandle::FASTBREAK_PERCENTAGE =
+		0;  // AntiCheat disabled due to bugs. We will enabled it once they are fixed. See #3506.
 
 	m_MojangAPI = new cMojangAPI;
 	bool ShouldAuthenticate = settingsRepo->GetValueSetB("Authentication", "Authenticate", true);
-	m_MojangAPI->Start(*settingsRepo, ShouldAuthenticate);  // Mojang API needs to be started before plugins, so that plugins may use it for DB upgrades on server init
+	m_MojangAPI->Start(
+		*settingsRepo,
+		ShouldAuthenticate
+	);  // Mojang API needs to be started before plugins, so that plugins may use it for DB upgrades on server init
 	if (!m_Server->InitServer(*settingsRepo, ShouldAuthenticate))
 	{
 		settingsRepo->Flush();
@@ -173,7 +180,7 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	m_RankManager->Initialize(*m_MojangAPI);
 	m_CraftingRecipes = new cCraftingRecipes();
 	m_RecipeMapper.reset(new cRecipeMapper());
-	m_FurnaceRecipe   = new cFurnaceRecipe();
+	m_FurnaceRecipe = new cFurnaceRecipe();
 	m_BrewingRecipes.reset(new cBrewingRecipes());
 
 	LOGD("Loading worlds...");
@@ -206,7 +213,11 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	{
 		m_WebAdmin->Start();
 
-		LOG("Startup complete, took %ldms!", static_cast<long int>(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - BeginTime).count()));
+		LOG("Startup complete, took %ldms!",
+			static_cast<long int>(
+				std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - BeginTime)
+					.count()
+			));
 
 		// Save the current time
 		m_StartTime = std::chrono::steady_clock::now();
@@ -221,7 +232,8 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 		m_Server->Shutdown();
 	}  // if (m_Server->Start()
 
-	delete m_MojangAPI; m_MojangAPI = nullptr;
+	delete m_MojangAPI;
+	m_MojangAPI = nullptr;
 
 	LOGD("Shutting down deadlock detector...");
 	dd.Stop();
@@ -233,18 +245,24 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	m_Authenticator.Stop();
 
 	LOGD("Freeing MonsterConfig...");
-	delete m_MonsterConfig; m_MonsterConfig = nullptr;
-	delete m_WebAdmin; m_WebAdmin = nullptr;
+	delete m_MonsterConfig;
+	m_MonsterConfig = nullptr;
+	delete m_WebAdmin;
+	m_WebAdmin = nullptr;
 
 	LOGD("Unloading recipes...");
-	delete m_FurnaceRecipe;   m_FurnaceRecipe = nullptr;
-	delete m_CraftingRecipes; m_CraftingRecipes = nullptr;
+	delete m_FurnaceRecipe;
+	m_FurnaceRecipe = nullptr;
+	delete m_CraftingRecipes;
+	m_CraftingRecipes = nullptr;
 
 	LOGD("Stopping plugin manager...");
-	delete m_PluginManager; m_PluginManager = nullptr;
+	delete m_PluginManager;
+	m_PluginManager = nullptr;
 
 	LOG("Cleaning up...");
-	delete m_Server; m_Server = nullptr;
+	delete m_Server;
+	m_Server = nullptr;
 
 	LOG("Shutdown successful!");
 	LOG("--- Stopped Log ---");
@@ -294,10 +312,12 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 		a_Settings.AddValue("WorldPaths", "world_nether", "world_nether");
 		a_Settings.AddValue("WorldPaths", "world_the_end", "world_the_end");
 
-		const AStringVector WorldNames{ "world", "world_nether", "world_the_end" };
+		const AStringVector WorldNames {"world", "world_nether", "world_the_end"};
 		m_pDefaultWorld = &m_WorldsByName.try_emplace("world", "world", "world", a_dd, WorldNames).first->second;
-		m_WorldsByName.try_emplace("world_nether", "world_nether", "world_nether", a_dd, WorldNames, dimNether, "world");
-		m_WorldsByName.try_emplace("world_the_end", "world_the_end", "world_the_end", a_dd, WorldNames, dimEnd, "world");
+		m_WorldsByName
+			.try_emplace("world_nether", "world_nether", "world_nether", a_dd, WorldNames, dimNether, "world");
+		m_WorldsByName
+			.try_emplace("world_the_end", "world_the_end", "world_the_end", a_dd, WorldNames, dimEnd, "world");
 		return;
 	}
 
@@ -312,7 +332,9 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 	// Get the default world
 	AString DefaultWorldName = a_Settings.GetValueSet("Worlds", "DefaultWorld", "world");
 	AString DefaultWorldPath = a_Settings.GetValueSet("WorldPaths", DefaultWorldName, DefaultWorldName);
-	m_pDefaultWorld = &m_WorldsByName.try_emplace(DefaultWorldName, DefaultWorldName, DefaultWorldPath, a_dd, WorldNames).first->second;
+	m_pDefaultWorld =
+		&m_WorldsByName.try_emplace(DefaultWorldName, DefaultWorldName, DefaultWorldPath, a_dd, WorldNames)
+			 .first->second;
 
 	// Then load the other worlds
 	if (Worlds.size() <= 0)
@@ -320,8 +342,8 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 		return;
 	}
 
-	/* Here are the world creation rules. Note that these only apply for a world which is in settings.ini but has no world.ini file.
-	If an ini file is present, it overrides the world linkages and the dimension type in cWorld::start()
+	/* Here are the world creation rules. Note that these only apply for a world which is in settings.ini but has no
+	world.ini file. If an ini file is present, it overrides the world linkages and the dimension type in cWorld::start()
 	The creation rules are as follows:
 
 	- If a world exists in settings.ini but has no world.ini, then:
@@ -367,7 +389,8 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 		AString LinkTo;
 
 		// if the world is called x_nether
-		if ((LowercaseName.size() > NetherAppend.size()) && (LowercaseName.substr(LowercaseName.size() - NetherAppend.size()) == NetherAppend))
+		if ((LowercaseName.size() > NetherAppend.size()) &&
+			(LowercaseName.substr(LowercaseName.size() - NetherAppend.size()) == NetherAppend))
 		{
 			// The world is called x_nether, see if a world called x exists. If yes, choose it as the linked world,
 			// otherwise, choose the default world as the linked world.
@@ -381,7 +404,8 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 			Dimension = dimNether;
 		}
 		// if the world is called x_the_end
-		else if ((LowercaseName.size() > EndAppend1.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend1.size()) == EndAppend1))
+		else if ((LowercaseName.size() > EndAppend1.size()) &&
+				 (LowercaseName.substr(LowercaseName.size() - EndAppend1.size()) == EndAppend1))
 		{
 			// The world is called x_the_end, see if a world called x exists. If yes, choose it as the linked world,
 			// otherwise, choose the default world as the linked world.
@@ -395,7 +419,8 @@ void cRoot::LoadWorlds(cDeadlockDetect & a_dd, cSettingsRepositoryInterface & a_
 			Dimension = dimEnd;
 		}
 		// if the world is called x_end
-		else if ((LowercaseName.size() > EndAppend2.size()) && (LowercaseName.substr(LowercaseName.size() - EndAppend2.size()) == EndAppend2))
+		else if ((LowercaseName.size() > EndAppend2.size()) &&
+				 (LowercaseName.substr(LowercaseName.size() - EndAppend2.size()) == EndAppend2))
 		{
 			// The world is called x_end, see if a world called x exists. If yes, choose it as the linked world,
 			// otherwise, choose the default world as the linked world.
@@ -698,15 +723,14 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 {
 	class cCallback
 	{
-		size_t        m_BestRating;
-		size_t        m_NameLength;
+		size_t m_BestRating;
+		size_t m_NameLength;
 		const AString m_PlayerName;
 
-	public:
-
-		bool operator () (cPlayer & a_Player)
+	  public:
+		bool operator()(cPlayer & a_Player)
 		{
-			size_t Rating = RateCompareString (m_PlayerName, a_Player.GetName());
+			size_t Rating = RateCompareString(m_PlayerName, a_Player.GetName());
 			if ((Rating > 0) && (Rating >= m_BestRating))
 			{
 				m_BestMatch = a_Player.GetName();
@@ -720,17 +744,18 @@ bool cRoot::FindAndDoWithPlayer(const AString & a_PlayerName, cPlayerListCallbac
 			return (Rating == m_NameLength);  // Perfect match
 		}
 
-		cCallback (const AString & a_CBPlayerName) :
+		cCallback(const AString & a_CBPlayerName) :
 			m_BestRating(0),
 			m_NameLength(a_CBPlayerName.length()),
 			m_PlayerName(a_CBPlayerName),
 			m_BestMatch(),
 			m_NumMatches(0)
-		{}
+		{
+		}
 
 		AString m_BestMatch;
-		unsigned  m_NumMatches;
-	} Callback (a_PlayerName);
+		unsigned m_NumMatches;
+	} Callback(a_PlayerName);
 	ForEachPlayer(Callback);
 
 	if (Callback.m_NumMatches == 1)
@@ -787,50 +812,48 @@ AString cRoot::GetProtocolVersionTextFromInt(int a_ProtocolVersion)
 
 int cRoot::GetVirtualRAMUsage(void)
 {
-	#ifdef _WIN32
-		PROCESS_MEMORY_COUNTERS_EX pmc;
-		if (GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *)&pmc, sizeof(pmc)))
-		{
-			return (int)(pmc.PrivateUsage / 1024);
-		}
+#ifdef _WIN32
+	PROCESS_MEMORY_COUNTERS_EX pmc;
+	if (GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS *) &pmc, sizeof(pmc)))
+	{
+		return (int) (pmc.PrivateUsage / 1024);
+	}
+	return -1;
+#elif defined(__linux__)
+	// Code adapted from
+	// https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+	std::ifstream StatFile("/proc/self/status");
+	if (!StatFile.good())
+	{
 		return -1;
-	#elif defined(__linux__)
-		// Code adapted from https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
-		std::ifstream StatFile("/proc/self/status");
-		if (!StatFile.good())
+	}
+	while (StatFile.good())
+	{
+		AString Line;
+		std::getline(StatFile, Line);
+		if (strncmp(Line.c_str(), "VmSize:", 7) == 0)
 		{
-			return -1;
+			int res = atoi(Line.c_str() + 8);
+			return (res == 0) ? -1 : res;  // If parsing failed, return -1
 		}
-		while (StatFile.good())
-		{
-			AString Line;
-			std::getline(StatFile, Line);
-			if (strncmp(Line.c_str(), "VmSize:", 7) == 0)
-			{
-				int res = atoi(Line.c_str() + 8);
-				return (res == 0) ? -1 : res;  // If parsing failed, return -1
-			}
-		}
-		return -1;
-	#elif defined (__APPLE__)
-		// Code adapted from https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
-		struct task_basic_info t_info;
-		mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
+	}
+	return -1;
+#elif defined(__APPLE__)
+	// Code adapted from
+	// https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+	struct task_basic_info t_info;
+	mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
 
-		if (KERN_SUCCESS == task_info(
-			mach_task_self(),
-			TASK_BASIC_INFO,
-			reinterpret_cast<task_info_t>(&t_info),
-			&t_info_count
-		))
-		{
-			return static_cast<int>(t_info.virtual_size / 1024);
-		}
-		return -1;
-	#else
-		LOGINFO("%s: Unknown platform, cannot query memory usage", __FUNCTION__);
-		return -1;
-	#endif
+	if (KERN_SUCCESS ==
+		task_info(mach_task_self(), TASK_BASIC_INFO, reinterpret_cast<task_info_t>(&t_info), &t_info_count))
+	{
+		return static_cast<int>(t_info.virtual_size / 1024);
+	}
+	return -1;
+#else
+	LOGINFO("%s: Unknown platform, cannot query memory usage", __FUNCTION__);
+	return -1;
+#endif
 }
 
 
@@ -839,81 +862,85 @@ int cRoot::GetVirtualRAMUsage(void)
 
 int cRoot::GetPhysicalRAMUsage(void)
 {
-	#ifdef _WIN32
-		PROCESS_MEMORY_COUNTERS pmc;
-		if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc)))
-		{
-			return (int)(pmc.WorkingSetSize / 1024);
-		}
+#ifdef _WIN32
+	PROCESS_MEMORY_COUNTERS pmc;
+	if (GetProcessMemoryInfo(GetCurrentProcess(), &pmc, sizeof(pmc)))
+	{
+		return (int) (pmc.WorkingSetSize / 1024);
+	}
+	return -1;
+#elif defined(__linux__)
+	// Code adapted from
+	// https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+	std::ifstream StatFile("/proc/self/status");
+	if (!StatFile.good())
+	{
 		return -1;
-	#elif defined(__linux__)
-		// Code adapted from https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
-		std::ifstream StatFile("/proc/self/status");
-		if (!StatFile.good())
+	}
+	while (StatFile.good())
+	{
+		AString Line;
+		std::getline(StatFile, Line);
+		if (strncmp(Line.c_str(), "VmRSS:", 6) == 0)
 		{
-			return -1;
+			int res = atoi(Line.c_str() + 7);
+			return (res == 0) ? -1 : res;  // If parsing failed, return -1
 		}
-		while (StatFile.good())
-		{
-			AString Line;
-			std::getline(StatFile, Line);
-			if (strncmp(Line.c_str(), "VmRSS:", 6) == 0)
-			{
-				int res = atoi(Line.c_str() + 7);
-				return (res == 0) ? -1 : res;  // If parsing failed, return -1
-			}
-		}
-		return -1;
-	#elif defined (__APPLE__)
-		// Code adapted from https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
-		struct task_basic_info t_info;
-		mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
+	}
+	return -1;
+#elif defined(__APPLE__)
+	// Code adapted from
+	// https://stackoverflow.com/questions/63166/how-to-determine-cpu-and-memory-consumption-from-inside-a-process
+	struct task_basic_info t_info;
+	mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_COUNT;
 
-		if (KERN_SUCCESS == task_info(
-			mach_task_self(),
-			TASK_BASIC_INFO,
-			reinterpret_cast<task_info_t>(&t_info),
-			&t_info_count
-		))
-		{
-			return static_cast<int>(t_info.resident_size / 1024);
-		}
-		return -1;
-	#elif defined (__FreeBSD__)
-		/*
-		struct rusage self_usage;
-		int status = getrusage(RUSAGE_SELF, &self_usage);
-		if (!status)
-		{
-			return static_cast<int>(self_usage.ru_maxrss);
-		}
-		return -1;
-		*/
-		// Good to watch: https://www.youtube.com/watch?v=Os5cK0H8EOA - getrusage.
-		// Unfortunately, it only gives peak memory usage a.k.a max resident set size
-		// So it is better to use FreeBSD kvm function to get the size of resident pages.
+	if (KERN_SUCCESS ==
+		task_info(mach_task_self(), TASK_BASIC_INFO, reinterpret_cast<task_info_t>(&t_info), &t_info_count))
+	{
+		return static_cast<int>(t_info.resident_size / 1024);
+	}
+	return -1;
+#elif defined(__FreeBSD__)
+	/*
+	struct rusage self_usage;
+	int status = getrusage(RUSAGE_SELF, &self_usage);
+	if (!status)
+	{
+		return static_cast<int>(self_usage.ru_maxrss);
+	}
+	return -1;
+	*/
+	// Good to watch: https://www.youtube.com/watch?v=Os5cK0H8EOA - getrusage.
+	// Unfortunately, it only gives peak memory usage a.k.a max resident set size
+	// So it is better to use FreeBSD kvm function to get the size of resident pages.
 
-		static kvm_t* kd = NULL;
+	static kvm_t * kd = NULL;
 
-		if (kd == NULL)
+	if (kd == NULL)
+	{
+		kd = kvm_open(
+			NULL,
+			"/dev/null",
+			NULL,
+			O_RDONLY,
+			"kvm_open"
+		);  // returns a descriptor used to access kernel virtual memory
+	}
+	if (kd != NULL)
+	{
+		int pc = 0;  // number of processes found
+		struct kinfo_proc * kp;
+		kp = kvm_getprocs(kd, KERN_PROC_PID, getpid(), &pc);
+		if ((kp != NULL) && (pc >= 1))
 		{
-			kd = kvm_open(NULL, "/dev/null", NULL, O_RDONLY, "kvm_open");  // returns a descriptor used to access kernel virtual memory
+			return static_cast<int>(kp->ki_rssize * getpagesize() / 1024);
 		}
-		if (kd != NULL)
-		{
-			int pc = 0;  // number of processes found
-			struct kinfo_proc* kp;
-			kp = kvm_getprocs(kd, KERN_PROC_PID, getpid(), &pc);
-			if ((kp != NULL) && (pc >= 1))
-			{
-				return static_cast<int>(kp->ki_rssize * getpagesize() / 1024);
-			}
-		}
-		return -1;
-	#else
-		LOGINFO("%s: Unknown platform, cannot query memory usage", __FUNCTION__);
-		return -1;
-	#endif
+	}
+	return -1;
+#else
+	LOGINFO("%s: Unknown platform, cannot query memory usage", __FUNCTION__);
+	return -1;
+#endif
 }
 
 
@@ -945,7 +972,11 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in storage load queue: {}"), NumInLoadQueue));
 		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in storage save queue: {}"), NumInSaveQueue));
 		int Mem = NumValid * static_cast<int>(sizeof(cChunk));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Memory used by chunks: {} KiB ({} MiB)"), (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024)));
+		a_Output.OutLn(fmt::format(
+			FMT_STRING("  Memory used by chunks: {} KiB ({} MiB)"),
+			(Mem + 1023) / 1024,
+			(Mem + 1024 * 1024 - 1) / (1024 * 1024)
+		));
 		SumNumValid += NumValid;
 		SumNumDirty += NumDirty;
 		SumNumInLighting += NumInLighting;
@@ -957,13 +988,37 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 	a_Output.OutLn(fmt::format(FMT_STRING("  Num dirty chunks: {}"), SumNumDirty));
 	a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in lighting queue: {}"), SumNumInLighting));
 	a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in generator queue: {}"), SumNumInGenerator));
-	a_Output.OutLn(fmt::format(FMT_STRING("  Memory used by chunks: {} KiB ({} MiB)"), (SumMem + 1023) / 1024, (SumMem + 1024 * 1024 - 1) / (1024 * 1024)));
+	a_Output.OutLn(fmt::format(
+		FMT_STRING("  Memory used by chunks: {} KiB ({} MiB)"),
+		(SumMem + 1023) / 1024,
+		(SumMem + 1024 * 1024 - 1) / (1024 * 1024)
+	));
 	a_Output.OutLn("Per-chunk memory size breakdown:");
-	a_Output.OutLn(fmt::format(FMT_STRING("  block types:    {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::BlockTypes), (sizeof(cChunkDef::BlockTypes) + 1023) / 1024));
-	a_Output.OutLn(fmt::format(FMT_STRING("  block metadata: {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::BlockNibbles), (sizeof(cChunkDef::BlockNibbles) + 1023) / 1024));
-	a_Output.OutLn(fmt::format(FMT_STRING("  block lighting: {:06} bytes ({:3} KiB)"), 2 * sizeof(cChunkDef::BlockNibbles), (2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024));
-	a_Output.OutLn(fmt::format(FMT_STRING("  heightmap:      {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024));
-	a_Output.OutLn(fmt::format(FMT_STRING("  biomemap:       {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024));
+	a_Output.OutLn(fmt::format(
+		FMT_STRING("  block types:    {:06} bytes ({:3} KiB)"),
+		sizeof(cChunkDef::BlockTypes),
+		(sizeof(cChunkDef::BlockTypes) + 1023) / 1024
+	));
+	a_Output.OutLn(fmt::format(
+		FMT_STRING("  block metadata: {:06} bytes ({:3} KiB)"),
+		sizeof(cChunkDef::BlockNibbles),
+		(sizeof(cChunkDef::BlockNibbles) + 1023) / 1024
+	));
+	a_Output.OutLn(fmt::format(
+		FMT_STRING("  block lighting: {:06} bytes ({:3} KiB)"),
+		2 * sizeof(cChunkDef::BlockNibbles),
+		(2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024
+	));
+	a_Output.OutLn(fmt::format(
+		FMT_STRING("  heightmap:      {:06} bytes ({:3} KiB)"),
+		sizeof(cChunkDef::HeightMap),
+		(sizeof(cChunkDef::HeightMap) + 1023) / 1024
+	));
+	a_Output.OutLn(fmt::format(
+		FMT_STRING("  biomemap:       {:06} bytes ({:3} KiB)"),
+		sizeof(cChunkDef::BiomeMap),
+		(sizeof(cChunkDef::BiomeMap) + 1023) / 1024
+	));
 }
 
 
@@ -983,7 +1038,8 @@ int cRoot::GetFurnaceFuelBurnTime(const cItem & a_Fuel)
 AStringVector cRoot::GetPlayerTabCompletionMultiWorld(const AString & a_Text)
 {
 	AStringVector Results;
-	ForEachWorld([&](cWorld & a_World)
+	ForEachWorld(
+		[&](cWorld & a_World)
 		{
 			a_World.TabCompleteUserName(a_Text, Results);
 			return false;
@@ -1010,7 +1066,7 @@ void cRoot::HandleInput()
 	while (s_NextState == NextState::Run)
 	{
 #ifndef _WIN32
-		timeval Timeout{ 0, 0 };
+		timeval Timeout {0, 0};
 		Timeout.tv_usec = 100 * 1000;  // 100 msec
 
 		fd_set ReadSet;
@@ -1072,19 +1128,9 @@ void cRoot::TransitionNextState(NextState a_NextState)
 
 #ifdef WIN32
 	DWORD Length;
-	INPUT_RECORD Record
-	{
+	INPUT_RECORD Record {
 		KEY_EVENT,
-		{
-			{
-				TRUE,
-				1,
-				VK_RETURN,
-				static_cast<WORD>(MapVirtualKey(VK_RETURN, MAPVK_VK_TO_VSC)),
-				{ { VK_RETURN } },
-				0
-			}
-		}
+		{{TRUE, 1, VK_RETURN, static_cast<WORD>(MapVirtualKey(VK_RETURN, MAPVK_VK_TO_VSC)), {{VK_RETURN}}, 0}}
 	};
 
 	// Can't kill the input thread since it breaks cin (getline doesn't block / receive input on restart)

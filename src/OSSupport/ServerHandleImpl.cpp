@@ -17,15 +17,15 @@
 
 namespace ServerHandleImplHelper
 {
-	static bool IsValidSocket(evutil_socket_t a_Socket)
-	{
+static bool IsValidSocket(evutil_socket_t a_Socket)
+{
 #ifdef _WIN32
-		return (a_Socket != INVALID_SOCKET);
+	return (a_Socket != INVALID_SOCKET);
 #else  // _WIN32
-		return (a_Socket >= 0);
+	return (a_Socket >= 0);
 #endif  // else _WIN32
-	}
 }
+}  // namespace ServerHandleImplHelper
 
 
 
@@ -34,7 +34,7 @@ namespace ServerHandleImplHelper
 ////////////////////////////////////////////////////////////////////////////////
 // cServerHandleImpl:
 
-cServerHandleImpl::cServerHandleImpl(cNetwork::cListenCallbacksPtr a_ListenCallbacks):
+cServerHandleImpl::cServerHandleImpl(cNetwork::cListenCallbacksPtr a_ListenCallbacks) :
 	m_ListenCallbacks(std::move(a_ListenCallbacks)),
 	m_ConnListener(nullptr),
 	m_SecondaryConnListener(nullptr),
@@ -82,7 +82,7 @@ void cServerHandleImpl::Close(void)
 		cCSLock Lock(m_CS);
 		std::swap(Conns, m_Connections);
 	}
-	for (const auto & conn: Conns)
+	for (const auto & conn : Conns)
 	{
 		conn->Shutdown();
 	}
@@ -98,12 +98,9 @@ void cServerHandleImpl::Close(void)
 
 
 
-cServerHandleImplPtr cServerHandleImpl::Listen(
-	UInt16 a_Port,
-	cNetwork::cListenCallbacksPtr a_ListenCallbacks
-)
+cServerHandleImplPtr cServerHandleImpl::Listen(UInt16 a_Port, cNetwork::cListenCallbacksPtr a_ListenCallbacks)
 {
-	cServerHandleImplPtr res{new cServerHandleImpl(std::move(a_ListenCallbacks))};
+	cServerHandleImplPtr res {new cServerHandleImpl(std::move(a_ListenCallbacks))};
 	res->m_SelfPtr = res;
 	if (res->Listen(a_Port))
 	{
@@ -141,8 +138,11 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		if (!ServerHandleImplHelper::IsValidSocket(MainSock))
 		{
 			m_ErrorCode = EVUTIL_SOCKET_ERROR();
-			m_ErrorMsg = fmt::format(FMT_STRING("Cannot create a server socket for port {}: {} ({})"),
-				a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
+			m_ErrorMsg = fmt::format(
+				FMT_STRING("Cannot create a server socket for port {}: {} ({})"),
+				a_Port,
+				m_ErrorCode,
+				evutil_socket_error_to_string(m_ErrorCode)
 			);
 			return false;
 		}
@@ -151,8 +151,11 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		if (evutil_make_listen_socket_reuseable(MainSock) != 0)
 		{
 			m_ErrorCode = EVUTIL_SOCKET_ERROR();
-			m_ErrorMsg = fmt::format(FMT_STRING("Port {} cannot be made reusable: {} ({}). Restarting the server might not work."),
-				a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
+			m_ErrorMsg = fmt::format(
+				FMT_STRING("Port {} cannot be made reusable: {} ({}). Restarting the server might not work."),
+				a_Port,
+				m_ErrorCode,
+				evutil_socket_error_to_string(m_ErrorCode)
 			);
 			LOG("%s", m_ErrorMsg);
 		}
@@ -165,8 +168,11 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		if (bind(MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
 		{
 			m_ErrorCode = EVUTIL_SOCKET_ERROR();
-			m_ErrorMsg = fmt::format(FMT_STRING("Cannot bind IPv4 socket to port {}: {} ({})"),
-				a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
+			m_ErrorMsg = fmt::format(
+				FMT_STRING("Cannot bind IPv4 socket to port {}: {} ({})"),
+				a_Port,
+				m_ErrorCode,
+				evutil_socket_error_to_string(m_ErrorCode)
 			);
 			evutil_closesocket(MainSock);
 			return false;
@@ -176,21 +182,24 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	{
 		// IPv6 socket created, switch it into "dualstack" mode:
 		UInt32 Zero = 0;
-		#ifdef _WIN32
-			// WinXP doesn't support this feature, so if the setting fails, create another socket later on:
-			int res = setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
-			err = EVUTIL_SOCKET_ERROR();
-			NeedsTwoSockets = ((res == SOCKET_ERROR) && (err == WSAENOPROTOOPT));
-		#else
-			setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
-		#endif
+#ifdef _WIN32
+		// WinXP doesn't support this feature, so if the setting fails, create another socket later on:
+		int res = setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
+		err = EVUTIL_SOCKET_ERROR();
+		NeedsTwoSockets = ((res == SOCKET_ERROR) && (err == WSAENOPROTOOPT));
+#else
+		setsockopt(MainSock, IPPROTO_IPV6, IPV6_V6ONLY, reinterpret_cast<const char *>(&Zero), sizeof(Zero));
+#endif
 
 		// Allow the port to be reused right after the socket closes:
 		if (evutil_make_listen_socket_reuseable(MainSock) != 0)
 		{
 			m_ErrorCode = EVUTIL_SOCKET_ERROR();
-			m_ErrorMsg = fmt::format(FMT_STRING("Port {} cannot be made reusable: {} ({}). Restarting the server might not work."),
-				a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
+			m_ErrorMsg = fmt::format(
+				FMT_STRING("Port {} cannot be made reusable: {} ({}). Restarting the server might not work."),
+				a_Port,
+				m_ErrorCode,
+				evutil_socket_error_to_string(m_ErrorCode)
 			);
 			LOG("%s", m_ErrorMsg);
 		}
@@ -203,7 +212,12 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 		if (bind(MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
 		{
 			m_ErrorCode = EVUTIL_SOCKET_ERROR();
-			m_ErrorMsg = fmt::format(FMT_STRING("Cannot bind IPv6 socket to port {}: {} ({})"), a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode));
+			m_ErrorMsg = fmt::format(
+				FMT_STRING("Cannot bind IPv6 socket to port {}: {} ({})"),
+				a_Port,
+				m_ErrorCode,
+				evutil_socket_error_to_string(m_ErrorCode)
+			);
 			evutil_closesocket(MainSock);
 			return false;
 		}
@@ -211,18 +225,35 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	if (evutil_make_socket_nonblocking(MainSock) != 0)
 	{
 		m_ErrorCode = EVUTIL_SOCKET_ERROR();
-		m_ErrorMsg = fmt::format(FMT_STRING("Cannot make socket on port {} non-blocking: {} ({})"), a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode));
+		m_ErrorMsg = fmt::format(
+			FMT_STRING("Cannot make socket on port {} non-blocking: {} ({})"),
+			a_Port,
+			m_ErrorCode,
+			evutil_socket_error_to_string(m_ErrorCode)
+		);
 		evutil_closesocket(MainSock);
 		return false;
 	}
 	if (listen(MainSock, SOMAXCONN) != 0)
 	{
 		m_ErrorCode = EVUTIL_SOCKET_ERROR();
-		m_ErrorMsg = fmt::format(FMT_STRING("Cannot listen on port {}: {} ({})"), a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode));
+		m_ErrorMsg = fmt::format(
+			FMT_STRING("Cannot listen on port {}: {} ({})"),
+			a_Port,
+			m_ErrorCode,
+			evutil_socket_error_to_string(m_ErrorCode)
+		);
 		evutil_closesocket(MainSock);
 		return false;
 	}
-	m_ConnListener = evconnlistener_new(cNetworkSingleton::Get().GetEventBase(), Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, MainSock);
+	m_ConnListener = evconnlistener_new(
+		cNetworkSingleton::Get().GetEventBase(),
+		Callback,
+		this,
+		LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE,
+		0,
+		MainSock
+	);
 	m_IsListening = true;
 
 	if (!NeedsTwoSockets)
@@ -245,8 +276,12 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	if (evutil_make_listen_socket_reuseable(SecondSock) != 0)
 	{
 		m_ErrorCode = EVUTIL_SOCKET_ERROR();
-		m_ErrorMsg = fmt::format(FMT_STRING("Port {} cannot be made reusable (second socket): {} ({}). Restarting the server might not work."),
-			a_Port, m_ErrorCode, evutil_socket_error_to_string(m_ErrorCode)
+		m_ErrorMsg = fmt::format(
+			FMT_STRING("Port {} cannot be made reusable (second socket): {} ({}). Restarting the server might not work."
+			),
+			a_Port,
+			m_ErrorCode,
+			evutil_socket_error_to_string(m_ErrorCode)
 		);
 		LOG("%s", m_ErrorMsg);
 	}
@@ -255,7 +290,11 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 	if (evutil_make_socket_nonblocking(SecondSock) != 0)
 	{
 		err = EVUTIL_SOCKET_ERROR();
-		LOGD("evutil_make_socket_nonblocking() failed for secondary socket: %d, %s", err, evutil_socket_error_to_string(err));
+		LOGD(
+			"evutil_make_socket_nonblocking() failed for secondary socket: %d, %s",
+			err,
+			evutil_socket_error_to_string(err)
+		);
 		evutil_closesocket(SecondSock);
 		return true;  // Report as success, the primary socket is working
 	}
@@ -283,7 +322,14 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 
 	UNUSED(err);
 
-	m_SecondaryConnListener = evconnlistener_new(cNetworkSingleton::Get().GetEventBase(), Callback, this, LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, 0, SecondSock);
+	m_SecondaryConnListener = evconnlistener_new(
+		cNetworkSingleton::Get().GetEventBase(),
+		Callback,
+		this,
+		LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE,
+		0,
+		SecondSock
+	);
 	return true;
 }
 
@@ -291,7 +337,13 @@ bool cServerHandleImpl::Listen(UInt16 a_Port)
 
 
 
-void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_Socket, sockaddr * a_Addr, int a_Len, void * a_Self)
+void cServerHandleImpl::Callback(
+	evconnlistener * a_Listener,
+	evutil_socket_t a_Socket,
+	sockaddr * a_Addr,
+	int a_Len,
+	void * a_Self
+)
 {
 	// Cast to true self:
 	cServerHandleImpl * Self = static_cast<cServerHandleImpl *>(a_Self);
@@ -332,7 +384,8 @@ void cServerHandleImpl::Callback(evconnlistener * a_Listener, evutil_socket_t a_
 	setsockopt(a_Socket, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<const char *>(&one), sizeof(one));
 
 	// Create a new cTCPLink for the incoming connection:
-	cTCPLinkImplPtr Link = std::make_shared<cTCPLinkImpl>(a_Socket, LinkCallbacks, Self->m_SelfPtr, a_Addr, static_cast<socklen_t>(a_Len));
+	cTCPLinkImplPtr Link =
+		std::make_shared<cTCPLinkImpl>(a_Socket, LinkCallbacks, Self->m_SelfPtr, a_Addr, static_cast<socklen_t>(a_Len));
 	{
 		cCSLock Lock(Self->m_CS);
 		Self->m_Connections.push_back(Link);
@@ -368,15 +421,7 @@ void cServerHandleImpl::RemoveLink(const cTCPLinkImpl * a_Link)
 ////////////////////////////////////////////////////////////////////////////////
 // cNetwork API:
 
-cServerHandlePtr cNetwork::Listen(
-	UInt16 a_Port,
-	cNetwork::cListenCallbacksPtr a_ListenCallbacks
-)
+cServerHandlePtr cNetwork::Listen(UInt16 a_Port, cNetwork::cListenCallbacksPtr a_ListenCallbacks)
 {
 	return cServerHandleImpl::Listen(a_Port, std::move(a_ListenCallbacks));
 }
-
-
-
-
-

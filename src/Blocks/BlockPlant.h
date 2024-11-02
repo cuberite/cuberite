@@ -7,19 +7,16 @@
 
 
 /** Base class for plants that use light values to decide whether to grow or not.
-On block update, the plant decides whether to grow, die or stay as-is, based on the CanGrow() overridable method result. */
-template <bool NeedsLightToGrow>
-class cBlockPlant :
-	public cBlockHandler
+On block update, the plant decides whether to grow, die or stay as-is, based on the CanGrow() overridable method result.
+*/
+template <bool NeedsLightToGrow> class cBlockPlant : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-protected:
-
+  protected:
 	~cBlockPlant() = default;
 
 	/** The action the plant can take on an update. */
@@ -44,7 +41,7 @@ protected:
 			return paGrowth;
 		}
 		NIBBLETYPE Blocklight = a_Chunk.GetBlockLight(a_RelPos);
-		NIBBLETYPE SkyLight   = a_Chunk.GetSkyLight  (a_RelPos);
+		NIBBLETYPE SkyLight = a_Chunk.GetSkyLight(a_RelPos);
 		NIBBLETYPE Light = a_Chunk.GetTimeAlteredLight(SkyLight);
 
 		// If the amount of light provided by blocks is greater than the sky light, use it instead
@@ -80,7 +77,8 @@ protected:
 	*/
 	virtual PlantAction CanGrow(cChunk & a_Chunk, Vector3i a_RelPos) const
 	{
-		// Plant can grow if it has the required amount of light, and it passes a random chance based on surrounding blocks
+		// Plant can grow if it has the required amount of light, and it passes a random chance based on surrounding
+		// blocks
 		auto action = HasEnoughLight(a_Chunk, a_RelPos);
 		if ((action == paGrowth) && !GetRandomProvider().RandBool(1.0 / GetGrowthChance(a_Chunk, a_RelPos)))
 		{
@@ -135,8 +133,7 @@ protected:
 		return FloorC(24.0f / Chance) + 1;
 	}
 
-private:
-
+  private:
 	virtual void OnUpdate(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,

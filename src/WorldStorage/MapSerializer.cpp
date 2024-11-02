@@ -14,7 +14,7 @@
 
 
 
-cMapSerializer::cMapSerializer(const AString & a_WorldName, cMap * a_Map):
+cMapSerializer::cMapSerializer(const AString & a_WorldName, cMap * a_Map) :
 	m_Map(a_Map)
 {
 	auto DataPath = fmt::format(FMT_STRING("{}{}data"), a_WorldName, cFile::PathSeparator());
@@ -50,10 +50,10 @@ bool cMapSerializer::Save(void)
 	SaveMapToNBT(Writer);
 	Writer.Finish();
 
-	#ifndef NDEBUG
+#ifndef NDEBUG
 	cParsedNBT TestParse(Writer.GetResult());
 	ASSERT(TestParse.IsValid());
-	#endif  // !NDEBUG
+#endif  // !NDEBUG
 
 	GZipFile::Write(m_Path, Writer.GetResult());
 
@@ -71,7 +71,7 @@ void cMapSerializer::SaveMapToNBT(cFastNBTWriter & a_Writer)
 	a_Writer.AddByte("scale", static_cast<Byte>(m_Map->GetScale()));
 	a_Writer.AddByte("dimension", static_cast<Byte>(m_Map->GetDimension()));
 
-	a_Writer.AddShort("width",  static_cast<Int16>(m_Map->GetWidth()));
+	a_Writer.AddShort("width", static_cast<Int16>(m_Map->GetWidth()));
 	a_Writer.AddShort("height", static_cast<Int16>(m_Map->GetHeight()));
 
 	a_Writer.AddInt("xCenter", m_Map->GetCenterX());
@@ -166,7 +166,8 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 
 
 
-cIDCountSerializer::cIDCountSerializer(const AString & a_WorldName) : m_MapCount(0)
+cIDCountSerializer::cIDCountSerializer(const AString & a_WorldName) :
+	m_MapCount(0)
 {
 	auto DataPath = fmt::format(FMT_STRING("{}{}data"), a_WorldName, cFile::PathSeparator());
 	m_Path = fmt::format(FMT_STRING("{}{}idcounts.dat"), DataPath, cFile::PathSeparator());
@@ -188,7 +189,7 @@ bool cIDCountSerializer::Load()
 	// NOTE: idcounts.dat is not compressed (raw format)
 
 	// Parse the NBT data:
-	cParsedNBT NBT({ reinterpret_cast<const std::byte *>(Data.data()), Data.size() });
+	cParsedNBT NBT({reinterpret_cast<const std::byte *>(Data.data()), Data.size()});
 	if (!NBT.IsValid())
 	{
 		// NBT Parsing failed
@@ -223,10 +224,10 @@ bool cIDCountSerializer::Save(void)
 
 	Writer.Finish();
 
-	#ifndef NDEBUG
+#ifndef NDEBUG
 	cParsedNBT TestParse(Writer.GetResult());
 	ASSERT(TestParse.IsValid());
-	#endif  // !NDEBUG
+#endif  // !NDEBUG
 
 	cFile File;
 	if (!File.Open(m_Path, cFile::fmWrite))

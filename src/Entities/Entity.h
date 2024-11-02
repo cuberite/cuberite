@@ -10,37 +10,39 @@
 
 
 // Place this macro in the public section of each cEntity descendant class and you're done :)
-#define CLASS_PROTODEF(classname) \
-	virtual bool IsA(const char * a_ClassName) const override\
-	{ \
+#define CLASS_PROTODEF(classname)                                                                                 \
+	virtual bool IsA(const char * a_ClassName) const override                                                     \
+	{                                                                                                             \
 		return ((a_ClassName != nullptr) && ((strcmp(a_ClassName, #classname) == 0) || Super::IsA(a_ClassName))); \
-	} \
-	virtual const char * GetClass(void) const override \
-	{ \
-		return #classname; \
-	} \
-	static const char * GetClassStatic(void) \
-	{ \
-		return #classname; \
-	} \
-	virtual const char * GetParentClass(void) const override \
-	{ \
-		return Super::GetClass(); \
+	}                                                                                                             \
+	virtual const char * GetClass(void) const override                                                            \
+	{                                                                                                             \
+		return #classname;                                                                                        \
+	}                                                                                                             \
+	static const char * GetClassStatic(void)                                                                      \
+	{                                                                                                             \
+		return #classname;                                                                                        \
+	}                                                                                                             \
+	virtual const char * GetParentClass(void) const override                                                      \
+	{                                                                                                             \
+		return Super::GetClass();                                                                                 \
 	}
 
 #define POSX_TOINT FloorC(GetPosX())
 #define POSY_TOINT FloorC(GetPosY())
 #define POSZ_TOINT FloorC(GetPosZ())
-#define POS_TOINT  GetPosition().Floor()
+#define POS_TOINT GetPosition().Floor()
 
-#define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z) \
-	cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z); \
-	do { \
+#define GET_AND_VERIFY_CURRENT_CHUNK(ChunkVarName, X, Z)           \
+	cChunk * ChunkVarName = a_Chunk.GetNeighborChunk(X, Z);        \
+	do                                                             \
+	{                                                              \
 		if ((ChunkVarName == nullptr) || !ChunkVarName->IsValid()) \
-		{ \
-			return; \
-		} \
-	} while (false)
+		{                                                          \
+			return;                                                \
+		}                                                          \
+	}                                                              \
+	while (false)
 
 
 
@@ -58,13 +60,13 @@ class cMonster;
 // tolua_begin
 struct TakeDamageInfo
 {
-	eDamageType DamageType;   // Where does the damage come from? Being hit / on fire / contact with cactus / ...
-	cEntity *   Attacker;     // The attacking entity; valid only for dtAttack
-	int         RawDamage;    // What damage would the receiver get without any armor. Usually: attacker mob type + weapons
-	float       FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
-	Vector3d    Knockback;    // The amount and direction of knockback received from the damage
+	eDamageType DamageType;  // Where does the damage come from? Being hit / on fire / contact with cactus / ...
+	cEntity * Attacker;  // The attacking entity; valid only for dtAttack
+	int RawDamage;  // What damage would the receiver get without any armor. Usually: attacker mob type + weapons
+	float FinalDamage;  // What actual damage will be received. Usually: m_RawDamage minus armor
+	Vector3d Knockback;  // The amount and direction of knockback received from the damage
 	// TODO: Effects - list of effects that the hit is causing. Unknown representation yet
-} ;
+};
 // tolua_end
 
 
@@ -74,7 +76,7 @@ struct TakeDamageInfo
 // tolua_begin
 class cEntity
 {
-protected:
+  protected:
 	/** State variables for MoveToWorld. */
 	struct sWorldChangeInfo
 	{
@@ -83,8 +85,7 @@ protected:
 		bool m_SetPortalCooldown;
 	};
 
-public:
-
+  public:
 	enum eEntityType
 	{
 		etEntity,  // For all other types
@@ -105,27 +106,28 @@ public:
 
 		// Common variations
 		etMob = etMonster,  // DEPRECATED, use etMonster instead!
-	} ;
+	};
 
 	// tolua_end
 
-	static const int FIRE_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in fire
-	static const int FIRE_DAMAGE           = 1;    ///< Damage to deal when standing in fire
-	static const int LAVA_TICKS_PER_DAMAGE = 10;   ///< Ticks to wait between damaging an entity when it stands in lava
-	static const int LAVA_DAMAGE           = 4;    ///< Damage to deal when standing in lava
-	static const int BURN_TICKS_PER_DAMAGE = 20;   ///< Ticks to wait between damaging an entity when it is burning
-	static const int BURN_DAMAGE           = 1;    ///< Damage to deal when the entity is burning
+	static const int FIRE_TICKS_PER_DAMAGE = 10;  ///< Ticks to wait between damaging an entity when it stands in fire
+	static const int FIRE_DAMAGE = 1;  ///< Damage to deal when standing in fire
+	static const int LAVA_TICKS_PER_DAMAGE = 10;  ///< Ticks to wait between damaging an entity when it stands in lava
+	static const int LAVA_DAMAGE = 4;  ///< Damage to deal when standing in lava
+	static const int BURN_TICKS_PER_DAMAGE = 20;  ///< Ticks to wait between damaging an entity when it is burning
+	static const int BURN_DAMAGE = 1;  ///< Damage to deal when the entity is burning
 
-	static const int BURN_TICKS            = 160;  ///< Ticks to keep an entity burning after it has stood in lava / fire
+	static const int BURN_TICKS = 160;  ///< Ticks to keep an entity burning after it has stood in lava / fire
 
-	static const int MAX_AIR_LEVEL         = 300;  ///< Maximum air an entity can have
-	static const int DROWNING_TICKS        = 20;   ///< Number of ticks per heart of damage
+	static const int MAX_AIR_LEVEL = 300;  ///< Maximum air an entity can have
+	static const int DROWNING_TICKS = 20;  ///< Number of ticks per heart of damage
 
-	static const int VOID_BOUNDARY         = -64;  ///< Y position to begin applying void damage
-	static const int FALL_DAMAGE_HEIGHT    = 4;    ///< Y difference after which fall damage is applied
+	static const int VOID_BOUNDARY = -64;  ///< Y position to begin applying void damage
+	static const int FALL_DAMAGE_HEIGHT = 4;  ///< Y difference after which fall damage is applied
 
 	/** Special ID that is considered an "invalid value", signifying no entity. */
-	static const UInt32 INVALID_ID = 0;  // Exported to Lua in ManualBindings.cpp, ToLua doesn't parse initialized constants.
+	static const UInt32 INVALID_ID =
+		0;  // Exported to Lua in ManualBindings.cpp, ToLua doesn't parse initialized constants.
 
 
 	cEntity(eEntityType a_EntityType, Vector3d a_Pos, float a_Width, float a_Height);
@@ -155,22 +157,22 @@ public:
 
 	eEntityType GetEntityType(void) const { return m_EntityType; }
 
-	bool IsArrow       (void) const { return IsA("cArrowEntity");              }
+	bool IsArrow(void) const { return IsA("cArrowEntity"); }
 	bool IsEnderCrystal(void) const { return (m_EntityType == etEnderCrystal); }
-	bool IsPlayer      (void) const { return (m_EntityType == etPlayer);       }
-	bool IsPickup      (void) const { return (m_EntityType == etPickup);       }
-	bool IsMob         (void) const { return (m_EntityType == etMonster);      }
-	bool IsPawn        (void) const { return (IsMob() || IsPlayer());          }
+	bool IsPlayer(void) const { return (m_EntityType == etPlayer); }
+	bool IsPickup(void) const { return (m_EntityType == etPickup); }
+	bool IsMob(void) const { return (m_EntityType == etMonster); }
+	bool IsPawn(void) const { return (IsMob() || IsPlayer()); }
 	bool IsFallingBlock(void) const { return (m_EntityType == etFallingBlock); }
-	bool IsMinecart    (void) const { return (m_EntityType == etMinecart);     }
-	bool IsBoat        (void) const { return (m_EntityType == etBoat);         }
-	bool IsTNT         (void) const { return (m_EntityType == etTNT);          }
-	bool IsProjectile  (void) const { return (m_EntityType == etProjectile);   }
-	bool IsExpOrb      (void) const { return (m_EntityType == etExpOrb);       }
-	bool IsFloater     (void) const { return (m_EntityType == etFloater);      }
-	bool IsItemFrame   (void) const { return (m_EntityType == etItemFrame);    }
-	bool IsLeashKnot   (void) const { return (m_EntityType == etLeashKnot);    }
-	bool IsPainting    (void) const { return (m_EntityType == etPainting);     }
+	bool IsMinecart(void) const { return (m_EntityType == etMinecart); }
+	bool IsBoat(void) const { return (m_EntityType == etBoat); }
+	bool IsTNT(void) const { return (m_EntityType == etTNT); }
+	bool IsProjectile(void) const { return (m_EntityType == etProjectile); }
+	bool IsExpOrb(void) const { return (m_EntityType == etExpOrb); }
+	bool IsFloater(void) const { return (m_EntityType == etFloater); }
+	bool IsItemFrame(void) const { return (m_EntityType == etItemFrame); }
+	bool IsLeashKnot(void) const { return (m_EntityType == etLeashKnot); }
+	bool IsPainting(void) const { return (m_EntityType == etPainting); }
 
 	/** Returns true if the entity is of the specified class or a subclass (cPawn's IsA("cEntity") returns true) */
 	virtual bool IsA(const char * a_ClassName) const;
@@ -189,20 +191,20 @@ public:
 
 	cWorld * GetWorld(void) const { return m_World; }
 
-	double           GetHeadYaw   (void) const { return m_HeadYaw; }  // In degrees
-	float            GetHeight    (void) const { return m_Height;  }
-	double           GetMass      (void) const { return m_Mass;    }
-	double           GetPosX      (void) const { return m_Position.x; }
-	double           GetPosY      (void) const { return m_Position.y; }
-	double           GetPosZ      (void) const { return m_Position.z; }
-	double           GetYaw       (void) const { return m_Rot.x;   }  // In degrees, [-180, +180)
-	double           GetPitch     (void) const { return m_Rot.y;   }  // In degrees, [-180, +180), but normal client clips to [-90, +90]
-	double           GetRoll      (void) const { return m_Rot.z;   }  // In degrees, unused in current client
-	Vector3d         GetLookVector(void) const;
-	double           GetSpeedX    (void) const { return m_Speed.x; }
-	double           GetSpeedY    (void) const { return m_Speed.y; }
-	double           GetSpeedZ    (void) const { return m_Speed.z; }
-	float            GetWidth     (void) const { return m_Width;   }
+	double GetHeadYaw(void) const { return m_HeadYaw; }  // In degrees
+	float GetHeight(void) const { return m_Height; }
+	double GetMass(void) const { return m_Mass; }
+	double GetPosX(void) const { return m_Position.x; }
+	double GetPosY(void) const { return m_Position.y; }
+	double GetPosZ(void) const { return m_Position.z; }
+	double GetYaw(void) const { return m_Rot.x; }  // In degrees, [-180, +180)
+	double GetPitch(void) const { return m_Rot.y; }  // In degrees, [-180, +180), but normal client clips to [-90, +90]
+	double GetRoll(void) const { return m_Rot.z; }  // In degrees, unused in current client
+	Vector3d GetLookVector(void) const;
+	double GetSpeedX(void) const { return m_Speed.x; }
+	double GetSpeedY(void) const { return m_Speed.y; }
+	double GetSpeedZ(void) const { return m_Speed.z; }
+	float GetWidth(void) const { return m_Width; }
 
 	int GetChunkX(void) const { return FloorC(m_Position.x / cChunkDef::Width); }
 	int GetChunkZ(void) const { return FloorC(m_Position.z / cChunkDef::Width); }
@@ -210,16 +212,16 @@ public:
 	// Get the Entity's axis aligned bounding box, with absolute (world-relative) coordinates.
 	cBoundingBox GetBoundingBox() const { return cBoundingBox(GetPosition(), GetWidth() / 2, GetHeight()); }
 
-	void SetHeadYaw (double a_HeadYaw);
-	void SetMass    (double a_Mass);
-	void SetPosX    (double a_PosX) { SetPosition({a_PosX, m_Position.y, m_Position.z}); }
-	void SetPosY    (double a_PosY) { SetPosition({m_Position.x, a_PosY, m_Position.z}); }
-	void SetPosZ    (double a_PosZ) { SetPosition({m_Position.x, m_Position.y, a_PosZ}); }
+	void SetHeadYaw(double a_HeadYaw);
+	void SetMass(double a_Mass);
+	void SetPosX(double a_PosX) { SetPosition({a_PosX, m_Position.y, m_Position.z}); }
+	void SetPosY(double a_PosY) { SetPosition({m_Position.x, a_PosY, m_Position.z}); }
+	void SetPosZ(double a_PosZ) { SetPosition({m_Position.x, m_Position.y, a_PosZ}); }
 	void SetPosition(double a_PosX, double a_PosY, double a_PosZ) { SetPosition({a_PosX, a_PosY, a_PosZ}); }
 	void SetPosition(const Vector3d & a_Position);
-	void SetYaw     (double a_Yaw);    // In degrees, normalizes to [-180, +180)
-	void SetPitch   (double a_Pitch);  // In degrees, normalizes to [-180, +180)
-	void SetRoll    (double a_Roll);   // In degrees, normalizes to [-180, +180)
+	void SetYaw(double a_Yaw);  // In degrees, normalizes to [-180, +180)
+	void SetPitch(double a_Pitch);  // In degrees, normalizes to [-180, +180)
+	void SetRoll(double a_Roll);  // In degrees, normalizes to [-180, +180)
 
 	/** Sets the speed of the entity, measured in m / sec */
 	void SetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ);
@@ -236,16 +238,19 @@ public:
 	/** Sets the speed in the Z axis, leaving the other speed components intact. Measured in m / sec. */
 	void SetSpeedZ(double a_SpeedZ);
 
-	void AddPosX    (double a_AddPosX) { AddPosition(a_AddPosX, 0, 0); }
-	void AddPosY    (double a_AddPosY) { AddPosition(0, a_AddPosY, 0); }
-	void AddPosZ    (double a_AddPosZ) { AddPosition(0, 0, a_AddPosZ); }
-	void AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ) { SetPosition(m_Position + Vector3d(a_AddPosX, a_AddPosY, a_AddPosZ)); }
+	void AddPosX(double a_AddPosX) { AddPosition(a_AddPosX, 0, 0); }
+	void AddPosY(double a_AddPosY) { AddPosition(0, a_AddPosY, 0); }
+	void AddPosZ(double a_AddPosZ) { AddPosition(0, 0, a_AddPosZ); }
+	void AddPosition(double a_AddPosX, double a_AddPosY, double a_AddPosZ)
+	{
+		SetPosition(m_Position + Vector3d(a_AddPosX, a_AddPosY, a_AddPosZ));
+	}
 	void AddPosition(const Vector3d & a_AddPos) { AddPosition(a_AddPos.x, a_AddPos.y, a_AddPos.z); }
-	void AddSpeed   (double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeedZ);
-	void AddSpeed   (const Vector3d & a_AddSpeed) { AddSpeed(a_AddSpeed.x, a_AddSpeed.y, a_AddSpeed.z); }
-	void AddSpeedX  (double a_AddSpeedX);
-	void AddSpeedY  (double a_AddSpeedY);
-	void AddSpeedZ  (double a_AddSpeedZ);
+	void AddSpeed(double a_AddSpeedX, double a_AddSpeedY, double a_AddSpeedZ);
+	void AddSpeed(const Vector3d & a_AddSpeed) { AddSpeed(a_AddSpeed.x, a_AddSpeed.y, a_AddSpeed.z); }
+	void AddSpeedX(double a_AddSpeedX);
+	void AddSpeedY(double a_AddSpeedY);
+	void AddSpeedZ(double a_AddSpeedZ);
 
 	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways);
 	void SteerVehicle(float a_Forward, float a_Sideways);
@@ -253,11 +258,11 @@ public:
 	inline UInt32 GetUniqueID(void) const { return m_UniqueID; }
 
 	/** Deprecated. Use IsTicking instead. */
-	inline bool IsDestroyed() const {return !IsTicking();}
+	inline bool IsDestroyed() const { return !IsTicking(); }
 
-	/** Returns true if the entity is valid and ticking. Returns false if the entity is not ticking and is about to leave
-	its current world either via teleportation or destruction.
-	If this returns false, you must stop using the cEntity pointer you have. */
+	/** Returns true if the entity is valid and ticking. Returns false if the entity is not ticking and is about to
+	leave its current world either via teleportation or destruction. If this returns false, you must stop using the
+	cEntity pointer you have. */
 	bool IsTicking(void) const;
 
 	// tolua_end
@@ -265,17 +270,27 @@ public:
 	void Destroy();
 	// tolua_begin
 
-	/** Makes this pawn take damage from an attack by a_Attacker. Damage values are calculated automatically and DoTakeDamage() called */
+	/** Makes this pawn take damage from an attack by a_Attacker. Damage values are calculated automatically and
+	 * DoTakeDamage() called */
 	void TakeDamage(cEntity & a_Attacker);
 
-	/** Makes this entity take the specified damage. The final damage is calculated using current armor, then DoTakeDamage() called */
+	/** Makes this entity take the specified damage. The final damage is calculated using current armor, then
+	 * DoTakeDamage() called */
 	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, double a_KnockbackAmount);
 
-	/** Makes this entity take the specified damage. The final damage is calculated using current armor, then DoTakeDamage() called */
+	/** Makes this entity take the specified damage. The final damage is calculated using current armor, then
+	 * DoTakeDamage() called */
 	void TakeDamage(eDamageType a_DamageType, UInt32 a_Attacker, int a_RawDamage, double a_KnockbackAmount);
 
-	/** Makes this entity take the specified damage. The values are packed into a TDI, knockback calculated, then sent through DoTakeDamage() */
-	void TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_RawDamage, float a_FinalDamage, double a_KnockbackAmount);
+	/** Makes this entity take the specified damage. The values are packed into a TDI, knockback calculated, then sent
+	 * through DoTakeDamage() */
+	void TakeDamage(
+		eDamageType a_DamageType,
+		cEntity * a_Attacker,
+		int a_RawDamage,
+		float a_FinalDamage,
+		double a_KnockbackAmount
+	);
 
 	float GetGravity(void) const { return m_Gravity; }
 
@@ -431,7 +446,12 @@ public:
 	/** Teleports to the coordinates specified */
 	virtual void TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ);
 
-	bool MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_ShouldSetPortalCooldown = false, bool a_ShouldSendRespawn = true);
+	bool MoveToWorld(
+		cWorld & a_World,
+		Vector3d a_NewPosition,
+		bool a_ShouldSetPortalCooldown = false,
+		bool a_ShouldSendRespawn = true
+	);
 
 	bool MoveToWorld(cWorld & a_World, bool a_ShouldSendRespawn, Vector3d a_NewPosition)
 	{
@@ -447,10 +467,7 @@ public:
 	// tolua_end
 
 	/** Returns true if a world change is scheduled to happen. */
-	bool IsWorldChangeScheduled() const
-	{
-		return (m_WorldChangeInfo.m_NewWorld != nullptr);
-	}
+	bool IsWorldChangeScheduled() const { return (m_WorldChangeInfo.m_NewWorld != nullptr); }
 
 	/** Updates clients of changes in the entity. */
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);
@@ -483,13 +500,13 @@ public:
 	// tolua_begin
 
 	// COMMON metadata flags; descendants may override the defaults:
-	virtual bool IsCrouched    (void) const { return false; }
+	virtual bool IsCrouched(void) const { return false; }
 	virtual bool IsElytraFlying(void) const { return false; }
-	virtual bool IsInvisible   (void) const { return false; }
-	virtual bool IsOnFire      (void) const { return m_TicksLeftBurning > 0; }
-	virtual bool IsRclking     (void) const { return false; }
-	virtual bool IsRiding      (void) const { return false; }
-	virtual bool IsSprinting   (void) const { return false; }
+	virtual bool IsInvisible(void) const { return false; }
+	virtual bool IsOnFire(void) const { return m_TicksLeftBurning > 0; }
+	virtual bool IsRclking(void) const { return false; }
+	virtual bool IsRiding(void) const { return false; }
+	virtual bool IsSprinting(void) const { return false; }
 
 	/** Returns true if any part of the entity is in a fire block */
 	virtual bool IsInFire(void) const { return m_IsInFire; }
@@ -523,7 +540,8 @@ public:
 	/** Called when the specified player right-clicks this entity */
 	virtual void OnRightClicked(cPlayer & a_Player) {}
 
-	/** Returns the list of drops for this pawn when it is killed. May check a_Killer for special handling (sword of looting etc.). Called from KilledBy(). */
+	/** Returns the list of drops for this pawn when it is killed. May check a_Killer for special handling (sword of
+	 * looting etc.). Called from KilledBy(). */
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr)
 	{
 		UNUSED(a_Drops);
@@ -559,8 +577,7 @@ public:
 	/** Announces a death message on chat about killing the entity. */
 	void BroadcastDeathMessage(TakeDamageInfo & a_TDI);
 
-protected:
-
+  protected:
 	/** Structure storing the portal delay timer and cooldown boolean */
 	struct sPortalCooldownData
 	{
@@ -692,8 +709,7 @@ protected:
 	/** Called when this entity dismounts from m_AttachedTo. */
 	virtual void OnDetach();
 
-private:
-
+  private:
 	/** Whether the entity is ticking or not. If not, it is scheduled for removal or world-teleportation. */
 	bool m_IsTicking;
 
@@ -701,7 +717,7 @@ private:
 	cChunk * m_ParentChunk;
 
 	/** Measured in degrees, [-180, +180) */
-	double   m_HeadYaw;
+	double m_HeadYaw;
 
 	/** Measured in degrees, [-180, +180) */
 	Vector3d m_Rot;
@@ -715,7 +731,8 @@ private:
 	/** Measured in Kilograms (Kg) */
 	double m_Mass;
 
-	/** Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter. */
+	/** Width of the entity, in the XZ plane. Since entities are represented as cylinders, this is more of a diameter.
+	 */
 	float m_Width;
 
 	/** Height of the entity (Y axis). */
@@ -732,4 +749,4 @@ private:
 
 	/** List of players who are spectating this entity. */
 	std::vector<cPlayer *> m_Spectators;
-} ;  // tolua_export
+};  // tolua_export

@@ -1,7 +1,8 @@
 
 // MojangAPI.cpp
 
-// Implements the cMojangAPI class representing the various API points provided by Mojang's webservices, and a cache for their results
+// Implements the cMojangAPI class representing the various API points provided by Mojang's webservices, and a cache for
+// their results
 
 #include "Globals.h"
 #include "MojangAPI.h"
@@ -31,9 +32,9 @@ const int MAX_PER_QUERY = 100;
 
 
 
-constexpr char DEFAULT_NAME_TO_UUID_SERVER[]     = "api.mojang.com";
-constexpr char DEFAULT_NAME_TO_UUID_ADDRESS[]    = "/profiles/minecraft";
-constexpr char DEFAULT_UUID_TO_PROFILE_SERVER[]  = "sessionserver.mojang.com";
+constexpr char DEFAULT_NAME_TO_UUID_SERVER[] = "api.mojang.com";
+constexpr char DEFAULT_NAME_TO_UUID_ADDRESS[] = "/profiles/minecraft";
+constexpr char DEFAULT_UUID_TO_PROFILE_SERVER[] = "sessionserver.mojang.com";
 constexpr char DEFAULT_UUID_TO_PROFILE_ADDRESS[] = "/session/minecraft/profile/%UUID%?unsigned=false";
 
 
@@ -42,69 +43,68 @@ constexpr char DEFAULT_UUID_TO_PROFILE_ADDRESS[] = "/session/minecraft/profile/%
 
 namespace MojangTrustedRootCAs
 {
-	/** Returns the Options that should be used for cUrlClient queries to the Mojang APIs. */
-	static const AStringMap & UrlClientOptions()
-	{
-		static const AString CertString =
-			// DigiCert Global Root CA (sessionserver.mojang.com, api.mojang.com)
-			// Downloaded from https://www.digicert.com/kb/digicert-root-certificates.htm
+/** Returns the Options that should be used for cUrlClient queries to the Mojang APIs. */
+static const AStringMap & UrlClientOptions()
+{
+	static const AString CertString =
+		// DigiCert Global Root CA (sessionserver.mojang.com, api.mojang.com)
+		// Downloaded from https://www.digicert.com/kb/digicert-root-certificates.htm
 
-			// DigiCert Global Root CA
-			"-----BEGIN CERTIFICATE-----\n"
-			"MIIDrzCCApegAwIBAgIQCDvgVpBCRrGhdWrJWZHHSjANBgkqhkiG9w0BAQUFADBh\n"
-			"MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\n"
-			"d3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBD\n"
-			"QTAeFw0wNjExMTAwMDAwMDBaFw0zMTExMTAwMDAwMDBaMGExCzAJBgNVBAYTAlVT\n"
-			"MRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5j\n"
-			"b20xIDAeBgNVBAMTF0RpZ2lDZXJ0IEdsb2JhbCBSb290IENBMIIBIjANBgkqhkiG\n"
-			"9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4jvhEXLeqKTTo1eqUKKPC3eQyaKl7hLOllsB\n"
-			"CSDMAZOnTjC3U/dDxGkAV53ijSLdhwZAAIEJzs4bg7/fzTtxRuLWZscFs3YnFo97\n"
-			"nh6Vfe63SKMI2tavegw5BmV/Sl0fvBf4q77uKNd0f3p4mVmFaG5cIzJLv07A6Fpt\n"
-			"43C/dxC//AH2hdmoRBBYMql1GNXRor5H4idq9Joz+EkIYIvUX7Q6hL+hqkpMfT7P\n"
-			"T19sdl6gSzeRntwi5m3OFBqOasv+zbMUZBfHWymeMr/y7vrTC0LUq7dBMtoM1O/4\n"
-			"gdW7jVg/tRvoSSiicNoxBN33shbyTApOB6jtSj1etX+jkMOvJwIDAQABo2MwYTAO\n"
-			"BgNVHQ8BAf8EBAMCAYYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUA95QNVbR\n"
-			"TLtm8KPiGxvDl7I90VUwHwYDVR0jBBgwFoAUA95QNVbRTLtm8KPiGxvDl7I90VUw\n"
-			"DQYJKoZIhvcNAQEFBQADggEBAMucN6pIExIK+t1EnE9SsPTfrgT1eXkIoyQY/Esr\n"
-			"hMAtudXH/vTBH1jLuG2cenTnmCmrEbXjcKChzUyImZOMkXDiqw8cvpOp/2PV5Adg\n"
-			"06O/nVsJ8dWO41P0jmP6P6fbtGbfYmbW0W5BjfIttep3Sp+dWOIrWcBAI+0tKIJF\n"
-			"PnlUkiaY4IBIqDfv8NZ5YBberOgOzW6sRBc4L0na4UU+Krk2U886UAb3LujEV0ls\n"
-			"YSEY1QSteDwsOoBrp+uvFRTp2InBuThs4pFsiv9kuXclVzDAGySj4dzp30d8tbQk\n"
-			"CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=\n"
-			"-----END CERTIFICATE-----\n"
+		// DigiCert Global Root CA
+		"-----BEGIN CERTIFICATE-----\n"
+		"MIIDrzCCApegAwIBAgIQCDvgVpBCRrGhdWrJWZHHSjANBgkqhkiG9w0BAQUFADBh\n"
+		"MQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYDVQQLExB3\n"
+		"d3cuZGlnaWNlcnQuY29tMSAwHgYDVQQDExdEaWdpQ2VydCBHbG9iYWwgUm9vdCBD\n"
+		"QTAeFw0wNjExMTAwMDAwMDBaFw0zMTExMTAwMDAwMDBaMGExCzAJBgNVBAYTAlVT\n"
+		"MRUwEwYDVQQKEwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5j\n"
+		"b20xIDAeBgNVBAMTF0RpZ2lDZXJ0IEdsb2JhbCBSb290IENBMIIBIjANBgkqhkiG\n"
+		"9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4jvhEXLeqKTTo1eqUKKPC3eQyaKl7hLOllsB\n"
+		"CSDMAZOnTjC3U/dDxGkAV53ijSLdhwZAAIEJzs4bg7/fzTtxRuLWZscFs3YnFo97\n"
+		"nh6Vfe63SKMI2tavegw5BmV/Sl0fvBf4q77uKNd0f3p4mVmFaG5cIzJLv07A6Fpt\n"
+		"43C/dxC//AH2hdmoRBBYMql1GNXRor5H4idq9Joz+EkIYIvUX7Q6hL+hqkpMfT7P\n"
+		"T19sdl6gSzeRntwi5m3OFBqOasv+zbMUZBfHWymeMr/y7vrTC0LUq7dBMtoM1O/4\n"
+		"gdW7jVg/tRvoSSiicNoxBN33shbyTApOB6jtSj1etX+jkMOvJwIDAQABo2MwYTAO\n"
+		"BgNVHQ8BAf8EBAMCAYYwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUA95QNVbR\n"
+		"TLtm8KPiGxvDl7I90VUwHwYDVR0jBBgwFoAUA95QNVbRTLtm8KPiGxvDl7I90VUw\n"
+		"DQYJKoZIhvcNAQEFBQADggEBAMucN6pIExIK+t1EnE9SsPTfrgT1eXkIoyQY/Esr\n"
+		"hMAtudXH/vTBH1jLuG2cenTnmCmrEbXjcKChzUyImZOMkXDiqw8cvpOp/2PV5Adg\n"
+		"06O/nVsJ8dWO41P0jmP6P6fbtGbfYmbW0W5BjfIttep3Sp+dWOIrWcBAI+0tKIJF\n"
+		"PnlUkiaY4IBIqDfv8NZ5YBberOgOzW6sRBc4L0na4UU+Krk2U886UAb3LujEV0ls\n"
+		"YSEY1QSteDwsOoBrp+uvFRTp2InBuThs4pFsiv9kuXclVzDAGySj4dzp30d8tbQk\n"
+		"CAUw7C29C79Fv1C5qfPrmAESrciIxpg0X40KPMbp1ZWVbd4=\n"
+		"-----END CERTIFICATE-----\n"
 
-			// AAA Certificate Services (authserver.ely.by GH#4832)
-			// Downloaded from https://www.tbs-certificates.co.uk/FAQ/en/Comodo_AAA_Certificate_Services.html
-			"-----BEGIN CERTIFICATE-----\n"
-			"MIIEMjCCAxqgAwIBAgIBATANBgkqhkiG9w0BAQUFADB7MQswCQYDVQQGEwJHQjEb\n"
-			"MBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHDAdTYWxmb3JkMRow\n"
-			"GAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEhMB8GA1UEAwwYQUFBIENlcnRpZmlj\n"
-			"YXRlIFNlcnZpY2VzMB4XDTA0MDEwMTAwMDAwMFoXDTI4MTIzMTIzNTk1OVowezEL\n"
-			"MAkGA1UEBhMCR0IxGzAZBgNVBAgMEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UE\n"
-			"BwwHU2FsZm9yZDEaMBgGA1UECgwRQ29tb2RvIENBIExpbWl0ZWQxITAfBgNVBAMM\n"
-			"GEFBQSBDZXJ0aWZpY2F0ZSBTZXJ2aWNlczCCASIwDQYJKoZIhvcNAQEBBQADggEP\n"
-			"ADCCAQoCggEBAL5AnfRu4ep2hxxNRUSOvkbIgwadwSr+GB+O5AL686tdUIoWMQua\n"
-			"BtDFcCLNSS1UY8y2bmhGC1Pqy0wkwLxyTurxFa70VJoSCsN6sjNg4tqJVfMiWPPe\n"
-			"3M/vg4aijJRPn2jymJBGhCfHdr/jzDUsi14HZGWCwEiwqJH5YZ92IFCokcdmtet4\n"
-			"YgNW8IoaE+oxox6gmf049vYnMlhvB/VruPsUK6+3qszWY19zjNoFmag4qMsXeDZR\n"
-			"rOme9Hg6jc8P2ULimAyrL58OAd7vn5lJ8S3frHRNG5i1R8XlKdH5kBjHYpy+g8cm\n"
-			"ez6KJcfA3Z3mNWgQIJ2P2N7Sw4ScDV7oL8kCAwEAAaOBwDCBvTAdBgNVHQ4EFgQU\n"
-			"oBEKIz6W8Qfs4q8p74Klf9AwpLQwDgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQF\n"
-			"MAMBAf8wewYDVR0fBHQwcjA4oDagNIYyaHR0cDovL2NybC5jb21vZG9jYS5jb20v\n"
-			"QUFBQ2VydGlmaWNhdGVTZXJ2aWNlcy5jcmwwNqA0oDKGMGh0dHA6Ly9jcmwuY29t\n"
-			"b2RvLm5ldC9BQUFDZXJ0aWZpY2F0ZVNlcnZpY2VzLmNybDANBgkqhkiG9w0BAQUF\n"
-			"AAOCAQEACFb8AvCb6P+k+tZ7xkSAzk/ExfYAWMymtrwUSWgEdujm7l3sAg9g1o1Q\n"
-			"GE8mTgHj5rCl7r+8dFRBv/38ErjHT1r0iWAFf2C3BUrz9vHCv8S5dIa2LX1rzNLz\n"
-			"Rt0vxuBqw8M0Ayx9lt1awg6nCpnBBYurDC/zXDrPbDdVCYfeU0BsWO/8tqtlbgT2\n"
-			"G9w84FoVxp7Z8VlIMCFlA2zs6SFz7JsDoeA3raAVGI/6ugLOpyypEBMs1OUIJqsi\n"
-			"l2D4kF501KKaU73yqWjgom7C12yxow+ev+to51byrvLjKzg6CYG1a4XXvi3tPxq3\n"
-			"smPi9WIsgtRqAEFQ8TmDn5XpNpaYbg==\n"
-			"-----END CERTIFICATE-----\n"
-		;
-		static const AStringMap UrlClientOptions = {{"TrustedRootCAs", CertString}};
-		return UrlClientOptions;
-	}
+		// AAA Certificate Services (authserver.ely.by GH#4832)
+		// Downloaded from https://www.tbs-certificates.co.uk/FAQ/en/Comodo_AAA_Certificate_Services.html
+		"-----BEGIN CERTIFICATE-----\n"
+		"MIIEMjCCAxqgAwIBAgIBATANBgkqhkiG9w0BAQUFADB7MQswCQYDVQQGEwJHQjEb\n"
+		"MBkGA1UECAwSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHDAdTYWxmb3JkMRow\n"
+		"GAYDVQQKDBFDb21vZG8gQ0EgTGltaXRlZDEhMB8GA1UEAwwYQUFBIENlcnRpZmlj\n"
+		"YXRlIFNlcnZpY2VzMB4XDTA0MDEwMTAwMDAwMFoXDTI4MTIzMTIzNTk1OVowezEL\n"
+		"MAkGA1UEBhMCR0IxGzAZBgNVBAgMEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UE\n"
+		"BwwHU2FsZm9yZDEaMBgGA1UECgwRQ29tb2RvIENBIExpbWl0ZWQxITAfBgNVBAMM\n"
+		"GEFBQSBDZXJ0aWZpY2F0ZSBTZXJ2aWNlczCCASIwDQYJKoZIhvcNAQEBBQADggEP\n"
+		"ADCCAQoCggEBAL5AnfRu4ep2hxxNRUSOvkbIgwadwSr+GB+O5AL686tdUIoWMQua\n"
+		"BtDFcCLNSS1UY8y2bmhGC1Pqy0wkwLxyTurxFa70VJoSCsN6sjNg4tqJVfMiWPPe\n"
+		"3M/vg4aijJRPn2jymJBGhCfHdr/jzDUsi14HZGWCwEiwqJH5YZ92IFCokcdmtet4\n"
+		"YgNW8IoaE+oxox6gmf049vYnMlhvB/VruPsUK6+3qszWY19zjNoFmag4qMsXeDZR\n"
+		"rOme9Hg6jc8P2ULimAyrL58OAd7vn5lJ8S3frHRNG5i1R8XlKdH5kBjHYpy+g8cm\n"
+		"ez6KJcfA3Z3mNWgQIJ2P2N7Sw4ScDV7oL8kCAwEAAaOBwDCBvTAdBgNVHQ4EFgQU\n"
+		"oBEKIz6W8Qfs4q8p74Klf9AwpLQwDgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQF\n"
+		"MAMBAf8wewYDVR0fBHQwcjA4oDagNIYyaHR0cDovL2NybC5jb21vZG9jYS5jb20v\n"
+		"QUFBQ2VydGlmaWNhdGVTZXJ2aWNlcy5jcmwwNqA0oDKGMGh0dHA6Ly9jcmwuY29t\n"
+		"b2RvLm5ldC9BQUFDZXJ0aWZpY2F0ZVNlcnZpY2VzLmNybDANBgkqhkiG9w0BAQUF\n"
+		"AAOCAQEACFb8AvCb6P+k+tZ7xkSAzk/ExfYAWMymtrwUSWgEdujm7l3sAg9g1o1Q\n"
+		"GE8mTgHj5rCl7r+8dFRBv/38ErjHT1r0iWAFf2C3BUrz9vHCv8S5dIa2LX1rzNLz\n"
+		"Rt0vxuBqw8M0Ayx9lt1awg6nCpnBBYurDC/zXDrPbDdVCYfeU0BsWO/8tqtlbgT2\n"
+		"G9w84FoVxp7Z8VlIMCFlA2zs6SFz7JsDoeA3raAVGI/6ugLOpyypEBMs1OUIJqsi\n"
+		"l2D4kF501KKaU73yqWjgom7C12yxow+ev+to51byrvLjKzg6CYG1a4XXvi3tPxq3\n"
+		"smPi9WIsgtRqAEFQ8TmDn5XpNpaYbg==\n"
+		"-----END CERTIFICATE-----\n";
+	static const AStringMap UrlClientOptions = {{"TrustedRootCAs", CertString}};
+	return UrlClientOptions;
 }
+}  // namespace MojangTrustedRootCAs
 
 
 
@@ -119,11 +119,7 @@ cMojangAPI::sProfile::sProfile(
 	const Json::Value & a_Properties,
 	Int64 a_DateTime
 ) :
-	m_PlayerName(a_PlayerName),
-	m_UUID(a_UUID),
-	m_Textures(),
-	m_TexturesSignature(),
-	m_DateTime(a_DateTime)
+	m_PlayerName(a_PlayerName), m_UUID(a_UUID), m_Textures(), m_TexturesSignature(), m_DateTime(a_DateTime)
 {
 	/*
 	Example a_Profile contents:
@@ -131,8 +127,10 @@ cMojangAPI::sProfile::sProfile(
 	[
 		{
 			"name": "textures",
-			"value": "eyJ0aW1lc3RhbXAiOjE0MDcwNzAzMjEyNzEsInByb2ZpbGVJZCI6ImIxY2FmMjQyMDJhODQxYTc4MDU1YTA3OWM0NjBlZWU3IiwicHJvZmlsZU5hbWUiOiJ4b2Z0IiwiaXNQdWJsaWMiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9iNzc5YmFiZjVhNTg3Zjk0OGFkNjc0N2VhOTEyNzU0MjliNjg4Mjk1YWUzYzA3YmQwZTJmNWJmNGQwNTIifX19",
-			"signature": "XCty+jGEF39hEPrPhYNnCX087kPaoCjYruzYI/DS4nkL5hbjnkSM5Rh15hnUyv/FHhC8OF5rif3D1tQjtMI19KSVaXoUFXpbJM8/+PB8GDgEbX8Fc3u9nYkzOcM/xfxdYsFAdFhLQMkvase/BZLSuPhdy9DdI+TCrO7xuSTZfYmmwVuWo3w5gCY+mSIAnqltnOzaOOTcly75xvO0WYpVk7nJdnR2tvSi0wfrQPDrIg/uzhX7p0SnDqijmBU4QaNez/TNKiFxy69dAzt0RSotlQzqkDbyVKhhv9a4eY8h3pXi4UMftKEj4FAKczxLImkukJXuOn5NN15/Q+le0rJVBC60/xjKIVzltEsMN6qjWD0lQjey7WEL+4pGhCVuWY5KzuZjFvgqszuJTFz7lo+bcHiceldJtea8/fa02eTRObZvdLxbWC9ZfFY0IhpOVKfcLdno/ddDMNMQMi5kMrJ8MZZ/PcW1w5n7MMGWPGCla1kOaC55AL0QYSMGRVEZqgU9wXI5M7sHGZKGM4mWxkbEJYBkpI/p3GyxWgV6v33ZWlsz65TqlNrR1gCLaoFCm7Sif8NqPBZUAONHYon0roXhin/DyEanS93WV6i6FC1Wisscjq2AcvnOlgTo/5nN/1QsMbjNumuMGo37sqjRqlXoPb8zEUbAhhztYuJjEfQ2Rd8="
+			"value":
+	"eyJ0aW1lc3RhbXAiOjE0MDcwNzAzMjEyNzEsInByb2ZpbGVJZCI6ImIxY2FmMjQyMDJhODQxYTc4MDU1YTA3OWM0NjBlZWU3IiwicHJvZmlsZU5hbWUiOiJ4b2Z0IiwiaXNQdWJsaWMiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9iNzc5YmFiZjVhNTg3Zjk0OGFkNjc0N2VhOTEyNzU0MjliNjg4Mjk1YWUzYzA3YmQwZTJmNWJmNGQwNTIifX19",
+			"signature":
+	"XCty+jGEF39hEPrPhYNnCX087kPaoCjYruzYI/DS4nkL5hbjnkSM5Rh15hnUyv/FHhC8OF5rif3D1tQjtMI19KSVaXoUFXpbJM8/+PB8GDgEbX8Fc3u9nYkzOcM/xfxdYsFAdFhLQMkvase/BZLSuPhdy9DdI+TCrO7xuSTZfYmmwVuWo3w5gCY+mSIAnqltnOzaOOTcly75xvO0WYpVk7nJdnR2tvSi0wfrQPDrIg/uzhX7p0SnDqijmBU4QaNez/TNKiFxy69dAzt0RSotlQzqkDbyVKhhv9a4eY8h3pXi4UMftKEj4FAKczxLImkukJXuOn5NN15/Q+le0rJVBC60/xjKIVzltEsMN6qjWD0lQjey7WEL+4pGhCVuWY5KzuZjFvgqszuJTFz7lo+bcHiceldJtea8/fa02eTRObZvdLxbWC9ZfFY0IhpOVKfcLdno/ddDMNMQMi5kMrJ8MZZ/PcW1w5n7MMGWPGCla1kOaC55AL0QYSMGRVEZqgU9wXI5M7sHGZKGM4mWxkbEJYBkpI/p3GyxWgV6v33ZWlsz65TqlNrR1gCLaoFCm7Sif8NqPBZUAONHYon0roXhin/DyEanS93WV6i6FC1Wisscjq2AcvnOlgTo/5nN/1QsMbjNumuMGo37sqjRqlXoPb8zEUbAhhztYuJjEfQ2Rd8="
 		}
 	]
 	*/
@@ -164,16 +162,13 @@ cMojangAPI::sProfile::sProfile(
 ////////////////////////////////////////////////////////////////////////////////
 // cMojangAPI::cUpdateThread:
 
-class cMojangAPI::cUpdateThread:
-	public cIsThread
+class cMojangAPI::cUpdateThread : public cIsThread
 {
 	using Super = cIsThread;
 
-public:
-
-	cUpdateThread(cMojangAPI & a_MojangAPI):
-		Super("MojangAPI Updater"),
-		m_MojangAPI(a_MojangAPI)
+  public:
+	cUpdateThread(cMojangAPI & a_MojangAPI) :
+		Super("MojangAPI Updater"), m_MojangAPI(a_MojangAPI)
 	{
 	}
 
@@ -187,8 +182,7 @@ public:
 		Stop();
 	}
 
-protected:
-
+  protected:
 	/** The cMojangAPI instance to update. */
 	cMojangAPI & m_MojangAPI;
 
@@ -202,9 +196,11 @@ protected:
 		do
 		{
 			m_MojangAPI.Update();
-		} while (!m_ShouldTerminate && !m_evtNotify.Wait(60 * 60 * 1000));  // Repeat every 60 minutes until termination request
+		}
+		while (!m_ShouldTerminate && !m_evtNotify.Wait(60 * 60 * 1000)
+		);  // Repeat every 60 minutes until termination request
 	}
-} ;
+};
 
 
 
@@ -213,9 +209,8 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cMojangAPI:
 
-cMojangAPI::cMojangAPI():
-	m_RankMgr(nullptr),
-	m_UpdateThread(new cUpdateThread(*this))
+cMojangAPI::cMojangAPI() :
+	m_RankMgr(nullptr), m_UpdateThread(new cUpdateThread(*this))
 {
 }
 
@@ -234,10 +229,12 @@ cMojangAPI::~cMojangAPI()
 
 void cMojangAPI::Start(cSettingsRepositoryInterface & a_Settings, bool a_ShouldAuth)
 {
-	auto NameToUUIDServer     = a_Settings.GetValueSet("MojangAPI", "NameToUUIDServer",     DEFAULT_NAME_TO_UUID_SERVER);
-	auto NameToUUIDAddress    = a_Settings.GetValueSet("MojangAPI", "NameToUUIDAddress",    DEFAULT_NAME_TO_UUID_ADDRESS);
-	auto UUIDToProfileServer  = a_Settings.GetValueSet("MojangAPI", "UUIDToProfileServer",  DEFAULT_UUID_TO_PROFILE_SERVER);
-	auto UUIDToProfileAddress = a_Settings.GetValueSet("MojangAPI", "UUIDToProfileAddress", DEFAULT_UUID_TO_PROFILE_ADDRESS);
+	auto NameToUUIDServer = a_Settings.GetValueSet("MojangAPI", "NameToUUIDServer", DEFAULT_NAME_TO_UUID_SERVER);
+	auto NameToUUIDAddress = a_Settings.GetValueSet("MojangAPI", "NameToUUIDAddress", DEFAULT_NAME_TO_UUID_ADDRESS);
+	auto UUIDToProfileServer =
+		a_Settings.GetValueSet("MojangAPI", "UUIDToProfileServer", DEFAULT_UUID_TO_PROFILE_SERVER);
+	auto UUIDToProfileAddress =
+		a_Settings.GetValueSet("MojangAPI", "UUIDToProfileAddress", DEFAULT_UUID_TO_PROFILE_ADDRESS);
 	m_NameToUUIDUrl = "https://" + NameToUUIDServer + NameToUUIDAddress;
 	m_UUIDToProfileUrl = "https://" + UUIDToProfileServer + UUIDToProfileAddress;
 	LoadCachesFromDisk();
@@ -259,7 +256,7 @@ cUUID cMojangAPI::GetUUIDFromPlayerName(const AString & a_PlayerName, bool a_Use
 	// Request the cache to query the name if not yet cached:
 	if (!a_UseOnlyCached)
 	{
-		AStringVector PlayerNames{ lcPlayerName };
+		AStringVector PlayerNames {lcPlayerName};
 		CacheNamesToUUIDs(PlayerNames);
 	}
 
@@ -395,7 +392,8 @@ void cMojangAPI::LoadCachesFromDisk(void)
 		// Open up the SQLite DB:
 		SQLite::Database db("MojangAPI.sqlite", SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
 		db.exec("CREATE TABLE IF NOT EXISTS PlayerNameToUUID (PlayerName, UUID, DateTime)");
-		db.exec("CREATE TABLE IF NOT EXISTS UUIDToProfile    (UUID, PlayerName, Textures, TexturesSignature, DateTime)");
+		db.exec("CREATE TABLE IF NOT EXISTS UUIDToProfile    (UUID, PlayerName, Textures, TexturesSignature, DateTime)"
+		);
 
 		// Retrieve all entries:
 		{
@@ -404,7 +402,7 @@ void cMojangAPI::LoadCachesFromDisk(void)
 			{
 				AString PlayerName = stmt.getColumn(0);
 				AString StringUUID = stmt.getColumn(1);
-				Int64 DateTime     = stmt.getColumn(2);
+				Int64 DateTime = stmt.getColumn(2);
 
 				cUUID UUID;
 				if (!UUID.FromString(StringUUID))
@@ -417,14 +415,17 @@ void cMojangAPI::LoadCachesFromDisk(void)
 			}
 		}
 		{
-			SQLite::Statement stmt(db, "SELECT PlayerName, UUID, Textures, TexturesSignature, DateTime FROM UUIDToProfile");
+			SQLite::Statement stmt(
+				db,
+				"SELECT PlayerName, UUID, Textures, TexturesSignature, DateTime FROM UUIDToProfile"
+			);
 			while (stmt.executeStep())
 			{
-				AString PlayerName        = stmt.getColumn(0);
-				AString StringUUID        = stmt.getColumn(1);
-				AString Textures          = stmt.getColumn(2);
+				AString PlayerName = stmt.getColumn(0);
+				AString StringUUID = stmt.getColumn(1);
+				AString Textures = stmt.getColumn(2);
 				AString TexturesSignature = stmt.getColumn(2);
-				Int64 DateTime            = stmt.getColumn(4);
+				Int64 DateTime = stmt.getColumn(4);
 
 				cUUID UUID;
 				if (!UUID.FromString(StringUUID))
@@ -482,7 +483,11 @@ void cMojangAPI::SaveCachesToDisk(void)
 
 		// Save all cache entries - m_UUIDToProfile:
 		{
-			SQLite::Statement stmt(db, "INSERT INTO UUIDToProfile(UUID, PlayerName, Textures, TexturesSignature, DateTime) VALUES (?, ?, ?, ?, ?)");
+			SQLite::Statement stmt(
+				db,
+				"INSERT INTO UUIDToProfile(UUID, PlayerName, Textures, TexturesSignature, DateTime) VALUES (?, ?, ?, "
+				"?, ?)"
+			);
 			cCSLock Lock(m_CSUUIDToProfile);
 			for (auto & UUIDToProfile : m_UUIDToProfile)
 			{
@@ -553,7 +558,12 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		auto RequestBody = JsonUtils::WriteFastString(root);
 
 		// Create and send the HTTP request
-		auto [IsSuccessful, Response] = cUrlClient::BlockingPost(m_NameToUUIDUrl, {}, std::move(RequestBody), MojangTrustedRootCAs::UrlClientOptions());
+		auto [IsSuccessful, Response] = cUrlClient::BlockingPost(
+			m_NameToUUIDUrl,
+			{},
+			std::move(RequestBody),
+			MojangTrustedRootCAs::UrlClientOptions()
+		);
 		if (!IsSuccessful)
 		{
 			continue;
@@ -564,7 +574,11 @@ void cMojangAPI::QueryNamesToUUIDs(AStringVector & a_NamesToQuery)
 		AString ParseError;
 		if (!JsonUtils::ParseString(Response, root, &ParseError) || !root.isArray())
 		{
-			LOGWARNING("%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"", __METHOD_NAME__, ParseError);
+			LOGWARNING(
+				"%s failed: Cannot parse received data (NameToUUID) to JSON: \"%s\"",
+				__METHOD_NAME__,
+				ParseError
+			);
 			LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16));
 			continue;
 		}
@@ -660,8 +674,10 @@ void cMojangAPI::QueryUUIDToProfile(const cUUID & a_UUID)
 		[
 			{
 				"name": "textures",
-				"value": "eyJ0aW1lc3RhbXAiOjE0MDcwNzAzMjEyNzEsInByb2ZpbGVJZCI6ImIxY2FmMjQyMDJhODQxYTc4MDU1YTA3OWM0NjBlZWU3IiwicHJvZmlsZU5hbWUiOiJ4b2Z0IiwiaXNQdWJsaWMiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9iNzc5YmFiZjVhNTg3Zjk0OGFkNjc0N2VhOTEyNzU0MjliNjg4Mjk1YWUzYzA3YmQwZTJmNWJmNGQwNTIifX19",
-				"signature": "XCty+jGEF39hEPrPhYNnCX087kPaoCjYruzYI/DS4nkL5hbjnkSM5Rh15hnUyv/FHhC8OF5rif3D1tQjtMI19KSVaXoUFXpbJM8/+PB8GDgEbX8Fc3u9nYkzOcM/xfxdYsFAdFhLQMkvase/BZLSuPhdy9DdI+TCrO7xuSTZfYmmwVuWo3w5gCY+mSIAnqltnOzaOOTcly75xvO0WYpVk7nJdnR2tvSi0wfrQPDrIg/uzhX7p0SnDqijmBU4QaNez/TNKiFxy69dAzt0RSotlQzqkDbyVKhhv9a4eY8h3pXi4UMftKEj4FAKczxLImkukJXuOn5NN15/Q+le0rJVBC60/xjKIVzltEsMN6qjWD0lQjey7WEL+4pGhCVuWY5KzuZjFvgqszuJTFz7lo+bcHiceldJtea8/fa02eTRObZvdLxbWC9ZfFY0IhpOVKfcLdno/ddDMNMQMi5kMrJ8MZZ/PcW1w5n7MMGWPGCla1kOaC55AL0QYSMGRVEZqgU9wXI5M7sHGZKGM4mWxkbEJYBkpI/p3GyxWgV6v33ZWlsz65TqlNrR1gCLaoFCm7Sif8NqPBZUAONHYon0roXhin/DyEanS93WV6i6FC1Wisscjq2AcvnOlgTo/5nN/1QsMbjNumuMGo37sqjRqlXoPb8zEUbAhhztYuJjEfQ2Rd8="
+				"value":
+	"eyJ0aW1lc3RhbXAiOjE0MDcwNzAzMjEyNzEsInByb2ZpbGVJZCI6ImIxY2FmMjQyMDJhODQxYTc4MDU1YTA3OWM0NjBlZWU3IiwicHJvZmlsZU5hbWUiOiJ4b2Z0IiwiaXNQdWJsaWMiOnRydWUsInRleHR1cmVzIjp7IlNLSU4iOnsidXJsIjoiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS9iNzc5YmFiZjVhNTg3Zjk0OGFkNjc0N2VhOTEyNzU0MjliNjg4Mjk1YWUzYzA3YmQwZTJmNWJmNGQwNTIifX19",
+				"signature":
+	"XCty+jGEF39hEPrPhYNnCX087kPaoCjYruzYI/DS4nkL5hbjnkSM5Rh15hnUyv/FHhC8OF5rif3D1tQjtMI19KSVaXoUFXpbJM8/+PB8GDgEbX8Fc3u9nYkzOcM/xfxdYsFAdFhLQMkvase/BZLSuPhdy9DdI+TCrO7xuSTZfYmmwVuWo3w5gCY+mSIAnqltnOzaOOTcly75xvO0WYpVk7nJdnR2tvSi0wfrQPDrIg/uzhX7p0SnDqijmBU4QaNez/TNKiFxy69dAzt0RSotlQzqkDbyVKhhv9a4eY8h3pXi4UMftKEj4FAKczxLImkukJXuOn5NN15/Q+le0rJVBC60/xjKIVzltEsMN6qjWD0lQjey7WEL+4pGhCVuWY5KzuZjFvgqszuJTFz7lo+bcHiceldJtea8/fa02eTRObZvdLxbWC9ZfFY0IhpOVKfcLdno/ddDMNMQMi5kMrJ8MZZ/PcW1w5n7MMGWPGCla1kOaC55AL0QYSMGRVEZqgU9wXI5M7sHGZKGM4mWxkbEJYBkpI/p3GyxWgV6v33ZWlsz65TqlNrR1gCLaoFCm7Sif8NqPBZUAONHYon0roXhin/DyEanS93WV6i6FC1Wisscjq2AcvnOlgTo/5nN/1QsMbjNumuMGo37sqjRqlXoPb8zEUbAhhztYuJjEfQ2Rd8="
 			}
 		]
 	}
@@ -745,7 +761,9 @@ void cMojangAPI::Update(void)
 	}
 	if (!ProfileUUIDs.empty())
 	{
-		LOG("%s: Updating uuid-to-profile cache for %u uuids", __METHOD_NAME__, static_cast<unsigned>(ProfileUUIDs.size()));
+		LOG("%s: Updating uuid-to-profile cache for %u uuids",
+			__METHOD_NAME__,
+			static_cast<unsigned>(ProfileUUIDs.size()));
 		for (const auto & UUID : ProfileUUIDs)
 		{
 			QueryUUIDToProfile(UUID);

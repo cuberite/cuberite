@@ -15,9 +15,9 @@
 
 // Easy switch for turning on debugging logging:
 #if 0
-	#define FIRE_FLOG FLOGD
+#define FIRE_FLOG FLOGD
 #else
-	#define FIRE_FLOG(...)
+#define FIRE_FLOG(...)
 #endif
 
 
@@ -36,26 +36,24 @@
 
 
 
-static constexpr Vector3i gCrossCoords[] =
-{
-	{ 1, 0,  0},
-	{-1, 0,  0},
-	{ 0, 0,  1},
-	{ 0, 0, -1},
-} ;
+static constexpr Vector3i gCrossCoords[] = {
+	{1, 0, 0},
+	{-1, 0, 0},
+	{0, 0, 1},
+	{0, 0, -1},
+};
 
 
 
 
 
-static constexpr Vector3i gNeighborCoords[] =
-{
-	{ 1,  0,  0},
-	{-1,  0,  0},
-	{ 0,  1,  0},
-	{ 0, -1,  0},
-	{ 0,  0,  1},
-	{ 0,  0, -1},
+static constexpr Vector3i gNeighborCoords[] = {
+	{1, 0, 0},
+	{-1, 0, 0},
+	{0, 1, 0},
+	{0, -1, 0},
+	{0, 0, 1},
+	{0, 0, -1},
 };
 
 
@@ -69,10 +67,10 @@ cFireSimulator::cFireSimulator(cWorld & a_World, cIniFile & a_IniFile) :
 	cSimulator(a_World)
 {
 	// Read params from the ini file:
-	m_BurnStepTimeFuel    = static_cast<unsigned>(a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeFuel",     500));
-	m_BurnStepTimeNonfuel = static_cast<unsigned>(a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeNonfuel",  100));
-	m_Flammability        = a_IniFile.GetValueSetI("FireSimulator", "Flammability",          50);
-	m_ReplaceFuelChance   = a_IniFile.GetValueSetI("FireSimulator", "ReplaceFuelChance",  50000);
+	m_BurnStepTimeFuel = static_cast<unsigned>(a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeFuel", 500));
+	m_BurnStepTimeNonfuel = static_cast<unsigned>(a_IniFile.GetValueSetI("FireSimulator", "BurnStepTimeNonfuel", 100));
+	m_Flammability = a_IniFile.GetValueSetI("FireSimulator", "Flammability", 50);
+	m_ReplaceFuelChance = a_IniFile.GetValueSetI("FireSimulator", "ReplaceFuelChance", 50000);
 }
 
 
@@ -91,7 +89,8 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 
 		if (!IsAllowedBlock(blockType))
 		{
-			// The block is no longer eligible (not a fire block anymore; a player probably placed a block over the fire)
+			// The block is no longer eligible (not a fire block anymore; a player probably placed a block over the
+			// fire)
 			FIRE_FLOG("FS: Removing block {0}", absPos);
 			itr = Data.erase(itr);
 			continue;
@@ -100,19 +99,24 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		auto BurnsForever = ((relPos.y > 0) && DoesBurnForever(a_Chunk->GetBlock(relPos.addedY(-1))));
 		auto BlockMeta = a_Chunk->GetMeta(relPos);
 
-		auto Raining = std::any_of(std::begin(gCrossCoords), std::end(gCrossCoords), [a_Chunk, relPos](Vector3i cc)
-		{
-			auto Adjusted = relPos + cc;
-			const auto Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(Adjusted);
-			if ((Chunk != nullptr) && Chunk->IsValid())
+		auto Raining = std::any_of(
+			std::begin(gCrossCoords),
+			std::end(gCrossCoords),
+			[a_Chunk, relPos](Vector3i cc)
 			{
-				return Chunk->IsWeatherWetAt(Adjusted);
+				auto Adjusted = relPos + cc;
+				const auto Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(Adjusted);
+				if ((Chunk != nullptr) && Chunk->IsValid())
+				{
+					return Chunk->IsWeatherWetAt(Adjusted);
+				}
+				return false;
 			}
-			return false;
-		});
+		);
 
 		// Randomly burn out the fire if it is raining:
-		if (!BurnsForever && Raining && GetRandomProvider().RandBool(CHANCE_BASE_RAIN_EXTINGUISH + (BlockMeta * CHANCE_AGE_M_RAIN_EXTINGUISH)))
+		if (!BurnsForever && Raining &&
+			GetRandomProvider().RandBool(CHANCE_BASE_RAIN_EXTINGUISH + (BlockMeta * CHANCE_AGE_M_RAIN_EXTINGUISH)))
 		{
 			a_Chunk->SetBlock(relPos, E_BLOCK_AIR, 0);
 			itr = Data.erase(itr);
@@ -245,7 +249,7 @@ void cFireSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a
 	cFireSimulatorChunkData & ChunkData = a_Chunk.GetFireSimulatorData();
 	for (cCoordWithIntList::iterator itr = ChunkData.begin(), end = ChunkData.end(); itr != end; ++itr)
 	{
-		const Vector3i ItrPos{itr->x, itr->y, itr->z};
+		const Vector3i ItrPos {itr->x, itr->y, itr->z};
 		if (ItrPos == a_Position)
 		{
 			// Block already present, check if burn step should decrease
@@ -287,9 +291,9 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, Vector3i a_RelPos)
 		IsBlockBelowSolid = cBlockInfo::IsSolid(BlockBelow);
 	}
 
-	for (const auto & cross: gCrossCoords)
+	for (const auto & cross : gCrossCoords)
 	{
-		BLOCKTYPE  BlockType;
+		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
 		if (a_Chunk->UnboundedRelGetBlock(a_RelPos + cross, BlockType, BlockMeta))
 		{
@@ -338,7 +342,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, Vector3i a_RelPos)
 				}
 
 				// Start the fire in the neighbor a_RelPos + {x, y, z}
-				auto dstRelPos = a_RelPos + Vector3i{x, y, z};
+				auto dstRelPos = a_RelPos + Vector3i {x, y, z};
 				if (CanStartFireInBlock(a_Chunk, dstRelPos))
 				{
 					auto dstAbsPos = a_Chunk->RelativeToAbsolute(dstRelPos);
@@ -410,7 +414,7 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos)
 
 bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, Vector3i a_RelPos)
 {
-	BLOCKTYPE  BlockType;
+	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
 	if (!a_NearChunk->UnboundedRelGetBlock(a_RelPos, BlockType, BlockMeta))
 	{
@@ -424,7 +428,7 @@ bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, Vector3i a_RelPos
 		return false;
 	}
 
-	for (const auto & neighbor: gNeighborCoords)
+	for (const auto & neighbor : gNeighborCoords)
 	{
 		if (!a_NearChunk->UnboundedRelGetBlock(a_RelPos + neighbor, BlockType, BlockMeta))
 		{

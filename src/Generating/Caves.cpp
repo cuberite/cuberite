@@ -13,14 +13,14 @@ Caves are generated in "nests" - groups of tunnels generated from a single point
 For each chunk, all the nests that could intersect it are generated.
 For each nest, first the schematic structure is generated (tunnel from ... to ..., branch, tunnel2 from ... to ...)
 Then each tunnel is randomized by inserting points in between its ends.
-Finally each tunnel is smoothed and Bresenham-3D-ed so that it is a collection of spheres with their centers next to each other.
-When the tunnels are ready, they are simply carved into the chunk, one by one.
-To optimize, each tunnel keeps track of its bounding box, so that it can be skipped for chunks that don't intersect it.
+Finally each tunnel is smoothed and Bresenham-3D-ed so that it is a collection of spheres with their centers next to
+each other. When the tunnels are ready, they are simply carved into the chunk, one by one. To optimize, each tunnel
+keeps track of its bounding box, so that it can be skipped for chunks that don't intersect it.
 
 MarbleCaves generator:
-For each voxel a 3D noise function is evaluated, if the value crosses a boundary, the voxel is dug out, otherwise it is kept.
-Problem with this is the amount of CPU work needed for each chunk.
-Also the overall shape of the generated holes is unsatisfactory - there are whole "sheets" of holes in the ground.
+For each voxel a 3D noise function is evaluated, if the value crosses a boundary, the voxel is dug out, otherwise it is
+kept. Problem with this is the amount of CPU work needed for each chunk. Also the overall shape of the generated holes
+is unsatisfactory - there are whole "sheets" of holes in the ground.
 
 DualRidgeCaves generator:
 Instead of evaluating a single noise function, two different noise functions are multiplied. This produces
@@ -51,13 +51,10 @@ struct cCaveDefPoint
 	int m_Radius;
 
 	cCaveDefPoint(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Radius) :
-		m_BlockX(a_BlockX),
-		m_BlockY(a_BlockY),
-		m_BlockZ(a_BlockZ),
-		m_Radius(a_Radius)
+		m_BlockX(a_BlockX), m_BlockY(a_BlockY), m_BlockZ(a_BlockZ), m_Radius(a_Radius)
 	{
 	}
-} ;
+};
 
 typedef std::vector<cCaveDefPoint> cCaveDefPoints;
 
@@ -76,7 +73,8 @@ class cCaveTunnel
 	/** Generates the shaping defpoints for the cave, based on the cave block coords and noise */
 	void Randomize(cNoise & a_Noise);
 
-	/** Refines (adds and smooths) defpoints from a_Src into a_Dst; returns false if no refinement possible (segments too short) */
+	/** Refines (adds and smooths) defpoints from a_Src into a_Dst; returns false if no refinement possible (segments
+	 * too short) */
 	bool RefineDefPoints(const cCaveDefPoints & a_Src, cCaveDefPoints & a_Dst);
 
 	/** Does rounds of smoothing, two passes of RefineDefPoints(), as long as they return true */
@@ -88,27 +86,34 @@ class cCaveTunnel
 	/** Calculates the bounding box of the points present */
 	void CalcBoundingBox(void);
 
-public:
+  public:
 	cCaveDefPoints m_Points;
 
 	cCaveTunnel(
-		int a_BlockStartX, int a_BlockStartY, int a_BlockStartZ, int a_StartRadius,
-		int a_BlockEndX,   int a_BlockEndY,   int a_BlockEndZ,   int a_EndRadius,
+		int a_BlockStartX,
+		int a_BlockStartY,
+		int a_BlockStartZ,
+		int a_StartRadius,
+		int a_BlockEndX,
+		int a_BlockEndY,
+		int a_BlockEndZ,
+		int a_EndRadius,
 		cNoise & a_Noise
 	);
 
 	/** Carves the tunnel into the chunk specified */
 	void ProcessChunk(
-		int a_ChunkX, int a_ChunkZ,
+		int a_ChunkX,
+		int a_ChunkZ,
 		cChunkDef::BlockTypes & a_BlockTypes,
 		cChunkDesc::BlockNibbleBytes & a_BlockMetas,
 		cChunkDef::HeightMap & a_HeightMap
 	);
 
-	#ifndef NDEBUG
+#ifndef NDEBUG
 	AString ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) const;
-	#endif  // !NDEBUG
-} ;
+#endif  // !NDEBUG
+};
 
 typedef std::vector<cCaveTunnel *> cCaveTunnels;
 
@@ -117,13 +122,11 @@ typedef std::vector<cCaveTunnel *> cCaveTunnels;
 
 
 /** A collection of connected tunnels, possibly branching. */
-class cStructGenWormNestCaves::cCaveSystem:
-	public cGridStructGen::cStructure
+class cStructGenWormNestCaves::cCaveSystem : public cGridStructGen::cStructure
 {
 	using Super = cGridStructGen::cStructure;
 
-public:
-
+  public:
 	// The generating block position; is read directly in cStructGenWormNestCaves::GetCavesForChunk()
 	int m_BlockX;
 	int m_BlockZ;
@@ -131,24 +134,22 @@ public:
 	cCaveSystem(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_MaxOffset, int a_Size, cNoise & a_Noise);
 	virtual ~cCaveSystem() override;
 
-protected:
+  protected:
 	int m_Size;
 	cCaveTunnels m_Tunnels;
 
 	void Clear(void);
 
-	/** Generates a_Segment successive tunnels, with possible branches. Generates the same output for the same [x, y, z, a_Segments] */
-	void GenerateTunnelsFromPoint(
-		int a_OriginX, int a_OriginY, int a_OriginZ,
-		cNoise & a_Noise, int a_Segments
-	);
+	/** Generates a_Segment successive tunnels, with possible branches. Generates the same output for the same [x, y, z,
+	 * a_Segments] */
+	void GenerateTunnelsFromPoint(int a_OriginX, int a_OriginY, int a_OriginZ, cNoise & a_Noise, int a_Segments);
 
 	/** Returns a radius based on the location provided. */
 	int GetRadius(cNoise & a_Noise, int a_OriginX, int a_OriginY, int a_OriginZ);
 
 	// cGridStructGen::cStructure overrides:
 	virtual void DrawIntoChunk(cChunkDesc & a_ChunkDesc) override;
-} ;
+};
 
 
 
@@ -158,13 +159,19 @@ protected:
 // cCaveTunnel:
 
 cCaveTunnel::cCaveTunnel(
-	int a_BlockStartX, int a_BlockStartY, int a_BlockStartZ, int a_StartRadius,
-	int a_BlockEndX,   int a_BlockEndY,   int a_BlockEndZ,   int a_EndRadius,
+	int a_BlockStartX,
+	int a_BlockStartY,
+	int a_BlockStartZ,
+	int a_StartRadius,
+	int a_BlockEndX,
+	int a_BlockEndY,
+	int a_BlockEndZ,
+	int a_EndRadius,
 	cNoise & a_Noise
 )
 {
 	m_Points.emplace_back(a_BlockStartX, a_BlockStartY, a_BlockStartZ, a_StartRadius);
-	m_Points.emplace_back(a_BlockEndX,   a_BlockEndY,   a_BlockEndZ,   a_EndRadius);
+	m_Points.emplace_back(a_BlockEndX, a_BlockEndY, a_BlockEndZ, a_EndRadius);
 
 	if ((a_BlockStartY <= 0) && (a_BlockEndY <= 0))
 	{
@@ -356,7 +363,7 @@ void cCaveTunnel::FinishLinear(void)
 				}
 
 				// move along x
-				PrevX  += sx;
+				PrevX += sx;
 				yd += dy;
 				zd += dz;
 			}
@@ -456,7 +463,8 @@ void cCaveTunnel::CalcBoundingBox(void)
 
 
 void cCaveTunnel::ProcessChunk(
-	int a_ChunkX, int a_ChunkZ,
+	int a_ChunkX,
+	int a_ChunkZ,
 	cChunkDef::BlockTypes & a_BlockTypes,
 	cChunkDesc::BlockNibbleBytes & a_BlockMetas,
 	cChunkDef::HeightMap & a_HeightMap
@@ -464,10 +472,8 @@ void cCaveTunnel::ProcessChunk(
 {
 	int BaseX = a_ChunkX * cChunkDef::Width;
 	int BaseZ = a_ChunkZ * cChunkDef::Width;
-	if (
-		(BaseX > m_MaxBlockX) || (BaseX + cChunkDef::Width < m_MinBlockX) ||
-		(BaseZ > m_MaxBlockZ) || (BaseZ + cChunkDef::Width < m_MinBlockZ)
-	)
+	if ((BaseX > m_MaxBlockX) || (BaseX + cChunkDef::Width < m_MinBlockX) || (BaseZ > m_MaxBlockZ) ||
+		(BaseZ + cChunkDef::Width < m_MinBlockZ))
 	{
 		// Tunnel does not intersect the chunk at all, bail out
 		return;
@@ -479,12 +485,8 @@ void cCaveTunnel::ProcessChunk(
 	int BlockEndZ = BlockStartZ + cChunkDef::Width;
 	for (cCaveDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
 	{
-		if (
-			(itr->m_BlockX + itr->m_Radius < BlockStartX) ||
-			(itr->m_BlockX - itr->m_Radius > BlockEndX) ||
-			(itr->m_BlockZ + itr->m_Radius < BlockStartZ) ||
-			(itr->m_BlockZ - itr->m_Radius > BlockEndZ)
-		)
+		if ((itr->m_BlockX + itr->m_Radius < BlockStartX) || (itr->m_BlockX - itr->m_Radius > BlockEndX) ||
+			(itr->m_BlockZ + itr->m_Radius < BlockStartZ) || (itr->m_BlockZ - itr->m_Radius > BlockEndZ))
 		{
 			// Cannot intersect, bail out early
 			continue;
@@ -495,38 +497,39 @@ void cCaveTunnel::ProcessChunk(
 		int DifY = itr->m_BlockY;
 		int DifZ = itr->m_BlockZ - BlockStartZ;  // substitution for faster calc
 		int Bottom = std::max(itr->m_BlockY - 3 * itr->m_Radius / 7, 1);
-		int Top    = std::min(itr->m_BlockY + 3 * itr->m_Radius / 7, static_cast<int>(cChunkDef::Height));
-		int SqRad  = itr->m_Radius * itr->m_Radius;
-		for (int z = 0; z < cChunkDef::Width; z++) for (int x = 0; x < cChunkDef::Width; x++)
-		{
-			for (int y = Bottom; y <= Top; y++)
+		int Top = std::min(itr->m_BlockY + 3 * itr->m_Radius / 7, static_cast<int>(cChunkDef::Height));
+		int SqRad = itr->m_Radius * itr->m_Radius;
+		for (int z = 0; z < cChunkDef::Width; z++)
+			for (int x = 0; x < cChunkDef::Width; x++)
 			{
-				int SqDist = (DifX - x) * (DifX - x) + (DifY - y) * (DifY - y) + (DifZ - z) * (DifZ - z);
-				if (4 * SqDist <= SqRad)
+				for (int y = Bottom; y <= Top; y++)
 				{
-					if (cBlockInfo::CanBeTerraformed(cChunkDef::GetBlock(a_BlockTypes, x, y, z)))
+					int SqDist = (DifX - x) * (DifX - x) + (DifY - y) * (DifY - y) + (DifZ - z) * (DifZ - z);
+					if (4 * SqDist <= SqRad)
 					{
-						cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
-					}
-				}
-				else if (SqDist <= SqRad * 2)
-				{
-					if (cChunkDef::GetBlock(a_BlockTypes, x, y, z) == E_BLOCK_SAND)
-					{
-						const auto Index = cChunkDef::MakeIndex(x, y, z);
-						if (a_BlockMetas[Index] == 1)
+						if (cBlockInfo::CanBeTerraformed(cChunkDef::GetBlock(a_BlockTypes, x, y, z)))
 						{
-							a_BlockMetas[Index] = 0;
-							cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_RED_SANDSTONE);
-						}
-						else
-						{
-							cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_SANDSTONE);
+							cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
 						}
 					}
-				}
-			}  // for y
-		}  // for x, z
+					else if (SqDist <= SqRad * 2)
+					{
+						if (cChunkDef::GetBlock(a_BlockTypes, x, y, z) == E_BLOCK_SAND)
+						{
+							const auto Index = cChunkDef::MakeIndex(x, y, z);
+							if (a_BlockMetas[Index] == 1)
+							{
+								a_BlockMetas[Index] = 0;
+								cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_RED_SANDSTONE);
+							}
+							else
+							{
+								cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_SANDSTONE);
+							}
+						}
+					}
+				}  // for y
+			}  // for x, z
 	}  // for itr - m_Points[]
 
 	/*
@@ -577,23 +580,30 @@ AString cCaveTunnel::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) cons
 ////////////////////////////////////////////////////////////////////////////////
 // cStructGenWormNestCaves::cCaveSystem:
 
-cStructGenWormNestCaves::cCaveSystem::cCaveSystem(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_MaxOffset, int a_Size, cNoise & a_Noise) :
-	Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
-	m_Size(a_Size)
+cStructGenWormNestCaves::cCaveSystem::cCaveSystem(
+	int a_GridX,
+	int a_GridZ,
+	int a_OriginX,
+	int a_OriginZ,
+	int a_MaxOffset,
+	int a_Size,
+	cNoise & a_Noise
+) :
+	Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ), m_Size(a_Size)
 {
 	int Num = 1 + a_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) % 3;
 	for (int i = 0; i < Num; i++)
 	{
 		int OriginX = a_OriginX + (a_Noise.IntNoise3DInt(13 * a_OriginX, 17 * a_OriginZ, 11 * i) / 19) % a_MaxOffset;
 		int OriginZ = a_OriginZ + (a_Noise.IntNoise3DInt(17 * a_OriginX, 13 * a_OriginZ, 11 * i) / 23) % a_MaxOffset;
-		int OriginY  = 20 + (a_Noise.IntNoise3DInt(19 * a_OriginX, 13 * a_OriginZ, 11 * i) / 17) % 20;
+		int OriginY = 20 + (a_Noise.IntNoise3DInt(19 * a_OriginX, 13 * a_OriginZ, 11 * i) / 17) % 20;
 
 		// Generate three branches from the origin point:
 		// The tunnels generated depend on X, Y, Z and Branches,
 		// for the same set of numbers it generates the same offsets!
 		// That's why we add a +1 to X in the third line
-		GenerateTunnelsFromPoint(OriginX,     OriginY, OriginZ, a_Noise, 3);
-		GenerateTunnelsFromPoint(OriginX,     OriginY, OriginZ, a_Noise, 2);
+		GenerateTunnelsFromPoint(OriginX, OriginY, OriginZ, a_Noise, 3);
+		GenerateTunnelsFromPoint(OriginX, OriginY, OriginZ, a_Noise, 2);
 		GenerateTunnelsFromPoint(OriginX + 1, OriginY, OriginZ, a_Noise, 3);
 	}
 }
@@ -615,8 +625,8 @@ void cStructGenWormNestCaves::cCaveSystem::DrawIntoChunk(cChunkDesc & a_ChunkDes
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
-	cChunkDef::BlockTypes        & BlockTypes = a_ChunkDesc.GetBlockTypes();
-	cChunkDef::HeightMap         &  HeightMap = a_ChunkDesc.GetHeightMap();
+	cChunkDef::BlockTypes & BlockTypes = a_ChunkDesc.GetBlockTypes();
+	cChunkDef::HeightMap & HeightMap = a_ChunkDesc.GetHeightMap();
 	cChunkDesc::BlockNibbleBytes & BlockMetas = a_ChunkDesc.GetBlockMetasUncompressed();
 	for (cCaveTunnels::const_iterator itr = m_Tunnels.begin(), end = m_Tunnels.end(); itr != end; ++itr)
 	{
@@ -642,17 +652,26 @@ void cStructGenWormNestCaves::cCaveSystem::Clear(void)
 
 
 void cStructGenWormNestCaves::cCaveSystem::GenerateTunnelsFromPoint(
-	int a_OriginX, int a_OriginY, int a_OriginZ,
-	cNoise & a_Noise, int a_NumSegments
+	int a_OriginX,
+	int a_OriginY,
+	int a_OriginZ,
+	cNoise & a_Noise,
+	int a_NumSegments
 )
 {
 	int DoubleSize = m_Size * 2;
 	int Radius = GetRadius(a_Noise, a_OriginX + a_OriginY, a_OriginY + a_OriginZ, a_OriginZ + a_OriginX);
 	for (int i = a_NumSegments - 1; i >= 0; --i)
 	{
-		int EndX = a_OriginX + (((a_Noise.IntNoise3DInt(a_OriginX, a_OriginY, a_OriginZ + 11 * a_NumSegments) / 7) % DoubleSize) - m_Size) / 2;
-		int EndY = a_OriginY + (((a_Noise.IntNoise3DInt(a_OriginY, 13 * a_NumSegments, a_OriginZ + a_OriginX) / 7) % DoubleSize) - m_Size) / 4;
-		int EndZ = a_OriginZ + (((a_Noise.IntNoise3DInt(a_OriginZ + 17 * a_NumSegments, a_OriginX, a_OriginY) / 7) % DoubleSize) - m_Size) / 2;
+		int EndX = a_OriginX +
+			(((a_Noise.IntNoise3DInt(a_OriginX, a_OriginY, a_OriginZ + 11 * a_NumSegments) / 7) % DoubleSize) - m_Size
+			) / 2;
+		int EndY = a_OriginY +
+			(((a_Noise.IntNoise3DInt(a_OriginY, 13 * a_NumSegments, a_OriginZ + a_OriginX) / 7) % DoubleSize) - m_Size
+			) / 4;
+		int EndZ = a_OriginZ +
+			(((a_Noise.IntNoise3DInt(a_OriginZ + 17 * a_NumSegments, a_OriginX, a_OriginY) / 7) % DoubleSize) - m_Size
+			) / 2;
 		int EndR = GetRadius(a_Noise, a_OriginX + 7 * i, a_OriginY + 11 * i, a_OriginZ + a_OriginX);
 		m_Tunnels.push_back(new cCaveTunnel(a_OriginX, a_OriginY, a_OriginZ, Radius, EndX, EndY, EndZ, EndR, a_Noise));
 		GenerateTunnelsFromPoint(EndX, EndY, EndZ, a_Noise, i);
@@ -669,16 +688,18 @@ void cStructGenWormNestCaves::cCaveSystem::GenerateTunnelsFromPoint(
 
 int cStructGenWormNestCaves::cCaveSystem::GetRadius(cNoise & a_Noise, int a_OriginX, int a_OriginY, int a_OriginZ)
 {
-	// Instead of a flat distribution noise function, we need to shape it, so that most caves are smallish and only a few select are large
+	// Instead of a flat distribution noise function, we need to shape it, so that most caves are smallish and only a
+	// few select are large
 	int rnd = a_Noise.IntNoise3DInt(a_OriginX, a_OriginY, a_OriginZ) / 11;
 	/*
 	// Not good enough:
-	// The algorithm of choice: emulate gauss-distribution noise by adding 3 flat noises, then fold it in half using absolute value.
+	// The algorithm of choice: emulate gauss-distribution noise by adding 3 flat noises, then fold it in half using
+	absolute value.
 	// To save on processing, use one random value and extract 3 bytes to be separately added as the gaussian noise
 	int sum = (rnd & 0xff) + ((rnd >> 8) & 0xff) + ((rnd >> 16) & 0xff);
 	// sum is now a gaussian-distribution noise within [0 .. 767], with center at 384.
-	// We want mapping 384 -> 3, 0 -> 19, 768 -> 19, so divide by 24 to get [0 .. 31] with center at 16, then use abs() to fold around the center
-	int res = 3 + abs((sum / 24) - 16);
+	// We want mapping 384 -> 3, 0 -> 19, 768 -> 19, so divide by 24 to get [0 .. 31] with center at 16, then use abs()
+	to fold around the center int res = 3 + abs((sum / 24) - 16);
 	*/
 
 	// Algorithm of choice: random value in the range of zero to random value - heavily towards zero
@@ -693,7 +714,12 @@ int cStructGenWormNestCaves::cCaveSystem::GetRadius(cNoise & a_Noise, int a_Orig
 ////////////////////////////////////////////////////////////////////////////////
 // cStructGenWormNestCaves:
 
-cGridStructGen::cStructurePtr cStructGenWormNestCaves::CreateStructure(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ)
+cGridStructGen::cStructurePtr cStructGenWormNestCaves::CreateStructure(
+	int a_GridX,
+	int a_GridZ,
+	int a_OriginX,
+	int a_OriginZ
+)
 {
 	return cStructurePtr(new cCaveSystem(a_GridX, a_GridZ, a_OriginX, a_OriginZ, m_MaxOffset, m_Size, m_Noise));
 }
@@ -705,7 +731,7 @@ cGridStructGen::cStructurePtr cStructGenWormNestCaves::CreateStructure(int a_Gri
 ////////////////////////////////////////////////////////////////////////////////
 // cStructGenMarbleCaves:
 
-static float GetMarbleNoise( float x, float y, float z, cNoise & a_Noise)
+static float GetMarbleNoise(float x, float y, float z, cNoise & a_Noise)
 {
 	static const float PI_2 = 1.57079633f;
 	float oct1 = (a_Noise.CubicNoise3D(x * 0.1f, y * 0.1f, z * 0.1f)) * 4;
@@ -747,7 +773,9 @@ void cStructGenMarbleCaves::GenFinish(cChunkDesc & a_ChunkDesc)
 
 				const float yy = static_cast<float>(y);
 				const float WaveNoise = 1;
-				if (cosf(GetMarbleNoise(xx, yy * 0.5f, zz, Noise)) * fabs(cosf(yy * 0.2f + WaveNoise * 2) * 0.75f + WaveNoise) > 0.0005f)
+				if (cosf(GetMarbleNoise(xx, yy * 0.5f, zz, Noise)) *
+						fabs(cosf(yy * 0.2f + WaveNoise * 2) * 0.75f + WaveNoise) >
+					0.0005f)
 				{
 					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
 				}
@@ -788,7 +816,3 @@ void cStructGenDualRidgeCaves::GenFinish(cChunkDesc & a_ChunkDesc)
 		}  // for x
 	}  // for z
 }
-
-
-
-

@@ -9,13 +9,11 @@
 
 
 
-class cItemShearsHandler final:
-	public cItemHandler
+class cItemShearsHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 
@@ -69,9 +67,9 @@ public:
 	{
 		switch (a_Action)
 		{
-			case dlaAttackEntity:       return 0;
-			case dlaBreakBlock:         return 0;
-			case dlaBreakBlockInstant:  return 1;
+			case dlaAttackEntity:      return 0;
+			case dlaBreakBlock:        return 0;
+			case dlaBreakBlockInstant: return 1;
 		}
 		UNREACHABLE("Unsupported durability loss action");
 	}
@@ -95,4 +93,4 @@ public:
 			return Super::GetBlockBreakingStrength(a_Block);
 		}
 	}
-} ;
+};

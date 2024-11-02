@@ -35,7 +35,3 @@ EMCSBiome Chunk::getBiome(int a_RelX, int a_RelZ)
 	}
 	return static_cast<EMCSBiome>(m_Biomes[a_RelX + 16 * a_RelZ]);
 }
-
-
-
-

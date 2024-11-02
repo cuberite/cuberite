@@ -12,17 +12,15 @@ class cBlockPistonHandler;
 
 
 
-template<BLOCKTYPE T>
-class GetHandlerCompileTime;
+template <BLOCKTYPE T> class GetHandlerCompileTime;
 
 
 
 
 
-template<>
-class GetHandlerCompileTime<E_BLOCK_TORCH>
+template <> class GetHandlerCompileTime<E_BLOCK_TORCH>
 {
-public:
+  public:
 	typedef cBlockTorchHandler type;
 };
 
@@ -30,10 +28,9 @@ public:
 
 
 
-template<>
-class GetHandlerCompileTime<E_BLOCK_LEVER>
+template <> class GetHandlerCompileTime<E_BLOCK_LEVER>
 {
-public:
+  public:
 	typedef cBlockLeverHandler type;
 };
 
@@ -41,10 +38,9 @@ public:
 
 
 
-template<>
-class GetHandlerCompileTime<E_BLOCK_STONE_BUTTON>
+template <> class GetHandlerCompileTime<E_BLOCK_STONE_BUTTON>
 {
-public:
+  public:
 	typedef cBlockButtonHandler type;
 };
 
@@ -52,10 +48,9 @@ public:
 
 
 
-template<>
-class GetHandlerCompileTime<E_BLOCK_TRIPWIRE_HOOK>
+template <> class GetHandlerCompileTime<E_BLOCK_TRIPWIRE_HOOK>
 {
-public:
+  public:
 	typedef cBlockTripwireHookHandler type;
 };
 
@@ -63,10 +58,9 @@ public:
 
 
 
-template<>
-class GetHandlerCompileTime<E_BLOCK_WOODEN_DOOR>
+template <> class GetHandlerCompileTime<E_BLOCK_WOODEN_DOOR>
 {
-public:
+  public:
 	typedef cBlockDoorHandler type;
 };
 
@@ -74,10 +68,8 @@ public:
 
 
 
-template<>
-class GetHandlerCompileTime<E_BLOCK_PISTON>
+template <> class GetHandlerCompileTime<E_BLOCK_PISTON>
 {
-public:
+  public:
 	typedef cBlockPistonHandler type;
 };
-

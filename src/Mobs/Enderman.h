@@ -7,13 +7,11 @@
 
 
 
-class cEnderman:
-	public cPassiveAggressiveMonster
+class cEnderman : public cPassiveAggressiveMonster
 {
 	using Super = cPassiveAggressiveMonster;
 
-public:
-
+  public:
 	cEnderman();
 
 	CLASS_PROTODEF(cEnderman)
@@ -23,14 +21,12 @@ public:
 	virtual void EventLosePlayer(void) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
-	bool IsScreaming(void) const {return m_bIsScreaming; }
-	BLOCKTYPE GetCarriedBlock(void) const {return m_CarriedBlock; }
-	NIBBLETYPE GetCarriedMeta(void) const {return m_CarriedMeta; }
+	bool IsScreaming(void) const { return m_bIsScreaming; }
+	BLOCKTYPE GetCarriedBlock(void) const { return m_CarriedBlock; }
+	NIBBLETYPE GetCarriedMeta(void) const { return m_CarriedMeta; }
 
-private:
-
+  private:
 	bool m_bIsScreaming;
 	BLOCKTYPE m_CarriedBlock;
 	NIBBLETYPE m_CarriedMeta;
-
-} ;
+};

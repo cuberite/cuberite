@@ -16,8 +16,8 @@
 
 // Disable MSVC warnings:
 #if defined(_MSC_VER)
-	#pragma warning(push)
-	#pragma warning(disable:4355)  // 'this' : used in base member initializer list
+#pragma warning(push)
+#pragma warning(disable : 4355)  // 'this' : used in base member initializer list
 #endif
 
 
@@ -30,7 +30,7 @@ struct HTTPFormData
 	std::string Name;
 	std::string Value;
 	std::string Type;
-} ;
+};
 // tolua_end
 
 
@@ -39,8 +39,8 @@ struct HTTPFormData
 // tolua_begin
 struct HTTPRequest
 {
-	typedef std::map< std::string, std::string > StringStringMap;
-	typedef std::map< std::string, HTTPFormData > FormDataMap;
+	typedef std::map<std::string, std::string> StringStringMap;
+	typedef std::map<std::string, HTTPFormData> FormDataMap;
 
 	/** The entire URL presented to the HTTP server. */
 	AString URL;
@@ -57,14 +57,14 @@ struct HTTPRequest
 	// tolua_end
 
 	/** Parameters given in the URL, after the questionmark */
-	StringStringMap Params;     // >> EXPORTED IN MANUALBINDINGS <<
+	StringStringMap Params;  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Parameters posted as a part of a form - either in the URL (GET method) or in the body (POST method) */
 	StringStringMap PostParams;  // >> EXPORTED IN MANUALBINDINGS <<
 
 	/** Same as PostParams */
-	FormDataMap FormData;       // >> EXPORTED IN MANUALBINDINGS <<
-} ;  // tolua_export
+	FormDataMap FormData;  // >> EXPORTED IN MANUALBINDINGS <<
+};  // tolua_export
 
 
 
@@ -74,7 +74,7 @@ struct HTTPRequest
 struct HTTPTemplateRequest
 {
 	HTTPRequest Request;
-} ;
+};
 // tolua_end
 
 
@@ -98,15 +98,15 @@ struct sWebAdminPage
 class cWebAdmin :
 	// tolua_end
 	public cHTTPServer::cCallbacks
-	// tolua_begin
+// tolua_begin
 {
-public:
+  public:
 	// tolua_end
 
 	/** Interface for getting the content of a single WebTab. */
 	class cWebTabCallback abstract
 	{
-	public:
+	  public:
 		// Force a virtual destructor in descendants
 		virtual ~cWebTabCallback() {}
 
@@ -130,17 +130,19 @@ public:
 	Each web tab is registered with a callback to provide the content. */
 	class cWebTab
 	{
-	public:
+	  public:
 		AString m_Title;
 		AString m_UrlPath;
 		AString m_PluginName;
 		std::shared_ptr<cWebTabCallback> m_Callback;
 
-		cWebTab(const AString & a_Title, const AString & a_UrlPath, const AString & a_PluginName, std::shared_ptr<cWebTabCallback> a_Callback):
-			m_Title(a_Title),
-			m_UrlPath(a_UrlPath),
-			m_PluginName(a_PluginName),
-			m_Callback(std::move(a_Callback))
+		cWebTab(
+			const AString & a_Title,
+			const AString & a_UrlPath,
+			const AString & a_PluginName,
+			std::shared_ptr<cWebTabCallback> a_Callback
+		) :
+			m_Title(a_Title), m_UrlPath(a_UrlPath), m_PluginName(a_PluginName), m_Callback(std::move(a_Callback))
 		{
 		}
 	};
@@ -185,7 +187,8 @@ public:
 	/** Returns the list of ports on which the webadmin is configured to listen. */
 	AString GetPorts(void) const { return StringsConcat(m_Ports, ','); }
 
-	/** Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style). */
+	/** Returns the prefix needed for making a link point to the webadmin root from the given URL
+	 * ("../../../webadmin"-style). */
 	static AString GetBaseURL(const AString & a_URL);
 
 	/** Returns the content type from the file extension.
@@ -218,11 +221,11 @@ public:
 	Exported to Lua in ManualBindings.cpp. */
 	static AString GetURLEncodedString(const AString & a_Input);
 
-	/** Returns the prefix needed for making a link point to the webadmin root from the given URL ("../../../webadmin"-style) */
+	/** Returns the prefix needed for making a link point to the webadmin root from the given URL
+	 * ("../../../webadmin"-style) */
 	static AString GetBaseURL(const AStringVector & a_URLSplit);
 
-protected:
-
+  protected:
 	/** Protects m_WebTabs, m_TemplateScript, m_LoginTemplate and m_IniFile against multithreaded access. */
 	cCriticalSection m_CS;
 
@@ -273,10 +276,15 @@ protected:
 	void HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request);
 
 	// cHTTPServer::cCallbacks overrides:
-	virtual void OnRequestBegun   (cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request) override;
-	virtual void OnRequestBody    (cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request, const char * a_Data, size_t a_Size) override;
+	virtual void OnRequestBegun(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request) override;
+	virtual void OnRequestBody(
+		cHTTPServerConnection & a_Connection,
+		cHTTPIncomingRequest & a_Request,
+		const char * a_Data,
+		size_t a_Size
+	) override;
 	virtual void OnRequestFinished(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request) override;
-} ;  // tolua_export
+};  // tolua_export
 
 
 
@@ -284,9 +292,5 @@ protected:
 
 // Revert MSVC warnings back to orignal state:
 #if defined(_MSC_VER)
-	#pragma warning(pop)
+#pragma warning(pop)
 #endif
-
-
-
-

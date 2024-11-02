@@ -25,39 +25,39 @@ If a_LogWarnings is true, outputs failure reasons to console.
 The range is returned in a_Min and a_Range, they are left unchanged if the range value is not present in the string. */
 namespace VerticalStrategy
 {
-	static bool ParseRange(const AString & a_Params, int & a_Min, int & a_Range, bool a_LogWarnings)
+static bool ParseRange(const AString & a_Params, int & a_Min, int & a_Range, bool a_LogWarnings)
+{
+	auto params = StringSplitAndTrim(a_Params, "|");
+	if (params.size() == 0)
 	{
-		auto params = StringSplitAndTrim(a_Params, "|");
-		if (params.size() == 0)
-		{
-			// No params, generate directly on top:
-			return true;
-		}
-		if (!StringToInteger(params[0], a_Min))
-		{
-			// Failed to parse the min rel height:
-			CONDWARNING(a_LogWarnings, "Cannot parse minimum height from string \"%s\"!", params[0].c_str());
-			return false;
-		}
-		if (params.size() == 1)
-		{
-			// Only one param was given, there's no range
-			return true;
-		}
-		int maxHeight = a_Min;
-		if (!StringToInteger(params[1], maxHeight))
-		{
-			CONDWARNING(a_LogWarnings, "Cannot parse maximum height from string \"%s\"!", params[1].c_str());
-			return false;
-		}
-		if (maxHeight < a_Min)
-		{
-			std::swap(maxHeight, a_Min);
-		}
-		a_Range = maxHeight - a_Min + 1;
+		// No params, generate directly on top:
 		return true;
 	}
+	if (!StringToInteger(params[0], a_Min))
+	{
+		// Failed to parse the min rel height:
+		CONDWARNING(a_LogWarnings, "Cannot parse minimum height from string \"%s\"!", params[0].c_str());
+		return false;
+	}
+	if (params.size() == 1)
+	{
+		// Only one param was given, there's no range
+		return true;
+	}
+	int maxHeight = a_Min;
+	if (!StringToInteger(params[1], maxHeight))
+	{
+		CONDWARNING(a_LogWarnings, "Cannot parse maximum height from string \"%s\"!", params[1].c_str());
+		return false;
+	}
+	if (maxHeight < a_Min)
+	{
+		std::swap(maxHeight, a_Min);
+	}
+	a_Range = maxHeight - a_Min + 1;
+	return true;
 }
+}  // namespace VerticalStrategy
 
 
 
@@ -65,20 +65,16 @@ namespace VerticalStrategy
 
 ////////////////////////////////////////////////////////////////////////////////
 /** A vertical strategy that places the piece at a predefined height. */
-class cVerticalStrategyFixed:
-	public cPiece::cVerticalStrategy
+class cVerticalStrategyFixed : public cPiece::cVerticalStrategy
 {
-public:
-	cVerticalStrategyFixed(void):
+  public:
+	cVerticalStrategyFixed(void) :
 		m_Height(-1000)  // Default to "unassigned" height
 	{
 	}
 
 
-	virtual int GetVerticalPlacement(int a_BlockX, int a_BlockZ) override
-	{
-		return m_Height;
-	}
+	virtual int GetVerticalPlacement(int a_BlockX, int a_BlockZ) override { return m_Height; }
 
 
 	virtual bool InitializeFromString(const AString & a_Params, bool a_LogWarnings) override
@@ -92,7 +88,7 @@ public:
 		return true;
 	}
 
-protected:
+  protected:
 	/** Height at which the pieces are placed.
 	Note that this height may be outside the world, so that only a part of the piece is generated. */
 	int m_Height;
@@ -104,11 +100,10 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////
 /** A vertical strategy that places the piece in a random height between two heights. */
-class cVerticalStrategyRange:
-	public cPiece::cVerticalStrategy
+class cVerticalStrategyRange : public cPiece::cVerticalStrategy
 {
-public:
-	cVerticalStrategyRange(void):
+  public:
+	cVerticalStrategyRange(void) :
 		m_Seed(0),
 		m_Min(-1),  // Default to "unassigned" height
 		m_Range(1)
@@ -135,7 +130,11 @@ public:
 		int Max = 0;
 		if (!StringToInteger(params[0], m_Min) || !StringToInteger(params[1], Max))
 		{
-			CONDWARNING(a_LogWarnings, "Cannot parse the minimum or maximum height from string \"%s\"!", a_Params.c_str());
+			CONDWARNING(
+				a_LogWarnings,
+				"Cannot parse the minimum or maximum height from string \"%s\"!",
+				a_Params.c_str()
+			);
 			return false;
 		}
 		if (m_Min > Max)
@@ -147,12 +146,13 @@ public:
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel)
+		override
 	{
 		m_Seed = a_Seed + SEED_OFFSET;
 	}
 
-protected:
+  protected:
 	/** Seed for the random generator. Received in AssignGens(). */
 	int m_Seed;
 
@@ -166,11 +166,9 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////
 /** A vertical strategy that places the piece in a specified range relative to the top of the terrain. */
-class cVerticalStrategyTerrainTop:
-	public cPiece::cVerticalStrategy
+class cVerticalStrategyTerrainTop : public cPiece::cVerticalStrategy
 {
-public:
-
+  public:
 	virtual int GetVerticalPlacement(int a_BlockX, int a_BlockZ) override
 	{
 		ASSERT(m_HeightGen != nullptr);
@@ -181,7 +179,12 @@ public:
 		m_HeightGen->GenHeightMap({ChunkX, ChunkZ}, HeightMap);
 		cNoise noise(m_Seed);
 		int rel = m_MinRelHeight + (noise.IntNoise2DInt(a_BlockX, a_BlockZ) / 7) % m_RelHeightRange + 1;
-		return cChunkDef::GetHeight(HeightMap, a_BlockX - ChunkX * cChunkDef::Width, a_BlockZ - ChunkZ * cChunkDef::Width) + rel;
+		return cChunkDef::GetHeight(
+				   HeightMap,
+				   a_BlockX - ChunkX * cChunkDef::Width,
+				   a_BlockZ - ChunkZ * cChunkDef::Width
+			   ) +
+			rel;
 	}
 
 
@@ -194,13 +197,14 @@ public:
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel)
+		override
 	{
 		m_Seed = a_Seed + SEED_OFFSET;
 		m_HeightGen = &a_HeightGen;
 	}
 
-protected:
+  protected:
 	/** Seed for the random generator. */
 	int m_Seed;
 
@@ -220,11 +224,9 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////
 /** A vertical strategy that places the piece within a range on top of the terrain or ocean, whichever's higher. */
-class cVerticalStrategyTerrainOrOceanTop:
-	public cPiece::cVerticalStrategy
+class cVerticalStrategyTerrainOrOceanTop : public cPiece::cVerticalStrategy
 {
-public:
-
+  public:
 	virtual int GetVerticalPlacement(int a_BlockX, int a_BlockZ) override
 	{
 		ASSERT(m_HeightGen != nullptr);
@@ -233,7 +235,9 @@ public:
 		cChunkDef::BlockToChunk(a_BlockX, a_BlockZ, ChunkX, ChunkZ);
 		cChunkDef::HeightMap HeightMap;
 		m_HeightGen->GenHeightMap({ChunkX, ChunkZ}, HeightMap);
-		int terrainHeight = static_cast<int>(cChunkDef::GetHeight(HeightMap, a_BlockX - ChunkX * cChunkDef::Width, a_BlockZ - ChunkZ * cChunkDef::Width));
+		int terrainHeight = static_cast<int>(
+			cChunkDef::GetHeight(HeightMap, a_BlockX - ChunkX * cChunkDef::Width, a_BlockZ - ChunkZ * cChunkDef::Width)
+		);
 		terrainHeight = std::max(1 + terrainHeight, m_SeaLevel);
 		cNoise noise(m_Seed);
 		int rel = m_MinRelHeight + (noise.IntNoise2DInt(a_BlockX, a_BlockZ) / 7) % m_RelHeightRange + 1;
@@ -250,14 +254,15 @@ public:
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel)
+		override
 	{
 		m_Seed = a_Seed + SEED_OFFSET;
 		m_HeightGen = &a_HeightGen;
 		m_SeaLevel = a_SeaLevel;
 	}
 
-protected:
+  protected:
 	/** Seed for the random generator. */
 	int m_Seed;
 

@@ -14,10 +14,9 @@ http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
 
 
 
-template<typename Datatype>
-class cSimplexNoise
+template <typename Datatype> class cSimplexNoise
 {
-public:
+  public:
 	cSimplexNoise(unsigned a_Seed)
 	{
 		// Based on the seed, initialize the permutation table, using a simple LCG and swapping
@@ -77,11 +76,19 @@ public:
 	Datatype GetValueAt3D(const Datatype a_X, const Datatype a_Y, const Datatype a_Z)
 	{
 		// The gradients are the midpoints of the vertices of a cube.
-		static const Datatype grad3[12][3] =
-		{
-			{1, 1, 0}, {-1,  1, 0}, {1, -1,  0}, {-1, -1,  0},
-			{1, 0, 1}, {-1,  0, 1}, {1,  0, -1}, {-1,  0, -1},
-			{0, 1, 1}, { 0, -1, 1}, {0,  1, -1}, { 0, -1, -1}
+		static const Datatype grad3[12][3] = {
+			{1, 1, 0},
+			{-1, 1, 0},
+			{1, -1, 0},
+			{-1, -1, 0},
+			{1, 0, 1},
+			{-1, 0, 1},
+			{1, 0, -1},
+			{-1, 0, -1},
+			{0, 1, 1},
+			{0, -1, 1},
+			{0, 1, -1},
+			{0, -1, -1}
 		};
 
 		// Skew factors:
@@ -115,17 +122,32 @@ public:
 			if (y0 >= z0)
 			{
 				// X Y Z order
-				i1 = 1; j1 = 0; k1 = 0; i2 = 1; j2 = 1; k2 = 0;
+				i1 = 1;
+				j1 = 0;
+				k1 = 0;
+				i2 = 1;
+				j2 = 1;
+				k2 = 0;
 			}
 			else if (x0 >= z0)
 			{
 				// X Z Y order
-				i1 = 1; j1 = 0; k1 = 0; i2 = 1; j2 = 0; k2 = 1;
+				i1 = 1;
+				j1 = 0;
+				k1 = 0;
+				i2 = 1;
+				j2 = 0;
+				k2 = 1;
 			}
 			else
 			{
 				// Z X Y order
-				i1 = 0; j1 = 0; k1 = 1; i2 = 1; j2 = 0; k2 = 1;
+				i1 = 0;
+				j1 = 0;
+				k1 = 1;
+				i2 = 1;
+				j2 = 0;
+				k2 = 1;
 			}
 		}
 		else
@@ -133,17 +155,32 @@ public:
 			if (y0 < z0)
 			{
 				// Z Y X order
-				i1 = 0; j1 = 0; k1 = 1; i2 = 0; j2 = 1; k2 = 1;
+				i1 = 0;
+				j1 = 0;
+				k1 = 1;
+				i2 = 0;
+				j2 = 1;
+				k2 = 1;
 			}
 			else if (x0 < z0)
 			{
 				// Y Z X order
-				i1 = 0; j1 = 1; k1 = 0; i2 = 0; j2 = 1; k2 = 1;
+				i1 = 0;
+				j1 = 1;
+				k1 = 0;
+				i2 = 0;
+				j2 = 1;
+				k2 = 1;
 			}
 			else
 			{
 				// Y X Z order
-				i1 = 0; j1 = 1; k1 = 0; i2 = 1; j2 = 1; k2 = 0;
+				i1 = 0;
+				j1 = 1;
+				k1 = 0;
+				i2 = 1;
+				j2 = 1;
+				k2 = 0;
 			}
 		}
 
@@ -156,7 +193,8 @@ public:
 		Datatype x2 = x0 - i2 + static_cast<Datatype>(2) * G3;  // Offsets for third corner in XYZ coords
 		Datatype y2 = y0 - j2 + static_cast<Datatype>(2) * G3;
 		Datatype z2 = z0 - k2 + static_cast<Datatype>(2) * G3;
-		Datatype x3 = x0 - static_cast<Datatype>(1) + static_cast<Datatype>(3) * G3;  // Offsets for last corner in XYZ coords
+		Datatype x3 =
+			x0 - static_cast<Datatype>(1) + static_cast<Datatype>(3) * G3;  // Offsets for last corner in XYZ coords
 		Datatype y3 = y0 - static_cast<Datatype>(1) + static_cast<Datatype>(3) * G3;
 		Datatype z3 = z0 - static_cast<Datatype>(1) + static_cast<Datatype>(3) * G3;
 
@@ -228,10 +266,15 @@ public:
 	a_Start and a_End are the coords of the 3D array in the noise-space. */
 	void Generate3D(
 		Datatype * a_Out,
-		int a_SizeX, int a_SizeY, int a_SizeZ,
-		Datatype a_StartX, Datatype a_EndX,
-		Datatype a_StartY, Datatype a_EndY,
-		Datatype a_StartZ, Datatype a_EndZ
+		int a_SizeX,
+		int a_SizeY,
+		int a_SizeZ,
+		Datatype a_StartX,
+		Datatype a_EndX,
+		Datatype a_StartY,
+		Datatype a_EndY,
+		Datatype a_StartZ,
+		Datatype a_EndZ
 	)
 	{
 		Datatype * out = a_Out;
@@ -251,14 +294,11 @@ public:
 		}  // for z
 	}
 
-protected:
+  protected:
 	/** The permutation table, initialized by the seed. */
 	int m_Perm[512];
 
-	/** A copy of the permutation table, with each item modulo 12, to avoid 4 modulo operations per value calculation. */
+	/** A copy of the permutation table, with each item modulo 12, to avoid 4 modulo operations per value calculation.
+	 */
 	int m_PermMod12[512];
 };
-
-
-
-

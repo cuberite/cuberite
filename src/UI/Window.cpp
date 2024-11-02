@@ -108,7 +108,11 @@ const cItem * cWindow::GetSlot(cPlayer & a_Player, int a_SlotNum) const
 	const cSlotArea * Area = GetSlotArea(a_SlotNum, LocalSlotNum);
 	if (Area == nullptr)
 	{
-		LOGWARNING("%s: requesting item from an invalid SlotArea (SlotNum %d), returning nullptr.", __FUNCTION__, a_SlotNum);
+		LOGWARNING(
+			"%s: requesting item from an invalid SlotArea (SlotNum %d), returning nullptr.",
+			__FUNCTION__,
+			a_SlotNum
+		);
 		return nullptr;
 	}
 	return Area->GetSlot(LocalSlotNum, a_Player);
@@ -159,8 +163,8 @@ bool cWindow::IsSlotInPlayerHotbar(int a_SlotNum) const
 
 bool cWindow::IsSlotInPlayerInventory(int a_SlotNum) const
 {
-	// Returns true if the specified slot is in the Player Main Inventory or Hotbar slotareas. Note that returns false for Armor.
-	// The player combined inventory is always the last 36 slots
+	// Returns true if the specified slot is in the Player Main Inventory or Hotbar slotareas. Note that returns false
+	// for Armor. The player combined inventory is always the last 36 slots
 	return ((a_SlotNum >= GetNumSlots() - 36) && (a_SlotNum < GetNumSlots()));
 }
 
@@ -196,14 +200,22 @@ void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
 
 void cWindow::Clicked(
 	cPlayer & a_Player,
-	int a_WindowID, short a_SlotNum, eClickAction a_ClickAction,
+	int a_WindowID,
+	short a_SlotNum,
+	eClickAction a_ClickAction,
 	const cItem & a_ClickedItem
 )
 {
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	if (a_WindowID != m_WindowID)
 	{
-		LOGWARNING("%s: Wrong window ID (exp %d, got %d) received from \"%s\"; ignoring click.", __FUNCTION__, m_WindowID, a_WindowID, a_Player.GetName().c_str());
+		LOGWARNING(
+			"%s: Wrong window ID (exp %d, got %d) received from \"%s\"; ignoring click.",
+			__FUNCTION__,
+			m_WindowID,
+			a_WindowID,
+			a_Player.GetName().c_str()
+		);
 		return;
 	}
 
@@ -214,7 +226,8 @@ void cWindow::Clicked(
 		{
 			if (PlgMgr->CallHookPlayerTossingItem(a_Player))
 			{
-				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the consequences (possible inventory mismatch)
+				// A plugin doesn't agree with the tossing. The plugin itself is responsible for handling the
+				// consequences (possible inventory mismatch)
 				return;
 			}
 			if (a_Player.IsGameModeCreative())
@@ -240,15 +253,15 @@ void cWindow::Clicked(
 			// Nothing needed
 			return;
 		}
-		case caLeftPaintBegin:      OnPaintBegin    (a_Player);            return;
-		case caRightPaintBegin:     OnPaintBegin    (a_Player);            return;
-		case caMiddlePaintBegin:    OnPaintBegin    (a_Player);            return;
-		case caLeftPaintProgress:   OnPaintProgress (a_Player, a_SlotNum); return;
-		case caRightPaintProgress:  OnPaintProgress (a_Player, a_SlotNum); return;
-		case caMiddlePaintProgress: OnPaintProgress (a_Player, a_SlotNum); return;
-		case caLeftPaintEnd:        OnLeftPaintEnd  (a_Player);            return;
-		case caRightPaintEnd:       OnRightPaintEnd (a_Player);            return;
-		case caMiddlePaintEnd:      OnMiddlePaintEnd(a_Player);            return;
+		case caLeftPaintBegin:      OnPaintBegin(a_Player); return;
+		case caRightPaintBegin:     OnPaintBegin(a_Player); return;
+		case caMiddlePaintBegin:    OnPaintBegin(a_Player); return;
+		case caLeftPaintProgress:   OnPaintProgress(a_Player, a_SlotNum); return;
+		case caRightPaintProgress:  OnPaintProgress(a_Player, a_SlotNum); return;
+		case caMiddlePaintProgress: OnPaintProgress(a_Player, a_SlotNum); return;
+		case caLeftPaintEnd:        OnLeftPaintEnd(a_Player); return;
+		case caRightPaintEnd:       OnRightPaintEnd(a_Player); return;
+		case caMiddlePaintEnd:      OnMiddlePaintEnd(a_Player); return;
 		default:
 		{
 			break;
@@ -272,8 +285,11 @@ void cWindow::Clicked(
 		LocalSlotNum -= itr->GetNumSlots();
 	}
 
-	LOGWARNING("Slot number higher than available window slots: %d, max %d received from \"%s\"; ignoring.",
-		a_SlotNum, GetNumSlots(), a_Player.GetName().c_str()
+	LOGWARNING(
+		"Slot number higher than available window slots: %d, max %d received from \"%s\"; ignoring.",
+		a_SlotNum,
+		GetNumSlots(),
+		a_Player.GetName().c_str()
 	);
 }
 
@@ -373,7 +389,11 @@ void cWindow::BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum)
 	cCSLock Lock(m_CS);
 	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
 	{
-		(*itr)->GetClientHandle()->SendInventorySlot(m_WindowID, static_cast<short>(SlotNum), *a_Area->GetSlot(a_LocalSlotNum, **itr));
+		(*itr)->GetClientHandle()->SendInventorySlot(
+			m_WindowID,
+			static_cast<short>(SlotNum),
+			*a_Area->GetSlot(a_LocalSlotNum, **itr)
+		);
 	}  // for itr - m_OpenedBy[]
 }
 
@@ -464,7 +484,13 @@ bool cWindow::ForEachClient(cClientHandleCallback a_Callback)
 
 
 
-void cWindow::DistributeStackToAreas(cItem & a_ItemStack, cPlayer & a_Player, cSlotAreas & a_AreasInOrder, bool a_ShouldApply, bool a_BackFill)
+void cWindow::DistributeStackToAreas(
+	cItem & a_ItemStack,
+	cPlayer & a_Player,
+	cSlotAreas & a_AreasInOrder,
+	bool a_ShouldApply,
+	bool a_BackFill
+)
 {
 	/* Ask each slot area to take as much of the stack as it can.
 	First ask only slots that already have the same kind of item
@@ -525,7 +551,9 @@ void cWindow::SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_Relativ
 	}
 
 	a_Player.GetClientHandle()->SendInventorySlot(
-		m_WindowID, static_cast<short>(a_RelativeSlotNum + SlotBase), *(a_SlotArea->GetSlot(a_RelativeSlotNum, a_Player))
+		m_WindowID,
+		static_cast<short>(a_RelativeSlotNum + SlotBase),
+		*(a_SlotArea->GetSlot(a_RelativeSlotNum, a_Player))
 	);
 }
 
@@ -551,7 +579,12 @@ cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum)
 {
 	if ((a_GlobalSlotNum < 0) || (a_GlobalSlotNum >= GetNumSlots()))
 	{
-		LOGWARNING("%s: requesting an invalid SlotNum: %d out of %d slots", __FUNCTION__, a_GlobalSlotNum, GetNumSlots() - 1);
+		LOGWARNING(
+			"%s: requesting an invalid SlotNum: %d out of %d slots",
+			__FUNCTION__,
+			a_GlobalSlotNum,
+			GetNumSlots() - 1
+		);
 		ASSERT(!"Invalid SlotNum");
 		return nullptr;
 	}
@@ -582,7 +615,12 @@ const cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum
 {
 	if ((a_GlobalSlotNum < 0) || (a_GlobalSlotNum >= GetNumSlots()))
 	{
-		LOGWARNING("%s: requesting an invalid SlotNum: %d out of %d slots", __FUNCTION__, a_GlobalSlotNum, GetNumSlots() - 1);
+		LOGWARNING(
+			"%s: requesting an invalid SlotNum: %d out of %d slots",
+			__FUNCTION__,
+			a_GlobalSlotNum,
+			GetNumSlots() - 1
+		);
 		ASSERT(!"Invalid SlotNum");
 		return nullptr;
 	}
@@ -710,11 +748,22 @@ void cWindow::OnMiddlePaintEnd(cPlayer & a_Player)
 
 
 
-char cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, char a_NumToEachSlot, const cSlotNums & a_SlotNums, bool a_LimitItems)
+char cWindow::DistributeItemToSlots(
+	cPlayer & a_Player,
+	const cItem & a_Item,
+	char a_NumToEachSlot,
+	const cSlotNums & a_SlotNums,
+	bool a_LimitItems
+)
 {
 	if (a_LimitItems && (static_cast<size_t>(a_Item.m_ItemCount) < a_SlotNums.size()))
 	{
-		LOGWARNING("%s: Distributing less items (%d) than slots (%zu)", __FUNCTION__, static_cast<int>(a_Item.m_ItemCount), a_SlotNums.size());
+		LOGWARNING(
+			"%s: Distributing less items (%d) than slots (%zu)",
+			__FUNCTION__,
+			static_cast<int>(a_Item.m_ItemCount),
+			a_SlotNums.size()
+		);
 		// This doesn't seem to happen with the 1.5.1 client, so we don't worry about it for now
 		return 0;
 	}

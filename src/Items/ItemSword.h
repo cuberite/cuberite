@@ -8,13 +8,11 @@
 
 
 
-class cItemSwordHandler final :
-	public cItemHandler
+class cItemSwordHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) const override
@@ -45,9 +43,9 @@ public:
 	{
 		switch (a_Action)
 		{
-			case dlaAttackEntity:       return 1;
-			case dlaBreakBlock:         return 2;
-			case dlaBreakBlockInstant:  return 0;
+			case dlaAttackEntity:      return 1;
+			case dlaBreakBlock:        return 2;
+			case dlaBreakBlockInstant: return 0;
 		}
 		UNREACHABLE("Unsupported durability loss action");
 	}
@@ -62,12 +60,8 @@ public:
 		}
 		else
 		{
-			if (
-				IsBlockMaterialPlants(a_Block) ||
-				IsBlockMaterialVine(a_Block)   ||
-				IsBlockMaterialLeaves(a_Block) ||
-				IsBlockMaterialGourd(a_Block)
-			)
+			if (IsBlockMaterialPlants(a_Block) || IsBlockMaterialVine(a_Block) || IsBlockMaterialLeaves(a_Block) ||
+				IsBlockMaterialGourd(a_Block))
 			{
 				return 1.5f;
 			}
@@ -77,5 +71,4 @@ public:
 			}
 		}
 	}
-
-} ;
+};

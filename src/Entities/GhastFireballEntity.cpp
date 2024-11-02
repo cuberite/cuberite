@@ -7,7 +7,7 @@
 
 
 
-cGhastFireballEntity::cGhastFireballEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
+cGhastFireballEntity::cGhastFireballEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed) :
 	Super(pkGhastFireball, a_Creator, a_Pos, 1, 1)
 {
 	SetSpeed(a_Speed);

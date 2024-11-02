@@ -15,8 +15,7 @@
 
 
 cSandSimulator::cSandSimulator(cWorld & a_World, cIniFile & a_IniFile) :
-	cSimulator(a_World),
-	m_TotalBlocks(0)
+	cSimulator(a_World), m_TotalBlocks(0)
 {
 	m_IsInstantFall = a_IniFile.GetValueSetB("Physics", "SandInstantFall", false);
 }
@@ -43,7 +42,8 @@ void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			continue;
 		}
 
-		BLOCKTYPE BlockBelow = (itr->y > 0) ? a_Chunk->GetBlock(itr->x, itr->y - 1, itr->z) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
+		BLOCKTYPE BlockBelow =
+			(itr->y > 0) ? a_Chunk->GetBlock(itr->x, itr->y - 1, itr->z) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
 		if (CanStartFallingThrough(BlockBelow))
 		{
 			if (m_IsInstantFall)
@@ -230,17 +230,21 @@ bool cSandSimulator::DoesBreakFallingThrough(BLOCKTYPE a_BlockType, NIBBLETYPE a
 
 
 void cSandSimulator::FinishFalling(
-	cWorld * a_World, int a_BlockX, int a_BlockY, int a_BlockZ,
-	BLOCKTYPE a_FallingBlockType, NIBBLETYPE a_FallingBlockMeta
+	cWorld * a_World,
+	int a_BlockX,
+	int a_BlockY,
+	int a_BlockZ,
+	BLOCKTYPE a_FallingBlockType,
+	NIBBLETYPE a_FallingBlockMeta
 )
 {
 	ASSERT(a_BlockY < cChunkDef::Height);
 
-	BLOCKTYPE CurrentBlockType = a_World->GetBlock({ a_BlockX, a_BlockY, a_BlockZ });
+	BLOCKTYPE CurrentBlockType = a_World->GetBlock({a_BlockX, a_BlockY, a_BlockZ});
 	if ((a_FallingBlockType == E_BLOCK_ANVIL) || IsReplacedOnRematerialization(CurrentBlockType))
 	{
 		// Rematerialize the material here:
-		a_World->SetBlock({ a_BlockX, a_BlockY, a_BlockZ }, a_FallingBlockType, a_FallingBlockMeta);
+		a_World->SetBlock({a_BlockX, a_BlockY, a_BlockZ}, a_FallingBlockType, a_FallingBlockMeta);
 		if (a_FallingBlockType == E_BLOCK_ANVIL)
 		{
 			a_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_LAND, {a_BlockX, a_BlockY, a_BlockZ}, 0);
@@ -289,7 +293,7 @@ bool cSandSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
 void cSandSimulator::DoInstantFall(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ)
 {
 	// Remove the original block:
-	BLOCKTYPE  FallingBlockType;
+	BLOCKTYPE FallingBlockType;
 	NIBBLETYPE FallingBlockMeta;
 	a_Chunk->GetBlockTypeMeta(a_RelX, a_RelY, a_RelZ, FallingBlockType, FallingBlockMeta);
 	a_Chunk->SetBlock({a_RelX, a_RelY, a_RelZ}, E_BLOCK_AIR, 0);
@@ -329,7 +333,3 @@ void cSandSimulator::DoInstantFall(cChunk * a_Chunk, int a_RelX, int a_RelY, int
 
 	// The block just "fell off the world" without leaving a trace
 }
-
-
-
-

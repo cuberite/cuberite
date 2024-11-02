@@ -8,16 +8,20 @@
 
 
 
-class cItemBigFlowerHandler final:
-	public cItemHandler
+class cItemBigFlowerHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
+	virtual bool CommitPlacement(
+		cPlayer & a_Player,
+		const cItem & a_HeldItem,
+		const Vector3i a_PlacePosition,
+		const eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPosition
+	) const override
 	{
 		// Needs at least two free blocks to build in:
 		if (a_PlacePosition.y >= (cChunkDef::Height - 1))
@@ -31,15 +35,15 @@ public:
 		NIBBLETYPE TopMeta;
 		World.GetBlockTypeMeta(TopPos, TopType, TopMeta);
 
-		if (!cBlockHandler::For(TopType).DoesIgnoreBuildCollision(World, a_HeldItem, TopPos, TopMeta, a_ClickedBlockFace, false))
+		if (!cBlockHandler::For(TopType)
+				 .DoesIgnoreBuildCollision(World, a_HeldItem, TopPos, TopMeta, a_ClickedBlockFace, false))
 		{
 			return false;
 		}
 
 		return a_Player.PlaceBlocks(
-		{
-			{ a_PlacePosition, E_BLOCK_BIG_FLOWER, static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage & 0x07) },
-			{ TopPos,          E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP }
-		});
+			{{a_PlacePosition, E_BLOCK_BIG_FLOWER, static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage & 0x07)},
+			 {TopPos, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP}}
+		);
 	}
 };

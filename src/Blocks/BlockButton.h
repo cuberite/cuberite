@@ -14,20 +14,16 @@
 
 
 
-class cBlockButtonHandler final :
-	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>>
+class cBlockButtonHandler final
+	: public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>>
 {
 	using Super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>>;
 
-public:
-
+  public:
 	using Super::Super;
 
 	/** Extracts the ON bit from metadata and returns if true if it is set */
-	static bool IsButtonOn(NIBBLETYPE a_Meta)
-	{
-		return (a_Meta & 0x08) == 0x08;
-	}
+	static bool IsButtonOn(NIBBLETYPE a_Meta) { return (a_Meta & 0x08) == 0x08; }
 
 	/** Event handler for an arrow striking a block.
 	Performs appropriate handling if the arrow intersected a wooden button. */
@@ -37,11 +33,8 @@ public:
 		NIBBLETYPE Meta;
 		const auto Pos = AddFaceDirection(a_Position, a_HitFace);
 
-		if (
-			!a_World.GetBlockTypeMeta(Pos, Type, Meta) ||
-			IsButtonOn(Meta) ||
-			!IsButtonPressedByArrow(a_World, Pos, Type, Meta)
-		)
+		if (!a_World.GetBlockTypeMeta(Pos, Type, Meta) || IsButtonOn(Meta) ||
+			!IsButtonPressedByArrow(a_World, Pos, Type, Meta))
 		{
 			// Bail if we're not specifically a wooden button, or it's already on
 			// or if the arrow didn't intersect. It is very important that nothing is
@@ -59,8 +52,7 @@ public:
 		QueueButtonRelease(a_World, Pos, Type);
 	}
 
-private:
-
+  private:
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
@@ -81,11 +73,13 @@ private:
 		// Set the ON bit to on
 		Meta |= 0x08;
 
-		const auto SoundToPlay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? "block.stone_button.click_on" : "block.wood_button.click_on";
+		const auto SoundToPlay =
+			(m_BlockType == E_BLOCK_STONE_BUTTON) ? "block.stone_button.click_on" : "block.wood_button.click_on";
 
 		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
 		a_WorldInterface.WakeUpSimulators(a_BlockPos);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect(SoundToPlay, a_BlockPos, 0.5f, 0.6f, a_Player.GetClientHandle());
+		a_WorldInterface.GetBroadcastManager()
+			.BroadcastSoundEffect(SoundToPlay, a_BlockPos, 0.5f, 0.6f, a_Player.GetClientHandle());
 
 		// Queue a button reset (unpress)
 		QueueButtonRelease(*a_Player.GetWorld(), a_BlockPos, m_BlockType);
@@ -97,10 +91,7 @@ private:
 
 
 
-	virtual bool IsUseable(void) const override
-	{
-		return true;
-	}
+	virtual bool IsUseable(void) const override { return true; }
 
 
 
@@ -152,16 +143,11 @@ private:
 		{
 			switch (Face)
 			{
-				case eBlockFace::BLOCK_FACE_YP:
-					return (SupportBlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
-				case eBlockFace::BLOCK_FACE_XP:
-					return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_XP);
-				case eBlockFace::BLOCK_FACE_XM:
-					return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_XM);
-				case eBlockFace::BLOCK_FACE_ZP:
-					return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_ZP);
-				case eBlockFace::BLOCK_FACE_ZM:
-					return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_ZM);
+				case eBlockFace::BLOCK_FACE_YP: return (SupportBlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
+				case eBlockFace::BLOCK_FACE_XP: return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_XP);
+				case eBlockFace::BLOCK_FACE_XM: return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_XM);
+				case eBlockFace::BLOCK_FACE_ZP: return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_ZP);
+				case eBlockFace::BLOCK_FACE_ZM: return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_ZM);
 				default:
 				{
 					return false;
@@ -194,10 +180,7 @@ private:
 				BLOCKTYPE Type;
 				NIBBLETYPE Meta;
 
-				if (
-					!a_World.GetBlockTypeMeta(a_Position, Type, Meta) ||
-					(Type != a_BlockType) || !IsButtonOn(Meta)
-				)
+				if (!a_World.GetBlockTypeMeta(a_Position, Type, Meta) || (Type != a_BlockType) || !IsButtonOn(Meta))
 				{
 					// Total failure or block changed, bail
 					return;
@@ -211,7 +194,8 @@ private:
 				}
 
 				// Block hasn't change in the meantime; release it
-				const auto SoundToPlayOnRelease = (Type == E_BLOCK_STONE_BUTTON) ? "block.stone_button.click_off" : "block.wood_button.click_off";
+				const auto SoundToPlayOnRelease =
+					(Type == E_BLOCK_STONE_BUTTON) ? "block.stone_button.click_off" : "block.wood_button.click_off";
 
 				a_World.SetBlockMeta(a_Position, Meta & 0x07);
 				a_World.WakeUpSimulators(a_Position);
@@ -221,7 +205,12 @@ private:
 	}
 
 	/** Returns true if an arrow was found in the wooden button */
-	static bool IsButtonPressedByArrow(cWorld & a_World, const Vector3i a_ButtonPosition, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
+	static bool IsButtonPressedByArrow(
+		cWorld & a_World,
+		const Vector3i a_ButtonPosition,
+		const BLOCKTYPE a_BlockType,
+		const NIBBLETYPE a_Meta
+	)
 	{
 		if (a_BlockType != E_BLOCK_WOODEN_BUTTON)
 		{
@@ -231,10 +220,7 @@ private:
 		const auto FaceOffset = GetButtonOffsetOnBlock(a_Meta);
 		const bool FoundArrow = !a_World.ForEachEntityInBox(
 			cBoundingBox(FaceOffset + a_ButtonPosition, 0.2, 0.2),
-			[](cEntity & a_Entity)
-			{
-				return a_Entity.IsArrow();
-			}
+			[](cEntity & a_Entity) { return a_Entity.IsArrow(); }
 		);
 
 		return FoundArrow;
@@ -249,12 +235,12 @@ private:
 	{
 		switch (BlockMetaDataToBlockFace(a_Meta))
 		{
-			case BLOCK_FACE_YM: return { 0.5, 1, 0.5 };
-			case BLOCK_FACE_XP: return { 0, 0.5, 0.5 };
-			case BLOCK_FACE_XM: return { 1, 0.5, 0.5 };
-			case BLOCK_FACE_ZP: return { 0.5, 0.5, 0 };
-			case BLOCK_FACE_ZM: return { 0.5, 0.5, 1 };
-			case BLOCK_FACE_YP: return { 0.5, 0, 0.5 };
+			case BLOCK_FACE_YM: return {0.5, 1, 0.5};
+			case BLOCK_FACE_XP: return {0, 0.5, 0.5};
+			case BLOCK_FACE_XM: return {1, 0.5, 0.5};
+			case BLOCK_FACE_ZP: return {0.5, 0.5, 0};
+			case BLOCK_FACE_ZM: return {0.5, 0.5, 1};
+			case BLOCK_FACE_YP: return {0.5, 0, 0.5};
 			case BLOCK_FACE_NONE:
 			{
 				break;
@@ -262,4 +248,4 @@ private:
 		}
 		UNREACHABLE("Unhandled block face!");
 	}
-} ;
+};

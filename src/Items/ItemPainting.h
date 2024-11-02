@@ -10,13 +10,11 @@
 
 
 
-class cItemPaintingHandler final:
-	public cItemHandler
+class cItemPaintingHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 
@@ -33,11 +31,8 @@ public:
 	) const override
 	{
 		// Paintings can't be flatly placed:
-		if (
-			(a_ClickedBlockFace == BLOCK_FACE_NONE) ||
-			(a_ClickedBlockFace == BLOCK_FACE_YM) ||
-			(a_ClickedBlockFace == BLOCK_FACE_YP)
-		)
+		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_YM) ||
+			(a_ClickedBlockFace == BLOCK_FACE_YP))
 		{
 			return false;
 		}
@@ -57,40 +52,18 @@ public:
 		}
 
 		// Define all the possible painting titles
-		static const AString gPaintingTitlesList[] =
-		{
-			{ "Kebab" },
-			{ "Aztec" },
-			{ "Alban" },
-			{ "Aztec2" },
-			{ "Bomb" },
-			{ "Plant" },
-			{ "Wasteland" },
-			{ "Wanderer" },
-			{ "Graham" },
-			{ "Pool" },
-			{ "Courbet" },
-			{ "Sunset" },
-			{ "Sea" },
-			{ "Creebet" },
-			{ "Match" },
-			{ "Bust" },
-			{ "Stage" },
-			{ "Void" },
-			{ "SkullAndRoses" },
-			{ "Wither" },
-			{ "Fighters" },
-			{ "Skeleton" },
-			{ "DonkeyKong" },
-			{ "Pointer" },
-			{ "Pigscene" },
-			{ "BurningSkull" }
+		static const AString gPaintingTitlesList[] = {
+			{"Kebab"},    {"Aztec"},      {"Alban"},   {"Aztec2"},   {"Bomb"},          {"Plant"},  {"Wasteland"},
+			{"Wanderer"}, {"Graham"},     {"Pool"},    {"Courbet"},  {"Sunset"},        {"Sea"},    {"Creebet"},
+			{"Match"},    {"Bust"},       {"Stage"},   {"Void"},     {"SkullAndRoses"}, {"Wither"}, {"Fighters"},
+			{"Skeleton"}, {"DonkeyKong"}, {"Pointer"}, {"Pigscene"}, {"BurningSkull"}
 		};
 
 		auto PaintingTitle = gPaintingTitlesList[a_World->GetTickRandomNumber(ARRAYCOUNT(gPaintingTitlesList) - 1)];
 
 		// A painting, centred so pickups spawn nicely.
-		auto Painting = std::make_unique<cPainting>(PaintingTitle, a_ClickedBlockFace, Vector3d(0.5, 0.5, 0.5) + PlacePos);
+		auto Painting =
+			std::make_unique<cPainting>(PaintingTitle, a_ClickedBlockFace, Vector3d(0.5, 0.5, 0.5) + PlacePos);
 		auto PaintingPtr = Painting.get();
 		if (!PaintingPtr->Initialize(std::move(Painting), *a_World))
 		{
@@ -104,7 +77,3 @@ public:
 		return true;
 	}
 };
-
-
-
-

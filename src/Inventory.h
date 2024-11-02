@@ -9,7 +9,7 @@
 
 namespace Json
 {
-	class Value;
+class Value;
 };
 
 class cPlayer;
@@ -32,24 +32,23 @@ You can use the invArmorOffset, invInventoryOffset and invHotbarOffset constants
 class cInventory :
 	// tolua_end
 	public cItemGrid::cListener
-	// tolua_begin
+// tolua_begin
 {
-public:
-
+  public:
 	// Counts and offsets to individual parts of the inventory, as used by GetSlot() / SetSlot() / HowManyCanFit():
 	enum
 	{
-		invArmorCount      = 4,
-		invInventoryCount  = 9 * 3,
-		invHotbarCount     = 9,
-		invShieldCount     = 1,      // Number of slots in shield slots grid
+		invArmorCount = 4,
+		invInventoryCount = 9 * 3,
+		invHotbarCount = 9,
+		invShieldCount = 1,  // Number of slots in shield slots grid
 
-		invArmorOffset     = 0,
-		invInventoryOffset = invArmorOffset     + invArmorCount,
-		invHotbarOffset    = invInventoryOffset + invInventoryCount,
-		invShieldOffset    = invHotbarOffset    + invHotbarCount,     // Offset where shield slots start
-		invNumSlots        = invShieldOffset    + invShieldCount
-	} ;
+		invArmorOffset = 0,
+		invInventoryOffset = invArmorOffset + invArmorCount,
+		invHotbarOffset = invInventoryOffset + invInventoryCount,
+		invShieldOffset = invHotbarOffset + invHotbarCount,  // Offset where shield slots start
+		invNumSlots = invShieldOffset + invShieldCount
+	};
 
 	// tolua_end
 
@@ -66,7 +65,12 @@ public:
 	int HowManyCanFit(const cItem & a_ItemStack, bool a_ConsiderEmptySlots = true);
 
 	/** Returns how many items of the specified type would fit into the slot range specified */
-	int HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int a_EndSlotNum, bool a_ConsiderEmptySlots = true);
+	int HowManyCanFit(
+		const cItem & a_ItemStack,
+		int a_BeginSlotNum,
+		int a_EndSlotNum,
+		bool a_ConsiderEmptySlots = true
+	);
 
 	/** Adds as many items out of a_ItemStack as can fit.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;
@@ -145,21 +149,21 @@ public:
 	/** Returns current equiped item */
 	const cItem & GetEquippedItem(void) const;
 	/** Puts a_Item item in a_SlotNum slot number */
-	void          SetSlot(int a_SlotNum, const cItem & a_Item);
+	void SetSlot(int a_SlotNum, const cItem & a_Item);
 	/** Puts a_Item item in a_ArmorSlotNum slot number in armor slots */
-	void          SetArmorSlot(int a_ArmorSlotNum, const cItem & a_Item);
+	void SetArmorSlot(int a_ArmorSlotNum, const cItem & a_Item);
 	/** Puts a_Item item in a_InventorySlotNum slot number in inventory slots */
-	void          SetInventorySlot(int a_InventorySlotNum, const cItem & a_Item);
+	void SetInventorySlot(int a_InventorySlotNum, const cItem & a_Item);
 	/** Puts a_Item item in a_HotBarSlotNum slot number in hotbar slots */
-	void          SetHotbarSlot(int a_HotBarSlotNum, const cItem & a_Item);
+	void SetHotbarSlot(int a_HotBarSlotNum, const cItem & a_Item);
 	/** Sets current item in shield slot */
-	void          SetShieldSlot(const cItem & a_Item);
+	void SetShieldSlot(const cItem & a_Item);
 	/** Sets current item in the equipped hotbar slot */
-	void          SetEquippedItem(const cItem & a_Item);
+	void SetEquippedItem(const cItem & a_Item);
 	/** Sets equiped item to the a_SlotNum slot number */
-	void          SetEquippedSlotNum(int a_SlotNum);
+	void SetEquippedSlotNum(int a_SlotNum);
 	/** Returns slot number of equiped item */
-	int           GetEquippedSlotNum(void) { return m_EquippedSlotNum; }
+	int GetEquippedSlotNum(void) { return m_EquippedSlotNum; }
 
 	/** Adds (or subtracts, if a_AddToCount is negative) to the count of items in the specified slot.
 	If the slot is empty, ignores the call.
@@ -173,10 +177,10 @@ public:
 	/** Adds the specified damage to the currently held item; deletes the item and returns true if the item broke. */
 	bool DamageEquippedItem(short a_Amount = 1);
 
-	const cItem & GetEquippedHelmet    (void) const { return m_ArmorSlots.GetSlot(0); }
+	const cItem & GetEquippedHelmet(void) const { return m_ArmorSlots.GetSlot(0); }
 	const cItem & GetEquippedChestplate(void) const { return m_ArmorSlots.GetSlot(1); }
-	const cItem & GetEquippedLeggings  (void) const { return m_ArmorSlots.GetSlot(2); }
-	const cItem & GetEquippedBoots     (void) const { return m_ArmorSlots.GetSlot(3); }
+	const cItem & GetEquippedLeggings(void) const { return m_ArmorSlots.GetSlot(2); }
+	const cItem & GetEquippedBoots(void) const { return m_ArmorSlots.GetSlot(3); }
 
 	// tolua_end
 
@@ -192,7 +196,7 @@ public:
 	void SaveToJson(Json::Value & a_Value);
 	bool LoadFromJson(Json::Value & a_Value);
 
-protected:
+  protected:
 	bool AddToBar(cItem & a_Item, const int a_Offset, const int a_Size, bool * a_bChangedSlots, int a_Mode = 0);
 
 	cItemGrid m_ArmorSlots;
@@ -204,10 +208,12 @@ protected:
 
 	cPlayer & m_Owner;
 
-	/** Returns the ItemGrid and the (grid-local) slot number for a (global) slot number; return nullptr for invalid SlotNum */
+	/** Returns the ItemGrid and the (grid-local) slot number for a (global) slot number; return nullptr for invalid
+	 * SlotNum */
 	const cItemGrid * GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum) const;
 
-	/** Returns the ItemGrid and the (grid-local) slot number for a (global) slot number; return nullptr for invalid SlotNum */
+	/** Returns the ItemGrid and the (grid-local) slot number for a (global) slot number; return nullptr for invalid
+	 * SlotNum */
 	cItemGrid * GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum);
 
 	// cItemGrid::cListener override:

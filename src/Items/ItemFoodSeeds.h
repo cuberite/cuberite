@@ -8,25 +8,18 @@
 
 
 
-class cItemFoodSeedsHandler final:
-	public cItemSeedsHandler
+class cItemFoodSeedsHandler final : public cItemSeedsHandler
 {
 	using Super = cItemSeedsHandler;
 
-public:
-
-	constexpr cItemFoodSeedsHandler(int a_ItemType, FoodInfo a_FoodInfo):
-		Super(a_ItemType),
-		m_FoodInfo(a_FoodInfo)
+  public:
+	constexpr cItemFoodSeedsHandler(int a_ItemType, FoodInfo a_FoodInfo) :
+		Super(a_ItemType), m_FoodInfo(a_FoodInfo)
 	{
-
 	}
 
 
-	virtual bool IsFood(void) const override
-	{
-		return true;
-	}
+	virtual bool IsFood(void) const override { return true; }
 
 	virtual FoodInfo GetFoodInfo(const cItem * a_Item) const override
 	{
@@ -49,7 +42,6 @@ public:
 		return true;
 	}
 
-protected:
+  protected:
 	FoodInfo m_FoodInfo;
-
 };

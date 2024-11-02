@@ -33,27 +33,22 @@ decorators are automatically managed (allocated and freed) by their parent cMap 
 */
 struct cMapDecorator
 {
-public:
-
+  public:
 	enum class eType
 	{
-		E_TYPE_PLAYER         = 0x00,
-		E_TYPE_ITEM_FRAME     = 0x01,
+		E_TYPE_PLAYER = 0x00,
+		E_TYPE_ITEM_FRAME = 0x01,
 
 		/** Player outside of the boundaries of the map. */
 		E_TYPE_PLAYER_OUTSIDE = 0x06
 	};
 
 	cMapDecorator(eType a_Type, unsigned int a_X, unsigned int a_Z, int a_Rot) :
-		m_Type(a_Type),
-		m_PixelX(a_X),
-		m_PixelZ(a_Z),
-		m_Rot(a_Rot)
+		m_Type(a_Type), m_PixelX(a_X), m_PixelZ(a_Z), m_Rot(a_Rot)
 	{
 	}
 
-public:
-
+  public:
 	unsigned int GetPixelX(void) const { return m_PixelX; }
 	unsigned int GetPixelZ(void) const { return m_PixelZ; }
 
@@ -61,15 +56,13 @@ public:
 
 	eType GetType(void) const { return m_Type; }
 
-private:
-
+  private:
 	eType m_Type;
 
 	unsigned int m_PixelX;
 	unsigned int m_PixelZ;
 
 	int m_Rot;
-
 };
 
 
@@ -81,25 +74,24 @@ private:
 /** Encapsulates an in-game world map. */
 class cMap
 {
-public:
-
+  public:
 	enum eBaseColor
 	{
-		E_BASE_COLOR_TRANSPARENT = 0,  /* Air     */
-		E_BASE_COLOR_LIGHT_GREEN = 4,  /* Grass   */
+		E_BASE_COLOR_TRANSPARENT = 0, /* Air     */
+		E_BASE_COLOR_LIGHT_GREEN = 4, /* Grass   */
 		E_BASE_COLOR_LIGHT_BLUE = 5,
-		E_BASE_COLOR_LIGHT_BROWN = 8,  /* Sand    */
-		E_BASE_COLOR_GRAY_1      = 12, /* Cloth   */
-		E_BASE_COLOR_RED         = 16, /* TNT     */
-		E_BASE_COLOR_PALE_BLUE   = 20, /* Ice     */
-		E_BASE_COLOR_GRAY_2      = 24, /* Iron    */
-		E_BASE_COLOR_DARK_GREEN  = 28, /* Foliage */
-		E_BASE_COLOR_WHITE       = 32, /* Snow    */
-		E_BASE_COLOR_LIGHT_GRAY  = 36, /* Clay    */
-		E_BASE_COLOR_BROWN       = 40, /* Dirt    */
-		E_BASE_COLOR_DARK_GRAY   = 44, /* Stone   */
-		E_BASE_COLOR_BLUE        = 48, /* Water   */
-		E_BASE_COLOR_DARK_BROWN  = 52  /* Wood    */
+		E_BASE_COLOR_LIGHT_BROWN = 8, /* Sand    */
+		E_BASE_COLOR_GRAY_1 = 12, /* Cloth   */
+		E_BASE_COLOR_RED = 16, /* TNT     */
+		E_BASE_COLOR_PALE_BLUE = 20, /* Ice     */
+		E_BASE_COLOR_GRAY_2 = 24, /* Iron    */
+		E_BASE_COLOR_DARK_GREEN = 28, /* Foliage */
+		E_BASE_COLOR_WHITE = 32, /* Snow    */
+		E_BASE_COLOR_LIGHT_GRAY = 36, /* Clay    */
+		E_BASE_COLOR_BROWN = 40, /* Dirt    */
+		E_BASE_COLOR_DARK_GRAY = 44, /* Stone   */
+		E_BASE_COLOR_BLUE = 48, /* Water   */
+		E_BASE_COLOR_DARK_BROWN = 52 /* Wood    */
 	};
 
 	typedef Byte ColorID;
@@ -141,7 +133,7 @@ public:
 
 	ColorID GetPixel(unsigned int a_X, unsigned int a_Z);
 
-	unsigned int GetWidth (void) const { return m_Width;  }
+	unsigned int GetWidth(void) const { return m_Width; }
 	unsigned int GetHeight(void) const { return m_Height; }
 
 	unsigned int GetScale(void) const { return m_Scale; }
@@ -169,8 +161,7 @@ public:
 
 	const cColorList & GetData(void) const { return m_Data; }
 
-private:
-
+  private:
 	/** Update the specified pixel. */
 	bool UpdatePixel(unsigned int a_X, unsigned int a_Z);
 
@@ -202,6 +193,3 @@ private:
 	friend class cMapSerializer;
 
 };  // tolua_export
-
-
-

@@ -7,14 +7,12 @@
 
 
 
-class cItemSpiderEyeHandler final:
-	public cItemFoodHandler
+class cItemSpiderEyeHandler final : public cItemFoodHandler
 {
 	using Super = cItemFoodHandler;
 
-public:
-
-	constexpr cItemSpiderEyeHandler(int a_ItemType):
+  public:
+	constexpr cItemSpiderEyeHandler(int a_ItemType) :
 		Super(a_ItemType, FoodInfo(2, 3.2))
 	{
 	}
@@ -30,5 +28,4 @@ public:
 
 		return true;
 	}
-
 };

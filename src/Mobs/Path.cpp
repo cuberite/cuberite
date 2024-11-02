@@ -19,7 +19,7 @@
 
 
 
-bool compareHeuristics::operator()(cPathCell * & a_Cell1, cPathCell * & a_Cell2)
+bool compareHeuristics::operator()(cPathCell *& a_Cell1, cPathCell *& a_Cell2)
 {
 	return a_Cell1->m_F > a_Cell2->m_F;
 }
@@ -31,12 +31,16 @@ bool compareHeuristics::operator()(cPathCell * & a_Cell1, cPathCell * & a_Cell2)
 /* cPath implementation */
 cPath::cPath(
 	cChunk & a_Chunk,
-	const Vector3d & a_StartingPoint, const Vector3d & a_EndingPoint, int a_MaxSteps,
-	double a_BoundingBoxWidth, double a_BoundingBoxHeight
+	const Vector3d & a_StartingPoint,
+	const Vector3d & a_EndingPoint,
+	int a_MaxSteps,
+	double a_BoundingBoxWidth,
+	double a_BoundingBoxHeight
 ) :
 	m_StepsLeft(a_MaxSteps),
 	m_IsValid(true),
-	m_CurrentPoint(0),  // GetNextPoint increments this to 1, but that's fine, since the first cell is always a_StartingPoint
+	m_CurrentPoint(0
+	),  // GetNextPoint increments this to 1, but that's fine, since the first cell is always a_StartingPoint
 	m_Chunk(&a_Chunk),
 	m_BadChunkFound(false)
 {
@@ -72,9 +76,9 @@ cPath::cPath(
 
 
 
-cPath::cPath() : m_IsValid(false)
+cPath::cPath() :
+	m_IsValid(false)
 {
-
 }
 
 
@@ -170,17 +174,11 @@ bool cPath::StepOnce()
 
 
 	// If true, no need to do more checks in that direction
-	bool DoneEast = false,
-	DoneWest = false,
-	DoneNorth = false,
-	DoneSouth = false;
+	bool DoneEast = false, DoneWest = false, DoneNorth = false, DoneSouth = false;
 
 	// If true, we can walk in that direction without changing height
 	// This is used for deciding if to calculate diagonals
-	bool WalkableEast = false,
-	WalkableWest = false,
-	WalkableNorth = false,
-	WalkableSouth = false;
+	bool WalkableEast = false, WalkableWest = false, WalkableNorth = false, WalkableSouth = false;
 
 	// If we can jump without hitting the ceiling
 	if (BodyFitsIn(CurrentCell->m_Location + Vector3i(0, 1, 0), CurrentCell->m_Location))
@@ -211,7 +209,6 @@ bool cPath::StepOnce()
 		{
 			DoneSouth = true;
 		}
-
 	}
 
 
@@ -222,7 +219,7 @@ bool cPath::StepOnce()
 	{
 		for (int y = 0; y >= -3; --y)
 		{
-			if (ProcessIfWalkable(CurrentCell->m_Location + Vector3i(1, y, 0),  CurrentCell, NORMAL_G_COST))
+			if (ProcessIfWalkable(CurrentCell->m_Location + Vector3i(1, y, 0), CurrentCell, NORMAL_G_COST))
 			{
 				DoneEast = true;
 				if (y == 0)
@@ -238,7 +235,7 @@ bool cPath::StepOnce()
 	{
 		for (int y = 0; y >= -3; --y)
 		{
-			if (ProcessIfWalkable(CurrentCell->m_Location + Vector3i(-1, y, 0),  CurrentCell, NORMAL_G_COST))
+			if (ProcessIfWalkable(CurrentCell->m_Location + Vector3i(-1, y, 0), CurrentCell, NORMAL_G_COST))
 			{
 				DoneWest = true;
 				if (y == 0)
@@ -254,7 +251,7 @@ bool cPath::StepOnce()
 	{
 		for (int y = 0; y >= -3; --y)
 		{
-			if (ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, y, 1),  CurrentCell, NORMAL_G_COST))
+			if (ProcessIfWalkable(CurrentCell->m_Location + Vector3i(0, y, 1), CurrentCell, NORMAL_G_COST))
 			{
 				DoneSouth = true;
 				if (y == 0)
@@ -337,10 +334,10 @@ void cPath::BuildPath()
 		{
 			CurrentCell->m_Location.y -= 30;
 		}
-		m_PathPoints.push_back(CurrentCell->m_Location);  // Populate the cPath with points. All midpoints are added. Destination is added. Source is excluded.
+		m_PathPoints.push_back(CurrentCell->m_Location
+		);  // Populate the cPath with points. All midpoints are added. Destination is added. Source is excluded.
 		CurrentCell = CurrentCell->m_Parent;
 	}
-
 }
 
 
@@ -350,7 +347,7 @@ void cPath::BuildPath()
 void cPath::FinishCalculation()
 {
 	m_Map.clear();
-	m_OpenList = std::priority_queue<cPathCell *, std::vector<cPathCell *>, compareHeuristics>{};
+	m_OpenList = std::priority_queue<cPathCell *, std::vector<cPathCell *>, compareHeuristics> {};
 }
 
 
@@ -375,9 +372,9 @@ void cPath::OpenListAdd(cPathCell * a_Cell)
 {
 	a_Cell->m_Status = eCellStatus::OPENLIST;
 	m_OpenList.push(a_Cell);
-	#ifdef COMPILING_PATHFIND_DEBUGGER
+#ifdef COMPILING_PATHFIND_DEBUGGER
 	si::setBlock(a_Cell->m_Location.x, a_Cell->m_Location.y, a_Cell->m_Location.z, debug_open, SetMini(a_Cell));
-	#endif
+#endif
 }
 
 
@@ -388,15 +385,16 @@ cPathCell * cPath::OpenListPop()  // Popping from the open list also means addin
 {
 	if (m_OpenList.size() == 0)
 	{
-		return nullptr;  // We've exhausted the search space and nothing was found, this will trigger a PATH_NOT_FOUND or NEARBY_FOUND status.
+		return nullptr;  // We've exhausted the search space and nothing was found, this will trigger a PATH_NOT_FOUND
+						 // or NEARBY_FOUND status.
 	}
 
 	cPathCell * Ret = m_OpenList.top();
 	m_OpenList.pop();
 	Ret->m_Status = eCellStatus::CLOSEDLIST;
-	#ifdef COMPILING_PATHFIND_DEBUGGER
+#ifdef COMPILING_PATHFIND_DEBUGGER
 	si::setBlock((Ret)->m_Location.x, (Ret)->m_Location.y, (Ret)->m_Location.z, debug_closed, SetMini(Ret));
-	#endif
+#endif
 	return Ret;
 }
 
@@ -440,20 +438,22 @@ void cPath::ProcessCell(cPathCell * a_Cell, cPathCell * a_Caller, int a_GDelta)
 			a_Cell->m_G = 0;
 		}
 
-		// Calculate H. This is A*'s Heuristics value.
-		#if DISTANCE_MANHATTAN == 1
-			// Manhattan distance. DeltaX + DeltaY + DeltaZ.
-			a_Cell->m_H = 10 * (abs(a_Cell->m_Location.x-m_Destination.x) + abs(a_Cell->m_Location.y-m_Destination.y) + abs(a_Cell->m_Location.z-m_Destination.z));
-		#else
-			// Euclidian distance. sqrt(DeltaX^2 + DeltaY^2 + DeltaZ^2), more precise.
-			a_Cell->m_H = static_cast<decltype(a_Cell->m_H)>((a_Cell->m_Location - m_Destination).Length() * 10);
-		#endif
+// Calculate H. This is A*'s Heuristics value.
+#if DISTANCE_MANHATTAN == 1
+		// Manhattan distance. DeltaX + DeltaY + DeltaZ.
+		a_Cell->m_H = 10 *
+			(abs(a_Cell->m_Location.x - m_Destination.x) + abs(a_Cell->m_Location.y - m_Destination.y) +
+			 abs(a_Cell->m_Location.z - m_Destination.z));
+#else
+		// Euclidian distance. sqrt(DeltaX^2 + DeltaY^2 + DeltaZ^2), more precise.
+		a_Cell->m_H = static_cast<decltype(a_Cell->m_H)>((a_Cell->m_Location - m_Destination).Length() * 10);
+#endif
 
-		#if HEURISTICS_ONLY == 1
-			a_Cell->m_F = a_Cell->m_H;  // Greedy search. https://en.wikipedia.org/wiki/Greedy_search
-		#else
-			a_Cell->m_F = a_Cell->m_H + a_Cell->m_G;  // Regular A*.
-		#endif
+#if HEURISTICS_ONLY == 1
+		a_Cell->m_F = a_Cell->m_H;  // Greedy search. https://en.wikipedia.org/wiki/Greedy_search
+#else
+		a_Cell->m_F = a_Cell->m_H + a_Cell->m_G;  // Regular A*.
+#endif
 
 		OpenListAdd(a_Cell);
 		return;
@@ -467,7 +467,6 @@ void cPath::ProcessCell(cPathCell * a_Cell, cPathCell * a_Caller, int a_GDelta)
 		a_Cell->m_H = a_Cell->m_F + a_Cell->m_G;
 		a_Cell->m_Parent = a_Caller;
 	}
-
 }
 
 
@@ -494,7 +493,8 @@ void cPath::FillCellAttributes(cPathCell & a_Cell)
 		m_BadChunkFound = true;
 		a_Cell.m_IsSolid = true;
 		a_Cell.m_IsSpecial = false;
-		a_Cell.m_BlockType = E_BLOCK_AIR;  // m_BlockType is never used when m_IsSpecial is false, but it may be used if we implement dijkstra
+		a_Cell.m_BlockType = E_BLOCK_AIR;  // m_BlockType is never used when m_IsSpecial is false, but it may be used if
+										   // we implement dijkstra
 		return;
 	}
 	m_Chunk = Chunk;
@@ -512,9 +512,11 @@ void cPath::FillCellAttributes(cPathCell & a_Cell)
 	if (BlockTypeIsSpecial(BlockType))
 	{
 		a_Cell.m_IsSpecial = true;
-		a_Cell.m_IsSolid = true;  // Specials are solids only from a certain direction. But their m_IsSolid is always true
+		a_Cell.m_IsSolid =
+			true;  // Specials are solids only from a certain direction. But their m_IsSolid is always true
 	}
-	else if ((!cBlockInfo::IsSolid(a_Cell.m_BlockType)) && IsBlockFence(GetCell(Location + Vector3i(0, -1, 0))->m_BlockType))
+	else if ((!cBlockInfo::IsSolid(a_Cell.m_BlockType)) &&
+			 IsBlockFence(GetCell(Location + Vector3i(0, -1, 0))->m_BlockType))
 	{
 		// Nonsolid blocks with fences below them are consider Special Solids. That is, they sometimes behave as solids.
 		a_Cell.m_IsSpecial = true;
@@ -526,7 +528,6 @@ void cPath::FillCellAttributes(cPathCell & a_Cell)
 		a_Cell.m_IsSpecial = false;
 		a_Cell.m_IsSolid = cBlockInfo::IsSolid(BlockType);
 	}
-
 }
 
 
@@ -541,11 +542,11 @@ cPathCell * cPath::GetCell(const Vector3i & a_Location)
 		m_Map[a_Location].m_Location = a_Location;
 		FillCellAttributes(m_Map[a_Location]);
 		m_Map[a_Location].m_Status = eCellStatus::NOLIST;
-		#ifdef COMPILING_PATHFIND_DEBUGGER
-			#ifdef COMPILING_PATHFIND_DEBUGGER_MARK_UNCHECKED
-				si::setBlock(a_Location.x, a_Location.y, a_Location.z, debug_unchecked, Cell->m_IsSolid ? NORMAL : MINI);
-			#endif
-		#endif
+#ifdef COMPILING_PATHFIND_DEBUGGER
+#ifdef COMPILING_PATHFIND_DEBUGGER_MARK_UNCHECKED
+		si::setBlock(a_Location.x, a_Location.y, a_Location.z, debug_unchecked, Cell->m_IsSolid ? NORMAL : MINI);
+#endif
+#endif
 		return &m_Map[a_Location];
 	}
 	else
@@ -581,7 +582,11 @@ bool cPath::BodyFitsIn(const Vector3i & a_Location, const Vector3i & a_Source)
 				{
 					if (CurrentCell->m_IsSpecial)
 					{
-						if (SpecialIsSolidFromThisDirection(CurrentCell->m_BlockType, CurrentCell->m_BlockMeta, a_Location - a_Source))
+						if (SpecialIsSolidFromThisDirection(
+								CurrentCell->m_BlockType,
+								CurrentCell->m_BlockMeta,
+								a_Location - a_Source
+							))
 						{
 							return false;
 						}
@@ -629,7 +634,7 @@ bool cPath::BlockTypeIsSpecial(BLOCKTYPE a_Type)
 
 
 
-bool cPath::SpecialIsSolidFromThisDirection(BLOCKTYPE a_Type, NIBBLETYPE a_Meta,  const Vector3i & a_Direction)
+bool cPath::SpecialIsSolidFromThisDirection(BLOCKTYPE a_Type, NIBBLETYPE a_Meta, const Vector3i & a_Direction)
 {
 	if (a_Direction == Vector3i(0, 0, 0))
 	{

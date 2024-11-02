@@ -16,16 +16,21 @@
 
 
 // tolua_begin
-class cBannerEntity :
-	public cBlockEntity
+class cBannerEntity : public cBlockEntity
 {
 	// tolua_end
 
 	using Super = cBlockEntity;
 
-public:
-
-	cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, unsigned char a_BaseColor = 1, AString a_CustomName = "");
+  public:
+	cBannerEntity(
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta,
+		Vector3i a_Pos,
+		cWorld * a_World,
+		unsigned char a_BaseColor = 1,
+		AString a_CustomName = ""
+	);
 
 	unsigned char GetBaseColor() const { return m_BaseColor; }
 	void SetBaseColor(unsigned char a_Color) { m_BaseColor = a_Color; }
@@ -33,8 +38,7 @@ public:
 	const AString & GetCustomName() const { return m_CustomName; }
 	void SetCustomName(const AString & a_CustomName) { m_CustomName = a_CustomName; }
 
-private:
-
+  private:
 	unsigned char m_BaseColor;
 
 	AString m_CustomName;
@@ -44,4 +48,4 @@ private:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
-} ;  // tolua_export
+};  // tolua_export

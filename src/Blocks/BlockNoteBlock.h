@@ -8,17 +8,14 @@
 
 
 
-class cBlockNoteBlockHandler final :
-	public cBlockEntityHandler
+class cBlockNoteBlockHandler final : public cBlockEntityHandler
 {
 	using Super = cBlockEntityHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual void OnDigging(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
@@ -26,12 +23,15 @@ private:
 		const Vector3i a_BlockPos
 	) const override
 	{
-		a_WorldInterface.DoWithBlockEntityAt(a_BlockPos, [](cBlockEntity & a_BlockEntity)
-		{
-			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_NOTE_BLOCK);
+		a_WorldInterface.DoWithBlockEntityAt(
+			a_BlockPos,
+			[](cBlockEntity & a_BlockEntity)
+			{
+				ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_NOTE_BLOCK);
 
-			static_cast<cNoteEntity &>(a_BlockEntity).MakeSound();
-			return false;
-		});
+				static_cast<cNoteEntity &>(a_BlockEntity).MakeSound();
+				return false;
+			}
+		);
 	}
 };

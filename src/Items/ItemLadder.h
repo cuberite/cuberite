@@ -8,17 +8,14 @@
 
 
 
-class cItemLadderHandler final  :
-	public cItemHandler
+class cItemLadderHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	/** Converts the block face of the neighbor to which the ladder is attached to the ladder block's meta. */
 	static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_NeighborBlockFace)
 	{
@@ -30,12 +27,18 @@ private:
 			case BLOCK_FACE_XP: return 0x5;
 			case BLOCK_FACE_YM:
 			case BLOCK_FACE_YP: return 0x2;
-			default: UNREACHABLE("Unsupported neighbor block face");
+			default:            UNREACHABLE("Unsupported neighbor block face");
 		}
 	}
 
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
+	virtual bool CommitPlacement(
+		cPlayer & a_Player,
+		const cItem & a_HeldItem,
+		const Vector3i a_PlacePosition,
+		eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPosition
+	) const override
 	{
 		const auto & World = *a_Player.GetWorld();
 		const auto ClickedBlockType = World.GetBlock(AddFaceDirection(a_PlacePosition, a_ClickedBlockFace, true));
@@ -60,7 +63,8 @@ private:
 	Returns BLOCK_FACE_NONE on failure. */
 	static eBlockFace FindSuitableFace(const cWorld & a_World, const Vector3i a_Position)
 	{
-		for (const auto Face : { BLOCK_FACE_ZM, BLOCK_FACE_XP, BLOCK_FACE_ZP, BLOCK_FACE_XM })  // Loop through all faces in specific order.
+		for (const auto Face :
+			 {BLOCK_FACE_ZM, BLOCK_FACE_XP, BLOCK_FACE_ZP, BLOCK_FACE_XM})  // Loop through all faces in specific order.
 		{
 			// The direction of Face is relative to the direction the ladder faces.
 			// This is the position, computed inverted, that such a ladder would attach to.

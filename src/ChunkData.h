@@ -16,8 +16,7 @@
 
 
 
-template <class ElementType, size_t ElementCount, ElementType DefaultValue>
-struct ChunkDataStore
+template <class ElementType, size_t ElementCount, ElementType DefaultValue> struct ChunkDataStore
 {
 	using Type = std::array<ElementType, ElementCount>;
 
@@ -38,11 +37,11 @@ struct ChunkDataStore
 
 	/** Copies the data from the specified flat section array into the internal representation.
 	Allocates a section if needed for the operation. */
-	void SetSection(const ElementType (& a_Source)[ElementCount], size_t a_Y);
+	void SetSection(const ElementType (&a_Source)[ElementCount], size_t a_Y);
 
 	/** Copies the data from the specified flat array into the internal representation.
 	Allocates sections that are needed for the operation. */
-	void SetAll(const ElementType (& a_Source)[cChunkDef::NumSections * ElementCount]);
+	void SetAll(const ElementType (&a_Source)[cChunkDef::NumSections * ElementCount]);
 
 	/** Contains all the sections this ChunkDataStore manages. */
 	std::unique_ptr<Type> Store[cChunkDef::NumSections];
@@ -54,8 +53,7 @@ struct ChunkDataStore
 
 class ChunkBlockData
 {
-public:
-
+  public:
 	static constexpr size_t SectionBlockCount = cChunkDef::SectionHeight * cChunkDef::Width * cChunkDef::Width;
 	static constexpr size_t SectionMetaCount = SectionBlockCount / 2;
 
@@ -65,13 +63,11 @@ public:
 	using SectionType = BLOCKTYPE[SectionBlockCount];
 	using SectionMetaType = NIBBLETYPE[SectionMetaCount];
 
-private:
-
+  private:
 	ChunkDataStore<BLOCKTYPE, SectionBlockCount, DefaultValue> m_Blocks;
 	ChunkDataStore<NIBBLETYPE, SectionMetaCount, DefaultMetaValue> m_Metas;
 
-public:
-
+  public:
 	using BlockArray = decltype(m_Blocks)::Type;
 	using MetaArray = decltype(m_Metas)::Type;
 
@@ -96,8 +92,7 @@ public:
 
 class ChunkLightData
 {
-public:
-
+  public:
 	static constexpr size_t SectionLightCount = (cChunkDef::SectionHeight * cChunkDef::Width * cChunkDef::Width) / 2;
 
 	static constexpr NIBBLETYPE DefaultBlockLightValue = 0x00;
@@ -105,13 +100,11 @@ public:
 
 	using SectionType = NIBBLETYPE[SectionLightCount];
 
-private:
-
+  private:
 	ChunkDataStore<NIBBLETYPE, SectionLightCount, DefaultBlockLightValue> m_BlockLights;
 	ChunkDataStore<NIBBLETYPE, SectionLightCount, DefaultSkyLightValue> m_SkyLights;
 
-public:
-
+  public:
 	using LightArray = decltype(m_BlockLights)::Type;
 
 	void Assign(const ChunkLightData & a_Other);
@@ -133,26 +126,33 @@ public:
 /** Invokes the callback functor for every chunk section containing at least one present block or light section data.
 This is used to collect all data for all sections.
 In macro form to work around a Visual Studio 2017 ICE bug. */
-#define ChunkDef_ForEachSection(BlockData, LightData, Callback) \
-	do \
-	{ \
-		for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y) \
-		{ \
-			const auto Blocks = BlockData.GetSection(Y); \
-			const auto Metas = BlockData.GetMetaSection(Y); \
-			const auto BlockLights = LightData.GetBlockLightSection(Y); \
-			const auto SkyLights = LightData.GetSkyLightSection(Y); \
+#define ChunkDef_ForEachSection(BlockData, LightData, Callback)                                                  \
+	do                                                                                                           \
+	{                                                                                                            \
+		for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)                                                      \
+		{                                                                                                        \
+			const auto Blocks = BlockData.GetSection(Y);                                                         \
+			const auto Metas = BlockData.GetMetaSection(Y);                                                      \
+			const auto BlockLights = LightData.GetBlockLightSection(Y);                                          \
+			const auto SkyLights = LightData.GetSkyLightSection(Y);                                              \
 			if ((Blocks != nullptr) || (Metas != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr)) \
-			{ \
-				Callback \
-			} \
-		} \
-	} while (false)
+			{                                                                                                    \
+				Callback                                                                                         \
+			}                                                                                                    \
+		}                                                                                                        \
+	}                                                                                                            \
+	while (false)
 
 
 
 
 
 extern template struct ChunkDataStore<BLOCKTYPE, ChunkBlockData::SectionBlockCount, ChunkBlockData::DefaultValue>;
-extern template struct ChunkDataStore<NIBBLETYPE, ChunkBlockData::SectionMetaCount, ChunkLightData::DefaultBlockLightValue>;
-extern template struct ChunkDataStore<NIBBLETYPE, ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue>;
+extern template struct ChunkDataStore<
+	NIBBLETYPE,
+	ChunkBlockData::SectionMetaCount,
+	ChunkLightData::DefaultBlockLightValue>;
+extern template struct ChunkDataStore<
+	NIBBLETYPE,
+	ChunkLightData::SectionLightCount,
+	ChunkLightData::DefaultSkyLightValue>;

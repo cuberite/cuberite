@@ -10,7 +10,15 @@
 
 
 cSkeleton::cSkeleton(void) :
-	Super("Skeleton", mtSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", "entity.skeleton.ambient", 0.6f, 1.99f),
+	Super(
+		"Skeleton",
+		mtSkeleton,
+		"entity.skeleton.hurt",
+		"entity.skeleton.death",
+		"entity.skeleton.ambient",
+		0.6f,
+		1.99f
+	),
 	m_ChargingBow(false)
 {
 }
@@ -61,7 +69,8 @@ void cSkeleton::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 {
-	StopMovingToPosition();  // Todo handle this in a better way, the skeleton does some uneeded recalcs due to inStateChasing
+	StopMovingToPosition(
+	);  // Todo handle this in a better way, the skeleton does some uneeded recalcs due to inStateChasing
 	auto & Random = GetRandomProvider();
 
 	if (!m_ChargingBow)
@@ -73,7 +82,11 @@ bool cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 
 	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0))
 	{
-		Vector3d Inaccuracy = Vector3d(Random.RandReal<double>(-0.25, 0.25), Random.RandReal<double>(-0.25, 0.25), Random.RandReal<double>(-0.25, 0.25));
+		Vector3d Inaccuracy = Vector3d(
+			Random.RandReal<double>(-0.25, 0.25),
+			Random.RandReal<double>(-0.25, 0.25),
+			Random.RandReal<double>(-0.25, 0.25)
+		);
 		Vector3d Speed = (GetTarget()->GetPosition() + Inaccuracy - GetPosition()) * 5;
 		Speed.y += Random.RandInt(-1, 1);
 

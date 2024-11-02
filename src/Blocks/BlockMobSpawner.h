@@ -8,17 +8,14 @@
 
 
 
-class cBlockMobSpawnerHandler final :
-	public cBlockHandler
+class cBlockMobSpawnerHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
 		cWorldInterface & a_WorldInterface,
@@ -35,10 +32,7 @@ private:
 
 
 
-	virtual bool IsUseable() const override
-	{
-		return true;
-	}
+	virtual bool IsUseable() const override { return true; }
 
 
 
@@ -55,9 +49,11 @@ private:
 
 
 	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BLOCKTYPE a_OldBlockType,
+		NIBBLETYPE a_OldBlockMeta,
 		const cEntity * a_Digger
 	) const override
 	{
@@ -81,4 +77,4 @@ private:
 		int Reward = 15 + Random.RandInt(14) + Random.RandInt(14);
 		a_WorldInterface.SpawnSplitExperienceOrbs(Vector3d(0.5, 0.5, 0.5) + a_BlockPos, Reward);
 	}
-} ;
+};

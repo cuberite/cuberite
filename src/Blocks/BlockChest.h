@@ -9,13 +9,11 @@
 
 
 
-class cBlockChestHandler final :
-	public cYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>
+class cBlockChestHandler final : public cYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>
 {
 	using Super = cYawRotator<cClearMetaOnDrop<cBlockEntityHandler>, 0x07, 0x03, 0x04, 0x02, 0x05>;
 
-public:
-
+  public:
 	using Super::Super;
 
 
@@ -24,4 +22,4 @@ public:
 		UNUSED(a_Meta);
 		return 13;
 	}
-} ;
+};

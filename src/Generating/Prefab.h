@@ -28,16 +28,16 @@ class cChunkDesc;
 
 
 
-class cPrefab :
-	public cPiece
+class cPrefab : public cPiece
 {
-public:
+  public:
 	/** How to handle the space between the prefab bottom and the terrain top. */
 	enum eExtendFloorStrategy
 	{
-		efsNone,                    ///< No processing, the prefab is left "floating in the air"
+		efsNone,  ///< No processing, the prefab is left "floating in the air"
 		efsRepeatBottomTillNonAir,  ///< Repeat the bottom-most block down until the first non-air block
-		efsRepeatBottomTillSolid,   ///< Repeat the bottom-most block down until the first solid block; non-solids are overwritten
+		efsRepeatBottomTillSolid,  ///< Repeat the bottom-most block down until the first solid block; non-solids are
+								   ///< overwritten
 	};
 
 	struct sDef
@@ -87,7 +87,8 @@ public:
 
 		/** The weight to add to this piece's base per-depth chance if the previous piece is the same.
 		Can be positive or negative.
-		This is used e. g. to make nether bridges prefer spanning multiple segments or to penalize turrets next to each other. */
+		This is used e. g. to make nether bridges prefer spanning multiple segments or to penalize turrets next to each
+		other. */
 		int m_AddWeightIfSame;
 
 		/** If true, the piece will be moved Y-wise so that its first connector is sitting on the terrain.
@@ -102,7 +103,8 @@ public:
 	/** Creates a prefab based on the given BlockArea and allowed rotations. */
 	cPrefab(const cBlockArea & a_Image, int a_AllowedRotations);
 
-	/** Creates a prefab based on the given BlockArea. Allowed rotations can be added later on using SetAllowedRotations(). */
+	/** Creates a prefab based on the given BlockArea. Allowed rotations can be added later on using
+	 * SetAllowedRotations(). */
 	cPrefab(const cBlockArea & a_Image);
 
 	/** Creates a prefab based on the specified block data, using the char-to-block map in a_BlockDefinitions.
@@ -156,11 +158,11 @@ public:
 	/** Sets the internal hitbox to the specified value. */
 	void SetHitBox(const cCuboid & a_HitBox) { m_HitBox = a_HitBox; }
 
-protected:
+  protected:
 	/** Packs complete definition of a single block, for per-letter assignment. */
 	struct sBlockTypeDef
 	{
-		BLOCKTYPE  m_BlockType;
+		BLOCKTYPE m_BlockType;
 		NIBBLETYPE m_BlockMeta;
 	};
 
@@ -206,7 +208,8 @@ protected:
 
 	/** The weight to add to this piece's base per-depth chance if the previous piece is the same.
 	Can be positive or negative.
-	This is used e. g. to make nether bridges prefer spanning multiple segments or to penalize turrets next to each other. */
+	This is used e. g. to make nether bridges prefer spanning multiple segments or to penalize turrets next to each
+	other. */
 	int m_AddWeightIfSame;
 
 	/** If true, the piece will be moved Y-wise so that its first connector is sitting on the terrain.
@@ -224,7 +227,8 @@ protected:
 	To be called only from this class's constructor! */
 	void AddRotatedBlockAreas(void);
 
-	/** Parses the CharMap in the definition into a CharMap binary data used for translating the definition into BlockArea. */
+	/** Parses the CharMap in the definition into a CharMap binary data used for translating the definition into
+	 * BlockArea. */
 	void ParseCharMap(CharMap & a_CharMapOut, const char * a_CharMapDef);
 
 	/** Parses the Image in the definition into m_BlockArea[0]'s block types and metas, using the specified CharMap. */
@@ -233,7 +237,3 @@ protected:
 	/** Parses the connectors definition text into m_Connectors member. */
 	void ParseConnectors(const char * a_ConnectorsDef);
 };
-
-
-
-

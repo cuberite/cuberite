@@ -83,7 +83,11 @@ void StatisticsSerializer::Load(StatisticsManager & Manager, const std::string &
 
 
 
-void StatisticsSerializer::Save(const StatisticsManager & Manager, const std::string & WorldPath, std::string && FileName)
+void StatisticsSerializer::Save(
+	const StatisticsManager & Manager,
+	const std::string & WorldPath,
+	std::string && FileName
+)
 {
 	Json::Value Root;
 

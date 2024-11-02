@@ -7,29 +7,33 @@
 
 
 
-class cBlockEndPortalFrameHandler final :
-	public cYawRotator<cBlockHandler, 0x03,
-		E_META_END_PORTAL_FRAME_ZP,
-		E_META_END_PORTAL_FRAME_XM,
-		E_META_END_PORTAL_FRAME_ZM,
-		E_META_END_PORTAL_FRAME_XP
-	>
+class cBlockEndPortalFrameHandler final : public cYawRotator<
+											  cBlockHandler,
+											  0x03,
+											  E_META_END_PORTAL_FRAME_ZP,
+											  E_META_END_PORTAL_FRAME_XM,
+											  E_META_END_PORTAL_FRAME_ZM,
+											  E_META_END_PORTAL_FRAME_XP>
 {
 	using Super = cYawRotator<
-		cBlockHandler, 0x03,
+		cBlockHandler,
+		0x03,
 		E_META_END_PORTAL_FRAME_ZP,
 		E_META_END_PORTAL_FRAME_XM,
 		E_META_END_PORTAL_FRAME_ZM,
-		E_META_END_PORTAL_FRAME_XP
-	>;
+		E_META_END_PORTAL_FRAME_XP>;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
-	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) const override
+  private:
+	virtual void OnPlaced(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta
+	) const override
 	{
 		// E_META_END_PORTAL_FRAME_EYE is the bit which signifies the eye of ender is in it.
 		// LOG("PortalPlaced, meta %d", a_BlockMeta);
@@ -46,7 +50,12 @@ private:
 
 
 	/** Returns false if portal cannot be made, true if portal was made. */
-	static bool FindAndSetPortal(Vector3i a_FirstFrame, NIBBLETYPE a_Direction, cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface)
+	static bool FindAndSetPortal(
+		Vector3i a_FirstFrame,
+		NIBBLETYPE a_Direction,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface
+	)
 	{
 		/*
 		PORTAL FINDING ALGORITH
@@ -54,8 +63,10 @@ private:
 		- Get clicked base block
 		- Check diagonally (clockwise) for another portal block
 			- if exists, and has eye, Continue. Abort if any are facing the wrong direction.
-			- if doesn't exist, check horizontally (the block to the left of this block). Abort if there is no horizontal block.
-		- After a corner has been met, traverse the portal clockwise, ensuring valid portal frames connect the rectangle.
+			- if doesn't exist, check horizontally (the block to the left of this block). Abort if there is no
+		horizontal block.
+		- After a corner has been met, traverse the portal clockwise, ensuring valid portal frames connect the
+		rectangle.
 		- Track the NorthWest Corner, and the dimensions.
 		- If dimensions are valid, create the portal.
 		*/
@@ -66,25 +77,23 @@ private:
 		const int MAX_PORTAL_WIDTH = 4;
 
 		// Directions to use for the clockwise traversal.
-		static const Vector3i Left[] =
-		{
-			{ 1, 0,  0},  // 0, South, left block is East  / XP
-			{ 0, 0,  1},  // 1, West,  left block is South / ZP
-			{-1, 0,  0},  // 2, North, left block is West  / XM
-			{ 0, 0, -1},  // 3, East,  left block is North / ZM
+		static const Vector3i Left[] = {
+			{1, 0, 0},  // 0, South, left block is East  / XP
+			{0, 0, 1},  // 1, West,  left block is South / ZP
+			{-1, 0, 0},  // 2, North, left block is West  / XM
+			{0, 0, -1},  // 3, East,  left block is North / ZM
 		};
-		static const Vector3i LeftForward[] =
-		{
-			{ 1, 0,  1},  // 0, South, left block is SouthEast / XP ZP
-			{-1, 0,  1},  // 1, West,  left block is SouthWest / XM ZP
+		static const Vector3i LeftForward[] = {
+			{1, 0, 1},  // 0, South, left block is SouthEast / XP ZP
+			{-1, 0, 1},  // 1, West,  left block is SouthWest / XM ZP
 			{-1, 0, -1},  // 2, North, left block is NorthWest / XM ZM
-			{ 1, 0, -1},  // 3, East,  left block is NorthEast / XP ZM
+			{1, 0, -1},  // 3, East,  left block is NorthEast / XP ZM
 		};
 
 
 		int EdgesComplete = -1;  // We start search _before_ finding the first edge
 		Vector3i NorthWestCorner;
-		int EdgeWidth[4] = { 1, 1, 1, 1 };
+		int EdgeWidth[4] = {1, 1, 1, 1};
 		NIBBLETYPE CurrentDirection = a_Direction;
 		Vector3i CurrentPos = a_FirstFrame;
 
@@ -152,7 +161,8 @@ private:
 		{
 			for (int j = 0; j < EdgeWidth[1]; j++)
 			{
-				a_ChunkInterface.SetBlock(NorthWestCorner.x + i, NorthWestCorner.y, NorthWestCorner.z + j, E_BLOCK_END_PORTAL, 0);
+				a_ChunkInterface
+					.SetBlock(NorthWestCorner.x + i, NorthWestCorner.y, NorthWestCorner.z + j, E_BLOCK_END_PORTAL, 0);
 				// TODO: Create block entity so portal doesn't become invisible on relog.
 			}
 		}
@@ -171,8 +181,7 @@ private:
 
 		return (
 			a_ChunkInterface.GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta) &&
-			(BlockType == E_BLOCK_END_PORTAL_FRAME) &&
-			(BlockMeta == (a_ShouldFace | E_META_END_PORTAL_FRAME_EYE))
+			(BlockType == E_BLOCK_END_PORTAL_FRAME) && (BlockMeta == (a_ShouldFace | E_META_END_PORTAL_FRAME_EYE))
 		);
 	}
 
@@ -180,10 +189,7 @@ private:
 
 
 	/** Return true if this block is a portal frame. */
-	static bool IsPortalFrame(BLOCKTYPE BlockType)
-	{
-		return (BlockType == E_BLOCK_END_PORTAL_FRAME);
-	}
+	static bool IsPortalFrame(BLOCKTYPE BlockType) { return (BlockType == E_BLOCK_END_PORTAL_FRAME); }
 
 
 
@@ -195,7 +201,3 @@ private:
 		return 27;
 	}
 };
-
-
-
-

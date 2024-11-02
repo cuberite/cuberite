@@ -1,7 +1,8 @@
 
 // SpringStats.cpp
 
-// Implements the cSpringStats class representing a cCallback descendant that collects statistics on lava and water springs
+// Implements the cSpringStats class representing a cCallback descendant that collects statistics on lava and water
+// springs
 
 #include "Globals.h"
 #include "SpringStats.h"
@@ -16,7 +17,7 @@
 cSpringStats::cStats::cStats(void) :
 	m_TotalChunks(0)
 {
-	memset(m_LavaSprings,  0, sizeof(m_LavaSprings));
+	memset(m_LavaSprings, 0, sizeof(m_LavaSprings));
 	memset(m_WaterSprings, 0, sizeof(m_WaterSprings));
 }
 
@@ -31,7 +32,7 @@ void cSpringStats::cStats::Add(const cSpringStats::cStats & a_Other)
 	{
 		for (int Height = 0; Height < 256; Height++)
 		{
-			m_LavaSprings[Biome][Height]  += a_Other.m_LavaSprings[Biome][Height];
+			m_LavaSprings[Biome][Height] += a_Other.m_LavaSprings[Biome][Height];
 			m_WaterSprings[Biome][Height] += a_Other.m_WaterSprings[Biome][Height];
 		}
 	}
@@ -84,8 +85,8 @@ bool cSpringStats::OnSection(
 	const NIBBLETYPE * a_BlockSkyLight
 )
 {
-	memcpy(m_BlockTypes + ((int)a_Y) * 16 * 16 * 16,     a_BlockTypes, 16 * 16 * 16);
-	memcpy(m_BlockMetas + ((int)a_Y) * 16 * 16 * 16 / 2, a_BlockMeta,  16 * 16 * 16 / 2);
+	memcpy(m_BlockTypes + ((int) a_Y) * 16 * 16 * 16, a_BlockTypes, 16 * 16 * 16);
+	memcpy(m_BlockMetas + ((int) a_Y) * 16 * 16 * 16 / 2, a_BlockMeta, 16 * 16 * 16 / 2);
 	return false;
 }
 
@@ -145,15 +146,14 @@ void cSpringStats::TestSpring(int a_RelX, int a_RelY, int a_RelZ, cSpringStats::
 	static const struct
 	{
 		int x, y, z;
-	} Coords[] =
-	{
-		{-1,  0,  0},
-		{ 1,  0,  0},
-		{ 0, -1,  0},
-		{ 0,  1,  0},
-		{ 0,  0, -1},
-		{ 0,  0,  1},
-	} ;
+	} Coords[] = {
+		{-1, 0, 0},
+		{1, 0, 0},
+		{0, -1, 0},
+		{0, 1, 0},
+		{0, 0, -1},
+		{0, 0, 1},
+	};
 	bool HasFluidNextToIt = false;
 	for (int i = 0; i < ARRAYCOUNT(Coords); i++)
 	{
@@ -164,7 +164,12 @@ void cSpringStats::TestSpring(int a_RelX, int a_RelY, int a_RelZ, cSpringStats::
 			case E_BLOCK_LAVA:
 			case E_BLOCK_STATIONARY_LAVA:
 			{
-				if (cChunkDef::GetNibble(m_BlockMetas, a_RelX + Coords[i].x, a_RelY + Coords[i].y, a_RelZ + Coords[i].z) == 0)
+				if (cChunkDef::GetNibble(
+						m_BlockMetas,
+						a_RelX + Coords[i].x,
+						a_RelY + Coords[i].y,
+						a_RelZ + Coords[i].z
+					) == 0)
 				{
 					// There is another source block next to this, so this is not a spring
 					return;
@@ -182,7 +187,7 @@ void cSpringStats::TestSpring(int a_RelX, int a_RelY, int a_RelZ, cSpringStats::
 	}
 
 	// No source blocks next to the specified block, so it is a spring. Add it to stats:
-	a_Stats[a_RelY][((unsigned char *)m_Biomes)[a_RelX + 16 * a_RelZ]] += 1;
+	a_Stats[a_RelY][((unsigned char *) m_Biomes)[a_RelX + 16 * a_RelZ]] += 1;
 }
 
 
@@ -217,7 +222,7 @@ void cSpringStatsFactory::JoinResults(void)
 {
 	for (cCallbacks::iterator itr = m_Callbacks.begin(), end = m_Callbacks.end(); itr != end; ++itr)
 	{
-		m_CombinedStats.Add(((cSpringStats *)(*itr))->GetStats());
+		m_CombinedStats.Add(((cSpringStats *) (*itr))->GetStats());
 	}  // for itr - m_Callbacks[]
 }
 

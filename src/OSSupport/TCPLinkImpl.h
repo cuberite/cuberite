@@ -31,13 +31,11 @@ typedef std::vector<cTCPLinkImplPtr> cTCPLinkImplPtrs;
 
 
 
-class cTCPLinkImpl:
-	public cTCPLink
+class cTCPLinkImpl : public cTCPLink
 {
 	using Super = cTCPLink;
 
-public:
-
+  public:
 	/** Creates a new link based on the given socket.
 	Used for connections accepted in a server using cNetwork::Listen().
 	a_Host is the hostname used for TLS SNI (can be empty in cases TLS is not used).
@@ -57,7 +55,12 @@ public:
 	/** Queues a connection request to the specified host.
 	a_ConnectCallbacks must be valid.
 	Returns a link that has the connection request queued, or NULL for failure. */
-	static cTCPLinkImplPtr Connect(const AString & a_Host, UInt16 a_Port, cTCPLink::cCallbacksPtr a_LinkCallbacks, cNetwork::cConnectCallbacksPtr a_ConnectCallbacks);
+	static cTCPLinkImplPtr Connect(
+		const AString & a_Host,
+		UInt16 a_Port,
+		cTCPLink::cCallbacksPtr a_LinkCallbacks,
+		cNetwork::cConnectCallbacksPtr a_ConnectCallbacks
+	);
 
 	/** Enables communication over the link.
 	Links are created with communication disabled, so that creation callbacks can be called first.
@@ -73,27 +76,19 @@ public:
 	virtual UInt16 GetRemotePort(void) const override { return m_RemotePort; }
 	virtual void Shutdown(void) override;
 	virtual void Close(void) override;
-	virtual AString StartTLSClient(
-		cX509CertPtr a_OwnCert,
-		cCryptoKeyPtr a_OwnPrivKey,
-		cX509CertPtr a_TrustedRootCAs
-	) override;
-	virtual AString StartTLSServer(
-		cX509CertPtr a_OwnCert,
-		cCryptoKeyPtr a_OwnPrivKey,
-		const AString & a_StartTLSData
-	) override;
+	virtual AString StartTLSClient(cX509CertPtr a_OwnCert, cCryptoKeyPtr a_OwnPrivKey, cX509CertPtr a_TrustedRootCAs)
+		override;
+	virtual AString StartTLSServer(cX509CertPtr a_OwnCert, cCryptoKeyPtr a_OwnPrivKey, const AString & a_StartTLSData)
+		override;
 
-protected:
-
+  protected:
 	// fwd:
 	class cLinkTlsContext;
 	typedef std::shared_ptr<cLinkTlsContext> cLinkTlsContextPtr;
 	typedef std::weak_ptr<cLinkTlsContext> cLinkTlsContextWPtr;
 
 	/** Wrapper around cSslContext that is used when this link is being encrypted by SSL. */
-	class cLinkTlsContext :
-		public cSslContext
+	class cLinkTlsContext : public cSslContext
 	{
 		cTCPLinkImpl & m_Link;
 
@@ -106,7 +101,7 @@ protected:
 		/** Shared ownership of self, so that this object can keep itself alive for as long as it needs. */
 		cLinkTlsContextWPtr m_Self;
 
-	public:
+	  public:
 		cLinkTlsContext(cTCPLinkImpl & a_Link);
 
 		/** Shares ownership of self, so that this object can keep itself alive for as long as it needs. */
@@ -134,10 +129,7 @@ protected:
 		virtual int SendEncrypted(const unsigned char * a_Buffer, size_t a_NumBytes) override;
 
 		/** Returns true if the context's associated TCP link is the same link as a_Link. */
-		bool IsLink(cTCPLinkImpl * a_Link)
-		{
-			return (a_Link == &m_Link);
-		}
+		bool IsLink(cTCPLinkImpl * a_Link) { return (a_Link == &m_Link); }
 	};
 
 
@@ -216,7 +208,3 @@ protected:
 	/** Called by the TLS when it has decoded a piece of incoming cleartext data from the socket. */
 	void ReceivedCleartextData(const char * a_Data, size_t a_Length);
 };
-
-
-
-

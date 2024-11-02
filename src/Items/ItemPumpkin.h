@@ -8,18 +8,21 @@
 
 
 
-class cItemPumpkinHandler final:
-	public cItemHandler
+class cItemPumpkinHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
+  private:
+	virtual bool CommitPlacement(
+		cPlayer & a_Player,
+		const cItem & a_HeldItem,
+		const Vector3i a_PlacePosition,
+		const eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPosition
+	) const override
 	{
 		// First try spawning a snow golem or an iron golem:
 		if (TrySpawnGolem(a_Player, a_PlacePosition))
@@ -30,15 +33,17 @@ private:
 		}
 
 		// No golem at these coords, place the block normally:
-		return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_PUMPKIN, cBlockPumpkinHandler::YawToMetaData(a_Player.GetYaw()));
+		return a_Player
+			.PlaceBlock(a_PlacePosition, E_BLOCK_PUMPKIN, cBlockPumpkinHandler::YawToMetaData(a_Player.GetYaw()));
 	}
 
 
 
 
 
-	/** Spawns a snow / iron golem if the shape matches the recipe, supposing that the block placed at the specified coords is a pumpkin.
-	Returns true if the golem blocks are removed (for spawning), false if the recipe is not matched. */
+	/** Spawns a snow / iron golem if the shape matches the recipe, supposing that the block placed at the specified
+	coords is a pumpkin. Returns true if the golem blocks are removed (for spawning), false if the recipe is not
+	matched. */
 	bool TrySpawnGolem(cPlayer & a_Player, const Vector3i a_PumpkinPos) const
 	{
 		// A golem can't form with a pumpkin below level 2 or above level 255:
@@ -66,9 +71,9 @@ private:
 
 
 
-	/** Spawns a snow golem if the shape matches the recipe, supposing that the block placed at the specified coords is a pumpkin.
-	Returns true if the golem blocks are removed (for spawning), false if the recipe is not matched.
-	Assumes that the block below the specified block has already been checked and is a snow block. */
+	/** Spawns a snow golem if the shape matches the recipe, supposing that the block placed at the specified coords is
+	a pumpkin. Returns true if the golem blocks are removed (for spawning), false if the recipe is not matched. Assumes
+	that the block below the specified block has already been checked and is a snow block. */
 	bool TrySpawnSnowGolem(cWorld & a_World, cPlayer & a_Player, const Vector3i a_PumpkinPos) const
 	{
 		ASSERT(a_PumpkinPos.y > 1);
@@ -81,14 +86,11 @@ private:
 		}
 
 		// Try to place air blocks where the original recipe blocks were:
-		if (
-			!a_Player.PlaceBlocks(
-			{
-				{ a_PumpkinPos,            E_BLOCK_AIR, 0 },  // Head
-				{ a_PumpkinPos.addedY(-1), E_BLOCK_AIR, 0 },  // Torso
-				{ a_PumpkinPos.addedY(-2), E_BLOCK_AIR, 0 }	  // Legs
-			})
-		)
+		if (!a_Player.PlaceBlocks({
+				{a_PumpkinPos, E_BLOCK_AIR, 0},  // Head
+				{a_PumpkinPos.addedY(-1), E_BLOCK_AIR, 0},  // Torso
+				{a_PumpkinPos.addedY(-2), E_BLOCK_AIR, 0}  // Legs
+			}))
 		{
 			return false;
 		}
@@ -103,9 +105,9 @@ private:
 
 
 
-	/** Spawns an iron golem if the shape matches the recipe, supposing that the block placed at the specified coords is a pumpkin.
-	Returns true if the golem blocks are removed (for spawning), false if the recipe is not matched.
-	Assumes that the block below the specified block has already been checked and is an iron block. */
+	/** Spawns an iron golem if the shape matches the recipe, supposing that the block placed at the specified coords is
+	a pumpkin. Returns true if the golem blocks are removed (for spawning), false if the recipe is not matched. Assumes
+	that the block below the specified block has already been checked and is an iron block. */
 	bool TrySpawnIronGolem(cWorld & a_World, cPlayer & a_Player, const Vector3i a_PumpkinPos) const
 	{
 		ASSERT(a_PumpkinPos.y > 1);
@@ -119,33 +121,27 @@ private:
 
 		// Check the two arm directions (X, Z) using a loop over two sets of offset vectors:
 		auto BodyPos = a_PumpkinPos.addedY(-1);
-		static const Vector3i ArmOffsets[] =
-		{
+		static const Vector3i ArmOffsets[] = {
 			{1, 0, 0},
 			{0, 0, 1},
 		};
 		for (size_t i = 0; i < ARRAYCOUNT(ArmOffsets); i++)
 		{
 			// If the arm blocks don't match, bail out of this loop repetition:
-			if (
-				(a_World.GetBlock(BodyPos + ArmOffsets[i]) != E_BLOCK_IRON_BLOCK) ||
-				(a_World.GetBlock(BodyPos - ArmOffsets[i]) != E_BLOCK_IRON_BLOCK)
-			)
+			if ((a_World.GetBlock(BodyPos + ArmOffsets[i]) != E_BLOCK_IRON_BLOCK) ||
+				(a_World.GetBlock(BodyPos - ArmOffsets[i]) != E_BLOCK_IRON_BLOCK))
 			{
 				continue;
 			}
 
 			// Try to place air blocks where the original recipe blocks were:
-			if (
-				!a_Player.PlaceBlocks(
-				{
-					{ a_PumpkinPos,            E_BLOCK_AIR, 0 },  // Head
-					{ BodyPos,                 E_BLOCK_AIR, 0 },  // Torso
-					{ BodyPos.addedY(-1),      E_BLOCK_AIR, 0 },  // Legs
-					{ BodyPos + ArmOffsets[i], E_BLOCK_AIR, 0 },  // Arm
-					{ BodyPos - ArmOffsets[i], E_BLOCK_AIR, 0 }   // Arm
-				})
-			)
+			if (!a_Player.PlaceBlocks({
+					{a_PumpkinPos, E_BLOCK_AIR, 0},  // Head
+					{BodyPos, E_BLOCK_AIR, 0},  // Torso
+					{BodyPos.addedY(-1), E_BLOCK_AIR, 0},  // Legs
+					{BodyPos + ArmOffsets[i], E_BLOCK_AIR, 0},  // Arm
+					{BodyPos - ArmOffsets[i], E_BLOCK_AIR, 0}  // Arm
+				}))
 			{
 				return false;
 			}

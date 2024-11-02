@@ -15,16 +15,16 @@
 
 class cEnvelopeParser
 {
-public:
+  public:
 	class cCallbacks
 	{
-	public:
+	  public:
 		// Force a virtual destructor in descendants:
 		virtual ~cCallbacks() {}
 
 		/** Called when a full header line is parsed */
 		virtual void OnHeaderLine(const AString & a_Key, const AString & a_Value) = 0;
-	} ;
+	};
 
 
 	cEnvelopeParser(cCallbacks & a_Callbacks);
@@ -44,11 +44,12 @@ public:
 	/** Sets the IsInHeaders flag; used by cMultipartParser to simplify the parser initial conditions */
 	void SetIsInHeaders(bool a_IsInHeaders) { m_IsInHeaders = a_IsInHeaders; }
 
-public:
+  public:
 	/** Callbacks to call for the various events */
 	cCallbacks & m_Callbacks;
 
-	/** Set to true while the parser is still parsing the envelope headers. Once set to true, the parser will not consume any more data. */
+	/** Set to true while the parser is still parsing the envelope headers. Once set to true, the parser will not
+	 * consume any more data. */
 	bool m_IsInHeaders;
 
 	/** Buffer for the incoming data until it is parsed */
@@ -66,8 +67,4 @@ public:
 
 	/** Parses one line of header data. Returns true if successful */
 	bool ParseLine(const char * a_Data, size_t a_Size);
-} ;
-
-
-
-
+};

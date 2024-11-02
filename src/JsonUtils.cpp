@@ -44,8 +44,7 @@ bool ParseString(const AString & a_JsonStr, Json::Value & a_Root, AString * a_Er
 
 
 
-AString SerializeSingleValueJsonObject(
-	const AString & a_Key, const AString & a_Value)
+AString SerializeSingleValueJsonObject(const AString & a_Key, const AString & a_Value)
 {
 	Json::Value root;
 	root[a_Key] = a_Value;

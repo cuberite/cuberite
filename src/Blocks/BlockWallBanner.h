@@ -10,13 +10,11 @@
 
 
 
-class cBlockWallBannerHandler final :
-	public cBlockEntityHandler
+class cBlockWallBannerHandler final : public cBlockEntityHandler
 {
 	using Super = cBlockEntityHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
@@ -35,11 +33,11 @@ public:
 
 		switch (a_Meta)
 		{
-			case BLOCK_FACE_ZM: Offset = Vector3i( 0, 0,  1); break;
-			case BLOCK_FACE_ZP: Offset = Vector3i( 0, 0, -1); break;
-			case BLOCK_FACE_XM: Offset = Vector3i( 1, 0,  0); break;
-			case BLOCK_FACE_XP: Offset = Vector3i(-1, 0,  0); break;
-			default: return false;
+			case BLOCK_FACE_ZM: Offset = Vector3i(0, 0, 1); break;
+			case BLOCK_FACE_ZP: Offset = Vector3i(0, 0, -1); break;
+			case BLOCK_FACE_XM: Offset = Vector3i(1, 0, 0); break;
+			case BLOCK_FACE_XP: Offset = Vector3i(-1, 0, 0); break;
+			default:            return false;
 		}
 
 		auto NeighborPos = a_Position + Offset;
@@ -61,4 +59,4 @@ public:
 		UNUSED(a_Meta);
 		return 0;
 	}
-} ;
+};

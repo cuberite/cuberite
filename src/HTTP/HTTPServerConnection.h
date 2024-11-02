@@ -24,11 +24,10 @@ class cHTTPIncomingRequest;
 
 
 
-class cHTTPServerConnection :
-	public cTCPLink::cCallbacks,
-	public cHTTPMessageParser::cCallbacks
+class cHTTPServerConnection : public cTCPLink::cCallbacks,
+							  public cHTTPMessageParser::cCallbacks
 {
-public:
+  public:
 	/** Creates a new instance, connected to the specified HTTP server instance */
 	cHTTPServerConnection(cHTTPServer & a_HTTPServer);
 
@@ -60,7 +59,7 @@ public:
 	/** Terminates the connection; finishes any request being currently processed */
 	void Terminate(void);
 
-protected:
+  protected:
 	typedef std::map<AString, AString> cNameValueMap;
 
 	/** The parent webserver that is to be notified of events on this connection */
@@ -104,15 +103,7 @@ protected:
 
 	/** Sends the raw data over the link.
 	Descendants may provide data transformations (SSL etc.) via the overridable SendData() function. */
-	void SendData(const AString & a_Data)
-	{
-		SendData(a_Data.data(), a_Data.size());
-	}
-} ;
+	void SendData(const AString & a_Data) { SendData(a_Data.data(), a_Data.size()); }
+};
 
 typedef std::vector<cHTTPServerConnection *> cHTTPServerConnections;
-
-
-
-
-

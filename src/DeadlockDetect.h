@@ -20,13 +20,11 @@ Once we learn to write crashdumps programmatically, we should do so just before 
 
 
 
-class cDeadlockDetect:
-	public cIsThread
+class cDeadlockDetect : public cIsThread
 {
 	using Super = cIsThread;
 
-public:
-
+  public:
 	cDeadlockDetect();
 	virtual ~cDeadlockDetect() override;
 
@@ -42,7 +40,7 @@ public:
 	/** Removes the CS from the tracking. */
 	void UntrackCriticalSection(cCriticalSection & a_CS);
 
-protected:
+  protected:
 	struct sWorldAge
 	{
 		/** Last m_WorldAge that has been detected in this world */
@@ -50,7 +48,7 @@ protected:
 
 		/** Number of cycles for which the age has been the same */
 		int m_NumCyclesSame;
-	} ;
+	};
 
 	/** Maps world name -> sWorldAge */
 	typedef std::map<AString, sWorldAge> WorldAges;
@@ -74,7 +72,8 @@ protected:
 	/** Sets the initial world age. */
 	void SetWorldAge(const AString & a_WorldName, cTickTimeLong a_Age);
 
-	/** Checks if the world's age has changed, updates the world's stats; calls DeadlockDetected() if deadlock detected. */
+	/** Checks if the world's age has changed, updates the world's stats; calls DeadlockDetected() if deadlock detected.
+	 */
 	void CheckWorldAge(const AString & a_WorldName, cTickTimeLong a_Age);
 
 	/** Called when a deadlock is detected in a world. Aborts the server.
@@ -84,8 +83,4 @@ protected:
 
 	/** Outputs a listing of the tracked CSs, together with their name and state. */
 	void ListTrackedCSs();
-} ;
-
-
-
-
+};

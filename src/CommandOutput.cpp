@@ -50,7 +50,3 @@ void cLogCommandOutputCallback::Finished()
 	// Clear the buffer for the next command output:
 	m_Accum.clear();
 }
-
-
-
-

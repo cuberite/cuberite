@@ -5,8 +5,8 @@
 // Please modify compile.sh if you want to rename or remove this file.
 // This file was chosen arbitrarily and it's a good enough indicator we're in the Cuberite folder.
 
-// Implements the cBlockArea object representing an area of block data that can be queried from cWorld and then accessed again without further queries
-// The object also supports writing the blockdata back into cWorld, even into other coords
+// Implements the cBlockArea object representing an area of block data that can be queried from cWorld and then accessed
+// again without further queries The object also supports writing the blockdata back into cWorld, even into other coords
 
 #include "Globals.h"
 #include "BlockArea.h"
@@ -23,27 +23,39 @@
 
 // Disable MSVC warnings: "conditional expression is constant"
 #ifdef _MSC_VER
-	#pragma warning(push)
-	#pragma warning(disable:4127)
+#pragma warning(push)
+#pragma warning(disable : 4127)
 #endif
 
 
 
 
 
-typedef void (CombinatorFunc)(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta);
+typedef void(CombinatorFunc)(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta);
 
 /** Merges two blocktypes and blockmetas of the specified sizes and offsets using the specified combinator function
 This wild construct allows us to pass a function argument and still have it inlined by the compiler. */
 template <bool MetasValid, CombinatorFunc Combinator>
 void InternalMergeBlocks(
-	BLOCKTYPE * a_DstTypes, const BLOCKTYPE * a_SrcTypes,
-	NIBBLETYPE * a_DstMetas, const NIBBLETYPE * a_SrcMetas,
-	int a_SizeX, int a_SizeY, int a_SizeZ,
-	int a_SrcOffX, int a_SrcOffY, int a_SrcOffZ,
-	int a_DstOffX, int a_DstOffY, int a_DstOffZ,
-	int a_SrcSizeX, int a_SrcSizeY, int a_SrcSizeZ,
-	int a_DstSizeX, int a_DstSizeY, int a_DstSizeZ
+	BLOCKTYPE * a_DstTypes,
+	const BLOCKTYPE * a_SrcTypes,
+	NIBBLETYPE * a_DstMetas,
+	const NIBBLETYPE * a_SrcMetas,
+	int a_SizeX,
+	int a_SizeY,
+	int a_SizeZ,
+	int a_SrcOffX,
+	int a_SrcOffY,
+	int a_SrcOffZ,
+	int a_DstOffX,
+	int a_DstOffY,
+	int a_DstOffZ,
+	int a_SrcSizeX,
+	int a_SrcSizeY,
+	int a_SrcSizeZ,
+	int a_DstSizeX,
+	int a_DstSizeY,
+	int a_DstSizeZ
 )
 {
 	UNUSED(a_SrcSizeY);
@@ -209,7 +221,12 @@ void MergeCombinatorLake(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE 
 
 /** Combinator used for cBlockArea::msSpongePrint merging */
 template <bool MetaValid>
-void MergeCombinatorSpongePrint(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+void MergeCombinatorSpongePrint(
+	BLOCKTYPE & a_DstType,
+	BLOCKTYPE a_SrcType,
+	NIBBLETYPE & a_DstMeta,
+	NIBBLETYPE a_SrcMeta
+)
 {
 	// Sponge overwrites nothing, everything else overwrites anything
 	if (a_SrcType != E_BLOCK_SPONGE)
@@ -254,7 +271,12 @@ void MergeCombinatorDifference(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBL
 
 /** Combinator used for cBlockArea::msSimpleCompare merging */
 template <bool MetaValid>
-void MergeCombinatorSimpleCompare(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE & a_DstMeta, NIBBLETYPE a_SrcMeta)
+void MergeCombinatorSimpleCompare(
+	BLOCKTYPE & a_DstType,
+	BLOCKTYPE a_SrcType,
+	NIBBLETYPE & a_DstMeta,
+	NIBBLETYPE a_SrcMeta
+)
 {
 	if ((a_DstType == a_SrcType) && (!MetaValid || (a_DstMeta == a_SrcMeta)))
 	{
@@ -289,7 +311,7 @@ void MergeCombinatorMask(BLOCKTYPE & a_DstType, BLOCKTYPE a_SrcType, NIBBLETYPE 
 
 // Re-enable previously disabled MSVC warnings
 #ifdef _MSC_VER
-	#pragma warning(pop)
+#pragma warning(pop)
 #endif
 
 
@@ -345,7 +367,10 @@ void cBlockArea::Create(int a_SizeX, int a_SizeY, int a_SizeZ, int a_DataTypes)
 	// Warn if the height is too much, but proceed with the creation:
 	if (a_SizeY > cChunkDef::Height)
 	{
-		LOGWARNING("Creating a cBlockArea with height larger than world height (%d). Continuing, but the area may misbehave.", a_SizeY);
+		LOGWARNING(
+			"Creating a cBlockArea with height larger than world height (%d). Continuing, but the area may misbehave.",
+			a_SizeY
+		);
 	}
 
 	Clear();
@@ -405,9 +430,8 @@ void cBlockArea::SetOrigin(const Vector3i & a_Origin)
 bool cBlockArea::IsValidRelCoords(int a_RelX, int a_RelY, int a_RelZ) const
 {
 	return (
-		(a_RelX >= 0) && (a_RelX < m_Size.x) &&
-		(a_RelY >= 0) && (a_RelY < m_Size.y) &&
-		(a_RelZ >= 0) && (a_RelZ < m_Size.z)
+		(a_RelX >= 0) && (a_RelX < m_Size.x) && (a_RelY >= 0) && (a_RelY < m_Size.y) && (a_RelZ >= 0) &&
+		(a_RelZ < m_Size.z)
 	);
 }
 
@@ -442,7 +466,16 @@ bool cBlockArea::IsValidCoords(const Vector3i & a_Coords) const
 
 
 
-bool cBlockArea::Read(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes)
+bool cBlockArea::Read(
+	cForEachChunkProvider & a_ForEachChunkProvider,
+	int a_MinBlockX,
+	int a_MaxBlockX,
+	int a_MinBlockY,
+	int a_MaxBlockY,
+	int a_MinBlockZ,
+	int a_MaxBlockZ,
+	int a_DataTypes
+)
 {
 	ASSERT(IsValidDataTypeCombination(a_DataTypes));
 	ASSERT(cChunkDef::IsValidHeight({a_MinBlockX, a_MinBlockY, a_MinBlockZ}));
@@ -489,9 +522,12 @@ bool cBlockArea::Read(cForEachChunkProvider & a_ForEachChunkProvider, const cCub
 {
 	return Read(
 		a_ForEachChunkProvider,
-		a_Bounds.p1.x, a_Bounds.p2.x,
-		a_Bounds.p1.y, a_Bounds.p2.y,
-		a_Bounds.p1.z, a_Bounds.p2.z,
+		a_Bounds.p1.x,
+		a_Bounds.p2.x,
+		a_Bounds.p1.y,
+		a_Bounds.p2.y,
+		a_Bounds.p1.z,
+		a_Bounds.p2.z,
 		a_DataTypes
 	);
 }
@@ -500,13 +536,21 @@ bool cBlockArea::Read(cForEachChunkProvider & a_ForEachChunkProvider, const cCub
 
 
 
-bool cBlockArea::Read(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_Point1, const Vector3i & a_Point2, int a_DataTypes)
+bool cBlockArea::Read(
+	cForEachChunkProvider & a_ForEachChunkProvider,
+	const Vector3i & a_Point1,
+	const Vector3i & a_Point2,
+	int a_DataTypes
+)
 {
 	return Read(
 		a_ForEachChunkProvider,
-		a_Point1.x, a_Point2.x,
-		a_Point1.y, a_Point2.y,
-		a_Point1.z, a_Point2.z,
+		a_Point1.x,
+		a_Point2.x,
+		a_Point1.y,
+		a_Point2.y,
+		a_Point1.z,
+		a_Point2.z,
 		a_DataTypes
 	);
 }
@@ -515,7 +559,13 @@ bool cBlockArea::Read(cForEachChunkProvider & a_ForEachChunkProvider, const Vect
 
 
 
-bool cBlockArea::Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
+bool cBlockArea::Write(
+	cForEachChunkProvider & a_ForEachChunkProvider,
+	int a_MinBlockX,
+	int a_MinBlockY,
+	int a_MinBlockZ,
+	int a_DataTypes
+)
 {
 	ASSERT((a_DataTypes & GetDataTypes()) == a_DataTypes);  // Are you requesting only the data that I have?
 	ASSERT(cChunkDef::IsValidHeight({a_MinBlockX, a_MinBlockY, a_MinBlockZ}));
@@ -530,11 +580,7 @@ bool cBlockArea::Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_Min
 
 bool cBlockArea::Write(cForEachChunkProvider & a_ForEachChunkProvider, const Vector3i & a_MinCoords, int a_DataTypes)
 {
-	return Write(
-		a_ForEachChunkProvider,
-		a_MinCoords.x, a_MinCoords.y, a_MinCoords.z,
-		a_DataTypes
-	);
+	return Write(a_ForEachChunkProvider, a_MinCoords.x, a_MinCoords.y, a_MinCoords.z, a_DataTypes);
 }
 
 
@@ -572,7 +618,7 @@ void cBlockArea::CopyTo(cBlockArea & a_Into) const
 	if (HasBlockEntities())
 	{
 		a_Into.m_BlockEntities->clear();
-		for (const auto & keyPair: *m_BlockEntities)
+		for (const auto & keyPair : *m_BlockEntities)
 		{
 			const auto & pos = keyPair.second->GetPos();
 			a_Into.m_BlockEntities->emplace(keyPair.first, keyPair.second->Clone(pos));
@@ -634,15 +680,17 @@ void cBlockArea::DumpToRawFile(const AString & a_FileName)
 
 void cBlockArea::Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
 {
-	if (
-		(a_AddMinX + a_SubMaxX >= m_Size.x) ||
-		(a_AddMinY + a_SubMaxY >= m_Size.y) ||
-		(a_AddMinZ + a_SubMaxZ >= m_Size.z)
-	)
+	if ((a_AddMinX + a_SubMaxX >= m_Size.x) || (a_AddMinY + a_SubMaxY >= m_Size.y) ||
+		(a_AddMinZ + a_SubMaxZ >= m_Size.z))
 	{
-		LOGWARNING("cBlockArea:Crop called with more croping than the dimensions: %d x %d x %d with cropping %d, %d and %d",
-			m_Size.x, m_Size.y, m_Size.z,
-			a_AddMinX + a_SubMaxX, a_AddMinY + a_SubMaxY, a_AddMinZ + a_SubMaxZ
+		LOGWARNING(
+			"cBlockArea:Crop called with more croping than the dimensions: %d x %d x %d with cropping %d, %d and %d",
+			m_Size.x,
+			m_Size.y,
+			m_Size.z,
+			a_AddMinX + a_SubMaxX,
+			a_AddMinY + a_SubMaxY,
+			a_AddMinZ + a_SubMaxZ
 		);
 		return;
 	}
@@ -665,13 +713,13 @@ void cBlockArea::Crop(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY
 	}
 	if (HasBlockEntities())
 	{
-		const Vector3i AddMin{ a_AddMinX, a_AddMinY, a_AddMinZ };
-		const cCuboid CropBox{ AddMin, m_Size - Vector3i{a_SubMaxX, a_SubMaxY, a_SubMaxZ} };
+		const Vector3i AddMin {a_AddMinX, a_AddMinY, a_AddMinZ};
+		const cCuboid CropBox {AddMin, m_Size - Vector3i {a_SubMaxX, a_SubMaxY, a_SubMaxZ}};
 
 		// Move and crop block Entities:
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (auto & keyPair: oldBE)
+		for (auto & keyPair : oldBE)
 		{
 			auto & be = keyPair.second;
 			auto Pos = be->GetPos();
@@ -718,7 +766,7 @@ void cBlockArea::Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMa
 		// Move block entities:
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (auto & keyPair: oldBE)
+		for (auto & keyPair : oldBE)
 		{
 			auto & be = keyPair.second;
 			auto posX = be->GetPosX() + a_SubMinX;
@@ -770,12 +818,22 @@ void cBlockArea::Merge(const cBlockArea & a_Src, const Vector3i & a_RelMinCoords
 
 
 
-void cBlockArea::Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight)
+void cBlockArea::Fill(
+	int a_DataTypes,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta,
+	NIBBLETYPE a_BlockLight,
+	NIBBLETYPE a_BlockSkyLight
+)
 {
 	if ((a_DataTypes & GetDataTypes()) != a_DataTypes)
 	{
-		LOGWARNING("%s: requested datatypes that are not present in the BlockArea object, trimming those away (req 0x%x, stor 0x%x)",
-			__FUNCTION__, a_DataTypes, GetDataTypes()
+		LOGWARNING(
+			"%s: requested datatypes that are not present in the BlockArea object, trimming those away (req 0x%x, stor "
+			"0x%x)",
+			__FUNCTION__,
+			a_DataTypes,
+			GetDataTypes()
 		);
 		a_DataTypes = a_DataTypes & GetDataTypes();
 	}
@@ -810,7 +868,8 @@ void cBlockArea::Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_Block
 		}
 	}
 
-	// If the area contains block entities, remove those not matching and replace with whatever block entity block was filled
+	// If the area contains block entities, remove those not matching and replace with whatever block entity block was
+	// filled
 	if (HasBlockEntities() && ((a_DataTypes & baTypes) != 0))
 	{
 		if (cBlockEntity::IsBlockEntityBlockType(a_BlockType))
@@ -828,49 +887,71 @@ void cBlockArea::Fill(int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_Block
 
 
 
-void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ,
-	int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
-	NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
+void cBlockArea::FillRelCuboid(
+	int a_MinRelX,
+	int a_MaxRelX,
+	int a_MinRelY,
+	int a_MaxRelY,
+	int a_MinRelZ,
+	int a_MaxRelZ,
+	int a_DataTypes,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta,
+	NIBBLETYPE a_BlockLight,
+	NIBBLETYPE a_BlockSkyLight
 )
 {
 	if ((a_DataTypes & GetDataTypes()) != a_DataTypes)
 	{
-		LOGWARNING("%s: requested datatypes that are not present in the BlockArea object, trimming those away (req 0x%x, stor 0x%x)",
-			__FUNCTION__, a_DataTypes, GetDataTypes()
+		LOGWARNING(
+			"%s: requested datatypes that are not present in the BlockArea object, trimming those away (req 0x%x, stor "
+			"0x%x)",
+			__FUNCTION__,
+			a_DataTypes,
+			GetDataTypes()
 		);
 		a_DataTypes = a_DataTypes & GetDataTypes();
 	}
 
 	if ((a_DataTypes & baTypes) != 0)
 	{
-		for (int y = a_MinRelY; y <= a_MaxRelY; y++) for (int z = a_MinRelZ; z <= a_MaxRelZ; z++) for (int x = a_MinRelX; x <= a_MaxRelX; x++)
-		{
-			m_BlockTypes[MakeIndex(x, y, z)] = a_BlockType;
-		}  // for x, z, y
+		for (int y = a_MinRelY; y <= a_MaxRelY; y++)
+			for (int z = a_MinRelZ; z <= a_MaxRelZ; z++)
+				for (int x = a_MinRelX; x <= a_MaxRelX; x++)
+				{
+					m_BlockTypes[MakeIndex(x, y, z)] = a_BlockType;
+				}  // for x, z, y
 	}
 	if ((a_DataTypes & baMetas) != 0)
 	{
-		for (int y = a_MinRelY; y <= a_MaxRelY; y++) for (int z = a_MinRelZ; z <= a_MaxRelZ; z++) for (int x = a_MinRelX; x <= a_MaxRelX; x++)
-		{
-			m_BlockMetas[MakeIndex(x, y, z)] = a_BlockMeta;
-		}  // for x, z, y
+		for (int y = a_MinRelY; y <= a_MaxRelY; y++)
+			for (int z = a_MinRelZ; z <= a_MaxRelZ; z++)
+				for (int x = a_MinRelX; x <= a_MaxRelX; x++)
+				{
+					m_BlockMetas[MakeIndex(x, y, z)] = a_BlockMeta;
+				}  // for x, z, y
 	}
 	if ((a_DataTypes & baLight) != 0)
 	{
-		for (int y = a_MinRelY; y <= a_MaxRelY; y++) for (int z = a_MinRelZ; z <= a_MaxRelZ; z++) for (int x = a_MinRelX; x <= a_MaxRelX; x++)
-		{
-			m_BlockLight[MakeIndex(x, y, z)] = a_BlockLight;
-		}  // for x, z, y
+		for (int y = a_MinRelY; y <= a_MaxRelY; y++)
+			for (int z = a_MinRelZ; z <= a_MaxRelZ; z++)
+				for (int x = a_MinRelX; x <= a_MaxRelX; x++)
+				{
+					m_BlockLight[MakeIndex(x, y, z)] = a_BlockLight;
+				}  // for x, z, y
 	}
 	if ((a_DataTypes & baSkyLight) != 0)
 	{
-		for (int y = a_MinRelY; y <= a_MaxRelY; y++) for (int z = a_MinRelZ; z <= a_MaxRelZ; z++) for (int x = a_MinRelX; x <= a_MaxRelX; x++)
-		{
-			m_BlockSkyLight[MakeIndex(x, y, z)] = a_BlockSkyLight;
-		}  // for x, z, y
+		for (int y = a_MinRelY; y <= a_MaxRelY; y++)
+			for (int z = a_MinRelZ; z <= a_MaxRelZ; z++)
+				for (int x = a_MinRelX; x <= a_MaxRelX; x++)
+				{
+					m_BlockSkyLight[MakeIndex(x, y, z)] = a_BlockSkyLight;
+				}  // for x, z, y
 	}
 
-	// If the area contains block entities, remove those in the affected cuboid and replace with whatever block entity block was filled:
+	// If the area contains block entities, remove those in the affected cuboid and replace with whatever block entity
+	// block was filled:
 	if (HasBlockEntities() && ((a_DataTypes & baTypes) != 0))
 	{
 		if (cBlockEntity::IsBlockEntityBlockType(a_BlockType))
@@ -888,16 +969,27 @@ void cBlockArea::FillRelCuboid(int a_MinRelX, int a_MaxRelX, int a_MinRelY, int 
 
 
 
-void cBlockArea::FillRelCuboid(const cCuboid & a_RelCuboid,
-	int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
-	NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
+void cBlockArea::FillRelCuboid(
+	const cCuboid & a_RelCuboid,
+	int a_DataTypes,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta,
+	NIBBLETYPE a_BlockLight,
+	NIBBLETYPE a_BlockSkyLight
 )
 {
 	FillRelCuboid(
-		a_RelCuboid.p1.x, a_RelCuboid.p2.x,
-		a_RelCuboid.p1.y, a_RelCuboid.p2.y,
-		a_RelCuboid.p1.z, a_RelCuboid.p2.z,
-		a_DataTypes, a_BlockType, a_BlockMeta, a_BlockLight, a_BlockSkyLight
+		a_RelCuboid.p1.x,
+		a_RelCuboid.p2.x,
+		a_RelCuboid.p1.y,
+		a_RelCuboid.p2.y,
+		a_RelCuboid.p1.z,
+		a_RelCuboid.p2.z,
+		a_DataTypes,
+		a_BlockType,
+		a_BlockMeta,
+		a_BlockLight,
+		a_BlockSkyLight
 	);
 }
 
@@ -905,9 +997,18 @@ void cBlockArea::FillRelCuboid(const cCuboid & a_RelCuboid,
 
 
 
-void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int a_RelY2, int a_RelZ2,
-	int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
-	NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
+void cBlockArea::RelLine(
+	int a_RelX1,
+	int a_RelY1,
+	int a_RelZ1,
+	int a_RelX2,
+	int a_RelY2,
+	int a_RelZ2,
+	int a_DataTypes,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta,
+	NIBBLETYPE a_BlockLight,
+	NIBBLETYPE a_BlockSkyLight
 )
 {
 	// Bresenham-3D algorithm for drawing lines:
@@ -945,7 +1046,7 @@ void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int
 			}
 
 			// move along x
-			a_RelX1  += sx;
+			a_RelX1 += sx;
 			yd += dy;
 			zd += dz;
 		}
@@ -1022,15 +1123,28 @@ void cBlockArea::RelLine(int a_RelX1, int a_RelY1, int a_RelZ1, int a_RelX2, int
 
 
 
-void cBlockArea::RelLine(const Vector3i & a_Point1, const Vector3i & a_Point2,
-	int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
-	NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
+void cBlockArea::RelLine(
+	const Vector3i & a_Point1,
+	const Vector3i & a_Point2,
+	int a_DataTypes,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta,
+	NIBBLETYPE a_BlockLight,
+	NIBBLETYPE a_BlockSkyLight
 )
 {
 	RelLine(
-		a_Point1.x, a_Point1.y, a_Point1.z,
-		a_Point2.x, a_Point2.y, a_Point2.z,
-		a_DataTypes, a_BlockType, a_BlockMeta, a_BlockLight, a_BlockSkyLight
+		a_Point1.x,
+		a_Point1.y,
+		a_Point1.z,
+		a_Point2.x,
+		a_Point2.y,
+		a_Point2.z,
+		a_DataTypes,
+		a_BlockType,
+		a_BlockMeta,
+		a_BlockLight,
+		a_BlockSkyLight
 	);
 }
 
@@ -1054,8 +1168,8 @@ void cBlockArea::RotateCCW(void)
 	}
 
 	// We are guaranteed that both blocktypes and blockmetas exist; rotate both at the same time:
-	BLOCKARRAY NewTypes{ new BLOCKTYPE[GetBlockCount()] };
-	NIBBLEARRAY NewMetas{ new NIBBLETYPE[GetBlockCount()] };
+	BLOCKARRAY NewTypes {new BLOCKTYPE[GetBlockCount()]};
+	NIBBLEARRAY NewMetas {new NIBBLETYPE[GetBlockCount()]};
 	for (int x = 0; x < m_Size.x; x++)
 	{
 		int NewZ = m_Size.x - x - 1;
@@ -1064,7 +1178,7 @@ void cBlockArea::RotateCCW(void)
 			int NewX = z;
 			for (int y = 0; y < m_Size.y; y++)
 			{
-				auto NewIdx = MakeIndexForSize({ NewX, y, NewZ }, { m_Size.z, m_Size.y, m_Size.x });
+				auto NewIdx = MakeIndexForSize({NewX, y, NewZ}, {m_Size.z, m_Size.y, m_Size.x});
 				auto OldIdx = MakeIndex(x, y, z);
 				NewTypes[NewIdx] = m_BlockTypes[OldIdx];
 				NewMetas[NewIdx] = cBlockHandler::For(m_BlockTypes[OldIdx]).MetaRotateCCW(m_BlockMetas[OldIdx]);
@@ -1079,7 +1193,7 @@ void cBlockArea::RotateCCW(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (auto & keyPair: oldBE)
+		for (auto & keyPair : oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = be->GetPosZ();
@@ -1114,8 +1228,8 @@ void cBlockArea::RotateCW(void)
 	}
 
 	// We are guaranteed that both blocktypes and blockmetas exist; rotate both at the same time:
-	BLOCKARRAY NewTypes{ new BLOCKTYPE[GetBlockCount()] };
-	NIBBLEARRAY NewMetas{ new NIBBLETYPE[GetBlockCount()] };
+	BLOCKARRAY NewTypes {new BLOCKTYPE[GetBlockCount()]};
+	NIBBLEARRAY NewMetas {new NIBBLETYPE[GetBlockCount()]};
 	for (int x = 0; x < m_Size.x; x++)
 	{
 		int NewZ = x;
@@ -1124,7 +1238,7 @@ void cBlockArea::RotateCW(void)
 			int NewX = m_Size.z - z - 1;
 			for (int y = 0; y < m_Size.y; y++)
 			{
-				auto NewIdx = MakeIndexForSize({ NewX, y, NewZ }, { m_Size.z, m_Size.y, m_Size.x });
+				auto NewIdx = MakeIndexForSize({NewX, y, NewZ}, {m_Size.z, m_Size.y, m_Size.x});
 				auto OldIdx = MakeIndex(x, y, z);
 				NewTypes[NewIdx] = m_BlockTypes[OldIdx];
 				NewMetas[NewIdx] = cBlockHandler::For(m_BlockTypes[OldIdx]).MetaRotateCW(m_BlockMetas[OldIdx]);
@@ -1139,7 +1253,7 @@ void cBlockArea::RotateCW(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (auto & keyPair: oldBE)
+		for (auto & keyPair : oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = m_Size.z - be->GetPosZ() - 1;
@@ -1198,7 +1312,7 @@ void cBlockArea::MirrorXY(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (auto & keyPair: oldBE)
+		for (auto & keyPair : oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = be->GetPosX();
@@ -1255,7 +1369,7 @@ void cBlockArea::MirrorXZ(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (auto & keyPair: oldBE)
+		for (auto & keyPair : oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = be->GetPosX();
@@ -1312,7 +1426,7 @@ void cBlockArea::MirrorYZ(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (auto & keyPair: oldBE)
+		for (auto & keyPair : oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = MaxX - be->GetPosX();
@@ -1333,7 +1447,7 @@ void cBlockArea::RotateCCWNoMeta(void)
 {
 	if (HasBlockTypes())
 	{
-		BLOCKARRAY NewTypes{ new BLOCKTYPE[GetBlockCount()] };
+		BLOCKARRAY NewTypes {new BLOCKTYPE[GetBlockCount()]};
 		for (int x = 0; x < m_Size.x; x++)
 		{
 			int NewZ = m_Size.x - x - 1;
@@ -1342,7 +1456,8 @@ void cBlockArea::RotateCCWNoMeta(void)
 				int NewX = z;
 				for (int y = 0; y < m_Size.y; y++)
 				{
-					NewTypes[MakeIndexForSize({ NewX, y, NewZ }, { m_Size.z, m_Size.y, m_Size.x })] = m_BlockTypes[MakeIndex(x, y, z)];
+					NewTypes[MakeIndexForSize({NewX, y, NewZ}, {m_Size.z, m_Size.y, m_Size.x})] =
+						m_BlockTypes[MakeIndex(x, y, z)];
 				}  // for y
 			}  // for z
 		}  // for x
@@ -1350,7 +1465,7 @@ void cBlockArea::RotateCCWNoMeta(void)
 	}
 	if (HasBlockMetas())
 	{
-		NIBBLEARRAY NewMetas{ new NIBBLETYPE[GetBlockCount()] };
+		NIBBLEARRAY NewMetas {new NIBBLETYPE[GetBlockCount()]};
 		for (int x = 0; x < m_Size.x; x++)
 		{
 			int NewZ = m_Size.x - x - 1;
@@ -1359,7 +1474,8 @@ void cBlockArea::RotateCCWNoMeta(void)
 				int NewX = z;
 				for (int y = 0; y < m_Size.y; y++)
 				{
-					NewMetas[MakeIndexForSize({ NewX, y, NewZ }, { m_Size.z, m_Size.y, m_Size.x })] = m_BlockMetas[MakeIndex(x, y, z)];
+					NewMetas[MakeIndexForSize({NewX, y, NewZ}, {m_Size.z, m_Size.y, m_Size.x})] =
+						m_BlockMetas[MakeIndex(x, y, z)];
 				}  // for y
 			}  // for z
 		}  // for x
@@ -1371,7 +1487,7 @@ void cBlockArea::RotateCCWNoMeta(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (auto & keyPair: oldBE)
+		for (auto & keyPair : oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = be->GetPosZ();
@@ -1394,7 +1510,7 @@ void cBlockArea::RotateCWNoMeta(void)
 {
 	if (HasBlockTypes())
 	{
-		BLOCKARRAY NewTypes{ new BLOCKTYPE[GetBlockCount()] };
+		BLOCKARRAY NewTypes {new BLOCKTYPE[GetBlockCount()]};
 		for (int z = 0; z < m_Size.z; z++)
 		{
 			int NewX = m_Size.z - z - 1;
@@ -1403,7 +1519,8 @@ void cBlockArea::RotateCWNoMeta(void)
 				int NewZ = x;
 				for (int y = 0; y < m_Size.y; y++)
 				{
-					NewTypes[MakeIndexForSize({ NewX, y, NewZ }, { m_Size.z, m_Size.y, m_Size.x })] = m_BlockTypes[MakeIndex(x, y, z)];
+					NewTypes[MakeIndexForSize({NewX, y, NewZ}, {m_Size.z, m_Size.y, m_Size.x})] =
+						m_BlockTypes[MakeIndex(x, y, z)];
 				}  // for y
 			}  // for x
 		}  // for z
@@ -1411,7 +1528,7 @@ void cBlockArea::RotateCWNoMeta(void)
 	}
 	if (HasBlockMetas())
 	{
-		NIBBLEARRAY NewMetas{ new NIBBLETYPE[GetBlockCount()] };
+		NIBBLEARRAY NewMetas {new NIBBLETYPE[GetBlockCount()]};
 		for (int z = 0; z < m_Size.z; z++)
 		{
 			int NewX = m_Size.z - z - 1;
@@ -1420,7 +1537,8 @@ void cBlockArea::RotateCWNoMeta(void)
 				int NewZ = x;
 				for (int y = 0; y < m_Size.y; y++)
 				{
-					NewMetas[MakeIndexForSize({ NewX, y, NewZ }, { m_Size.z, m_Size.y, m_Size.x })] = m_BlockMetas[MakeIndex(x, y, z)];
+					NewMetas[MakeIndexForSize({NewX, y, NewZ}, {m_Size.z, m_Size.y, m_Size.x})] =
+						m_BlockMetas[MakeIndex(x, y, z)];
 				}  // for y
 			}  // for x
 		}  // for z
@@ -1432,7 +1550,7 @@ void cBlockArea::RotateCWNoMeta(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (auto & keyPair: oldBE)
+		for (auto & keyPair : oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = m_Size.z - be->GetPosZ() - 1;
@@ -1488,7 +1606,7 @@ void cBlockArea::MirrorXYNoMeta(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (auto & keyPair: oldBE)
+		for (auto & keyPair : oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = be->GetPosX();
@@ -1542,7 +1660,7 @@ void cBlockArea::MirrorXZNoMeta(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (auto & keyPair: oldBE)
+		for (auto & keyPair : oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = be->GetPosX();
@@ -1596,7 +1714,7 @@ void cBlockArea::MirrorYZNoMeta(void)
 	{
 		cBlockEntities oldBE;
 		std::swap(oldBE, *m_BlockEntities);
-		for (auto & keyPair: oldBE)
+		for (auto & keyPair : oldBE)
 		{
 			auto & be = keyPair.second;
 			auto newX = MaxX - be->GetPosX();
@@ -1784,7 +1902,13 @@ NIBBLETYPE cBlockArea::GetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ
 
 
 
-void cBlockArea::SetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cBlockArea::SetBlockTypeMeta(
+	int a_BlockX,
+	int a_BlockY,
+	int a_BlockZ,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta
+)
 {
 	SetRelBlockTypeMeta(a_BlockX - m_Origin.x, a_BlockY - m_Origin.y, a_BlockZ - m_Origin.z, a_BlockType, a_BlockMeta);
 }
@@ -1793,7 +1917,7 @@ void cBlockArea::SetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOC
 
 
 
-void cBlockArea::SetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cBlockArea::SetRelBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	auto idx = MakeIndex(a_RelX, a_RelY, a_RelZ);
 	if (m_BlockTypes == nullptr)
@@ -1828,7 +1952,10 @@ void cBlockArea::SetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   B
 		}
 		if (cBlockEntity::IsBlockEntityBlockType(a_BlockType))
 		{
-			m_BlockEntities->emplace(idx, cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, {a_RelX, a_RelY, a_RelZ}));
+			m_BlockEntities->emplace(
+				idx,
+				cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, {a_RelX, a_RelY, a_RelZ})
+			);
 		}
 	}
 }
@@ -1837,16 +1964,34 @@ void cBlockArea::SetRelBlockTypeMeta(int a_RelX,   int a_RelY,   int a_RelZ,   B
 
 
 
-void cBlockArea::GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
+void cBlockArea::GetBlockTypeMeta(
+	int a_BlockX,
+	int a_BlockY,
+	int a_BlockZ,
+	BLOCKTYPE & a_BlockType,
+	NIBBLETYPE & a_BlockMeta
+) const
 {
-	return GetRelBlockTypeMeta(a_BlockX - m_Origin.x, a_BlockY - m_Origin.y, a_BlockZ - m_Origin.z, a_BlockType, a_BlockMeta);
+	return GetRelBlockTypeMeta(
+		a_BlockX - m_Origin.x,
+		a_BlockY - m_Origin.y,
+		a_BlockZ - m_Origin.z,
+		a_BlockType,
+		a_BlockMeta
+	);
 }
 
 
 
 
 
-void cBlockArea::GetRelBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
+void cBlockArea::GetRelBlockTypeMeta(
+	int a_RelX,
+	int a_RelY,
+	int a_RelZ,
+	BLOCKTYPE & a_BlockType,
+	NIBBLETYPE & a_BlockMeta
+) const
 {
 	auto idx = MakeIndex(a_RelX, a_RelY, a_RelZ);
 	if (m_BlockTypes == nullptr)
@@ -1876,10 +2021,7 @@ void cBlockArea::GetRelBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTY
 
 cCuboid cBlockArea::GetBounds(void) const
 {
-	return cCuboid(
-		m_Origin,
-		m_Origin + m_Size - Vector3i(1, 1, 1)
-	);
+	return cCuboid(m_Origin, m_Origin + m_Size - Vector3i(1, 1, 1));
 }
 
 
@@ -1976,7 +2118,15 @@ size_t cBlockArea::CountSpecificBlocks(BLOCKTYPE a_BlockType, NIBBLETYPE a_Block
 
 
 
-void cBlockArea::GetNonAirCropRelCoords(int & a_MinRelX, int & a_MinRelY, int & a_MinRelZ, int & a_MaxRelX, int & a_MaxRelY, int & a_MaxRelZ, BLOCKTYPE a_IgnoreBlockType)
+void cBlockArea::GetNonAirCropRelCoords(
+	int & a_MinRelX,
+	int & a_MinRelY,
+	int & a_MinRelZ,
+	int & a_MaxRelX,
+	int & a_MaxRelY,
+	int & a_MaxRelZ,
+	BLOCKTYPE a_IgnoreBlockType
+)
 {
 	// Check if blocktypes are valid:
 	if (m_BlockTypes == nullptr)
@@ -2190,7 +2340,7 @@ bool cBlockArea::ForEachBlockEntity(cBlockEntityCallback a_Callback)
 	{
 		return true;
 	}
-	for (auto & keyPair: *m_BlockEntities)
+	for (auto & keyPair : *m_BlockEntities)
 	{
 		if (a_Callback(*keyPair.second))
 		{
@@ -2250,12 +2400,19 @@ NIBBLETYPE cBlockArea::GetNibble(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBL
 
 
 
-void cBlockArea::CropBlockTypes(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
+void cBlockArea::CropBlockTypes(
+	int a_AddMinX,
+	int a_SubMaxX,
+	int a_AddMinY,
+	int a_SubMaxY,
+	int a_AddMinZ,
+	int a_SubMaxZ
+)
 {
 	int NewSizeX = GetSizeX() - a_AddMinX - a_SubMaxX;
 	int NewSizeY = GetSizeY() - a_AddMinY - a_SubMaxY;
 	int NewSizeZ = GetSizeZ() - a_AddMinZ - a_SubMaxZ;
-	BLOCKARRAY NewBlockTypes{ new BLOCKTYPE[ToUnsigned(NewSizeX * NewSizeY * NewSizeZ)] };
+	BLOCKARRAY NewBlockTypes {new BLOCKTYPE[ToUnsigned(NewSizeX * NewSizeY * NewSizeZ)]};
 	size_t idx = 0;
 	for (int y = 0; y < NewSizeY; y++)
 	{
@@ -2275,12 +2432,20 @@ void cBlockArea::CropBlockTypes(int a_AddMinX, int a_SubMaxX, int a_AddMinY, int
 
 
 
-void cBlockArea::CropNibbles(NIBBLEARRAY & a_Array, int a_AddMinX, int a_SubMaxX, int a_AddMinY, int a_SubMaxY, int a_AddMinZ, int a_SubMaxZ)
+void cBlockArea::CropNibbles(
+	NIBBLEARRAY & a_Array,
+	int a_AddMinX,
+	int a_SubMaxX,
+	int a_AddMinY,
+	int a_SubMaxY,
+	int a_AddMinZ,
+	int a_SubMaxZ
+)
 {
 	int NewSizeX = GetSizeX() - a_AddMinX - a_SubMaxX;
 	int NewSizeY = GetSizeY() - a_AddMinY - a_SubMaxY;
 	int NewSizeZ = GetSizeZ() - a_AddMinZ - a_SubMaxZ;
-	NIBBLEARRAY NewNibbles{ new NIBBLETYPE[ToUnsigned(NewSizeX * NewSizeY * NewSizeZ)] };
+	NIBBLEARRAY NewNibbles {new NIBBLETYPE[ToUnsigned(NewSizeX * NewSizeY * NewSizeZ)]};
 	size_t idx = 0;
 	for (int y = 0; y < NewSizeY; y++)
 	{
@@ -2299,13 +2464,20 @@ void cBlockArea::CropNibbles(NIBBLEARRAY & a_Array, int a_AddMinX, int a_SubMaxX
 
 
 
-void cBlockArea::ExpandBlockTypes(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ)
+void cBlockArea::ExpandBlockTypes(
+	int a_SubMinX,
+	int a_AddMaxX,
+	int a_SubMinY,
+	int a_AddMaxY,
+	int a_SubMinZ,
+	int a_AddMaxZ
+)
 {
 	int NewSizeX = m_Size.x + a_SubMinX + a_AddMaxX;
 	int NewSizeY = m_Size.y + a_SubMinY + a_AddMaxY;
 	int NewSizeZ = m_Size.z + a_SubMinZ + a_AddMaxZ;
 	size_t BlockCount = static_cast<size_t>(NewSizeX * NewSizeY * NewSizeZ);
-	BLOCKARRAY NewBlockTypes{ new BLOCKTYPE[BlockCount] };
+	BLOCKARRAY NewBlockTypes {new BLOCKTYPE[BlockCount]};
 	memset(NewBlockTypes.get(), 0, BlockCount * sizeof(BLOCKTYPE));
 	size_t OldIndex = 0;
 	for (int y = 0; y < m_Size.y; y++)
@@ -2328,13 +2500,21 @@ void cBlockArea::ExpandBlockTypes(int a_SubMinX, int a_AddMaxX, int a_SubMinY, i
 
 
 
-void cBlockArea::ExpandNibbles(NIBBLEARRAY & a_Array, int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ)
+void cBlockArea::ExpandNibbles(
+	NIBBLEARRAY & a_Array,
+	int a_SubMinX,
+	int a_AddMaxX,
+	int a_SubMinY,
+	int a_AddMaxY,
+	int a_SubMinZ,
+	int a_AddMaxZ
+)
 {
 	int NewSizeX = m_Size.x + a_SubMinX + a_AddMaxX;
 	int NewSizeY = m_Size.y + a_SubMinY + a_AddMaxY;
 	int NewSizeZ = m_Size.z + a_SubMinZ + a_AddMaxZ;
 	size_t BlockCount = static_cast<size_t>(NewSizeX * NewSizeY * NewSizeZ);
-	NIBBLEARRAY NewNibbles{ new NIBBLETYPE[BlockCount] };
+	NIBBLEARRAY NewNibbles {new NIBBLETYPE[BlockCount]};
 	memset(NewNibbles.get(), 0, BlockCount * sizeof(NIBBLETYPE));
 	size_t OldIndex = 0;
 	for (int y = 0; y < m_Size.y; y++)
@@ -2358,9 +2538,14 @@ void cBlockArea::ExpandNibbles(NIBBLEARRAY & a_Array, int a_SubMinX, int a_AddMa
 
 
 void cBlockArea::RelSetData(
-	int a_RelX, int a_RelY, int a_RelZ,
-	int a_DataTypes, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
-	NIBBLETYPE a_BlockLight, NIBBLETYPE a_BlockSkyLight
+	int a_RelX,
+	int a_RelY,
+	int a_RelZ,
+	int a_DataTypes,
+	BLOCKTYPE a_BlockType,
+	NIBBLETYPE a_BlockMeta,
+	NIBBLETYPE a_BlockLight,
+	NIBBLETYPE a_BlockSkyLight
 )
 {
 	if (!IsValidCoords(a_RelX, a_RelY, a_RelZ))
@@ -2403,7 +2588,10 @@ void cBlockArea::RelSetData(
 		if (cBlockEntity::IsBlockEntityBlockType(a_BlockType))
 		{
 			// The block type should have a block entity attached to it, create an empty one:
-			m_BlockEntities->emplace(Index, cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, {a_RelX, a_RelY, a_RelZ}));
+			m_BlockEntities->emplace(
+				Index,
+				cBlockEntity::CreateByBlockType(a_BlockType, a_BlockMeta, {a_RelX, a_RelY, a_RelZ})
+			);
 		}
 	}
 }
@@ -2413,7 +2601,15 @@ void cBlockArea::RelSetData(
 
 
 template <bool MetasValid>
-void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy, const NIBBLETYPE * SrcMetas, NIBBLETYPE * DstMetas)
+void cBlockArea::MergeByStrategy(
+	const cBlockArea & a_Src,
+	int a_RelX,
+	int a_RelY,
+	int a_RelZ,
+	eMergeStrategy a_Strategy,
+	const NIBBLETYPE * SrcMetas,
+	NIBBLETYPE * DstMetas
+)
 {
 	// Block types are compulsory, block metas are optional
 	if (!HasBlockTypes() || !a_Src.HasBlockTypes())
@@ -2424,16 +2620,16 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 
 	// Dst is *this, Src is a_Src
 	int SrcOffX = std::max(0, -a_RelX);  // Offset in Src where to start reading
-	int DstOffX = std::max(0,  a_RelX);  // Offset in Dst where to start writing
-	int SizeX   = std::min(a_Src.GetSizeX() - SrcOffX, GetSizeX() - DstOffX);  // How many blocks to copy
+	int DstOffX = std::max(0, a_RelX);  // Offset in Dst where to start writing
+	int SizeX = std::min(a_Src.GetSizeX() - SrcOffX, GetSizeX() - DstOffX);  // How many blocks to copy
 
 	int SrcOffY = std::max(0, -a_RelY);  // Offset in Src where to start reading
-	int DstOffY = std::max(0,  a_RelY);  // Offset in Dst where to start writing
-	int SizeY   = std::min(a_Src.GetSizeY() - SrcOffY, GetSizeY() - DstOffY);  // How many blocks to copy
+	int DstOffY = std::max(0, a_RelY);  // Offset in Dst where to start writing
+	int SizeY = std::min(a_Src.GetSizeY() - SrcOffY, GetSizeY() - DstOffY);  // How many blocks to copy
 
 	int SrcOffZ = std::max(0, -a_RelZ);  // Offset in Src where to start reading
-	int DstOffZ = std::max(0,  a_RelZ);  // Offset in Dst where to start writing
-	int SizeZ   = std::min(a_Src.GetSizeZ() - SrcOffZ, GetSizeZ() - DstOffZ);  // How many blocks to copy
+	int DstOffZ = std::max(0, a_RelZ);  // Offset in Dst where to start writing
+	int SizeZ = std::min(a_Src.GetSizeZ() - SrcOffZ, GetSizeZ() - DstOffZ);  // How many blocks to copy
 
 	[&]
 	{
@@ -2441,112 +2637,208 @@ void cBlockArea::MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_Rel
 		{
 			case cBlockArea::msOverwrite:
 			{
-				InternalMergeBlocks<MetasValid, MergeCombinatorOverwrite<MetasValid> >(
-					GetBlockTypes(), a_Src.GetBlockTypes(),
-					DstMetas, SrcMetas,
-					SizeX, SizeY, SizeZ,
-					SrcOffX, SrcOffY, SrcOffZ,
-					DstOffX, DstOffY, DstOffZ,
-					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-					m_Size.x, m_Size.y, m_Size.z
+				InternalMergeBlocks<MetasValid, MergeCombinatorOverwrite<MetasValid>>(
+					GetBlockTypes(),
+					a_Src.GetBlockTypes(),
+					DstMetas,
+					SrcMetas,
+					SizeX,
+					SizeY,
+					SizeZ,
+					SrcOffX,
+					SrcOffY,
+					SrcOffZ,
+					DstOffX,
+					DstOffY,
+					DstOffZ,
+					a_Src.GetSizeX(),
+					a_Src.GetSizeY(),
+					a_Src.GetSizeZ(),
+					m_Size.x,
+					m_Size.y,
+					m_Size.z
 				);
 				return;
 			}  // case msOverwrite
 
 			case cBlockArea::msFillAir:
 			{
-				InternalMergeBlocks<MetasValid, MergeCombinatorFillAir<MetasValid> >(
-					GetBlockTypes(), a_Src.GetBlockTypes(),
-					DstMetas, SrcMetas,
-					SizeX, SizeY, SizeZ,
-					SrcOffX, SrcOffY, SrcOffZ,
-					DstOffX, DstOffY, DstOffZ,
-					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-					m_Size.x, m_Size.y, m_Size.z
+				InternalMergeBlocks<MetasValid, MergeCombinatorFillAir<MetasValid>>(
+					GetBlockTypes(),
+					a_Src.GetBlockTypes(),
+					DstMetas,
+					SrcMetas,
+					SizeX,
+					SizeY,
+					SizeZ,
+					SrcOffX,
+					SrcOffY,
+					SrcOffZ,
+					DstOffX,
+					DstOffY,
+					DstOffZ,
+					a_Src.GetSizeX(),
+					a_Src.GetSizeY(),
+					a_Src.GetSizeZ(),
+					m_Size.x,
+					m_Size.y,
+					m_Size.z
 				);
 				return;
 			}  // case msFillAir
 
 			case cBlockArea::msImprint:
 			{
-				InternalMergeBlocks<MetasValid, MergeCombinatorImprint<MetasValid> >(
-					GetBlockTypes(), a_Src.GetBlockTypes(),
-					DstMetas, SrcMetas,
-					SizeX, SizeY, SizeZ,
-					SrcOffX, SrcOffY, SrcOffZ,
-					DstOffX, DstOffY, DstOffZ,
-					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-					m_Size.x, m_Size.y, m_Size.z
+				InternalMergeBlocks<MetasValid, MergeCombinatorImprint<MetasValid>>(
+					GetBlockTypes(),
+					a_Src.GetBlockTypes(),
+					DstMetas,
+					SrcMetas,
+					SizeX,
+					SizeY,
+					SizeZ,
+					SrcOffX,
+					SrcOffY,
+					SrcOffZ,
+					DstOffX,
+					DstOffY,
+					DstOffZ,
+					a_Src.GetSizeX(),
+					a_Src.GetSizeY(),
+					a_Src.GetSizeZ(),
+					m_Size.x,
+					m_Size.y,
+					m_Size.z
 				);
 				return;
 			}  // case msImprint
 
 			case cBlockArea::msLake:
 			{
-				InternalMergeBlocks<MetasValid, MergeCombinatorLake<MetasValid> >(
-					GetBlockTypes(), a_Src.GetBlockTypes(),
-					DstMetas, SrcMetas,
-					SizeX, SizeY, SizeZ,
-					SrcOffX, SrcOffY, SrcOffZ,
-					DstOffX, DstOffY, DstOffZ,
-					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-					m_Size.x, m_Size.y, m_Size.z
+				InternalMergeBlocks<MetasValid, MergeCombinatorLake<MetasValid>>(
+					GetBlockTypes(),
+					a_Src.GetBlockTypes(),
+					DstMetas,
+					SrcMetas,
+					SizeX,
+					SizeY,
+					SizeZ,
+					SrcOffX,
+					SrcOffY,
+					SrcOffZ,
+					DstOffX,
+					DstOffY,
+					DstOffZ,
+					a_Src.GetSizeX(),
+					a_Src.GetSizeY(),
+					a_Src.GetSizeZ(),
+					m_Size.x,
+					m_Size.y,
+					m_Size.z
 				);
 				return;
 			}  // case msLake
 
 			case cBlockArea::msSpongePrint:
 			{
-				InternalMergeBlocks<MetasValid, MergeCombinatorSpongePrint<MetasValid> >(
-					GetBlockTypes(), a_Src.GetBlockTypes(),
-					DstMetas, SrcMetas,
-					SizeX, SizeY, SizeZ,
-					SrcOffX, SrcOffY, SrcOffZ,
-					DstOffX, DstOffY, DstOffZ,
-					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-					m_Size.x, m_Size.y, m_Size.z
+				InternalMergeBlocks<MetasValid, MergeCombinatorSpongePrint<MetasValid>>(
+					GetBlockTypes(),
+					a_Src.GetBlockTypes(),
+					DstMetas,
+					SrcMetas,
+					SizeX,
+					SizeY,
+					SizeZ,
+					SrcOffX,
+					SrcOffY,
+					SrcOffZ,
+					DstOffX,
+					DstOffY,
+					DstOffZ,
+					a_Src.GetSizeX(),
+					a_Src.GetSizeY(),
+					a_Src.GetSizeZ(),
+					m_Size.x,
+					m_Size.y,
+					m_Size.z
 				);
 				return;
 			}  // case msSpongePrint
 
 			case cBlockArea::msDifference:
 			{
-				InternalMergeBlocks<MetasValid, MergeCombinatorDifference<MetasValid> >(
-					GetBlockTypes(), a_Src.GetBlockTypes(),
-					DstMetas, SrcMetas,
-					SizeX, SizeY, SizeZ,
-					SrcOffX, SrcOffY, SrcOffZ,
-					DstOffX, DstOffY, DstOffZ,
-					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-					m_Size.x, m_Size.y, m_Size.z
+				InternalMergeBlocks<MetasValid, MergeCombinatorDifference<MetasValid>>(
+					GetBlockTypes(),
+					a_Src.GetBlockTypes(),
+					DstMetas,
+					SrcMetas,
+					SizeX,
+					SizeY,
+					SizeZ,
+					SrcOffX,
+					SrcOffY,
+					SrcOffZ,
+					DstOffX,
+					DstOffY,
+					DstOffZ,
+					a_Src.GetSizeX(),
+					a_Src.GetSizeY(),
+					a_Src.GetSizeZ(),
+					m_Size.x,
+					m_Size.y,
+					m_Size.z
 				);
 				return;
 			}  // case msDifference
 
 			case cBlockArea::msSimpleCompare:
 			{
-				InternalMergeBlocks<MetasValid, MergeCombinatorSimpleCompare<MetasValid> >(
-					GetBlockTypes(), a_Src.GetBlockTypes(),
-					DstMetas, SrcMetas,
-					SizeX, SizeY, SizeZ,
-					SrcOffX, SrcOffY, SrcOffZ,
-					DstOffX, DstOffY, DstOffZ,
-					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-					m_Size.x, m_Size.y, m_Size.z
+				InternalMergeBlocks<MetasValid, MergeCombinatorSimpleCompare<MetasValid>>(
+					GetBlockTypes(),
+					a_Src.GetBlockTypes(),
+					DstMetas,
+					SrcMetas,
+					SizeX,
+					SizeY,
+					SizeZ,
+					SrcOffX,
+					SrcOffY,
+					SrcOffZ,
+					DstOffX,
+					DstOffY,
+					DstOffZ,
+					a_Src.GetSizeX(),
+					a_Src.GetSizeY(),
+					a_Src.GetSizeZ(),
+					m_Size.x,
+					m_Size.y,
+					m_Size.z
 				);
 				return;
 			}  // case msSimpleCompare
 
 			case cBlockArea::msMask:
 			{
-				InternalMergeBlocks<MetasValid, MergeCombinatorMask<MetasValid> >(
-					GetBlockTypes(), a_Src.GetBlockTypes(),
-					DstMetas, SrcMetas,
-					SizeX, SizeY, SizeZ,
-					SrcOffX, SrcOffY, SrcOffZ,
-					DstOffX, DstOffY, DstOffZ,
-					a_Src.GetSizeX(), a_Src.GetSizeY(), a_Src.GetSizeZ(),
-					m_Size.x, m_Size.y, m_Size.z
+				InternalMergeBlocks<MetasValid, MergeCombinatorMask<MetasValid>>(
+					GetBlockTypes(),
+					a_Src.GetBlockTypes(),
+					DstMetas,
+					SrcMetas,
+					SizeX,
+					SizeY,
+					SizeZ,
+					SrcOffX,
+					SrcOffY,
+					SrcOffZ,
+					DstOffX,
+					DstOffY,
+					DstOffZ,
+					a_Src.GetSizeX(),
+					a_Src.GetSizeY(),
+					a_Src.GetSizeZ(),
+					m_Size.x,
+					m_Size.y,
+					m_Size.z
 				);
 				return;
 			}  // case msMask
@@ -2583,41 +2875,43 @@ void cBlockArea::MergeBlockEntities(int a_RelX, int a_RelY, int a_RelZ, const cB
 	RemoveNonMatchingBlockEntities();
 
 	// Clone BEs from a_Src wherever a BE is missing:
-	for (int y = 0; y < m_Size.y; ++y) for (int z = 0; z < m_Size.z; ++z) for (int x = 0; x < m_Size.x; ++x)
-	{
-		auto idx = MakeIndex(x, y, z);
-		auto type = m_BlockTypes[idx];
-		if (!cBlockEntity::IsBlockEntityBlockType(type))
-		{
-			continue;
-		}
-
-		// This block should have a block entity, check that there is one:
-		auto itr = m_BlockEntities->find(idx);
-		if (itr != m_BlockEntities->end())
-		{
-			// There is one already
-			continue;
-		}
-
-		// Copy a BE from a_Src, if it exists there:
-		auto srcX = x + a_RelX;
-		auto srcY = y + a_RelY;
-		auto srcZ = z + a_RelZ;
-		if (a_Src.IsValidRelCoords(srcX, srcY, srcZ))
-		{
-			auto srcIdx = a_Src.MakeIndex(srcX, srcY, srcZ);
-			auto itrSrc = a_Src.m_BlockEntities->find(srcIdx);
-			if (itrSrc != a_Src.m_BlockEntities->end())
+	for (int y = 0; y < m_Size.y; ++y)
+		for (int z = 0; z < m_Size.z; ++z)
+			for (int x = 0; x < m_Size.x; ++x)
 			{
-				m_BlockEntities->emplace(idx, itrSrc->second->Clone({x, y, z}));
-				continue;
-			}
-		}
-		// No BE found in a_Src, insert a new empty one:
-		NIBBLETYPE meta = HasBlockMetas() ? m_BlockMetas[idx] : 0;
-		m_BlockEntities->emplace(idx, cBlockEntity::CreateByBlockType(type, meta, {x, y, z}));
-	}  // for x, z, y
+				auto idx = MakeIndex(x, y, z);
+				auto type = m_BlockTypes[idx];
+				if (!cBlockEntity::IsBlockEntityBlockType(type))
+				{
+					continue;
+				}
+
+				// This block should have a block entity, check that there is one:
+				auto itr = m_BlockEntities->find(idx);
+				if (itr != m_BlockEntities->end())
+				{
+					// There is one already
+					continue;
+				}
+
+				// Copy a BE from a_Src, if it exists there:
+				auto srcX = x + a_RelX;
+				auto srcY = y + a_RelY;
+				auto srcZ = z + a_RelZ;
+				if (a_Src.IsValidRelCoords(srcX, srcY, srcZ))
+				{
+					auto srcIdx = a_Src.MakeIndex(srcX, srcY, srcZ);
+					auto itrSrc = a_Src.m_BlockEntities->find(srcIdx);
+					if (itrSrc != a_Src.m_BlockEntities->end())
+					{
+						m_BlockEntities->emplace(idx, itrSrc->second->Clone({x, y, z}));
+						continue;
+					}
+				}
+				// No BE found in a_Src, insert a new empty one:
+				NIBBLETYPE meta = HasBlockMetas() ? m_BlockMetas[idx] : 0;
+				m_BlockEntities->emplace(idx, cBlockEntity::CreateByBlockType(type, meta, {x, y, z}));
+			}  // for x, z, y
 }
 
 
@@ -2636,24 +2930,26 @@ void cBlockArea::RescanBlockEntities(void)
 	RemoveNonMatchingBlockEntities();
 
 	// Add block entities for all block types that should have a BE assigned to them:
-	for (int y = 0; y < m_Size.y; ++y) for (int z = 0; z < m_Size.z; ++z) for (int x = 0; x < m_Size.x; ++x)
-	{
-		auto idx = MakeIndex(x, y, z);
-		auto type = m_BlockTypes[idx];
-		if (!cBlockEntity::IsBlockEntityBlockType(type))
-		{
-			continue;
-		}
-		// This block should have a block entity, check that there is one:
-		auto itr = m_BlockEntities->find(idx);
-		if (itr != m_BlockEntities->end())
-		{
-			continue;
-		}
-		// Create a new BE for this block:
-		NIBBLETYPE meta = HasBlockMetas() ? m_BlockMetas[idx] : 0;
-		m_BlockEntities->emplace(idx, cBlockEntity::CreateByBlockType(type, meta, {x, y, z}));
-	}  // for x, z, y
+	for (int y = 0; y < m_Size.y; ++y)
+		for (int z = 0; z < m_Size.z; ++z)
+			for (int x = 0; x < m_Size.x; ++x)
+			{
+				auto idx = MakeIndex(x, y, z);
+				auto type = m_BlockTypes[idx];
+				if (!cBlockEntity::IsBlockEntityBlockType(type))
+				{
+					continue;
+				}
+				// This block should have a block entity, check that there is one:
+				auto itr = m_BlockEntities->find(idx);
+				if (itr != m_BlockEntities->end())
+				{
+					continue;
+				}
+				// Create a new BE for this block:
+				NIBBLETYPE meta = HasBlockMetas() ? m_BlockMetas[idx] : 0;
+				m_BlockEntities->emplace(idx, cBlockEntity::CreateByBlockType(type, meta, {x, y, z}));
+			}  // for x, z, y
 }
 
 
@@ -2668,7 +2964,7 @@ void cBlockArea::RemoveNonMatchingBlockEntities(void)
 
 	cBlockEntities oldBE;
 	std::swap(oldBE, *m_BlockEntities);
-	for (auto & keyPair: oldBE)
+	for (auto & keyPair : oldBE)
 	{
 		auto type = m_BlockTypes[static_cast<size_t>(keyPair.first)];
 		if (type == keyPair.second->GetBlockType())
@@ -2768,7 +3064,8 @@ void cBlockArea::cChunkReader::CopyNibbles(NIBBLETYPE * a_AreaDst, const NIBBLET
 			{
 				int ChunkX = BaseX + x;
 				int AreaX = OffX + x;
-				a_AreaDst[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = cChunkDef::GetNibble(a_ChunkSrc, ChunkX, ChunkY, ChunkZ);
+				a_AreaDst[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] =
+					cChunkDef::GetNibble(a_ChunkSrc, ChunkX, ChunkY, ChunkZ);
 			}  // for x
 		}  // for z
 	}  // for y
@@ -2848,7 +3145,8 @@ void cBlockArea::cChunkReader::ChunkData(const ChunkBlockData & a_BlockData, con
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockData.GetBlock({ InChunkX, InChunkY, InChunkZ });
+					m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] =
+						a_BlockData.GetBlock({InChunkX, InChunkY, InChunkZ});
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2869,7 +3167,8 @@ void cBlockArea::cChunkReader::ChunkData(const ChunkBlockData & a_BlockData, con
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockMetas[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockData.GetMeta({ InChunkX, InChunkY, InChunkZ });
+					m_Area.m_BlockMetas[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] =
+						a_BlockData.GetMeta({InChunkX, InChunkY, InChunkZ});
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2890,7 +3189,8 @@ void cBlockArea::cChunkReader::ChunkData(const ChunkBlockData & a_BlockData, con
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_LightData.GetBlockLight({ InChunkX, InChunkY, InChunkZ });
+					m_Area.m_BlockLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] =
+						a_LightData.GetBlockLight({InChunkX, InChunkY, InChunkZ});
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2911,7 +3211,8 @@ void cBlockArea::cChunkReader::ChunkData(const ChunkBlockData & a_BlockData, con
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockSkyLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_LightData.GetSkyLight({ InChunkX, InChunkY, InChunkZ });
+					m_Area.m_BlockSkyLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] =
+						a_LightData.GetSkyLight({InChunkX, InChunkY, InChunkZ});
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2936,8 +3237,3 @@ void cBlockArea::cChunkReader::BlockEntity(cBlockEntity * a_BlockEntity)
 	auto Idx = m_Area.MakeIndex(areaPos);
 	m_Area.m_BlockEntities->emplace(Idx, a_BlockEntity->Clone(areaPos));
 }
-
-
-
-
-

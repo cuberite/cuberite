@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cCriticalSection:
 
-cCriticalSection::cCriticalSection():
+cCriticalSection::cCriticalSection() :
 	m_RecursionCount(0)
 {
 }
@@ -63,9 +63,8 @@ bool cCriticalSection::IsLockedByCurrentThread(void)
 ////////////////////////////////////////////////////////////////////////////////
 // cCSLock
 
-cCSLock::cCSLock(cCriticalSection * a_CS)
-	: m_CS(a_CS)
-	, m_IsLocked(false)
+cCSLock::cCSLock(cCriticalSection * a_CS) :
+	m_CS(a_CS), m_IsLocked(false)
 {
 	Lock();
 }
@@ -74,9 +73,8 @@ cCSLock::cCSLock(cCriticalSection * a_CS)
 
 
 
-cCSLock::cCSLock(cCriticalSection & a_CS)
-	: m_CS(&a_CS)
-	, m_IsLocked(false)
+cCSLock::cCSLock(cCriticalSection & a_CS) :
+	m_CS(&a_CS), m_IsLocked(false)
 {
 	Lock();
 }
@@ -137,7 +135,3 @@ cCSUnlock::~cCSUnlock()
 {
 	m_Lock.Lock();
 }
-
-
-
-

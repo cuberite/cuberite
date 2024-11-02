@@ -7,17 +7,14 @@
 
 
 
-class cBlockCactusHandler final :
-	public cClearMetaOnDrop<cBlockPlant<false>>
+class cBlockCactusHandler final : public cClearMetaOnDrop<cBlockPlant<false>>
 {
 	using Super = cClearMetaOnDrop<cBlockPlant<false>>;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
 		if (a_Position.y <= 0)
@@ -32,25 +29,19 @@ private:
 		}
 
 		// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks
-		static const Vector3i Coords[] =
-		{
-			{-1, 0,  0},
-			{ 1, 0,  0},
-			{ 0, 0, -1},
-			{ 0, 0,  1},
+		static const Vector3i Coords[] = {
+			{-1, 0, 0},
+			{1, 0, 0},
+			{0, 0, -1},
+			{0, 0, 1},
 		};
 		for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 		{
 			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;
-			if (
-				a_Chunk.UnboundedRelGetBlock(a_Position + Coords[i], BlockType, BlockMeta) &&
-				(
-					cBlockInfo::IsSolid(BlockType) ||
-					(BlockType == E_BLOCK_LAVA) ||
-					(BlockType == E_BLOCK_STATIONARY_LAVA)
-				)
-			)
+			if (a_Chunk.UnboundedRelGetBlock(a_Position + Coords[i], BlockType, BlockMeta) &&
+				(cBlockInfo::IsSolid(BlockType) || (BlockType == E_BLOCK_LAVA) || (BlockType == E_BLOCK_STATIONARY_LAVA)
+				))
 			{
 				return false;
 			}
@@ -76,18 +67,12 @@ private:
 	{
 		// Check the total height of the cacti blocks here:
 		int top = a_RelPos.y + 1;
-		while (
-			(top < cChunkDef::Height) &&
-			(a_Chunk.GetBlock({a_RelPos.x, top, a_RelPos.z}) == E_BLOCK_CACTUS)
-		)
+		while ((top < cChunkDef::Height) && (a_Chunk.GetBlock({a_RelPos.x, top, a_RelPos.z}) == E_BLOCK_CACTUS))
 		{
 			++top;
 		}
 		int bottom = a_RelPos.y - 1;
-		while (
-			(bottom > 0) &&
-			(a_Chunk.GetBlock({a_RelPos.x, bottom, a_RelPos.z}) == E_BLOCK_CACTUS)
-		)
+		while ((bottom > 0) && (a_Chunk.GetBlock({a_RelPos.x, bottom, a_RelPos.z}) == E_BLOCK_CACTUS))
 		{
 			--bottom;
 		}
@@ -111,24 +96,19 @@ private:
 
 			a_Chunk.UnboundedRelFastSetBlock(pos, E_BLOCK_CACTUS, 0);
 
-			// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks; if they aren't, drop as pickup and bail out the growing
-			static const Vector3i neighborOffsets[] =
+			// Check surroundings. Cacti may ONLY be surrounded by non-solid blocks; if they aren't, drop as pickup and
+			// bail out the growing
+			static const Vector3i neighborOffsets[] = {
+				{-1, 0, 0},
+				{1, 0, 0},
+				{0, 0, -1},
+				{0, 0, 1},
+			};
+			for (const auto & ofs : neighborOffsets)
 			{
-				{-1, 0,  0},
-				{ 1, 0,  0},
-				{ 0, 0, -1},
-				{ 0, 0,  1},
-			} ;
-			for (const auto & ofs: neighborOffsets)
-			{
-				if (
-					a_Chunk.UnboundedRelGetBlockType(pos + ofs, blockType) &&
-					(
-						cBlockInfo::IsSolid(blockType) ||
-						(blockType == E_BLOCK_LAVA) ||
-						(blockType == E_BLOCK_STATIONARY_LAVA)
-					)
-				)
+				if (a_Chunk.UnboundedRelGetBlockType(pos + ofs, blockType) &&
+					(cBlockInfo::IsSolid(blockType) || (blockType == E_BLOCK_LAVA) ||
+					 (blockType == E_BLOCK_STATIONARY_LAVA)))
 				{
 					// Remove the cactus
 					auto absPos = a_Chunk.RelativeToAbsolute(pos);
@@ -149,8 +129,4 @@ private:
 		}
 		return paStay;
 	}
-} ;
-
-
-
-
+};

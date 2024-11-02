@@ -35,16 +35,14 @@ If a CommonPrefix header is present, its value is pre-pended to each blockTypeNa
 the file to be overall smaller). */
 class BlockTypePalette
 {
-public:
-
+  public:
 	/** Exception that is thrown if requiesting an index not present in the palette. */
-	class NoSuchIndexException:
-		public std::runtime_error
+	class NoSuchIndexException : public std::runtime_error
 	{
 		using Super = std::runtime_error;
 
-	public:
-		NoSuchIndexException(UInt32 aIndex):
+	  public:
+		NoSuchIndexException(UInt32 aIndex) :
 			Super(fmt::format(FMT_STRING("No such palette index: {}"), aIndex))
 		{
 		}
@@ -52,13 +50,12 @@ public:
 
 
 	/** Exception that is thrown when loading the palette fails hard (bad format). */
-	class LoadFailedException:
-		public std::runtime_error
+	class LoadFailedException : public std::runtime_error
 	{
 		using Super = std::runtime_error;
 
-	public:
-		LoadFailedException(const AString & aReason):
+	  public:
+		LoadFailedException(const AString & aReason) :
 			Super(aReason)
 		{
 		}
@@ -92,7 +89,8 @@ public:
 	/** Returns an index-transform map from aFrom to this (this.entry(idx) == aFrom.entry(res[idx])).
 	Entries from aFrom that are not present in this are assigned the fallback index.
 	Used for protocol block type mapping. */
-	std::map<UInt32, UInt32> createTransformMapWithFallback(const BlockTypePalette & aFrom, UInt32 aFallbackIndex) const;
+	std::map<UInt32, UInt32> createTransformMapWithFallback(const BlockTypePalette & aFrom, UInt32 aFallbackIndex)
+		const;
 
 	/** Loads the palette from the string representation.
 	Throws a LoadFailedException if the loading fails hard (bad string format);
@@ -103,8 +101,7 @@ public:
 	void loadFromString(const AString & aString);
 
 
-protected:
-
+  protected:
 	/** The mapping from numeric to stringular representation.
 	mNumberToBlock[index] = {"blockTypeName", blockState}. */
 	std::map<UInt32, std::pair<AString, BlockState>> mNumberToBlock;

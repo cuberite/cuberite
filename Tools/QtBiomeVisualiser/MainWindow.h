@@ -18,16 +18,15 @@ class GeneratorSetup;
 
 
 
-class MainWindow :
-	public QMainWindow
+class MainWindow : public QMainWindow
 {
 	Q_OBJECT
 
-public:
+  public:
 	MainWindow(QWidget * parent = nullptr);
 	~MainWindow();
 
-private slots:
+  private slots:
 	/** Creates a generator definition from scratch, lets user modify generator params in realtime. */
 	void newGenerator();
 
@@ -55,7 +54,7 @@ private slots:
 	/** Updates the statusbar for the specified info about the current block under the cursor. */
 	void hoverChanged(int a_BlockX, int a_BlockZ, int a_Biome);
 
-protected:
+  protected:
 	/** The zoom levels */
 	static const double m_ViewZooms[10];
 
@@ -119,9 +118,3 @@ protected:
 	/** Closes and destroys the generator setup pane, if there is one. */
 	void closeGeneratorSetup();
 };
-
-
-
-
-
-

@@ -5,10 +5,8 @@
 #include "../ClientHandle.h"
 
 
-cExpOrb::cExpOrb(Vector3d a_Pos, int a_Reward):
-	Super(etExpOrb, a_Pos, 0.5f, 0.5f),
-	m_Reward(a_Reward),
-	m_Timer(0)
+cExpOrb::cExpOrb(Vector3d a_Pos, int a_Reward) :
+	Super(etExpOrb, a_Pos, 0.5f, 0.5f), m_Reward(a_Reward), m_Timer(0)
 {
 	SetMaxHealth(5);
 	SetHealth(5);
@@ -37,41 +35,53 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	m_TicksAlive++;
 
 	// Find closest player within 6.5 meter (slightly increase detect range to have same effect in client)
-	bool FoundPlayer = m_World->DoWithNearestPlayer(GetPosition(), 6.5, [&](cPlayer & a_Player) -> bool
-	{
-		Vector3f a_PlayerPos(a_Player.GetPosition());
-		a_PlayerPos.y += 0.8f;
-		Vector3f a_Distance = a_PlayerPos - GetPosition();
-		double Distance = a_Distance.Length();
-
-		if (Distance < 0.7f)
+	bool FoundPlayer = m_World->DoWithNearestPlayer(
+		GetPosition(),
+		6.5,
+		[&](cPlayer & a_Player) -> bool
 		{
-			a_Player.DeltaExperience(m_Reward);
+			Vector3f a_PlayerPos(a_Player.GetPosition());
+			a_PlayerPos.y += 0.8f;
+			Vector3f a_Distance = a_PlayerPos - GetPosition();
+			double Distance = a_Distance.Length();
 
-			m_World->BroadcastSoundEffect("entity.experience_orb.pickup", GetPosition(), 0.5f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
-			Destroy();
+			if (Distance < 0.7f)
+			{
+				a_Player.DeltaExperience(m_Reward);
+
+				m_World->BroadcastSoundEffect(
+					"entity.experience_orb.pickup",
+					GetPosition(),
+					0.5f,
+					(0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64)
+				);
+				Destroy();
+				return true;
+			}
+
+			// Experience orb will "float" or glide toward the player up to a distance of 6 blocks.
+			// speeding up as they get nearer to the player, Speed range 6 - 12 m per second, accelerate 60 m per
+			// second^2
+			Vector3d SpeedDelta(a_Distance);
+			SpeedDelta.Normalize();
+			SpeedDelta *= 3;
+
+			Vector3d CurrentSpeed = GetSpeed();
+			CurrentSpeed += SpeedDelta;
+			if (CurrentSpeed.Length() > 12)
+			{
+				CurrentSpeed.Normalize();
+				CurrentSpeed *= 12;
+			}
+
+			SetSpeed(CurrentSpeed);
+			m_Gravity = 0;
+
 			return true;
-		}
-
-		// Experience orb will "float" or glide toward the player up to a distance of 6 blocks.
-		// speeding up as they get nearer to the player, Speed range 6 - 12 m per second, accelerate 60 m per second^2
-		Vector3d SpeedDelta(a_Distance);
-		SpeedDelta.Normalize();
-		SpeedDelta *= 3;
-
-		Vector3d CurrentSpeed = GetSpeed();
-		CurrentSpeed += SpeedDelta;
-		if (CurrentSpeed.Length() > 12)
-		{
-			CurrentSpeed.Normalize();
-			CurrentSpeed *= 12;
-		}
-
-		SetSpeed(CurrentSpeed);
-		m_Gravity = 0;
-
-		return true;
-	}, false, true);  // Don't check line of sight, ignore spectator mode player
+		},
+		false,
+		true
+	);  // Don't check line of sight, ignore spectator mode player
 
 	if (!FoundPlayer)
 	{
@@ -127,5 +137,3 @@ std::vector<int> cExpOrb::Split(int a_Reward)
 
 	return Rewards;
 }
-
-

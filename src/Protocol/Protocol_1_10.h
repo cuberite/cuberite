@@ -19,18 +19,16 @@ Declares the 1.10 protocol classes:
 
 
 
-class cProtocol_1_10_0:
-	public cProtocol_1_9_4
+class cProtocol_1_10_0 : public cProtocol_1_9_4
 {
 	using Super = cProtocol_1_9_4;
 
-public:
-
+  public:
 	using Super::Super;
 
-protected:
-
-	virtual void SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch) override;
+  protected:
+	virtual void SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch)
+		override;
 
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
 	virtual Version GetProtocolVersion() const override;

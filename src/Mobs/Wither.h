@@ -7,13 +7,11 @@
 
 
 
-class cWither:
-	public cAggressiveMonster
+class cWither : public cAggressiveMonster
 {
 	using Super = cAggressiveMonster;
 
-public:
-
+  public:
 	cWither();
 
 	CLASS_PROTODEF(cWither)
@@ -33,9 +31,8 @@ public:
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
-private:
-
-	/** The number of ticks of invulnerability left after being initially created. Zero once invulnerability has expired. */
+  private:
+	/** The number of ticks of invulnerability left after being initially created. Zero once invulnerability has
+	 * expired. */
 	unsigned int m_WitherInvulnerableTicks;
-
-} ;
+};

@@ -8,17 +8,14 @@
 
 
 /** Handler for the small (singleblock) mushrooms. */
-class cBlockMushroomHandler final :
-	public cClearMetaOnDrop<cBlockHandler>
+class cBlockMushroomHandler final : public cClearMetaOnDrop<cBlockHandler>
 {
 	using Super = cClearMetaOnDrop<cBlockHandler>;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	// TODO: Add Mushroom Spread
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
@@ -54,8 +51,4 @@ private:
 		UNUSED(a_Meta);
 		return 0;
 	}
-} ;
-
-
-
-
+};

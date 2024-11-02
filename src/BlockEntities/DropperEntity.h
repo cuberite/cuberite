@@ -16,20 +16,17 @@
 
 
 // tolua_begin
-class cDropperEntity :
-	public cDropSpenserEntity
+class cDropperEntity : public cDropSpenserEntity
 {
 	// tolua_end
 
 	using Super = cDropSpenserEntity;
 
-public:  // tolua_export
-
+  public:  // tolua_export
 	/** Constructor used for normal operation */
 	cDropperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
-protected:
-
+  protected:
 	// cDropSpenserEntity overrides:
 	virtual void DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum) override;
-} ;  // tolua_export
+};  // tolua_export

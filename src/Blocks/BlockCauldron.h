@@ -8,17 +8,14 @@
 
 
 
-class cBlockCauldronHandler final :
-	public cBlockHandler
+class cBlockCauldronHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		return cItem(E_ITEM_CAULDRON, 1, 0);
@@ -103,7 +100,9 @@ private:
 			case E_ITEM_LEATHER_TUNIC:
 			{
 				// Resets any color to default:
-				if ((Meta > 0) && ((EquippedItem.m_ItemColor.GetRed() != 255) || (EquippedItem.m_ItemColor.GetBlue() != 255) || (EquippedItem.m_ItemColor.GetGreen() != 255)))
+				if ((Meta > 0) &&
+					((EquippedItem.m_ItemColor.GetRed() != 255) || (EquippedItem.m_ItemColor.GetBlue() != 255) ||
+					 (EquippedItem.m_ItemColor.GetGreen() != 255)))
 				{
 					a_ChunkInterface.SetBlockMeta(a_BlockPos, --Meta);
 					auto NewItem = cItem(EquippedItem);
@@ -129,7 +128,8 @@ private:
 			{
 				// Resets shulker box color.
 
-				// TODO: When there is an actual default shulker box add the appropriate changes here! - 19.09.2020 - 12xx12
+				// TODO: When there is an actual default shulker box add the appropriate changes here! - 19.09.2020 -
+				// 12xx12
 				if (Meta == 0)
 				{
 					// The cauldron is empty:
@@ -168,10 +168,7 @@ private:
 
 
 
-	virtual bool IsUseable() const override
-	{
-		return true;
-	}
+	virtual bool IsUseable() const override { return true; }
 
 
 
@@ -208,8 +205,4 @@ private:
 		UNUSED(a_Meta);
 		return 21;
 	}
-} ;
-
-
-
-
+};

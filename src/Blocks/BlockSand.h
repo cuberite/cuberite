@@ -7,15 +7,12 @@
 
 
 
-class cBlockSandHandler final :
-	public cBlockHandler
+class cBlockSandHandler final : public cBlockHandler
 {
-public:
-
+  public:
 	using cBlockHandler::cBlockHandler;
 
-private:
-
+  private:
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);

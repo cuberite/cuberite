@@ -64,7 +64,3 @@ void cCaveSpider::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 		AddRandomUncommonDropItem(a_Drops, 33.0f, E_ITEM_SPIDER_EYE);
 	}
 }
-
-
-
-

@@ -6,7 +6,7 @@
 
 namespace PaletteUpgrade
 {
-	BlockState FromBlock(BLOCKTYPE Block, NIBBLETYPE Meta);
-	Item FromItem(short Item, short Damage);
-	std::pair<short, short> ToItem(Item ID);
-}
+BlockState FromBlock(BLOCKTYPE Block, NIBBLETYPE Meta);
+Item FromItem(short Item, short Damage);
+std::pair<short, short> ToItem(Item ID);
+}  // namespace PaletteUpgrade

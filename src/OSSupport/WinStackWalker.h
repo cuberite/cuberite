@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class StackWalkerInternal;  // forward
 class WinStackWalker
 {
-public:
+  public:
 	enum StackWalkOptions
 	{
 		// No addition info will be retrived
@@ -91,31 +91,31 @@ public:
 	WinStackWalker(DWORD dwProcessId, HANDLE hProcess);
 	virtual ~WinStackWalker();
 
-	typedef BOOL(__stdcall *PReadProcessMemoryRoutine)(
-		HANDLE      hProcess,
-		DWORD64     qwBaseAddress,
-		PVOID       lpBuffer,
-		DWORD       nSize,
-		LPDWORD     lpNumberOfBytesRead,
-		LPVOID      pUserData  // optional data, which was passed in "ShowCallstack"
+	typedef BOOL(__stdcall * PReadProcessMemoryRoutine)(
+		HANDLE hProcess,
+		DWORD64 qwBaseAddress,
+		PVOID lpBuffer,
+		DWORD nSize,
+		LPDWORD lpNumberOfBytesRead,
+		LPVOID pUserData  // optional data, which was passed in "ShowCallstack"
 	);
 
 	BOOL LoadModules();
 
 	BOOL ShowCallstack(
 		HANDLE hThread = GetCurrentThread(),
-		const CONTEXT *context = nullptr,
+		const CONTEXT * context = nullptr,
 		PReadProcessMemoryRoutine readMemoryFunction = nullptr,
 		LPVOID pUserData = nullptr  // optional to identify some data in the 'readMemoryFunction'-callback
 	);
 
-protected:
+  protected:
 	enum
 	{
 		STACKWALK_MAX_NAMELEN = 1024,  ///< Max name length for found symbols
 	};
 
-protected:
+  protected:
 	// Entry for each Callstack-Entry
 	struct CallstackEntry
 	{
@@ -134,15 +134,29 @@ protected:
 		CHAR loadedImageName[STACKWALK_MAX_NAMELEN];
 	};
 
-	enum CallstackEntryType { firstEntry, nextEntry, lastEntry };
+	enum CallstackEntryType
+	{
+		firstEntry,
+		nextEntry,
+		lastEntry
+	};
 
 	virtual void OnSymInit(LPCSTR szSearchPath, DWORD symOptions, LPCSTR szUserName);
-	virtual void OnLoadModule(LPCSTR img, LPCSTR mod, DWORD64 baseAddr, DWORD size, DWORD result, LPCSTR symType, LPCSTR pdbName, ULONGLONG fileVersion);
-	virtual void OnCallstackEntry(CallstackEntryType eType, CallstackEntry &entry);
+	virtual void OnLoadModule(
+		LPCSTR img,
+		LPCSTR mod,
+		DWORD64 baseAddr,
+		DWORD size,
+		DWORD result,
+		LPCSTR symType,
+		LPCSTR pdbName,
+		ULONGLONG fileVersion
+	);
+	virtual void OnCallstackEntry(CallstackEntryType eType, CallstackEntry & entry);
 	virtual void OnDbgHelpErr(LPCSTR szFuncName, DWORD gle, DWORD64 addr);
 	virtual void OnOutput(LPCSTR szText);
 
-	StackWalkerInternal *m_sw;
+	StackWalkerInternal * m_sw;
 	HANDLE m_hProcess;
 	DWORD m_dwProcessId;
 	BOOL m_modulesLoaded;
@@ -151,7 +165,13 @@ protected:
 	int m_options;
 	int m_MaxRecursionCount;
 
-	static BOOL __stdcall myReadProcMem(HANDLE hProcess, DWORD64 qwBaseAddress, PVOID lpBuffer, DWORD nSize, LPDWORD lpNumberOfBytesRead);
+	static BOOL __stdcall myReadProcMem(
+		HANDLE hProcess,
+		DWORD64 qwBaseAddress,
+		PVOID lpBuffer,
+		DWORD nSize,
+		LPDWORD lpNumberOfBytesRead
+	);
 
 	friend StackWalkerInternal;
 };
@@ -160,12 +180,13 @@ protected:
 
 
 #define GET_CURRENT_CONTEXT(c, contextFlags) \
-	do \
-	{ \
-		memset(&c, 0, sizeof(CONTEXT)); \
-		c.ContextFlags = contextFlags; \
-		RtlCaptureContext(&c); \
-	} while (false);
+	do                                       \
+	{                                        \
+		memset(&c, 0, sizeof(CONTEXT));      \
+		c.ContextFlags = contextFlags;       \
+		RtlCaptureContext(&c);               \
+	}                                        \
+	while (false);
 
 
 

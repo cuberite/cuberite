@@ -22,19 +22,17 @@ class cChunk;
 
 
 
-class cLineBlockTracer:
-	public cBlockTracer
+class cLineBlockTracer : public cBlockTracer
 {
 	using Super = cBlockTracer;
 
-public:
-
+  public:
 	enum eLineOfSight
 	{
 		// Bit flags used for LineOfSightTrace's Sight parameter:
-		losAir = 1,    // Can see through air
+		losAir = 1,  // Can see through air
 		losWater = 2,  // Can see through water
-		losLava = 4,   // Can see through lava
+		losLava = 4,  // Can see through lava
 
 		// Common combinations:
 		losAirWaterLava = losAir | losWater | losLava,
@@ -54,24 +52,25 @@ public:
 	static bool Trace(cWorld & a_World, cCallbacks & a_Callbacks, const Vector3d a_Start, const Vector3d a_End);
 
 	/** Returns true if the two positions are within line of sight (not obscured by blocks).
-	a_Sight specifies which blocks are considered transparent for the trace, is an OR-combination of eLineOfSight constants. */
+	a_Sight specifies which blocks are considered transparent for the trace, is an OR-combination of eLineOfSight
+	constants. */
 	static bool LineOfSightTrace(cWorld & a_World, const Vector3d & a_Start, const Vector3d & a_End, int a_Sight);
 
 	/** Traces until the first solid block is hit (or until end, whichever comes first.
 	If a solid block was hit, returns true and fills a_HitCoords, a_HitBlockCoords and a_HitBlockFace.
-	If a_End is encountered without hitting any solid block, returns false and doesn't touch a_HitCoords, a_HitBlockCoords nor a_HitBlockFace.
-	a_HitCoords is the exact coords of the hit,
-	a_HitBlockCoords are the coords of the solid block that was hit,
-	a_HitBlockFace is the face of the solid block that was hit. */
+	If a_End is encountered without hitting any solid block, returns false and doesn't touch a_HitCoords,
+	a_HitBlockCoords nor a_HitBlockFace. a_HitCoords is the exact coords of the hit, a_HitBlockCoords are the coords of
+	the solid block that was hit, a_HitBlockFace is the face of the solid block that was hit. */
 	static bool FirstSolidHitTrace(
 		cWorld & a_World,
-		const Vector3d & a_Start, const Vector3d & a_End,
+		const Vector3d & a_Start,
+		const Vector3d & a_End,
 		Vector3d & a_HitCoords,
 		Vector3i & a_HitBlockCoords,
 		eBlockFace & a_HitBlockFace
 	);
 
-protected:
+  protected:
 	/** The start point of the trace */
 	Vector3d m_Start;
 
@@ -97,14 +96,12 @@ protected:
 	/** Adjusts the start point below the world to just at the world's bottom */
 	void FixStartBelowWorld(void);
 
-	/** Calculates the XZ coords of an intersection with the specified Yconst plane; assumes that such an intersection exists */
+	/** Calculates the XZ coords of an intersection with the specified Yconst plane; assumes that such an intersection
+	 * exists */
 	void CalcXZIntersection(double a_Y, double & a_IntersectX, double & a_IntersectZ);
 
 	/** Moves m_Current to the next block on the line; returns false if no move is possible (reached the end) */
 	bool MoveToNextBlock(void);
 
 	bool ChunkCallback(cChunk * a_Chunk);
-} ;
-
-
-
+};

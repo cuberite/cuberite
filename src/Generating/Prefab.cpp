@@ -80,7 +80,13 @@ cPrefab::cPrefab(const cBlockArea & a_Image) :
 
 
 
-cPrefab::cPrefab(const AString & a_BlockDefinitions, const AString & a_BlockData, int a_SizeX, int a_SizeY, int a_SizeZ) :
+cPrefab::cPrefab(
+	const AString & a_BlockDefinitions,
+	const AString & a_BlockData,
+	int a_SizeX,
+	int a_SizeY,
+	int a_SizeZ
+) :
 	m_Size(a_SizeX, a_SizeY, a_SizeZ),
 	m_AllowedRotations(0),
 	m_MergeStrategy(cBlockArea::msOverwrite),
@@ -149,10 +155,8 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumR
 	const cBlockArea & Image = m_BlockArea[a_NumRotations];
 
 	// If the placement is outside this chunk, bail out:
-	if (
-		(Placement.x > cChunkDef::Width) || (Placement.x + Image.GetSizeX() < 0) ||
-		(Placement.z > cChunkDef::Width) || (Placement.z + Image.GetSizeZ() < 0)
-	)
+	if ((Placement.x > cChunkDef::Width) || (Placement.x + Image.GetSizeX() < 0) || (Placement.z > cChunkDef::Width) ||
+		(Placement.z + Image.GetSizeZ() < 0))
 	{
 		return;
 	}
@@ -382,7 +386,8 @@ void cPrefab::ParseBlockImage(const CharMap & a_CharMap, const char * a_BlockIma
 	{
 		for (int z = 0; z < m_Size.z; z++)
 		{
-			const unsigned char * BlockImage = reinterpret_cast<const unsigned char *>(a_BlockImage + y * m_Size.x * m_Size.z + z * m_Size.x);
+			const unsigned char * BlockImage =
+				reinterpret_cast<const unsigned char *>(a_BlockImage + y * m_Size.x * m_Size.z + z * m_Size.x);
 			for (int x = 0; x < m_Size.x; x++)
 			{
 				const sBlockTypeDef & MappedValue = a_CharMap[BlockImage[x]];
@@ -432,7 +437,9 @@ void cPrefab::ParseConnectors(const char * a_ConnectorsDef)
 
 		// Add the connector:
 		m_Connectors.push_back(cPiece::cConnector(
-			atoi(Coords[0].c_str()), atoi(Coords[1].c_str()), atoi(Coords[2].c_str()),  // Connector pos
+			atoi(Coords[0].c_str()),
+			atoi(Coords[1].c_str()),
+			atoi(Coords[2].c_str()),  // Connector pos
 			atoi(Defs[0].c_str()),  // Connector type
 			Direction
 		));
@@ -524,7 +531,3 @@ bool cPrefab::CanRotateCCW(int a_NumRotations) const
 	// Or the proper bit in m_AllowedRotations is set
 	return (a_NumRotations == 0) || ((m_AllowedRotations & (1 << ((a_NumRotations + 3) % 4))) != 0);
 }
-
-
-
-

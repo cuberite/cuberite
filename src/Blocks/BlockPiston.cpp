@@ -22,12 +22,12 @@ Vector3i cBlockPistonHandler::MetadataToOffset(NIBBLETYPE a_PistonMeta)
 {
 	switch (a_PistonMeta & 0x07)
 	{
-		case 0: return Vector3i( 0, -1,  0);
-		case 1: return Vector3i( 0,  1,  0);
-		case 2: return Vector3i( 0,  0, -1);
-		case 3: return Vector3i( 0,  0,  1);
-		case 4: return Vector3i(-1,  0,  0);
-		case 5: return Vector3i( 1,  0,  0);
+		case 0: return Vector3i(0, -1, 0);
+		case 1: return Vector3i(0, 1, 0);
+		case 2: return Vector3i(0, 0, -1);
+		case 3: return Vector3i(0, 0, 1);
+		case 4: return Vector3i(-1, 0, 0);
+		case 5: return Vector3i(1, 0, 0);
 		default:
 		{
 			LOGWARNING("%s: invalid direction %d, ignoring", __FUNCTION__, a_PistonMeta & 0x07);
@@ -56,7 +56,9 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 	// However, we don't confuse animation with the underlying state of the world, so emulate by delaying 1 tick
 	// (Probably why vanilla has so many dupe glitches with sand and pistons lolol)
 
-	a_World.ScheduleTask(1_tick, [a_BlockPos](cWorld & World)
+	a_World.ScheduleTask(
+		1_tick,
+		[a_BlockPos](cWorld & World)
 		{
 			BLOCKTYPE pistonBlock;
 			NIBBLETYPE pistonMeta;
@@ -108,7 +110,9 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 		a_World.BroadcastBlockAction(a_BlockPos, PistonRetractAction, pistonMeta, pistonBlock);
 	}
 
-	a_World.ScheduleTask(1_tick, [a_BlockPos](cWorld & World)
+	a_World.ScheduleTask(
+		1_tick,
+		[a_BlockPos](cWorld & World)
 		{
 			BLOCKTYPE pistonBlock;
 			NIBBLETYPE pistonMeta;
@@ -171,18 +175,16 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 
 
 
-void cBlockPistonHandler::PushBlocks(
-	const Vector3iSet & a_BlocksToPush,
-	cWorld & a_World, const Vector3i & a_PushDir
-)
+void cBlockPistonHandler::PushBlocks(const Vector3iSet & a_BlocksToPush, cWorld & a_World, const Vector3i & a_PushDir)
 {
 	// Sort blocks to move the blocks first, which are farthest away from the piston
 	// This prevents the overwriting of existing blocks
 	std::vector<Vector3i> sortedBlocks(a_BlocksToPush.begin(), a_BlocksToPush.end());
-	std::sort(sortedBlocks.begin(), sortedBlocks.end(), [a_PushDir](const Vector3i & a, const Vector3i & b)
-	{
-		return (a.Dot(a_PushDir) > b.Dot(a_PushDir));
-	});
+	std::sort(
+		sortedBlocks.begin(),
+		sortedBlocks.end(),
+		[a_PushDir](const Vector3i & a, const Vector3i & b) { return (a.Dot(a_PushDir) > b.Dot(a_PushDir)); }
+	);
 
 	// Move every block
 	BLOCKTYPE moveBlock;
@@ -211,8 +213,11 @@ void cBlockPistonHandler::PushBlocks(
 
 
 bool cBlockPistonHandler::CanPushBlock(
-	const Vector3i & a_BlockPos, cWorld & a_World, bool a_RequirePushable,
-	Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
+	const Vector3i & a_BlockPos,
+	cWorld & a_World,
+	bool a_RequirePushable,
+	Vector3iSet & a_BlocksPushed,
+	const Vector3i & a_PushDir
 )
 {
 	if (!cChunkDef::IsValidHeight(a_BlockPos))
@@ -221,13 +226,13 @@ bool cBlockPistonHandler::CanPushBlock(
 		return false;
 	}
 
-	const static std::array<Vector3i, 6> pushingDirs =
-	{
-		{
-			Vector3i(-1,  0,  0), Vector3i(1, 0, 0),
-			Vector3i( 0, -1,  0), Vector3i(0, 1, 0),
-			Vector3i( 0,  0, -1), Vector3i(0, 0, 1)
-		}
+	const static std::array<Vector3i, 6> pushingDirs = {
+		{Vector3i(-1, 0, 0),
+		 Vector3i(1, 0, 0),
+		 Vector3i(0, -1, 0),
+		 Vector3i(0, 1, 0),
+		 Vector3i(0, 0, -1),
+		 Vector3i(0, 0, 1)}
 	};
 
 	BLOCKTYPE currBlock;
@@ -285,9 +290,11 @@ bool cBlockPistonHandler::CanPushBlock(
 
 
 void cBlockPistonHandler::OnBroken(
-	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+	cChunkInterface & a_ChunkInterface,
+	cWorldInterface & a_WorldInterface,
 	Vector3i a_BlockPos,
-	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+	BLOCKTYPE a_OldBlockType,
+	NIBBLETYPE a_OldBlockMeta,
 	const cEntity * a_Digger
 ) const
 {
@@ -298,10 +305,7 @@ void cBlockPistonHandler::OnBroken(
 	}
 
 	const auto Extension = a_BlockPos + MetadataToOffset(a_OldBlockMeta);
-	if (
-		cChunkDef::IsValidHeight(Extension) &&
-		(a_ChunkInterface.GetBlock(Extension) == E_BLOCK_PISTON_EXTENSION)
-	)
+	if (cChunkDef::IsValidHeight(Extension) && (a_ChunkInterface.GetBlock(Extension) == E_BLOCK_PISTON_EXTENSION))
 	{
 		// If the piston is extended, destroy the extension as well:
 		a_ChunkInterface.SetBlock(Extension, E_BLOCK_AIR, 0);
@@ -316,9 +320,11 @@ void cBlockPistonHandler::OnBroken(
 // cBlockPistonHeadHandler:
 
 void cBlockPistonHeadHandler::OnBroken(
-	cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+	cChunkInterface & a_ChunkInterface,
+	cWorldInterface & a_WorldInterface,
 	Vector3i a_BlockPos,
-	BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+	BLOCKTYPE a_OldBlockType,
+	NIBBLETYPE a_OldBlockMeta,
 	const cEntity * a_Digger
 ) const
 {
@@ -344,6 +350,7 @@ void cBlockPistonHeadHandler::OnBroken(
 cItems cBlockPistonHeadHandler::ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const
 {
 	// Give a normal\sticky piston base, not piston extension
-	// With 1.7, the item forms of these technical blocks have been removed, so giving someone this will crash their client...
-	return { cItem(((a_BlockMeta & 0x8) == 0x8) ? E_BLOCK_STICKY_PISTON : E_BLOCK_PISTON) };
+	// With 1.7, the item forms of these technical blocks have been removed, so giving someone this will crash their
+	// client...
+	return {cItem(((a_BlockMeta & 0x8) == 0x8) ? E_BLOCK_STICKY_PISTON : E_BLOCK_PISTON)};
 }

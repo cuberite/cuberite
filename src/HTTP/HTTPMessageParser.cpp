@@ -11,9 +11,8 @@
 
 
 
-cHTTPMessageParser::cHTTPMessageParser(cHTTPMessageParser::cCallbacks & a_Callbacks):
-	m_Callbacks(a_Callbacks),
-	m_EnvelopeParser(*this)
+cHTTPMessageParser::cHTTPMessageParser(cHTTPMessageParser::cCallbacks & a_Callbacks) :
+	m_Callbacks(a_Callbacks), m_EnvelopeParser(*this)
 {
 	Reset();
 }
@@ -36,7 +35,9 @@ size_t cHTTPMessageParser::Parse(const char * a_Data, size_t a_Size)
 	{
 		m_Buffer.append(a_Data, a_Size);
 		auto bytesConsumedFirstLine = ParseFirstLine();
-		ASSERT(bytesConsumedFirstLine <= inBufferSoFar + a_Size);  // Haven't consumed more data than there is in the buffer
+		ASSERT(
+			bytesConsumedFirstLine <= inBufferSoFar + a_Size
+		);  // Haven't consumed more data than there is in the buffer
 		ASSERT(bytesConsumedFirstLine > inBufferSoFar);  // Have consumed at least the previous buffer contents
 		if (m_FirstLine.empty())
 		{
@@ -55,7 +56,9 @@ size_t cHTTPMessageParser::Parse(const char * a_Data, size_t a_Size)
 			m_Callbacks.OnError("Failed to parse the envelope");
 			return AString::npos;
 		}
-		ASSERT(bytesConsumedEnvelope <= bytesConsumedFirstLine + a_Size);  // Haven't consumed more data than there was in the buffer
+		ASSERT(
+			bytesConsumedEnvelope <= bytesConsumedFirstLine + a_Size
+		);  // Haven't consumed more data than there was in the buffer
 		m_Buffer.erase(0, bytesConsumedEnvelope);
 		if (!m_EnvelopeParser.IsInHeaders())
 		{
@@ -218,7 +221,3 @@ void cHTTPMessageParser::OnBodyFinished(void)
 	m_IsFinished = true;
 	m_Callbacks.OnBodyFinished();
 }
-
-
-
-

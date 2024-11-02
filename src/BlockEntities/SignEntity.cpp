@@ -12,10 +12,10 @@
 
 
 
-cSignEntity::cSignEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+cSignEntity::cSignEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) :
 	Super(a_BlockType, a_BlockMeta, a_Pos, a_World)
 {
-	ASSERT((a_BlockType ==  E_BLOCK_WALLSIGN) || (a_BlockType == E_BLOCK_SIGN_POST));
+	ASSERT((a_BlockType == E_BLOCK_WALLSIGN) || (a_BlockType == E_BLOCK_SIGN_POST));
 	ASSERT(cChunkDef::IsValidHeight(a_Pos));
 }
 
@@ -44,7 +44,12 @@ bool cSignEntity::UsedBy(cPlayer * a_Player)
 
 
 
-void cSignEntity::SetLines(const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+void cSignEntity::SetLines(
+	const AString & a_Line1,
+	const AString & a_Line2,
+	const AString & a_Line3,
+	const AString & a_Line4
+)
 {
 	m_Line[0] = a_Line1;
 	m_Line[1] = a_Line2;

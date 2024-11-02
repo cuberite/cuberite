@@ -67,10 +67,26 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			if (Random.RandBool(0.02))
 			{
-				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, GetPosition().Floor(), int(SmokeDirection::SOUTH_EAST));
-				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, GetPosition().Floor(), int(SmokeDirection::SOUTH_WEST));
-				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, GetPosition().Floor(), int(SmokeDirection::NORTH_EAST));
-				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, GetPosition().Floor(), int(SmokeDirection::NORTH_WEST));
+				m_World->BroadcastSoundParticleEffect(
+					EffectID::PARTICLE_SMOKE,
+					GetPosition().Floor(),
+					int(SmokeDirection::SOUTH_EAST)
+				);
+				m_World->BroadcastSoundParticleEffect(
+					EffectID::PARTICLE_SMOKE,
+					GetPosition().Floor(),
+					int(SmokeDirection::SOUTH_WEST)
+				);
+				m_World->BroadcastSoundParticleEffect(
+					EffectID::PARTICLE_SMOKE,
+					GetPosition().Floor(),
+					int(SmokeDirection::NORTH_EAST)
+				);
+				m_World->BroadcastSoundParticleEffect(
+					EffectID::PARTICLE_SMOKE,
+					GetPosition().Floor(),
+					int(SmokeDirection::NORTH_WEST)
+				);
 
 				m_World->BroadcastSoundEffect("entity.horse.angry", GetPosition(), 1.0f, 1.0f);
 				m_Attachee->Detach();
@@ -80,7 +96,7 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 		else
 		{
-			m_World->BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+			m_World->BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f {}, 0, 5);
 			MetadataDirty = true;
 			m_bIsTame = true;
 		}
@@ -139,13 +155,7 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 
 		auto EquipedItemType = a_Player.GetEquippedItem().m_ItemType;
 
-		if (
-			!IsSaddled() &&
-			(
-				(EquipedItemType == E_ITEM_SADDLE) ||
-				ItemCategory::IsHorseArmor(EquipedItemType)
-			)
-		)
+		if (!IsSaddled() && ((EquipedItemType == E_ITEM_SADDLE) || ItemCategory::IsHorseArmor(EquipedItemType)))
 		{
 			// Player is holding a horse inventory item, open the window:
 			PlayerOpenWindow(a_Player);

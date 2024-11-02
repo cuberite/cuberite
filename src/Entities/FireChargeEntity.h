@@ -17,29 +17,22 @@
 
 // tolua_begin
 
-class cFireChargeEntity :
-	public cProjectileEntity
+class cFireChargeEntity : public cProjectileEntity
 {
 	// tolua_end
 
 	using Super = cProjectileEntity;
 
-public:  // tolua_export
-
+  public:  // tolua_export
 	CLASS_PROTODEF(cFireChargeEntity)
 
 	cFireChargeEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed);
 
-protected:
-
+  protected:
 	void Explode(Vector3i a_Block);
 
 	// cProjectileEntity overrides:
 	virtual void OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace) override;
 	virtual void OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos) override;
 
-} ;  // tolua_export
-
-
-
-
+};  // tolua_export

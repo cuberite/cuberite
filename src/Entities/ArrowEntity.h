@@ -17,8 +17,7 @@
 
 // tolua_begin
 
-class cArrowEntity :
-	public cProjectileEntity
+class cArrowEntity : public cProjectileEntity
 {
 	// tolua_end
 
@@ -27,19 +26,19 @@ class cArrowEntity :
 	// tolua_begin
 
 
-public:
-
-	/** Determines when the arrow can be picked up (depending on player gamemode). Corresponds to the MCA file "pickup" field */
+  public:
+	/** Determines when the arrow can be picked up (depending on player gamemode). Corresponds to the MCA file "pickup"
+	 * field */
 	enum ePickupState
 	{
-		psNoPickup             = 0,
+		psNoPickup = 0,
 		psInSurvivalOrCreative = 1,
-		psInCreative           = 2,
-	} ;
+		psInCreative = 2,
+	};
 
 	// tolua_end
 
-	static constexpr float ARROW_WATER_FRICTION = 50.0f;    ///< Value used to calculate arrow speed in water
+	static constexpr float ARROW_WATER_FRICTION = 50.0f;  ///< Value used to calculate arrow speed in water
 
 	CLASS_PROTODEF(cArrowEntity)
 
@@ -80,12 +79,12 @@ public:
 	/** Sets the block arrow is in. To be used by the MCA loader only! */
 	void SetBlockHit(const Vector3i & a_BlockHit) { m_HitBlockPos = a_BlockHit; }
 
-protected:
-
+  protected:
 	/** Determines when the arrow can be picked up by players */
 	ePickupState m_PickupState;
 
-	/** The coefficient applied to the damage that the arrow will deal, based on the bow enchantment. 2.0 for normal arrow */
+	/** The coefficient applied to the damage that the arrow will deal, based on the bow enchantment. 2.0 for normal
+	 * arrow */
 	double m_DamageCoeff;
 
 	/** If true, the arrow deals more damage */

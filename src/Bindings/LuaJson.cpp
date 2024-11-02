@@ -26,37 +26,35 @@ static Json::Value JsonSerializeValue(cLuaState & a_LuaState);
 /** Exception thrown when the input cannot be serialized.
 Keeps track of the error message and the problematic value's path in the table.
 */
-class CannotSerializeException:
-	public std::runtime_error
+class CannotSerializeException : public std::runtime_error
 {
 	using Super = std::runtime_error;
 
-public:
+  public:
 	/** Constructs a new instance of the exception based on the provided values directly. */
-	explicit CannotSerializeException(const AString & a_ValueName, const char * a_ErrorMsg):
-		Super(a_ErrorMsg),
-		m_ValueName(a_ValueName)
+	explicit CannotSerializeException(const AString & a_ValueName, const char * a_ErrorMsg) :
+		Super(a_ErrorMsg), m_ValueName(a_ValueName)
 	{
 	}
 
 	/** Constructs a new instance of the exception based on the provided values directly. */
-	explicit CannotSerializeException(int a_ValueIndex, const char * a_ErrorMsg):
-		Super(a_ErrorMsg),
-		m_ValueName(fmt::format(FMT_STRING("{}"), a_ValueIndex))
+	explicit CannotSerializeException(int a_ValueIndex, const char * a_ErrorMsg) :
+		Super(a_ErrorMsg), m_ValueName(fmt::format(FMT_STRING("{}"), a_ValueIndex))
 	{
 	}
 
-	/** Constructs a new instance of the exception that takes the error message and value name from the parent, and prefix the value name with the specified prefix.
-	Used for prefixing the value name's path along the call stack that lead to the main exception. */
-	explicit CannotSerializeException(const CannotSerializeException & a_Parent, const AString & a_ValueNamePrefix):
-		Super(a_Parent.what()),
-		m_ValueName(a_ValueNamePrefix + "." + a_Parent.m_ValueName)
+	/** Constructs a new instance of the exception that takes the error message and value name from the parent, and
+	prefix the value name with the specified prefix. Used for prefixing the value name's path along the call stack that
+	lead to the main exception. */
+	explicit CannotSerializeException(const CannotSerializeException & a_Parent, const AString & a_ValueNamePrefix) :
+		Super(a_Parent.what()), m_ValueName(a_ValueNamePrefix + "." + a_Parent.m_ValueName)
 	{
 	}
 
-	/** Constructs a new instance of the exception that takes the error message and value name from the parent, and prefix the value name with the specified prefix.
-	Used for prefixing the value name's path along the call stack that lead to the main exception. */
-	explicit CannotSerializeException(const CannotSerializeException & a_Parent, int a_ValueNamePrefixIndex):
+	/** Constructs a new instance of the exception that takes the error message and value name from the parent, and
+	prefix the value name with the specified prefix. Used for prefixing the value name's path along the call stack that
+	lead to the main exception. */
+	explicit CannotSerializeException(const CannotSerializeException & a_Parent, int a_ValueNamePrefixIndex) :
 		Super(a_Parent.what()),
 		m_ValueName(fmt::format(FMT_STRING("{}"), a_ValueNamePrefixIndex) + "." + a_Parent.m_ValueName)
 	{
@@ -64,7 +62,7 @@ public:
 
 	const AString & GetValueName() const { return m_ValueName; }
 
-protected:
+  protected:
 	AString m_ValueName;
 };
 
@@ -81,7 +79,7 @@ static void PushJsonArray(const Json::Value & a_Value, cLuaState & a_LuaState)
 
 	// Insert each value to the appropriate index (1-based):
 	int idx = 1;
-	for (const auto & v: a_Value)
+	for (const auto & v : a_Value)
 	{
 		// Include Json null values in the array - it will have holes, but indices will stay the same
 		PushJsonValue(v, a_LuaState);
@@ -104,7 +102,7 @@ static void PushJsonObject(const Json::Value & a_Value, cLuaState & a_LuaState)
 	// Json::Value has no means of iterating over children with their names included.
 	// We need to iterate over names and "find" them in the object again:
 	auto names = a_Value.getMemberNames();
-	for (const auto & n: names)
+	for (const auto & n : names)
 	{
 		auto v = a_Value[n];
 		if (v.isNull())
@@ -276,11 +274,7 @@ static int tolua_cJson_Parse(lua_State * a_LuaState)
 
 	// Check the param types:
 	cLuaState L(a_LuaState);
-	if (
-		!L.CheckParamUserTable(1, "cJson") ||
-		!L.CheckParamString(2) ||
-		!L.CheckParamEnd(3)
-	)
+	if (!L.CheckParamUserTable(1, "cJson") || !L.CheckParamString(2) || !L.CheckParamEnd(3))
 	{
 		return 0;
 	}
@@ -319,11 +313,7 @@ static int tolua_cJson_Serialize(lua_State * a_LuaState)
 
 	// Check the param types:
 	cLuaState L(a_LuaState);
-	if (
-		!L.CheckParamUserTable(1, "cJson") ||
-		!L.CheckParamTable(2) ||
-		!L.CheckParamEnd(4)
-	)
+	if (!L.CheckParamUserTable(1, "cJson") || !L.CheckParamTable(2) || !L.CheckParamEnd(4))
 	{
 		return 0;
 	}
@@ -340,7 +330,8 @@ static int tolua_cJson_Serialize(lua_State * a_LuaState)
 		lua_pushnil(L);
 		L.Push(fmt::format(
 			FMT_STRING("Cannot serialize into Json, value \"{}\" caused an error \"{}\""),
-			exc.GetValueName(), exc.what()
+			exc.GetValueName(),
+			exc.what()
 		));
 		return 2;
 	}
@@ -368,7 +359,7 @@ static int tolua_cJson_Serialize(lua_State * a_LuaState)
 		if (!builder.validate(&invalid))
 		{
 			LOGINFO("cJson:Serialize(): detected invalid settings:");
-			for (const auto & n: invalid.getMemberNames())
+			for (const auto & n : invalid.getMemberNames())
 			{
 				LOGINFO("  \"%s\" (\"%s\")", n.c_str(), invalid[n].asCString());
 			}
@@ -391,18 +382,14 @@ void cLuaJson::Bind(cLuaState & a_LuaState)
 {
 	tolua_beginmodule(a_LuaState, nullptr);
 
-		// Create the cJson API class:
-		tolua_usertype(a_LuaState, "cJson");
-		tolua_cclass(a_LuaState, "cJson", "cJson", "", nullptr);
+	// Create the cJson API class:
+	tolua_usertype(a_LuaState, "cJson");
+	tolua_cclass(a_LuaState, "cJson", "cJson", "", nullptr);
 
-		// Fill in the functions (alpha-sorted):
-		tolua_beginmodule(a_LuaState, "cJson");
-			tolua_function(a_LuaState, "Parse",     tolua_cJson_Parse);
-			tolua_function(a_LuaState, "Serialize", tolua_cJson_Serialize);
-		tolua_endmodule(a_LuaState);
+	// Fill in the functions (alpha-sorted):
+	tolua_beginmodule(a_LuaState, "cJson");
+	tolua_function(a_LuaState, "Parse", tolua_cJson_Parse);
+	tolua_function(a_LuaState, "Serialize", tolua_cJson_Serialize);
+	tolua_endmodule(a_LuaState);
 	tolua_endmodule(a_LuaState);
 }
-
-
-
-

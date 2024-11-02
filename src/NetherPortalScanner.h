@@ -14,7 +14,7 @@ class cWorld;
 // This is the chunk stay which finds nearby nether portals
 class cNetherPortalScanner : public cChunkStay
 {
-public:
+  public:
 	cNetherPortalScanner(cEntity & a_MovingEntity, cWorld & a_DestinationWorld, Vector3d a_DestPosition, int a_MaxY);
 	virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkY) override;
 	virtual bool OnAllChunksAvailable(void) override;
@@ -26,8 +26,7 @@ public:
 		Y
 	};
 
-private:
-
+  private:
 	/** Length and height, including the obsidian. */
 	static const int PortalLength = 4;
 	static const int PortalHeight = 5;

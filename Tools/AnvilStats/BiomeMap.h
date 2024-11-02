@@ -15,16 +15,15 @@
 
 
 
-class cBiomeMap :
-	public cCallback
+class cBiomeMap : public cCallback
 {
-public:
+  public:
 	cBiomeMap(void);
 
 	/** Saves the last region that it was processing */
 	void Finish(void);
 
-protected:
+  protected:
 	int m_CurrentChunkX;  // Absolute chunk coords
 	int m_CurrentChunkZ;
 	int m_CurrentChunkOffX;  // Chunk offset from the start of the region
@@ -37,29 +36,30 @@ protected:
 	// cCallback overrides:
 	virtual bool OnNewChunk(int a_ChunkX, int a_ChunkZ) override;
 	virtual bool OnHeader(int a_FileOffset, unsigned char a_NumSectors, int a_Timestamp) override { return false; }
-	virtual bool OnCompressedDataSizePos(int a_CompressedDataSize, int a_DataOffset, char a_CompressionMethod) override { return false; }
+	virtual bool OnCompressedDataSizePos(int a_CompressedDataSize, int a_DataOffset, char a_CompressionMethod) override
+	{
+		return false;
+	}
 	virtual bool OnDecompressedData(const char * a_DecompressedNBT, int a_DataSize) override { return false; }
 	virtual bool OnRealCoords(int a_ChunkX, int a_ChunkZ) override { return false; }
 	virtual bool OnLastUpdate(Int64 a_LastUpdate) override { return false; }
-	virtual bool OnTerrainPopulated(bool a_Populated) override { return false; }  // We don't care about "populated", the biomes are the same
+	virtual bool OnTerrainPopulated(bool a_Populated) override
+	{
+		return false;
+	}  // We don't care about "populated", the biomes are the same
 	virtual bool OnBiomes(const unsigned char * a_BiomeData) override;
 
 	void StartNewRegion(int a_RegionX, int a_RegionZ);
-} ;
+};
 
 
 
 
 
-class cBiomeMapFactory :
-	public cCallbackFactory
+class cBiomeMapFactory : public cCallbackFactory
 {
-public:
+  public:
 	virtual ~cBiomeMapFactory();
 
-	virtual cCallback * CreateNewCallback(void) override
-	{
-		return new cBiomeMap;
-	}
-
-} ;
+	virtual cCallback * CreateNewCallback(void) override { return new cBiomeMap; }
+};

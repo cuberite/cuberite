@@ -12,14 +12,12 @@ class cMonster;
 
 
 // tolua_begin
-class cPawn:
-	public cEntity
+class cPawn : public cEntity
 {
 	// tolua_end
 	using Super = cEntity;
 
-public:
-
+  public:
 	CLASS_PROTODEF(cPawn)
 
 	cPawn(eEntityType a_EntityType, float a_Width, float a_Height);
@@ -56,7 +54,12 @@ public:
 	a_EffectIntensity is the level of the effect (0 = Potion I, 1 = Potion II, etc).
 	a_DistanceModifier is the scalar multiplied to the potion duration (only applies to splash potions).
 	*/
-	void AddEntityEffect(cEntityEffect::eType a_EffectType, int a_EffectDurationTicks, short a_EffectIntensity, double a_DistanceModifier = 1);
+	void AddEntityEffect(
+		cEntityEffect::eType a_EffectType,
+		int a_EffectDurationTicks,
+		short a_EffectIntensity,
+		double a_DistanceModifier = 1
+	);
 
 	/** Removes a currently applied entity effect. */
 	void RemoveEntityEffect(cEntityEffect::eType a_EffectType);
@@ -83,21 +86,40 @@ public:
 
 	// tolua_begin
 
-	static bool FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const Vector3i a_MinBoxCorner, const Vector3i a_MaxBoxCorner);
+	static bool FindTeleportDestination(
+		cWorld & a_World,
+		const int a_HeightRequired,
+		const unsigned int a_NumTries,
+		Vector3d & a_Destination,
+		const Vector3i a_MinBoxCorner,
+		const Vector3i a_MaxBoxCorner
+	);
 
-	static bool FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, const cBoundingBox a_BoundingBox);
+	static bool FindTeleportDestination(
+		cWorld & a_World,
+		const int a_HeightRequired,
+		const unsigned int a_NumTries,
+		Vector3d & a_Destination,
+		const cBoundingBox a_BoundingBox
+	);
 
 	/** Used by enderman and chorus fruit.
 	Checks for valid destinations in a cube of length 2 * a_HalfCubeWidth centred at a_Centre.
 	Returns true and places destination in a_Destination if successful.
 	Returns false if destination could be found after a_NumTries attempts.
 	Details at: https://minecraft.wiki/w/Enderman#Teleportation. */
-	static bool FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, Vector3i a_Centre, const int a_HalfCubeWidth);
+	static bool FindTeleportDestination(
+		cWorld & a_World,
+		const int a_HeightRequired,
+		const unsigned int a_NumTries,
+		Vector3d & a_Destination,
+		Vector3i a_Centre,
+		const int a_HalfCubeWidth
+	);
 
 	// tolua_end
 
-protected:
-
+  protected:
 	typedef std::map<cEntityEffect::eType, std::unique_ptr<cEntityEffect>> tEffectMap;
 	tEffectMap m_EntityEffects;
 
@@ -106,12 +128,11 @@ protected:
 
 	virtual void ResetPosition(Vector3d a_NewPosition) override;
 
-private:
-
+  private:
 	/** A list of all monsters that are targeting this pawn. */
-	std::vector<cMonster*> m_TargetingMe;
+	std::vector<cMonster *> m_TargetingMe;
 
 	/** Attempt to activate a Totem of Undying.
 	If activation for the given type of damage was successful, consumes the totem and returns true. */
 	bool DeductTotem(eDamageType a_DamageType);
-} ;  // tolua_export
+};  // tolua_export

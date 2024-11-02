@@ -12,18 +12,21 @@
 
 
 
-class cItemBannerHandler final:
-	public cItemHandler
+class cItemBannerHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
+  private:
+	virtual bool CommitPlacement(
+		cPlayer & a_Player,
+		const cItem & a_HeldItem,
+		const Vector3i a_PlacePosition,
+		const eBlockFace a_ClickedBlockFace,
+		const Vector3i a_CursorPosition
+	) const override
 	{
 		// Cannot place a banner at "no face" and from the bottom:
 		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_BOTTOM))
@@ -36,15 +39,21 @@ private:
 			return false;
 		}
 
-		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_HeldItem](cBlockEntity & a_BlockEntity)
-		{
-			ASSERT((a_BlockEntity.GetBlockType() == E_BLOCK_STANDING_BANNER) || (a_BlockEntity.GetBlockType() == E_BLOCK_WALL_BANNER));
+		a_Player.GetWorld()->DoWithBlockEntityAt(
+			a_PlacePosition,
+			[&a_HeldItem](cBlockEntity & a_BlockEntity)
+			{
+				ASSERT(
+					(a_BlockEntity.GetBlockType() == E_BLOCK_STANDING_BANNER) ||
+					(a_BlockEntity.GetBlockType() == E_BLOCK_WALL_BANNER)
+				);
 
-			cBannerEntity & BannerEntity = static_cast<cBannerEntity &>(a_BlockEntity);
-			BannerEntity.SetBaseColor(static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage));
-			BannerEntity.SetCustomName(a_HeldItem.m_CustomName);
-			return false;
-		});
+				cBannerEntity & BannerEntity = static_cast<cBannerEntity &>(a_BlockEntity);
+				BannerEntity.SetBaseColor(static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage));
+				BannerEntity.SetCustomName(a_HeldItem.m_CustomName);
+				return false;
+			}
+		);
 
 		return true;
 	}
@@ -53,10 +62,7 @@ private:
 
 
 
-	virtual bool IsPlaceable(void) const override
-	{
-		return true;
-	}
+	virtual bool IsPlaceable(void) const override { return true; }
 
 
 

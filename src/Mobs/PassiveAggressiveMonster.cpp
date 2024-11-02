@@ -9,7 +9,15 @@
 
 
 
-cPassiveAggressiveMonster::cPassiveAggressiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height) :
+cPassiveAggressiveMonster::cPassiveAggressiveMonster(
+	const AString & a_ConfigName,
+	eMonsterType a_MobType,
+	const AString & a_SoundHurt,
+	const AString & a_SoundDeath,
+	const AString & a_SoundAmbient,
+	float a_Width,
+	float a_Height
+) :
 	Super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_SoundAmbient, a_Width, a_Height)
 {
 	m_EMPersonality = PASSIVE;
@@ -44,5 +52,3 @@ void cPassiveAggressiveMonster::EventSeePlayer(cPlayer *, cChunk & a_Chunk)
 {
 	// don't do anything, neutral mobs don't react to just seeing the player
 }
-
-

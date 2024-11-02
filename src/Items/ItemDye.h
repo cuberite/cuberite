@@ -10,12 +10,11 @@
 
 
 
-class cItemDyeHandler final :
-	public cItemHandler
+class cItemDyeHandler final : public cItemHandler
 {
 	using Super = cItemHandler;
 
-public:
+  public:
 	using Super::Super;
 
 
@@ -43,7 +42,8 @@ public:
 				}
 			}
 		}
-		else if ((a_HeldItem.m_ItemDamage == E_META_DYE_BROWN) && (a_ClickedBlockFace >= BLOCK_FACE_ZM) && (a_ClickedBlockFace <= BLOCK_FACE_XP))
+		else if ((a_HeldItem.m_ItemDamage == E_META_DYE_BROWN) && (a_ClickedBlockFace >= BLOCK_FACE_ZM) &&
+				 (a_ClickedBlockFace <= BLOCK_FACE_XP))
 		{
 			// Players can't place blocks while in adventure mode.
 			if (a_Player->IsGameModeAdventure())
@@ -126,7 +126,8 @@ public:
 			case E_BLOCK_BEETROOTS:
 			{
 				// Fix GH #4805.
-				// Bonemeal should only advance growth, not spawn produce, and should not be consumed if plant at maturity:
+				// Bonemeal should only advance growth, not spawn produce, and should not be consumed if plant at
+				// maturity:
 				if (a_World.GrowPlantAt(a_BlockPos, 1) <= 0)
 				{
 					return false;
@@ -157,10 +158,14 @@ public:
 				cItems Pickups;
 				switch (BlockMeta)
 				{
-					case E_META_BIG_FLOWER_SUNFLOWER: Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_SUNFLOWER); break;
-					case E_META_BIG_FLOWER_LILAC:     Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_LILAC);     break;
-					case E_META_BIG_FLOWER_ROSE_BUSH: Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_ROSE_BUSH); break;
-					case E_META_BIG_FLOWER_PEONY:     Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_PEONY);     break;
+					case E_META_BIG_FLOWER_SUNFLOWER:
+						Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_SUNFLOWER);
+						break;
+					case E_META_BIG_FLOWER_LILAC: Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_LILAC); break;
+					case E_META_BIG_FLOWER_ROSE_BUSH:
+						Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_ROSE_BUSH);
+						break;
+					case E_META_BIG_FLOWER_PEONY: Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_PEONY); break;
 				}
 				// TODO: Should we call any hook for this?
 				a_World.SpawnItemPickups(Pickups, a_BlockPos);
@@ -201,10 +206,10 @@ public:
 				return true;
 			}
 
-			// TODO: case E_BLOCK_SWEET_BERRY_BUSH:
-			// TODO: case E_BLOCK_SEA_PICKLE:
-			// TODO: case E_BLOCK_KELP:
-			// TODO: case E_BLOCK_BAMBOO:
+				// TODO: case E_BLOCK_SWEET_BERRY_BUSH:
+				// TODO: case E_BLOCK_SEA_PICKLE:
+				// TODO: case E_BLOCK_KELP:
+				// TODO: case E_BLOCK_BAMBOO:
 		}  // switch (blockType)
 		return false;
 	}
@@ -284,13 +289,17 @@ public:
 					case 0: a_World.SetBlock(a_Position, E_BLOCK_DANDELION, 0); break;
 					case 1: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_POPPY); break;
 					case 2: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_ALLIUM); break;
-					case 3: a_World.SetBlock(a_Position, E_BLOCK_RED_ROSE, 0); break;  // was renamed to Azure Bluet later
+					case 3:
+						a_World.SetBlock(a_Position, E_BLOCK_RED_ROSE, 0);
+						break;  // was renamed to Azure Bluet later
 					case 4: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_RED_TULIP); break;
 					case 5: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_PINK_TULIP); break;
 					case 6: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_WHITE_TULIP); break;
 					case 7: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_ORANGE_TULIP); break;
-					case 8: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_OXEYE_DAISY); break;
-					// TODO: Add cornflower
+					case 8:
+						a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_OXEYE_DAISY);
+						break;
+						// TODO: Add cornflower
 				}
 				break;
 			}
@@ -307,13 +316,17 @@ public:
 					case 0: a_World.SetBlock(a_Position, E_BLOCK_DANDELION, 0); break;
 					case 1: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_POPPY); break;
 					case 2: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_ALLIUM); break;
-					case 3: a_World.SetBlock(a_Position, E_BLOCK_RED_ROSE, 0); break;  // was renamed to Azure Bluet later
+					case 3:
+						a_World.SetBlock(a_Position, E_BLOCK_RED_ROSE, 0);
+						break;  // was renamed to Azure Bluet later
 					case 4: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_RED_TULIP); break;
 					case 5: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_PINK_TULIP); break;
 					case 6: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_WHITE_TULIP); break;
 					case 7: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_ORANGE_TULIP); break;
-					case 8: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_OXEYE_DAISY); break;
-					// TODO: Add cornflower, lily of the valley
+					case 8:
+						a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_OXEYE_DAISY);
+						break;
+						// TODO: Add cornflower, lily of the valley
 				}
 				break;
 			}
@@ -342,30 +355,26 @@ public:
 		}
 	}
 
-	/** Walks adjacent grass blocks up to 7 taxicab distance away from a_Position and calls the Planter function on the first suitable one found.
-	Does nothing if no position suitable for growing was found. */
-	template <auto Planter>
-	static void FindAdjacentGrassAnd(cWorld & a_World, const Vector3i a_Position)
+	/** Walks adjacent grass blocks up to 7 taxicab distance away from a_Position and calls the Planter function on the
+	first suitable one found. Does nothing if no position suitable for growing was found. */
+	template <auto Planter> static void FindAdjacentGrassAnd(cWorld & a_World, const Vector3i a_Position)
 	{
 		auto & Random = GetRandomProvider();
 		auto Position = a_Position;
 
 		// Maximum 7 taxicab distance away from centre:
-		for (
-			int Tries = 0;
-			Tries != 8;
-			Tries++,
+		for (int Tries = 0; Tries != 8;
+			 Tries++,
 
-			// Get the adjacent block to visit this iteration:
-			Position += Vector3i(
-				Random.RandInt(-1, 1),
-				Random.RandInt(-1, 1) * (Random.RandInt(2) / 2),  // Y offset, with discouragement to values that aren't zero
-				Random.RandInt(-1, 1)
-			)
-		)
+				 // Get the adjacent block to visit this iteration:
+			 Position += Vector3i(
+				 Random.RandInt(-1, 1),
+				 Random.RandInt(-1, 1) *
+					 (Random.RandInt(2) / 2),  // Y offset, with discouragement to values that aren't zero
+				 Random.RandInt(-1, 1)
+			 ))
 		{
-			if (
-				!cChunkDef::IsValidHeight(Position) ||
+			if (!cChunkDef::IsValidHeight(Position) ||
 				(a_World.GetBlock(Position) != E_BLOCK_GRASS)  // Are we looking at grass?
 			)
 			{
@@ -395,8 +404,4 @@ public:
 			return;
 		}
 	}
-} ;
-
-
-
-
+};

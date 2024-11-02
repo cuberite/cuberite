@@ -8,17 +8,14 @@
 
 
 /** Handler for huge mushroom blocks. */
-class cBlockHugeMushroomHandler final :
-	public cBlockHandler
+class cBlockHugeMushroomHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		if (ToolHasSilkTouch(a_Tool))
@@ -31,7 +28,8 @@ private:
 			return cItem();
 		}
 
-		const auto MushroomType = (m_BlockType == E_BLOCK_HUGE_BROWN_MUSHROOM) ? E_BLOCK_BROWN_MUSHROOM : E_BLOCK_RED_MUSHROOM;
+		const auto MushroomType =
+			(m_BlockType == E_BLOCK_HUGE_BROWN_MUSHROOM) ? E_BLOCK_BROWN_MUSHROOM : E_BLOCK_RED_MUSHROOM;
 		const auto DropNum = GetRandomProvider().RandInt<char>(2);
 
 		return cItem(MushroomType, DropNum);
@@ -46,8 +44,4 @@ private:
 		UNUSED(a_Meta);
 		return (m_BlockType == E_BLOCK_HUGE_BROWN_MUSHROOM) ? 10 : 28;
 	}
-} ;
-
-
-
-
+};

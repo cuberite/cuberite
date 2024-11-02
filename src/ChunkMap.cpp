@@ -39,10 +39,7 @@ cChunkMap::cChunkMap(cWorld * a_World) :
 cChunk & cChunkMap::ConstructChunk(int a_ChunkX, int a_ChunkZ)
 {
 	// If not exists insert. Then, return the chunk at these coordinates:
-	return m_Chunks.try_emplace(
-		{ a_ChunkX, a_ChunkZ },
-		a_ChunkX, a_ChunkZ, this, m_World
-	).first->second;
+	return m_Chunks.try_emplace({a_ChunkX, a_ChunkZ}, a_ChunkX, a_ChunkZ, this, m_World).first->second;
 }
 
 
@@ -51,7 +48,8 @@ cChunk & cChunkMap::ConstructChunk(int a_ChunkX, int a_ChunkZ)
 
 cChunk & cChunkMap::GetChunk(int a_ChunkX, int a_ChunkZ)
 {
-	ASSERT(m_CSChunks.IsLockedByCurrentThread());  // m_CSChunks should already be locked by the operation that called us
+	ASSERT(m_CSChunks.IsLockedByCurrentThread()
+	);  // m_CSChunks should already be locked by the operation that called us
 
 	auto & Chunk = ConstructChunk(a_ChunkX, a_ChunkZ);
 	if (!Chunk.IsValid() && !Chunk.IsQueued())
@@ -70,7 +68,7 @@ cChunk * cChunkMap::FindChunk(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_CSChunks.IsLockedByCurrentThread());
 
-	const auto Chunk = m_Chunks.find({ a_ChunkX, a_ChunkZ });
+	const auto Chunk = m_Chunks.find({a_ChunkX, a_ChunkZ});
 	return (Chunk == m_Chunks.end()) ? nullptr : &Chunk->second;
 }
 
@@ -82,7 +80,7 @@ const cChunk * cChunkMap::FindChunk(int a_ChunkX, int a_ChunkZ) const
 {
 	ASSERT(m_CSChunks.IsLockedByCurrentThread());
 
-	const auto Chunk = m_Chunks.find({ a_ChunkX, a_ChunkZ });
+	const auto Chunk = m_Chunks.find({a_ChunkX, a_ChunkZ});
 	return (Chunk == m_Chunks.end()) ? nullptr : &Chunk->second;
 }
 
@@ -197,7 +195,7 @@ void cChunkMap::MarkChunkSaving(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cChunkMap::MarkChunkSaved (int a_ChunkX, int a_ChunkZ)
+void cChunkMap::MarkChunkSaved(int a_ChunkX, int a_ChunkZ)
 {
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk = FindChunk(a_ChunkX, a_ChunkZ);
@@ -228,7 +226,8 @@ void cChunkMap::SetChunkData(struct SetChunkData && a_SetChunkData)
 		{
 			if ((*itr)->ChunkAvailable(ChunkX, ChunkZ))
 			{
-				// The chunkstay wants to be disabled, add it to a list of to-be-disabled chunkstays for later processing:
+				// The chunkstay wants to be disabled, add it to a list of to-be-disabled chunkstays for later
+				// processing:
 				ToBeDisabled.push_back(*itr);
 			}
 		}  // for itr - m_ChunkStays[]
@@ -249,7 +248,8 @@ void cChunkMap::SetChunkData(struct SetChunkData && a_SetChunkData)
 
 
 void cChunkMap::ChunkLighted(
-	int a_ChunkX, int a_ChunkZ,
+	int a_ChunkX,
+	int a_ChunkZ,
 	const cChunkDef::BlockNibbles & a_BlockLight,
 	const cChunkDef::BlockNibbles & a_SkyLight
 )
@@ -380,7 +380,7 @@ bool cChunkMap::HasChunkAnyClients(int a_ChunkX, int a_ChunkZ) const
 
 
 
-int  cChunkMap::GetHeight(int a_BlockX, int a_BlockZ)
+int cChunkMap::GetHeight(int a_BlockX, int a_BlockZ)
 {
 	for (;;)
 	{
@@ -446,26 +446,29 @@ void cChunkMap::CollectPickupsByEntity(cEntity & a_Entity)
 	auto BoundingBox = a_Entity.GetBoundingBox();
 	BoundingBox.Expand(1, 0.5, 1);
 
-	ForEachEntityInBox(BoundingBox, [&a_Entity](cEntity & Entity)
-	{
-		// Only pickups and projectiles can be picked up:
-		if (Entity.IsPickup())
+	ForEachEntityInBox(
+		BoundingBox,
+		[&a_Entity](cEntity & Entity)
 		{
-			/*
-			LOG("Pickup %d being collected by player \"%s\", distance %f",
-				(*itr)->GetUniqueID(), a_Player->GetName().c_str(), SqrDist
-			);
-			*/
-			static_cast<cPickup &>(Entity).CollectedBy(a_Entity);
-		}
-		else if (Entity.IsProjectile() && a_Entity.IsPlayer())
-		{
-			static_cast<cProjectileEntity &>(Entity).CollectedBy(static_cast<cPlayer&>(a_Entity));
-		}
+			// Only pickups and projectiles can be picked up:
+			if (Entity.IsPickup())
+			{
+				/*
+				LOG("Pickup %d being collected by player \"%s\", distance %f",
+					(*itr)->GetUniqueID(), a_Player->GetName().c_str(), SqrDist
+				);
+				*/
+				static_cast<cPickup &>(Entity).CollectedBy(a_Entity);
+			}
+			else if (Entity.IsProjectile() && a_Entity.IsPlayer())
+			{
+				static_cast<cProjectileEntity &>(Entity).CollectedBy(static_cast<cPlayer &>(a_Entity));
+			}
 
-		// The entities will MarkDirty when they Destroy themselves
-		return false;
-	});
+			// The entities will MarkDirty when they Destroy themselves
+			return false;
+		}
+	);
 }
 
 
@@ -602,7 +605,13 @@ bool cChunkMap::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, N
 
 
 
-bool cChunkMap::GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const
+bool cChunkMap::GetBlockInfo(
+	Vector3i a_BlockPos,
+	BLOCKTYPE & a_BlockType,
+	NIBBLETYPE & a_Meta,
+	NIBBLETYPE & a_SkyLight,
+	NIBBLETYPE & a_BlockLight
+) const
 {
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto relPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
@@ -635,20 +644,20 @@ void cChunkMap::ReplaceTreeBlocks(const sSetBlockVector & a_Blocks)
 		Vector3i relPos(itr->m_RelX, itr->m_RelY, itr->m_RelZ);
 		switch (Chunk->GetBlock(relPos))
 		{
-			CASE_TREE_OVERWRITTEN_BLOCKS:
+		CASE_TREE_OVERWRITTEN_BLOCKS:
+		{
+			Chunk->SetBlock(relPos, itr->m_BlockType, itr->m_BlockMeta);
+			break;
+		}
+		case E_BLOCK_LEAVES:
+		case E_BLOCK_NEW_LEAVES:
+		{
+			if ((itr->m_BlockType == E_BLOCK_LOG) || (itr->m_BlockType == E_BLOCK_NEW_LOG))
 			{
 				Chunk->SetBlock(relPos, itr->m_BlockType, itr->m_BlockMeta);
-				break;
 			}
-			case E_BLOCK_LEAVES:
-			case E_BLOCK_NEW_LEAVES:
-			{
-				if ((itr->m_BlockType == E_BLOCK_LOG) || (itr->m_BlockType == E_BLOCK_NEW_LOG))
-				{
-					Chunk->SetBlock(relPos, itr->m_BlockType, itr->m_BlockMeta);
-				}
-				break;
-			}
+			break;
+		}
 		}
 	}  // for itr - a_Blocks[]
 }
@@ -819,7 +828,13 @@ void cChunkMap::SendBlockTo(int a_X, int a_Y, int a_Z, const cPlayer & a_Player)
 
 
 
-void cChunkMap::CompareChunkClients(int a_ChunkX1, int a_ChunkZ1, int a_ChunkX2, int a_ChunkZ2, cClientDiffCallback & a_Callback)
+void cChunkMap::CompareChunkClients(
+	int a_ChunkX1,
+	int a_ChunkZ1,
+	int a_ChunkX2,
+	int a_ChunkZ2,
+	cClientDiffCallback & a_Callback
+)
 {
 	cCSLock Lock(m_CSChunks);
 	const auto Chunk1 = FindChunk(a_ChunkX1, a_ChunkZ1);
@@ -910,8 +925,12 @@ void cChunkMap::AddEntity(OwnedEntity a_Entity)
 	cCSLock Lock(m_CSChunks);
 	if (FindChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ()) == nullptr)
 	{
-		LOGWARNING("%s: Entity at %p (%s, ID %d) spawning in a non-existent chunk.",
-			__FUNCTION__, static_cast<void *>(a_Entity.get()), a_Entity->GetClass(), a_Entity->GetUniqueID()
+		LOGWARNING(
+			"%s: Entity at %p (%s, ID %d) spawning in a non-existent chunk.",
+			__FUNCTION__,
+			static_cast<void *>(a_Entity.get()),
+			a_Entity->GetClass(),
+			a_Entity->GetUniqueID()
 		);
 	}
 
@@ -935,7 +954,8 @@ void cChunkMap::AddEntity(OwnedEntity a_Entity)
 void cChunkMap::AddPlayer(std::unique_ptr<cPlayer> a_Player)
 {
 	cCSLock Lock(m_CSChunks);
-	auto & Chunk = ConstructChunk(a_Player->GetChunkX(), a_Player->GetChunkZ());  // Always construct the chunk for players
+	auto & Chunk =
+		ConstructChunk(a_Player->GetChunkX(), a_Player->GetChunkZ());  // Always construct the chunk for players
 	ASSERT(!Chunk.HasEntity(a_Player->GetUniqueID()));
 	Chunk.AddEntity(std::move(a_Player));
 }
@@ -1164,7 +1184,13 @@ bool cChunkMap::IsChunkLighted(int a_ChunkX, int a_ChunkZ)
 
 
 
-bool cChunkMap::ForEachChunkInRect(int a_MinChunkX, int a_MaxChunkX, int a_MinChunkZ, int a_MaxChunkZ, cChunkDataCallback & a_Callback)
+bool cChunkMap::ForEachChunkInRect(
+	int a_MinChunkX,
+	int a_MaxChunkX,
+	int a_MinChunkZ,
+	int a_MaxChunkZ,
+	cChunkDataCallback & a_Callback
+)
 {
 	bool Result = true;
 	cCSLock Lock(m_CSChunks);
@@ -1386,9 +1412,9 @@ void cChunkMap::UnloadUnusedChunks(void)
 	cCSLock Lock(m_CSChunks);
 	for (auto itr = m_Chunks.begin(); itr != m_Chunks.end();)
 	{
-		if (
-			itr->second.CanUnload() &&  // Can unload
-			!cPluginManager::Get()->CallHookChunkUnloading(*GetWorld(), itr->first.m_ChunkX, itr->first.m_ChunkZ)  // Plugins agree
+		if (itr->second.CanUnload() &&  // Can unload
+			!cPluginManager::Get()
+				 ->CallHookChunkUnloading(*GetWorld(), itr->first.m_ChunkX, itr->first.m_ChunkZ)  // Plugins agree
 		)
 		{
 			// First notify plugins:
@@ -1497,7 +1523,9 @@ void cChunkMap::AddChunkStay(cChunkStay & a_ChunkStay)
 	cCSLock Lock(m_CSChunks);
 
 	// Add it to the list:
-	ASSERT(std::find(m_ChunkStays.begin(), m_ChunkStays.end(), &a_ChunkStay) == m_ChunkStays.end());  // Has not yet been added
+	ASSERT(
+		std::find(m_ChunkStays.begin(), m_ChunkStays.end(), &a_ChunkStay) == m_ChunkStays.end()
+	);  // Has not yet been added
 	m_ChunkStays.push_back(&a_ChunkStay);
 
 	// Schedule all chunks to be loaded / generated, and mark each as locked:

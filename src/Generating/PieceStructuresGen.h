@@ -21,13 +21,11 @@ cPieceGenerator instance.
 
 
 
-class cPieceStructuresGen:
-	public cFinishGen
+class cPieceStructuresGen : public cFinishGen
 {
 	using Super = cFinishGen;
 
-public:
-
+  public:
 	cPieceStructuresGen(int a_Seed);
 
 	/** Initializes the generator based on the specified prefab sets.
@@ -39,7 +37,7 @@ public:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-protected:
+  protected:
 	/** The generator doing the work for a single prefab set.
 	Forward-declared so that its implementation changes don't affect the header. */
 	class cGen;

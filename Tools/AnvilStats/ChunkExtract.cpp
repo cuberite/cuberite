@@ -1,7 +1,8 @@
 
 // ChunkExtract.cpp
 
-// Implements the cChunkExtract class representing a cCallback descendant that extracts raw chunk data into separate .chunk files
+// Implements the cChunkExtract class representing a cCallback descendant that extracts raw chunk data into separate
+// .chunk files
 
 #include "Globals.h"
 #include "ChunkExtract.h"
@@ -47,7 +48,10 @@ bool cChunkExtract::OnCompressedDataSizePos(int a_CompressedDataSize, int a_Data
 	AString ChunkPath = Printf("%d.%d.zchunk", mCurChunkX, mCurChunkZ);
 	if (!ChunkFile.Open(ChunkPath, cFile::fmWrite))
 	{
-		LOG("Cannot open zchunk file \"%s\" for writing. Chunk [%d, %d] skipped.", ChunkPath.c_str(), mCurChunkX, mCurChunkZ);
+		LOG("Cannot open zchunk file \"%s\" for writing. Chunk [%d, %d] skipped.",
+			ChunkPath.c_str(),
+			mCurChunkX,
+			mCurChunkZ);
 		return false;
 	}
 
@@ -56,11 +60,12 @@ bool cChunkExtract::OnCompressedDataSizePos(int a_CompressedDataSize, int a_Data
 	for (int BytesToCopy = a_CompressedDataSize; BytesToCopy > 0;)
 	{
 		char Buffer[64000];
-		int NumBytes = std::min(BytesToCopy, (int)sizeof(Buffer));
+		int NumBytes = std::min(BytesToCopy, (int) sizeof(Buffer));
 		int BytesRead = mAnvilFile.Read(Buffer, NumBytes);
 		if (BytesRead != NumBytes)
 		{
-			LOG("Cannot copy chunk data, chunk [%d, %d] is probably corrupted. Skipping chunk.", mCurChunkX, mCurChunkZ);
+			LOG("Cannot copy chunk data, chunk [%d, %d] is probably corrupted. Skipping chunk.", mCurChunkX, mCurChunkZ
+			);
 			return false;
 		}
 		ChunkFile.Write(Buffer, BytesRead);
@@ -80,7 +85,10 @@ bool cChunkExtract::OnDecompressedData(const char * a_DecompressedNBT, int a_Dat
 	cGZipFile GZipChunk;
 	if (!GZipChunk.Open(FileName, cGZipFile::fmWrite))
 	{
-		LOG("Cannot open gzchunk file \"%s\" for writing. Chunk [%d, %d] skipped.", FileName.c_str(), mCurChunkX, mCurChunkZ);
+		LOG("Cannot open gzchunk file \"%s\" for writing. Chunk [%d, %d] skipped.",
+			FileName.c_str(),
+			mCurChunkX,
+			mCurChunkZ);
 		return true;
 	}
 	GZipChunk.Write(a_DecompressedNBT, a_DataSize);

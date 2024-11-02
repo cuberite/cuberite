@@ -18,7 +18,7 @@
 /** Calculates a SHA1 checksum for data stream */
 class cSha1Checksum
 {
-public:
+  public:
 	typedef Byte Checksum[20];  // The type used for storing the checksum
 
 	cSha1Checksum(void);
@@ -43,13 +43,9 @@ public:
 	/** Clears the current context and start a new checksum calculation */
 	void Restart(void);
 
-protected:
+  protected:
 	/** True if the object is accepts more input data, false if Finalize()-d (need to Restart()) */
 	bool m_DoesAcceptInput;
 
 	mbedtls_sha1_context m_Sha1;
-} ;
-
-
-
-
+};

@@ -7,29 +7,36 @@
 
 
 
-class cBlockSpongeHandler final :
-	public cBlockHandler
+class cBlockSpongeHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual void OnPlaced(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
+		BLOCKTYPE a_BlockType,
+		NIBBLETYPE a_BlockMeta
 	) const override
 	{
 		OnNeighborChanged(a_ChunkInterface, a_BlockPos, BLOCK_FACE_NONE);
 	}
 
-	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor)
+		const override
 	{
-		a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk) { CheckSoaked(cChunkDef::AbsoluteToRelative(a_BlockPos), a_Chunk); return true; });
+		a_ChunkInterface.DoWithChunkAt(
+			a_BlockPos,
+			[&](cChunk & a_Chunk)
+			{
+				CheckSoaked(cChunkDef::AbsoluteToRelative(a_BlockPos), a_Chunk);
+				return true;
+			}
+		);
 	}
 
 	/** Check blocks around the sponge to see if they are water.
@@ -56,10 +63,11 @@ private:
 		}
 
 		const auto & WaterCheck = cSimulator::AdjacentOffsets;
-		const bool ShouldSoak = std::any_of(WaterCheck.cbegin(), WaterCheck.cend(), [a_Rel, &a_Chunk](Vector3i a_Offset)
-		{
-			return IsWet(a_Rel + a_Offset, a_Chunk);
-		});
+		const bool ShouldSoak = std::any_of(
+			WaterCheck.cbegin(),
+			WaterCheck.cend(),
+			[a_Rel, &a_Chunk](Vector3i a_Offset) { return IsWet(a_Rel + a_Offset, a_Chunk); }
+		);
 
 		// Early return if the sponge isn't touching any water.
 		if (!ShouldSoak)
@@ -113,7 +121,7 @@ private:
 	{
 		// TODO: support detecting waterlogged blocks.
 		BLOCKTYPE Type;
-		return(a_Chunk.UnboundedRelGetBlockType(a_Rel.x, a_Rel.y, a_Rel.z, Type) && IsBlockWater(Type));
+		return (a_Chunk.UnboundedRelGetBlockType(a_Rel.x, a_Rel.y, a_Rel.z, Type) && IsBlockWater(Type));
 	}
 
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override

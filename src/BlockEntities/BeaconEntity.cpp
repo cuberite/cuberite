@@ -12,7 +12,7 @@
 
 
 
-cBeaconEntity::cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+cBeaconEntity::cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) :
 	Super(a_BlockType, a_BlockMeta, a_Pos, 1, 1, a_World),
 	m_IsActive(false),
 	m_BeaconLevel(0),
@@ -36,13 +36,7 @@ char cBeaconEntity::CalculatePyramidLevel(void)
 	int MinY = std::max(GetPosY() - 4, 0);
 	int MaxY = std::max(GetPosY() - 1, 0);
 
-	Area.Read(
-		*m_World,
-		GetPosX() - 4, GetPosX() + 4,
-		MinY, MaxY,
-		GetPosZ() - 4, GetPosZ() + 4,
-		cBlockArea::baTypes
-	);
+	Area.Read(*m_World, GetPosX() - 4, GetPosX() + 4, MinY, MaxY, GetPosZ() - 4, GetPosZ() + 4, cBlockArea::baTypes);
 
 	int Layer = 1;
 	int MiddleXZ = 4;
@@ -197,14 +191,11 @@ void cBeaconEntity::UpdateBeacon(void)
 		}
 
 		Vector3d BeaconPosition(m_Pos);
-		GetWorld()->ForEachPlayer([=](cPlayer & a_Player)
+		GetWorld()->ForEachPlayer(
+			[=](cPlayer & a_Player)
 			{
 				Vector3d Distance = BeaconPosition - a_Player.GetPosition();
-				if (
-					(std::abs(Distance.y) <= 14) &&
-					(std::abs(Distance.x) <= 20) &&
-					(std::abs(Distance.z) <= 20)
-				)
+				if ((std::abs(Distance.y) <= 14) && (std::abs(Distance.x) <= 20) && (std::abs(Distance.z) <= 20))
 				{
 					a_Player.AwardAchievement(CustomStatistic::AchFullBeacon);
 				}
@@ -235,21 +226,24 @@ void cBeaconEntity::GiveEffects(void)
 	bool HasSecondaryEffect = (m_BeaconLevel >= 4) && (m_PrimaryEffect != m_SecondaryEffect) && (m_SecondaryEffect > 0);
 
 	auto Area = cBoundingBox(m_Pos, Radius, Radius + static_cast<double>(cChunkDef::Height), -Radius);
-	GetWorld()->ForEachEntityInBox(Area, [&](cEntity & a_Entity)
-	{
-		if (!a_Entity.IsPlayer())
+	GetWorld()->ForEachEntityInBox(
+		Area,
+		[&](cEntity & a_Entity)
 		{
+			if (!a_Entity.IsPlayer())
+			{
+				return false;
+			}
+			auto & Player = static_cast<cPlayer &>(a_Entity);
+			Player.AddEntityEffect(m_PrimaryEffect, 180, EffectLevel);
+
+			if (HasSecondaryEffect)
+			{
+				Player.AddEntityEffect(m_SecondaryEffect, 180, 0);
+			}
 			return false;
 		}
-		auto & Player = static_cast<cPlayer &>(a_Entity);
-		Player.AddEntityEffect(m_PrimaryEffect, 180, EffectLevel);
-
-		if (HasSecondaryEffect)
-		{
-			Player.AddEntityEffect(m_SecondaryEffect, 180, 0);
-		}
-		return false;
-	});
+	);
 }
 
 
@@ -325,7 +319,8 @@ bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 	if (Window != nullptr)
 	{
 		// if (a_Player->GetWindow() != Window)
-		// -> Because mojang doesn't send a 'close window' packet when you click the cancel button in the beacon inventory ...
+		// -> Because mojang doesn't send a 'close window' packet when you click the cancel button in the beacon
+		// inventory ...
 		{
 			a_Player->OpenWindow(*Window);
 		}

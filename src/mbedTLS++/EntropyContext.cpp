@@ -23,7 +23,3 @@ cEntropyContext::~cEntropyContext()
 {
 	mbedtls_entropy_free(&m_Entropy);
 }
-
-
-
-

@@ -10,26 +10,32 @@ class cEntity;
 // as the behaviour and even life of mobs depends on the distance to closest player
 class cMobProximityCounter
 {
-protected :
+  protected:
 	// structs used for later maps (see m_MonsterToDistance and m_DistanceToMonster)
 	struct sDistanceAndChunk
 	{
-		sDistanceAndChunk(double a_Distance, cChunk & a_Chunk) : m_Distance(a_Distance), m_Chunk(&a_Chunk) {}
+		sDistanceAndChunk(double a_Distance, cChunk & a_Chunk) :
+			m_Distance(a_Distance), m_Chunk(&a_Chunk)
+		{
+		}
 		double m_Distance;
 		cChunk * m_Chunk;
 	};
 	struct sMonsterAndChunk
 	{
-		sMonsterAndChunk(cEntity & a_Monster, cChunk & a_Chunk) : m_Monster(a_Monster), m_Chunk(a_Chunk) {}
+		sMonsterAndChunk(cEntity & a_Monster, cChunk & a_Chunk) :
+			m_Monster(a_Monster), m_Chunk(a_Chunk)
+		{
+		}
 		cEntity & m_Monster;
 		cChunk & m_Chunk;
 	};
 
-public :
+  public:
 	typedef std::map<cEntity *, sDistanceAndChunk> tMonsterToDistance;
 	typedef std::multimap<double, sMonsterAndChunk> tDistanceToMonster;
 
-protected :
+  protected:
 	// this map is filled during collection phase, it will be later transformed into DistanceToMonster
 	tMonsterToDistance m_MonsterToDistance;
 
@@ -37,14 +43,14 @@ protected :
 	tDistanceToMonster m_DistanceToMonster;
 
 	// this are the collected chunks. Used to determinate the number of elligible chunk for spawning.
-	std::set<cChunk*> m_EligibleForSpawnChunks;
+	std::set<cChunk *> m_EligibleForSpawnChunks;
 
-protected :
+  protected:
 	// transform monsterToDistance map (that was usefull for collecting) into distanceToMonster
 	// that will be usefull for picking up.
 	void convertMaps();
 
-public :
+  public:
 	// count a mob on a specified chunk with specified distance to an unkown player
 	// if the distance is shortest than the one collected, this become the new closest
 	// distance and the chunk become the "hosting" chunk (that is the one that will perform the action)
@@ -60,5 +66,4 @@ public :
 		int m_Count;
 	};
 	sIterablePair getMobWithinThosesDistances(double a_DistanceMin, double a_DistanceMax);
-
 };

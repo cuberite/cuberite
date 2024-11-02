@@ -14,7 +14,7 @@
 
 
 
-cChestEntity::cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+cChestEntity::cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) :
 	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_NumActivePlayers(0),
 	m_Neighbour(nullptr)
@@ -33,10 +33,7 @@ cChestEntity & cChestEntity::GetPrimaryChest()
 	}
 
 	// The primary chest should be the one with lesser X or Z coord:
-	return (
-		(m_Neighbour->GetPosX() < GetPosX()) ||
-		(m_Neighbour->GetPosZ() < GetPosZ())
-	) ? *m_Neighbour : *this;
+	return ((m_Neighbour->GetPosX() < GetPosX()) || (m_Neighbour->GetPosZ() < GetPosZ())) ? *m_Neighbour : *this;
 }
 
 
@@ -96,10 +93,8 @@ bool cChestEntity::IsBlocked()
 {
 	return (
 		(GetPosY() < cChunkDef::Height - 1) &&
-		(
-			!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPos().addedY(1))) ||
-			!cOcelot::IsCatSittingOnBlock(GetWorld(), Vector3d(GetPos()))
-		)
+		(!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPos().addedY(1))) ||
+		 !cOcelot::IsCatSittingOnBlock(GetWorld(), Vector3d(GetPos())))
 	);
 }
 
@@ -146,17 +141,14 @@ void cChestEntity::OnAddToWorld(cWorld & a_World, cChunk & a_Chunk)
 	Super::OnAddToWorld(a_World, a_Chunk);
 
 	// Scan horizontally adjacent blocks for any neighbouring chest of the same type:
-	if (
-		const auto Position = GetRelPos();
+	if (const auto Position = GetRelPos();
 
-		ScanNeighbour(a_Chunk, Position.addedX(-1)) ||
-		ScanNeighbour(a_Chunk, Position.addedX(+1)) ||
-		ScanNeighbour(a_Chunk, Position.addedZ(-1)) ||
-		ScanNeighbour(a_Chunk, Position.addedZ(+1))
-	)
+		ScanNeighbour(a_Chunk, Position.addedX(-1)) || ScanNeighbour(a_Chunk, Position.addedX(+1)) ||
+		ScanNeighbour(a_Chunk, Position.addedZ(-1)) || ScanNeighbour(a_Chunk, Position.addedZ(+1)))
 	{
 		m_Neighbour->m_Neighbour = this;
-		m_Neighbour->DestroyWindow();  // Force neighbour's window shut. Does Mojang server do this or should a double window open?
+		m_Neighbour->DestroyWindow(
+		);  // Force neighbour's window shut. Does Mojang server do this or should a double window open?
 	}
 }
 

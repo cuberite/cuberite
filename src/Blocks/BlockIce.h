@@ -7,17 +7,14 @@
 
 
 
-class cBlockIceHandler final :
-	public cBlockHandler
+class cBlockIceHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Only drop self when using silk-touch:
@@ -45,13 +42,8 @@ private:
 		}
 
 		// Artificial light on any of the surrounding block > 11 leads to melting the ice.
-		static const std::array<Vector3i, 7> Adjacents
-		{
-			{
-				{ 1, 0, 0 }, { -1, 0, 0 },
-				{ 0, 1, 0 }, { 0, -1, 0 },
-				{ 0, 0, 1 }, { 0, 0, -1 }
-			}
+		static const std::array<Vector3i, 7> Adjacents {
+			{{1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}, {0, 0, 1}, {0, 0, -1}}
 		};
 
 		for (const auto & Offset : Adjacents)
@@ -79,9 +71,11 @@ private:
 	}
 
 	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BLOCKTYPE a_OldBlockType,
+		NIBBLETYPE a_OldBlockMeta,
 		const cEntity * a_Digger
 	) const override
 	{
@@ -108,4 +102,4 @@ private:
 		UNUSED(a_Meta);
 		return 5;
 	}
-} ;
+};

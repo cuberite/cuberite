@@ -8,17 +8,14 @@
 
 
 
-class cItemSoupHandler final:
-	public cItemFoodHandler
+class cItemSoupHandler final : public cItemFoodHandler
 {
 	using Super = cItemFoodHandler;
 
-public:
-
-	constexpr cItemSoupHandler(int a_ItemType, FoodInfo a_FoodInfo):
+  public:
+	constexpr cItemSoupHandler(int a_ItemType, FoodInfo a_FoodInfo) :
 		Super(a_ItemType, a_FoodInfo)
 	{
-
 	}
 
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) const override
@@ -36,5 +33,4 @@ public:
 
 		return true;
 	}
-
 };

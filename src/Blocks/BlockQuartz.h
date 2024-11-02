@@ -7,20 +7,17 @@
 
 
 
-class cBlockQuartzHandler final :
-	public cBlockHandler
+class cBlockQuartzHandler final : public cBlockHandler
 {
 	using Super = cBlockHandler;
 
-public:
-
+  public:
 	using Super::Super;
 
-private:
-
+  private:
 	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 8;
 	}
-} ;
+};

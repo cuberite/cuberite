@@ -28,26 +28,26 @@ Usage:
 
 class cProbabDistrib
 {
-public:
+  public:
 	class cPoint
 	{
-	public:
+	  public:
 		int m_Value;
 		int m_Probability;
 
 		cPoint(int a_Value, int a_Probability) :
-			m_Value(a_Value),
-			m_Probability(a_Probability)
+			m_Value(a_Value), m_Probability(a_Probability)
 		{
 		}
-	} ;
+	};
 
 	typedef std::vector<cPoint> cPoints;
 
 
 	cProbabDistrib(int a_MaxValue);
 
-	/** Sets the distribution curve using an array of [value, probability] points, linearly interpolated. a_Points must not be empty. */
+	/** Sets the distribution curve using an array of [value, probability] points, linearly interpolated. a_Points must
+	 * not be empty. */
 	void SetPoints(const cPoints & a_Points);
 
 	/** Sets the distribution curve using a definition string; returns true on successful parse */
@@ -61,8 +61,7 @@ public:
 
 	int GetSum(void) const { return m_Sum; }
 
-protected:
-
+  protected:
 	int m_MaxValue;
 
 	/** Cumulative probability of the values, sorted, for fast bsearch lookup */
@@ -70,8 +69,4 @@ protected:
 
 	/** Sum of all the probabilities across all values in the domain; -1 if not set */
 	int m_Sum;
-} ;
-
-
-
-
+};
