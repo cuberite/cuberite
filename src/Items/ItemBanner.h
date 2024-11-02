@@ -7,7 +7,7 @@
 #include "../BlockEntities/BannerEntity.h"
 #include "../Blocks/ChunkInterface.h"
 #include "../Blocks/BlockHandler.h"
-#include "../Blocks/BlockBanner.h"
+#include "../Blocks/BlockStandingBanner.h"
 
 
 
@@ -42,7 +42,7 @@ private:
 
 		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_HeldItem](cBlockEntity & BlockToPlaceEntity)
 		{
-			ASSERT(cBlockBannerHandler::IsBlockBanner(BlockToPlaceEntity.GetBlock()));
+			ASSERT(cBlockStandingBannerHandler::IsBlockBanner(BlockToPlaceEntity.GetBlock()));
 
 			static_cast<cBannerEntity &>(BlockToPlaceEntity).SetBaseColor(static_cast<unsigned char>(a_HeldItem.m_ItemDamage));
 			return false;
