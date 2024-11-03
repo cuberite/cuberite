@@ -113,7 +113,7 @@ UInt32 cProtocol_1_18::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktSpawnPosition:        return 0x4B;
 			//  scoreboard display 0x4C
 		case cProtocol::pktEntityMeta:           return 0x4D;
-			// entity attach 0x4E
+		case cProtocol::pktLeashEntity:          return 0x4E;
 		case cProtocol::pktEntityVelocity:       return 0x4F;
 		case cProtocol::pktEntityEquipment:      return 0x50;
 		case cProtocol::pktExperience:           return 0x51;

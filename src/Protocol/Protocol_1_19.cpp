@@ -115,7 +115,7 @@ UInt32 cProtocol_1_19::GetPacketID(ePacketType a_PacketType) const
 			//  ChatPreviewStateChangeS2CPacket 0x4B
 			//  scoreboard display 0x4C
 		case cProtocol::pktEntityMeta:           return 0x4D;
-			// entity attach 0x4E
+		case cProtocol::pktLeashEntity:          return 0x4E;
 		case cProtocol::pktEntityVelocity:       return 0x4F;
 		case cProtocol::pktEntityEquipment:      return 0x50;
 		case cProtocol::pktExperience:           return 0x51;
@@ -1495,7 +1495,7 @@ UInt32 cProtocol_1_19_1::GetPacketID(ePacketType a_PacketType) const
 			//  ChatPreviewStateChangeS2CPacket 0x4E
 			//  scoreboard display 0x4F
 		case cProtocol::pktEntityMeta:           return 0x50;
-			// entity attach 0x51
+		case cProtocol::pktLeashEntity:          return 0x51;
 		case cProtocol::pktEntityVelocity:       return 0x52;
 		case cProtocol::pktEntityEquipment:      return 0x53;
 		case cProtocol::pktExperience:           return 0x54;
@@ -1939,7 +1939,7 @@ UInt32 cProtocol_1_19_3::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktSpawnPosition:        return 0x4C;
 			//  scoreboard display 0x4D
 		case cProtocol::pktEntityMeta:           return 0x4E;
-			// entity attach 0x4F
+		case cProtocol::pktLeashEntity:          return 0x4F;
 		case cProtocol::pktEntityVelocity:       return 0x50;
 		case cProtocol::pktEntityEquipment:      return 0x51;
 		case cProtocol::pktExperience:           return 0x52;
@@ -2701,7 +2701,7 @@ UInt32 cProtocol_1_19_4::GetPacketID(ePacketType a_PacketType) const
         case cProtocol::pktSpawnPosition:        return 0x50;
                 //  scoreboard display 0x51
         case cProtocol::pktEntityMeta:           return 0x52;
-                // entity attach 0x53
+        case cProtocol::pktLeashEntity:          return 0x53;
         case cProtocol::pktEntityVelocity:       return 0x54;
         case cProtocol::pktEntityEquipment:      return 0x55;
         case cProtocol::pktExperience:           return 0x56;
@@ -3100,6 +3100,10 @@ void cProtocol_1_19_4::WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMeta
 	if (v >= 2) // temp fix 
 	{
 		v++;
+	}
+	if (v >= 8)
+	{
+		v += 2;
 	}
 	a_Pkt.WriteVarInt32(v);        // Type
 }

@@ -3,11 +3,12 @@
 
 #include "BlockHandler.h"
 #include "../BoundingBox.h"
+#include "ChunkInterface.h"
 #include "../EffectID.h"
 #include "../Entities/LeashKnot.h"
 #include "../BoundingBox.h"
 #include "../Mobs/PassiveMonster.h"
-
+#include "AllTags/BlockTags.h"
 
 
 class cBlockFenceHandler final :
@@ -191,6 +192,127 @@ private:
 		{
 			leashKnot->SetShouldSelfDestroy();
 		}
+	}
+
+
+#define GET_FENCE_XM(FenceType,State) \
+	ToPlace = Block::FenceType::FenceType( \
+					Block::FenceType::East(current),\
+					Block::FenceType::North(current),\
+					Block::FenceType::South(current),\
+					Block::FenceType::Waterlogged(current),\
+					State); break; 
+#define GET_FENCE_XP(FenceType,State) \
+	ToPlace = Block::FenceType::FenceType( \
+					State,\
+					Block::FenceType::North(current),\
+					Block::FenceType::South(current),\
+					Block::FenceType::Waterlogged(current),\
+					Block::FenceType::West(current)); break; 
+#define GET_FENCE_ZM(FenceType,State) \
+	ToPlace = Block::FenceType::FenceType( \
+					Block::FenceType::East(current),\
+					State,\
+					Block::FenceType::South(current),\
+					Block::FenceType::Waterlogged(current),\
+					Block::FenceType::West(current)); break; 
+#define GET_FENCE_ZP(FenceType,State) \
+	ToPlace = Block::FenceType::FenceType( \
+					Block::FenceType::East(current),\
+					Block::FenceType::North(current),\
+					State,\
+					Block::FenceType::Waterlogged(current),\
+					Block::FenceType::West(current)); break; \
+
+
+	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
+	{
+		BlockState current = a_ChunkInterface.GetBlock(a_BlockPos);
+		bool NewState = false;
+		BlockState ToPlace;
+		switch (a_WhichNeighbor)
+		{
+			case BLOCK_FACE_YM:
+			case BLOCK_FACE_YP:
+			case BLOCK_FACE_NONE: return;
+			case BLOCK_FACE_XM:
+			NewState = BlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedX(-1)).Type());
+			switch (m_BlockType)
+			{
+				case BlockType::OakFence: GET_FENCE_XM(OakFence, NewState)
+				case BlockType::AcaciaFence: GET_FENCE_XM(AcaciaFence, NewState)
+				case BlockType::BirchFence: GET_FENCE_XM(BirchFence, NewState)
+				case BlockType::BambooFence: GET_FENCE_XM(BambooFence, NewState)
+				case BlockType::DarkOakFence: GET_FENCE_XM(DarkOakFence, NewState)
+				case BlockType::JungleFence: GET_FENCE_XM(JungleFence, NewState)
+				case BlockType::CrimsonFence: GET_FENCE_XM(CrimsonFence, NewState)
+				case BlockType::CherryFence: GET_FENCE_XM(CherryFence, NewState)
+				case BlockType::MangroveFence: GET_FENCE_XM(MangroveFence, NewState)
+				case BlockType::NetherBrickFence: GET_FENCE_XM(NetherBrickFence, NewState)
+				case BlockType::PaleOakFence: GET_FENCE_XM(PaleOakFence, NewState)
+				case BlockType::SpruceFence: GET_FENCE_XM(SpruceFence, NewState)
+				case BlockType::WarpedFence: GET_FENCE_XM(WarpedFence, NewState)
+			}
+			break;
+			case BLOCK_FACE_XP:
+			NewState = BlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedX(1)).Type());
+			switch (m_BlockType)
+			{
+				case BlockType::OakFence: GET_FENCE_XP(OakFence, NewState)
+				case BlockType::AcaciaFence: GET_FENCE_XP(AcaciaFence, NewState)
+				case BlockType::BirchFence: GET_FENCE_XP(BirchFence, NewState)
+				case BlockType::BambooFence: GET_FENCE_XP(BambooFence, NewState)
+				case BlockType::DarkOakFence: GET_FENCE_XP(DarkOakFence, NewState)
+				case BlockType::JungleFence: GET_FENCE_XP(JungleFence, NewState)
+				case BlockType::CrimsonFence: GET_FENCE_XP(CrimsonFence, NewState)
+				case BlockType::CherryFence: GET_FENCE_XP(CherryFence, NewState)
+				case BlockType::MangroveFence: GET_FENCE_XP(MangroveFence, NewState)
+				case BlockType::NetherBrickFence: GET_FENCE_XP(NetherBrickFence, NewState)
+				case BlockType::PaleOakFence: GET_FENCE_XP(PaleOakFence, NewState)
+				case BlockType::SpruceFence: GET_FENCE_XP(SpruceFence, NewState)
+				case BlockType::WarpedFence: GET_FENCE_XP(WarpedFence, NewState)
+			}
+			break;
+			case BLOCK_FACE_ZM:
+			NewState = BlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedZ(-1)).Type());
+			switch (m_BlockType)
+			{
+				case BlockType::OakFence: GET_FENCE_ZM(OakFence, NewState)
+				case BlockType::AcaciaFence: GET_FENCE_ZM(AcaciaFence, NewState)
+				case BlockType::BirchFence: GET_FENCE_ZM(BirchFence, NewState)
+				case BlockType::BambooFence: GET_FENCE_ZM(BambooFence, NewState)
+				case BlockType::DarkOakFence: GET_FENCE_ZM(DarkOakFence, NewState)
+				case BlockType::JungleFence: GET_FENCE_ZM(JungleFence, NewState)
+				case BlockType::CrimsonFence: GET_FENCE_ZM(CrimsonFence, NewState)
+				case BlockType::CherryFence: GET_FENCE_ZM(CherryFence, NewState)
+				case BlockType::MangroveFence: GET_FENCE_ZM(MangroveFence, NewState)
+				case BlockType::NetherBrickFence: GET_FENCE_ZM(NetherBrickFence, NewState)
+				case BlockType::PaleOakFence: GET_FENCE_ZM(PaleOakFence, NewState)
+				case BlockType::SpruceFence: GET_FENCE_ZM(SpruceFence, NewState)
+				case BlockType::WarpedFence: GET_FENCE_ZM(WarpedFence, NewState)
+			}
+			break;
+			case BLOCK_FACE_ZP:
+			NewState = BlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedZ(1)).Type());
+			switch (m_BlockType)
+			{
+				case BlockType::OakFence: GET_FENCE_ZP(OakFence, NewState)
+				case BlockType::AcaciaFence: GET_FENCE_ZP(AcaciaFence, NewState)
+				case BlockType::BirchFence: GET_FENCE_ZP(BirchFence, NewState)
+				case BlockType::BambooFence: GET_FENCE_ZP(BambooFence, NewState)
+				case BlockType::DarkOakFence: GET_FENCE_ZP(DarkOakFence, NewState)
+				case BlockType::JungleFence: GET_FENCE_ZP(JungleFence, NewState)
+				case BlockType::CrimsonFence: GET_FENCE_ZP(CrimsonFence, NewState)
+				case BlockType::CherryFence: GET_FENCE_ZP(CherryFence, NewState)
+				case BlockType::MangroveFence: GET_FENCE_ZP(MangroveFence, NewState)
+				case BlockType::NetherBrickFence: GET_FENCE_ZP(NetherBrickFence, NewState)
+				case BlockType::PaleOakFence: GET_FENCE_ZP(PaleOakFence, NewState)
+				case BlockType::SpruceFence: GET_FENCE_ZP(SpruceFence, NewState)
+				case BlockType::WarpedFence: GET_FENCE_ZP(WarpedFence, NewState)
+			}
+			break;
+		}
+		a_ChunkInterface.FastSetBlock(a_BlockPos, ToPlace);
 	}
 };
 

@@ -31,7 +31,7 @@ public:
 	) const override
 	{
 		// Only allow placing blocks on top of blocks, or when not in range of dest block:
-		if ((a_ClickedBlockFace != BLOCK_FACE_YM) && (a_ClickedBlockFace != BLOCK_FACE_NONE))
+		if ((a_ClickedBlockFace != BLOCK_FACE_YP) && (a_ClickedBlockFace != BLOCK_FACE_NONE))
 		{
 			return false;
 		}
