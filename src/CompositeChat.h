@@ -7,7 +7,7 @@
 
 #include "Defines.h"
 #include "json/json.h"
-
+#include "WorldStorage/FastNBT.h"
 
 
 

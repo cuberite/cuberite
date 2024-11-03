@@ -444,7 +444,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 					return false;
 				}
 				AString blockid = a_NBT.GetString(NameTagId);
-				if (!blockid._Starts_with("minecraft:"))
+				if (blockid.compare(0, 10, "minecraft:") != 0)
 				{
 					ChunkLoadFailed(a_Chunk, "Invalid namespace: " + blockid + " Mods arent supported", a_RawChunkData);
 					return false;
