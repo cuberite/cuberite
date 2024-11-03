@@ -110,7 +110,7 @@ UInt32 cProtocol_1_17::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktSpawnPosition:        return 0x4B;
 			//  scoreboard display 0x4C
 		case cProtocol::pktEntityMeta:           return 0x4D;
-			// entity attach 0x4E
+		case cProtocol::pktLeashEntity:          return 0x4E;
 		case cProtocol::pktEntityVelocity:       return 0x4F;
 		case cProtocol::pktEntityEquipment:      return 0x50;
 		case cProtocol::pktExperience:           return 0x51;
@@ -149,7 +149,7 @@ UInt8 cProtocol_1_17::GetEntityMetadataID(EntityMetadata a_Metadata) const
 	const UInt8 Living = Entity + 7;
 	const UInt8 Insentient = Living + 1;
 	const UInt8 Ageable = Insentient + 1;
-	const UInt8 AbstractHorse = Ageable + 2;
+	const UInt8 AbstractHorse = Ageable + 1;
 	const UInt8 ChestedHorse = AbstractHorse + 1;
 	const UInt8 TameableAnimal = Ageable + 2;
 	const UInt8 Minecart = Entity + 6;

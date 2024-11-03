@@ -36,7 +36,7 @@ protected:
 	virtual void    HandlePacketBlockDig(cByteBuffer & a_ByteBuffer) override;
 	virtual void    HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer) override;
 	virtual void    HandlePacketWindowClick(cByteBuffer & a_ByteBuffer) override;
-	virtual void    HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer);
+	virtual void    HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer) override;
 
 	virtual UInt32  GetProtocolMobType(eMonsterType a_MobType) const override;
 	virtual int     GetProtocolParticleID(const AString & a_ParticleName) const override;

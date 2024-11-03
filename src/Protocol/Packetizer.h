@@ -166,7 +166,7 @@ public:
 	// TODO: implement a variant with max length
 	inline void WriteLengthPrefixedBuf(const ContiguousByteBufferView a_Data)
 	{
-		VERIFY(m_Out.WriteVarInt32(a_Data.size()));
+		VERIFY(m_Out.WriteVarInt32(static_cast<UInt32>(a_Data.size())));
 		VERIFY(m_Out.Write(a_Data.data(), a_Data.size()));
 	}
 

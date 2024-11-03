@@ -553,7 +553,7 @@ UInt32 cProtocol_1_20_2::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktSpawnPosition:        return 0x52;
 				//  scoreboard display 0x53
 		case cProtocol::pktEntityMeta:           return 0x54;
-				// entity attach 0x55
+		case cProtocol::pktLeashEntity:          return 0x55;
 		case cProtocol::pktEntityVelocity:       return 0x56;
 		case cProtocol::pktEntityEquipment:      return 0x57;
 		case cProtocol::pktExperience:           return 0x58;
@@ -1314,7 +1314,7 @@ UInt32 cProtocol_1_20_3::GetPacketID(ePacketType a_PacketType) const
         case cProtocol::pktSpawnPosition:        return 0x54;
                         //  scoreboard display 0x55
         case cProtocol::pktEntityMeta:           return 0x56;
-                        // entity attach 0x57
+        case cProtocol::pktLeashEntity:          return 0x57;
         case cProtocol::pktEntityVelocity:       return 0x58;
         case cProtocol::pktEntityEquipment:      return 0x59;
         case cProtocol::pktExperience:           return 0x5A;
@@ -2205,7 +2205,7 @@ UInt32 cProtocol_1_20_5::GetPacketID(ePacketType a_PacketType) const
         case cProtocol::pktSpawnPosition:        return 0x56;
                         //  scoreboard display 0x57
         case cProtocol::pktEntityMeta:           return 0x58;
-                        // entity attach 0x59
+		case cProtocol::pktLeashEntity:          return 0x59;
         case cProtocol::pktEntityVelocity:       return 0x5A;
         case cProtocol::pktEntityEquipment:      return 0x5B;
         case cProtocol::pktExperience:           return 0x5C;

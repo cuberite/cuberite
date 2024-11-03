@@ -1088,7 +1088,7 @@ namespace
     constexpr cBlockSignPostHandler                         BlockJungleHangingSignHandler(BlockType::JungleHangingSign);
     constexpr cBlockSignPostHandler                         BlockJungleWallHangingSignHandler(BlockType::JungleWallHangingSign);
     constexpr cDefaultBlockHandler                          BlockLargeAmethystBudHandler(BlockType::LargeAmethystBud);
-    constexpr cDefaultBlockHandler                          BlockLavaCauldronHandler(BlockType::LavaCauldron);
+    constexpr cBlockCauldronHandler                         BlockLavaCauldronHandler(BlockType::LavaCauldron);
     constexpr cDefaultBlockHandler                          BlockLightHandler(BlockType::Light);
     constexpr cDefaultBlockHandler                          BlockLightBlueCandleHandler(BlockType::LightBlueCandle);
     constexpr cDefaultBlockHandler                          BlockLightBlueCandleCakeHandler(BlockType::LightBlueCandleCake);
@@ -1164,7 +1164,7 @@ namespace
     constexpr cDefaultBlockHandler                          BlockPottedMangrovePropaguleHandler(BlockType::PottedMangrovePropagule);
     constexpr cDefaultBlockHandler                          BlockPottedTorchflowerHandler(BlockType::PottedTorchflower);
     constexpr cDefaultBlockHandler                          BlockPowderSnowHandler(BlockType::PowderSnow);
-    constexpr cDefaultBlockHandler                          BlockPowderSnowCauldronHandler(BlockType::PowderSnowCauldron);
+    constexpr cBlockCauldronHandler                         BlockPowderSnowCauldronHandler(BlockType::PowderSnowCauldron);
     constexpr cDefaultBlockHandler                          BlockPurpleCandleHandler(BlockType::PurpleCandle);
     constexpr cDefaultBlockHandler                          BlockPurpleCandleCakeHandler(BlockType::PurpleCandleCake);
     constexpr cDefaultBlockHandler                          BlockRawCopperBlockHandler(BlockType::RawCopperBlock);
@@ -1211,7 +1211,7 @@ namespace
     constexpr cDefaultBlockHandler                          BlockVerdantFroglightHandler(BlockType::VerdantFroglight);
     constexpr cBlockSignPostHandler                         BlockWarpedHangingSignHandler(BlockType::WarpedHangingSign);
     constexpr cBlockSignPostHandler                         BlockWarpedWallHangingSignHandler(BlockType::WarpedWallHangingSign);
-    constexpr cDefaultBlockHandler                          BlockWaterCauldronHandler(BlockType::WaterCauldron);
+    constexpr cBlockCauldronHandler                         BlockWaterCauldronHandler(BlockType::WaterCauldron);
     constexpr cDefaultBlockHandler                          BlockWaxedChiseledCopperHandler(BlockType::WaxedChiseledCopper);
     constexpr cDefaultBlockHandler                          BlockWaxedCopperBlockHandler(BlockType::WaxedCopperBlock);
     constexpr cDefaultBlockHandler                          BlockWaxedCopperBulbHandler(BlockType::WaxedCopperBulb);
