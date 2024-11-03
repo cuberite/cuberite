@@ -5,12 +5,8 @@
 
 #include "Globals.h"
 
+#include "Endianness.h"
 #include "fmt/printf.h"
-
-#ifdef _MSC_VER
-	// Under MSVC, link to WinSock2 (needed by RawBEToUTF8's byteswapping)
-	#pragma comment(lib, "ws2_32.lib")
-#endif
 
 
 
@@ -339,13 +335,14 @@ void ReplaceURL(AString & iHayStack, const AString & iNeedle, const AString & iR
 
 
 
-AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8)
+AString & RawBEUTF16ToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8)
 {
 	a_UTF8.clear();
 	a_UTF8.reserve(3 * a_NumShorts / 2);  // a quick guess of the resulting size
 	for (size_t i = 0; i < a_NumShorts; i++)
 	{
-		a_UTF8.append(UnicodeCharToUtf8(GetBEUShort(&a_RawData[i * 2])));
+		auto UTF16 = NetworkBufToHost<UInt16>(reinterpret_cast<const std::byte *>(&a_RawData[i * 2]));
+		a_UTF8.append(UnicodeCharToUtf8(UTF16));
 	}
 	return a_UTF8;
 }
@@ -940,54 +937,6 @@ AString Base64Encode(const AString & a_Input)
 	ASSERT(output_index == output.size());
 
 	return output;
-}
-
-
-
-
-
-short GetBEShort(const std::byte * const a_Mem)
-{
-	return static_cast<short>(
-		(static_cast<short>(a_Mem[0]) << 8) |
-		static_cast<short>(a_Mem[1])
-	);
-}
-
-
-
-
-
-unsigned short GetBEUShort(const char * a_Mem)
-{
-	const Byte * Bytes = reinterpret_cast<const Byte *>(a_Mem);
-	return static_cast<unsigned short>((Bytes[0] << 8) | Bytes[1]);
-}
-
-
-
-
-
-int GetBEInt(const std::byte * const a_Mem)
-{
-	return
-		(static_cast<int>(a_Mem[0]) << 24) |
-		(static_cast<int>(a_Mem[1]) << 16) |
-		(static_cast<int>(a_Mem[2]) << 8) |
-		static_cast<int>(a_Mem[3])
-	;
-}
-
-
-
-
-
-void SetBEInt(std::byte * a_Mem, Int32 a_Value)
-{
-	a_Mem[0] = std::byte(a_Value >> 24);
-	a_Mem[1] = std::byte((a_Value >> 16) & 0xff);
-	a_Mem[2] = std::byte((a_Value >> 8) & 0xff);
-	a_Mem[3] = std::byte(a_Value & 0xff);
 }
 
 
