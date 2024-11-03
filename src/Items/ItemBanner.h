@@ -73,7 +73,7 @@ private:
 			// Placing on the floor
 			case BLOCK_FACE_YP:
 			{
-				auto Rotation = static_cast<unsigned char>(RotationToBlockFace(a_Player.GetYaw()));
+				auto Rotation = RotationToFineFace(a_Player.GetYaw());
 				switch (a_Player.GetEquippedItem().m_ItemType)
 				{
 					case Item::BlackBanner:      BlockToPlace = BlackBanner::BlackBanner(Rotation);         break;
@@ -101,7 +101,7 @@ private:
 			case BLOCK_FACE_ZP:
 			{
 				// placing on the sides
-				auto Facing = RotationToBlockFace(a_Player.GetYaw());
+				auto Facing = a_ClickedBlockFace;//RotationToBlockFace(a_Player.GetYaw());
 				switch (a_Player.GetEquippedItem().m_ItemType)
 				{
 					case Item::BlackBanner:      BlockToPlace = BlackWallBanner::BlackWallBanner(Facing);         break;

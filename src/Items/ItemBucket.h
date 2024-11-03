@@ -142,7 +142,7 @@ public:
 
 		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
-			return false;
+			//return false;
 		}
 
 		BlockState Dest;

@@ -545,7 +545,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 
 				for (size_t i = 0; i < static_cast<size_t>(SectionBlockLongCount); i++)
 				{
-					LEstates[i] = ntohll(reinterpret_cast<const UInt64*>(BlockStateData)[i]);
+					LEstates[i] = NetworkBufToHost<UInt64>(BlockStateData + i * 8);
 				}
 
 				BlockState resolveddata[4096] = { BlockType::Air };
