@@ -3,7 +3,7 @@
 # Use CMake to generate the build files for your platform
 
 cmake_minimum_required (VERSION 3.13)
-cmake_policy(VERSION 3.13...3.17.2)
+cmake_policy(VERSION 3.13...3.29.5)
 project(
 	Cuberite
 	DESCRIPTION "A lightweight, fast and extensible game server for Minecraft"
