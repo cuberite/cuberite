@@ -5,6 +5,7 @@
 #include "src/StringCompression.h"
 #include "src/WorldStorage/FastNBT.h"
 #include "src/IniFile.h"
+#include "src/Endianness.h"
 
 
 
@@ -143,7 +144,7 @@ public:
 
 		// Get the real data size:
 		const char * chunkData = m_FileData.data() + chunkOffset * 4096;
-		UInt32 chunkSize = GetBEInt(chunkData);
+		UInt32 chunkSize = NetworkBufToHost(chunkData);
 		if ((chunkSize < 2) || (chunkSize / 4096 > numChunkSectors))
 		{
 			// Bad data, bail out
@@ -181,7 +182,7 @@ protected:
 		const char * hdr = m_FileData.data();
 		for (size_t i = 0; i < ARRAYCOUNT(m_Header); i++)
 		{
-			m_Header[i] = GetBEInt(hdr + 4 * i);
+			m_Header[i] = NetworkBufToHost(hdr + 4 * i);
 		}
 		m_IsValid = true;
 	}
@@ -241,7 +242,7 @@ void AnvilSource::getChunkBiomes(int a_ChunkX, int a_ChunkZ, Chunk & a_DestChunk
 		const char * beBiomes = nbt.GetData(mcsBiomes);
 		for (size_t i = 0; i < ARRAYCOUNT(biomeMap); i++)
 		{
-			biomeMap[i] = (EMCSBiome)GetBEInt(beBiomes + 4 * i);
+			biomeMap[i] = (EMCSBiome)NetworkBufToHost<Int32>(beBiomes + 4 * i);
 		}
 		a_DestChunk.setBiomes(biomeMap);
 		return;
