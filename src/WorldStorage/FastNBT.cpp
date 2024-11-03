@@ -361,7 +361,7 @@ eNBTParseError cParsedNBT::ReadTag(void)
 		case TAG_LongArray:
 		{
 			NEEDBYTES(4, eNBTParseError::npArrayMissingLength);
-			int len = GetBEInt(m_Data.data() + m_Pos);
+			int len = NetworkBufToHost<int>(m_Data.data() + m_Pos);
 			m_Pos += 4;
 			if (len < 0)
 			{
