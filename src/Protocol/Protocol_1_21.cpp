@@ -1290,8 +1290,8 @@ void cProtocol_1_21_2::SendEntityPosition(const cEntity & a_Entity)
 	Pkt.WriteBEDouble(0);
 	Pkt.WriteBEDouble(0);
 	Pkt.WriteBEDouble(0);
-	Pkt.WriteBEFloat(a_Entity.GetYaw());
-	Pkt.WriteBEFloat(a_Entity.GetPitch());
+	Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetYaw()));
+	Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetPitch()));
 	Pkt.WriteBEInt32(0);
 	Pkt.WriteBool(a_Entity.IsOnGround());
 }

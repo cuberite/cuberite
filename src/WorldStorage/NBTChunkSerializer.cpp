@@ -1302,7 +1302,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				std::copy(Blocks->begin(),Blocks->end(),temparr.begin());
 				std::sort(temparr.begin(), temparr.end());
 				auto newlistend = std::unique(temparr.begin(),temparr.end());
-				int newsize = (newlistend - temparr.begin());
+				int newsize = static_cast<int>(newlistend - temparr.begin());
 				int bitused = Clamp(CeilC(log2(newsize)), 4, 16);
 
 				int longarrsize = -1;
@@ -1386,7 +1386,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				UINT64 tbuf = 0;
 				int BitIndex = 0;
 				int longindex = 0;
-				int toloop = Blocks->size();
+				int toloop = static_cast<int>(Blocks->size());
 				//int bitswritten = 0;
 				//std::vector<int> bw = {0};
 				for (size_t i = 0; i < toloop; i++)

@@ -354,7 +354,7 @@ namespace Block
 	}
 	namespace AcaciaHangingSign
 	{
-		constexpr BlockState AcaciaHangingSign(const bool Attached, const int Rotation, const bool Waterlogged)
+		constexpr BlockState AcaciaHangingSign(const bool Attached, const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Attached)
 				if (Rotation == 0)
@@ -457,12 +457,12 @@ namespace Block
 		}
 		BlockState AcaciaHangingSign();
 		bool Attached(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace AcaciaLeaves
 	{
-		constexpr BlockState AcaciaLeaves(const int Distance, const bool Persistent, const bool Waterlogged)
+		constexpr BlockState AcaciaLeaves(const unsigned char Distance, const bool Persistent, const bool Waterlogged)
 		{
 			if (Distance == 1)
 				if (Persistent)
@@ -515,7 +515,7 @@ namespace Block
 					else return 391;
 		}
 		BlockState AcaciaLeaves();
-		int Distance(BlockState Block);
+		unsigned char Distance(BlockState Block);
 		bool Persistent(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -555,17 +555,17 @@ namespace Block
 	}
 	namespace AcaciaSapling
 	{
-		constexpr BlockState AcaciaSapling(const int Stage)
+		constexpr BlockState AcaciaSapling(const unsigned char Stage)
 		{
 			if (Stage == 0) return 37;
 			else return 38;
 		}
 		BlockState AcaciaSapling();
-		int Stage(BlockState Block);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace AcaciaSign
 	{
-		constexpr BlockState AcaciaSign(const int Rotation, const bool Waterlogged)
+		constexpr BlockState AcaciaSign(const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Rotation == 0)
 				if (Waterlogged) return 4450;
@@ -617,7 +617,7 @@ namespace Block
 				else return 4481;
 		}
 		BlockState AcaciaSign();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace AcaciaSlab
@@ -1906,7 +1906,7 @@ namespace Block
 	}
 	namespace AzaleaLeaves
 	{
-		constexpr BlockState AzaleaLeaves(const int Distance, const bool Persistent, const bool Waterlogged)
+		constexpr BlockState AzaleaLeaves(const unsigned char Distance, const bool Persistent, const bool Waterlogged)
 		{
 			if (Distance == 1)
 				if (Persistent)
@@ -1959,7 +1959,7 @@ namespace Block
 					else return 531;
 		}
 		BlockState AzaleaLeaves();
-		int Distance(BlockState Block);
+		unsigned char Distance(BlockState Block);
 		bool Persistent(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -1978,7 +1978,7 @@ namespace Block
 			Small,
 			Large,
 		};
-		constexpr BlockState Bamboo(const int Age, const enum Leaves Leaves, const int Stage)
+		constexpr BlockState Bamboo(const unsigned char Age, const enum Leaves Leaves, const unsigned char Stage)
 		{
 			if (Age == 0)
 				if (Leaves == Leaves::None)
@@ -2002,9 +2002,9 @@ namespace Block
 					else return 13425;
 		}
 		BlockState Bamboo();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 		enum Leaves Leaves(BlockState Block);
-		int Stage(BlockState Block);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace BambooBlock
 	{
@@ -2371,7 +2371,7 @@ namespace Block
 	}
 	namespace BambooHangingSign
 	{
-		constexpr BlockState BambooHangingSign(const bool Attached, const int Rotation, const bool Waterlogged)
+		constexpr BlockState BambooHangingSign(const bool Attached, const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Attached)
 				if (Rotation == 0)
@@ -2474,7 +2474,7 @@ namespace Block
 		}
 		BlockState BambooHangingSign();
 		bool Attached(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace BambooMosaic
@@ -2690,7 +2690,7 @@ namespace Block
 	}
 	namespace BambooSign
 	{
-		constexpr BlockState BambooSign(const int Rotation, const bool Waterlogged)
+		constexpr BlockState BambooSign(const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Rotation == 0)
 				if (Waterlogged) return 4642;
@@ -2742,7 +2742,7 @@ namespace Block
 				else return 4673;
 		}
 		BlockState BambooSign();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace BambooSlab
@@ -3178,7 +3178,7 @@ namespace Block
 	}
 	namespace BeeNest
 	{
-		constexpr BlockState BeeNest(const eBlockFace Facing, const int HoneyLevel)
+		constexpr BlockState BeeNest(const eBlockFace Facing, const unsigned char HoneyLevel)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM)
 				if (HoneyLevel == 0) return 19866;
@@ -3211,11 +3211,11 @@ namespace Block
 		}
 		BlockState BeeNest();
 		eBlockFace Facing(BlockState Block);
-		int HoneyLevel(BlockState Block);
+		unsigned char HoneyLevel(BlockState Block);
 	}
 	namespace Beehive
 	{
-		constexpr BlockState Beehive(const eBlockFace Facing, const int HoneyLevel)
+		constexpr BlockState Beehive(const eBlockFace Facing, const unsigned char HoneyLevel)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM)
 				if (HoneyLevel == 0) return 19890;
@@ -3248,11 +3248,11 @@ namespace Block
 		}
 		BlockState Beehive();
 		eBlockFace Facing(BlockState Block);
-		int HoneyLevel(BlockState Block);
+		unsigned char HoneyLevel(BlockState Block);
 	}
 	namespace Beetroots
 	{
-		constexpr BlockState Beetroots(const int Age)
+		constexpr BlockState Beetroots(const unsigned char Age)
 		{
 			if (Age == 0) return 12978;
 			else if (Age == 1) return 12979;
@@ -3260,7 +3260,7 @@ namespace Block
 			else return 12981;
 		}
 		BlockState Beetroots();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace Bell
 	{
@@ -3769,7 +3769,7 @@ namespace Block
 	}
 	namespace BirchHangingSign
 	{
-		constexpr BlockState BirchHangingSign(const bool Attached, const int Rotation, const bool Waterlogged)
+		constexpr BlockState BirchHangingSign(const bool Attached, const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Attached)
 				if (Rotation == 0)
@@ -3872,12 +3872,12 @@ namespace Block
 		}
 		BlockState BirchHangingSign();
 		bool Attached(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace BirchLeaves
 	{
-		constexpr BlockState BirchLeaves(const int Distance, const bool Persistent, const bool Waterlogged)
+		constexpr BlockState BirchLeaves(const unsigned char Distance, const bool Persistent, const bool Waterlogged)
 		{
 			if (Distance == 1)
 				if (Persistent)
@@ -3930,7 +3930,7 @@ namespace Block
 					else return 335;
 		}
 		BlockState BirchLeaves();
-		int Distance(BlockState Block);
+		unsigned char Distance(BlockState Block);
 		bool Persistent(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -3970,17 +3970,17 @@ namespace Block
 	}
 	namespace BirchSapling
 	{
-		constexpr BlockState BirchSapling(const int Stage)
+		constexpr BlockState BirchSapling(const unsigned char Stage)
 		{
 			if (Stage == 0) return 33;
 			else return 34;
 		}
 		BlockState BirchSapling();
-		int Stage(BlockState Block);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace BirchSign
 	{
-		constexpr BlockState BirchSign(const int Rotation, const bool Waterlogged)
+		constexpr BlockState BirchSign(const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Rotation == 0)
 				if (Waterlogged) return 4418;
@@ -4032,7 +4032,7 @@ namespace Block
 				else return 4449;
 		}
 		BlockState BirchSign();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace BirchSlab
@@ -4417,7 +4417,7 @@ namespace Block
 	}
 	namespace BlackBanner
 	{
-		constexpr BlockState BlackBanner(const int Rotation)
+		constexpr BlockState BlackBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11334;
 			else if (Rotation == 1) return 11335;
@@ -4437,7 +4437,7 @@ namespace Block
 			else return 11349;
 		}
 		BlockState BlackBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace BlackBed
 	{
@@ -4484,7 +4484,7 @@ namespace Block
 	}
 	namespace BlackCandle
 	{
-		constexpr BlockState BlackCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState BlackCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -4516,7 +4516,7 @@ namespace Block
 					else return 21465;
 		}
 		BlockState BlackCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -5456,7 +5456,7 @@ namespace Block
 	}
 	namespace BlueBanner
 	{
-		constexpr BlockState BlueBanner(const int Rotation)
+		constexpr BlockState BlueBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11270;
 			else if (Rotation == 1) return 11271;
@@ -5476,7 +5476,7 @@ namespace Block
 			else return 11285;
 		}
 		BlockState BlueBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace BlueBed
 	{
@@ -5523,7 +5523,7 @@ namespace Block
 	}
 	namespace BlueCandle
 	{
-		constexpr BlockState BlueCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState BlueCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -5555,7 +5555,7 @@ namespace Block
 					else return 21401;
 		}
 		BlockState BlueCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -6584,7 +6584,7 @@ namespace Block
 	}
 	namespace BrownBanner
 	{
-		constexpr BlockState BrownBanner(const int Rotation)
+		constexpr BlockState BrownBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11286;
 			else if (Rotation == 1) return 11287;
@@ -6604,7 +6604,7 @@ namespace Block
 			else return 11301;
 		}
 		BlockState BrownBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace BrownBed
 	{
@@ -6651,7 +6651,7 @@ namespace Block
 	}
 	namespace BrownCandle
 	{
-		constexpr BlockState BrownCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState BrownCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -6683,7 +6683,7 @@ namespace Block
 					else return 21417;
 		}
 		BlockState BrownCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -7064,7 +7064,7 @@ namespace Block
 	}
 	namespace Cactus
 	{
-		constexpr BlockState Cactus(const int Age)
+		constexpr BlockState Cactus(const unsigned char Age)
 		{
 			if (Age == 0) return 5948;
 			else if (Age == 1) return 5949;
@@ -7084,11 +7084,11 @@ namespace Block
 			else return 5963;
 		}
 		BlockState Cactus();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace Cake
 	{
-		constexpr BlockState Cake(const int Bites)
+		constexpr BlockState Cake(const unsigned char Bites)
 		{
 			if (Bites == 0) return 6040;
 			else if (Bites == 1) return 6041;
@@ -7099,7 +7099,7 @@ namespace Block
 			else return 6046;
 		}
 		BlockState Cake();
-		int Bites(BlockState Block);
+		unsigned char Bites(BlockState Block);
 	}
 	namespace Calcite
 	{
@@ -7116,7 +7116,7 @@ namespace Block
 			Active,
 			Cooldown,
 		};
-		constexpr BlockState CalibratedSculkSensor(const eBlockFace Facing, const int Power, const enum SculkSensorPhase SculkSensorPhase, const bool Waterlogged)
+		constexpr BlockState CalibratedSculkSensor(const eBlockFace Facing, const unsigned char Power, const enum SculkSensorPhase SculkSensorPhase, const bool Waterlogged)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM)
 				if (Power == 0)
@@ -7765,7 +7765,7 @@ namespace Block
 		}
 		BlockState CalibratedSculkSensor();
 		eBlockFace Facing(BlockState Block);
-		int Power(BlockState Block);
+		unsigned char Power(BlockState Block);
 		enum SculkSensorPhase SculkSensorPhase(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -7842,7 +7842,7 @@ namespace Block
 	}
 	namespace Candle
 	{
-		constexpr BlockState Candle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState Candle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -7874,7 +7874,7 @@ namespace Block
 					else return 21209;
 		}
 		BlockState Candle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -7890,7 +7890,7 @@ namespace Block
 	}
 	namespace Carrots
 	{
-		constexpr BlockState Carrots(const int Age)
+		constexpr BlockState Carrots(const unsigned char Age)
 		{
 			if (Age == 0) return 8826;
 			else if (Age == 1) return 8827;
@@ -7902,7 +7902,7 @@ namespace Block
 			else return 8833;
 		}
 		BlockState Carrots();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace CartographyTable
 	{
@@ -7939,7 +7939,7 @@ namespace Block
 	}
 	namespace CaveVines
 	{
-		constexpr BlockState CaveVines(const int Age, const bool Berries)
+		constexpr BlockState CaveVines(const unsigned char Age, const bool Berries)
 		{
 			if (Age == 0)
 				if (Berries) return 25238;
@@ -8021,7 +8021,7 @@ namespace Block
 				else return 25289;
 		}
 		BlockState CaveVines();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 		bool Berries(BlockState Block);
 	}
 	namespace CaveVinesPlant
@@ -8429,7 +8429,7 @@ namespace Block
 	}
 	namespace CherryHangingSign
 	{
-		constexpr BlockState CherryHangingSign(const bool Attached, const int Rotation, const bool Waterlogged)
+		constexpr BlockState CherryHangingSign(const bool Attached, const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Attached)
 				if (Rotation == 0)
@@ -8532,12 +8532,12 @@ namespace Block
 		}
 		BlockState CherryHangingSign();
 		bool Attached(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace CherryLeaves
 	{
-		constexpr BlockState CherryLeaves(const int Distance, const bool Persistent, const bool Waterlogged)
+		constexpr BlockState CherryLeaves(const unsigned char Distance, const bool Persistent, const bool Waterlogged)
 		{
 			if (Distance == 1)
 				if (Persistent)
@@ -8590,7 +8590,7 @@ namespace Block
 					else return 419;
 		}
 		BlockState CherryLeaves();
-		int Distance(BlockState Block);
+		unsigned char Distance(BlockState Block);
 		bool Persistent(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -8630,17 +8630,17 @@ namespace Block
 	}
 	namespace CherrySapling
 	{
-		constexpr BlockState CherrySapling(const int Stage)
+		constexpr BlockState CherrySapling(const unsigned char Stage)
 		{
 			if (Stage == 0) return 39;
 			else return 40;
 		}
 		BlockState CherrySapling();
-		int Stage(BlockState Block);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace CherrySign
 	{
-		constexpr BlockState CherrySign(const int Rotation, const bool Waterlogged)
+		constexpr BlockState CherrySign(const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Rotation == 0)
 				if (Waterlogged) return 4482;
@@ -8692,7 +8692,7 @@ namespace Block
 				else return 4513;
 		}
 		BlockState CherrySign();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace CherrySlab
@@ -9737,7 +9737,7 @@ namespace Block
 	}
 	namespace ChorusFlower
 	{
-		constexpr BlockState ChorusFlower(const int Age)
+		constexpr BlockState ChorusFlower(const unsigned char Age)
 		{
 			if (Age == 0) return 12873;
 			else if (Age == 1) return 12874;
@@ -9747,7 +9747,7 @@ namespace Block
 			else return 12878;
 		}
 		BlockState ChorusFlower();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace ChorusPlant
 	{
@@ -11423,7 +11423,7 @@ namespace Block
 	}
 	namespace Cocoa
 	{
-		constexpr BlockState Cocoa(const int Age, const eBlockFace Facing)
+		constexpr BlockState Cocoa(const unsigned char Age, const eBlockFace Facing)
 		{
 			if (Age == 0)
 				if (Facing == eBlockFace::BLOCK_FACE_ZM) return 7649;
@@ -11442,7 +11442,7 @@ namespace Block
 				else return 7660;
 		}
 		BlockState Cocoa();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 		eBlockFace Facing(BlockState Block);
 	}
 	namespace CommandBlock
@@ -11513,7 +11513,7 @@ namespace Block
 	}
 	namespace Composter
 	{
-		constexpr BlockState Composter(const int Level)
+		constexpr BlockState Composter(const unsigned char Level)
 		{
 			if (Level == 0) return 19841;
 			else if (Level == 1) return 19842;
@@ -11526,7 +11526,7 @@ namespace Block
 			else return 19849;
 		}
 		BlockState Composter();
-		int Level(BlockState Block);
+		unsigned char Level(BlockState Block);
 	}
 	namespace Conduit
 	{
@@ -12047,7 +12047,7 @@ namespace Block
 	}
 	namespace CreeperHead
 	{
-		constexpr BlockState CreeperHead(const bool Powered, const int Rotation)
+		constexpr BlockState CreeperHead(const bool Powered, const unsigned char Rotation)
 		{
 			if (Powered)
 				if (Rotation == 0) return 9242;
@@ -12086,7 +12086,7 @@ namespace Block
 		}
 		BlockState CreeperHead();
 		bool Powered(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace CreeperWallHead
 	{
@@ -12464,7 +12464,7 @@ namespace Block
 	}
 	namespace CrimsonHangingSign
 	{
-		constexpr BlockState CrimsonHangingSign(const bool Attached, const int Rotation, const bool Waterlogged)
+		constexpr BlockState CrimsonHangingSign(const bool Attached, const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Attached)
 				if (Rotation == 0)
@@ -12567,7 +12567,7 @@ namespace Block
 		}
 		BlockState CrimsonHangingSign();
 		bool Attached(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace CrimsonHyphae
@@ -12620,7 +12620,7 @@ namespace Block
 	}
 	namespace CrimsonSign
 	{
-		constexpr BlockState CrimsonSign(const int Rotation, const bool Waterlogged)
+		constexpr BlockState CrimsonSign(const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Rotation == 0)
 				if (Waterlogged) return 19745;
@@ -12672,7 +12672,7 @@ namespace Block
 				else return 19776;
 		}
 		BlockState CrimsonSign();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace CrimsonSlab
@@ -13313,7 +13313,7 @@ namespace Block
 	}
 	namespace CyanBanner
 	{
-		constexpr BlockState CyanBanner(const int Rotation)
+		constexpr BlockState CyanBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11238;
 			else if (Rotation == 1) return 11239;
@@ -13333,7 +13333,7 @@ namespace Block
 			else return 11253;
 		}
 		BlockState CyanBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace CyanBed
 	{
@@ -13380,7 +13380,7 @@ namespace Block
 	}
 	namespace CyanCandle
 	{
-		constexpr BlockState CyanCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState CyanCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -13412,7 +13412,7 @@ namespace Block
 					else return 21369;
 		}
 		BlockState CyanCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -13947,7 +13947,7 @@ namespace Block
 	}
 	namespace DarkOakHangingSign
 	{
-		constexpr BlockState DarkOakHangingSign(const bool Attached, const int Rotation, const bool Waterlogged)
+		constexpr BlockState DarkOakHangingSign(const bool Attached, const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Attached)
 				if (Rotation == 0)
@@ -14050,12 +14050,12 @@ namespace Block
 		}
 		BlockState DarkOakHangingSign();
 		bool Attached(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace DarkOakLeaves
 	{
-		constexpr BlockState DarkOakLeaves(const int Distance, const bool Persistent, const bool Waterlogged)
+		constexpr BlockState DarkOakLeaves(const unsigned char Distance, const bool Persistent, const bool Waterlogged)
 		{
 			if (Distance == 1)
 				if (Persistent)
@@ -14108,7 +14108,7 @@ namespace Block
 					else return 447;
 		}
 		BlockState DarkOakLeaves();
-		int Distance(BlockState Block);
+		unsigned char Distance(BlockState Block);
 		bool Persistent(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -14148,17 +14148,17 @@ namespace Block
 	}
 	namespace DarkOakSapling
 	{
-		constexpr BlockState DarkOakSapling(const int Stage)
+		constexpr BlockState DarkOakSapling(const unsigned char Stage)
 		{
 			if (Stage == 0) return 41;
 			else return 42;
 		}
 		BlockState DarkOakSapling();
-		int Stage(BlockState Block);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace DarkOakSign
 	{
-		constexpr BlockState DarkOakSign(const int Rotation, const bool Waterlogged)
+		constexpr BlockState DarkOakSign(const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Rotation == 0)
 				if (Waterlogged) return 4546;
@@ -14210,7 +14210,7 @@ namespace Block
 				else return 4577;
 		}
 		BlockState DarkOakSign();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace DarkOakSlab
@@ -14782,7 +14782,7 @@ namespace Block
 	}
 	namespace DaylightDetector
 	{
-		constexpr BlockState DaylightDetector(const bool Inverted, const int Power)
+		constexpr BlockState DaylightDetector(const bool Inverted, const unsigned char Power)
 		{
 			if (Inverted)
 				if (Power == 0) return 9446;
@@ -14821,7 +14821,7 @@ namespace Block
 		}
 		BlockState DaylightDetector();
 		bool Inverted(BlockState Block);
-		int Power(BlockState Block);
+		unsigned char Power(BlockState Block);
 	}
 	namespace DeadBrainCoral
 	{
@@ -17550,7 +17550,7 @@ namespace Block
 	}
 	namespace DragonHead
 	{
-		constexpr BlockState DragonHead(const bool Powered, const int Rotation)
+		constexpr BlockState DragonHead(const bool Powered, const unsigned char Rotation)
 		{
 			if (Powered)
 				if (Rotation == 0) return 9282;
@@ -17589,7 +17589,7 @@ namespace Block
 		}
 		BlockState DragonHead();
 		bool Powered(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace DragonWallHead
 	{
@@ -19013,7 +19013,7 @@ namespace Block
 	}
 	namespace Farmland
 	{
-		constexpr BlockState Farmland(const int Moisture)
+		constexpr BlockState Farmland(const unsigned char Moisture)
 		{
 			if (Moisture == 0) return 4338;
 			else if (Moisture == 1) return 4339;
@@ -19025,7 +19025,7 @@ namespace Block
 			else return 4345;
 		}
 		BlockState Farmland();
-		int Moisture(BlockState Block);
+		unsigned char Moisture(BlockState Block);
 	}
 	namespace Fern
 	{
@@ -19036,7 +19036,7 @@ namespace Block
 	}
 	namespace Fire
 	{
-		constexpr BlockState Fire(const int Age, const bool East, const bool North, const bool South, const bool Up, const bool West)
+		constexpr BlockState Fire(const unsigned char Age, const bool East, const bool North, const bool South, const bool Up, const bool West)
 		{
 			if (Age == 0)
 				if (East)
@@ -20048,7 +20048,7 @@ namespace Block
 								else return 2914;
 		}
 		BlockState Fire();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 		bool East(BlockState Block);
 		bool North(BlockState Block);
 		bool South(BlockState Block);
@@ -20126,7 +20126,7 @@ namespace Block
 	}
 	namespace FloweringAzaleaLeaves
 	{
-		constexpr BlockState FloweringAzaleaLeaves(const int Distance, const bool Persistent, const bool Waterlogged)
+		constexpr BlockState FloweringAzaleaLeaves(const unsigned char Distance, const bool Persistent, const bool Waterlogged)
 		{
 			if (Distance == 1)
 				if (Persistent)
@@ -20179,7 +20179,7 @@ namespace Block
 					else return 559;
 		}
 		BlockState FloweringAzaleaLeaves();
-		int Distance(BlockState Block);
+		unsigned char Distance(BlockState Block);
 		bool Persistent(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -20192,7 +20192,7 @@ namespace Block
 	}
 	namespace FrostedIce
 	{
-		constexpr BlockState FrostedIce(const int Age)
+		constexpr BlockState FrostedIce(const unsigned char Age)
 		{
 			if (Age == 0) return 13008;
 			else if (Age == 1) return 13009;
@@ -20200,7 +20200,7 @@ namespace Block
 			else return 13011;
 		}
 		BlockState FrostedIce();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace Furnace
 	{
@@ -21368,7 +21368,7 @@ namespace Block
 	}
 	namespace GrayBanner
 	{
-		constexpr BlockState GrayBanner(const int Rotation)
+		constexpr BlockState GrayBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11206;
 			else if (Rotation == 1) return 11207;
@@ -21388,7 +21388,7 @@ namespace Block
 			else return 11221;
 		}
 		BlockState GrayBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace GrayBed
 	{
@@ -21435,7 +21435,7 @@ namespace Block
 	}
 	namespace GrayCandle
 	{
-		constexpr BlockState GrayCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState GrayCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -21467,7 +21467,7 @@ namespace Block
 					else return 21337;
 		}
 		BlockState GrayCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -21637,7 +21637,7 @@ namespace Block
 	}
 	namespace GreenBanner
 	{
-		constexpr BlockState GreenBanner(const int Rotation)
+		constexpr BlockState GreenBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11302;
 			else if (Rotation == 1) return 11303;
@@ -21657,7 +21657,7 @@ namespace Block
 			else return 11317;
 		}
 		BlockState GreenBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace GreenBed
 	{
@@ -21704,7 +21704,7 @@ namespace Block
 	}
 	namespace GreenCandle
 	{
-		constexpr BlockState GreenCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState GreenCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -21736,7 +21736,7 @@ namespace Block
 					else return 21433;
 		}
 		BlockState GreenCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -21973,7 +21973,7 @@ namespace Block
 	}
 	namespace HeavyWeightedPressurePlate
 	{
-		constexpr BlockState HeavyWeightedPressurePlate(const int Power)
+		constexpr BlockState HeavyWeightedPressurePlate(const unsigned char Power)
 		{
 			if (Power == 0) return 9414;
 			else if (Power == 1) return 9415;
@@ -21993,7 +21993,7 @@ namespace Block
 			else return 9429;
 		}
 		BlockState HeavyWeightedPressurePlate();
-		int Power(BlockState Block);
+		unsigned char Power(BlockState Block);
 	}
 	namespace HoneyBlock
 	{
@@ -22924,7 +22924,7 @@ namespace Block
 	}
 	namespace JungleHangingSign
 	{
-		constexpr BlockState JungleHangingSign(const bool Attached, const int Rotation, const bool Waterlogged)
+		constexpr BlockState JungleHangingSign(const bool Attached, const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Attached)
 				if (Rotation == 0)
@@ -23027,12 +23027,12 @@ namespace Block
 		}
 		BlockState JungleHangingSign();
 		bool Attached(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace JungleLeaves
 	{
-		constexpr BlockState JungleLeaves(const int Distance, const bool Persistent, const bool Waterlogged)
+		constexpr BlockState JungleLeaves(const unsigned char Distance, const bool Persistent, const bool Waterlogged)
 		{
 			if (Distance == 1)
 				if (Persistent)
@@ -23085,7 +23085,7 @@ namespace Block
 					else return 363;
 		}
 		BlockState JungleLeaves();
-		int Distance(BlockState Block);
+		unsigned char Distance(BlockState Block);
 		bool Persistent(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -23125,17 +23125,17 @@ namespace Block
 	}
 	namespace JungleSapling
 	{
-		constexpr BlockState JungleSapling(const int Stage)
+		constexpr BlockState JungleSapling(const unsigned char Stage)
 		{
 			if (Stage == 0) return 35;
 			else return 36;
 		}
 		BlockState JungleSapling();
-		int Stage(BlockState Block);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace JungleSign
 	{
-		constexpr BlockState JungleSign(const int Rotation, const bool Waterlogged)
+		constexpr BlockState JungleSign(const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Rotation == 0)
 				if (Waterlogged) return 4514;
@@ -23187,7 +23187,7 @@ namespace Block
 				else return 4545;
 		}
 		BlockState JungleSign();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace JungleSlab
@@ -23572,7 +23572,7 @@ namespace Block
 	}
 	namespace Kelp
 	{
-		constexpr BlockState Kelp(const int Age)
+		constexpr BlockState Kelp(const unsigned char Age)
 		{
 			if (Age == 0) return 13229;
 			else if (Age == 1) return 13230;
@@ -23602,7 +23602,7 @@ namespace Block
 			else return 13254;
 		}
 		BlockState Kelp();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace KelpPlant
 	{
@@ -23705,7 +23705,7 @@ namespace Block
 	}
 	namespace Lava
 	{
-		constexpr BlockState Lava(const int Level)
+		constexpr BlockState Lava(const unsigned char Level)
 		{
 			if (Level == 0) return 102;
 			else if (Level == 1) return 103;
@@ -23725,7 +23725,7 @@ namespace Block
 			else return 117;
 		}
 		BlockState Lava();
-		int Level(BlockState Block);
+		unsigned char Level(BlockState Block);
 	}
 	namespace LavaCauldron
 	{
@@ -23829,7 +23829,7 @@ namespace Block
 	}
 	namespace Light
 	{
-		constexpr BlockState Light(const int Level, const bool Waterlogged)
+		constexpr BlockState Light(const unsigned char Level, const bool Waterlogged)
 		{
 			if (Level == 0)
 				if (Waterlogged) return 10702;
@@ -23881,12 +23881,12 @@ namespace Block
 				else return 10733;
 		}
 		BlockState Light();
-		int Level(BlockState Block);
+		unsigned char Level(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace LightBlueBanner
 	{
-		constexpr BlockState LightBlueBanner(const int Rotation)
+		constexpr BlockState LightBlueBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11142;
 			else if (Rotation == 1) return 11143;
@@ -23906,7 +23906,7 @@ namespace Block
 			else return 11157;
 		}
 		BlockState LightBlueBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace LightBlueBed
 	{
@@ -23953,7 +23953,7 @@ namespace Block
 	}
 	namespace LightBlueCandle
 	{
-		constexpr BlockState LightBlueCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState LightBlueCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -23985,7 +23985,7 @@ namespace Block
 					else return 21273;
 		}
 		BlockState LightBlueCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -24155,7 +24155,7 @@ namespace Block
 	}
 	namespace LightGrayBanner
 	{
-		constexpr BlockState LightGrayBanner(const int Rotation)
+		constexpr BlockState LightGrayBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11222;
 			else if (Rotation == 1) return 11223;
@@ -24175,7 +24175,7 @@ namespace Block
 			else return 11237;
 		}
 		BlockState LightGrayBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace LightGrayBed
 	{
@@ -24222,7 +24222,7 @@ namespace Block
 	}
 	namespace LightGrayCandle
 	{
-		constexpr BlockState LightGrayCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState LightGrayCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -24254,7 +24254,7 @@ namespace Block
 					else return 21353;
 		}
 		BlockState LightGrayCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -24424,7 +24424,7 @@ namespace Block
 	}
 	namespace LightWeightedPressurePlate
 	{
-		constexpr BlockState LightWeightedPressurePlate(const int Power)
+		constexpr BlockState LightWeightedPressurePlate(const unsigned char Power)
 		{
 			if (Power == 0) return 9398;
 			else if (Power == 1) return 9399;
@@ -24444,7 +24444,7 @@ namespace Block
 			else return 9413;
 		}
 		BlockState LightWeightedPressurePlate();
-		int Power(BlockState Block);
+		unsigned char Power(BlockState Block);
 	}
 	namespace LightningRod
 	{
@@ -24529,7 +24529,7 @@ namespace Block
 	}
 	namespace LimeBanner
 	{
-		constexpr BlockState LimeBanner(const int Rotation)
+		constexpr BlockState LimeBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11174;
 			else if (Rotation == 1) return 11175;
@@ -24549,7 +24549,7 @@ namespace Block
 			else return 11189;
 		}
 		BlockState LimeBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace LimeBed
 	{
@@ -24596,7 +24596,7 @@ namespace Block
 	}
 	namespace LimeCandle
 	{
-		constexpr BlockState LimeCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState LimeCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -24628,7 +24628,7 @@ namespace Block
 					else return 21305;
 		}
 		BlockState LimeCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -24817,7 +24817,7 @@ namespace Block
 	}
 	namespace MagentaBanner
 	{
-		constexpr BlockState MagentaBanner(const int Rotation)
+		constexpr BlockState MagentaBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11126;
 			else if (Rotation == 1) return 11127;
@@ -24837,7 +24837,7 @@ namespace Block
 			else return 11141;
 		}
 		BlockState MagentaBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace MagentaBed
 	{
@@ -24884,7 +24884,7 @@ namespace Block
 	}
 	namespace MagentaCandle
 	{
-		constexpr BlockState MagentaCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState MagentaCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -24916,7 +24916,7 @@ namespace Block
 					else return 21257;
 		}
 		BlockState MagentaCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -25439,7 +25439,7 @@ namespace Block
 	}
 	namespace MangroveHangingSign
 	{
-		constexpr BlockState MangroveHangingSign(const bool Attached, const int Rotation, const bool Waterlogged)
+		constexpr BlockState MangroveHangingSign(const bool Attached, const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Attached)
 				if (Rotation == 0)
@@ -25542,12 +25542,12 @@ namespace Block
 		}
 		BlockState MangroveHangingSign();
 		bool Attached(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace MangroveLeaves
 	{
-		constexpr BlockState MangroveLeaves(const int Distance, const bool Persistent, const bool Waterlogged)
+		constexpr BlockState MangroveLeaves(const unsigned char Distance, const bool Persistent, const bool Waterlogged)
 		{
 			if (Distance == 1)
 				if (Persistent)
@@ -25600,7 +25600,7 @@ namespace Block
 					else return 503;
 		}
 		BlockState MangroveLeaves();
-		int Distance(BlockState Block);
+		unsigned char Distance(BlockState Block);
 		bool Persistent(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -25640,7 +25640,7 @@ namespace Block
 	}
 	namespace MangrovePropagule
 	{
-		constexpr BlockState MangrovePropagule(const int Age, const bool Hanging, const int Stage, const bool Waterlogged)
+		constexpr BlockState MangrovePropagule(const unsigned char Age, const bool Hanging, const unsigned char Stage, const bool Waterlogged)
 		{
 			if (Age == 0)
 				if (Hanging)
@@ -25719,9 +25719,9 @@ namespace Block
 						else return 84;
 		}
 		BlockState MangrovePropagule();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 		bool Hanging(BlockState Block);
-		int Stage(BlockState Block);
+		unsigned char Stage(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace MangroveRoots
@@ -25736,7 +25736,7 @@ namespace Block
 	}
 	namespace MangroveSign
 	{
-		constexpr BlockState MangroveSign(const int Rotation, const bool Waterlogged)
+		constexpr BlockState MangroveSign(const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Rotation == 0)
 				if (Waterlogged) return 4610;
@@ -25788,7 +25788,7 @@ namespace Block
 				else return 4641;
 		}
 		BlockState MangroveSign();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace MangroveSlab
@@ -26207,7 +26207,7 @@ namespace Block
 	}
 	namespace MelonStem
 	{
-		constexpr BlockState MelonStem(const int Age)
+		constexpr BlockState MelonStem(const unsigned char Age)
 		{
 			if (Age == 0) return 7059;
 			else if (Age == 1) return 7060;
@@ -26219,7 +26219,7 @@ namespace Block
 			else return 7066;
 		}
 		BlockState MelonStem();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace MossBlock
 	{
@@ -29548,7 +29548,7 @@ namespace Block
 	}
 	namespace NetherWart
 	{
-		constexpr BlockState NetherWart(const int Age)
+		constexpr BlockState NetherWart(const unsigned char Age)
 		{
 			if (Age == 0) return 7615;
 			else if (Age == 1) return 7616;
@@ -29556,7 +29556,7 @@ namespace Block
 			else return 7618;
 		}
 		BlockState NetherWart();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace NetherWartBlock
 	{
@@ -29607,7 +29607,7 @@ namespace Block
 			Piglin,
 			CustomHead,
 		};
-		constexpr BlockState NoteBlock(const enum Instrument Instrument, const int Note, const bool Powered)
+		constexpr BlockState NoteBlock(const enum Instrument Instrument, const unsigned char Note, const bool Powered)
 		{
 			if (Instrument == Instrument::Harp)
 				if (Note == 0)
@@ -31360,7 +31360,7 @@ namespace Block
 		}
 		BlockState NoteBlock();
 		enum Instrument Instrument(BlockState Block);
-		int Note(BlockState Block);
+		unsigned char Note(BlockState Block);
 		bool Powered(BlockState Block);
 	}
 	namespace OakButton
@@ -31711,7 +31711,7 @@ namespace Block
 	}
 	namespace OakHangingSign
 	{
-		constexpr BlockState OakHangingSign(const bool Attached, const int Rotation, const bool Waterlogged)
+		constexpr BlockState OakHangingSign(const bool Attached, const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Attached)
 				if (Rotation == 0)
@@ -31814,12 +31814,12 @@ namespace Block
 		}
 		BlockState OakHangingSign();
 		bool Attached(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace OakLeaves
 	{
-		constexpr BlockState OakLeaves(const int Distance, const bool Persistent, const bool Waterlogged)
+		constexpr BlockState OakLeaves(const unsigned char Distance, const bool Persistent, const bool Waterlogged)
 		{
 			if (Distance == 1)
 				if (Persistent)
@@ -31872,7 +31872,7 @@ namespace Block
 					else return 279;
 		}
 		BlockState OakLeaves();
-		int Distance(BlockState Block);
+		unsigned char Distance(BlockState Block);
 		bool Persistent(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -31912,17 +31912,17 @@ namespace Block
 	}
 	namespace OakSapling
 	{
-		constexpr BlockState OakSapling(const int Stage)
+		constexpr BlockState OakSapling(const unsigned char Stage)
 		{
 			if (Stage == 0) return 29;
 			else return 30;
 		}
 		BlockState OakSapling();
-		int Stage(BlockState Block);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace OakSign
 	{
-		constexpr BlockState OakSign(const int Rotation, const bool Waterlogged)
+		constexpr BlockState OakSign(const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Rotation == 0)
 				if (Waterlogged) return 4354;
@@ -31974,7 +31974,7 @@ namespace Block
 				else return 4385;
 		}
 		BlockState OakSign();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace OakSlab
@@ -32410,7 +32410,7 @@ namespace Block
 	}
 	namespace OrangeBanner
 	{
-		constexpr BlockState OrangeBanner(const int Rotation)
+		constexpr BlockState OrangeBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11110;
 			else if (Rotation == 1) return 11111;
@@ -32430,7 +32430,7 @@ namespace Block
 			else return 11125;
 		}
 		BlockState OrangeBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace OrangeBed
 	{
@@ -32477,7 +32477,7 @@ namespace Block
 	}
 	namespace OrangeCandle
 	{
-		constexpr BlockState OrangeCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState OrangeCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -32509,7 +32509,7 @@ namespace Block
 					else return 21241;
 		}
 		BlockState OrangeCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -33861,7 +33861,7 @@ namespace Block
 	}
 	namespace PaleOakHangingSign
 	{
-		constexpr BlockState PaleOakHangingSign(const bool Attached, const int Rotation, const bool Waterlogged)
+		constexpr BlockState PaleOakHangingSign(const bool Attached, const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Attached)
 				if (Rotation == 0)
@@ -33964,12 +33964,12 @@ namespace Block
 		}
 		BlockState PaleOakHangingSign();
 		bool Attached(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace PaleOakLeaves
 	{
-		constexpr BlockState PaleOakLeaves(const int Distance, const bool Persistent, const bool Waterlogged)
+		constexpr BlockState PaleOakLeaves(const unsigned char Distance, const bool Persistent, const bool Waterlogged)
 		{
 			if (Distance == 1)
 				if (Persistent)
@@ -34022,7 +34022,7 @@ namespace Block
 					else return 475;
 		}
 		BlockState PaleOakLeaves();
-		int Distance(BlockState Block);
+		unsigned char Distance(BlockState Block);
 		bool Persistent(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -34062,17 +34062,17 @@ namespace Block
 	}
 	namespace PaleOakSapling
 	{
-		constexpr BlockState PaleOakSapling(const int Stage)
+		constexpr BlockState PaleOakSapling(const unsigned char Stage)
 		{
 			if (Stage == 0) return 43;
 			else return 44;
 		}
 		BlockState PaleOakSapling();
-		int Stage(BlockState Block);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace PaleOakSign
 	{
-		constexpr BlockState PaleOakSign(const int Rotation, const bool Waterlogged)
+		constexpr BlockState PaleOakSign(const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Rotation == 0)
 				if (Waterlogged) return 4578;
@@ -34124,7 +34124,7 @@ namespace Block
 				else return 4609;
 		}
 		BlockState PaleOakSign();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace PaleOakSlab
@@ -34565,7 +34565,7 @@ namespace Block
 	}
 	namespace PiglinHead
 	{
-		constexpr BlockState PiglinHead(const bool Powered, const int Rotation)
+		constexpr BlockState PiglinHead(const bool Powered, const unsigned char Rotation)
 		{
 			if (Powered)
 				if (Rotation == 0) return 9322;
@@ -34604,7 +34604,7 @@ namespace Block
 		}
 		BlockState PiglinHead();
 		bool Powered(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace PiglinWallHead
 	{
@@ -34629,7 +34629,7 @@ namespace Block
 	}
 	namespace PinkBanner
 	{
-		constexpr BlockState PinkBanner(const int Rotation)
+		constexpr BlockState PinkBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11190;
 			else if (Rotation == 1) return 11191;
@@ -34649,7 +34649,7 @@ namespace Block
 			else return 11205;
 		}
 		BlockState PinkBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace PinkBed
 	{
@@ -34696,7 +34696,7 @@ namespace Block
 	}
 	namespace PinkCandle
 	{
-		constexpr BlockState PinkCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState PinkCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -34728,7 +34728,7 @@ namespace Block
 					else return 21321;
 		}
 		BlockState PinkCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -34777,7 +34777,7 @@ namespace Block
 	}
 	namespace PinkPetals
 	{
-		constexpr BlockState PinkPetals(const eBlockFace Facing, const int FlowerAmount)
+		constexpr BlockState PinkPetals(const eBlockFace Facing, const unsigned char FlowerAmount)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM)
 				if (FlowerAmount == 1) return 25296;
@@ -34802,7 +34802,7 @@ namespace Block
 		}
 		BlockState PinkPetals();
 		eBlockFace Facing(BlockState Block);
-		int FlowerAmount(BlockState Block);
+		unsigned char FlowerAmount(BlockState Block);
 	}
 	namespace PinkShulkerBox
 	{
@@ -35019,7 +35019,7 @@ namespace Block
 			Upper,
 			Lower,
 		};
-		constexpr BlockState PitcherCrop(const int Age, const enum Half Half)
+		constexpr BlockState PitcherCrop(const unsigned char Age, const enum Half Half)
 		{
 			if (Age == 0)
 				if (Half == Half::Upper) return 12966;
@@ -35038,7 +35038,7 @@ namespace Block
 				else return 12975;
 		}
 		BlockState PitcherCrop();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 		enum Half Half(BlockState Block);
 	}
 	namespace PitcherPlant
@@ -35058,7 +35058,7 @@ namespace Block
 	}
 	namespace PlayerHead
 	{
-		constexpr BlockState PlayerHead(const bool Powered, const int Rotation)
+		constexpr BlockState PlayerHead(const bool Powered, const unsigned char Rotation)
 		{
 			if (Powered)
 				if (Rotation == 0) return 9202;
@@ -35097,7 +35097,7 @@ namespace Block
 		}
 		BlockState PlayerHead();
 		bool Powered(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace PlayerWallHead
 	{
@@ -38836,7 +38836,7 @@ namespace Block
 	}
 	namespace Potatoes
 	{
-		constexpr BlockState Potatoes(const int Age)
+		constexpr BlockState Potatoes(const unsigned char Age)
 		{
 			if (Age == 0) return 8834;
 			else if (Age == 1) return 8835;
@@ -38848,7 +38848,7 @@ namespace Block
 			else return 8841;
 		}
 		BlockState Potatoes();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace PottedAcaciaSapling
 	{
@@ -39104,14 +39104,14 @@ namespace Block
 	}
 	namespace PowderSnowCauldron
 	{
-		constexpr BlockState PowderSnowCauldron(const int Level)
+		constexpr BlockState PowderSnowCauldron(const unsigned char Level)
 		{
 			if (Level == 1) return 7633;
 			else if (Level == 2) return 7634;
 			else return 7635;
 		}
 		BlockState PowderSnowCauldron();
-		int Level(BlockState Block);
+		unsigned char Level(BlockState Block);
 	}
 	namespace PoweredRail
 	{
@@ -40115,7 +40115,7 @@ namespace Block
 	}
 	namespace PumpkinStem
 	{
-		constexpr BlockState PumpkinStem(const int Age)
+		constexpr BlockState PumpkinStem(const unsigned char Age)
 		{
 			if (Age == 0) return 7051;
 			else if (Age == 1) return 7052;
@@ -40127,11 +40127,11 @@ namespace Block
 			else return 7058;
 		}
 		BlockState PumpkinStem();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace PurpleBanner
 	{
-		constexpr BlockState PurpleBanner(const int Rotation)
+		constexpr BlockState PurpleBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11254;
 			else if (Rotation == 1) return 11255;
@@ -40151,7 +40151,7 @@ namespace Block
 			else return 11269;
 		}
 		BlockState PurpleBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace PurpleBed
 	{
@@ -40198,7 +40198,7 @@ namespace Block
 	}
 	namespace PurpleCandle
 	{
-		constexpr BlockState PurpleCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState PurpleCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -40230,7 +40230,7 @@ namespace Block
 					else return 21385;
 		}
 		BlockState PurpleCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -40888,7 +40888,7 @@ namespace Block
 	}
 	namespace RedBanner
 	{
-		constexpr BlockState RedBanner(const int Rotation)
+		constexpr BlockState RedBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11318;
 			else if (Rotation == 1) return 11319;
@@ -40908,7 +40908,7 @@ namespace Block
 			else return 11333;
 		}
 		BlockState RedBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace RedBed
 	{
@@ -40955,7 +40955,7 @@ namespace Block
 	}
 	namespace RedCandle
 	{
-		constexpr BlockState RedCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState RedCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -40987,7 +40987,7 @@ namespace Block
 					else return 21449;
 		}
 		BlockState RedCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -42897,7 +42897,7 @@ namespace Block
 			Side,
 			None,
 		};
-		constexpr BlockState RedstoneWire(const enum East East, const enum North North, const int Power, const enum South South, const enum West West)
+		constexpr BlockState RedstoneWire(const enum East East, const enum North North, const unsigned char Power, const enum South South, const enum West West)
 		{
 			if (East == East::Up)
 				if (North == North::Up)
@@ -44787,7 +44787,7 @@ namespace Block
 		BlockState RedstoneWire();
 		enum East East(BlockState Block);
 		enum North North(BlockState Block);
-		int Power(BlockState Block);
+		unsigned char Power(BlockState Block);
 		enum South South(BlockState Block);
 		enum West West(BlockState Block);
 	}
@@ -44800,7 +44800,7 @@ namespace Block
 	}
 	namespace Repeater
 	{
-		constexpr BlockState Repeater(const int Delay, const eBlockFace Facing, const bool Locked, const bool Powered)
+		constexpr BlockState Repeater(const unsigned char Delay, const eBlockFace Facing, const bool Locked, const bool Powered)
 		{
 			if (Delay == 1)
 				if (Facing == eBlockFace::BLOCK_FACE_ZM)
@@ -44920,7 +44920,7 @@ namespace Block
 						else return 6110;
 		}
 		BlockState Repeater();
-		int Delay(BlockState Block);
+		unsigned char Delay(BlockState Block);
 		eBlockFace Facing(BlockState Block);
 		bool Locked(BlockState Block);
 		bool Powered(BlockState Block);
@@ -44950,7 +44950,7 @@ namespace Block
 	}
 	namespace RespawnAnchor
 	{
-		constexpr BlockState RespawnAnchor(const int Charges)
+		constexpr BlockState RespawnAnchor(const unsigned char Charges)
 		{
 			if (Charges == 0) return 19919;
 			else if (Charges == 1) return 19920;
@@ -44959,7 +44959,7 @@ namespace Block
 			else return 19923;
 		}
 		BlockState RespawnAnchor();
-		int Charges(BlockState Block);
+		unsigned char Charges(BlockState Block);
 	}
 	namespace RootedDirt
 	{
@@ -45741,7 +45741,7 @@ namespace Block
 	}
 	namespace Scaffolding
 	{
-		constexpr BlockState Scaffolding(const bool Bottom, const int Distance, const bool Waterlogged)
+		constexpr BlockState Scaffolding(const bool Bottom, const unsigned char Distance, const bool Waterlogged)
 		{
 			if (Bottom)
 				if (Distance == 0)
@@ -45796,7 +45796,7 @@ namespace Block
 		}
 		BlockState Scaffolding();
 		bool Bottom(BlockState Block);
-		int Distance(BlockState Block);
+		unsigned char Distance(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace Sculk
@@ -45824,7 +45824,7 @@ namespace Block
 			Active,
 			Cooldown,
 		};
-		constexpr BlockState SculkSensor(const int Power, const enum SculkSensorPhase SculkSensorPhase, const bool Waterlogged)
+		constexpr BlockState SculkSensor(const unsigned char Power, const enum SculkSensorPhase SculkSensorPhase, const bool Waterlogged)
 		{
 			if (Power == 0)
 				if (SculkSensorPhase == SculkSensorPhase::Inactive)
@@ -45988,7 +45988,7 @@ namespace Block
 					else return 22883;
 		}
 		BlockState SculkSensor();
-		int Power(BlockState Block);
+		unsigned char Power(BlockState Block);
 		enum SculkSensorPhase SculkSensorPhase(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -46293,7 +46293,7 @@ namespace Block
 	}
 	namespace SeaPickle
 	{
-		constexpr BlockState SeaPickle(const int Pickles, const bool Waterlogged)
+		constexpr BlockState SeaPickle(const unsigned char Pickles, const bool Waterlogged)
 		{
 			if (Pickles == 1)
 				if (Waterlogged) return 13402;
@@ -46309,7 +46309,7 @@ namespace Block
 				else return 13409;
 		}
 		BlockState SeaPickle();
-		int Pickles(BlockState Block);
+		unsigned char Pickles(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace Seagrass
@@ -46349,7 +46349,7 @@ namespace Block
 	}
 	namespace SkeletonSkull
 	{
-		constexpr BlockState SkeletonSkull(const bool Powered, const int Rotation)
+		constexpr BlockState SkeletonSkull(const bool Powered, const unsigned char Rotation)
 		{
 			if (Powered)
 				if (Rotation == 0) return 9082;
@@ -46388,7 +46388,7 @@ namespace Block
 		}
 		BlockState SkeletonSkull();
 		bool Powered(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace SkeletonWallSkull
 	{
@@ -47117,18 +47117,18 @@ namespace Block
 	}
 	namespace SnifferEgg
 	{
-		constexpr BlockState SnifferEgg(const int Hatch)
+		constexpr BlockState SnifferEgg(const unsigned char Hatch)
 		{
 			if (Hatch == 0) return 13269;
 			else if (Hatch == 1) return 13270;
 			else return 13271;
 		}
 		BlockState SnifferEgg();
-		int Hatch(BlockState Block);
+		unsigned char Hatch(BlockState Block);
 	}
 	namespace Snow
 	{
-		constexpr BlockState Snow(const int Layers)
+		constexpr BlockState Snow(const unsigned char Layers)
 		{
 			if (Layers == 1) return 5938;
 			else if (Layers == 2) return 5939;
@@ -47140,7 +47140,7 @@ namespace Block
 			else return 5945;
 		}
 		BlockState Snow();
-		int Layers(BlockState Block);
+		unsigned char Layers(BlockState Block);
 	}
 	namespace SnowBlock
 	{
@@ -47644,7 +47644,7 @@ namespace Block
 	}
 	namespace SpruceHangingSign
 	{
-		constexpr BlockState SpruceHangingSign(const bool Attached, const int Rotation, const bool Waterlogged)
+		constexpr BlockState SpruceHangingSign(const bool Attached, const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Attached)
 				if (Rotation == 0)
@@ -47747,12 +47747,12 @@ namespace Block
 		}
 		BlockState SpruceHangingSign();
 		bool Attached(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace SpruceLeaves
 	{
-		constexpr BlockState SpruceLeaves(const int Distance, const bool Persistent, const bool Waterlogged)
+		constexpr BlockState SpruceLeaves(const unsigned char Distance, const bool Persistent, const bool Waterlogged)
 		{
 			if (Distance == 1)
 				if (Persistent)
@@ -47805,7 +47805,7 @@ namespace Block
 					else return 307;
 		}
 		BlockState SpruceLeaves();
-		int Distance(BlockState Block);
+		unsigned char Distance(BlockState Block);
 		bool Persistent(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -47845,17 +47845,17 @@ namespace Block
 	}
 	namespace SpruceSapling
 	{
-		constexpr BlockState SpruceSapling(const int Stage)
+		constexpr BlockState SpruceSapling(const unsigned char Stage)
 		{
 			if (Stage == 0) return 31;
 			else return 32;
 		}
 		BlockState SpruceSapling();
-		int Stage(BlockState Block);
+		unsigned char Stage(BlockState Block);
 	}
 	namespace SpruceSign
 	{
-		constexpr BlockState SpruceSign(const int Rotation, const bool Waterlogged)
+		constexpr BlockState SpruceSign(const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Rotation == 0)
 				if (Waterlogged) return 4386;
@@ -47907,7 +47907,7 @@ namespace Block
 				else return 4417;
 		}
 		BlockState SpruceSign();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace SpruceSlab
@@ -49745,7 +49745,7 @@ namespace Block
 	}
 	namespace SugarCane
 	{
-		constexpr BlockState SugarCane(const int Age)
+		constexpr BlockState SugarCane(const unsigned char Age)
 		{
 			if (Age == 0) return 5965;
 			else if (Age == 1) return 5966;
@@ -49765,7 +49765,7 @@ namespace Block
 			else return 5980;
 		}
 		BlockState SugarCane();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace Sunflower
 	{
@@ -49784,7 +49784,7 @@ namespace Block
 	}
 	namespace SuspiciousGravel
 	{
-		constexpr BlockState SuspiciousGravel(const int Dusted)
+		constexpr BlockState SuspiciousGravel(const unsigned char Dusted)
 		{
 			if (Dusted == 0) return 125;
 			else if (Dusted == 1) return 126;
@@ -49792,11 +49792,11 @@ namespace Block
 			else return 128;
 		}
 		BlockState SuspiciousGravel();
-		int Dusted(BlockState Block);
+		unsigned char Dusted(BlockState Block);
 	}
 	namespace SuspiciousSand
 	{
-		constexpr BlockState SuspiciousSand(const int Dusted)
+		constexpr BlockState SuspiciousSand(const unsigned char Dusted)
 		{
 			if (Dusted == 0) return 119;
 			else if (Dusted == 1) return 120;
@@ -49804,11 +49804,11 @@ namespace Block
 			else return 122;
 		}
 		BlockState SuspiciousSand();
-		int Dusted(BlockState Block);
+		unsigned char Dusted(BlockState Block);
 	}
 	namespace SweetBerryBush
 	{
-		constexpr BlockState SweetBerryBush(const int Age)
+		constexpr BlockState SweetBerryBush(const unsigned char Age)
 		{
 			if (Age == 0) return 19044;
 			else if (Age == 1) return 19045;
@@ -49816,7 +49816,7 @@ namespace Block
 			else return 19047;
 		}
 		BlockState SweetBerryBush();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace TallGrass
 	{
@@ -49850,7 +49850,7 @@ namespace Block
 	}
 	namespace Target
 	{
-		constexpr BlockState Target(const int Power)
+		constexpr BlockState Target(const unsigned char Power)
 		{
 			if (Power == 0) return 19850;
 			else if (Power == 1) return 19851;
@@ -49870,7 +49870,7 @@ namespace Block
 			else return 19865;
 		}
 		BlockState Target();
-		int Power(BlockState Block);
+		unsigned char Power(BlockState Block);
 	}
 	namespace Terracotta
 	{
@@ -49912,13 +49912,13 @@ namespace Block
 	}
 	namespace TorchflowerCrop
 	{
-		constexpr BlockState TorchflowerCrop(const int Age)
+		constexpr BlockState TorchflowerCrop(const unsigned char Age)
 		{
 			if (Age == 0) return 12964;
 			else return 12965;
 		}
 		BlockState TorchflowerCrop();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace TrappedChest
 	{
@@ -51860,7 +51860,7 @@ namespace Block
 	}
 	namespace TurtleEgg
 	{
-		constexpr BlockState TurtleEgg(const int Eggs, const int Hatch)
+		constexpr BlockState TurtleEgg(const unsigned char Eggs, const unsigned char Hatch)
 		{
 			if (Eggs == 1)
 				if (Hatch == 0) return 13257;
@@ -51880,12 +51880,12 @@ namespace Block
 				else return 13268;
 		}
 		BlockState TurtleEgg();
-		int Eggs(BlockState Block);
-		int Hatch(BlockState Block);
+		unsigned char Eggs(BlockState Block);
+		unsigned char Hatch(BlockState Block);
 	}
 	namespace TwistingVines
 	{
-		constexpr BlockState TwistingVines(const int Age)
+		constexpr BlockState TwistingVines(const unsigned char Age)
 		{
 			if (Age == 0) return 19107;
 			else if (Age == 1) return 19108;
@@ -51915,7 +51915,7 @@ namespace Block
 			else return 19132;
 		}
 		BlockState TwistingVines();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace TwistingVinesPlant
 	{
@@ -52450,7 +52450,7 @@ namespace Block
 	}
 	namespace WarpedHangingSign
 	{
-		constexpr BlockState WarpedHangingSign(const bool Attached, const int Rotation, const bool Waterlogged)
+		constexpr BlockState WarpedHangingSign(const bool Attached, const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Attached)
 				if (Rotation == 0)
@@ -52553,7 +52553,7 @@ namespace Block
 		}
 		BlockState WarpedHangingSign();
 		bool Attached(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace WarpedHyphae
@@ -52606,7 +52606,7 @@ namespace Block
 	}
 	namespace WarpedSign
 	{
-		constexpr BlockState WarpedSign(const int Rotation, const bool Waterlogged)
+		constexpr BlockState WarpedSign(const unsigned char Rotation, const bool Waterlogged)
 		{
 			if (Rotation == 0)
 				if (Waterlogged) return 19777;
@@ -52658,7 +52658,7 @@ namespace Block
 				else return 19808;
 		}
 		BlockState WarpedSign();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
 	namespace WarpedSlab
@@ -53050,7 +53050,7 @@ namespace Block
 	}
 	namespace Water
 	{
-		constexpr BlockState Water(const int Level)
+		constexpr BlockState Water(const unsigned char Level)
 		{
 			if (Level == 0) return 86;
 			else if (Level == 1) return 87;
@@ -53070,18 +53070,18 @@ namespace Block
 			else return 101;
 		}
 		BlockState Water();
-		int Level(BlockState Block);
+		unsigned char Level(BlockState Block);
 	}
 	namespace WaterCauldron
 	{
-		constexpr BlockState WaterCauldron(const int Level)
+		constexpr BlockState WaterCauldron(const unsigned char Level)
 		{
 			if (Level == 1) return 7629;
 			else if (Level == 2) return 7630;
 			else return 7631;
 		}
 		BlockState WaterCauldron();
-		int Level(BlockState Block);
+		unsigned char Level(BlockState Block);
 	}
 	namespace WaxedChiseledCopper
 	{
@@ -55650,7 +55650,7 @@ namespace Block
 	}
 	namespace WeepingVines
 	{
-		constexpr BlockState WeepingVines(const int Age)
+		constexpr BlockState WeepingVines(const unsigned char Age)
 		{
 			if (Age == 0) return 19080;
 			else if (Age == 1) return 19081;
@@ -55680,7 +55680,7 @@ namespace Block
 			else return 19105;
 		}
 		BlockState WeepingVines();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace WeepingVinesPlant
 	{
@@ -55698,7 +55698,7 @@ namespace Block
 	}
 	namespace Wheat
 	{
-		constexpr BlockState Wheat(const int Age)
+		constexpr BlockState Wheat(const unsigned char Age)
 		{
 			if (Age == 0) return 4330;
 			else if (Age == 1) return 4331;
@@ -55710,11 +55710,11 @@ namespace Block
 			else return 4337;
 		}
 		BlockState Wheat();
-		int Age(BlockState Block);
+		unsigned char Age(BlockState Block);
 	}
 	namespace WhiteBanner
 	{
-		constexpr BlockState WhiteBanner(const int Rotation)
+		constexpr BlockState WhiteBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11094;
 			else if (Rotation == 1) return 11095;
@@ -55734,7 +55734,7 @@ namespace Block
 			else return 11109;
 		}
 		BlockState WhiteBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace WhiteBed
 	{
@@ -55781,7 +55781,7 @@ namespace Block
 	}
 	namespace WhiteCandle
 	{
-		constexpr BlockState WhiteCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState WhiteCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -55813,7 +55813,7 @@ namespace Block
 					else return 21225;
 		}
 		BlockState WhiteCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -55997,7 +55997,7 @@ namespace Block
 	}
 	namespace WitherSkeletonSkull
 	{
-		constexpr BlockState WitherSkeletonSkull(const bool Powered, const int Rotation)
+		constexpr BlockState WitherSkeletonSkull(const bool Powered, const unsigned char Rotation)
 		{
 			if (Powered)
 				if (Rotation == 0) return 9122;
@@ -56036,7 +56036,7 @@ namespace Block
 		}
 		BlockState WitherSkeletonSkull();
 		bool Powered(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace WitherSkeletonWallSkull
 	{
@@ -56061,7 +56061,7 @@ namespace Block
 	}
 	namespace YellowBanner
 	{
-		constexpr BlockState YellowBanner(const int Rotation)
+		constexpr BlockState YellowBanner(const unsigned char Rotation)
 		{
 			if (Rotation == 0) return 11158;
 			else if (Rotation == 1) return 11159;
@@ -56081,7 +56081,7 @@ namespace Block
 			else return 11173;
 		}
 		BlockState YellowBanner();
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace YellowBed
 	{
@@ -56128,7 +56128,7 @@ namespace Block
 	}
 	namespace YellowCandle
 	{
-		constexpr BlockState YellowCandle(const int Candles, const bool Lit, const bool Waterlogged)
+		constexpr BlockState YellowCandle(const unsigned char Candles, const bool Lit, const bool Waterlogged)
 		{
 			if (Candles == 1)
 				if (Lit)
@@ -56160,7 +56160,7 @@ namespace Block
 					else return 21289;
 		}
 		BlockState YellowCandle();
-		int Candles(BlockState Block);
+		unsigned char Candles(BlockState Block);
 		bool Lit(BlockState Block);
 		bool Waterlogged(BlockState Block);
 	}
@@ -56330,7 +56330,7 @@ namespace Block
 	}
 	namespace ZombieHead
 	{
-		constexpr BlockState ZombieHead(const bool Powered, const int Rotation)
+		constexpr BlockState ZombieHead(const bool Powered, const unsigned char Rotation)
 		{
 			if (Powered)
 				if (Rotation == 0) return 9162;
@@ -56369,7 +56369,7 @@ namespace Block
 		}
 		BlockState ZombieHead();
 		bool Powered(BlockState Block);
-		int Rotation(BlockState Block);
+		unsigned char Rotation(BlockState Block);
 	}
 	namespace ZombieWallHead
 	{

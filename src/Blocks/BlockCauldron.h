@@ -97,7 +97,7 @@ private:
 		}
 		else if (m_BlockType == BlockType::WaterCauldron)
 		{
-			int FillState = Block::WaterCauldron::Level(a_ChunkInterface.GetBlock(a_BlockPos));
+			auto FillState = Block::WaterCauldron::Level(a_ChunkInterface.GetBlock(a_BlockPos));
 			switch (EquippedItem.m_ItemType)
 			{
 				case Item::PowderSnowBucket:

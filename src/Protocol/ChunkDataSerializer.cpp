@@ -1335,7 +1335,7 @@ inline void cChunkDataSerializer::WriteBlockSectionSeamless2(const ChunkBlockDat
 	UInt64 Buffer = 0;  // A buffer to compose multiple smaller bitsizes into one 64-bit number
 	unsigned char BitIndex = 0;  // The bit-position in Buffer that represents where to write next
 
-	const bool BlocksExist = a_Blocks != nullptr;
+	//const bool BlocksExist = a_Blocks != nullptr;
 	//const bool MetasExist = a_Metas != nullptr;
 
 	for (size_t Index = 0; Index != ChunkBlockData::SectionBlockCount; Index++)
