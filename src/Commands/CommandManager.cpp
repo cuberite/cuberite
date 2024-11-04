@@ -244,7 +244,6 @@ cCommandManager::cCommandNode::CollectChildren(std::vector<cCommandNode*>& a_lis
 {
 	for (auto& var : a_node.m_ChildrenNodes)
 	{
-		auto ptr = &var;
 		a_list.push_back(&var);
 		CollectChildren(a_list, var);
 	}

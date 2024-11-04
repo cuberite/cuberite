@@ -980,7 +980,7 @@ void cProtocol_1_17::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32,  UInt32,  Mode);
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32,  UInt32,  ArrLen);
 	std::vector<cItem> items;
-	for (int i = 0; i < ArrLen; ++i)
+	for (UInt32 i = 0; i < ArrLen; ++i)
 	{
 		cItem Item;
 		ReadItem(a_ByteBuffer, Item, 0);

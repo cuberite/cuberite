@@ -193,7 +193,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -230,7 +230,7 @@ namespace Block
 		{
 			return 391;
 		}
-		int Distance(BlockState Block)
+		unsigned char Distance(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -300,7 +300,7 @@ namespace Block
 		{
 			return 37;
 		}
-		int Stage(BlockState Block)
+		unsigned char Stage(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -315,7 +315,7 @@ namespace Block
 		{
 			return 4451;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -793,7 +793,7 @@ namespace Block
 		{
 			return 531;
 		}
-		int Distance(BlockState Block)
+		unsigned char Distance(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -832,7 +832,7 @@ namespace Block
 		{
 			return 13414;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -849,7 +849,7 @@ namespace Block
 				default:  return Leaves::Small;
 			}
 		}
-		int Stage(BlockState Block)
+		unsigned char Stage(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -1059,7 +1059,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -1188,7 +1188,7 @@ namespace Block
 		{
 			return 4643;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -1466,7 +1466,7 @@ namespace Block
 				default:  return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		int HoneyLevel(BlockState Block)
+		unsigned char HoneyLevel(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -1495,7 +1495,7 @@ namespace Block
 				default:  return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		int HoneyLevel(BlockState Block)
+		unsigned char HoneyLevel(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -1514,7 +1514,7 @@ namespace Block
 		{
 			return 12978;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -1805,7 +1805,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -1842,7 +1842,7 @@ namespace Block
 		{
 			return 335;
 		}
-		int Distance(BlockState Block)
+		unsigned char Distance(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -1912,7 +1912,7 @@ namespace Block
 		{
 			return 33;
 		}
-		int Stage(BlockState Block)
+		unsigned char Stage(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -1927,7 +1927,7 @@ namespace Block
 		{
 			return 4419;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -2147,7 +2147,7 @@ namespace Block
 		{
 			return 11334;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -2209,7 +2209,7 @@ namespace Block
 		{
 			return 21453;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -2530,7 +2530,7 @@ namespace Block
 		{
 			return 11270;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -2592,7 +2592,7 @@ namespace Block
 		{
 			return 21389;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -3002,7 +3002,7 @@ namespace Block
 		{
 			return 11286;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -3064,7 +3064,7 @@ namespace Block
 		{
 			return 21405;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -3364,7 +3364,7 @@ namespace Block
 		{
 			return 5948;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -3393,7 +3393,7 @@ namespace Block
 		{
 			return 6040;
 		}
-		int Bites(BlockState Block)
+		unsigned char Bites(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -3426,7 +3426,7 @@ namespace Block
 				default:  return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		int Power(BlockState Block)
+		unsigned char Power(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -3513,7 +3513,7 @@ namespace Block
 		{
 			return 21197;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -3561,7 +3561,7 @@ namespace Block
 		{
 			return 8826;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -3608,7 +3608,7 @@ namespace Block
 		{
 			return 25239;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -3900,7 +3900,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -3937,7 +3937,7 @@ namespace Block
 		{
 			return 419;
 		}
-		int Distance(BlockState Block)
+		unsigned char Distance(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -4007,7 +4007,7 @@ namespace Block
 		{
 			return 39;
 		}
-		int Stage(BlockState Block)
+		unsigned char Stage(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -4022,7 +4022,7 @@ namespace Block
 		{
 			return 4483;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -4388,7 +4388,7 @@ namespace Block
 		{
 			return 12873;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -4737,7 +4737,7 @@ namespace Block
 		{
 			return 7649;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -4823,7 +4823,7 @@ namespace Block
 		{
 			return 19841;
 		}
-		int Level(BlockState Block)
+		unsigned char Level(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -5097,7 +5097,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -5333,7 +5333,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -5410,7 +5410,7 @@ namespace Block
 		{
 			return 19746;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -5758,7 +5758,7 @@ namespace Block
 		{
 			return 11238;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -5820,7 +5820,7 @@ namespace Block
 		{
 			return 21357;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -6185,7 +6185,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -6222,7 +6222,7 @@ namespace Block
 		{
 			return 447;
 		}
-		int Distance(BlockState Block)
+		unsigned char Distance(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -6292,7 +6292,7 @@ namespace Block
 		{
 			return 41;
 		}
-		int Stage(BlockState Block)
+		unsigned char Stage(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -6307,7 +6307,7 @@ namespace Block
 		{
 			return 4547;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -6606,7 +6606,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Power(BlockState Block)
+		unsigned char Power(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -7488,7 +7488,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -8005,7 +8005,7 @@ namespace Block
 		{
 			return 4338;
 		}
-		int Moisture(BlockState Block)
+		unsigned char Moisture(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -8029,7 +8029,7 @@ namespace Block
 		{
 			return 2434;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -8165,7 +8165,7 @@ namespace Block
 		{
 			return 559;
 		}
-		int Distance(BlockState Block)
+		unsigned char Distance(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -8204,7 +8204,7 @@ namespace Block
 		{
 			return 13008;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -8519,7 +8519,7 @@ namespace Block
 		{
 			return 11206;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -8581,7 +8581,7 @@ namespace Block
 		{
 			return 21325;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -8747,7 +8747,7 @@ namespace Block
 		{
 			return 11302;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -8809,7 +8809,7 @@ namespace Block
 		{
 			return 21421;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -9047,7 +9047,7 @@ namespace Block
 		{
 			return 9414;
 		}
-		int Power(BlockState Block)
+		unsigned char Power(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -9590,7 +9590,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -9627,7 +9627,7 @@ namespace Block
 		{
 			return 363;
 		}
-		int Distance(BlockState Block)
+		unsigned char Distance(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -9697,7 +9697,7 @@ namespace Block
 		{
 			return 35;
 		}
-		int Stage(BlockState Block)
+		unsigned char Stage(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -9712,7 +9712,7 @@ namespace Block
 		{
 			return 4515;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -9932,7 +9932,7 @@ namespace Block
 		{
 			return 13229;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -10070,7 +10070,7 @@ namespace Block
 		{
 			return 102;
 		}
-		int Level(BlockState Block)
+		unsigned char Level(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -10169,7 +10169,7 @@ namespace Block
 		{
 			return 10733;
 		}
-		int Level(BlockState Block)
+		unsigned char Level(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -10206,7 +10206,7 @@ namespace Block
 		{
 			return 11142;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -10268,7 +10268,7 @@ namespace Block
 		{
 			return 21261;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -10434,7 +10434,7 @@ namespace Block
 		{
 			return 11222;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -10496,7 +10496,7 @@ namespace Block
 		{
 			return 21341;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -10662,7 +10662,7 @@ namespace Block
 		{
 			return 9398;
 		}
-		int Power(BlockState Block)
+		unsigned char Power(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -10747,7 +10747,7 @@ namespace Block
 		{
 			return 11174;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -10809,7 +10809,7 @@ namespace Block
 		{
 			return 21293;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -10995,7 +10995,7 @@ namespace Block
 		{
 			return 11126;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -11057,7 +11057,7 @@ namespace Block
 		{
 			return 21245;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -11405,7 +11405,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -11442,7 +11442,7 @@ namespace Block
 		{
 			return 503;
 		}
-		int Distance(BlockState Block)
+		unsigned char Distance(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -11512,7 +11512,7 @@ namespace Block
 		{
 			return 50;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -11531,7 +11531,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Stage(BlockState Block)
+		unsigned char Stage(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -11569,7 +11569,7 @@ namespace Block
 		{
 			return 4611;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -11819,7 +11819,7 @@ namespace Block
 		{
 			return 7059;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -12553,7 +12553,7 @@ namespace Block
 		{
 			return 7615;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -12608,7 +12608,7 @@ namespace Block
 				default:  return Instrument::Zombie;
 			}
 		}
-		int Note(BlockState Block)
+		unsigned char Note(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -12833,7 +12833,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -12870,7 +12870,7 @@ namespace Block
 		{
 			return 279;
 		}
-		int Distance(BlockState Block)
+		unsigned char Distance(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -12940,7 +12940,7 @@ namespace Block
 		{
 			return 29;
 		}
-		int Stage(BlockState Block)
+		unsigned char Stage(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -12955,7 +12955,7 @@ namespace Block
 		{
 			return 4355;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -13221,7 +13221,7 @@ namespace Block
 		{
 			return 11110;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -13283,7 +13283,7 @@ namespace Block
 		{
 			return 21229;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -13922,7 +13922,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -13959,7 +13959,7 @@ namespace Block
 		{
 			return 475;
 		}
-		int Distance(BlockState Block)
+		unsigned char Distance(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -14029,7 +14029,7 @@ namespace Block
 		{
 			return 43;
 		}
-		int Stage(BlockState Block)
+		unsigned char Stage(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -14044,7 +14044,7 @@ namespace Block
 		{
 			return 4579;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -14327,7 +14327,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -14381,7 +14381,7 @@ namespace Block
 		{
 			return 11190;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -14443,7 +14443,7 @@ namespace Block
 		{
 			return 21309;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -14527,7 +14527,7 @@ namespace Block
 				default:  return eBlockFace::BLOCK_FACE_ZP;
 			}
 		}
-		int FlowerAmount(BlockState Block)
+		unsigned char FlowerAmount(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -14701,7 +14701,7 @@ namespace Block
 		{
 			return 12967;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -14750,7 +14750,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -15654,7 +15654,7 @@ namespace Block
 		{
 			return 8834;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -15783,7 +15783,7 @@ namespace Block
 		{
 			return 7633;
 		}
-		int Level(BlockState Block)
+		unsigned char Level(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -16038,7 +16038,7 @@ namespace Block
 		{
 			return 7051;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -16059,7 +16059,7 @@ namespace Block
 		{
 			return 11254;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -16121,7 +16121,7 @@ namespace Block
 		{
 			return 21373;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -16504,7 +16504,7 @@ namespace Block
 		{
 			return 11318;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -16566,7 +16566,7 @@ namespace Block
 		{
 			return 21437;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -17147,7 +17147,7 @@ namespace Block
 				default:  return North::Up;
 			}
 		}
-		int Power(BlockState Block)
+		unsigned char Power(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -17197,7 +17197,7 @@ namespace Block
 		{
 			return 6050;
 		}
-		int Delay(BlockState Block)
+		unsigned char Delay(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -17267,7 +17267,7 @@ namespace Block
 		{
 			return 19919;
 		}
-		int Charges(BlockState Block)
+		unsigned char Charges(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -17444,7 +17444,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Distance(BlockState Block)
+		unsigned char Distance(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -17491,7 +17491,7 @@ namespace Block
 		{
 			return 22789;
 		}
-		int Power(BlockState Block)
+		unsigned char Power(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -17634,7 +17634,7 @@ namespace Block
 		{
 			return 13402;
 		}
-		int Pickles(BlockState Block)
+		unsigned char Pickles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -17695,7 +17695,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -18083,7 +18083,7 @@ namespace Block
 		{
 			return 13269;
 		}
-		int Hatch(BlockState Block)
+		unsigned char Hatch(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -18099,7 +18099,7 @@ namespace Block
 		{
 			return 5938;
 		}
-		int Layers(BlockState Block)
+		unsigned char Layers(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -18404,7 +18404,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -18441,7 +18441,7 @@ namespace Block
 		{
 			return 307;
 		}
-		int Distance(BlockState Block)
+		unsigned char Distance(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -18511,7 +18511,7 @@ namespace Block
 		{
 			return 31;
 		}
-		int Stage(BlockState Block)
+		unsigned char Stage(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -18526,7 +18526,7 @@ namespace Block
 		{
 			return 4387;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -19428,7 +19428,7 @@ namespace Block
 		{
 			return 5965;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -19472,7 +19472,7 @@ namespace Block
 		{
 			return 125;
 		}
-		int Dusted(BlockState Block)
+		unsigned char Dusted(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -19489,7 +19489,7 @@ namespace Block
 		{
 			return 119;
 		}
-		int Dusted(BlockState Block)
+		unsigned char Dusted(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -19506,7 +19506,7 @@ namespace Block
 		{
 			return 19044;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -19553,7 +19553,7 @@ namespace Block
 		{
 			return 19850;
 		}
-		int Power(BlockState Block)
+		unsigned char Power(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -19609,7 +19609,7 @@ namespace Block
 		{
 			return 12964;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -20099,7 +20099,7 @@ namespace Block
 		{
 			return 13257;
 		}
-		int Eggs(BlockState Block)
+		unsigned char Eggs(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -20109,7 +20109,7 @@ namespace Block
 				default:  return 4;
 			}
 		}
-		int Hatch(BlockState Block)
+		unsigned char Hatch(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -20125,7 +20125,7 @@ namespace Block
 		{
 			return 19107;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -20467,7 +20467,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -20544,7 +20544,7 @@ namespace Block
 		{
 			return 19778;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -20767,7 +20767,7 @@ namespace Block
 		{
 			return 86;
 		}
-		int Level(BlockState Block)
+		unsigned char Level(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -20796,7 +20796,7 @@ namespace Block
 		{
 			return 7629;
 		}
-		int Level(BlockState Block)
+		unsigned char Level(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -21877,7 +21877,7 @@ namespace Block
 		{
 			return 19080;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -21922,7 +21922,7 @@ namespace Block
 		{
 			return 4330;
 		}
-		int Age(BlockState Block)
+		unsigned char Age(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -21943,7 +21943,7 @@ namespace Block
 		{
 			return 11094;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -22005,7 +22005,7 @@ namespace Block
 		{
 			return 21213;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -22185,7 +22185,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -22239,7 +22239,7 @@ namespace Block
 		{
 			return 11158;
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -22301,7 +22301,7 @@ namespace Block
 		{
 			return 21277;
 		}
-		int Candles(BlockState Block)
+		unsigned char Candles(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -22475,7 +22475,7 @@ namespace Block
 				default:  return true;
 			}
 		}
-		int Rotation(BlockState Block)
+		unsigned char Rotation(BlockState Block)
 		{
 			switch(Block.ID)
 			{
@@ -22523,6 +22523,7 @@ namespace Block
 			}
 		}
 	}
+
 }
 
 BlockType BlockState::Type() const

@@ -301,7 +301,7 @@ bool cPickup::CollectedBy(cEntity & a_Dest)
 			default: break;
 		}
 
-			m_Item.m_ItemCount -= NumAdded;
+			m_Item.m_ItemCount -= static_cast<unsigned>(NumAdded);
 			m_World->BroadcastCollectEntity(*this, a_Dest, static_cast<unsigned>(NumAdded));
 
 			// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)

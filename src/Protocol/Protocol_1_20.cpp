@@ -1743,7 +1743,7 @@ void cProtocol_1_20_3::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 				if (!MinecartContent.IsEmpty())
 				{
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockIDMeta, EntityMetadataType::VarInt);
-					a_Pkt.WriteVarInt32(Palette_1_16::From(MinecartContent.m_ItemType)); // todo use proper palette
+					a_Pkt.WriteVarInt32(GetProtocolItemType(MinecartContent.m_ItemType)); // todo use proper palette
 
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockY, EntityMetadataType::VarInt);
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
@@ -2450,7 +2450,7 @@ void cProtocol_1_20_5::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 {
 	if (a_Item.IsEmpty())
 	{
-		a_Pkt.WriteVarInt32(-1);
+		a_Pkt.WriteVarInt32(0);
 		return;
 	}
 	a_Pkt.WriteVarInt32(a_Item.m_ItemCount);
