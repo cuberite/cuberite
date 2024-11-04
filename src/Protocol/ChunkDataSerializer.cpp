@@ -503,7 +503,7 @@ inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_C
 	ChunkDef_ForEachSection(a_BlockData, a_LightData,
 	{
 		// Count non-air blocks.
-		int BlockCount = 0;
+		Int16 BlockCount = 0;
 		if (Blocks != nullptr)
 		{
 			for (size_t i = 0; i != ChunkBlockData::SectionBlockCount; i++)
