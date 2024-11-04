@@ -15,7 +15,7 @@ public:
 
 	using Super::Super;
 
-	constexpr cSolidSurfaceUnderneath(BLOCKTYPE a_BlockType):
+	constexpr cSolidSurfaceUnderneath(BlockState a_BlockType):
 		Base(a_BlockType)
 	{
 	}
@@ -24,11 +24,9 @@ protected:
 
 	~cSolidSurfaceUnderneath() = default;
 
-protected:
-
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Block) const override
 	{
-		if (!Super::CanBeAt(a_Chunk, a_Position, a_Meta))
+		if (!Super::CanBeAt(a_Chunk, a_Position, a_Block))
 		{
 			return false;
 		}
@@ -39,9 +37,7 @@ protected:
 			return false;
 		}
 
-		BLOCKTYPE BelowBlock;
-		NIBBLETYPE BelowBlockMeta;
-		a_Chunk.GetBlockTypeMeta(BelowPos, BelowBlock, BelowBlockMeta);
+		BlockState BelowBlock;
 
 		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
 		{
@@ -51,13 +47,13 @@ protected:
 		// upside down slabs
 		if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
 		{
-			return BelowBlockMeta & E_META_WOODEN_SLAB_UPSIDE_DOWN;
+			return cBlockSlabHandler::IsSlabUpsideDown(BelowBlock);
 		}
 
 		// upside down stairs
 		if (cBlockStairsHandler::IsAnyStairType(BelowBlock))
 		{
-			return BelowBlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN;
+			return cBlockStairsHandler::IsStairsUpsideDown(BelowBlock);
 		}
 
 		return false;

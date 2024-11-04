@@ -7,7 +7,7 @@
 
 
 
-class cBlockSugarcaneHandler final :
+class cBlockSugarCaneHandler final :
 	public cBlockPlant<false>
 {
 	using Super = cBlockPlant<false>;
@@ -20,12 +20,13 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		if (a_Position.y <= 0)
+		const auto BelowPos = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(BelowPos))
 		{
 			return false;
 		}
 
-		switch (a_Chunk.GetBlock(a_Position.addedY(-1)).Type())
+		switch (a_Chunk.GetBlock(BelowPos).Type())
 		{
 			case BlockType::Dirt:
 			case BlockType::GrassBlock:
@@ -34,10 +35,10 @@ private:
 			{
 				static const Vector3i Coords[] =
 				{
-					{-1, -1,  0},
-					{ 1, -1,  0},
-					{ 0, -1, -1},
-					{ 0, -1,  1},
+					{-1, 0,  0},
+					{ 1, 0,  0},
+					{ 0, 0, -1},
+					{ 0, 0,  1},
 				} ;
 				for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 				{
@@ -79,27 +80,27 @@ private:
 	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, char a_NumStages = 1) const override
 	{
 		// Check the total height of the sugarcane blocks here:
-		int TopY = a_RelPos.y + 1;
+		auto top = a_RelPos.addedY(1);
 		while (
-			(TopY < cChunkDef::Height) &&
-			(a_Chunk.GetBlock({a_RelPos.x, TopY, a_RelPos.z}).Type() == BlockType::SugarCane)
+			cChunkDef::IsValidHeight(top) &&
+			(a_Chunk.GetBlock(top).Type() == BlockType::SugarCane)
 		)
 		{
-			++TopY;
+			++top.y;
 		}
-		int bottom = a_RelPos.y - 1;
+		auto bottom = a_RelPos.addedY(-1);
 		while (
-			(bottom > 0) &&
-			(a_Chunk.GetBlock({a_RelPos.x, bottom, a_RelPos.z}).Type() == BlockType::SugarCane)
+			cChunkDef::IsValidHeight(bottom) &&
+			(a_Chunk.GetBlock(bottom).Type() == BlockType::SugarCane)
 		)
 		{
-			--bottom;
+			--bottom.y;
 		}
 		const auto NumStages = static_cast<unsigned char>(std::clamp<char>(a_NumStages, 0, std::numeric_limits<char>::max()));
 
 		// Grow by at most a_NumStages, but no more than max height:
-		auto toGrow = std::min<unsigned char>(NumStages, static_cast<unsigned char>(a_Chunk.GetWorld()->GetMaxSugarcaneHeight() + 1 - (TopY - bottom)));
-		Vector3i TopYPos(a_RelPos.x, TopY, a_RelPos.z);
+		auto toGrow = std::min<unsigned char>(NumStages, static_cast<unsigned char>(a_Chunk.GetWorld()->GetMaxSugarcaneHeight() + 1 - (top.y - bottom.y)));
+		Vector3i TopYPos(a_RelPos.x, top.y, a_RelPos.z);
 		for (int i = 0; i < toGrow; i++)
 		{
 			if (cBlockAirHandler::IsBlockAir(a_Chunk.GetBlock(TopYPos.addedY(i))))
