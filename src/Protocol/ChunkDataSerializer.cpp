@@ -502,7 +502,7 @@ inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_C
 	// Write each chunk section...
 	ChunkDef_ForEachSection(a_BlockData, a_LightData,
 	{
-		m_Packet.WriteBEInt16(4096);  // a temp fix to make sure sections don't disappear
+		m_Packet.WriteBEInt16(ChunkBlockData::SectionBlockCount);  // a temp fix to make sure sections don't disappear
 		m_Packet.WriteBEUInt8(BitsPerEntry);
 		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
 		WriteBlockSectionSeamless<&Palette477>(Blocks, Metas, BitsPerEntry);
