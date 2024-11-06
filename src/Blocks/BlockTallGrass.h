@@ -54,12 +54,13 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_Position.y <= 0)
+		const auto BelowPos = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(BelowPos))
 		{
 			return false;
 		}
 
-		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(a_Position.addedY(-1));
+		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(BelowPos);
 		return IsBlockTypeOfDirt(BelowBlock);
 	}
 
@@ -70,7 +71,8 @@ private:
 	/** Growing a tall grass produces a big flower (2-block high fern or double-tall grass). */
 	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
-		if (a_RelPos.y > (cChunkDef::Height - 2))
+		const auto TopPos = a_RelPos.addedY(1);
+		if (!cChunkDef::IsValidHeight(TopPos))
 		{
 			return 0;
 		}
@@ -83,7 +85,7 @@ private:
 			default:                      return 0;
 		}
 		a_Chunk.SetBlock(a_RelPos,           E_BLOCK_BIG_FLOWER, largeFlowerMeta);
-		a_Chunk.SetBlock(a_RelPos.addedY(1), E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
+		a_Chunk.SetBlock(TopPos, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
 		return 1;
 	}
 

@@ -31,12 +31,13 @@ public:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_Position.y < 1)
+		const auto BelowPos = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(BelowPos))
 		{
 			return false;
 		}
 
-		return cBlockInfo::IsSolid(a_Chunk.GetBlock(a_Position.addedY(-1)));
+		return cBlockInfo::IsSolid(a_Chunk.GetBlock(BelowPos));
 	}
 
 

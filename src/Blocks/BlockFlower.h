@@ -30,7 +30,9 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		return (a_Position.y > 0) && IsBlockTypeOfDirt(a_Chunk.GetBlock(a_Position.addedY(-1)));
+		const auto BottomPos = a_Position.addedY(-1);
+
+		return cChunkDef::IsValidHeight(BottomPos) && IsBlockTypeOfDirt(a_Chunk.GetBlock(BottomPos));
 	}
 
 

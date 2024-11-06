@@ -58,7 +58,8 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		return (a_Position.y > 0) && (a_Chunk.GetBlock(a_Position.addedY(-1)) == E_BLOCK_FARMLAND);
+		const auto BelowPos = a_Position.addedY(-1);
+		return cChunkDef::IsValidHeight(BelowPos) && (a_Chunk.GetBlock(BelowPos) == E_BLOCK_FARMLAND);
 	}
 
 

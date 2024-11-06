@@ -177,11 +177,17 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, NIBBLETYPE a_Meta) const override
 	{
+		const auto BelowPos = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(BelowPos))
+		{
+			return false;
+		}
+
 		BLOCKTYPE BelowBlock;
 		NIBBLETYPE BelowBlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_Position.addedY(-1), BelowBlock, BelowBlockMeta);
+		a_Chunk.GetBlockTypeMeta(BelowPos, BelowBlock, BelowBlockMeta);
 
-		if ((a_Position.y <= 0) || !CanBeSupportedBy(BelowBlock, BelowBlockMeta))
+		if (!CanBeSupportedBy(BelowBlock, BelowBlockMeta))
 		{
 			return false;
 		}

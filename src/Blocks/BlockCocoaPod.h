@@ -43,7 +43,10 @@ private:
 		auto LogPos = AddFaceDirection(a_Position, BlockFace, true);
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
-		a_Chunk.UnboundedRelGetBlock(LogPos, BlockType, BlockMeta);
+		if (!a_Chunk.UnboundedRelGetBlock(LogPos, BlockType, BlockMeta))
+		{
+			return true;
+		}
 		return ((BlockType == E_BLOCK_LOG) && ((BlockMeta & 0x03) == E_META_LOG_JUNGLE));
 	}
 
