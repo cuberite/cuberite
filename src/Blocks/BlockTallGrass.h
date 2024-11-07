@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "Mixins/DirtLikeUnderneath.h"
 #include "ChunkInterface.h"
 
 
@@ -10,9 +11,9 @@
 
 /** Handles the grass that is 1 block tall */
 class cBlockTallGrassHandler final :
-	public cBlockHandler
+	public cDirtLikeUnderneath<cBlockHandler>
 {
-	using Super = cBlockHandler;
+	using Super = cDirtLikeUnderneath<cBlockHandler>;
 
 public:
 
@@ -46,22 +47,6 @@ private:
 		// 12.5% chance of dropping 0 or more seeds.
 		const auto DropNum = FortuneDiscreteRandom(1, 1, 2 * ToolFortuneLevel(a_Tool));
 		return cItem(E_ITEM_SEEDS, DropNum);
-	}
-
-
-
-
-
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
-	{
-		const auto BelowPos = a_Position.addedY(-1);
-		if (!cChunkDef::IsValidHeight(BelowPos))
-		{
-			return false;
-		}
-
-		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(BelowPos);
-		return IsBlockTypeOfDirt(BelowBlock);
 	}
 
 

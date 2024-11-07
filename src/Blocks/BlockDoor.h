@@ -5,7 +5,7 @@
 #include "../BlockInfo.h"
 #include "../Entities/Player.h"
 #include "../Chunk.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
 #include "ChunkInterface.h"
 #include "BlockSlab.h"
 

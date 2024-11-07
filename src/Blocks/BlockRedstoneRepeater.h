@@ -3,10 +3,9 @@
 
 #include "BlockHandler.h"
 #include "BlockType.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
+#include "Mixins/SolidSurfaceUnderneath.h"
 #include "ChunkInterface.h"
-#include "BlockSlab.h"
-#include "BlockStairs.h"
 #include "../Chunk.h"
 
 
@@ -14,9 +13,9 @@
 
 
 class cBlockRedstoneRepeaterHandler final :
-	public cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>
+	public cSolidSurfaceUnderneath<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>
 {
-	using Super = cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>;
+	using Super = cSolidSurfaceUnderneath<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>;
 
 public:
 
@@ -101,42 +100,6 @@ private:
 	virtual bool IsUseable(void) const override
 	{
 		return true;
-	}
-
-
-
-
-
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
-	{
-		const auto BelowPos = a_Position.addedY(-1);
-		if (!cChunkDef::IsValidHeight(BelowPos))
-		{
-			return false;
-		}
-
-		BLOCKTYPE BelowBlock;
-		NIBBLETYPE BelowBlockMeta;
-		a_Chunk.GetBlockTypeMeta(BelowPos, BelowBlock, BelowBlockMeta);
-
-		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
-		{
-			return true;
-		}
-
-		// upside down slabs
-		if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
-		{
-			return BelowBlockMeta & E_META_WOODEN_SLAB_UPSIDE_DOWN;
-		}
-
-		// upside down stairs
-		if (cBlockStairsHandler::IsAnyStairType(BelowBlock))
-		{
-			return BelowBlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN;
-		}
-
-		return false;
 	}
 
 

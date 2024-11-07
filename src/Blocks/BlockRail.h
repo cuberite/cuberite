@@ -1,10 +1,9 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "BlockSlab.h"
-#include "BlockStairs.h"
 #include "BlockType.h"
-#include "Blocks/Mixins.h"
+#include "Mixins/Mixins.h"
+#include "Mixins/SolidSurfaceUnderneath.h"
 #include "../BlockInfo.h"
 #include "../Chunk.h"
 #include "ChunkDef.h"
@@ -25,9 +24,9 @@ enum ENUM_PURE
 
 
 class cBlockRailHandler final :
-	public cClearMetaOnDrop<cBlockHandler>
+	public cSolidSurfaceUnderneath<cClearMetaOnDrop<cBlockHandler>>
 {
-	using Super = cClearMetaOnDrop<cBlockHandler>;
+	using Super = cSolidSurfaceUnderneath<cClearMetaOnDrop<cBlockHandler>>;
 
 public:
 
@@ -162,32 +161,9 @@ public:
 
 private:
 
-	static bool CanBeSupportedBy(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-	{
-		if (cBlockSlabHandler::IsAnySlabType(a_BlockType))
-		{
-			return (a_BlockMeta & E_META_WOODEN_SLAB_UPSIDE_DOWN);
-		}
-		else if (cBlockStairsHandler::IsAnyStairType(a_BlockType))
-		{
-			return (a_BlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
-		}
-		return cBlockInfo::FullyOccupiesVoxel(a_BlockType);
-	}
-
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, NIBBLETYPE a_Meta) const override
 	{
-		const auto BelowPos = a_Position.addedY(-1);
-		if (!cChunkDef::IsValidHeight(BelowPos))
-		{
-			return false;
-		}
-
-		BLOCKTYPE BelowBlock;
-		NIBBLETYPE BelowBlockMeta;
-		a_Chunk.GetBlockTypeMeta(BelowPos, BelowBlock, BelowBlockMeta);
-
-		if (!CanBeSupportedBy(BelowBlock, BelowBlockMeta))
+		if (!Super::CanBeAt(a_Chunk, a_Position, a_Meta))
 		{
 			return false;
 		}

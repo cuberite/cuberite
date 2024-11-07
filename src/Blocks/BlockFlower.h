@@ -2,15 +2,16 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "Mixins/DirtLikeUnderneath.h"
 
 
 
 
 
 class cBlockFlowerHandler final :
-	public cBlockHandler
+	public cDirtLikeUnderneath<cBlockHandler>
 {
-	using Super = cBlockHandler;
+	using Super = cDirtLikeUnderneath<cBlockHandler>;
 
 public:
 
@@ -22,17 +23,6 @@ private:
 	{
 		NIBBLETYPE meta = a_BlockMeta & 0x7;
 		return cItem(m_BlockType, 1, meta);
-	}
-
-
-
-
-
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
-	{
-		const auto BottomPos = a_Position.addedY(-1);
-
-		return cChunkDef::IsValidHeight(BottomPos) && IsBlockTypeOfDirt(a_Chunk.GetBlock(BottomPos));
 	}
 
 

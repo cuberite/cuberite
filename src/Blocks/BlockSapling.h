@@ -3,15 +3,16 @@
 
 #include "BlockHandler.h"
 #include "../FastRandom.h"
+#include "Mixins/DirtLikeUnderneath.h"
 
 
 
 
 
 class cBlockSaplingHandler final :
-	public cBlockHandler
+	public cDirtLikeUnderneath<cBlockHandler>
 {
-	using Super = cBlockHandler;
+	using Super = cDirtLikeUnderneath<cBlockHandler>;
 
 public:
 
@@ -23,16 +24,6 @@ private:
 	{
 		// The low 3 bits store the sapling type; bit 0x08 is the growth timer (not used in pickups)
 		return cItem(m_BlockType, 1, a_BlockMeta & 0x07);
-	}
-
-
-
-
-
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
-	{
-		const auto BelowPos = a_Position.addedY(-1);
-		return cChunkDef::IsValidHeight(BelowPos) && IsBlockTypeOfDirt(a_Chunk.GetBlock(BelowPos));
 	}
 
 
