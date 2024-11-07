@@ -26,7 +26,7 @@ private:
 			return false;
 		}
 
-		switch (a_Chunk.GetBlock(BelowPos))
+		switch (a_Chunk.GetBlock(BelowPos).Type())
 		{
 			case BlockType::Dirt:
 			case BlockType::GrassBlock:

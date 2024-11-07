@@ -13,9 +13,9 @@
 
 
 class cBlockRedstoneRepeaterHandler final :
-	public cSolidSurfaceUnderneath<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>
+	public cBlockHandler
 {
-	using Super = cSolidSurfaceUnderneath<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>;
+	using Super = cBlockHandler;
 
 public:
 

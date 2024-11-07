@@ -1,9 +1,9 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "BlockSlab.h"
+#include "BlockStairs.h"
 #include "BlockType.h"
-#include "Mixins/Mixins.h"
-#include "Mixins/SolidSurfaceUnderneath.h"
 #include "../BlockInfo.h"
 #include "../Chunk.h"
 #include "ChunkDef.h"
@@ -25,9 +25,9 @@ enum ENUM_PURE
 
 
 class cBlockRailHandler final :
-	public cClearMetaOnDrop<cBlockHandler>
+	public cBlockHandler
 {
-	using Super = cClearMetaOnDrop<cBlockHandler>;
+	using Super = cBlockHandler;
 
 public:
 
@@ -405,17 +405,17 @@ public:
 
 private:
 
-	static bool CanBeSupportedBy(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	static bool CanBeSupportedBy(BlockState a_Block)
 	{
-		if (cBlockSlabHandler::IsAnySlabType(a_BlockType))
+		if (cBlockSlabHandler::IsAnySlabType(a_Block))
 		{
-			return (a_BlockMeta & E_META_WOODEN_SLAB_UPSIDE_DOWN);
+			return cBlockSlabHandler::IsSlabUpsideDown(a_Block);
 		}
-		else if (cBlockStairsHandler::IsAnyStairType(a_BlockType))
+		else if (cBlockStairsHandler::IsAnyStairType(a_Block))
 		{
-			return (a_BlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
+			return cBlockStairsHandler::IsStairsUpsideDown(a_Block);
 		}
-		return cBlockInfo::FullyOccupiesVoxel(a_BlockType);
+		return cBlockInfo::FullyOccupiesVoxel(a_Block);
 	}
 
 	virtual void OnPlaced(
@@ -448,11 +448,39 @@ private:
 			const cEntity * a_Digger
 	) const override
 	{
-		BLOCKTYPE BelowBlock;
-		NIBBLETYPE BelowBlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_Position.addedY(-1), BelowBlock, BelowBlockMeta);
+		Super::OnBroken(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_OldBlock, a_Digger);
 
-		if ((a_Position.y <= 0) || !CanBeSupportedBy(BelowBlock, BelowBlockMeta))
+		// Alert diagonal rails:
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1,  1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1,  1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1,  1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1, -1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1, -1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1, -1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1,  1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1, -1), BLOCK_FACE_NONE);
+	}
+
+
+
+#define GETOFFSET(RailType) \
+{ \
+	switch (Rail::Shape(Self)) \
+	{ \
+		case Rail::Shape::AscendingEast:  Offset = { 1, 0,  0}; break; \
+		case Rail::Shape::AscendingWest:  Offset = {-1, 0,  0}; break; \
+		case Rail::Shape::AscendingNorth: Offset = { 0, 0, -1}; break; \
+		case Rail::Shape::AscendingSouth: Offset = { 0, 0,  1}; break; \
+		default: break; \
+	} \
+	break; \
+}
+
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
+	{
+		BlockState BelowBlock = a_Chunk.GetBlock(a_Position.addedY(-1));
+
+		if ((a_Position.y <= 0) || !CanBeSupportedBy(BelowBlock))
 		{
 			return false;
 		}
