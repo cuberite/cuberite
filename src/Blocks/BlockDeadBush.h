@@ -29,12 +29,13 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_Position.y <= 0)
+		const auto PosBelow = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(PosBelow))
 		{
 			return false;
 		}
 
-		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(a_Position.addedY(-1));
+		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(PosBelow);
 		switch (BelowBlock)
 		{
 			case E_BLOCK_CLAY:
