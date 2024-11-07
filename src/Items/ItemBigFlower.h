@@ -29,7 +29,10 @@ public:
 		const auto TopPos = a_PlacePosition.addedY(1);
 		BLOCKTYPE TopType;
 		NIBBLETYPE TopMeta;
-		World.GetBlockTypeMeta(TopPos, TopType, TopMeta);
+		if (!World.GetBlockTypeMeta(TopPos, TopType, TopMeta))
+		{
+			return false;
+		}
 
 		if (!cBlockHandler::For(TopType).DoesIgnoreBuildCollision(World, a_HeldItem, TopPos, TopMeta, a_ClickedBlockFace, false))
 		{

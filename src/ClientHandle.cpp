@@ -1254,7 +1254,10 @@ void cClientHandle::HandleBlockDigStarted(Vector3i a_BlockPos, eBlockFace a_Bloc
 
 	BLOCKTYPE DiggingBlock;
 	NIBBLETYPE DiggingMeta;
-	m_Player->GetWorld()->GetBlockTypeMeta(a_BlockPos, DiggingBlock, DiggingMeta);
+	if (!m_Player->GetWorld()->GetBlockTypeMeta(a_BlockPos, DiggingBlock, DiggingMeta))
+	{
+		return;
+	}
 
 	if (
 		m_Player->IsGameModeCreative() &&
@@ -1322,7 +1325,10 @@ void cClientHandle::HandleBlockDigFinished(Vector3i a_BlockPos, eBlockFace a_Blo
 
 	BLOCKTYPE DugBlock;
 	NIBBLETYPE DugMeta;
-	m_Player->GetWorld()->GetBlockTypeMeta(a_BlockPos, DugBlock, DugMeta);
+	if (!m_Player->GetWorld()->GetBlockTypeMeta(a_BlockPos, DugBlock, DugMeta))
+	{
+		return;
+	}
 
 	if (!m_Player->IsGameModeCreative())
 	{

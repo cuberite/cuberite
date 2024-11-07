@@ -27,7 +27,10 @@ public:
 		auto & World = *a_Player.GetWorld();
 		BLOCKTYPE HeadType;
 		NIBBLETYPE HeadMeta;
-		World.GetBlockTypeMeta(HeadPosition, HeadType, HeadMeta);
+		if (!World.GetBlockTypeMeta(HeadPosition, HeadType, HeadMeta))
+		{
+			return false;
+		}
 
 		// Vanilla only allows beds to be placed into air.
 		// Check if there is empty space for the "head" block:

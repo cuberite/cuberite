@@ -54,7 +54,10 @@ public:
 		{
 			BLOCKTYPE TopType;
 			NIBBLETYPE TopMeta;
-			World.GetBlockTypeMeta(UpperBlockPosition, TopType, TopMeta);
+			if (!World.GetBlockTypeMeta(UpperBlockPosition, TopType, TopMeta))
+			{
+				return false;
+			}
 
 			if (!cBlockHandler::For(TopType).DoesIgnoreBuildCollision(World, a_HeldItem, UpperBlockPosition, TopMeta, a_ClickedBlockFace, false))
 			{
