@@ -83,7 +83,7 @@ public:
 
 	/** Check if the player is queued to be transferred to a World.
 	Returns true is Player is found in queue. */
-	bool IsPlayerInQueue(AString a_Username);
+	bool IsPlayerInQueue(const AString & a_Username);
 
 	/** Can login more than once with same username.
 	Returns false if it is not allowed, true otherwise. */
@@ -94,14 +94,24 @@ public:
 
 	// tolua_end
 
+	/** Returns true if clients must accept resource pack. This is read from the settings. */
+	bool ShouldRequireResourcePack(void) { return m_RequireResourcePack; }
+
 	const AString & GetResourcePackUrl(void) { return m_ResourcePackUrl; }
+
+	std::string_view GetCustomRedirectUrl(void) { return m_CustomRedirectUrl; }
 
 	bool Start(void);
 
 	bool Command(cClientHandle & a_Client, AString & a_Cmd);
 
-	/** Executes the console command, sends output through the specified callback */
-	void ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
+	/** Queues a console command for execution through the cServer class.
+	The command will be executed in the server tick thread.
+	The command's output will be written to the a_Output callback. */
+	void QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
+
+	/** Queues a lambda task onto the server tick thread, with the specified delay in ticks. */
+	void ScheduleTask(cTickTime a_DelayTicks, std::function<void(class cServer &)> a_Task);
 
 	/** Lists all available console commands and their helpstrings */
 	void PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & a_Output);
@@ -113,8 +123,8 @@ public:
 
 	void KickUser(int a_ClientID, const AString & a_Reason);
 
-	/** Authenticates the specified user, called by cAuthenticator */
-	void AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties);
+	/** Authenticates the specified user, called by cAuthenticator supplying player details from Mojang. */
+	void AuthenticateUser(int a_ClientID, AString && a_Username, const cUUID & a_UUID, Json::Value && a_Properties);
 
 	const AString & GetServerID(void) const { return m_ServerID; }  // tolua_export
 
@@ -131,7 +141,7 @@ public:
 	const AString & GetFaviconData(void) const { return m_FaviconData; }
 
 	cRsaPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
-	const AString & GetPublicKeyDER(void) const { return m_PublicKeyDER; }
+	ContiguousByteBufferView GetPublicKeyDER(void) const { return m_PublicKeyDER; }
 
 	/** Returns true if authentication has been turned on in server settings. */
 	bool ShouldAuthenticate(void) const { return m_ShouldAuthenticate; }  // tolua_export
@@ -139,19 +149,14 @@ public:
 	/** Returns true if limit for number of block changes per tick by a player has been turned on in server settings. */
 	bool ShouldLimitPlayerBlockChanges(void) const { return m_ShouldLimitPlayerBlockChanges; }
 
-	/** Returns true if offline UUIDs should be used to load data for players whose normal UUIDs cannot be found.
-	Loaded from the settings.ini [PlayerData].LoadOfflinePlayerData setting. */
-	bool ShouldLoadOfflinePlayerData(void) const { return m_ShouldLoadOfflinePlayerData; }
-
-	/** Returns true if old-style playernames should be used to load data for players whose regular datafiles cannot be found.
-	This allows a seamless transition from name-based to UUID-based player storage.
-	Loaded from the settings.ini [PlayerData].LoadNamedPlayerData setting. */
-	bool ShouldLoadNamedPlayerData(void) const { return m_ShouldLoadNamedPlayerData; }
-
 	/** Returns true if BungeeCord logins (that specify the player's UUID) are allowed.
 	Read from settings, admins should set this to true only when they chain to BungeeCord,
 	it makes the server vulnerable to identity theft through direct connections. */
 	bool ShouldAllowBungeeCord(void) const { return m_ShouldAllowBungeeCord; }
+
+	bool OnlyAllowBungeeCord(void) const { return m_OnlyAllowBungeeCord; }
+
+	const AString & GetProxySharedSecret(void) const { return m_ProxySharedSecret; }
 
 	/** Returns true if usernames should be completed across worlds. This is read
 	from the settings. */
@@ -201,17 +206,18 @@ private:
 	/** Number of players currently playing in the server. */
 	std::atomic_size_t m_PlayerCount;
 
+	cCriticalSection m_CSPendingCommands;
+	std::vector<std::pair<AString, cCommandOutputCallback *>> m_PendingCommands;
+
 	int m_ClientViewDistance;  // The default view distance for clients; settable in Settings.ini
 
 	bool m_bIsConnected;  // true - connected false - not connected
-
-	std::atomic<bool> m_bRestarting;
 
 	/** The private key used for the assymetric encryption start in the protocols */
 	cRsaPrivateKey m_PrivateKey;
 
 	/** Public key for m_PrivateKey, ASN1-DER-encoded */
-	AString m_PublicKeyDER;
+	ContiguousByteBuffer m_PublicKeyDER;
 
 	cRCONServer m_RCONServer;
 
@@ -220,7 +226,9 @@ private:
 	AString m_FaviconData;
 	size_t m_MaxPlayers;
 	bool m_bIsHardcore;
+	bool m_RequireResourcePack;
 	AString m_ResourcePackUrl;
+	AString m_CustomRedirectUrl;
 
 	/** Map of protocol version to Forge mods (map of ModName -> ModVersionString) */
 	std::map<UInt32, AStringMap> m_ForgeModsByVersion;
@@ -229,7 +237,6 @@ private:
 	bool m_bAllowMultiLogin;
 
 	cTickThread m_TickThread;
-	cEvent m_RestartEvent;
 
 	/** The server ID used for client authentication */
 	AString m_ServerID;
@@ -241,18 +248,14 @@ private:
 	/** True if limit for number of block changes per tick by a player should be enabled. */
 	bool m_ShouldLimitPlayerBlockChanges;
 
-	/** True if offline UUIDs should be used to load data for players whose normal UUIDs cannot be found.
-	This allows transitions from an offline (no-auth) server to an online one.
-	Loaded from the settings.ini [PlayerData].LoadOfflinePlayerData setting. */
-	bool m_ShouldLoadOfflinePlayerData;
-
-	/** True if old-style playernames should be used to load data for players whose regular datafiles cannot be found.
-	This allows a seamless transition from name-based to UUID-based player storage.
-	Loaded from the settings.ini [PlayerData].LoadNamedPlayerData setting. */
-	bool m_ShouldLoadNamedPlayerData;
-
 	/** True if BungeeCord handshake packets (with player UUID) should be accepted. */
 	bool m_ShouldAllowBungeeCord;
+
+	/** True if BungeeCord handshake packets should be the only ones accepted. */
+	bool m_OnlyAllowBungeeCord;
+
+	/** Security string that the proxy server should send, compatible with BungeeGuard */
+	AString m_ProxySharedSecret;
 
 	/** True if usernames should be completed across worlds. */
 	bool m_ShouldAllowMultiWorldTabCompletion;
@@ -262,7 +265,22 @@ private:
 	AStringVector m_Ports;
 
 
+	/** Time, in ticks, since the server started
+		Not persistent across server restarts */
+	cTickTimeLong m_UpTime;
+
+	/** Guards the m_Tasks */
+	cCriticalSection m_CSTasks;
+
+	/** Tasks that have been queued onto the tick thread, possibly to be
+	executed at target tick in the future; guarded by m_CSTasks */
+	std::vector<std::pair<std::chrono::milliseconds, std::function<void(class cServer &)>>> m_Tasks;
+
+
 	cServer(void);
+
+	/** Executes the console command, sends output through the specified callback. */
+	void ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output);
 
 	/** Get the Forge mods registered for a given protocol, for modification */
 	AStringMap & RegisteredForgeMods(const UInt32 a_Protocol);
@@ -274,10 +292,19 @@ private:
 	Returns the cClientHandle reinterpreted as cTCPLink callbacks. */
 	cTCPLink::cCallbacksPtr OnConnectionAccepted(const AString & a_RemoteIPAddress);
 
-	bool Tick(float a_Dt);
+	void Tick(float a_Dt);
 
 	/** Ticks the clients in m_Clients, manages the list in respect to removing clients */
 	void TickClients(float a_Dt);
+
+	/** Executes commands queued in the command queue. */
+	void TickCommands(void);
+
+
+	/** Executes all tasks queued onto the tick thread */
+	void TickQueuedTasks(void);
+
+
 };  // tolua_export
 
 

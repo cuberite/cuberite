@@ -1,5 +1,6 @@
+target_sources(
+	${CMAKE_PROJECT_NAME} PRIVATE
 
-SET (SRCS
 	AggressiveMonster.cpp
 	Bat.cpp
 	Blaze.cpp
@@ -8,6 +9,7 @@ SET (SRCS
 	Cow.cpp
 	Creeper.cpp
 	EnderDragon.cpp
+	Endermite.cpp
 	Enderman.cpp
 	Ghast.cpp
 	Giant.cpp
@@ -25,6 +27,7 @@ SET (SRCS
 	Pig.cpp
 	Rabbit.cpp
 	Sheep.cpp
+	Silverfish.cpp
 	Skeleton.cpp
 	Slime.cpp
 	SnowGolem.cpp
@@ -37,9 +40,8 @@ SET (SRCS
 	Wolf.cpp
 	Zombie.cpp
 	ZombiePigman.cpp
-	ZombieVillager.cpp)
+	ZombieVillager.cpp
 
-SET (HDRS
 	AggressiveMonster.h
 	Bat.h
 	Blaze.h
@@ -48,6 +50,7 @@ SET (HDRS
 	Cow.h
 	Creeper.h
 	EnderDragon.h
+	Endermite.h
 	Enderman.h
 	Ghast.h
 	Giant.h
@@ -80,9 +83,5 @@ SET (HDRS
 	Wolf.h
 	Zombie.h
 	ZombiePigman.h
-	ZombieVillager.h)
-
-if(NOT MSVC)
-	add_library(Mobs ${SRCS} ${HDRS})
-	target_link_libraries(Mobs fmt::fmt SQLiteCpp)
-endif()
+	ZombieVillager.h
+)

@@ -23,8 +23,8 @@ class cTerrainHeightToShapeGen:
 	public cTerrainShapeGen
 {
 public:
-	cTerrainHeightToShapeGen(cTerrainHeightGenPtr a_HeightGen):
-		m_HeightGen(a_HeightGen)
+	cTerrainHeightToShapeGen(std::unique_ptr<cTerrainHeightGen> a_HeightGen):
+		m_HeightGen(std::move(a_HeightGen))
 	{
 	}
 
@@ -63,7 +63,7 @@ public:
 
 protected:
 	/** The height generator being converted. */
-	cTerrainHeightGenPtr m_HeightGen;
+	std::unique_ptr<cTerrainHeightGen> m_HeightGen;
 };
 
 typedef std::shared_ptr<cTerrainHeightToShapeGen> cTerrainHeightToShapeGenPtr;
@@ -75,9 +75,9 @@ typedef std::shared_ptr<cTerrainHeightToShapeGen> cTerrainHeightToShapeGenPtr;
 ////////////////////////////////////////////////////////////////////////////////
 // cTerrainShapeGen:
 
-cTerrainShapeGenPtr cTerrainShapeGen::CreateShapeGen(
+std::unique_ptr<cTerrainShapeGen> cTerrainShapeGen::CreateShapeGen(
 	cIniFile & a_IniFile,
-	cBiomeGenPtr a_BiomeGen,
+	cBiomeGen & a_BiomeGen,
 	int a_Seed,
 	bool & a_CacheOffByDefault
 )
@@ -92,10 +92,10 @@ cTerrainShapeGenPtr cTerrainShapeGen::CreateShapeGen(
 	// If the shapegen is HeightMap, redirect to older HeightMap-based generators:
 	if (NoCaseCompare(shapeGenName, "HeightMap") == 0)
 	{
-		cTerrainHeightGenPtr heightGen = cTerrainHeightGen::CreateHeightGen(a_IniFile, a_BiomeGen, a_Seed, a_CacheOffByDefault);
+		auto heightGen = cTerrainHeightGen::CreateHeightGen(a_IniFile, a_BiomeGen, a_Seed, a_CacheOffByDefault);
 		if (heightGen != nullptr)
 		{
-			return std::make_shared<cTerrainHeightToShapeGen>(heightGen);
+			return std::make_unique<cTerrainHeightToShapeGen>(std::move(heightGen));
 		}
 
 		// The height gen was not recognized; several heightgens were promoted to shape gens, so let's try them instead:
@@ -110,22 +110,22 @@ cTerrainShapeGenPtr cTerrainShapeGen::CreateShapeGen(
 
 	// Choose the shape generator based on the name:
 	a_CacheOffByDefault = false;
-	cTerrainShapeGenPtr res;
+	std::unique_ptr<cTerrainShapeGen> res;
 	if (NoCaseCompare(shapeGenName, "DistortedHeightmap") == 0)
 	{
-		res = std::make_shared<cDistortedHeightmap>(a_Seed, a_BiomeGen);
+		res = std::make_unique<cDistortedHeightmap>(a_Seed, a_BiomeGen);
 	}
 	else if (NoCaseCompare(shapeGenName, "End") == 0)
 	{
-		res = std::make_shared<cEndGen>(a_Seed);
+		res = std::make_unique<cEndGen>(a_Seed);
 	}
 	else if (NoCaseCompare(shapeGenName, "BiomalNoise3D") == 0)
 	{
-		res = std::make_shared<cBiomalNoise3DComposable>(a_Seed, a_BiomeGen);
+		res = std::make_unique<cBiomalNoise3DComposable>(a_Seed, a_BiomeGen);
 	}
 	else if (NoCaseCompare(shapeGenName, "Noise3D") == 0)
 	{
-		res = std::make_shared<cNoise3DComposable>(a_Seed);
+		res = std::make_unique<cNoise3DComposable>(a_Seed);
 	}
 	else if (NoCaseCompare(shapeGenName, "TwoHeights") == 0)
 	{
@@ -144,7 +144,3 @@ cTerrainShapeGenPtr cTerrainShapeGen::CreateShapeGen(
 
 	return res;
 }
-
-
-
-

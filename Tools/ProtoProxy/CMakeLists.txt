@@ -1,11 +1,5 @@
-cmake_minimum_required(VERSION 3.0.2)
 project (ProtoProxy)
-
-include(../../SetFlags.cmake)
-
-set_flags()
-set_lib_flags()
-
+find_package(Threads REQUIRED)
 
 # Set include paths to the used libraries:
 include_directories(SYSTEM "../../lib")
@@ -20,11 +14,6 @@ function(flatten_files arg1)
 	endforeach()
 	set(${arg1} "${res}" PARENT_SCOPE)
 endfunction()
-
-include(../../lib/mbedtls.cmake)
-add_subdirectory(../../lib/zlib ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/lib/zlib)
-
-set_exe_flags()
 
 # Include the shared files:
 set(SHARED_SRC
@@ -42,6 +31,7 @@ set(SHARED_SRC
 )
 set(SHARED_HDR
 	../../src/ByteBuffer.h
+	../../src/Globals.h
 	../../src/StringUtils.h
 	../../src/UUID.h
 	../../src/mbedTLS++/AesCfb128Decryptor.h
@@ -81,13 +71,11 @@ source_group("Shared\\OSSupport" FILES ${SHARED_OSS_SRC} ${SHARED_OSS_HDR})
 # Include the main source files:
 set(SOURCES
 	Connection.cpp
-	Globals.cpp
 	ProtoProxy.cpp
 	Server.cpp
 )
 set(HEADERS
 	Connection.h
-	Globals.h
 	Server.h
 )
 source_group("" FILES ${SOURCES} ${HEADERS})
@@ -101,5 +89,7 @@ add_executable(ProtoProxy
 	${SHARED_OSS_HDR}
 )
 
-target_link_libraries(ProtoProxy zlib mbedtls fmt::fmt)
+target_link_libraries(ProtoProxy fmt::fmt libdeflate mbedtls Threads::Threads)
 
+include(../../SetFlags.cmake)
+set_exe_flags(ProtoProxy)

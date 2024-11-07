@@ -2,6 +2,7 @@
 #include "Globals.h"
 
 #include "Path.h"
+#include "BlockType.h"
 #include "../BlockInfo.h"
 #include "../Chunk.h"
 
@@ -479,7 +480,7 @@ void cPath::FillCellAttributes(cPathCell & a_Cell)
 
 	ASSERT(m_Chunk != nullptr);
 
-	if (!cChunkDef::IsValidHeight(Location.y))
+	if (!cChunkDef::IsValidHeight(Location))
 	{
 		// Players can't build outside the game height, so it must be air
 		a_Cell.m_IsSolid = false;
@@ -639,15 +640,8 @@ bool cPath::SpecialIsSolidFromThisDirection(BLOCKTYPE a_Type, NIBBLETYPE a_Meta,
 	// If there is a nonsolid above a fence
 	if (!cBlockInfo::IsSolid(a_Type))
 	{
-			// If we're coming from below
-			if (a_Direction.y > 0)
-			{
-				return true;  // treat the nonsolid as solid
-			}
-			else
-			{
-				return false;  // Treat it as a nonsolid because we are not coming from below
-			}
+		// Only treat as solid when we're coming from below
+		return (a_Direction.y > 0);
 	}
 
 	/* switch (a_Type)

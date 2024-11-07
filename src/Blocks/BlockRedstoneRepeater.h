@@ -2,122 +2,29 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "Mixins.h"
+#include "BlockType.h"
+#include "Mixins/Mixins.h"
+#include "Mixins/SolidSurfaceUnderneath.h"
 #include "ChunkInterface.h"
-#include "BlockSlab.h"
 #include "../Chunk.h"
 
 
 
 
 
-class cBlockRedstoneRepeaterHandler:
-	public cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>
+class cBlockRedstoneRepeaterHandler final :
+	public cSolidSurfaceUnderneath<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>
 {
-	using Super = cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>;
+	using Super = cSolidSurfaceUnderneath<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>;
 
 public:
 
-	cBlockRedstoneRepeaterHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
+	using Super::Super;
+
+	inline static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta)
 	{
+		return -GetRearCoordinateOffset(a_Meta);
 	}
-
-
-
-
-
-	virtual bool OnUse(
-		cChunkInterface & a_ChunkInterface,
-		cWorldInterface & a_WorldInterface,
-		cPlayer & a_Player,
-		const Vector3i a_BlockPos,
-		eBlockFace a_BlockFace,
-		const Vector3i a_CursorPos
-	) override
-	{
-		// Increment the delay setting:
-		a_ChunkInterface.SetBlockMeta(a_BlockPos, ((a_ChunkInterface.GetBlockMeta(a_BlockPos) + 0x04) & 0x0f));
-		return true;
-	}
-
-
-
-
-
-	virtual void OnCancelRightClick(
-		cChunkInterface & a_ChunkInterface,
-		cWorldInterface & a_WorldInterface,
-		cPlayer & a_Player,
-		const Vector3i a_BlockPos,
-		eBlockFace a_BlockFace
-	) override
-	{
-		UNUSED(a_ChunkInterface);
-		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
-	}
-
-
-
-
-
-	virtual bool IsUseable(void) override
-	{
-		return true;
-	}
-
-
-
-
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
-	{
-		if (a_RelPos.y <= 0)
-		{
-			return false;
-		}
-
-		BLOCKTYPE BelowBlock;
-		NIBBLETYPE BelowBlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_RelPos.addedY(-1), BelowBlock, BelowBlockMeta);
-
-		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
-		{
-			return true;
-		}
-		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
-		{
-			// Check if the slab is turned up side down
-			if ((BelowBlockMeta & 0x08) == 0x08)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
-	{
-		return cItem(E_ITEM_REDSTONE_REPEATER, 1, 0);
-	}
-
-
-
-
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
-	{
-		UNUSED(a_Meta);
-		return 11;
-	}
-
-
-
-
 
 	inline static Vector3i GetLeftCoordinateOffset(NIBBLETYPE a_Meta)
 	{
@@ -137,18 +44,6 @@ public:
 		}
 	}
 
-
-
-
-	inline static Vector3i GetFrontCoordinateOffset(NIBBLETYPE a_Meta)
-	{
-		return -GetRearCoordinateOffset(a_Meta);
-	}
-
-
-
-
-
 	inline static Vector3i GetRearCoordinateOffset(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & E_META_REDSTONE_REPEATER_FACING_MASK)  // We only want the direction (bottom) bits
@@ -164,6 +59,66 @@ public:
 				return { 0, 0, 0 };
 			}
 		}
+	}
+
+private:
+
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) const override
+	{
+		// Increment the delay setting:
+		a_ChunkInterface.SetBlockMeta(a_BlockPos, ((a_ChunkInterface.GetBlockMeta(a_BlockPos) + 0x04) & 0x0f));
+		return true;
+	}
+
+
+
+
+
+	virtual void OnCancelRightClick(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace
+	) const override
+	{
+		UNUSED(a_ChunkInterface);
+		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
+	}
+
+
+
+
+
+	virtual bool IsUseable(void) const override
+	{
+		return true;
+	}
+
+
+
+
+
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	{
+		return cItem(E_ITEM_REDSTONE_REPEATER, 1, 0);
+	}
+
+
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	{
+		UNUSED(a_Meta);
+		return 11;
 	}
 } ;
 

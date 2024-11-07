@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "ChunkDef.h"
+
 class cWorld;
 
 

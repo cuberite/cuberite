@@ -7,23 +7,18 @@
 
 
 
-class cBlockDirtHandler :
+class cBlockDirtHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
 
 public:
 
-	cBlockDirtHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		if (a_BlockMeta == E_META_DIRT_COARSE)
 		{
@@ -40,7 +35,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 10;

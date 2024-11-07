@@ -2,7 +2,7 @@
 
 #pragma once
 
-
+#include "ChunkDef.h"
 
 
 
@@ -21,7 +21,6 @@ class NBTChunkSerializer
 {
 public:
 
-	/** Serializes the chunk into the specified writer.
-	Returns true on success, false on failure (chunk not present etc.) */
-	static bool serialize(const cWorld & aWorld, cChunkCoords aCoords, cFastNBTWriter & aWriter);
+	/** Serializes the chunk into the specified writer. The chunk must be present. */
+	static void Serialize(const cWorld & aWorld, cChunkCoords aCoords, cFastNBTWriter & aWriter);
 };

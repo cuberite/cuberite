@@ -10,12 +10,10 @@
 
 
 
-cAnvilWindow::cAnvilWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
+cAnvilWindow::cAnvilWindow(Vector3i a_BlockPos) :
 	cWindow(wtAnvil, "Repair"),
-	m_RepairedItemName(""),
-	m_BlockX(a_BlockX),
-	m_BlockY(a_BlockY),
-	m_BlockZ(a_BlockZ)
+	m_RepairedItemName(),
+	m_BlockPos(a_BlockPos)
 {
 	m_AnvilSlotArea = new cSlotAreaAnvil(*this);
 	m_SlotAreas.push_back(m_AnvilSlotArea);
@@ -43,17 +41,6 @@ void cAnvilWindow::SetRepairedItemName(const AString & a_Name, cPlayer * a_Playe
 	{
 		m_AnvilSlotArea->UpdateResult(*a_Player);
 	}
-}
-
-
-
-
-
-void cAnvilWindow::GetBlockPos(int & a_PosX, int & a_PosY, int & a_PosZ)
-{
-	a_PosX = m_BlockX;
-	a_PosY = m_BlockY;
-	a_PosZ = m_BlockZ;
 }
 
 

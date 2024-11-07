@@ -9,132 +9,150 @@
 
 #pragma once
 
-
-#include <cstring>
-
-#include "AllocationPool.h"
+#include "FunctionRef.h"
+#include "ChunkDef.h"
 
 
 
-class cChunkData
+
+
+template <class ElementType, size_t ElementCount, ElementType DefaultValue>
+struct ChunkDataStore
 {
-public:
+	using Type = std::array<ElementType, ElementCount>;
 
-	static const int SectionHeight = 16;
-	static const size_t NumSections = (cChunkDef::Height / SectionHeight);
-	static const size_t SectionBlockCount = SectionHeight * cChunkDef::Width * cChunkDef::Width;
+	/** Copy assign from another ChunkDataStore. */
+	void Assign(const ChunkDataStore<ElementType, ElementCount, DefaultValue> & a_Other);
 
-	struct sChunkSection
-	{
-		BLOCKTYPE  m_BlockTypes[SectionBlockCount];
-		NIBBLETYPE m_BlockMetas[SectionBlockCount / 2];
-		NIBBLETYPE m_BlockLight[SectionBlockCount / 2];
-		NIBBLETYPE m_BlockSkyLight[SectionBlockCount / 2];
-	};
+	/** Gets one value at the given position.
+	Returns DefaultValue if the section is not allocated. */
+	ElementType Get(Vector3i a_Position) const;
 
-	cChunkData(cAllocationPool<sChunkSection> & a_Pool);
-	cChunkData(cChunkData && a_Other);
-	~cChunkData();
+	/** Returns a raw pointer to the internal representation of the specified section.
+	Will be nullptr if the section is not allocated. */
+	Type * GetSection(size_t a_Y) const;
 
-	cChunkData & operator = (cChunkData && a_Other)
-	{
-		Assign(std::move(a_Other));
-		return *this;
-	}
+	/** Sets one value at the given position.
+	Allocates a section if needed for the operation. */
+	void Set(Vector3i a_Position, ElementType a_Value);
 
-	/** Copy assign from another cChunkData */
-	void Assign(const cChunkData & a_Other);
+	/** Copies the data from the specified flat section array into the internal representation.
+	Allocates a section if needed for the operation. */
+	void SetSection(const ElementType (& a_Source)[ElementCount], size_t a_Y);
 
-	/** Move assign from another cChunkData */
-	void Assign(cChunkData && a_Other);
+	/** Copies the data from the specified flat array into the internal representation.
+	Allocates sections that are needed for the operation. */
+	void SetAll(const ElementType (& a_Source)[cChunkDef::NumSections * ElementCount]);
 
-	BLOCKTYPE GetBlock(Vector3i a_RelPos) const;
-	void SetBlock(Vector3i a_RelPos, BLOCKTYPE a_Block);
-
-	NIBBLETYPE GetMeta(Vector3i a_RelPos) const;
-	bool SetMeta(Vector3i a_RelPos, NIBBLETYPE a_Nibble);
-
-	NIBBLETYPE GetBlockLight(Vector3i a_RelPos) const;
-
-	NIBBLETYPE GetSkyLight(Vector3i a_RelPos) const;
-
-	/** Return a pointer to the chunk section or nullptr if all air */
-	const sChunkSection * GetSection(size_t a_SectionNum) const;
-
-	/** Returns a bitmask of chunk sections which are currently stored. */
-	UInt16 GetSectionBitmask() const;
-
-	/** Clears all data */
-	void Clear();
-
-	/** Copies the blocktype data into the specified flat array.
-	Optionally, only a part of the data is copied, as specified by the a_Idx and a_Length parameters. */
-	void CopyBlockTypes(BLOCKTYPE * a_Dest, size_t a_Idx = 0, size_t a_Length = cChunkDef::NumBlocks) const;
-
-	/** Copies the metadata into the specified flat array. */
-	void CopyMetas(NIBBLETYPE * a_Dest) const;
-
-	/** Copies the block light data into the specified flat array. */
-	void CopyBlockLight(NIBBLETYPE * a_Dest) const;
-
-	/** Copies the skylight data into the specified flat array. */
-	void CopySkyLight  (NIBBLETYPE * a_Dest) const;
-
-	/** Fills the chunk with the specified block. */
-	void FillBlockTypes(BLOCKTYPE a_Value);
-
-	/** Fills the chunk with the specified meta value. */
-	void FillMetas     (NIBBLETYPE a_Value);
-
-	/** Fills the chunk with the specified block light. */
-	void FillBlockLight(NIBBLETYPE a_Value);
-
-	/** Fills the chunk with the specified sky light. */
-	void FillSkyLight  (NIBBLETYPE a_Value);
-
-	/** Copies the blocktype data from the specified flat array into the internal representation.
-	Allocates sections that are needed for the operation.
-	Requires that a_Src is a valid pointer. */
-	void SetBlockTypes(const BLOCKTYPE * a_Src);
-
-	/** Copies the metadata from the specified flat array into the internal representation.
-	Allocates sectios that are needed for the operation.
-	Requires that a_Src is a valid pointer. */
-	void SetMetas(const NIBBLETYPE * a_Src);
-
-	/** Copies the blocklight data from the specified flat array into the internal representation.
-	Allocates sectios that are needed for the operation.
-	Allows a_Src to be nullptr, in which case it doesn't do anything. */
-	void SetBlockLight(const NIBBLETYPE * a_Src);
-
-	/** Copies the skylight data from the specified flat array into the internal representation.
-	Allocates sectios that are needed for the operation.
-	Allows a_Src to be nullptr, in which case it doesn't do anything. */
-	void SetSkyLight(const NIBBLETYPE * a_Src);
-
-	/** Returns the number of sections present (i.e. non-air). */
-	UInt32 NumPresentSections() const;
-
-private:
-
-	sChunkSection * m_Sections[NumSections];
-
-	cAllocationPool<sChunkSection> & m_Pool;
-
-	/** Allocates a new section. Entry-point to custom allocators. */
-	sChunkSection * Allocate(void);
-
-	/** Frees the specified section, previously allocated using Allocate().
-	Note that a_Section may be nullptr. */
-	void Free(sChunkSection * a_Section);
-
-	/** Sets the data in the specified section to their default values. */
-	void ZeroSection(sChunkSection * a_Section) const;
-
+	/** Contains all the sections this ChunkDataStore manages. */
+	std::unique_ptr<Type> Store[cChunkDef::NumSections];
 };
 
 
 
 
 
+class ChunkBlockData
+{
+public:
 
+	static constexpr size_t SectionBlockCount = cChunkDef::SectionHeight * cChunkDef::Width * cChunkDef::Width;
+	static constexpr size_t SectionMetaCount = SectionBlockCount / 2;
+
+	static constexpr BLOCKTYPE DefaultValue = 0x00;
+	static constexpr NIBBLETYPE DefaultMetaValue = 0x00;
+
+	using SectionType = BLOCKTYPE[SectionBlockCount];
+	using SectionMetaType = NIBBLETYPE[SectionMetaCount];
+
+private:
+
+	ChunkDataStore<BLOCKTYPE, SectionBlockCount, DefaultValue> m_Blocks;
+	ChunkDataStore<NIBBLETYPE, SectionMetaCount, DefaultMetaValue> m_Metas;
+
+public:
+
+	using BlockArray = decltype(m_Blocks)::Type;
+	using MetaArray = decltype(m_Metas)::Type;
+
+	void Assign(const ChunkBlockData & a_Other);
+
+	BLOCKTYPE GetBlock(Vector3i a_Position) const { return m_Blocks.Get(a_Position); }
+	NIBBLETYPE GetMeta(Vector3i a_Position) const { return m_Metas.Get(a_Position); }
+
+	BlockArray * GetSection(size_t a_Y) const { return m_Blocks.GetSection(a_Y); }
+	MetaArray * GetMetaSection(size_t a_Y) const { return m_Metas.GetSection(a_Y); }
+
+	void SetBlock(Vector3i a_Position, BLOCKTYPE a_Block) { m_Blocks.Set(a_Position, a_Block); }
+	void SetMeta(Vector3i a_Position, NIBBLETYPE a_Meta) { m_Metas.Set(a_Position, a_Meta); }
+
+	void SetAll(const cChunkDef::BlockTypes & a_BlockSource, const cChunkDef::BlockNibbles & a_MetaSource);
+	void SetSection(const SectionType & a_BlockSource, const SectionMetaType & a_MetaSource, size_t a_Y);
+};
+
+
+
+
+
+class ChunkLightData
+{
+public:
+
+	static constexpr size_t SectionLightCount = (cChunkDef::SectionHeight * cChunkDef::Width * cChunkDef::Width) / 2;
+
+	static constexpr NIBBLETYPE DefaultBlockLightValue = 0x00;
+	static constexpr NIBBLETYPE DefaultSkyLightValue = 0xFF;
+
+	using SectionType = NIBBLETYPE[SectionLightCount];
+
+private:
+
+	ChunkDataStore<NIBBLETYPE, SectionLightCount, DefaultBlockLightValue> m_BlockLights;
+	ChunkDataStore<NIBBLETYPE, SectionLightCount, DefaultSkyLightValue> m_SkyLights;
+
+public:
+
+	using LightArray = decltype(m_BlockLights)::Type;
+
+	void Assign(const ChunkLightData & a_Other);
+
+	NIBBLETYPE GetBlockLight(Vector3i a_Position) const { return m_BlockLights.Get(a_Position); }
+	NIBBLETYPE GetSkyLight(Vector3i a_Position) const { return m_SkyLights.Get(a_Position); }
+
+	LightArray * GetBlockLightSection(size_t a_Y) const { return m_BlockLights.GetSection(a_Y); }
+	LightArray * GetSkyLightSection(size_t a_Y) const { return m_SkyLights.GetSection(a_Y); }
+
+	void SetAll(const cChunkDef::BlockNibbles & a_BlockLightSource, const cChunkDef::BlockNibbles & a_SkyLightSource);
+	void SetSection(const SectionType & a_BlockLightSource, const SectionType & a_SkyLightSource, size_t a_Y);
+};
+
+
+
+
+
+/** Invokes the callback functor for every chunk section containing at least one present block or light section data.
+This is used to collect all data for all sections.
+In macro form to work around a Visual Studio 2017 ICE bug. */
+#define ChunkDef_ForEachSection(BlockData, LightData, Callback) \
+	do \
+	{ \
+		for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y) \
+		{ \
+			const auto Blocks = BlockData.GetSection(Y); \
+			const auto Metas = BlockData.GetMetaSection(Y); \
+			const auto BlockLights = LightData.GetBlockLightSection(Y); \
+			const auto SkyLights = LightData.GetSkyLightSection(Y); \
+			if ((Blocks != nullptr) || (Metas != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr)) \
+			{ \
+				Callback \
+			} \
+		} \
+	} while (false)
+
+
+
+
+
+extern template struct ChunkDataStore<BLOCKTYPE, ChunkBlockData::SectionBlockCount, ChunkBlockData::DefaultValue>;
+extern template struct ChunkDataStore<NIBBLETYPE, ChunkBlockData::SectionMetaCount, ChunkLightData::DefaultBlockLightValue>;
+extern template struct ChunkDataStore<NIBBLETYPE, ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue>;

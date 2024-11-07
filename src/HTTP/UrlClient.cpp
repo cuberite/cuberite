@@ -4,11 +4,12 @@
 // Implements the cUrlClient class for high-level URL interaction
 
 #include "Globals.h"
-#include "UrlClient.h"
-#include "UrlParser.h"
-#include "HTTPMessageParser.h"
-#include "../mbedTLS++/X509Cert.h"
-#include "../mbedTLS++/CryptoKey.h"
+
+#include "HTTP/UrlClient.h"
+#include "HTTP/UrlParser.h"
+#include "HTTP/HTTPMessageParser.h"
+#include "mbedTLS++/X509Cert.h"
+#include "mbedTLS++/CryptoKey.h"
 
 
 
@@ -16,7 +17,52 @@
 
 // fwd:
 class cSchemeHandler;
-typedef std::shared_ptr<cSchemeHandler> cSchemeHandlerPtr;
+using cSchemeHandlerPtr = std::shared_ptr<cSchemeHandler>;
+
+
+
+
+
+namespace
+{
+	/** Callbacks implementing the blocking UrlClient behavior. */
+	class cBlockingHTTPCallbacks :
+		public cUrlClient::cCallbacks
+	{
+	public:
+
+		explicit cBlockingHTTPCallbacks(std::shared_ptr<cEvent> a_Event, AString & a_ResponseBody) :
+			m_Event(std::move(a_Event)), m_ResponseBody(a_ResponseBody),
+			m_IsError(false)
+		{
+		}
+
+		void OnBodyFinished() override
+		{
+			m_Event->Set();
+		}
+
+		void OnError(const AString & a_ErrorMsg) override
+		{
+			LOGERROR("%s %d: HTTP Error: %s", __FILE__, __LINE__, a_ErrorMsg.c_str());
+			m_IsError = true;
+			m_Event->Set();
+		}
+
+		void OnBodyData(const void * a_Data, size_t a_Size) override
+		{
+			m_ResponseBody.append(static_cast<const char *>(a_Data), a_Size);
+		}
+
+		std::shared_ptr<cEvent> m_Event;
+
+		/** The accumulator for the partial body data, so that OnBodyFinished() can send the entire thing at once. */
+		AString & m_ResponseBody;
+
+		/** Indicates whether an error was encountered while processing the request. */
+		bool m_IsError;
+	};
+}
 
 
 
@@ -35,13 +81,13 @@ public:
 		cUrlClient::cCallbacksPtr && a_Callbacks,
 		AStringMap && a_Headers,
 		const AString & a_Body,
-		AStringMap && a_Options
+		const AStringMap & a_Options
 	)
 	{
 		// Create a new instance of cUrlClientRequest, wrapped in a SharedPtr, so that it has a controlled lifetime.
 		// Cannot use std::make_shared, because the constructor is not public
 		std::shared_ptr<cUrlClientRequest> ptr (new cUrlClientRequest(
-			a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, std::move(a_Options)
+			a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options
 		));
 		return ptr->DoRequest(ptr);
 	}
@@ -100,6 +146,24 @@ public:
 		return key;
 	}
 
+	/** Returns the parsed TrustedRootCAs from the options, or an empty pointer if the option is not set.
+	Throws a std::runtime_error if CAs are provided, but parsing them fails. */
+	cX509CertPtr GetTrustedRootCAs() const
+	{
+		auto itr = m_Options.find("TrustedRootCAs");
+		if (itr == m_Options.end())
+		{
+			return nullptr;
+		}
+		auto Cert = std::make_shared<cX509Cert>();
+		auto Res = Cert->Parse(itr->second.data(), itr->second.size());
+		if (Res != 0)
+		{
+			throw std::runtime_error(fmt::format("Failed to parse the TrustedRootCAs certificate: {}", Res));
+		}
+		return Cert;
+	}
+
 protected:
 
 	/** Method to be used for the request */
@@ -146,20 +210,20 @@ protected:
 		cUrlClient::cCallbacksPtr && a_Callbacks,
 		AStringMap && a_Headers,
 		const AString & a_Body,
-		AStringMap && a_Options
+		const AStringMap & a_Options
 	):
 		m_Method(a_Method),
 		m_Url(a_Url),
 		m_Callbacks(std::move(a_Callbacks)),
 		m_Headers(std::move(a_Headers)),
 		m_Body(a_Body),
-		m_Options(std::move(a_Options))
+		m_Options(a_Options)
 	{
 		m_NumRemainingRedirects = GetStringMapInteger(m_Options, "MaxRedirects", 30);
 	}
 
 
-	std::pair<bool, AString> DoRequest(std::shared_ptr<cUrlClientRequest> a_Self);
+	std::pair<bool, AString> DoRequest(const std::shared_ptr<cUrlClientRequest> & a_Self);
 
 
 	// cNetwork::cConnectCallbacks override: TCP link connected:
@@ -168,7 +232,7 @@ protected:
 	// cNetwork::cConnectCallbacks override: An error has occurred:
 	virtual void OnError(int a_ErrorCode, const AString & a_ErrorMsg) override
 	{
-		m_Callbacks->OnError(Printf("Network error %d (%s)", a_ErrorCode, a_ErrorMsg.c_str()));
+		m_Callbacks->OnError(fmt::format(FMT_STRING("Network error {} ({})"), a_ErrorCode, a_ErrorMsg));
 	}
 
 
@@ -261,7 +325,7 @@ public:
 		m_Link = &a_Link;
 		if (m_IsTls)
 		{
-			m_Link->StartTLSClient(m_ParentRequest.GetOwnCert(), m_ParentRequest.GetOwnPrivKey());
+			m_Link->StartTLSClient(m_ParentRequest.GetOwnCert(), m_ParentRequest.GetOwnPrivKey(), m_ParentRequest.GetTrustedRootCAs());
 		}
 		else
 		{
@@ -285,14 +349,14 @@ public:
 			requestLine.push_back('?');
 			requestLine.append(m_ParentRequest.m_UrlQuery);
 		}
-		m_Link->Send(Printf("%s %s HTTP/1.1\r\n", m_ParentRequest.m_Method.c_str(), requestLine.c_str()));
+		m_Link->Send(fmt::format(FMT_STRING("{} {} HTTP/1.1\r\n"), m_ParentRequest.m_Method, requestLine));
 
 		// Send the headers:
-		m_Link->Send(Printf("Host: %s\r\n", m_ParentRequest.m_UrlHost.c_str()));
-		m_Link->Send(Printf("Content-Length: %u\r\n", static_cast<unsigned>(m_ParentRequest.m_Body.size())));
-		for (auto itr = m_ParentRequest.m_Headers.cbegin(), end = m_ParentRequest.m_Headers.cend(); itr != end; ++itr)
+		m_Link->Send(fmt::format(FMT_STRING("Host: {}\r\n"), m_ParentRequest.m_UrlHost));
+		m_Link->Send(fmt::format(FMT_STRING("Content-Length: {}\r\n"), m_ParentRequest.m_Body.size()));
+		for (const auto & hdr: m_ParentRequest.m_Headers)
 		{
-			m_Link->Send(Printf("%s: %s\r\n", itr->first.c_str(), itr->second.c_str()));
+			m_Link->Send(fmt::format(FMT_STRING("{}: {}\r\n"), hdr.first, hdr.second));
 		}  // for itr - m_Headers[]
 		m_Link->Send("\r\n", 2);
 
@@ -341,20 +405,20 @@ public:
 		auto idxFirstSpace = a_FirstLine.find(' ');
 		if (idxFirstSpace == AString::npos)
 		{
-			m_ParentRequest.CallErrorCallback(Printf("Failed to parse HTTP status line \"%s\", no space delimiter.", a_FirstLine.c_str()));
+			m_ParentRequest.CallErrorCallback(fmt::format(FMT_STRING("Failed to parse HTTP status line \"{}\", no space delimiter."), a_FirstLine));
 			return;
 		}
 		auto idxSecondSpace = a_FirstLine.find(' ', idxFirstSpace + 1);
 		if (idxSecondSpace == AString::npos)
 		{
-			m_ParentRequest.CallErrorCallback(Printf("Failed to parse HTTP status line \"%s\", missing second space delimiter.", a_FirstLine.c_str()));
+			m_ParentRequest.CallErrorCallback(fmt::format(FMT_STRING("Failed to parse HTTP status line \"{}\", missing second space delimiter."), a_FirstLine));
 			return;
 		}
 		int resultCode;
 		auto resultCodeStr = a_FirstLine.substr(idxFirstSpace + 1, idxSecondSpace - idxFirstSpace - 1);
 		if (!StringToInteger(resultCodeStr, resultCode))
 		{
-			m_ParentRequest.CallErrorCallback(Printf("Failed to parse HTTP result code from response \"%s\"", resultCodeStr.c_str()));
+			m_ParentRequest.CallErrorCallback(fmt::format(FMT_STRING("Failed to parse HTTP result code from response \"{}\""), resultCodeStr));
 			return;
 		}
 
@@ -371,7 +435,7 @@ public:
 				return;
 			}
 		}
-		m_ParentRequest.GetCallbacks().OnStatusLine(a_FirstLine.substr(1, idxFirstSpace), resultCode, a_FirstLine.substr(idxSecondSpace + 1));
+		m_ParentRequest.GetCallbacks().OnStatusLine(a_FirstLine.substr(0, idxFirstSpace), resultCode, a_FirstLine.substr(idxSecondSpace + 1));
 	}
 
 
@@ -489,7 +553,7 @@ void cUrlClientRequest::RedirectTo(const AString & a_RedirectUrl)
 	m_Callbacks->OnRedirecting(a_RedirectUrl);
 	if (!ShouldAllowRedirects())
 	{
-		CallErrorCallback(Printf("Redirect to \"%s\" not allowed", a_RedirectUrl.c_str()));
+		CallErrorCallback(fmt::format(FMT_STRING("Redirect to \"{}\" not allowed"), a_RedirectUrl));
 		return;
 	}
 
@@ -507,7 +571,7 @@ void cUrlClientRequest::RedirectTo(const AString & a_RedirectUrl)
 	auto res = DoRequest(Self);
 	if (!res.first)
 	{
-		m_Callbacks->OnError(Printf("Redirection failed: %s", res.second.c_str()));
+		m_Callbacks->OnError(fmt::format(FMT_STRING("Redirection failed: {}"), res.second));
 	}
 }
 
@@ -572,7 +636,7 @@ void cUrlClientRequest::OnRemoteClosed()
 
 
 
-std::pair<bool, AString> cUrlClientRequest::DoRequest(std::shared_ptr<cUrlClientRequest> a_Self)
+std::pair<bool, AString> cUrlClientRequest::DoRequest(const std::shared_ptr<cUrlClientRequest> & a_Self)
 {
 	// We need a shared pointer to self, care must be taken not to pass any other ptr:
 	ASSERT(a_Self.get() == this);
@@ -590,7 +654,7 @@ std::pair<bool, AString> cUrlClientRequest::DoRequest(std::shared_ptr<cUrlClient
 	m_SchemeHandler = cSchemeHandler::Create(m_UrlScheme, *this);
 	if (m_SchemeHandler == nullptr)
 	{
-		return std::make_pair(false, Printf("Unknown Url scheme: %s", m_UrlScheme.c_str()));
+		return std::make_pair(false, fmt::format(FMT_STRING("Unknown URL scheme: {}"), m_UrlScheme));
 	}
 
 	// Connect and transfer ownership to the link
@@ -613,12 +677,12 @@ std::pair<bool, AString> cUrlClient::Request(
 	const AString & a_URL,
 	cCallbacksPtr && a_Callbacks,
 	AStringMap && a_Headers,
-	AString && a_Body,
-	AStringMap && a_Options
+	const AString & a_Body,
+	const AStringMap & a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		a_Method, a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options
 	);
 }
 
@@ -629,13 +693,13 @@ std::pair<bool, AString> cUrlClient::Request(
 std::pair<bool, AString> cUrlClient::Get(
 	const AString & a_URL,
 	cCallbacksPtr && a_Callbacks,
-	AStringMap a_Headers,
-	AString a_Body,
-	AStringMap a_Options
+	AStringMap && a_Headers,
+	const AString & a_Body,
+	const AStringMap & a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		"GET", a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		"GET", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options
 	);
 }
 
@@ -647,12 +711,12 @@ std::pair<bool, AString> cUrlClient::Post(
 	const AString & a_URL,
 	cCallbacksPtr && a_Callbacks,
 	AStringMap && a_Headers,
-	AString && a_Body,
-	AStringMap && a_Options
+	const AString & a_Body,
+	const AStringMap & a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		"POST", a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		"POST", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options
 	);
 }
 
@@ -664,13 +728,90 @@ std::pair<bool, AString> cUrlClient::Put(
 	const AString & a_URL,
 	cCallbacksPtr && a_Callbacks,
 	AStringMap && a_Headers,
-	AString && a_Body,
-	AStringMap && a_Options
+	const AString & a_Body,
+	const AStringMap & a_Options
 )
 {
 	return cUrlClientRequest::Request(
-		"PUT", a_URL, std::move(a_Callbacks), std::move(a_Headers), std::move(a_Body), std::move(a_Options)
+		"PUT", a_URL, std::move(a_Callbacks), std::move(a_Headers), a_Body, a_Options
 	);
+}
+
+
+
+
+
+std::pair<bool, AString> cUrlClient::BlockingRequest(
+	const AString & a_Method,
+	const AString & a_URL,
+	AStringMap && a_Headers,
+	const AString & a_Body,
+	const AStringMap & a_Options
+)
+{
+	auto EvtFinished = std::make_shared<cEvent>();
+	AString Response;
+	auto Callbacks = std::make_shared<cBlockingHTTPCallbacks>(EvtFinished, Response);
+	auto [Success, ErrorMessage] = cUrlClient::Request(a_Method, a_URL, Callbacks, std::move(a_Headers), a_Body, a_Options);
+	if (Success)
+	{
+		if (!EvtFinished->Wait(10000))
+		{
+			return std::make_pair(false, "Timeout");
+		}
+		if (Callbacks->m_IsError)
+		{
+			return std::make_pair(false, AString());
+		}
+	}
+	else
+	{
+		LOGWARNING("%s: HTTP error: %s", __FUNCTION__, ErrorMessage.c_str());
+		return std::make_pair(false, AString());
+	}
+	return std::make_pair(true, Response);
+}
+
+
+
+
+
+std::pair<bool, AString> cUrlClient::BlockingGet(
+	const AString & a_URL,
+	AStringMap a_Headers,
+	const AString & a_Body,
+	const AStringMap & a_Options
+)
+{
+	return BlockingRequest("GET", a_URL, std::move(a_Headers), a_Body, a_Options);
+}
+
+
+
+
+
+std::pair<bool, AString> cUrlClient::BlockingPost(
+	const AString & a_URL,
+	AStringMap && a_Headers,
+	const AString & a_Body,
+	const AStringMap & a_Options
+)
+{
+	return BlockingRequest("POST", a_URL, std::move(a_Headers), a_Body, a_Options);
+}
+
+
+
+
+
+std::pair<bool, AString> cUrlClient::BlockingPut(
+	const AString & a_URL,
+	AStringMap && a_Headers,
+	const AString & a_Body,
+	const AStringMap & a_Options
+)
+{
+	return BlockingRequest("PUT", a_URL, std::move(a_Headers), a_Body, a_Options);
 }
 
 

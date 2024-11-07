@@ -9,21 +9,14 @@
 
 
 
-class cItemSpawnEggHandler:
+class cItemSpawnEggHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemSpawnEggHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
-
-
-
-
+	using Super::Super;
 
 	virtual bool OnItemUse(
 		cWorld * a_World,
@@ -32,7 +25,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		// Must click a valid block:
 		if (a_ClickedBlockFace < 0)
@@ -79,6 +72,7 @@ public:
 			case E_META_SPAWN_EGG_COW:             return mtCow;
 			case E_META_SPAWN_EGG_CREEPER:         return mtCreeper;
 			case E_META_SPAWN_EGG_ENDERMAN:        return mtEnderman;
+			case E_META_SPAWN_EGG_ENDERMITE:       return mtEndermite;
 			case E_META_SPAWN_EGG_GHAST:           return mtGhast;
 			case E_META_SPAWN_EGG_GUARDIAN:        return mtGuardian;
 			case E_META_SPAWN_EGG_HORSE:           return mtHorse;

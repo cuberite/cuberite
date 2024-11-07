@@ -5,12 +5,14 @@
 #include "Globals.h"
 #include "NBTChunkSerializer.h"
 #include "EnchantmentSerializer.h"
+#include "NamespaceSerializer.h"
 #include "../ChunkDataCallback.h"
 #include "../ItemGrid.h"
 #include "../StringCompression.h"
 #include "../UUID.h"
 #include "FastNBT.h"
 
+#include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BedEntity.h"
 #include "../BlockEntities/BrewingstandEntity.h"
@@ -18,6 +20,9 @@
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/DispenserEntity.h"
 #include "../BlockEntities/DropperEntity.h"
+#include "../BlockEntities/EnchantingTableEntity.h"
+#include "../BlockEntities/EnderChestEntity.h"
+#include "../BlockEntities/EndPortalEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
 #include "../BlockEntities/HopperEntity.h"
 #include "../BlockEntities/JukeboxEntity.h"
@@ -49,16 +54,14 @@
 
 
 /** Collects and stores the chunk data via the cChunkDataCallback interface */
-class SerializerCollector:
+class SerializerCollector final :
 	public cChunkDataCopyCollector
 {
 public:
 
 	// The data collected from the chunk:
-	cChunkDef::BiomeMap mBiomes;
-	UInt8 mVanillaBiomes[cChunkDef::Width * cChunkDef::Width];
-	int mVanillaHeightMap[cChunkDef::Width * cChunkDef::Width];
-	bool mBiomesAreValid;
+	UInt8 Biomes[cChunkDef::Width * cChunkDef::Width];
+	int Heights[cChunkDef::Width * cChunkDef::Width];
 
 	/** True if a tag has been opened in the callbacks and not yet closed. */
 	bool mIsTagOpen;
@@ -80,7 +83,6 @@ public:
 
 
 	SerializerCollector(cFastNBTWriter & aWriter):
-		mBiomesAreValid(false),
 		mIsTagOpen(false),
 		mHasHadEntity(false),
 		mHasHadBlockEntity(false),
@@ -102,14 +104,13 @@ public:
 
 
 
-	virtual void HeightMap(const cChunkDef::HeightMap * a_HeightMap) override
+	virtual void HeightMap(const cChunkDef::HeightMap & a_HeightMap) override
 	{
-		for (int RelX = 0; RelX < cChunkDef::Width; RelX++)
+		for (int RelZ = 0; RelZ < cChunkDef::Width; RelZ++)
 		{
-			for (int RelZ = 0; RelZ < cChunkDef::Width; RelZ++)
+			for (int RelX = 0; RelX < cChunkDef::Width; RelX++)
 			{
-				int Height = cChunkDef::GetHeight(*a_HeightMap, RelX, RelZ);
-				mVanillaHeightMap[(RelZ << 4) | RelX] = Height;
+				Heights[RelX + RelZ * cChunkDef::Width] = cChunkDef::GetHeight(a_HeightMap, RelX, RelZ);
 			}
 		}
 	}
@@ -118,15 +119,14 @@ public:
 
 
 
-	virtual void BiomeData(const cChunkDef::BiomeMap * a_BiomeMap) override
+	virtual void BiomeMap(const cChunkDef::BiomeMap & a_BiomeMap) override
 	{
-		memcpy(mBiomes, a_BiomeMap, sizeof(mBiomes));
-		for (size_t i = 0; i < ARRAYCOUNT(mBiomes); i++)
+		for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
 		{
-			if ((*a_BiomeMap)[i] < 255)
+			if (a_BiomeMap[i] < 255)
 			{
 				// Normal MC biome, copy as-is:
-				mVanillaBiomes[i] = static_cast<Byte>((*a_BiomeMap)[i]);
+				Biomes[i] = static_cast<Byte>(a_BiomeMap[i]);
 			}
 			else
 			{
@@ -135,7 +135,6 @@ public:
 				return;
 			}
 		}  // for i - mBiomeMap[]
-		mBiomesAreValid = true;
 	}
 
 
@@ -207,26 +206,32 @@ public:
 		// Add tile-entity into NBT:
 		switch (a_Entity->GetBlockType())
 		{
-			case E_BLOCK_BEACON:        AddBeaconEntity      (static_cast<cBeaconEntity *>      (a_Entity)); break;
-			case E_BLOCK_BED:           AddBedEntity         (static_cast<cBedEntity *>         (a_Entity)); break;
-			case E_BLOCK_BREWING_STAND: AddBrewingstandEntity(static_cast<cBrewingstandEntity *>(a_Entity)); break;
-			case E_BLOCK_CHEST:         AddChestEntity       (static_cast<cChestEntity *>       (a_Entity), a_Entity->GetBlockType()); break;
-			case E_BLOCK_COMMAND_BLOCK: AddCommandBlockEntity(static_cast<cCommandBlockEntity *>(a_Entity)); break;
-			case E_BLOCK_DISPENSER:     AddDispenserEntity   (static_cast<cDispenserEntity *>   (a_Entity)); break;
-			case E_BLOCK_DROPPER:       AddDropperEntity     (static_cast<cDropperEntity *>     (a_Entity)); break;
-			case E_BLOCK_ENDER_CHEST:   /* No data to be saved */                               break;
-			case E_BLOCK_FLOWER_POT:    AddFlowerPotEntity   (static_cast<cFlowerPotEntity *>   (a_Entity)); break;
-			case E_BLOCK_FURNACE:       AddFurnaceEntity     (static_cast<cFurnaceEntity *>     (a_Entity)); break;
-			case E_BLOCK_HEAD:          AddMobHeadEntity     (static_cast<cMobHeadEntity *>     (a_Entity)); break;
-			case E_BLOCK_HOPPER:        AddHopperEntity      (static_cast<cHopperEntity *>      (a_Entity)); break;
-			case E_BLOCK_JUKEBOX:       AddJukeboxEntity     (static_cast<cJukeboxEntity *>     (a_Entity)); break;
-			case E_BLOCK_LIT_FURNACE:   AddFurnaceEntity     (static_cast<cFurnaceEntity *>     (a_Entity)); break;
-			case E_BLOCK_MOB_SPAWNER:   AddMobSpawnerEntity  (static_cast<cMobSpawnerEntity *>  (a_Entity)); break;
-			case E_BLOCK_NOTE_BLOCK:    AddNoteEntity        (static_cast<cNoteEntity *>        (a_Entity)); break;
-			case E_BLOCK_SIGN_POST:     AddSignEntity        (static_cast<cSignEntity *>        (a_Entity)); break;
-			case E_BLOCK_TRAPPED_CHEST: AddChestEntity       (static_cast<cChestEntity *>       (a_Entity), a_Entity->GetBlockType()); break;
-			case E_BLOCK_WALLSIGN:      AddSignEntity        (static_cast<cSignEntity *>        (a_Entity)); break;
+			// Banners:
+			case E_BLOCK_STANDING_BANNER:
+			case E_BLOCK_WALL_BANNER:       AddBannerEntity         (static_cast<cBannerEntity *>         (a_Entity)); break;
 
+			// Others:
+			case E_BLOCK_BEACON:            AddBeaconEntity         (static_cast<cBeaconEntity *>         (a_Entity)); break;
+			case E_BLOCK_BED:               AddBedEntity            (static_cast<cBedEntity *>            (a_Entity)); break;
+			case E_BLOCK_BREWING_STAND:     AddBrewingstandEntity   (static_cast<cBrewingstandEntity *>   (a_Entity)); break;
+			case E_BLOCK_CHEST:             AddChestEntity          (static_cast<cChestEntity *>          (a_Entity), a_Entity->GetBlockType()); break;
+			case E_BLOCK_COMMAND_BLOCK:     AddCommandBlockEntity   (static_cast<cCommandBlockEntity *>   (a_Entity)); break;
+			case E_BLOCK_DISPENSER:         AddDispenserEntity      (static_cast<cDispenserEntity *>      (a_Entity)); break;
+			case E_BLOCK_DROPPER:           AddDropperEntity        (static_cast<cDropperEntity *>        (a_Entity)); break;
+			case E_BLOCK_ENCHANTMENT_TABLE: AddEnchantingTableEntity(static_cast<cEnchantingTableEntity *>(a_Entity)); break;
+			case E_BLOCK_ENDER_CHEST:       AddEnderchestEntity     (static_cast<cEnderChestEntity *>     (a_Entity)); break;
+			case E_BLOCK_END_PORTAL:        AddEndPortalEntity      (static_cast<cEndPortalEntity *>      (a_Entity)); break;
+			case E_BLOCK_FLOWER_POT:        AddFlowerPotEntity      (static_cast<cFlowerPotEntity *>      (a_Entity)); break;
+			case E_BLOCK_FURNACE:           AddFurnaceEntity        (static_cast<cFurnaceEntity *>        (a_Entity)); break;
+			case E_BLOCK_HEAD:              AddMobHeadEntity        (static_cast<cMobHeadEntity *>        (a_Entity)); break;
+			case E_BLOCK_HOPPER:            AddHopperEntity         (static_cast<cHopperEntity *>         (a_Entity)); break;
+			case E_BLOCK_JUKEBOX:           AddJukeboxEntity        (static_cast<cJukeboxEntity *>        (a_Entity)); break;
+			case E_BLOCK_LIT_FURNACE:       AddFurnaceEntity        (static_cast<cFurnaceEntity *>        (a_Entity)); break;
+			case E_BLOCK_MOB_SPAWNER:       AddMobSpawnerEntity     (static_cast<cMobSpawnerEntity *>     (a_Entity)); break;
+			case E_BLOCK_NOTE_BLOCK:        AddNoteEntity           (static_cast<cNoteEntity *>           (a_Entity)); break;
+			case E_BLOCK_SIGN_POST:         AddSignEntity           (static_cast<cSignEntity *>           (a_Entity)); break;
+			case E_BLOCK_TRAPPED_CHEST:     AddChestEntity          (static_cast<cChestEntity *>          (a_Entity), a_Entity->GetBlockType()); break;
+			case E_BLOCK_WALLSIGN:          AddSignEntity           (static_cast<cSignEntity *>           (a_Entity)); break;
 			default:
 			{
 				ASSERT(!"Unhandled block entity saved into Anvil");
@@ -244,13 +249,6 @@ public:
 		if (mIsTagOpen)
 		{
 			mWriter.EndList();
-		}
-
-		// If light not valid, reset it to defaults:
-		if (!mIsLightValid)
-		{
-			m_Data.FillBlockLight(0x00);
-			m_Data.FillSkyLight(0x0f);
 		}
 
 		// Check if "Entity" and "TileEntities" lists exists. MCEdit requires this.
@@ -373,6 +371,22 @@ public:
 
 
 
+	void AddBannerEntity(cBannerEntity * a_Entity)
+	{
+		mWriter.BeginCompound("");
+			AddBasicTileEntity(a_Entity,"Banner");
+			mWriter.AddInt("Base", static_cast<int>(a_Entity->GetBaseColor()));
+			if (!a_Entity->GetCustomName().empty())
+			{
+				mWriter.AddString("CustomName", a_Entity->GetCustomName());
+			}
+		mWriter.EndCompound();
+	}
+
+
+
+
+
 	void AddBeaconEntity(cBeaconEntity * a_Entity)
 	{
 		mWriter.BeginCompound("");
@@ -460,6 +474,41 @@ public:
 
 
 
+	void AddEnchantingTableEntity(cEnchantingTableEntity * a_Entity)
+	{
+		mWriter.BeginCompound("");
+			AddBasicTileEntity(a_Entity, "EnchantingTable");
+			if (!a_Entity->GetCustomName().empty())
+			{
+				mWriter.AddString("CustomName", a_Entity->GetCustomName());
+			}
+		mWriter.EndCompound();
+	}
+
+
+
+
+	void AddEnderchestEntity(cEnderChestEntity * a_Entity)
+	{
+		mWriter.BeginCompound("");
+			AddBasicTileEntity(a_Entity, "EnderChest");
+		mWriter.EndCompound();
+	}
+
+
+
+
+	void AddEndPortalEntity(cEndPortalEntity * a_Entity)
+	{
+		mWriter.BeginCompound("");
+			AddBasicTileEntity(a_Entity, "EndPortal");
+		mWriter.EndCompound();
+	}
+
+
+
+
+
 	void AddFurnaceEntity(cFurnaceEntity * a_Furnace)
 	{
 		mWriter.BeginCompound("");
@@ -506,9 +555,14 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_MobSpawner, "MobSpawner");
-			mWriter.AddShort("Entity", static_cast<short>(a_MobSpawner->GetEntity()));
-			mWriter.AddString("EntityId", cMonster::MobTypeToVanillaName(a_MobSpawner->GetEntity()));
+			mWriter.AddString("EntityId", NamespaceSerializer::From(a_MobSpawner->GetEntity()));
+			mWriter.AddShort("SpawnCount", a_MobSpawner->GetSpawnCount());
+			mWriter.AddShort("SpawnRange", a_MobSpawner->GetSpawnRange());
 			mWriter.AddShort("Delay", a_MobSpawner->GetSpawnDelay());
+			mWriter.AddShort("MinSpawnDelay", a_MobSpawner->GetMinSpawnDelay());
+			mWriter.AddShort("MaxSpawnDelay", a_MobSpawner->GetMaxSpawnDelay());
+			mWriter.AddShort("MaxNearbyEntities", a_MobSpawner->GetMaxNearbyEntities());
+			mWriter.AddShort("RequiredPlayerRange", a_MobSpawner->GetRequiredPlayerRange());
 		mWriter.EndCompound();
 	}
 
@@ -520,7 +574,7 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_Note, "Music");
-			mWriter.AddByte("note", static_cast<Byte>(a_Note->GetPitch()));
+			mWriter.AddByte("note", static_cast<Byte>(a_Note->GetNote()));
 		mWriter.EndCompound();
 	}
 
@@ -565,7 +619,7 @@ public:
 			mWriter.AddByte  ("SkullType", a_MobHead->GetType() & 0xFF);
 			mWriter.AddByte  ("Rot",       a_MobHead->GetRotation() & 0xFF);
 
-			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
+			// The new Block Entity format for a Mob Head. See: https://minecraft.wiki/w/Head#Block_entity
 			mWriter.BeginCompound("Owner");
 				mWriter.AddString("Id", a_MobHead->GetOwnerUUID().ToShortString());
 				mWriter.AddString("Name", a_MobHead->GetOwnerName());
@@ -598,7 +652,7 @@ public:
 
 
 
-	void AddBasicEntity(cEntity * a_Entity, const AString & a_ClassName)
+	void AddBasicEntity(cEntity * a_Entity, const std::string_view a_ClassName)
 	{
 		mWriter.AddString("id", a_ClassName);
 		mWriter.BeginList("Pos", TAG_Double);
@@ -638,6 +692,16 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicEntity(a_EnderCrystal, "EnderCrystal");
+			mWriter.AddByte("ShowBottom", a_EnderCrystal->ShowsBottom() ? 1 : 0);
+			if (a_EnderCrystal->DisplaysBeam())
+			{
+				mWriter.BeginCompound("BeamTarget");
+				const auto & BeamTarget = a_EnderCrystal->GetBeamTarget();
+				mWriter.AddInt("X", BeamTarget.x);
+				mWriter.AddInt("Y", BeamTarget.y);
+				mWriter.AddInt("Z", BeamTarget.z);
+				mWriter.EndCompound();
+			}
 		mWriter.EndCompound();
 	}
 
@@ -707,51 +771,8 @@ public:
 
 	void AddMonsterEntity(cMonster * a_Monster)
 	{
-		const char * EntityClass = nullptr;
-		switch (a_Monster->GetMobType())
-		{
-			case mtBat:            EntityClass = "Bat";            break;
-			case mtBlaze:          EntityClass = "Blaze";          break;
-			case mtCaveSpider:     EntityClass = "CaveSpider";     break;
-			case mtChicken:        EntityClass = "Chicken";        break;
-			case mtCow:            EntityClass = "Cow";            break;
-			case mtCreeper:        EntityClass = "Creeper";        break;
-			case mtEnderDragon:    EntityClass = "EnderDragon";    break;
-			case mtEnderman:       EntityClass = "Enderman";       break;
-			case mtGhast:          EntityClass = "Ghast";          break;
-			case mtGiant:          EntityClass = "Giant";          break;
-			case mtGuardian:       EntityClass = "Guardian";       break;
-			case mtHorse:          EntityClass = "Horse";          break;
-			case mtIronGolem:      EntityClass = "VillagerGolem";  break;
-			case mtMagmaCube:      EntityClass = "LavaSlime";      break;
-			case mtMooshroom:      EntityClass = "MushroomCow";    break;
-			case mtOcelot:         EntityClass = "Ozelot";         break;
-			case mtPig:            EntityClass = "Pig";            break;
-			case mtRabbit:         EntityClass = "Rabbit";         break;
-			case mtSheep:          EntityClass = "Sheep";          break;
-			case mtSilverfish:     EntityClass = "Silverfish";     break;
-			case mtSkeleton:       EntityClass = "Skeleton";       break;
-			case mtSlime:          EntityClass = "Slime";          break;
-			case mtSnowGolem:      EntityClass = "SnowMan";        break;
-			case mtSpider:         EntityClass = "Spider";         break;
-			case mtSquid:          EntityClass = "Squid";          break;
-			case mtVillager:       EntityClass = "Villager";       break;
-			case mtWitch:          EntityClass = "Witch";          break;
-			case mtWither:         EntityClass = "WitherBoss";     break;
-			case mtWitherSkeleton: EntityClass = "WitherSkeleton"; break;
-			case mtWolf:           EntityClass = "Wolf";           break;
-			case mtZombie:         EntityClass = "Zombie";         break;
-			case mtZombiePigman:   EntityClass = "PigZombie";      break;
-			case mtZombieVillager: EntityClass = "ZombieVillager"; break;
-			default:
-			{
-				ASSERT(!"Unhandled monster type");
-				return;
-			}
-		}  // switch (payload)
-
 		mWriter.BeginCompound("");
-			AddBasicEntity(a_Monster, EntityClass);
+			AddBasicEntity(a_Monster, NamespaceSerializer::From(a_Monster->GetMobType()));
 			mWriter.BeginList("DropChances", TAG_Float);
 				mWriter.AddFloat("", a_Monster->GetDropChanceWeapon());
 				mWriter.AddFloat("", a_Monster->GetDropChanceHelmet());
@@ -876,6 +897,9 @@ public:
 					const cVillager *Villager = static_cast<const cVillager *>(a_Monster);
 					mWriter.AddInt("Profession", Villager->GetVilType());
 					mWriter.AddInt("Age",        Villager->GetAge());
+					mWriter.BeginList("Inventory", TAG_Compound);
+						AddItemGrid(Villager->GetInventory());
+					mWriter.EndList();
 					break;
 				}
 				case mtWither:
@@ -916,6 +940,7 @@ public:
 					mWriter.AddInt("Profession",     ZombieVillager->GetProfession());
 					mWriter.AddInt("ConversionTime", ZombieVillager->ConversionTime());
 					mWriter.AddInt("Age",            ZombieVillager->GetAge());
+					break;
 				}
 				case mtBlaze:
 				case mtCaveSpider:
@@ -936,6 +961,47 @@ public:
 				case mtWitherSkeleton:
 				{
 					// Other mobs have no special tags.
+					break;
+				}
+				case mtCat:
+				case mtCod:
+				case mtDolphin:
+				case mtDonkey:
+				case mtDrowned:
+				case mtElderGuardian:
+				case mtEndermite:
+				case mtEvoker:
+				case mtFox:
+				case mtHoglin:
+				case mtHusk:
+				case mtIllusioner:
+				case mtLlama:
+				case mtMule:
+				case mtPanda:
+				case mtParrot:
+				case mtPhantom:
+				case mtPiglin:
+				case mtPiglinBrute:
+				case mtPillager:
+				case mtPolarBear:
+				case mtPufferfish:
+				case mtRavager:
+				case mtSalmon:
+				case mtShulker:
+				case mtSkeletonHorse:
+				case mtStray:
+				case mtStrider:
+				case mtTraderLlama:
+				case mtTropicalFish:
+				case mtTurtle:
+				case mtVex:
+				case mtVindicator:
+				case mtWanderingTrader:
+				case mtZoglin:
+				case mtZombieHorse:
+				{
+					// All the entities not added
+					LOGD("Saving unimplemented entity type: %d", NamespaceSerializer::From(a_Monster->GetMobType()));
 					break;
 				}
 				case mtInvalidType:
@@ -979,7 +1045,7 @@ public:
 					mWriter.AddShort("xTile", static_cast<Int16>(Arrow->GetBlockHit().x));
 					mWriter.AddShort("yTile", static_cast<Int16>(Arrow->GetBlockHit().y));
 					mWriter.AddShort("zTile", static_cast<Int16>(Arrow->GetBlockHit().z));
-					mWriter.AddByte("pickup",   Arrow->GetPickupState());
+					mWriter.AddByte("pickup", static_cast<unsigned char>(Arrow->GetPickupState()));
 					mWriter.AddDouble("damage", Arrow->GetDamageCoeff());
 					break;
 				}
@@ -1002,6 +1068,7 @@ public:
 				case cProjectileEntity::pkFireCharge:
 				case cProjectileEntity::pkWitherSkull:
 				case cProjectileEntity::pkEnderPearl:
+				case cProjectileEntity::pkSnowball:
 				{
 					break;
 				}
@@ -1122,53 +1189,67 @@ public:
 ////////////////////////////////////////////////////////////////////////////////
 // NBTChunkSerializer:
 
-bool NBTChunkSerializer::serialize(const cWorld & aWorld, cChunkCoords aCoords, cFastNBTWriter & aWriter)
+void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, cFastNBTWriter & aWriter)
 {
 	SerializerCollector serializer(aWriter);
 	aWriter.BeginCompound("Level");
 	aWriter.AddInt("xPos", aCoords.m_ChunkX);
 	aWriter.AddInt("zPos", aCoords.m_ChunkZ);
-	if (!aWorld.GetChunkData(aCoords, serializer))
-	{
-		aWriter.EndCompound();  // "Level"
-		return false;
-	}
+	[[maybe_unused]] const bool Result = aWorld.GetChunkData(aCoords, serializer);  // Chunk must be present in order to save
+	ASSERT(Result);
 	serializer.Finish();  // Close NBT tags
 
-	// Save biomes, both MCS (IntArray) and MC-vanilla (ByteArray):
-	if (serializer.mBiomesAreValid)
-	{
-		aWriter.AddByteArray("Biomes",    reinterpret_cast<const char *>(serializer.mVanillaBiomes), ARRAYCOUNT(serializer.mVanillaBiomes));
-		aWriter.AddIntArray ("MCSBiomes", reinterpret_cast<const int *>(serializer.mBiomes),         ARRAYCOUNT(serializer.mBiomes));
-	}
+	// Save biomes:
+	aWriter.AddByteArray("Biomes", reinterpret_cast<const char *>(serializer.Biomes), ARRAYCOUNT(serializer.Biomes));
 
 	// Save heightmap (Vanilla require this):
-	aWriter.AddIntArray("HeightMap", reinterpret_cast<const int *>(serializer.mVanillaHeightMap), ARRAYCOUNT(serializer.mVanillaHeightMap));
+	aWriter.AddIntArray("HeightMap", reinterpret_cast<const int *>(serializer.Heights), ARRAYCOUNT(serializer.Heights));
 
 	// Save blockdata:
 	aWriter.BeginList("Sections", TAG_Compound);
-	for (size_t Y = 0; Y != cChunkData::NumSections; ++Y)
+	ChunkDef_ForEachSection(serializer.m_BlockData, serializer.m_LightData,
 	{
-		auto section = serializer.m_Data.GetSection(Y);
-		if (section == nullptr)
+		aWriter.BeginCompound("");
+
+		if (Blocks != nullptr)
 		{
-			continue;
+			aWriter.AddByteArray("Blocks", reinterpret_cast<const char *>(Blocks->data()), Blocks->size());
+		}
+		else
+		{
+			aWriter.AddByteArray("Blocks", ChunkBlockData::SectionBlockCount, ChunkBlockData::DefaultValue);
 		}
 
-		aWriter.BeginCompound("");
-		aWriter.AddByteArray("Blocks", reinterpret_cast<const char *>(section->m_BlockTypes), ARRAYCOUNT(section->m_BlockTypes));
-		aWriter.AddByteArray("Data",   reinterpret_cast<const char *>(section->m_BlockMetas), ARRAYCOUNT(section->m_BlockMetas));
+		if (Metas != nullptr)
+		{
+			aWriter.AddByteArray("Data", reinterpret_cast<const char *>(Metas->data()), Metas->size());
+		}
+		else
+		{
+			aWriter.AddByteArray("Data", ChunkBlockData::SectionMetaCount, ChunkBlockData::DefaultMetaValue);
+		}
 
-		#ifdef DEBUG_SKYLIGHT
-			aWriter.AddByteArray("BlockLight", reinterpret_cast<const char *>(section->m_BlockSkyLight), ARRAYCOUNT(section->m_BlockSkyLight));
-		#else
-			aWriter.AddByteArray("BlockLight", reinterpret_cast<const char *>(section->m_BlockLight),    ARRAYCOUNT(section->m_BlockLight));
-		#endif
+		if (BlockLights != nullptr)
+		{
+			aWriter.AddByteArray("BlockLight", reinterpret_cast<const char *>(BlockLights->data()), BlockLights->size());
+		}
+		else
+		{
+			aWriter.AddByteArray("BlockLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultBlockLightValue);
+		}
 
-		aWriter.AddByteArray("SkyLight", reinterpret_cast<const char *>(section->m_BlockSkyLight), ARRAYCOUNT(section->m_BlockSkyLight));
+		if (SkyLights != nullptr)
+		{
+			aWriter.AddByteArray("SkyLight", reinterpret_cast<const char *>(SkyLights->data()), SkyLights->size());
+		}
+		else
+		{
+			aWriter.AddByteArray("SkyLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue);
+		}
+
 		aWriter.AddByte("Y", static_cast<unsigned char>(Y));
 		aWriter.EndCompound();
-	}
+	});
 	aWriter.EndList();  // "Sections"
 
 	// Store the information that the lighting is valid.
@@ -1179,11 +1260,10 @@ bool NBTChunkSerializer::serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 	}
 
 	// Save the world age to the chunk data. Required by vanilla and mcedit.
-	aWriter.AddLong("LastUpdate", aWorld.GetWorldAge());
+	aWriter.AddLong("LastUpdate", aWorld.GetWorldAge().count());
 
 	// Store the flag that the chunk has all the ores, trees, dungeons etc. Cuberite chunks are always complete.
 	aWriter.AddByte("TerrainPopulated", 1);
 
 	aWriter.EndCompound();  // "Level"
-	return true;
 }

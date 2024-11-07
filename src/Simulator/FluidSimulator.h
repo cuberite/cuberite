@@ -43,14 +43,11 @@ public:
 
 	cFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid);
 
-	// cSimulator overrides:
-	virtual bool IsAllowedBlock(BLOCKTYPE a_BlockType) override;
-
 	/** Returns a unit vector in the direction the fluid is flowing or a zero-vector if not flowing. */
-	virtual Vector3f GetFlowingDirection(int a_X, int a_Y, int a_Z);
+	virtual Vector3f GetFlowingDirection(Vector3i a_Pos);
 
 	/** Creates a ChunkData object for the simulator to use. The simulator returns the correct object type. */
-	virtual cFluidSimulatorData * CreateChunkData(void) { return nullptr; }
+	virtual cFluidSimulatorData * CreateChunkData(void) = 0;
 
 	bool IsFluidBlock          (BLOCKTYPE a_BlockType) const { return (a_BlockType == m_FluidBlock); }
 	bool IsStationaryFluidBlock(BLOCKTYPE a_BlockType) const { return (a_BlockType == m_StationaryFluidBlock); }
@@ -65,6 +62,9 @@ public:
 	bool IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2);
 
 protected:
+
+	bool IsAllowedBlock(BLOCKTYPE a_BlockType);
+
 	BLOCKTYPE m_FluidBlock;            // The fluid block type that needs simulating
 	BLOCKTYPE m_StationaryFluidBlock;  // The fluid block type that indicates no simulation is needed
 };

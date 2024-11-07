@@ -14,50 +14,28 @@
 
 
 
-class cBlockCarpetHandler:
+class cBlockCarpetHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
 
 public:
 
-	cBlockCarpetHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
+	using Super::Super;
+
+private:
+
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
+		const auto PosBelow = a_Position.addedY(-1);
+		return cChunkDef::IsValidHeight(PosBelow) && (a_Chunk.GetBlock(PosBelow) != E_BLOCK_AIR);
 	}
 
 
 
 
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = a_Player.GetEquippedItem().m_ItemDamage & 0x0f;
-		return true;
-	}
-
-
-
-
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
-	{
-		return (a_RelPos.y > 0) && (a_Chunk.GetBlock(a_RelPos.addedY(-1)) != E_BLOCK_AIR);
-	}
-
-
-
-
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		switch (a_Meta)
 		{

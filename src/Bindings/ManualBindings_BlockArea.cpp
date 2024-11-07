@@ -15,6 +15,66 @@
 
 
 
+/** Template for the bindings for the DoWithXYZAt(X, Y, Z) functions that need to check their coords. */
+template <
+	class SELF,
+	class ITEM,
+	bool (SELF::*DoWithFn)(int, int, int, cFunctionRef<bool(ITEM &)>),
+	bool (SELF::*CoordCheckFn)(int, int, int) const
+>
+static int DoWithXYZ(lua_State * tolua_S)
+{
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamNumber(2, 4) ||
+		!L.CheckParamFunction(5) ||
+		!L.CheckParamEnd(6)
+	)
+	{
+		return 0;
+	}
+
+	// Get parameters:
+	SELF * Self = nullptr;
+	int BlockX = 0;
+	int BlockY = 0;
+	int BlockZ = 0;
+	cLuaState::cRef FnRef;
+	L.GetStackValues(1, Self, BlockX, BlockY, BlockZ, FnRef);
+	if (Self == nullptr)
+	{
+		return L.ApiParamError("Invalid 'self'");
+	}
+	if (!FnRef.IsValid())
+	{
+		return L.ApiParamError("Expected a valid callback function for parameter #5");
+	}
+	if (!(Self->*CoordCheckFn)(BlockX, BlockY, BlockZ))
+	{
+		return L.ApiParamError(fmt::format(FMT_STRING("The provided coordinates ({0}) are not valid"),
+			Vector3i{BlockX, BlockY, BlockZ}
+		));
+	}
+
+	// Call the DoWith function:
+	bool res = (Self->*DoWithFn)(BlockX, BlockY, BlockZ, [&](ITEM & a_Item)
+		{
+			bool ret = false;
+			L.Call(FnRef, &a_Item, cLuaState::Return, ret);
+			return ret;
+		}
+	);
+
+	// Push the result as the return value:
+	L.Push(res);
+	return 1;
+}
+
+
+
+
+
 /** Reads params that together form a Cuboid.
 These can be:
 	- 6 numbers (MinX, MaxX, MinY, MaxY, MinZ, MaxZ)
@@ -74,7 +134,7 @@ static int readVector3iOverloadParams(cLuaState & a_LuaState, int a_StartParam, 
 		// Assume the 3-number version:
 		if (!a_LuaState.GetStackValues(a_StartParam, a_Coords.x, a_Coords.y, a_Coords.z))
 		{
-			return a_LuaState.ApiParamError("Cannot read the %s, expected 3 numbers", a_ParamName);
+			return a_LuaState.ApiParamError(fmt::format(FMT_STRING("Cannot read the {}, expected 3 numbers"), a_ParamName));
 		}
 		return a_StartParam + 3;
 	}
@@ -83,7 +143,7 @@ static int readVector3iOverloadParams(cLuaState & a_LuaState, int a_StartParam, 
 		// Assume the Vector3i version:
 		if (!a_LuaState.GetStackValues(a_StartParam, a_Coords))
 		{
-			return a_LuaState.ApiParamError("Cannot read the %s, expected a Vector3i instance", a_ParamName);
+			return a_LuaState.ApiParamError(fmt::format(FMT_STRING("Cannot read the {}, expected a Vector3i instance"), a_ParamName));
 		}
 		return a_StartParam + 1;
 	}
@@ -117,13 +177,13 @@ static int tolua_cBlockArea_Create(lua_State * a_LuaState)
 	L.GetStackValue(dataTypesIdx, dataTypes);
 	if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
 	{
-		return L.ApiParamError("Invalid combination of baDataTypes specified (%d)", dataTypes);
+		return L.ApiParamError(fmt::format(FMT_STRING("Invalid combination of baDataTypes specified (0x{:02x})"), dataTypes));
 	}
 
 	// Create the area:
 	if ((size.x <= 0) || (size.y <= 0) || (size.z <= 0))
 	{
-		return L.FApiParamError("Invalid sizes, must be greater than zero, got {0}", size);
+		return L.ApiParamError(fmt::format(FMT_STRING("Invalid sizes, must be greater than zero, got {}"), size));
 	}
 	ASSERT(self != nullptr);
 	self->Create(size, dataTypes);
@@ -161,13 +221,13 @@ static int tolua_cBlockArea_FillRelCuboid(lua_State * a_LuaState)
 	bounds.Sort();
 	if (!(self->IsValidRelCoords(bounds.p1) && self->IsValidRelCoords(bounds.p2)))
 	{
-		return L.FApiParamError(
-			"The bounds ({0} - {1}) are out of range ({2} - {3})",
+		return L.ApiParamError(fmt::format(
+			FMT_STRING("The bounds ({0} - {1}) are out of range ({2} - {3})"),
 			bounds.p1,
 			bounds.p2,
 			Vector3i(0, 0, 0),
 			(self->GetSize() - Vector3i{1, 1, 1})
-		);
+		));
 	}
 	int dataTypes = cBlockArea::baTypes | cBlockArea::baMetas | cBlockArea::baBlockEntities;
 	BLOCKTYPE blockType;
@@ -179,7 +239,7 @@ static int tolua_cBlockArea_FillRelCuboid(lua_State * a_LuaState)
 	L.GetStackValues(nextIdx + 2, blockMeta, blockLight, blockSkyLight);  // These values are optional
 	if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
 	{
-		return L.ApiParamError("Invalid baDataTypes combination (%d)", dataTypes);
+		return L.ApiParamError(fmt::format(FMT_STRING("Invalid baDataTypes combination (0x{:02x})"), dataTypes));
 	}
 
 	// Do the actual Fill:
@@ -215,9 +275,9 @@ static int tolua_cBlockArea_GetBlockTypeMeta(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidCoords(coords))
 	{
-		return L.FApiParamError("Coords ({0}) out of range ({1} - {2})",
+		return L.ApiParamError(fmt::format(FMT_STRING("Coords ({0}) out of range ({1} - {2})"),
 			coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
-		);
+		));
 	}
 	BLOCKTYPE blockType;
 	NIBBLETYPE blockMeta;
@@ -365,9 +425,9 @@ static int tolua_cBlockArea_GetRelBlockTypeMeta(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidRelCoords(coords))
 	{
-		return L.FApiParamError("The coords ({0}) are out of range (max {1})",
+		return L.ApiParamError(fmt::format(FMT_STRING("The coords ({0}) are out of range (max {1})"),
 			coords, (self->GetSize() - Vector3i{1, 1, 1})
-		);
+		));
 	}
 	BLOCKTYPE blockType;
 	NIBBLETYPE blockMeta;
@@ -435,7 +495,17 @@ static int tolua_cBlockArea_LoadFromSchematicFile(lua_State * a_LuaState)
 		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
-	L.Push(cSchematicFileSerializer::LoadFromSchematicFile(*self, fileName));
+	try
+	{
+		cSchematicFileSerializer::LoadFromSchematicFile(*self, fileName);
+		L.Push(true);
+	}
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING(Oops.what());
+		L.LogStackTrace();
+		L.Push(false);
+	}
 	return 1;
 }
 
@@ -457,7 +527,7 @@ static int tolua_cBlockArea_LoadFromSchematicString(lua_State * a_LuaState)
 		return 0;
 	}
 	cBlockArea * self;
-	AString data;
+	ContiguousByteBuffer data;
 	if (!L.GetStackValues(1, self, data))
 	{
 		return L.ApiParamError("Cannot read the parameters");
@@ -467,7 +537,17 @@ static int tolua_cBlockArea_LoadFromSchematicString(lua_State * a_LuaState)
 		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
-	L.Push(cSchematicFileSerializer::LoadFromSchematicString(*self, data));
+	try
+	{
+		cSchematicFileSerializer::LoadFromSchematicString(*self, data);
+		L.Push(true);
+	}
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING(Oops.what());
+		L.LogStackTrace();
+		L.Push(false);
+	}
 	return 1;
 }
 
@@ -507,43 +587,16 @@ static int tolua_cBlockArea_Read(lua_State * a_LuaState)
 	L.GetStackValues(dataTypesIdx, dataTypes);
 	if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
 	{
-		return L.ApiParamError("Invalid baDataTypes combination (%d)", dataTypes);
+		return L.ApiParamError(fmt::format(FMT_STRING("Invalid baDataTypes combination (0x{:02x})"), dataTypes));
 	}
 
-	// Check the coords, shift if needed:
+	// Check the coords:
+	if (!cChunkDef::IsValidHeight(bounds.p1) || !cChunkDef::IsValidHeight(bounds.p2))
+	{
+		return L.ApiParamError(fmt::format(FMT_STRING("Coordinates {0} - {1} exceed world bounds"), bounds.p1, bounds.p2));
+	}
+
 	bounds.Sort();
-	if (bounds.p1.y < 0)
-	{
-		FLOGWARNING("cBlockArea:Read(): MinBlockY less than zero, adjusting to zero. Coords: {0} - {1}",
-			bounds.p1, bounds.p2
-		);
-		L.LogStackTrace();
-		bounds.p1.y = 0;
-	}
-	else if (bounds.p1.y >= cChunkDef::Height)
-	{
-		FLOGWARNING("cBlockArea:Read(): MinBlockY more than chunk height, adjusting to chunk height. Coords: {0} - {1}",
-			bounds.p1, bounds.p2
-		);
-		L.LogStackTrace();
-		bounds.p1.y = cChunkDef::Height - 1;
-	}
-	if (bounds.p2.y < 0)
-	{
-		FLOGWARNING("cBlockArea:Read(): MaxBlockY less than zero, adjusting to zero. Coords: {0} - {1}",
-			bounds.p1, bounds.p2
-		);
-		L.LogStackTrace();
-		bounds.p2.y = 0;
-	}
-	else if (bounds.p2.y > cChunkDef::Height)
-	{
-		FLOGWARNING("cBlockArea:Read(): MaxBlockY more than chunk height, adjusting to chunk height. Coords: {0} - {1}",
-			bounds.p1, bounds.p2
-		);
-		L.LogStackTrace();
-		bounds.p2.y = cChunkDef::Height;
-	}
 
 	// Do the actual read:
 	L.Push(self->Read(*world, bounds, dataTypes));
@@ -583,13 +636,14 @@ static int tolua_cBlockArea_RelLine(lua_State * a_LuaState)
 	L.GetStackValues(idx, dataTypes, blockType, blockMeta, blockLight, blockSkyLight);
 	if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
 	{
-		return L.ApiParamError("Invalid baDataTypes combination (%d)", dataTypes);
+		return L.ApiParamError(fmt::format(FMT_STRING("Invalid baDataTypes combination (0x{:02x})"), dataTypes));
 	}
 	if ((self->GetDataTypes() & dataTypes) != dataTypes)
 	{
-		return L.ApiParamError("Requested datatypes not present in the cBlockArea. Got only 0x%02x, requested 0x%02x",
+		return L.ApiParamError(fmt::format(
+			FMT_STRING("Requested datatypes not present in the cBlockArea. Got only 0x{:02x}, requested 0x{:02x}"),
 			self->GetDataTypes(), dataTypes
-		);
+		));
 	}
 
 	// Draw the line:
@@ -625,7 +679,17 @@ static int tolua_cBlockArea_SaveToSchematicFile(lua_State * a_LuaState)
 		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
-	L.Push(cSchematicFileSerializer::SaveToSchematicFile(*self, fileName));
+	try
+	{
+		cSchematicFileSerializer::SaveToSchematicFile(*self, fileName);
+		L.Push(true);
+	}
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING(Oops.what());
+		L.LogStackTrace();
+		L.Push(false);
+	}
 	return 1;
 }
 
@@ -655,13 +719,17 @@ static int tolua_cBlockArea_SaveToSchematicString(lua_State * a_LuaState)
 		return L.ApiParamError("Invalid 'self', must not be nil");
 	}
 
-	AString data;
-	if (cSchematicFileSerializer::SaveToSchematicString(*self, data))
+	try
 	{
-		L.Push(data);
+		L.Push(cSchematicFileSerializer::SaveToSchematicString(*self).GetView());
 		return 1;
 	}
-	return 0;
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING(Oops.what());
+		L.LogStackTrace();
+		return 0;
+	}
 }
 
 
@@ -704,13 +772,14 @@ static int tolua_cBlockArea_Write(lua_State * a_LuaState)
 	{
 		if (!cBlockArea::IsValidDataTypeCombination(dataTypes))
 		{
-			return L.ApiParamError("Invalid datatype combination (%d)", dataTypes);
+			return L.ApiParamError(fmt::format(FMT_STRING("Invalid datatype combination (0x{:02x})"), dataTypes));
 		}
 		if ((self->GetDataTypes() & dataTypes) != dataTypes)
 		{
-			return L.ApiParamError("Requesting datatypes not present in the cBlockArea. Got only 0x%02x, requested 0x%02x",
+			return L.ApiParamError(fmt::format(
+				FMT_STRING("Requesting datatypes not present in the cBlockArea. Got only 0x{:02x}, requested 0x{:02x}"),
 				self->GetDataTypes(), dataTypes
-			);
+			));
 		}
 	}
 
@@ -777,7 +846,7 @@ static int GetBlock(lua_State * a_LuaState)
 	// Check the datatype's presence:
 	if ((self->GetDataTypes() & DataTypeFlag) == 0)
 	{
-		return L.ApiParamError("The area doesn't contain the datatype (%d)", DataTypeFlag);
+		return L.ApiParamError(fmt::format(FMT_STRING("The area doesn't contain the datatype (0x{:02x})"), DataTypeFlag));
 	}
 
 	// Read the overloaded params:
@@ -785,9 +854,9 @@ static int GetBlock(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidCoords(coords))
 	{
-		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
+		return L.ApiParamError(fmt::format(FMT_STRING("The coords ({0}) are out of range ({1} - {2})"),
 			coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
-		);
+		));
 	}
 
 	// Get the block info:
@@ -828,7 +897,7 @@ static int GetRelBlock(lua_State * a_LuaState)
 	// Check the datatype's presence:
 	if ((self->GetDataTypes() & DataTypeFlag) == 0)
 	{
-		return L.ApiParamError("The area doesn't contain the datatype (%d)", DataTypeFlag);
+		return L.ApiParamError(fmt::format(FMT_STRING("The area doesn't contain the datatype (0x{:02x})"), DataTypeFlag));
 	}
 
 	// Read the overloaded params:
@@ -836,9 +905,9 @@ static int GetRelBlock(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidRelCoords(coords))
 	{
-		return L.FApiParamError("The coords ({0}) are out of range ({1})",
+		return L.ApiParamError(fmt::format(FMT_STRING("The coords ({0}) are out of range ({1})"),
 			coords, (self->GetSize() - Vector3i(1, 1, 1))
-		);
+		));
 	}
 
 	// Get the block info:
@@ -879,7 +948,7 @@ static int SetBlock(lua_State * a_LuaState)
 	// Check the datatype's presence:
 	if ((self->GetDataTypes() & DataTypeFlag) == 0)
 	{
-		return L.ApiParamError("The area doesn't contain the datatype (%d)", DataTypeFlag);
+		return L.ApiParamError(fmt::format(FMT_STRING("The area doesn't contain the datatype (0x{:02x})"), DataTypeFlag));
 	}
 
 	// Read the overloaded params:
@@ -887,9 +956,9 @@ static int SetBlock(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidCoords(coords))
 	{
-		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
+		return L.ApiParamError(fmt::format(FMT_STRING("The coords ({0}) are out of range ({1} - {2})"),
 			coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
-		);
+		));
 	}
 	DataType data;
 	L.GetStackValues(idx, data);
@@ -932,7 +1001,7 @@ static int SetRelBlock(lua_State * a_LuaState)
 	// Check the datatype's presence:
 	if ((self->GetDataTypes() & DataTypeFlag) == 0)
 	{
-		return L.ApiParamError("The area doesn't contain the datatype (%d)", DataTypeFlag);
+		return L.ApiParamError(fmt::format(FMT_STRING("The area doesn't contain the datatype (0x{:02x})"), DataTypeFlag));
 	}
 
 	// Read the overloaded params:
@@ -940,9 +1009,10 @@ static int SetRelBlock(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidRelCoords(coords))
 	{
-		return L.FApiParamError("The coords ({0}) are out of range ({1})",
+		return L.ApiParamError(fmt::format(
+			FMT_STRING("The coords ({0}) are out of range ({1})"),
 			coords, (self->GetSize() - Vector3i(1, 1, 1))
-		);
+		));
 	}
 	DataType data;
 	L.GetStackValues(idx, data);
@@ -983,9 +1053,9 @@ static int tolua_cBlockArea_SetBlockTypeMeta(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidCoords(coords))
 	{
-		return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
+		return L.ApiParamError(fmt::format(FMT_STRING("The coords ({0}) are out of range ({1} - {2})"),
 			coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
-		);
+		));
 	}
 
 	BLOCKTYPE block;
@@ -1023,7 +1093,7 @@ static int tolua_cBlockArea_SetRelBlockTypeMeta(lua_State * a_LuaState)
 	// Check if block types and metas are present:
 	if (!self->HasBlockTypes() || !self->HasBlockMetas())
 	{
-		return L.ApiParamError("The area doesn't contain the baTypes or baMetas datatypes (0x%02x)", self->GetDataTypes());
+		return L.ApiParamError(fmt::format(FMT_STRING("The area doesn't contain the baTypes or baMetas datatypes (0x{:02x})"), self->GetDataTypes()));
 	}
 
 	// Read the overloaded params:
@@ -1031,9 +1101,9 @@ static int tolua_cBlockArea_SetRelBlockTypeMeta(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, coords, "coords");
 	if (!self->IsValidRelCoords(coords))
 	{
-		return L.FApiParamError("The coords ({0}) are out of range ({1})",
+		return L.ApiParamError(fmt::format(FMT_STRING("The coords ({0}) are out of range ({1})"),
 			coords, (self->GetSize() - Vector3i(1, 1, 1))
-		);
+		));
 	}
 
 	BLOCKTYPE block;

@@ -14,7 +14,7 @@
 
 
 #include "Defines.h"
-
+#include "ChunkDef.h"
 
 
 
@@ -45,7 +45,7 @@ public:
 		/** Called on each block encountered along the path, including the first block (path start), if chunk data is not loaded
 		When this callback returns true, the tracing is aborted.
 		*/
-		virtual bool OnNextBlockNoData(Vector3i a_BlockPos, char a_EntryFace)
+		virtual bool OnNextBlockNoData(Vector3i a_BlockPos, eBlockFace a_EntryFace)
 		{
 			UNUSED(a_BlockPos);
 			UNUSED(a_EntryFace);

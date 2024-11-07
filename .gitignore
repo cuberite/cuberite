@@ -1,4 +1,5 @@
 build/
+build*/
 nbproject/
 ipch/
 Win32/
@@ -14,6 +15,7 @@ Tools/ProtoProxy/ProtoProxy
 Testing/
 ChunkWorxSave.ini
 doxy/
+.vscode/
 Profiling
 Symbols
 cloc-ignored.txt
@@ -44,6 +46,8 @@ GPUCache
 *.cbp
 ## KDevelop
 *.kdev*
+## Vim
+.cache/
 
 # world inside source
 ChunkWorx.ini
@@ -106,7 +110,7 @@ ReleaseProfile/
 *.dir/
 CPackConfig.cmake
 CPackSourceConfig.cmake
-cmake-build-debug
+cmake-build-*
 
 # APIDump-generated status files:
 Server/cuberite_api.lua
@@ -121,3 +125,9 @@ build-cuberite
 # clang-tidy
 tidy-build
 run-clang-tidy.py
+
+# ctags output
+tags
+
+# mac things
+.DS_Store

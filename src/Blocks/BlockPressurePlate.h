@@ -2,35 +2,48 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "BlockSlab.h"
+#include "../Chunk.h"
+#include "BlockStairs.h"
 
 
 
 
-class cBlockPressurePlateHandler :
+class cBlockPressurePlateHandler final :
 	public cClearMetaOnDrop<cBlockHandler>
 {
 	using Super = cClearMetaOnDrop<cBlockHandler>;
 
 public:
 
-	cBlockPressurePlateHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
+	using Super::Super;
+
+private:
+
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-	}
-
-
-
-
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
-	{
-		if (a_RelPos.y <= 1)
+		const auto PosBelow = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(PosBelow))
 		{
 			return false;
 		}
 
-		// TODO: check if the block is upside-down slab or upside-down stairs
-		auto Block = a_Chunk.GetBlock(a_RelPos.addedY(-1));
+		BLOCKTYPE Block;
+		NIBBLETYPE BlockMeta;
+		a_Chunk.GetBlockTypeMeta(PosBelow, Block, BlockMeta);
+
+		// upside down slabs
+		if (cBlockSlabHandler::IsAnySlabType(Block))
+		{
+			return BlockMeta & E_META_WOODEN_SLAB_UPSIDE_DOWN;
+		}
+
+		// upside down stairs
+		if (cBlockStairsHandler::IsAnyStairType(Block))
+		{
+			return BlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN;
+		}
+
 		switch (Block)
 		{
 			case E_BLOCK_ACACIA_FENCE:
@@ -46,7 +59,7 @@ public:
 			}
 			default:
 			{
-				return (!cBlockInfo::IsTransparent(Block));
+				return !cBlockInfo::IsTransparent(Block);
 			}
 		}
 	}
@@ -55,7 +68,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		switch (m_BlockType)

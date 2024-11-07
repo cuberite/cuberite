@@ -26,6 +26,13 @@ Regular upscaling takes two arrays and "moves" the input from src to dst; src is
 
 
 
+
+#pragma once
+
+
+
+
+
 /**
 Linearly interpolates values in the array between the equidistant anchor points (upscales).
 Works in-place (input is already present at the correct output coords)
@@ -116,11 +123,10 @@ template <typename TYPE> void LinearUpscale2DArray(
 		RatioY[y] = static_cast<TYPE>(y) / a_UpscaleY;
 	}
 
+	const int DstSizeX = (a_SrcSizeX - 1) * a_UpscaleX + 1;
+	[[maybe_unused]] const int DstSizeY = (a_SrcSizeY - 1) * a_UpscaleY + 1;
+
 	// Interpolate each XY cell:
-	int DstSizeX = (a_SrcSizeX - 1) * a_UpscaleX + 1;
-	#ifdef _DEBUG
-		int DstSizeY = (a_SrcSizeY - 1) * a_UpscaleY + 1;
-	#endif
 	for (int y = 0; y < (a_SrcSizeY - 1); y++)
 	{
 		int DstY = y * a_UpscaleY;
@@ -197,12 +203,11 @@ template <typename TYPE> void LinearUpscale3DArray(
 		RatioZ[z] = static_cast<TYPE>(z) / a_UpscaleZ;
 	}
 
+	const int DstSizeX = (a_SrcSizeX - 1) * a_UpscaleX + 1;
+	const int DstSizeY = (a_SrcSizeY - 1) * a_UpscaleY + 1;
+	[[maybe_unused]] const int DstSizeZ = (a_SrcSizeZ - 1) * a_UpscaleZ + 1;
+
 	// Interpolate each XYZ cell:
-	int DstSizeX = (a_SrcSizeX - 1) * a_UpscaleX + 1;
-	int DstSizeY = (a_SrcSizeY - 1) * a_UpscaleY + 1;
-	#ifdef _DEBUG
-		int DstSizeZ = (a_SrcSizeZ - 1) * a_UpscaleZ + 1;
-	#endif
 	for (int z = 0; z < (a_SrcSizeZ - 1); z++)
 	{
 		int DstZ = z * a_UpscaleZ;

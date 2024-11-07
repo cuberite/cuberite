@@ -26,7 +26,7 @@ class cDistortedHeightmap :
 	public cTerrainShapeGen
 {
 public:
-	cDistortedHeightmap(int a_Seed, cBiomeGenPtr a_BiomeGen);
+	cDistortedHeightmap(int a_Seed, cBiomeGen & a_BiomeGen);
 
 protected:
 	typedef cChunkDef::BiomeMap BiomeNeighbors[3][3];
@@ -53,10 +53,10 @@ protected:
 	NOISE_DATATYPE m_DistortedHeightmap[17 * 257 * 17];
 
 	/** The bime generator to query for biomes. */
-	cBiomeGenPtr m_BiomeGen;
+	cBiomeGen & m_BiomeGen;
 
 	/** The generator that provides the base heightmap (before distortion). */
-	cTerrainHeightGenPtr m_UnderlyingHeiGen;
+	cHeiGenBiomal m_UnderlyingHeiGen;
 
 	/** Cache for m_UnderlyingHeiGen. */
 	cHeiGenCache m_HeightGen;

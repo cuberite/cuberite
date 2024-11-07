@@ -14,21 +14,15 @@
 
 cHTTPServerConnection::cHTTPServerConnection(cHTTPServer & a_HTTPServer) :
 	m_HTTPServer(a_HTTPServer),
-	m_Parser(*this),
-	m_CurrentRequest(nullptr)
+	m_Parser(*this)
 {
-	// LOGD("HTTP: New connection at %p", this);
 }
 
 
 
 
 
-cHTTPServerConnection::~cHTTPServerConnection()
-{
-	// LOGD("HTTP: Connection deleting: %p", this);
-	m_CurrentRequest.reset();
-}
+cHTTPServerConnection::~cHTTPServerConnection() = default;
 
 
 
@@ -36,8 +30,8 @@ cHTTPServerConnection::~cHTTPServerConnection()
 
 void cHTTPServerConnection::SendStatusAndReason(int a_StatusCode, const AString & a_Response)
 {
-	SendData(Printf("HTTP/1.1 %d %s\r\n", a_StatusCode, a_Response.c_str()));
-	SendData(Printf("Content-Length: %u\r\n\r\n", static_cast<unsigned>(a_Response.size())));
+	SendData(fmt::format(FMT_STRING("HTTP/1.1 {} {}\r\n"), a_StatusCode, a_Response));
+	SendData(fmt::format(FMT_STRING("Content-Length: {}\r\n\r\n"), a_Response));
 	SendData(a_Response.data(), a_Response.size());
 	m_CurrentRequest.reset();
 	m_Parser.Reset();
@@ -49,7 +43,7 @@ void cHTTPServerConnection::SendStatusAndReason(int a_StatusCode, const AString 
 
 void cHTTPServerConnection::SendNeedAuth(const AString & a_Realm)
 {
-	SendData(Printf("HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm=\"%s\"\r\nContent-Length: 0\r\n\r\n", a_Realm.c_str()));
+	SendData(fmt::format(FMT_STRING("HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm=\"{}\"\r\nContent-Length: 0\r\n\r\n"), a_Realm));
 	m_CurrentRequest.reset();
 	m_Parser.Reset();
 }
@@ -101,6 +95,7 @@ void cHTTPServerConnection::Terminate(void)
 	{
 		m_HTTPServer.RequestFinished(*this, *m_CurrentRequest);
 	}
+	m_Link->Close();  // Terminate the connection
 	m_Link.reset();
 }
 
@@ -153,7 +148,7 @@ void cHTTPServerConnection::OnError(int a_ErrorCode, const AString & a_ErrorMsg)
 
 void cHTTPServerConnection::OnError(const AString & a_ErrorDescription)
 {
-	OnRemoteClosed();
+	Terminate();  // HTTP data malformed, disconnect
 }
 
 
@@ -162,15 +157,16 @@ void cHTTPServerConnection::OnError(const AString & a_ErrorDescription)
 
 void cHTTPServerConnection::OnFirstLine(const AString & a_FirstLine)
 {
-	// Create a new request object for this request:
-	auto split = StringSplit(a_FirstLine, " ");
-	if (split.size() < 2)
+	const auto Split = StringSplit(a_FirstLine, " ");
+	if (Split.size() < 2)
 	{
-		// Invalid request line. We need at least the Method and URL
-		OnRemoteClosed();
+		// Invalid request line. We need at least the Method and URL:
+		Terminate();
 		return;
 	}
-	m_CurrentRequest.reset(new cHTTPIncomingRequest(split[0], split[1]));
+
+	// Create a new request object for this request:
+	m_CurrentRequest = std::make_unique<cHTTPIncomingRequest>(Split[0], Split[1]);
 }
 
 
@@ -218,8 +214,13 @@ void cHTTPServerConnection::OnBodyData(const void * a_Data, size_t a_Size)
 
 void cHTTPServerConnection::OnBodyFinished(void)
 {
-	// Process the request and reset:
-	m_HTTPServer.RequestFinished(*this, *m_CurrentRequest);
+	// Process the request:
+	if (m_CurrentRequest != nullptr)
+	{
+		m_HTTPServer.RequestFinished(*this, *m_CurrentRequest);
+	}
+
+	// ...and reset:
 	m_CurrentRequest.reset();
 	m_Parser.Reset();
 }
@@ -232,7 +233,3 @@ void cHTTPServerConnection::SendData(const void * a_Data, size_t a_Size)
 {
 	m_Link->Send(a_Data, a_Size);
 }
-
-
-
-

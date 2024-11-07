@@ -8,8 +8,6 @@
 
 #pragma once
 
-
-
 typedef std::string AString;
 typedef std::vector<AString> AStringVector;
 typedef std::list<AString>   AStringList;
@@ -20,33 +18,6 @@ typedef std::map<AString, AString> AStringMap;
 
 
 
-
-/** Output the formatted text into the string.
-Returns a_Dst. */
-extern AString & vPrintf(AString & a_Dst, const char * format, fmt::printf_args args);
-template <typename... Args>
-AString & Printf(AString & a_Dst, const char * a_Format, const Args & ... args)
-{
-	return vPrintf(a_Dst, a_Format, fmt::make_printf_args(args...));
-}
-
-/** Output the formatted text into string
-Returns the formatted string by value. */
-extern AString vPrintf(const char * format, fmt::printf_args args);
-template <typename... Args>
-AString Printf(const char * a_Format, const Args & ... args)
-{
-	return vPrintf(a_Format, fmt::make_printf_args(args...));
-}
-
-/** Add the formated string to the existing data in the string.
-Returns a_Dst. */
-extern AString & vAppendPrintf(AString & a_Dst, const char * a_Format, fmt::printf_args args);
-template <typename... Args>
-extern AString & AppendPrintf(AString & a_Dst, const char * a_Format, const Args & ... a_Args)
-{
-	return vAppendPrintf(a_Dst, a_Format, fmt::make_printf_args(a_Args...));
-}
 
 /** Split the string at any of the listed delimiters.
 Return the splitted strings as a stringvector. */
@@ -92,8 +63,11 @@ extern size_t RateCompareString(const AString & s1, const AString & s2);
 /** Replaces each occurence of iNeedle in iHayStack with iReplaceWith */
 extern void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith);  // tolua_export
 
+/** Replaces each occurence of iNeedle in iHayStack with iReplaceWith, after URL-encoding iReplaceWith */
+extern void ReplaceURL(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith);
+
 /** Converts a stream of BE shorts into UTF-8 string; returns a_UTF8. */
-extern AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8);
+extern AString & RawBEUTF16ToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8);
 
 /** Converts a unicode character to its UTF8 representation. */
 extern AString UnicodeCharToUtf8(unsigned a_UnicodeChar);
@@ -126,18 +100,6 @@ extern AString Base64Decode(const AString & a_Base64String);  // Exported manual
 
 /** Encodes a string into Base64 */
 extern AString Base64Encode(const AString & a_Input);  // Exported manually due to embedded NULs and extra parameter
-
-/** Reads two bytes from the specified memory location and interprets them as BigEndian short */
-extern short GetBEShort(const char * a_Mem);
-
-/** Reads two bytes from the specified memory location and interprets them as BigEndian unsigned short */
-extern unsigned short GetBEUShort(const char * a_Mem);
-
-/** Reads four bytes from the specified memory location and interprets them as BigEndian int */
-extern int GetBEInt(const char * a_Mem);
-
-/** Writes four bytes to the specified memory location so that they interpret as BigEndian int */
-extern void SetBEInt(char * a_Mem, Int32 a_Value);
 
 /** Splits a string that has embedded \0 characters, on those characters.
 a_Output is first cleared and then each separate string is pushed back into a_Output.

@@ -1,5 +1,6 @@
 #include "Globals.h"
 #include "PathFinder.h"
+#include "BlockType.h"
 #include "../BlockInfo.h"
 #include "../Chunk.h"
 
@@ -7,13 +8,12 @@
 
 
 
-cPathFinder::cPathFinder(double a_MobWidth, double a_MobHeight) :
-	m_Path(),
+cPathFinder::cPathFinder(float a_MobWidth, float a_MobHeight) :
+	m_Width(a_MobWidth),
+	m_Height(a_MobHeight),
 	m_GiveUpCounter(0),
 	m_NotFoundCooldown(0)
 {
-	m_Width = a_MobWidth;
-	m_Height = a_MobHeight;
 }
 
 
@@ -185,74 +185,78 @@ bool cPathFinder::EnsureProperPoint(Vector3d & a_Vector, cChunk & a_Chunk)
 		return false;
 	}
 
-	int RelX = FloorC(a_Vector.x) - Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = FloorC(a_Vector.z) - Chunk->GetPosZ() * cChunkDef::Width;
-
 	// If destination in the air, first try to go 1 block north, or east, or west.
 	// This fixes the player leaning issue.
 	// If that failed, we instead go down to the lowest air block.
-	int YBelowUs = FloorC(a_Vector.y) - 1;
-	if (YBelowUs < 0)
+	auto Below = a_Vector.Floor().addedY(-1);
+	if (!cChunkDef::IsValidHeight(Below))
 	{
 		return false;
 
 	}
-	Chunk->GetBlockTypeMeta(RelX, YBelowUs, RelZ, BlockType, BlockMeta);
+	auto BelowRel = cChunkDef::AbsoluteToRelative(Below);
+
+	Chunk->GetBlockTypeMeta(BelowRel, BlockType, BlockMeta);
 	if (!(IsWaterOrSolid(BlockType)))
 	{
-		bool InTheAir = true;
-		int x, z;
-		for (z = -1; z <= 1; ++z)
+		constexpr std::array<Vector3i, 8> Offsets =
 		{
-			for (x = -1; x <= 1; ++x)
 			{
-				if ((x == 0) && (z == 0))
-				{
-					continue;
-				}
-				Chunk = a_Chunk.GetNeighborChunk(FloorC(a_Vector.x+x), FloorC(a_Vector.z+z));
-				if ((Chunk == nullptr) || !Chunk->IsValid())
-				{
-					return false;
-				}
-				RelX = FloorC(a_Vector.x+x) - Chunk->GetPosX() * cChunkDef::Width;
-				RelZ = FloorC(a_Vector.z+z) - Chunk->GetPosZ() * cChunkDef::Width;
-				Chunk->GetBlockTypeMeta(RelX, YBelowUs, RelZ, BlockType, BlockMeta);
-				if (IsWaterOrSolid((BlockType)))
-				{
-					a_Vector.x += x;
-					a_Vector.z += z;
-					InTheAir = false;
-					goto breakBothLoops;
-				}
+				{-1, 0, 0},
+				{1, 0, 0},
+				{0, 0, -1},
+				{0, 0, 1},
+				{-1, 0, -1},
+				{-1, 0, 1},
+				{1, 0, -1},
+				{1, 0, 1},
+			}
+		};
+
+		// Looks for a neighbouring block one block in x or z direction that is water or solid.
+		bool InTheAir = true;
+		for (const auto & Offset : Offsets)
+		{
+			auto InspectPos = Below + Offset;
+			Chunk = a_Chunk.GetNeighborChunk(InspectPos.x, InspectPos.z);
+			if ((Chunk == nullptr) || !Chunk->IsValid())
+			{
+				return false;
+			}
+			auto InspectRel = cChunkDef::AbsoluteToRelative(InspectPos);
+			Chunk->GetBlockTypeMeta(InspectRel, BlockType, BlockMeta);
+			if (IsWaterOrSolid((BlockType)))
+			{
+				BelowRel = InspectRel;
+				InTheAir = false;
+				break;
 			}
 		}
-		breakBothLoops:
 
 		// Go down to the lowest air block.
 		if (InTheAir)
 		{
-			while (a_Vector.y > 0)
+			while (cChunkDef::IsValidHeight(BelowRel.addedY(-1)))
 			{
-				Chunk->GetBlockTypeMeta(RelX, FloorC(a_Vector.y) - 1, RelZ, BlockType, BlockMeta);
+				Chunk->GetBlockTypeMeta(BelowRel.addedY(-1), BlockType, BlockMeta);
 				if (IsWaterOrSolid(BlockType))
 				{
 					break;
 				}
-				a_Vector.y -= 1;
+				BelowRel.y -= 1;
 			}
 		}
 	}
 
 	// If destination in water or solid, go up to the first air block.
-	while (a_Vector.y < cChunkDef::Height)
+	while (BelowRel.y < cChunkDef::Height)
 	{
-		Chunk->GetBlockTypeMeta(RelX, FloorC(a_Vector.y), RelZ, BlockType, BlockMeta);
+		Chunk->GetBlockTypeMeta(BelowRel, BlockType, BlockMeta);
 		if (!IsWaterOrSolid(BlockType))
 		{
 			break;
 		}
-		a_Vector.y += 1;
+		BelowRel.y += 1;
 	}
 
 	return true;
@@ -278,9 +282,6 @@ bool cPathFinder::PathIsTooOld() const
 	{
 		acceptableDeviation = 1;
 	}
-	if ((m_FinalDestination - m_DeviationOrigin).SqrLength() > acceptableDeviation * acceptableDeviation)
-	{
-		return true;
-	}
-	return false;
+	const auto DeviationSqr = (m_FinalDestination - m_DeviationOrigin).SqrLength();
+	return (DeviationSqr > (acceptableDeviation * acceptableDeviation));
 }

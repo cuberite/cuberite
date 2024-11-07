@@ -41,7 +41,7 @@ int cSslContext::Initialize(std::shared_ptr<const cSslConfig> a_Config)
 	}
 
 	// Check the Config:
-	m_Config = a_Config;
+	m_Config = std::move(a_Config);
 	if (m_Config == nullptr)
 	{
 		ASSERT(!"Config must not be nullptr");
@@ -82,10 +82,10 @@ int cSslContext::Initialize(bool a_IsClient)
 
 
 
-void cSslContext::SetExpectedPeerName(const AString & a_ExpectedPeerName)
+void cSslContext::SetExpectedPeerName(const std::string_view a_ExpectedPeerName)
 {
 	ASSERT(m_IsValid);  // Call Initialize() first
-	mbedtls_ssl_set_hostname(&m_Ssl, a_ExpectedPeerName.c_str());
+	mbedtls_ssl_set_hostname(&m_Ssl, a_ExpectedPeerName.data());
 }
 
 

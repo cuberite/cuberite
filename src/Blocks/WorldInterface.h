@@ -6,13 +6,11 @@
 
 #include <optional>
 
-class cBedEntity;
 class cBlockEntity;
 class cBroadcastInterface;
 class cItems;
 class cPlayer;
 
-using cBedCallback         = cFunctionRef<bool(cBedEntity   &)>;
 using cBlockEntityCallback = cFunctionRef<bool(cBlockEntity &)>;
 using cPlayerListCallback  = cFunctionRef<bool(cPlayer      &)>;
 using cEntityCallback      = cFunctionRef<bool(cEntity      &)>;
@@ -25,8 +23,8 @@ class cWorldInterface
 public:
 	virtual ~cWorldInterface() {}
 
-	virtual int GetTimeOfDay(void) const = 0;
-	virtual Int64 GetWorldAge(void)  const = 0;
+	virtual cTickTime GetTimeOfDay(void) const = 0;
+	virtual cTickTimeLong GetWorldAge(void)  const = 0;
 
 	virtual eDimension GetDimension(void) const = 0;
 
@@ -34,10 +32,8 @@ public:
 
 	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) = 0;
 
-	virtual bool DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback a_Callback) = 0;
-
 	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
-	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback) = 0;
+	virtual bool DoWithBlockEntityAt(Vector3i a_Position, cBlockEntityCallback a_Callback) = 0;
 
 	/** Spawns item pickups for each item in the list. May compress pickups if too many entities: */
 	virtual void SpawnItemPickups(const cItems & a_Pickups, double a_BlockX, double a_BlockY, double a_BlockZ, double a_FlyAwaySpeed = 1.0, bool IsPlayerCreated = false) = 0;
@@ -60,10 +56,10 @@ public:
 	virtual std::vector<UInt32> SpawnSplitExperienceOrbs(Vector3d a_Pos, int a_Reward) = 0;
 
 	/** Sends the block on those coords to the player */
-	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, cPlayer & a_Player) = 0;
+	virtual void SendBlockTo(int a_BlockX, int a_BlockY, int a_BlockZ, const cPlayer & a_Player) = 0;
 
 	/** Sends the block on those coords to the player */
-	inline void SendBlockTo(const Vector3i a_BlockPos, cPlayer & a_Player)
+	inline void SendBlockTo(const Vector3i a_BlockPos, const cPlayer & a_Player)
 	{
 		SendBlockTo(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Player);
 	}
@@ -76,7 +72,7 @@ public:
 	If any chunk in the box is missing, ignores the entities in that chunk silently. */
 	virtual bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback) = 0;
 
-	virtual void SetTimeOfDay(int a_TimeOfDay) = 0;
+	virtual void SetTimeOfDay(cTickTime a_TimeOfDay) = 0;
 
 	/** Returns true if it is raining or storming at the specified location. This takes into account biomes. */
 	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) = 0;
@@ -85,7 +81,7 @@ public:
 	and the rain reaches the specified block position.
 	Returns nullopt for unloaded chunks.
 	*/
-	virtual std::optional<bool> IsWeatherWetAtXYZ(Vector3i a_Pos) = 0;
+	virtual bool IsWeatherWetAtXYZ(Vector3i a_Pos) = 0;
 
 	/** Returns or sets the minumim or maximum netherportal width */
 	virtual int GetMinNetherPortalWidth(void) const = 0;

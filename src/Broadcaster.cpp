@@ -123,7 +123,7 @@ void cWorld::BroadcastBlockAction(Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte
 {
 	ForClientsWithChunkAtPos(a_BlockPos, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendBlockAction(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, static_cast<char>(a_Byte1), static_cast<char>(a_Byte2), a_BlockType);
+			a_Client.SendBlockAction(a_BlockPos, static_cast<char>(a_Byte1), static_cast<char>(a_Byte2), a_BlockType);
 		}
 	);
 }
@@ -136,7 +136,7 @@ void cWorld::BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos
 {
 	ForClientsWithChunkAtPos(a_BlockPos, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendBlockBreakAnim(a_EntityID, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Stage);
+			a_Client.SendBlockBreakAnim(a_EntityID, a_BlockPos, a_Stage);
 		}
 	);
 }
@@ -171,8 +171,26 @@ void cWorld::BroadcastBlockEntity(Vector3i a_BlockPos, const cClientHandle * a_E
 
 
 
+void cWorld::BroadcastBossBarUpdateHealth(const cEntity & a_Entity, UInt32 a_UniqueID, float a_FractionFilled)
+{
+	ForClientsWithEntity(a_Entity, *this, nullptr, [&](cClientHandle & a_Client)
+		{
+			a_Client.SendBossBarUpdateHealth(a_UniqueID, a_FractionFilled);
+		}
+	);
+}
+
+
+
+
+
 void cWorld::BroadcastChat(const AString & a_Message, const cClientHandle * a_Exclude, eMessageType a_ChatPrefix)
 {
+	if ((a_ChatPrefix == mtDeath) && !ShouldBroadcastDeathMessages())
+	{
+		return;
+	}
+
 	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendChat(a_Message, a_ChatPrefix);
@@ -316,7 +334,7 @@ void cWorld::BroadcastEntityMetadata(const cEntity & a_Entity, const cClientHand
 
 void cWorld::BroadcastEntityPosition(const cEntity & a_Entity, const cClientHandle * a_Exclude)
 {
-	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsWithEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendEntityPosition(a_Entity);
 		}
@@ -327,11 +345,11 @@ void cWorld::BroadcastEntityPosition(const cEntity & a_Entity, const cClientHand
 
 
 
-void cWorld::BroadcastEntityStatus(const cEntity & a_Entity, Int8 a_Status, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityProperties(const cEntity & a_Entity)
 {
-	ForClientsWithEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsWithEntity(a_Entity, *this, nullptr, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendEntityStatus(a_Entity, a_Status);
+			a_Client.SendEntityProperties(a_Entity);
 		}
 	);
 }
@@ -353,7 +371,7 @@ void cWorld::BroadcastEntityVelocity(const cEntity & a_Entity, const cClientHand
 
 
 
-void cWorld::BroadcastEntityAnimation(const cEntity & a_Entity, Int8 a_Animation, const cClientHandle * a_Exclude)
+void cWorld::BroadcastEntityAnimation(const cEntity & a_Entity, EntityAnimation a_Animation, const cClientHandle * a_Exclude)
 {
 	ForClientsWithEntity(a_Entity, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
@@ -383,7 +401,7 @@ void cWorld::BroadcastParticleEffect(const AString & a_ParticleName, const Vecto
 {
 	ForClientsWithChunkAtPos(a_Src, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendParticleEffect(a_ParticleName, a_Src.x, a_Src.y, a_Src.z, a_Offset.x, a_Offset.y, a_Offset.z, a_ParticleData, a_ParticleAmount);
+			a_Client.SendParticleEffect(a_ParticleName, a_Src, a_Offset, a_ParticleData, a_ParticleAmount);
 		}
 	);
 }
@@ -418,11 +436,37 @@ void cWorld::BroadcastPlayerListAddPlayer(const cPlayer & a_Player, const cClien
 
 
 
+void cWorld::BroadcastPlayerListHeaderFooter(const cCompositeChat & a_Header, const cCompositeChat & a_Footer)
+{
+	ForClientsInWorld(*this, nullptr, [&](cClientHandle & a_Client)
+		{
+			a_Client.SendPlayerListHeaderFooter(a_Header, a_Footer);
+		}
+	);
+}
+
+
+
+
+
 void cWorld::BroadcastPlayerListRemovePlayer(const cPlayer & a_Player, const cClientHandle * a_Exclude)
 {
 	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendPlayerListRemovePlayer(a_Player);
+		}
+	);
+}
+
+
+
+
+
+void cWorld::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude)
+{
+	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
+		{
+			a_Client.SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
 		}
 	);
 }
@@ -444,24 +488,11 @@ void cWorld::BroadcastPlayerListUpdateGameMode(const cPlayer & a_Player, const c
 
 
 
-void cWorld::BroadcastPlayerListUpdatePing(const cPlayer & a_Player, const cClientHandle * a_Exclude)
+void cWorld::BroadcastPlayerListUpdatePing()
 {
-	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
+	ForClientsInWorld(*this, nullptr, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendPlayerListUpdatePing(a_Player);
-		}
-	);
-}
-
-
-
-
-
-void cWorld::BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude)
-{
-	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
-		{
-			a_Client.SendPlayerListUpdateDisplayName(a_Player, a_CustomName);
+			a_Client.SendPlayerListUpdatePing();
 		}
 	);
 }
@@ -526,7 +557,7 @@ void cWorld::BroadcastSoundParticleEffect(const EffectID a_EffectID, Vector3i a_
 {
 	ForClientsWithChunkAtPos(a_SrcPos, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendSoundParticleEffect(a_EffectID, a_SrcPos.x, a_SrcPos.y, a_SrcPos.z, a_Data);
+			a_Client.SendSoundParticleEffect(a_EffectID, a_SrcPos, a_Data);
 		}
 	);
 }
@@ -552,7 +583,7 @@ void cWorld::BroadcastThunderbolt(Vector3i a_BlockPos, const cClientHandle * a_E
 {
 	ForClientsWithChunkAtPos(a_BlockPos, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendThunderbolt(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
+			a_Client.SendThunderbolt(a_BlockPos);
 		}
 	);
 }
@@ -565,7 +596,7 @@ void cWorld::BroadcastTimeUpdate(const cClientHandle * a_Exclude)
 {
 	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
-			a_Client.SendTimeUpdate(GetWorldAge(), GetTimeOfDay(), IsDaylightCycleEnabled());
+			a_Client.SendTimeUpdate(GetWorldAge(), GetWorldDate(), IsDaylightCycleEnabled());
 		}
 	);
 }
@@ -579,19 +610,6 @@ void cWorld::BroadcastUnleashEntity(const cEntity & a_Entity)
 	ForClientsWithEntity(a_Entity, *this, nullptr, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendUnleashEntity(a_Entity);
-		}
-	);
-}
-
-
-
-
-
-void cWorld::BroadcastUseBed(const cEntity & a_Entity, Vector3i a_BedPos)
-{
-	ForClientsWithChunkAtPos(a_BedPos, *this, nullptr, [&](cClientHandle & a_Client)
-		{
-			a_Client.SendUseBed(a_Entity, a_BedPos.x, a_BedPos.y, a_BedPos.z);
 		}
 	);
 }

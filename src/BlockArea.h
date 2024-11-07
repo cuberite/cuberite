@@ -425,8 +425,6 @@ public:
 	/** Direct read-only access to block entities. */
 	const cBlockEntities & GetBlockEntities(void) const { ASSERT(HasBlockEntities()); return *m_BlockEntities; }
 
-	/** Returns the pickups that would result if the block at the specified position was mined by a_Digger, using a_Tool. */
-	cItems PickupsFromBlock(Vector3i a_AbsPos, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr);
 
 
 protected:
@@ -451,7 +449,7 @@ protected:
 
 		// cChunkDataCallback overrides:
 		virtual bool Coords(int a_ChunkX, int a_ChunkZ) override;
-		virtual void ChunkData(const cChunkData &  a_BlockTypes) override;
+		virtual void ChunkData(const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData) override;
 		virtual void BlockEntity(cBlockEntity * a_BlockEntity) override;
 	} ;
 

@@ -11,7 +11,9 @@
 
 
 
-cSslHTTPServerConnection::cSslHTTPServerConnection(cHTTPServer & a_HTTPServer, std::shared_ptr<const cSslConfig> a_Config):
+cSslHTTPServerConnection::cSslHTTPServerConnection(
+	cHTTPServer & a_HTTPServer, const std::shared_ptr<const cSslConfig> & a_Config
+):
 	Super(a_HTTPServer),
 	m_Ssl(64000)
 {

@@ -147,6 +147,7 @@ bool cIniFile::ReadFile(const AString & a_FileName, bool a_AllowExampleRedirect)
 			{
 				valuename = line.substr(0, pLeft);
 				value = TrimString(line.substr(pLeft + 1));
+				ReplaceString(value, "\\n", "\n");
 				AddValue(keyname, valuename, value);
 				break;
 			}
@@ -191,6 +192,7 @@ bool cIniFile::WriteFile(const AString & a_FileName) const
 	// Normally you would use ofstream, but the SGI CC compiler has
 	// a few bugs with ofstream. So ... fstream used.
 	fstream f;
+	AString writevalue;
 
 	f.open((a_FileName).c_str(), ios::out);
 	if (f.fail())
@@ -223,7 +225,9 @@ bool cIniFile::WriteFile(const AString & a_FileName) const
 		// Values.
 		for (size_t valueID = 0; valueID < m_Keys[keyID].m_Names.size(); ++valueID)
 		{
-			f << m_Keys[keyID].m_Names[valueID] << '=' << m_Keys[keyID].m_Values[valueID] << iniEOL;
+			writevalue = m_Keys[keyID].m_Values[valueID];
+			ReplaceString(writevalue, "\n", "\\n");
+			f << m_Keys[keyID].m_Names[valueID] << '=' << writevalue << iniEOL;
 		}
 		f << iniEOL;
 	}
@@ -374,7 +378,7 @@ void cIniFile::AddValue(const AString & a_KeyName, const AString & a_ValueName, 
 
 void cIniFile::AddValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value)
 {
-	AddValue(a_KeyName, a_ValueName, Printf("%d", a_Value));
+	AddValue(a_KeyName, a_ValueName, fmt::format(FMT_STRING("{}"), a_Value));
 }
 
 
@@ -383,7 +387,7 @@ void cIniFile::AddValueI(const AString & a_KeyName, const AString & a_ValueName,
 
 void cIniFile::AddValueF(const AString & a_KeyName, const AString & a_ValueName, const double a_Value)
 {
-	AddValue(a_KeyName, a_ValueName, Printf("%f", a_Value));
+	AddValue(a_KeyName, a_ValueName, fmt::format(FMT_STRING("{}"), a_Value));
 }
 
 
@@ -440,7 +444,7 @@ bool cIniFile::SetValue(const AString & a_KeyName, const AString & a_ValueName, 
 
 bool cIniFile::SetValueI(const AString & a_KeyName, const AString & a_ValueName, const int a_Value, const bool a_CreateIfNotExists)
 {
-	return SetValue(a_KeyName, a_ValueName, Printf("%d", a_Value), a_CreateIfNotExists);
+	return SetValue(a_KeyName, a_ValueName, fmt::format(FMT_STRING("{}"), a_Value), a_CreateIfNotExists);
 }
 
 
@@ -449,7 +453,7 @@ bool cIniFile::SetValueI(const AString & a_KeyName, const AString & a_ValueName,
 
 bool cIniFile::SetValueI(const AString & a_Keyname, const AString & a_ValueName, const Int64 a_Value, const bool a_CreateIfNotExists)
 {
-	return SetValue(a_Keyname, a_ValueName, Printf("%lld", a_Value), a_CreateIfNotExists);
+	return SetValue(a_Keyname, a_ValueName, fmt::format(FMT_STRING("{}"), a_Value), a_CreateIfNotExists);
 }
 
 
@@ -458,7 +462,7 @@ bool cIniFile::SetValueI(const AString & a_Keyname, const AString & a_ValueName,
 
 bool cIniFile::SetValueF(const AString & a_KeyName, const AString & a_ValueName, double const a_Value, const bool a_CreateIfNotExists)
 {
-	return SetValue(a_KeyName, a_ValueName, Printf("%f", a_Value), a_CreateIfNotExists);
+	return SetValue(a_KeyName, a_ValueName, fmt::format(FMT_STRING("{}"), a_Value), a_CreateIfNotExists);
 }
 
 
@@ -501,8 +505,7 @@ AString cIniFile::GetValue(const AString & keyname, const AString & valuename, c
 
 int cIniFile::GetValueI(const AString & keyname, const AString & valuename, const int defValue) const
 {
-	AString Data;
-	Printf(Data, "%d", defValue);
+	auto Data = fmt::format(FMT_STRING("{}"), defValue);
 	return atoi(GetValue(keyname, valuename, Data).c_str());
 }
 
@@ -512,8 +515,7 @@ int cIniFile::GetValueI(const AString & keyname, const AString & valuename, cons
 
 double cIniFile::GetValueF(const AString & keyname, const AString & valuename, double const defValue) const
 {
-	AString Data;
-	Printf(Data, "%f", defValue);
+	auto Data = fmt::format(FMT_STRING("{}"), defValue);
 	return atof(GetValue(keyname, valuename, Data).c_str());
 }
 
@@ -546,8 +548,7 @@ AString cIniFile::GetValueSet(const AString & keyname, const AString & valuename
 
 double cIniFile::GetValueSetF(const AString & keyname, const AString & valuename, const double defValue)
 {
-	AString Data;
-	Printf(Data, "%f", defValue);
+	auto Data = fmt::format(FMT_STRING("{}"), defValue);
 	return atof(GetValueSet(keyname, valuename, Data).c_str());
 }
 
@@ -557,8 +558,7 @@ double cIniFile::GetValueSetF(const AString & keyname, const AString & valuename
 
 int cIniFile::GetValueSetI(const AString & keyname, const AString & valuename, const int defValue)
 {
-	AString Data;
-	Printf(Data, "%d", defValue);
+	auto Data = fmt::format(FMT_STRING("{}"), defValue);
 	return atoi(GetValueSet(keyname, valuename, Data).c_str());
 }
 
@@ -568,8 +568,7 @@ int cIniFile::GetValueSetI(const AString & keyname, const AString & valuename, c
 
 Int64 cIniFile::GetValueSetI(const AString & keyname, const AString & valuename, const Int64 defValue)
 {
-	AString Data;
-	Printf(Data, "%lld", defValue);
+	auto Data = fmt::format(FMT_STRING("{}"), defValue);
 	AString resultstring = GetValueSet(keyname, valuename, Data);
 	Int64 result = defValue;
 #ifdef _WIN32
@@ -934,7 +933,7 @@ AStringVector ReadUpgradeIniPorts(
 
 	AStringVector Ports;
 
-	for (auto pair : a_Settings.GetValues(a_KeyName))
+	for (const auto & pair : a_Settings.GetValues(a_KeyName))
 	{
 		if (pair.first != a_PortsValueName)
 		{

@@ -8,7 +8,7 @@
 
 
 
-class cBlockRedstoneOreHandler :
+class cBlockRedstoneOreHandler final :
 	public cBlockOreHandler
 {
 	using Super = cBlockOreHandler;
@@ -26,7 +26,7 @@ public:
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
-	) override
+	) const override
 	{
 		a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_REDSTONE_ORE_GLOWING, 0);
 		return false;
@@ -41,7 +41,7 @@ public:
 		cWorldInterface & a_WorldInterface,
 		cPlayer & a_Player,
 		const Vector3i a_BlockPos
-	) override
+	) const override
 	{
 		a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_REDSTONE_ORE_GLOWING, 0);
 	}
@@ -50,7 +50,7 @@ public:
 
 
 
-	virtual bool IsUseable() override
+	virtual bool IsUseable() const override
 	{
 		return true;
 	}
@@ -60,7 +60,7 @@ public:
 
 
 
-class cBlockGlowingRedstoneOreHandler:
+class cBlockGlowingRedstoneOreHandler final :
 	public cBlockOreHandler
 {
 	using Super = cBlockOreHandler;
@@ -79,7 +79,7 @@ public:
 		cBlockPluginInterface & a_BlockPluginInterface,
 		cChunk & a_Chunk,
 		const Vector3i a_RelPos
-	) override
+	) const override
 	{
 		auto BlockPos = a_Chunk.RelativeToAbsolute(a_RelPos);
 		a_ChunkInterface.SetBlock(BlockPos, E_BLOCK_REDSTONE_ORE, 0);

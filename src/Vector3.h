@@ -30,11 +30,18 @@ public:
 
 	// tolua_end
 	// Conversion constructors where U is not the same as T leaving the copy-constructor implicitly generated
-	template <typename U, typename = typename std::enable_if<!std::is_same<U, T>::value>::type>
+	template <typename U, std::enable_if_t<(!std::is_same<U, T>::value) && ((!std::is_integral<T>::value) || (std::is_integral<U>::value)), bool> = true>
 	constexpr Vector3(const Vector3<U> & a_Rhs):
 			x(static_cast<T>(a_Rhs.x)),
 			y(static_cast<T>(a_Rhs.y)),
 			z(static_cast<T>(a_Rhs.z))
+	{
+	}
+	template <typename U, std::enable_if_t<(!std::is_same<U, T>::value) && ((std::is_integral<T>::value) && (!std::is_integral<U>::value)), bool> = true>
+	constexpr Vector3(const Vector3<U> & a_Rhs):
+			x(static_cast<T>(std::floor(a_Rhs.x))),
+			y(static_cast<T>(std::floor(a_Rhs.y))),
+			z(static_cast<T>(std::floor(a_Rhs.z)))
 	{
 	}
 	// tolua_begin
@@ -400,26 +407,25 @@ public:
 
 
 
-namespace fmt
-{
 
+/** Allows formatting a Vector<T> using the same format specifiers as for T
+e.g. `fmt::format("{0:0.2f}", Vector3f{0.0231f, 1.2146f, 1.0f}) == "{0.02, 1.21, 1.00}"` */
 template <typename What>
-class formatter<Vector3<What>>:
-	public fmt::formatter<What>
+class fmt::formatter<Vector3<What>> : public fmt::formatter<What>
 {
 	using Super = fmt::formatter<What>;
 
 	template <typename FormatContext, size_t Len>
 	void Write(FormatContext & a_Ctx, const char (& a_Str)[Len])
 	{
-		auto Itr = std::copy_n(&a_Str[0], Len - 1, a_Ctx.out());
+		const auto Itr = std::copy_n(&a_Str[0], Len - 1, a_Ctx.out());
 		a_Ctx.advance_to(Itr);
 	}
 
 	template <typename FormatContext>
 	void Write(FormatContext & a_Ctx, const What & a_Arg)
 	{
-		auto Itr = Super::format(a_Arg, a_Ctx);
+		const auto Itr = Super::format(a_Arg, a_Ctx);
 		a_Ctx.advance_to(Itr);
 	}
 
@@ -427,7 +433,6 @@ public:
 
 	template <typename FormatContext>
 	auto format(const Vector3<What> & a_Vec, FormatContext & a_Ctx)
-			-> typename FormatContext::iterator
 	{
 		Write(a_Ctx, "{");
 		Write(a_Ctx, a_Vec.x);
@@ -439,8 +444,6 @@ public:
 		return a_Ctx.out();
 	}
 };
-
-}
 
 
 
@@ -496,9 +499,3 @@ typedef Vector3<int>    Vector3i;
 
 
 typedef std::vector<Vector3i> cVector3iArray;
-
-
-
-
-
-

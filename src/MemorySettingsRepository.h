@@ -3,8 +3,6 @@
 
 #include "SettingsRepositoryInterface.h"
 
-#include <unordered_map>
-
 class cMemorySettingsRepository : public cSettingsRepositoryInterface
 {
 public:
@@ -54,15 +52,15 @@ private:
 	struct sValue
 	{
 		sValue(AString value):
-			#ifdef _DEBUG
+			#ifndef NDEBUG
 				m_Type(eType::String),
 			#endif
-			m_stringValue (value)
+			m_stringValue (std::move(value))
 		{
 		}
 
 		sValue(Int64 value):
-			#ifdef _DEBUG
+			#ifndef NDEBUG
 				m_Type(eType::Int64),
 			#endif
 			m_intValue(value)
@@ -70,7 +68,7 @@ private:
 		}
 
 		sValue(bool value):
-			#ifdef _DEBUG
+			#ifndef NDEBUG
 				m_Type(eType::Bool),
 			#endif
 			m_boolValue(value)
@@ -83,7 +81,7 @@ private:
 
 	private:
 
-		#ifdef _DEBUG
+		#ifndef NDEBUG
 			enum class eType
 			{
 				String,

@@ -7,7 +7,10 @@
 #include "../Entities/Player.h"
 #include "../UI/SlotArea.h"
 #include "PluginLua.h"
-#include "lua/src/lauxlib.h"  // Needed for LUA_REFNIL
+extern "C"
+{
+	#include "lua/src/lauxlib.h"  // Needed for LUA_REFNIL
+}
 #include "../Root.h"
 #include "../ClientHandle.h"
 
@@ -196,11 +199,7 @@ void cLuaWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Pl
 
 void cLuaWindow::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
-	if (a_ItemGrid != &m_Contents)
-	{
-		ASSERT(!"Invalid ItemGrid in callback");
-		return;
-	}
+	ASSERT(a_ItemGrid == &m_Contents);
 
 	// If an OnSlotChanged callback has been registered, call it:
 	if (m_OnSlotChanged != nullptr)

@@ -1,13 +1,6 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.13)
 project (MCADefrag)
-
-# Without this, the MSVC variable isn't defined for MSVC builds ( https://www.cmake.org/pipermail/cmake/2011-November/047130.html )
-enable_language(CXX C)
-
-include(../../SetFlags.cmake)
-set_flags()
-set_lib_flags()
-enable_profile()
+find_package(Threads REQUIRED)
 
 # Set include paths to the used libraries:
 include_directories(SYSTEM "../../lib")
@@ -23,12 +16,6 @@ function(flatten_files arg1)
 	set(${arg1} "${res}" PARENT_SCOPE)
 endfunction()
 
-
-# Include the libraries:
-
-add_subdirectory(../../lib/zlib ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/lib/zlib)
-
-set_exe_flags()
 
 # Include the shared files:
 set(SHARED_SRC
@@ -75,11 +62,9 @@ source_group("Shared\\OSSupport" FILES ${SHARED_OSS_SRC} ${SHARED_OSS_HDR})
 # Include the main source files:
 set(SOURCES
 	MCADefrag.cpp
-	Globals.cpp
 )
 set(HEADERS
 	MCADefrag.h
-	Globals.h
 )
 
 source_group("" FILES ${SOURCES} ${HEADERS})
@@ -93,4 +78,7 @@ add_executable(MCADefrag
 	${SHARED_OSS_HDR}
 )
 
-target_link_libraries(MCADefrag zlib fmt::fmt)
+target_link_libraries(MCADefrag fmt::fmt libdeflate Threads::Threads)
+
+include(../../SetFlags.cmake)
+set_exe_flags(MCADefrag)

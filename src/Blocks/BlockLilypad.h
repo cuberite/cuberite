@@ -7,23 +7,18 @@
 
 
 
-class cBlockLilypadHandler:
+class cBlockLilypadHandler final :
 	public cClearMetaOnDrop<cBlockHandler>
 {
 	using Super = cClearMetaOnDrop<cBlockHandler>;
 
 public:
 
-	cBlockLilypadHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 7;
@@ -33,10 +28,10 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		auto UnderPos = a_RelPos.addedY(-1);
-		if (!cChunkDef::IsValidHeight(UnderPos.y))
+		auto UnderPos = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(UnderPos))
 		{
 			return false;
 		}

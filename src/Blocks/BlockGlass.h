@@ -7,20 +7,16 @@
 
 
 
-class cBlockGlassHandler :
+class cBlockGlassHandler final :
 	public cBlockHandler
 {
 public:
-	cBlockGlassHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
-	{
-	}
 
+	using cBlockHandler::cBlockHandler;
 
+private:
 
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Only drop self when mined with silk-touch:
 		if (ToolHasSilkTouch(a_Tool))
@@ -34,7 +30,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 0;

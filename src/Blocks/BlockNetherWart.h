@@ -8,41 +8,34 @@
 
 
 
-class cBlockNetherWartHandler:
+class cBlockNetherWartHandler final :
 	public cBlockPlant<false>
 {
 	using Super = cBlockPlant<false>;
 
 public:
 
-	cBlockNetherWartHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		if (a_BlockMeta == 0x03)
 		{
 			// Fully grown, drop the entire produce:
-			auto & rand = GetRandomProvider();
-			return cItem(E_ITEM_NETHER_WART, 1 + (rand.RandInt<char>(2) + rand.RandInt<char>(2)) / 2, 0);
+			const auto DropNum = FortuneDiscreteRandom(2, 4, ToolFortuneLevel(a_Tool));
+			return cItem(E_ITEM_NETHER_WART, DropNum);
 		}
-		else
-		{
-			return cItem(E_ITEM_NETHER_WART);
-		}
+
+		return cItem(E_ITEM_NETHER_WART);
 	}
 
 
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
 		auto oldMeta = a_Chunk.GetMeta(a_RelPos);
 		auto meta = std::min(oldMeta + a_NumStages, 3);
@@ -64,17 +57,18 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
 		// Needs to be placed on top of a Soulsand block:
-		return ((a_RelPos.y > 0) && (a_Chunk.GetBlock(a_RelPos.addedY(-1)) == E_BLOCK_SOULSAND));
+		const auto BasePos = a_Position.addedY(-1);
+		return cChunkDef::IsValidHeight(BasePos) && (a_Chunk.GetBlock(BasePos) == E_BLOCK_SOULSAND);
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 35;

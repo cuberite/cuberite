@@ -12,11 +12,11 @@
 cSlime::cSlime(int a_Size) :
 	Super("Slime",
 		mtSlime,
-		Printf("entity.%sslime.hurt", GetSizeName(a_Size).c_str()),
-		Printf("entity.%sslime.death", GetSizeName(a_Size).c_str()),
+		fmt::format(FMT_STRING("entity.{}slime.hurt"),  GetSizeName(a_Size)),
+		fmt::format(FMT_STRING("entity.{}slime.death"), GetSizeName(a_Size)),
 		"",
-		0.6 * a_Size,
-		0.6 * a_Size
+		0.51f * a_Size,
+		0.51f * a_Size
 	),
 	m_Size(a_Size)
 {
@@ -79,10 +79,18 @@ void cSlime::KilledBy(TakeDamageInfo & a_TDI)
 			double AddX = (i % 2 - 0.5) * m_Size / 4.0;
 			double AddZ = (i / 2 - 0.5) * m_Size / 4.0;
 
-			auto NewSlime = cpp14::make_unique<cSlime>(m_Size / 2);
-			NewSlime->SetPosition(GetPosX() + AddX, GetPosY() + 0.5, GetPosZ() + AddZ);
-			NewSlime->SetYaw(Random.RandReal(360.0f));
-			m_World->SpawnMobFinalize(std::move(NewSlime));
+			// Queue slimes to be spawned after the 1 second death animation has finished playing:
+			m_World->ScheduleTask(cTickTime(20), [
+				Position = GetPosition() + Vector3d(AddX, 0.5, AddZ),
+				Yaw = Random.RandReal(360.0f),
+				Size = m_Size / 2
+			](cWorld & a_World)
+			{
+				auto NewSlime = std::make_unique<cSlime>(Size);
+				NewSlime->SetPosition(Position);
+				NewSlime->SetYaw(Yaw);
+				a_World.SpawnMobFinalize(std::move(NewSlime));
+			});
 		}
 	}
 	Super::KilledBy(a_TDI);

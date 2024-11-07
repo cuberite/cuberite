@@ -24,7 +24,7 @@ I'd say that the important topics are:
 Useful Resources
 ----------------
 
- - [Minecraft Wiki](https://minecraft.gamepedia.com/Minecraft_Wiki)
+ - [Minecraft Wiki](https://minecraft.wiki/w/Minecraft_Wiki)
  - [Minecraft Protocol Wiki](http://wiki.vg/Main_Page)
  - [Lua API Documentation](https://api.cuberite.org/)
  - [Visual Studio Community Edition Download](https://www.visualstudio.com/downloads/)
@@ -117,7 +117,7 @@ Issues that should be easy to get started with are tagged as [easy][6] in GitHub
 
 Other good places to get started are:
 
- - Cleaning up some of the compiler warnings. Check [Travis CI][7] for a list of them.
+ - Cleaning up some of the compiler warnings. Check [our CI][7] for a list of them.
  - Writing some plugins: They are written in lua, with excellent API documentation available via [APIDump][8]. The [Core plugin][9] should also help quite a bit here.
 
 Special Things
@@ -127,10 +127,10 @@ Special Things
 
 [1]: https://book.cuberite.org/
 [2]: https://github.com/cuberite/cuberite/blob/master/TESTING.md
-[3]: https://minecraft.gamepedia.com/Minecraft_Wiki
+[3]: https://minecraft.wiki/w/Minecraft_Wiki
 [4]: https://github.com/cuberite/cuberite/blob/master/CONTRIBUTING.md
 [5]: https://github.com/cuberite/cuberite/blob/master/COMPILING.md
 [6]: https://github.com/cuberite/cuberite/issues?q=is%3Aopen+is%3Aissue+label%3Aeffort%2Feasy
-[7]: https://travis-ci.org/cuberite/cuberite
+[7]: https://builds.cuberite.org/job/cuberite/job/master/lastSuccessfulBuild/console
 [8]: https://api.cuberite.org/
 [9]: https://github.com/cuberite/Core

@@ -39,6 +39,8 @@ public:
 
 	// tolua_end
 
+	static constexpr float ARROW_WATER_FRICTION = 50.0f;    ///< Value used to calculate arrow speed in water
+
 	CLASS_PROTODEF(cArrowEntity)
 
 	/** Creates a new arrow with psNoPickup state and default damage modifier coeff */
@@ -103,5 +105,8 @@ protected:
 	virtual void OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos) override;
 	virtual void CollectedBy(cPlayer & a_Player) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+
+	// cEntity overrides:
+	virtual bool DoesPreventBlockPlacement(void) const override;
 
 };  // tolua_export

@@ -1,4 +1,13 @@
-Checks: '-*,readability-identifier-naming'
+Checks: >-
+  -*,
+  readability-identifier-naming,
+  readability-redundant-string-cstr,
+  readability-redundant-string-init,
+  readability-simplify-boolean-expr,
+  performance-unnecessary-value-param,
+  performance-unnecessary-copy-initialization,
+  performance-for-range-copy,
+  performance-implicit-conversion-in-loop,
 CheckOptions:
 - key:             readability-identifier-naming.PrivateMemberPrefix
   value:           'm_'
@@ -13,5 +22,9 @@ CheckOptions:
 #  value:           CamelCase
 #- key:             readability-identifier-naming.EnumCase
 #  value:           camelBack
+
+- key: performance-unnecessary-value-param.AllowedTypes
+  value: 'cEntityEffect;cNoise'
 WarningsAsErrors: '*'
 HeaderFilterRegex: '/cuberite/src/\.?[^\.]'
+FormatStyle: 'file'

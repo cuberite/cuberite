@@ -29,17 +29,17 @@ public:
 	If false is returned, the chunk is skipped. */
 	virtual bool Coords(int a_ChunkX, int a_ChunkZ) { UNUSED(a_ChunkX); UNUSED(a_ChunkZ); return true; }
 
-	/** Called once to provide heightmap data */
-	virtual void HeightMap(const cChunkDef::HeightMap * a_HeightMap) { UNUSED(a_HeightMap); }
-
-	/** Called once to provide biome data */
-	virtual void BiomeData(const cChunkDef::BiomeMap * a_BiomeMap) { UNUSED(a_BiomeMap); }
-
 	/** Called once to let know if the chunk lighting is valid. Return value is ignored */
 	virtual void LightIsValid(bool a_IsLightValid) { UNUSED(a_IsLightValid); }
 
-	/** Called once to export block info */
-	virtual void ChunkData(const cChunkData & a_Buffer) { UNUSED(a_Buffer); }
+	/** Called once to export block data. */
+	virtual void ChunkData(const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData) { UNUSED(a_BlockData); UNUSED(a_LightData); }
+
+	/** Called once to provide heightmap data. */
+	virtual void HeightMap(const cChunkDef::HeightMap & a_HeightMap) { UNUSED(a_HeightMap); }
+
+	/** Called once to provide biome data. */
+	virtual void BiomeMap(const cChunkDef::BiomeMap & a_BiomeMap) { UNUSED(a_BiomeMap); }
 
 	/** Called for each entity in the chunk */
 	virtual void Entity(cEntity * a_Entity) { UNUSED(a_Entity); }
@@ -51,87 +51,20 @@ public:
 
 
 
-
-/** A simple implementation of the cChunkDataCallback interface that collects all block data into a single buffer */
-class cChunkDataArrayCollector :
-	public cChunkDataCallback
-{
-public:
-
-	// Must be unsigned char instead of BLOCKTYPE or NIBBLETYPE, because it houses both.
-	unsigned char m_BlockData[cChunkDef::BlockDataSize];
-
-protected:
-
-	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
-	{
-		a_ChunkBuffer.CopyBlockTypes(m_BlockData);
-		a_ChunkBuffer.CopyMetas(m_BlockData + cChunkDef::NumBlocks);
-		a_ChunkBuffer.CopyBlockLight(m_BlockData + 3 * cChunkDef::NumBlocks / 2);
-		a_ChunkBuffer.CopySkyLight(m_BlockData + 2 * cChunkDef::NumBlocks);
-	}
-};
-
-
-
-
-
-/** A simple implementation of the cChunkDataCallback interface that collects all block data into separate buffers */
-class cChunkDataSeparateCollector :
-	public cChunkDataCallback
-{
-public:
-
-	cChunkDef::BlockTypes m_BlockTypes;
-	cChunkDef::BlockNibbles m_BlockMetas;
-	cChunkDef::BlockNibbles m_BlockLight;
-	cChunkDef::BlockNibbles m_BlockSkyLight;
-
-protected:
-
-	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
-	{
-		a_ChunkBuffer.CopyBlockTypes(m_BlockTypes);
-		a_ChunkBuffer.CopyMetas(m_BlockMetas);
-		a_ChunkBuffer.CopyBlockLight(m_BlockLight);
-		a_ChunkBuffer.CopySkyLight(m_BlockSkyLight);
-	}
-} ;
-
-
-
-
 /** A simple implementation of the cChunkDataCallback interface that just copies the cChunkData */
 class cChunkDataCopyCollector :
 	public cChunkDataCallback
 {
 public:
-	struct MemCallbacks:
-		cAllocationPool<cChunkData::sChunkSection>::cStarvationCallbacks
+
+	ChunkBlockData m_BlockData;
+	ChunkLightData m_LightData;
+
+private:
+
+	virtual void ChunkData(const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData) override
 	{
-		virtual void OnStartUsingReserve() override {}
-		virtual void OnEndUsingReserve() override {}
-		virtual void OnOutOfReserve() override {}
-	};
-
-	cChunkDataCopyCollector():
-		m_Pool(cpp14::make_unique<MemCallbacks>(), 0, cChunkData::NumSections),  // Keep 1 chunk worth of reserve
-		m_Data(m_Pool)
-	{
-	}
-
-
-	cListAllocationPool<cChunkData::sChunkSection> m_Pool;
-	cChunkData m_Data;
-
-protected:
-
-	virtual void ChunkData(const cChunkData & a_ChunkBuffer) override
-	{
-		m_Data.Assign(a_ChunkBuffer);
+		m_BlockData.Assign(a_BlockData);
+		m_LightData.Assign(a_LightData);
 	}
 };
-
-
-
-

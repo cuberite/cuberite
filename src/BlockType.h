@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ChunkDef.h"
 
 // tolua_begin
 
@@ -272,7 +273,7 @@ enum ENUM_BLOCK_TYPE : BLOCKTYPE
 	E_BLOCK_STRUCTURE_BLOCK = 255,
 
 	// Keep these two as the last values. Update the last block value to the last block with an id less than 255 when adding another block
-	// IsValidBlock() depends on this (255 gets checked additionally because there is a gap. See https://minecraft.gamepedia.com/Data_values#Block_IDs
+	// IsValidBlock() depends on this (255 gets checked additionally because there is a gap. See https://minecraft.wiki/w/Data_values#Block_IDs
 	E_BLOCK_NUMBER_OF_TYPES = E_BLOCK_CONCRETE_POWDER + 1,  ///< Number of individual (different) blocktypes
 	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
 
@@ -711,6 +712,21 @@ enum ENUM_BLOCK_META : NIBBLETYPE
 	E_META_LEAVES_BIRCH_CHECK_DECAY   = 10,
 	E_META_LEAVES_JUNGLE_CHECK_DECAY  = 11,
 
+	// E_BLOCK_MUSHROOM metas:
+	E_META_MUSHROOM_ALL_SIDES  = 0,
+	E_META_MUSHROOM_NORTH_WEST = 1,
+	E_META_MUSHROOM_NORTH      = 2,
+	E_META_MUSHROOM_NORTH_EAST = 3,
+	E_META_MUSHROOM_WEST       = 4,
+	E_META_MUSHROOM_CENTER     = 5,
+	E_META_MUSHROOM_EAST       = 6,
+	E_META_MUSHROOM_SOUTH_WEST = 7,
+	E_META_MUSHROOM_SOUTH      = 8,
+	E_META_MUSHROOM_SOUTH_EAST = 9,
+	E_META_MUSHROOM_STEM       = 10,
+	E_META_MUSHROOM_CAP        = 14,
+	E_META_MUSHROOM_FULL_STEM  = 15,
+
 	// E_BLOCK_LEAVES meta cont. (Block ID 161):
 	E_META_NEWLEAVES_ACACIA               = 0,
 	E_META_NEWLEAVES_DARK_OAK             = 1,
@@ -803,9 +819,12 @@ enum ENUM_BLOCK_META : NIBBLETYPE
 	E_META_SAPLING_DARK_OAK = 5,
 
 	// E_BLOCK_SILVERFISH_EGG metas:
-	E_META_SILVERFISH_EGG_STONE       = 0,
-	E_META_SILVERFISH_EGG_COBBLESTONE = 1,
-	E_META_SILVERFISH_EGG_STONE_BRICK = 2,
+	E_META_SILVERFISH_EGG_STONE                = 0,
+	E_META_SILVERFISH_EGG_COBBLESTONE          = 1,
+	E_META_SILVERFISH_EGG_STONE_BRICK          = 2,
+	E_META_SILVERFISH_EGG_MOSSY_STONE_BRICK    = 3,
+	E_META_SILVERFISH_EGG_CRACKED_STONE_BRICK  = 4,
+	E_META_SILVERFISH_EGG_CHISELED_STONE_BRICK = 5,
 
 	// E_BLOCK_SNOW metas:
 	E_META_SNOW_LAYER_ONE          = 0,
@@ -1111,6 +1130,7 @@ enum ENUM_ITEM_META : short
 	E_META_SPAWN_EGG_WITHER           = 64,
 	E_META_SPAWN_EGG_BAT              = 65,
 	E_META_SPAWN_EGG_WITCH            = 66,
+	E_META_SPAWN_EGG_ENDERMITE        = 67,
 	E_META_SPAWN_EGG_GUARDIAN         = 68,
 	E_META_SPAWN_EGG_PIG              = 90,
 	E_META_SPAWN_EGG_SHEEP            = 91,
@@ -1162,36 +1182,3 @@ extern AString ItemToFullString(const cItem & a_Item);
 extern cItem GetIniItemSet(cIniFile & a_IniFile, const char * a_Section, const char * a_Key, const char * a_Default);
 
 // tolua_end
-
-
-
-
-
-/** Base case for IsOneOf to handle empty template aguments. */
-template <class = void>
-bool IsOneOf(BLOCKTYPE a_BlockType)
-{
-	return false;
-}
-
-
-/** Returns true if a_BlockType is equal to any of the variadic template arguments.
-Some example usage:
-\code
-	IsOneOf<>(E_BLOCK_AIR)                           == false
-	IsOneOf<E_BLOCK_AIR>(E_BLOCK_DIRT)               == false
-	IsOneOf<E_BLOCK_AIR, E_BLOCK_DIRT>(E_BLOCK_DIRT) == true
-\endcode
-The implementation is ugly but it is equivalent to this C++17 fold expression:
-\code
-	((a_BlockType == Types) || ...)
-\endcode
-Just written to be valid without fold expressions or SFINAE. */
-template <BLOCKTYPE Head, BLOCKTYPE ... Tail>
-bool IsOneOf(BLOCKTYPE a_BlockType)
-{
-	return ((a_BlockType == Head) || (IsOneOf<Tail...>(a_BlockType)));
-}
-
-
-

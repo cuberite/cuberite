@@ -7,44 +7,18 @@
 
 
 
-class cBlockPortalHandler:
+class cBlockPortalHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
+
 public:
 
-	cBlockPortalHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		// We set meta to zero so Cuberite doesn't stop a Creative-mode player from building custom portal shapes
-		// CanBeAt doesn't do anything if meta is zero
-		// We set to zero because the client sends meta = 1 or 2 to the server (it calculates rotation itself)
-
-		a_BlockType = m_BlockType;
-		a_BlockMeta = 0;
-		return true;
-	}
-
-
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// No pickups
 		return {};
@@ -60,7 +34,7 @@ public:
 		cBlockPluginInterface & a_PluginInterface,
 		cChunk & a_Chunk,
 		const Vector3i a_RelPos
-	) override
+	) const override
 	{
 		// Spawn zombie pigmen with a 0.05% chance:
 		if (GetRandomProvider().RandBool(0.9995))
@@ -75,14 +49,14 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if ((a_RelPos.y <= 0) || (a_RelPos.y >= cChunkDef::Height - 1))
+		if (!cChunkDef::IsValidHeight(a_Position.addedY(-1)) || !cChunkDef::IsValidHeight(a_Position.addedY(1)))
 		{
-			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1
+			return false;  // Must be 1 away from the boundary, there will always be another portal or an obsidian between the portal block and the boundary.
 		}
 
-		switch (a_Chunk.GetMeta(a_RelPos))
+		switch (a_Meta)
 		{
 			case 0x1:
 			{
@@ -99,7 +73,7 @@ public:
 				for (const auto & Direction : PortalCheck)
 				{
 					BLOCKTYPE Block;
-					a_Chunk.UnboundedRelGetBlockType(a_RelPos + Direction, Block);
+					a_Chunk.UnboundedRelGetBlockType(a_Position + Direction, Block);
 					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
 					{
 						return false;
@@ -122,7 +96,7 @@ public:
 				for (const auto & Direction : PortalCheck)
 				{
 					BLOCKTYPE Block;
-					a_Chunk.UnboundedRelGetBlockType(a_RelPos + Direction, Block);
+					a_Chunk.UnboundedRelGetBlockType(a_Position + Direction, Block);
 					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
 					{
 						return false;
@@ -138,7 +112,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 24;

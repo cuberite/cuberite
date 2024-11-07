@@ -28,7 +28,7 @@ For reading entire files into memory, just use the static cFile::ReadWholeFile()
 
 #pragma once
 
-
+#include "StringUtils.h"
 
 
 
@@ -75,10 +75,15 @@ public:
 	int Read(void * a_Buffer, size_t a_NumBytes);
 
 	/** Reads up to a_NumBytes bytes, returns the bytes actually read, or empty string on failure; asserts if not open */
-	AString Read(size_t a_NumBytes);
+	std::basic_string<std::byte> Read(size_t a_NumBytes);
 
 	/** Writes up to a_NumBytes bytes from a_Buffer, returns the number of bytes actually written, or -1 on failure; asserts if not open */
 	int Write(const void * a_Buffer, size_t a_NumBytes);
+
+	int Write(std::string_view a_String)
+	{
+		return Write(a_String.data(), a_String.size());
+	}
 
 	/** Seeks to iPosition bytes from file start, returns old position or -1 for failure; asserts if not open */
 	long Seek (int iPosition);
@@ -153,25 +158,18 @@ public:
 
 	/** Returns the path separator used by the current platform.
 	Note that the platform / CRT may support additional path separators (such as slashes on Windows), these don't get reported. */
-	static AString GetPathSeparator(void);
+	static AString GetPathSeparator();
 
 	/** Returns the customary executable extension used by the current platform. */
-	static AString GetExecutableExt(void);
+	static AString GetExecutableExt();
 
 	// tolua_end
 
 	/** Returns the list of all items in the specified folder (files, folders, nix pipes, whatever's there). */
 	static AStringVector GetFolderContents(const AString & a_Folder);  // Exported in ManualBindings.cpp
 
-	int vPrintf(const char * a_Fmt, fmt::printf_args);
-	template <typename... Args>
-	int Printf(const char * a_Fmt, const Args & ... a_Args)
-	{
-		return vPrintf(a_Fmt, fmt::make_printf_args(a_Args...));
-	}
-
 	/** Flushes all the bufferef output into the file (only when writing) */
-	void Flush(void);
+	void Flush();
 
 private:
 	FILE * m_File;
@@ -180,3 +178,32 @@ private:
 
 
 
+
+/** A wrapper for file streams that enables exceptions. */
+template <class StreamType>
+class FileStream final : public StreamType
+{
+public:
+
+	FileStream(const std::string & Path);
+	FileStream(const std::string & Path, const typename FileStream::openmode Mode);
+};
+
+
+
+
+
+using InputFileStream = FileStream<std::ifstream>;
+using OutputFileStream = FileStream<std::ofstream>;
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wweak-template-vtables"  // http://bugs.llvm.org/show_bug.cgi?id=18733
+#endif
+
+extern template class FileStream<std::ifstream>;
+extern template class FileStream<std::ofstream>;
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif

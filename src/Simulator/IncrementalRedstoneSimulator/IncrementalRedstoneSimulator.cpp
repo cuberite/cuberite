@@ -1,126 +1,28 @@
 
-
 #include "Globals.h"
 
 #include "IncrementalRedstoneSimulator.h"
-#include "../../Chunk.h"
-
-#include "CommandBlockHandler.h"
-#include "DoorHandler.h"
+#include "BlockType.h"
 #include "RedstoneHandler.h"
-#include "RedstoneTorchHandler.h"
-#include "RedstoneWireHandler.h"
-#include "RedstoneRepeaterHandler.h"
-#include "RedstoneToggleHandler.h"
-#include "SolidBlockHandler.h"
-#include "RedstoneLampHandler.h"
-#include "RedstoneBlockHandler.h"
-#include "PistonHandler.h"
-#include "SmallGateHandler.h"
-#include "NoteBlockHandler.h"
-#include "ObserverHandler.h"
-#include "TNTHandler.h"
-#include "PoweredRailHandler.h"
-#include "PressurePlateHandler.h"
-#include "TripwireHookHandler.h"
-#include "DropSpenserHandler.h"
-#include "RedstoneComparatorHandler.h"
-#include "TrappedChestHandler.h"
-#include "HopperHandler.h"
+#include "RedstoneSimulatorChunkData.h"
+#include "ForEachSourceCallback.h"
 
 
 
 
-const cRedstoneHandler * cIncrementalRedstoneSimulator::GetComponentHandler(BLOCKTYPE a_BlockType)
+
+bool cIncrementalRedstoneSimulator::IsAlwaysTicked(BLOCKTYPE a_Block)
 {
-	struct sComponents:
-		public std::array<std::unique_ptr<cRedstoneHandler>, 256>
+	switch (a_Block)  // Call the appropriate simulator for the entry's block type
 	{
-		sComponents()
-		{
-			for (size_t i = 0; i != 256; ++i)
-			{
-				(*this)[i] = cIncrementalRedstoneSimulator::CreateComponent(static_cast<BLOCKTYPE>(i));
-			}
-		}
-	};
-
-
-	static sComponents Components;
-	return Components[a_BlockType].get();
-}
-
-
-
-
-
-std::unique_ptr<cRedstoneHandler> cIncrementalRedstoneSimulator::CreateComponent(BLOCKTYPE a_BlockType)
-{
-	switch (a_BlockType)
-	{
-		case E_BLOCK_ACTIVATOR_RAIL:
-		case E_BLOCK_DETECTOR_RAIL:
-		case E_BLOCK_POWERED_RAIL: return cpp14::make_unique<cPoweredRailHandler>();
-
-		case E_BLOCK_ACTIVE_COMPARATOR:
-		case E_BLOCK_INACTIVE_COMPARATOR: return cpp14::make_unique<cRedstoneComparatorHandler>();
-
-		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER: return cpp14::make_unique<cDropSpenserHandler>();
-
-		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+		case E_BLOCK_DAYLIGHT_SENSOR:
+		case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
+		case E_BLOCK_TRIPWIRE_HOOK:
+		case E_BLOCK_WOODEN_PRESSURE_PLATE:
 		case E_BLOCK_STONE_PRESSURE_PLATE:
-		case E_BLOCK_WOODEN_PRESSURE_PLATE: return cpp14::make_unique<cPressurePlateHandler>();
-
-		case E_BLOCK_ACACIA_FENCE_GATE:
-		case E_BLOCK_BIRCH_FENCE_GATE:
-		case E_BLOCK_DARK_OAK_FENCE_GATE:
-		case E_BLOCK_FENCE_GATE:
-		case E_BLOCK_IRON_TRAPDOOR:
-		case E_BLOCK_JUNGLE_FENCE_GATE:
-		case E_BLOCK_SPRUCE_FENCE_GATE:
-		case E_BLOCK_TRAPDOOR: return cpp14::make_unique<cSmallGateHandler>();
-
-		case E_BLOCK_REDSTONE_LAMP_OFF:
-		case E_BLOCK_REDSTONE_LAMP_ON: return cpp14::make_unique<cRedstoneLampHandler>();
-
-		case E_BLOCK_REDSTONE_REPEATER_OFF:
-		case E_BLOCK_REDSTONE_REPEATER_ON: return cpp14::make_unique<cRedstoneRepeaterHandler>();
-
-		case E_BLOCK_REDSTONE_TORCH_OFF:
-		case E_BLOCK_REDSTONE_TORCH_ON: return cpp14::make_unique<cRedstoneTorchHandler>();
-
-		case E_BLOCK_OBSERVER: return cpp14::make_unique<cObserverHandler>();
-
-		case E_BLOCK_PISTON:
-		case E_BLOCK_STICKY_PISTON: return cpp14::make_unique<cPistonHandler>();
-
-		case E_BLOCK_LEVER:
-		case E_BLOCK_STONE_BUTTON:
-		case E_BLOCK_WOODEN_BUTTON: return cpp14::make_unique<cRedstoneToggleHandler>();
-
-		case E_BLOCK_BLOCK_OF_REDSTONE: return cpp14::make_unique<cRedstoneBlockHandler>();
-		case E_BLOCK_COMMAND_BLOCK: return cpp14::make_unique<cCommandBlockHandler>();
-		case E_BLOCK_HOPPER: return cpp14::make_unique<cHopperHandler>();
-		case E_BLOCK_NOTE_BLOCK: return cpp14::make_unique<cNoteBlockHandler>();
-		case E_BLOCK_REDSTONE_WIRE: return cpp14::make_unique<cRedstoneWireHandler>();
-		case E_BLOCK_TNT: return cpp14::make_unique<cTNTHandler>();
-		case E_BLOCK_TRAPPED_CHEST: return cpp14::make_unique<cTrappedChestHandler>();
-		case E_BLOCK_TRIPWIRE_HOOK: return cpp14::make_unique<cTripwireHookHandler>();
-		default:
-		{
-			if (cBlockDoorHandler::IsDoorBlockType(a_BlockType))
-			{
-				return cpp14::make_unique<cDoorHandler>();
-			}
-
-			if (cBlockInfo::FullyOccupiesVoxel(a_BlockType))
-			{
-				return cpp14::make_unique<cSolidBlockHandler>();
-			}
-			return nullptr;
-		}
+		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE: return true;
+		default: return false;
 	}
 }
 
@@ -128,71 +30,121 @@ std::unique_ptr<cRedstoneHandler> cIncrementalRedstoneSimulator::CreateComponent
 
 
 
-void cIncrementalRedstoneSimulator::Simulate(float a_dt)
+bool cIncrementalRedstoneSimulator::IsRedstone(BLOCKTYPE a_Block)
+
 {
-	for (auto & DelayInfo : m_Data.m_MechanismDelays)
+	switch (a_Block)
+	{
+		// All redstone devices, please alpha sort
+		case E_BLOCK_ACACIA_DOOR:
+		case E_BLOCK_ACACIA_FENCE_GATE:
+		case E_BLOCK_ACTIVATOR_RAIL:
+		case E_BLOCK_ACTIVE_COMPARATOR:
+		case E_BLOCK_BIRCH_DOOR:
+		case E_BLOCK_BIRCH_FENCE_GATE:
+		case E_BLOCK_BLOCK_OF_REDSTONE:
+		case E_BLOCK_COMMAND_BLOCK:
+		case E_BLOCK_DARK_OAK_DOOR:
+		case E_BLOCK_DARK_OAK_FENCE_GATE:
+		case E_BLOCK_DAYLIGHT_SENSOR:
+		case E_BLOCK_DETECTOR_RAIL:
+		case E_BLOCK_DISPENSER:
+		case E_BLOCK_DROPPER:
+		case E_BLOCK_FENCE_GATE:
+		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
+		case E_BLOCK_HOPPER:
+		case E_BLOCK_INACTIVE_COMPARATOR:
+		case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
+		case E_BLOCK_IRON_DOOR:
+		case E_BLOCK_IRON_TRAPDOOR:
+		case E_BLOCK_JUNGLE_DOOR:
+		case E_BLOCK_JUNGLE_FENCE_GATE:
+		case E_BLOCK_LEVER:
+		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
+		case E_BLOCK_NOTE_BLOCK:
+		case E_BLOCK_OBSERVER:
+		case E_BLOCK_POWERED_RAIL:
+		case E_BLOCK_REDSTONE_LAMP_OFF:
+		case E_BLOCK_REDSTONE_LAMP_ON:
+		case E_BLOCK_REDSTONE_REPEATER_OFF:
+		case E_BLOCK_REDSTONE_REPEATER_ON:
+		case E_BLOCK_REDSTONE_TORCH_OFF:
+		case E_BLOCK_REDSTONE_TORCH_ON:
+		case E_BLOCK_REDSTONE_WIRE:
+		case E_BLOCK_SPRUCE_DOOR:
+		case E_BLOCK_SPRUCE_FENCE_GATE:
+		case E_BLOCK_STICKY_PISTON:
+		case E_BLOCK_STONE_BUTTON:
+		case E_BLOCK_STONE_PRESSURE_PLATE:
+		case E_BLOCK_TNT:
+		case E_BLOCK_TRAPDOOR:
+		case E_BLOCK_TRAPPED_CHEST:
+		case E_BLOCK_TRIPWIRE_HOOK:
+		case E_BLOCK_WOODEN_BUTTON:
+		case E_BLOCK_WOODEN_DOOR:
+		case E_BLOCK_WOODEN_PRESSURE_PLATE:
+		case E_BLOCK_PISTON:
+		{
+			return true;
+		}
+		default: return false;
+	}
+}
+
+
+
+
+
+void cIncrementalRedstoneSimulator::ProcessWorkItem(cChunk & Chunk, cChunk & TickingSource, const Vector3i Position)
+{
+	BLOCKTYPE CurrentBlock;
+	NIBBLETYPE CurrentMeta;
+	Chunk.GetBlockTypeMeta(Position, CurrentBlock, CurrentMeta);
+
+	ForEachSourceCallback Callback(Chunk, Position, CurrentBlock);
+	RedstoneHandler::ForValidSourcePositions(Chunk, Position, CurrentBlock, CurrentMeta, Callback);
+
+	// Inform the handler to update
+	RedstoneHandler::Update(Chunk, TickingSource, Position, CurrentBlock, CurrentMeta, Callback.Power);
+}
+
+
+
+
+
+void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
+{
+	auto & ChunkData = *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk->GetRedstoneSimulatorData());
+	for (auto & DelayInfo : ChunkData.m_MechanismDelays)
 	{
 		if ((--DelayInfo.second.first) == 0)
 		{
-			m_Data.GetActiveBlocks().emplace_back(DelayInfo.first);
+			ChunkData.WakeUp(DelayInfo.first);
 		}
 	}
 
 	// Build our work queue
-	cVector3iArray WorkQueue;
-	std::swap(WorkQueue, m_Data.GetActiveBlocks());
+	auto & WorkQueue = ChunkData.GetActiveBlocks();
 
 	// Process the work queue
 	while (!WorkQueue.empty())
 	{
 		// Grab the first element and remove it from the list
-		Vector3i CurrentLocation = WorkQueue.back();
-		WorkQueue.pop_back();
+		Vector3i CurrentLocation = WorkQueue.top();
+		WorkQueue.pop();
 
-		BLOCKTYPE CurrentBlock;
-		NIBBLETYPE CurrentMeta;
-		if (!m_World.GetBlockTypeMeta(CurrentLocation.x, CurrentLocation.y, CurrentLocation.z, CurrentBlock, CurrentMeta))
+		const auto NeighbourChunk = a_Chunk->GetRelNeighborChunkAdjustCoords(CurrentLocation);
+		if ((NeighbourChunk == nullptr) || !NeighbourChunk->IsValid())
 		{
 			continue;
 		}
 
-		auto CurrentHandler = GetComponentHandler(CurrentBlock);
-		if (CurrentHandler == nullptr)  // Block at CurrentPosition doesn't have a corresponding redstone handler
-		{
-			// Clean up cached PowerData for CurrentPosition
-			GetChunkData()->ErasePowerData(CurrentLocation);
-			continue;
-		}
+		ProcessWorkItem(*NeighbourChunk, *a_Chunk, CurrentLocation);
+	}
 
-		cRedstoneHandler::PoweringData Power;
-		for (const auto & Location : CurrentHandler->GetValidSourcePositions(m_World, CurrentLocation, CurrentBlock, CurrentMeta))
-		{
-			if (!cChunk::IsValidHeight(Location.y))
-			{
-				continue;
-			}
-			BLOCKTYPE PotentialBlock;
-			NIBBLETYPE PotentialMeta;
-			m_World.GetBlockTypeMeta(Location.x, Location.y, Location.z, PotentialBlock, PotentialMeta);
-
-			auto PotentialSourceHandler = GetComponentHandler(PotentialBlock);
-			if (PotentialSourceHandler == nullptr)
-			{
-				continue;
-			}
-
-			decltype(Power) PotentialPower(PotentialBlock, PotentialSourceHandler->GetPowerDeliveredToPosition(m_World, Location, PotentialBlock, PotentialMeta, CurrentLocation, CurrentBlock));
-			Power = std::max(Power, PotentialPower);
-		}
-
-		// Inform the handler to update
-		cVector3iArray Updates = CurrentHandler->Update(m_World, CurrentLocation, CurrentBlock, CurrentMeta, Power);
-		WorkQueue.insert(WorkQueue.end(), Updates.begin(), Updates.end());
-
-		if (IsAlwaysTicked(CurrentBlock))
-		{
-			m_Data.GetActiveBlocks().emplace_back(CurrentLocation);
-		}
+	for (const auto & Position : ChunkData.AlwaysTickedPositions)
+	{
+		ChunkData.WakeUp(Position);
 	}
 }
 
@@ -200,58 +152,85 @@ void cIncrementalRedstoneSimulator::Simulate(float a_dt)
 
 
 
-void cIncrementalRedstoneSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
+void cIncrementalRedstoneSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
-	// Can't inspect block, so queue update anyway
-	if (a_Chunk == nullptr)
+	// Never update blocks without a handler:
+	if (!IsRedstone(a_Block))
 	{
-		m_Data.WakeUp(a_Block);
 		return;
 	}
 
-	const auto RelPos = cChunkDef::AbsoluteToRelative(a_Block, a_Chunk->GetPos());
-	const auto CurBlock = a_Chunk->GetBlock(RelPos);
+	auto & ChunkData = *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk.GetRedstoneSimulatorData());
 
-	// Always update redstone devices
-	if (IsRedstone(CurBlock))
+	if (IsAlwaysTicked(a_Block))
 	{
-		m_Data.WakeUp(a_Block);
-		return;
+		ChunkData.AlwaysTickedPositions.emplace(a_Position);
 	}
 
-	// Never update blocks without a handler
-	if (GetComponentHandler(CurBlock) == nullptr)
+	// Temporary: in the absence of block state support calculate our own:
+	if (a_Block == E_BLOCK_REDSTONE_WIRE)
 	{
-		GetChunkData()->ErasePowerData(a_Block);
-		return;
+		RedstoneHandler::SetWireState(a_Chunk, a_Position);
 	}
 
-	// Only update others if there is a redstone device nearby
-	for (int x = -1; x < 2; ++x)
+	// Always update redstone devices:
+	ChunkData.WakeUp(a_Position);
+}
+
+
+
+
+
+cRedstoneSimulatorChunkData * cIncrementalRedstoneSimulator::CreateChunkData()
+{
+	return new cIncrementalRedstoneSimulatorChunkData;
+}
+
+
+
+
+
+void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
+{
+	// Having WakeUp called on us directly means someone called SetBlock (or WakeUp)
+	// Since the simulator never does this, something external changed. Clear cached data:
+	static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk.GetRedstoneSimulatorData())->ErasePowerData(a_Position);
+
+	// Queue the block, in case the set block was redstone:
+	AddBlock(a_Chunk, a_Position, a_Block);
+}
+
+
+
+
+
+void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BLOCKTYPE a_Block)
+{
+	// This is an automatic cross-coords wakeup by cSimulatorManager
+	// There is no need to erase power data; if a component was destroyed the 3-arg WakeUp will handle it
+
+	AddBlock(a_Chunk, a_Position, a_Block);
+
+	// The only thing to do go one block farther than this cross-coord, in the direction of Offset
+	// in order to notify linked-powered positions that there was a change
+
+	for (const auto & Offset : cSimulator::GetLinkedOffsets(a_Offset))
 	{
-		for (int y = -1; y < 2; ++y)
+		auto Relative = a_Position - a_Offset + Offset;
+
+		if (!cChunkDef::IsValidHeight(Relative))
 		{
-			if (!cChunkDef::IsValidHeight(RelPos.y + y))
-			{
-				continue;
-			}
-
-			for (int z = -1; z < 2; ++z)
-			{
-				auto CheckPos = RelPos + Vector3i{x, y, z};
-				BLOCKTYPE Block;
-				NIBBLETYPE Meta;
-
-				// If we can't read the block, assume it is a mechanism
-				if (
-					!a_Chunk->UnboundedRelGetBlock(CheckPos, Block, Meta) ||
-					IsRedstone(Block)
-				)
-				{
-					m_Data.WakeUp(a_Block);
-					return;
-				}
-			}
+			continue;
 		}
+
+		const auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(Relative);
+
+		if ((Chunk == nullptr) || !Chunk->IsValid())
+		{
+			continue;
+		}
+
+		const auto Block = Chunk->GetBlock(Relative);
+		AddBlock(*Chunk, Relative, Block);
 	}
 }

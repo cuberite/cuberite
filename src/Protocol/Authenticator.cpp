@@ -1,32 +1,32 @@
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
-#include "Authenticator.h"
-#include "MojangAPI.h"
-#include "../Root.h"
-#include "../Server.h"
-#include "../ClientHandle.h"
-#include "../UUID.h"
+#include "Protocol/Authenticator.h"
 
-#include "../IniFile.h"
-#include "../JsonUtils.h"
+#include "ClientHandle.h"
+#include "HTTP/UrlClient.h"
+#include "HTTP/UrlParser.h"
+#include "IniFile.h"
+#include "JsonUtils.h"
 #include "json/json.h"
+#include "Protocol/MojangAPI.h"
+#include "Root.h"
+#include "Server.h"
+#include "UUID.h"
 
-#include "../mbedTLS++/BlockingSslClientSocket.h"
 
 
 
 
-
-#define DEFAULT_AUTH_SERVER "sessionserver.mojang.com"
-#define DEFAULT_AUTH_ADDRESS "/session/minecraft/hasJoined?username=%USERNAME%&serverId=%SERVERID%"
+constexpr char DEFAULT_AUTH_SERVER[]  = "sessionserver.mojang.com";
+constexpr char DEFAULT_AUTH_ADDRESS[] = "/session/minecraft/hasJoined?username=%USERNAME%&serverId=%SERVERID%";
 
 
 
 
 
 cAuthenticator::cAuthenticator(void) :
-	Super("cAuthenticator"),
+	Super("Authenticator"),
 	m_Server(DEFAULT_AUTH_SERVER),
 	m_Address(DEFAULT_AUTH_ADDRESS),
 	m_ShouldAuthenticate(true)
@@ -51,23 +51,59 @@ void cAuthenticator::ReadSettings(cSettingsRepositoryInterface & a_Settings)
 	m_Server             = a_Settings.GetValueSet ("Authentication", "Server", DEFAULT_AUTH_SERVER);
 	m_Address            = a_Settings.GetValueSet ("Authentication", "Address", DEFAULT_AUTH_ADDRESS);
 	m_ShouldAuthenticate = a_Settings.GetValueSetB("Authentication", "Authenticate", true);
+
+	// prepend https:// if missing
+	constexpr std::string_view HttpPrefix = "http://";
+	constexpr std::string_view HttpsPrefix = "https://";
+
+	if (
+		(std::string_view(m_Server).substr(0, HttpPrefix.size()) != HttpPrefix) &&
+		(std::string_view(m_Server).substr(0, HttpsPrefix.size()) != HttpsPrefix)
+	)
+	{
+		m_Server = "https://" + m_Server;
+	}
+
+	{
+		auto [IsSuccessful, ErrorMessage] = cUrlParser::Validate(m_Server);
+		if (!IsSuccessful)
+		{
+			LOGWARNING("%s %d: Supplied invalid URL for configuration value [Authentication: Server]: \"%s\", using default! Error: %s", __FUNCTION__, __LINE__, m_Server.c_str(), ErrorMessage.c_str());
+			m_Server = DEFAULT_AUTH_SERVER;
+		}
+	}
+
+	{
+		auto [IsSuccessful, ErrorMessage] = cUrlParser::Validate(m_Server);
+		if (!IsSuccessful)
+		{
+			LOGWARNING("%s %d: Supplied invalid URL for configuration value [Authentication: Address]: \"%s\", using default! Error: %s", __FUNCTION__, __LINE__, m_Address.c_str(), ErrorMessage.c_str());
+			m_Address = DEFAULT_AUTH_ADDRESS;
+		}
+	}
 }
 
 
 
 
 
-void cAuthenticator::Authenticate(int a_ClientID, const AString & a_UserName, const AString & a_ServerHash)
+void cAuthenticator::Authenticate(int a_ClientID, const std::string_view a_Username, const std::string_view a_ServerHash)
 {
 	if (!m_ShouldAuthenticate)
 	{
-		Json::Value Value;
-		cRoot::Get()->AuthenticateUser(a_ClientID, a_UserName, cClientHandle::GenerateOfflineUUID(a_UserName), Value);
+		// An "authenticated" username, which is just what the client sent since auth is off.
+		std::string OfflineUsername(a_Username);
+
+		// A specially constructed UUID based wholly on the username.
+		const auto OfflineUUID = cClientHandle::GenerateOfflineUUID(OfflineUsername);
+
+		// "Authenticate" the user based on what little information we have:
+		cRoot::Get()->GetServer()->AuthenticateUser(a_ClientID, std::move(OfflineUsername), OfflineUUID, Json::Value());
 		return;
 	}
 
-	cCSLock LOCK(m_CS);
-	m_Queue.push_back(cUser(a_ClientID, a_UserName, a_ServerHash));
+	cCSLock Lock(m_CS);
+	m_Queue.emplace_back(a_ClientID, a_Username, a_ServerHash);
 	m_QueueNonempty.Set();
 }
 
@@ -112,20 +148,19 @@ void cAuthenticator::Execute(void)
 		}
 		ASSERT(!m_Queue.empty());
 
-		cAuthenticator::cUser & User = m_Queue.front();
-		int ClientID = User.m_ClientID;
-		AString UserName = User.m_Name;
-		AString ServerID = User.m_ServerID;
+		cAuthenticator::cUser User = std::move(m_Queue.front());
+		int & ClientID = User.m_ClientID;
+		AString & Username = User.m_Name;
+		AString & ServerID = User.m_ServerID;
 		m_Queue.pop_front();
 		Lock.Unlock();
 
-		AString NewUserName = UserName;
 		cUUID UUID;
 		Json::Value Properties;
-		if (AuthWithYggdrasil(NewUserName, ServerID, UUID, Properties))
+		if (AuthWithYggdrasil(Username, ServerID, UUID, Properties))
 		{
-			LOGINFO("User %s authenticated with UUID %s", NewUserName.c_str(), UUID.ToShortString().c_str());
-			cRoot::Get()->AuthenticateUser(ClientID, NewUserName, UUID, Properties);
+			LOGINFO("User %s authenticated with UUID %s", Username.c_str(), UUID.ToShortString().c_str());
+			cRoot::Get()->GetServer()->AuthenticateUser(ClientID, std::move(Username), UUID, std::move(Properties));
 		}
 		else
 		{
@@ -138,47 +173,21 @@ void cAuthenticator::Execute(void)
 
 
 
-bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, cUUID & a_UUID, Json::Value & a_Properties)
+bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, cUUID & a_UUID, Json::Value & a_Properties) const
 {
 	LOGD("Trying to authenticate user %s", a_UserName.c_str());
 
 	// Create the GET request:
 	AString ActualAddress = m_Address;
-	ReplaceString(ActualAddress, "%USERNAME%", a_UserName);
-	ReplaceString(ActualAddress, "%SERVERID%", a_ServerId);
+	ReplaceURL(ActualAddress, "%USERNAME%", a_UserName);
+	ReplaceURL(ActualAddress, "%SERVERID%", a_ServerId);
 
-	AString Request;
-	Request += "GET " + ActualAddress + " HTTP/1.0\r\n";
-	Request += "Host: " + m_Server + "\r\n";
-	Request += "User-Agent: Cuberite\r\n";
-	Request += "Connection: close\r\n";
-	Request += "\r\n";
-
-	AString Response;
-	if (!cMojangAPI::SecureRequest(m_Server, Request, Response))
+	// Create and send the HTTP request
+	auto [IsSuccessful, Response] = cUrlClient::BlockingGet(m_Server + ActualAddress);
+	if (!IsSuccessful)
 	{
 		return false;
 	}
-
-	// Check the HTTP status line:
-	const AString Prefix("HTTP/1.1 200 OK");
-	AString HexDump;
-	if (Response.compare(0, Prefix.size(), Prefix))
-	{
-		LOGINFO("User %s failed to auth, bad HTTP status line received", a_UserName.c_str());
-		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
-		return false;
-	}
-
-	// Erase the HTTP headers from the response:
-	size_t idxHeadersEnd = Response.find("\r\n\r\n");
-	if (idxHeadersEnd == AString::npos)
-	{
-		LOGINFO("User %s failed to authenticate, bad HTTP response header received", a_UserName.c_str());
-		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
-		return false;
-	}
-	Response.erase(0, idxHeadersEnd + 4);
 
 	// Parse the Json response:
 	if (Response.empty())
@@ -188,14 +197,14 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 	Json::Value root;
 	if (!JsonUtils::ParseString(Response, root))
 	{
-		LOGWARNING("cAuthenticator: Cannot parse received data (authentication) to JSON!");
+		LOGWARNING("%s: Cannot parse received data (authentication) to JSON!", __FUNCTION__);
 		return false;
 	}
 	a_UserName = root.get("name", "Unknown").asString();
 	a_Properties = root["properties"];
 	if (!a_UUID.FromString(root.get("id", "").asString()))
 	{
-		LOGWARNING("cAuthenticator: Recieved invalid UUID format");
+		LOGWARNING("%s: Received invalid UUID format", __FUNCTION__);
 		return false;
 	}
 
@@ -207,9 +216,9 @@ bool cAuthenticator::AuthWithYggdrasil(AString & a_UserName, const AString & a_S
 
 
 
+#ifdef ENABLE_PROPERTIES
 
-
-/* In case we want to export this function to the plugin API later - don't forget to add the relevant INI configuration lines for DEFAULT_PROPERTIES_ADDRESS
+/* In case we want to export this function to the plugin API later - don't forget to add the relevant INI configuration lines for DEFAULT_PROPERTIES_ADDRESS */
 
 #define DEFAULT_PROPERTIES_ADDRESS "/session/minecraft/profile/%UUID%"
 
@@ -220,42 +229,12 @@ bool cAuthenticator::GetPlayerProperties(const AString & a_UUID, Json::Value & a
 {
 	LOGD("Trying to get properties for user %s", a_UUID.c_str());
 
-	// Create the GET request:
-	AString ActualAddress = m_PropertiesAddress;
-	ReplaceString(ActualAddress, "%UUID%", a_UUID);
-
-	AString Request;
-	Request += "GET " + ActualAddress + " HTTP/1.0\r\n";
-	Request += "Host: " + m_Server + "\r\n";
-	Request += "User-Agent: Cuberite\r\n";
-	Request += "Connection: close\r\n";
-	Request += "\r\n";
-
-	AString Response;
-	if (!ConnectSecurelyToAddress(StarfieldCACert(), m_Server, Request, Response))
+	// Create and send the HTTP request
+	auto [IsSuccessful, Response] = cUrlClient::BlockingGet(m_Server + ActualAddress);
+	if (!IsSuccessful)
 	{
 		return false;
 	}
-
-	// Check the HTTP status line:
-	const AString Prefix("HTTP/1.1 200 OK");
-	AString HexDump;
-	if (Response.compare(0, Prefix.size(), Prefix))
-	{
-		LOGINFO("Failed to get properties for user %s, bad HTTP status line received", a_UUID.c_str());
-		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
-		return false;
-	}
-
-	// Erase the HTTP headers from the response:
-	size_t idxHeadersEnd = Response.find("\r\n\r\n");
-	if (idxHeadersEnd == AString::npos)
-	{
-		LOGINFO("Failed to get properties for user %s, bad HTTP response header received", a_UUID.c_str());
-		LOGD("Response: \n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
-		return false;
-	}
-	Response.erase(0, idxHeadersEnd + 4);
 
 	// Parse the Json response:
 	if (Response.empty())
@@ -274,7 +253,7 @@ bool cAuthenticator::GetPlayerProperties(const AString & a_UUID, Json::Value & a
 	a_Properties = root["properties"];
 	return true;
 }
-*/
+#endif
 
 
 

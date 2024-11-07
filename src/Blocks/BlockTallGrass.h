@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "Mixins/DirtLikeUnderneath.h"
 #include "ChunkInterface.h"
 
 
@@ -9,23 +10,18 @@
 
 
 /** Handles the grass that is 1 block tall */
-class cBlockTallGrassHandler:
-	public cBlockHandler
+class cBlockTallGrassHandler final :
+	public cDirtLikeUnderneath<cBlockHandler>
 {
-	using Super = cBlockHandler;
+	using Super = cDirtLikeUnderneath<cBlockHandler>;
 
 public:
 
-	cBlockTallGrassHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual bool DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta) override
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
 	{
 		return true;
 	}
@@ -34,7 +30,7 @@ public:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// If using shears, drop self:
 		if ((a_Tool != nullptr) && (a_Tool->m_ItemType == E_ITEM_SHEARS))
@@ -42,27 +38,15 @@ public:
 			return cItem(m_BlockType, 1, a_BlockMeta);
 		}
 
-		// Drop seeds, sometimes:
-		if (GetRandomProvider().RandBool(0.125))
+		// Drop seeds, depending on bernoulli trial result:
+		if (GetRandomProvider().RandBool(0.875))  // 87.5% chance of dropping nothing
 		{
-			return cItem(E_ITEM_SEEDS);
-		}
-		return {};
-	}
-
-
-
-
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
-	{
-		if (a_RelPos.y <= 0)
-		{
-			return false;
+			return {};
 		}
 
-		BLOCKTYPE BelowBlock = a_Chunk.GetBlock(a_RelPos.addedY(-1));
-		return IsBlockTypeOfDirt(BelowBlock);
+		// 12.5% chance of dropping 0 or more seeds.
+		const auto DropNum = FortuneDiscreteRandom(1, 1, 2 * ToolFortuneLevel(a_Tool));
+		return cItem(E_ITEM_SEEDS, DropNum);
 	}
 
 
@@ -70,9 +54,10 @@ public:
 
 
 	/** Growing a tall grass produces a big flower (2-block high fern or double-tall grass). */
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
-		if (a_RelPos.y > (cChunkDef::Height - 2))
+		const auto TopPos = a_RelPos.addedY(1);
+		if (!cChunkDef::IsValidHeight(TopPos))
 		{
 			return 0;
 		}
@@ -85,7 +70,7 @@ public:
 			default:                      return 0;
 		}
 		a_Chunk.SetBlock(a_RelPos,           E_BLOCK_BIG_FLOWER, largeFlowerMeta);
-		a_Chunk.SetBlock(a_RelPos.addedY(1), E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
+		a_Chunk.SetBlock(TopPos, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP);
 		return 1;
 	}
 
@@ -93,7 +78,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 7;

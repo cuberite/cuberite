@@ -675,6 +675,17 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 				},
 				Notes = "Queues the specified plugin to be unloaded. To avoid deadlocks, the unloading happens in the main tick thread asynchronously.",
 			},
+			ReloadPlugin =
+			{
+				Params =
+				{
+					{
+						Name = "PluginName",
+						Type = "string",
+					},
+				},
+				Notes = "Queues the specified plugin to be reloaded. To avoid deadlocks, the reloading happens in the main tick thread asynchronously.",
+			}
 		},
 		Constants =
 		{
@@ -790,6 +801,10 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			{
 				Notes = "Called when a hopper is pushing an item into the container it is aimed at.",
 			},
+			HOOK_DROPSPENSE =
+			{
+				Notes = "Called when a {{cDropSpenserEntity|DropSpenser}} is dropspensing an {{cItem|item}}.",
+			},
 			HOOK_KILLED =
 			{
 				Notes = "Called when an entity has been killed.",
@@ -832,11 +847,11 @@ cPluginManager.AddHook(cPluginManager.HOOK_CHAT, OnChatMessage);
 			},
 			HOOK_PLAYER_FISHED =
 			{
-				Notes = "Called when the player reels the fishing rod back in, after the server decides the player's fishing reward.",
+				Notes = "Called when the player reels the fishing rod back in, after the server decides the player's fishing reward and the experience to grant.",
 			},
 			HOOK_PLAYER_FISHING =
 			{
-				Notes = "Called when the player reels the fishing rod back in, plugins may alter the fishing reward.",
+				Notes = "Called when the player reels the fishing rod back in, plugins may alter the fishing reward and the experience granted to the player.",
 			},
 			HOOK_PLAYER_FOOD_LEVEL_CHANGE =
 			{

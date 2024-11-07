@@ -11,7 +11,7 @@
 
 
 cCreeper::cCreeper(void) :
-	Super("Creeper", mtCreeper, "entity.creeper.hurt", "entity.creeper.death", "entity.creeper.ambient", 0.6, 1.8),
+	Super("Creeper", mtCreeper, "entity.creeper.hurt", "entity.creeper.death", "entity.creeper.ambient", 0.6f, 1.7f),
 	m_bIsBlowing(false),
 	m_bIsCharged(false),
 	m_BurnedWithFlintAndSteel(false),
@@ -83,11 +83,10 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		auto ProjectileCreatorCallback = [](cEntity & a_Entity)
 			{
-				if (a_Entity.IsMob() && ((static_cast<cMonster &>(a_Entity)).GetMobType() == mtSkeleton))
-				{
-					return true;
-				}
-				return false;
+				return (
+					a_Entity.IsMob() &&
+					((static_cast<cMonster &>(a_Entity)).GetMobType() == mtSkeleton)
+				);
 			};
 
 		if (GetWorld()->DoWithEntityByID(static_cast<cProjectileEntity *>(a_Killer)->GetCreatorUniqueID(), ProjectileCreatorCallback))

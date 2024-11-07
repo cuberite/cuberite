@@ -285,11 +285,7 @@ bool cBoundingBox::Intersect(const cBoundingBox & a_Other, cBoundingBox & a_Inte
 	}
 	a_Intersection.m_Min.z = std::max(m_Min.z, a_Other.m_Min.z);
 	a_Intersection.m_Max.z = std::min(m_Max.z, a_Other.m_Max.z);
-	if (a_Intersection.m_Min.z >= a_Intersection.m_Max.z)
-	{
-		return false;
-	}
-	return true;
+	return (a_Intersection.m_Min.z < a_Intersection.m_Max.z);
 }
 
 

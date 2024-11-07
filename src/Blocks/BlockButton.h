@@ -1,29 +1,65 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "BlockSlab.h"
+#include "BlockStairs.h"
 #include "../BlockInfo.h"
 #include "../Chunk.h"
-#include "Mixins.h"
+#include "Defines.h"
+#include "Entities/Player.h"
+#include "Mixins/Mixins.h"
 #include "ChunkInterface.h"
+#include "World.h"
 
 
 
 
-class cBlockButtonHandler :
+class cBlockButtonHandler final :
 	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>>
 {
 	using Super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, true>>;
 
 public:
 
-	cBlockButtonHandler(BLOCKTYPE a_BlockType):
-		Super(a_BlockType)
+	using Super::Super;
+
+	/** Extracts the ON bit from metadata and returns if true if it is set */
+	static bool IsButtonOn(NIBBLETYPE a_Meta)
 	{
+		return (a_Meta & 0x08) == 0x08;
 	}
 
+	/** Event handler for an arrow striking a block.
+	Performs appropriate handling if the arrow intersected a wooden button. */
+	static void OnArrowHit(cWorld & a_World, const Vector3i a_Position, const eBlockFace a_HitFace)
+	{
+		BLOCKTYPE Type;
+		NIBBLETYPE Meta;
+		const auto Pos = AddFaceDirection(a_Position, a_HitFace);
 
+		if (
+			!a_World.GetBlockTypeMeta(Pos, Type, Meta) ||
+			IsButtonOn(Meta) ||
+			!IsButtonPressedByArrow(a_World, Pos, Type, Meta)
+		)
+		{
+			// Bail if we're not specifically a wooden button, or it's already on
+			// or if the arrow didn't intersect. It is very important that nothing is
+			// done if the button is depressed, since the release task will already be queued
+			return;
+		}
 
+		a_World.SetBlockMeta(Pos, Meta | 0x08);
+		a_World.WakeUpSimulators(Pos);
 
+		// sound name is ok to be wood, because only wood gets triggered by arrow
+		a_World.GetBroadcastManager().BroadcastSoundEffect("block.wood_button.click_on", Pos, 0.5f, 0.6f);
+
+		// Queue a button reset
+		QueueButtonRelease(a_World, Pos, Type);
+	}
+
+private:
 
 	virtual bool OnUse(
 		cChunkInterface & a_ChunkInterface,
@@ -32,7 +68,7 @@ public:
 		const Vector3i a_BlockPos,
 		eBlockFace a_BlockFace,
 		const Vector3i a_CursorPos
-	) override
+	) const override
 	{
 		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
 
@@ -47,7 +83,7 @@ public:
 
 		const auto SoundToPlay = (m_BlockType == E_BLOCK_STONE_BUTTON) ? "block.stone_button.click_on" : "block.wood_button.click_on";
 
-		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta, false);
+		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
 		a_WorldInterface.WakeUpSimulators(a_BlockPos);
 		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect(SoundToPlay, a_BlockPos, 0.5f, 0.6f, a_Player.GetClientHandle());
 
@@ -61,51 +97,9 @@ public:
 
 
 
-	virtual bool IsUseable(void) override
+	virtual bool IsUseable(void) const override
 	{
 		return true;
-	}
-
-
-
-
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface,
-		cPlayer & a_Player,
-		const Vector3i a_PlacedBlockPos,
-		eBlockFace a_ClickedBlockFace,
-		const Vector3i a_CursorPos,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = BlockFaceToMetaData(a_ClickedBlockFace);
-		return true;
-	}
-
-
-
-
-
-	/** Converts the block face of the neighbor to which the button is attached, to the block meta for this button. */
-	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
-	{
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_YP: return 0x5;
-			case BLOCK_FACE_ZM: return 0x4;
-			case BLOCK_FACE_ZP: return 0x3;
-			case BLOCK_FACE_XM: return 0x2;
-			case BLOCK_FACE_XP: return 0x1;
-			case BLOCK_FACE_YM: return 0x0;
-			case BLOCK_FACE_NONE:
-			{
-				ASSERT(!"Unhandled block face!");
-				return 0x0;
-			}
-		}
-		UNREACHABLE("Unsupported block face");
 	}
 
 
@@ -135,16 +129,45 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		auto Meta = a_Chunk.GetMeta(a_RelPos);
-		auto SupportRelPos = AddFaceDirection(a_RelPos, BlockMetaDataToBlockFace(Meta), true);
-		if (!cChunkDef::IsValidHeight(SupportRelPos.y))
+		auto SupportRelPos = AddFaceDirection(a_Position, BlockMetaDataToBlockFace(a_Meta), true);
+		if (!cChunkDef::IsValidHeight(SupportRelPos))
 		{
 			return false;
 		}
 		BLOCKTYPE SupportBlockType;
-		a_Chunk.UnboundedRelGetBlockType(SupportRelPos, SupportBlockType);
+		NIBBLETYPE SupportBlockMeta;
+		a_Chunk.UnboundedRelGetBlock(SupportRelPos, SupportBlockType, SupportBlockMeta);
+		eBlockFace Face = BlockMetaDataToBlockFace(a_Meta);
+
+		// upside down slabs
+		if (cBlockSlabHandler::IsAnySlabType(SupportBlockType))
+		{
+			return (Face == BLOCK_FACE_YP) && (SupportBlockMeta & E_META_WOODEN_SLAB_UPSIDE_DOWN);
+		}
+
+		// stairs (top and sides)
+		if (cBlockStairsHandler::IsAnyStairType(SupportBlockType))
+		{
+			switch (Face)
+			{
+				case eBlockFace::BLOCK_FACE_YP:
+					return (SupportBlockMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
+				case eBlockFace::BLOCK_FACE_XP:
+					return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_XP);
+				case eBlockFace::BLOCK_FACE_XM:
+					return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_XM);
+				case eBlockFace::BLOCK_FACE_ZP:
+					return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_ZP);
+				case eBlockFace::BLOCK_FACE_ZM:
+					return ((SupportBlockMeta & 0b11) == E_BLOCK_STAIRS_ZM);
+				default:
+				{
+					return false;
+				}
+			}
+		}
 
 		return cBlockInfo::FullyOccupiesVoxel(SupportBlockType);
 	}
@@ -153,55 +176,17 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 0;
 	}
 
-	/** Extracts the ON bit from metadata and returns if true if it is set */
-	static bool IsButtonOn(NIBBLETYPE a_Meta)
-	{
-		return (a_Meta & 0x08) == 0x08;
-	}
-
-	/** Event handler for an arrow striking a block.
-	Performs appropriate handling if the arrow intersected a wooden button. */
-	static void OnArrowHit(cWorld & a_World, const Vector3i a_Position, const eBlockFace a_HitFace)
-	{
-		BLOCKTYPE Type;
-		NIBBLETYPE Meta;
-		const auto Pos = AddFaceDirection(a_Position, a_HitFace);
-
-		if (
-			!a_World.GetBlockTypeMeta(Pos, Type, Meta) ||
-			IsButtonOn(Meta) ||
-			!IsButtonPressedByArrow(a_World, Pos, Type, Meta)
-		)
-		{
-			// Bail if we're not specifically a wooden button, or it's already on
-			// or if the arrow didn't intersect. It is very important that nothing is
-			// done if the button is depressed, since the release task will already be queued
-			return;
-		}
-
-		a_World.SetBlockMeta(Pos, Meta | 0x08, false);
-		a_World.WakeUpSimulators(Pos);
-
-		// sound name is ok to be wood, because only wood gets triggered by arrow
-		a_World.GetBroadcastManager().BroadcastSoundEffect("block.wood_button.click_on", Pos, 0.5f, 0.6f);
-
-		// Queue a button reset
-		QueueButtonRelease(a_World, Pos, Type);
-	}
-
-private:
-
 	/** Schedules a recurring event at appropriate intervals to release a button at a given position.
 	The given block type is checked when the task is executed to ensure the position still contains a button. */
 	static void QueueButtonRelease(cWorld & a_ButtonWorld, const Vector3i a_Position, const BLOCKTYPE a_BlockType)
 	{
-		const auto TickDelay = (a_BlockType == E_BLOCK_STONE_BUTTON) ? 20 : 30;
+		const auto TickDelay = (a_BlockType == E_BLOCK_STONE_BUTTON) ? 20_tick : 30_tick;
 		a_ButtonWorld.ScheduleTask(
 			TickDelay,
 			[a_Position, a_BlockType](cWorld & a_World)
@@ -228,7 +213,7 @@ private:
 				// Block hasn't change in the meantime; release it
 				const auto SoundToPlayOnRelease = (Type == E_BLOCK_STONE_BUTTON) ? "block.stone_button.click_off" : "block.wood_button.click_off";
 
-				a_World.SetBlockMeta(a_Position, Meta & 0x07, false);
+				a_World.SetBlockMeta(a_Position, Meta & 0x07);
 				a_World.WakeUpSimulators(a_Position);
 				a_World.BroadcastSoundEffect(SoundToPlayOnRelease, a_Position, 0.5f, 0.5f);
 			}
@@ -272,10 +257,9 @@ private:
 			case BLOCK_FACE_YP: return { 0.5, 0, 0.5 };
 			case BLOCK_FACE_NONE:
 			{
-				ASSERT(!"Unhandled block face!");
-				return { 0, 0, 0 };
+				break;
 			}
 		}
-		UNREACHABLE(!"Unhandled block face!");
+		UNREACHABLE("Unhandled block face!");
 	}
 } ;

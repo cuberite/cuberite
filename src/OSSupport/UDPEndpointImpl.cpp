@@ -14,13 +14,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Globals:
 
-static bool IsValidSocket(evutil_socket_t a_Socket)
+namespace UDPEndpointImplHelper
 {
-	#ifdef _WIN32
+	static bool IsValidSocket(evutil_socket_t a_Socket)
+	{
+#ifdef _WIN32
 		return (a_Socket != INVALID_SOCKET);
-	#else  // _WIN32
+#else  // _WIN32
 		return (a_Socket >= 0);
-	#endif  // else _WIN32
+#endif  // else _WIN32
+	}
 }
 
 
@@ -281,7 +284,7 @@ bool cUDPEndpointImpl::Send(const AString & a_Payload, const AString & a_Host, U
 			reinterpret_cast<sockaddr_in *>(&sa)->sin_port = htons(a_Port);
 			if (m_IsMainSockIPv6)
 			{
-				if (IsValidSocket(m_SecondarySock))
+				if (UDPEndpointImplHelper::IsValidSocket(m_SecondarySock))
 				{
 					// The secondary socket, which is always IPv4, is present:
 					NumSent = static_cast<int>(sendto(m_SecondarySock, a_Payload.data(), a_Payload.size(), 0, reinterpret_cast<const sockaddr *>(&sa), static_cast<socklen_t>(salen)));
@@ -339,7 +342,7 @@ void cUDPEndpointImpl::EnableBroadcasts(void)
 		}
 
 		// Enable broadcasts on the secondary socket, if opened (use char, it worked for primary):
-		if (IsValidSocket(m_SecondarySock))
+		if (UDPEndpointImplHelper::IsValidSocket(m_SecondarySock))
 		{
 			if (setsockopt(m_SecondarySock, SOL_SOCKET, SO_BROADCAST, &broadcastChar, sizeof(broadcastChar)) == -1)
 			{
@@ -351,7 +354,7 @@ void cUDPEndpointImpl::EnableBroadcasts(void)
 	}
 
 	// Enable broadcasts on the secondary socket, if opened (use int, it worked for primary):
-	if (IsValidSocket(m_SecondarySock))
+	if (UDPEndpointImplHelper::IsValidSocket(m_SecondarySock))
 	{
 		if (setsockopt(m_SecondarySock, SOL_SOCKET, SO_BROADCAST, reinterpret_cast<const char *>(&broadcastInt), sizeof(broadcastInt)) == -1)
 		{
@@ -379,17 +382,19 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 	m_MainSock = socket(AF_INET6, SOCK_DGRAM, IPPROTO_UDP);
 
 	int err;
-	if (!IsValidSocket(m_MainSock))
+	if (!UDPEndpointImplHelper::IsValidSocket(m_MainSock))
 	{
 		// Failed to create IPv6 socket, create an IPv4 one instead:
 		m_IsMainSockIPv6 = false;
 		err = EVUTIL_SOCKET_ERROR();
 		LOGD("UDP: Failed to create IPv6 MainSock: %d (%s)", err, evutil_socket_error_to_string(err));
 		m_MainSock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-		if (!IsValidSocket(m_MainSock))
+		if (!UDPEndpointImplHelper::IsValidSocket(m_MainSock))
 		{
 			err = EVUTIL_SOCKET_ERROR();
-			m_Callbacks.OnError(err, Printf("Cannot create UDP socket for port %d: %s", a_Port, evutil_socket_error_to_string(err)));
+			m_Callbacks.OnError(err, fmt::format(FMT_STRING("Cannot create UDP socket for port {}: {} ({})"),
+				a_Port, err, evutil_socket_error_to_string(err))
+			);
 			return;
 		}
 
@@ -410,7 +415,9 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 		if (bind(m_MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
 		{
 			err = EVUTIL_SOCKET_ERROR();
-			m_Callbacks.OnError(err, Printf("Cannot bind UDP port %d: %s", a_Port, evutil_socket_error_to_string(err)));
+			m_Callbacks.OnError(err, fmt::format(FMT_STRING("Cannot bind UDP port {}: {} ({})"),
+				a_Port, err, evutil_socket_error_to_string(err))
+			);
 			evutil_closesocket(m_MainSock);
 			return;
 		}
@@ -445,7 +452,9 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 		if (bind(m_MainSock, reinterpret_cast<const sockaddr *>(&name), sizeof(name)) != 0)
 		{
 			err = EVUTIL_SOCKET_ERROR();
-			m_Callbacks.OnError(err, Printf("Cannot bind to UDP port %d: %s", a_Port, evutil_socket_error_to_string(err)));
+			m_Callbacks.OnError(err, fmt::format(FMT_STRING("Cannot bind to UDP port {}: {} ({})"),
+				a_Port, err, evutil_socket_error_to_string(err))
+			);
 			evutil_closesocket(m_MainSock);
 			return;
 		}
@@ -453,7 +462,9 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 	if (evutil_make_socket_nonblocking(m_MainSock) != 0)
 	{
 		err = EVUTIL_SOCKET_ERROR();
-		m_Callbacks.OnError(err, Printf("Cannot make socket on UDP port %d nonblocking: %s", a_Port, evutil_socket_error_to_string(err)));
+		m_Callbacks.OnError(err, fmt::format(FMT_STRING("Cannot make socket on UDP port {} nonblocking: {} ({})"),
+			a_Port, err, evutil_socket_error_to_string(err))
+		);
 		evutil_closesocket(m_MainSock);
 		return;
 	}
@@ -492,7 +503,7 @@ void cUDPEndpointImpl::Open(UInt16 a_Port)
 	LOGD("Creating a second UDP socket for IPv4");
 	m_SecondarySock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 
-	if (!IsValidSocket(m_SecondarySock))
+	if (!UDPEndpointImplHelper::IsValidSocket(m_SecondarySock))
 	{
 		// Don't report as an error, the primary socket is working
 		err = EVUTIL_SOCKET_ERROR();

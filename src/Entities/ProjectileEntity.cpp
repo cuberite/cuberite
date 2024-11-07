@@ -75,7 +75,7 @@ protected:
 			{
 				Vector3d Intersection = LineStart + m_Projectile->GetSpeed() * LineCoeff;  // Point where projectile goes into the hit block
 
-				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, Face, Intersection))
+				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, a_BlockPos, Face, Intersection))
 				{
 					return false;
 				}
@@ -167,7 +167,8 @@ public:
 				!a_Entity.IsPlayer() ||
 				static_cast<cPlayer &>(a_Entity).IsGameModeSpectator()
 			) &&
-			!a_Entity.IsBoat()
+			!a_Entity.IsBoat() &&
+			!a_Entity.IsEnderCrystal()
 		)
 		{
 			// Not an entity that interacts with a projectile
@@ -218,7 +219,7 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cProjectileEntity:
 
-cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, double a_Width, double a_Height):
+cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, float a_Width, float a_Height):
 	Super(etProjectile, a_Pos, a_Width, a_Height),
 	m_ProjectileKind(a_Kind),
 	m_CreatorData(
@@ -236,7 +237,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d
 
 
 
-cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed, double a_Width, double a_Height):
+cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed, float a_Width, float a_Height):
 	cProjectileEntity(a_Kind, a_Creator, a_Pos, a_Width, a_Height)
 {
 	SetSpeed(a_Speed);
@@ -264,15 +265,15 @@ std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(
 
 	switch (a_Kind)
 	{
-		case pkArrow:         return cpp14::make_unique<cArrowEntity>           (a_Creator, a_Pos, Speed);
-		case pkEgg:           return cpp14::make_unique<cThrownEggEntity>       (a_Creator, a_Pos, Speed);
-		case pkEnderPearl:    return cpp14::make_unique<cThrownEnderPearlEntity>(a_Creator, a_Pos, Speed);
-		case pkSnowball:      return cpp14::make_unique<cThrownSnowballEntity>  (a_Creator, a_Pos, Speed);
-		case pkGhastFireball: return cpp14::make_unique<cGhastFireballEntity>   (a_Creator, a_Pos, Speed);
-		case pkFireCharge:    return cpp14::make_unique<cFireChargeEntity>      (a_Creator, a_Pos, Speed);
-		case pkExpBottle:     return cpp14::make_unique<cExpBottleEntity>       (a_Creator, a_Pos, Speed);
-		case pkSplashPotion:  return cpp14::make_unique<cSplashPotionEntity>    (a_Creator, a_Pos, Speed, *a_Item);
-		case pkWitherSkull:   return cpp14::make_unique<cWitherSkullEntity>     (a_Creator, a_Pos, Speed);
+		case pkArrow:         return std::make_unique<cArrowEntity>           (a_Creator, a_Pos, Speed);
+		case pkEgg:           return std::make_unique<cThrownEggEntity>       (a_Creator, a_Pos, Speed);
+		case pkEnderPearl:    return std::make_unique<cThrownEnderPearlEntity>(a_Creator, a_Pos, Speed);
+		case pkSnowball:      return std::make_unique<cThrownSnowballEntity>  (a_Creator, a_Pos, Speed);
+		case pkGhastFireball: return std::make_unique<cGhastFireballEntity>   (a_Creator, a_Pos, Speed);
+		case pkFireCharge:    return std::make_unique<cFireChargeEntity>      (a_Creator, a_Pos, Speed);
+		case pkExpBottle:     return std::make_unique<cExpBottleEntity>       (a_Creator, a_Pos, Speed);
+		case pkSplashPotion:  return std::make_unique<cSplashPotionEntity>    (a_Creator, a_Pos, Speed, *a_Item);
+		case pkWitherSkull:   return std::make_unique<cWitherSkullEntity>     (a_Creator, a_Pos, Speed);
 		case pkFirework:
 		{
 			ASSERT(a_Item != nullptr);
@@ -281,7 +282,7 @@ std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(
 				return nullptr;
 			}
 
-			return cpp14::make_unique<cFireworkEntity>(a_Creator, a_Pos, *a_Item);
+			return std::make_unique<cFireworkEntity>(a_Creator, a_Pos, *a_Item);
 		}
 	}
 

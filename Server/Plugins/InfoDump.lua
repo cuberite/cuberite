@@ -3,7 +3,7 @@
 -- InfoDump.lua
 
 --[[
-Loads plugins' Info.lua and dumps its g_PluginInfo into various text formats
+Loads plugins' Info.lua and dumps its g_PluginInfo (or gPluginInfo) into various text formats
 This is used for generating plugin documentation for the forum and for GitHub's INFO.md files
 
 This script can be used in two ways:
@@ -594,6 +594,55 @@ end
 
 
 
+local function DumpDependenciesForum(a_PluginInfo, f)
+	if (not a_PluginInfo.Dependencies) then
+		return
+	end
+
+	f:write("\n[size=x-large]Dependencies[/size]\n[list]")
+	for idx, dependency in ipairs(a_PluginInfo.Dependencies) do
+		f:write("\n\n [*] [b]", dependency.Name, "[/b]", dependency.Optional == true and " (Optional)" or " (Required)")
+		if (dependency.Description) then
+			f:write("\nDescription: ", ForumizeString(dependency.Description))
+		end
+		if (dependency.Type) then
+			f:write("\nType: ", dependency.Type)
+		end
+		if (dependency.Url) then
+			f:write("\nUrl: ", dependency.Url)
+		end
+	end
+	f:write("\n[/list]")
+end
+
+
+
+
+
+local function DumpDependenciesGithub(a_PluginInfo, f)
+	if (not a_PluginInfo.Dependencies) then
+		return
+	end
+
+	f:write("\n# Dependencies\n")
+	for idx, dependency in ipairs(a_PluginInfo.Dependencies) do
+		f:write("\n\n * **", dependency.Name, "** ", dependency.Optional == true and "(Optional)" or "(Required)")
+		if (dependency.Description) then
+			f:write("<br />\nDescription: ", GithubizeString(dependency.Description))
+		end
+		if (dependency.Type) then
+			f:write("<br />\nType: ", dependency.Type)
+		end
+		if (dependency.Url) then
+			f:write("<br />\nUrl: [", dependency.Url, "](", dependency.Url , ")")
+		end
+	end
+end
+
+
+
+
+
 --- Dumps the forum-format info for the plugin
 -- Returns true on success, nil and error message on failure
 local function DumpPluginInfoForum(a_PluginFolder, a_PluginInfo)
@@ -608,6 +657,7 @@ local function DumpPluginInfoForum(a_PluginFolder, a_PluginInfo)
 	DumpAdditionalInfoForum(a_PluginInfo, f)
 	DumpCommandsForum(a_PluginInfo, f)
 	DumpPermissionsForum(a_PluginInfo, f)
+	DumpDependenciesForum(a_PluginInfo, f)
 	if (a_PluginInfo.SourceLocation ~= nil) then
 		f:write("\n[b]Source[/b]: ", a_PluginInfo.SourceLocation, "\n")
 	end
@@ -641,6 +691,7 @@ local function DumpPluginInfoGithub(a_PluginFolder, a_PluginInfo)
 	DumpAdditionalInfoGithub(a_PluginInfo, f)
 	DumpCommandsGithub(a_PluginInfo, f)
 	DumpPermissionsGithub(a_PluginInfo, f)
+	DumpDependenciesGithub(a_PluginInfo, f)
 
 	f:close()
 	return true
@@ -650,8 +701,8 @@ end
 
 
 
---- Tries to load the g_PluginInfo from the plugin's Info.lua file
--- Returns the g_PluginInfo table on success, or nil and error message on failure
+--- Tries to load the g_PluginInfo or gPluginInfo from the plugin's Info.lua file
+-- Returns the plugin info table on success, or nil and error message on failure
 local function LoadPluginInfo(a_FolderName)
 	-- Load and compile the Info file:
 	local cfg, err = loadfile(a_FolderName .. "/Info.lua")
@@ -668,10 +719,12 @@ local function LoadPluginInfo(a_FolderName)
 		return nil, "Cannot load Info.lua: " .. (errMsg or "<unknown error>")
 	end
 
-	if (Sandbox.g_PluginInfo == nil) then
-		return nil, "Info.lua doesn't contain the g_PluginInfo declaration"
+	if (Sandbox.g_PluginInfo) then
+		return Sandbox.g_PluginInfo
+	elseif (Sandbox.gPluginInfo) then
+		return Sandbox.gPluginInfo
 	end
-	return Sandbox.g_PluginInfo
+	return nil, "Info.lua doesn't contain the g_PluginInfo declaration"
 end
 
 

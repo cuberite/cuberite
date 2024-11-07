@@ -24,17 +24,6 @@
 #include <sstream>
 #include <iostream>
 
-extern "C"
-{
-	#include "zlib/zlib.h"
-}
-
-
-
-
-
-typedef std::list< cClientHandle* > ClientList;
-
 
 
 
@@ -76,7 +65,7 @@ public:
 // cServer::cTickThread:
 
 cServer::cTickThread::cTickThread(cServer & a_Server) :
-	Super("ServerTickThread"),
+	Super("Server Ticker"),
 	m_Server(a_Server)
 {
 }
@@ -94,7 +83,7 @@ void cServer::cTickThread::Execute(void)
 	{
 		auto NowTime = std::chrono::steady_clock::now();
 		auto msec = std::chrono::duration_cast<std::chrono::milliseconds>(NowTime - LastTime).count();
-		m_ShouldTerminate = !m_Server.Tick(static_cast<float>(msec));
+		m_Server.Tick(static_cast<float>(msec));
 		auto TickTime = std::chrono::steady_clock::now() - NowTime;
 
 		if (TickTime < msPerTick)
@@ -118,14 +107,12 @@ cServer::cServer(void) :
 	m_PlayerCount(0),
 	m_ClientViewDistance(0),
 	m_bIsConnected(false),
-	m_bRestarting(false),
 	m_RCONServer(*this),
 	m_MaxPlayers(0),
 	m_bIsHardcore(false),
 	m_TickThread(*this),
 	m_ShouldAuthenticate(false),
-	m_ShouldLoadOfflinePlayerData(false),
-	m_ShouldLoadNamedPlayerData(true)
+	m_UpTime(0)
 {
 	// Initialize the LuaStateTracker singleton before the app goes multithreaded:
 	cLuaStateTracker::GetStats();
@@ -170,7 +157,9 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 	m_MaxPlayers = static_cast<size_t>(a_Settings.GetValueSetI("Server", "MaxPlayers", 100));
 	m_bIsHardcore = a_Settings.GetValueSetB("Server", "HardcoreEnabled", false);
 	m_bAllowMultiLogin = a_Settings.GetValueSetB("Server", "AllowMultiLogin", false);
+	m_RequireResourcePack = a_Settings.GetValueSetB("Server", "RequireResourcePack", false);
 	m_ResourcePackUrl = a_Settings.GetValueSet("Server", "ResourcePackUrl", "");
+	m_CustomRedirectUrl = a_Settings.GetValueSet("Server", "CustomRedirectUrl", "https://youtu.be/dQw4w9WgXcQ");
 
 	m_FaviconData = Base64Encode(cFile::ReadWholeFile(AString("favicon.png")));  // Will return empty string if file nonexistant; client doesn't mind
 
@@ -181,7 +170,7 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 	}
 
 	LOGINFO("Compatible clients: %s", MCS_CLIENT_VERSIONS);
-	LOGINFO("Compatible protocol versions %s", MCS_PROTOCOL_VERSIONS);
+	LOGD("Compatible protocol versions %s", MCS_PROTOCOL_VERSIONS);
 
 	m_Ports = ReadUpgradeIniPorts(a_Settings, "Server", "Ports", "Port", "PortsIPv6", "25565");
 
@@ -205,26 +194,36 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 
 	// Check if both BungeeCord and online mode are on, if so, warn the admin:
 	m_ShouldAllowBungeeCord = a_Settings.GetValueSetB("Authentication", "AllowBungeeCord", false);
+	m_OnlyAllowBungeeCord = a_Settings.GetValueSetB("Authentication", "OnlyAllowBungeeCord", false);
+	m_ProxySharedSecret = a_Settings.GetValueSet("Authentication", "ProxySharedSecret", "");
+
 	if (m_ShouldAllowBungeeCord && m_ShouldAuthenticate)
 	{
 		LOGWARNING("WARNING: BungeeCord is allowed and server set to online mode. This is unsafe and will not work properly. Disable either authentication or BungeeCord in settings.ini.");
 	}
 
+	if (m_ShouldAllowBungeeCord && m_ProxySharedSecret.empty())
+	{
+		LOGWARNING("WARNING: There is not a Proxy Forward Secret set up, and any proxy server can forward a player to this server unless closed from the internet.");
+	}
+
 	m_ShouldAllowMultiWorldTabCompletion = a_Settings.GetValueSetB("Server", "AllowMultiWorldTabCompletion", true);
 	m_ShouldLimitPlayerBlockChanges = a_Settings.GetValueSetB("AntiCheat", "LimitPlayerBlockChanges", true);
-	m_ShouldLoadOfflinePlayerData = a_Settings.GetValueSetB("PlayerData", "LoadOfflinePlayerData", false);
-	m_ShouldLoadNamedPlayerData   = a_Settings.GetValueSetB("PlayerData", "LoadNamedPlayerData", true);
 
-	m_ClientViewDistance = a_Settings.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
-	if (m_ClientViewDistance < cClientHandle::MIN_VIEW_DISTANCE)
+	const auto ClientViewDistance = a_Settings.GetValueSetI("Server", "DefaultViewDistance", cClientHandle::DEFAULT_VIEW_DISTANCE);
+	if (ClientViewDistance < cClientHandle::MIN_VIEW_DISTANCE)
 	{
 		m_ClientViewDistance = cClientHandle::MIN_VIEW_DISTANCE;
-		LOGINFO("Setting default viewdistance to the minimum of %d", m_ClientViewDistance);
+		LOGINFO("Setting default view distance to the minimum of %d", m_ClientViewDistance);
 	}
-	if (m_ClientViewDistance > cClientHandle::MAX_VIEW_DISTANCE)
+	else if (ClientViewDistance > cClientHandle::MAX_VIEW_DISTANCE)
 	{
 		m_ClientViewDistance = cClientHandle::MAX_VIEW_DISTANCE;
-		LOGINFO("Setting default viewdistance to the maximum of %d", m_ClientViewDistance);
+		LOGINFO("Setting default view distance to the maximum of %d", m_ClientViewDistance);
+	}
+	else
+	{
+		m_ClientViewDistance = ClientViewDistance;
 	}
 
 	PrepareKeys();
@@ -289,10 +288,10 @@ const AStringMap & cServer::GetRegisteredForgeMods(const UInt32 a_Protocol)
 
 
 
-bool cServer::IsPlayerInQueue(AString a_Username)
+bool cServer::IsPlayerInQueue(const AString & a_Username)
 {
 	cCSLock Lock(m_CSClients);
-	for (auto client : m_Clients)
+	for (const auto & client : m_Clients)
 	{
 		if ((client->GetUsername()).compare(a_Username) == 0)
 		{
@@ -321,37 +320,31 @@ cTCPLink::cCallbacksPtr cServer::OnConnectionAccepted(const AString & a_RemoteIP
 {
 	LOGD("Client \"%s\" connected!", a_RemoteIPAddress.c_str());
 	cClientHandlePtr NewHandle = std::make_shared<cClientHandle>(a_RemoteIPAddress, m_ClientViewDistance);
-	NewHandle->SetSelf(NewHandle);
 	cCSLock Lock(m_CSClients);
 	m_Clients.push_back(NewHandle);
-	return std::move(NewHandle);
+	return NewHandle;
 }
 
 
 
 
 
-bool cServer::Tick(float a_Dt)
+void cServer::Tick(float a_Dt)
 {
+	// Update server uptime
+	m_UpTime++;
+
 	// Send the tick to the plugins, as well as let the plugin manager reload, if asked to (issue #102):
 	cPluginManager::Get()->Tick(a_Dt);
 
-	// Let the Root process all the queued commands:
-	cRoot::Get()->TickCommands();
+	// Process all the queued commands:
+	TickCommands();
 
 	// Tick all clients not yet assigned to a world:
 	TickClients(a_Dt);
 
-	if (!m_bRestarting)
-	{
-		return true;
-	}
-	else
-	{
-		m_bRestarting = false;
-		m_RestartEvent.Set();
-		return false;
-	}
+	// Process all queued tasks
+	TickQueuedTasks();
 }
 
 
@@ -381,14 +374,17 @@ void cServer::TickClients(float a_Dt)
 		// Tick the remaining clients, take out those that have been destroyed into RemoveClients
 		for (auto itr = m_Clients.begin(); itr != m_Clients.end();)
 		{
-			if ((*itr)->IsDestroyed())
+			auto & Client = *itr;
+
+			Client->ServerTick(a_Dt);
+			if (Client->IsDestroyed())
 			{
 				// Delete the client later, when CS is not held, to avoid deadlock: https://forum.cuberite.org/thread-374.html
-				RemoveClients.push_back(*itr);
+				RemoveClients.push_back(std::move(Client));
 				itr = m_Clients.erase(itr);
 				continue;
 			}
-			(*itr)->ServerTick(a_Dt);
+
 			++itr;
 		}  // for itr - m_Clients[]
 	}
@@ -403,7 +399,7 @@ void cServer::TickClients(float a_Dt)
 
 bool cServer::Start(void)
 {
-	for (auto port: m_Ports)
+	for (const auto & port: m_Ports)
 	{
 		UInt16 PortNum;
 		if (!StringToInteger(port, PortNum))
@@ -422,10 +418,7 @@ bool cServer::Start(void)
 		LOGERROR("Couldn't open any ports. Aborting the server");
 		return false;
 	}
-	if (!m_TickThread.Start())
-	{
-		return false;
-	}
+	m_TickThread.Start();
 	return true;
 }
 
@@ -449,6 +442,31 @@ bool cServer::Command(cClientHandle & a_Client, AString & a_Cmd)
 
 
 
+void cServer::QueueExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
+{
+	// Put the command into a queue (Alleviates FS #363):
+	cCSLock Lock(m_CSPendingCommands);
+	m_PendingCommands.emplace_back(a_Cmd, &a_Output);
+}
+
+
+
+
+
+void cServer::ScheduleTask(cTickTime a_DelayTicks, std::function<void(cServer &)> a_Task)
+{
+	const auto TargetTick = a_DelayTicks + m_UpTime;
+	// Insert the task into the list of scheduled tasks
+	{
+		cCSLock Lock(m_CSTasks);
+		m_Tasks.emplace_back(TargetTick, std::move(a_Task));
+	}
+}
+
+
+
+
+
 void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallback & a_Output)
 {
 	AStringVector split = StringSplit(a_Cmd, " ");
@@ -459,7 +477,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 
 	// "stop" and "restart" are handled in cRoot::ExecuteConsoleCommand, our caller, due to its access to controlling variables
 
-	// "help" and "reload" are to be handled by MCS, so that they work no matter what
+	// "help" and "reload" are to be handled by Cuberite, so that they work no matter what
 	if (split[0] == "help")
 	{
 		PrintHelp(split, a_Output);
@@ -468,14 +486,29 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	}
 	else if (split[0] == "reload")
 	{
-		cPluginManager::Get()->ReloadPlugins();
+		if (split.size() > 1)
+		{
+			cPluginManager::Get()->ReloadPlugin(split[1]);
+			a_Output.OutLn("Plugin reload scheduled");
+		}
+		else
+		{
+			cPluginManager::Get()->ReloadPlugins();
+		}
 		a_Output.Finished();
 		return;
 	}
 	else if (split[0] == "reloadplugins")
 	{
 		cPluginManager::Get()->ReloadPlugins();
-		a_Output.Out("Plugins reloaded");
+		a_Output.OutLn("Plugins reloaded");
+		a_Output.Finished();
+		return;
+	}
+	else if (split[0] == "reloadweb")
+	{
+		cRoot::Get()->GetWebAdmin()->Reload();
+		a_Output.OutLn("WebAdmin configuration reloaded");
 		a_Output.Finished();
 		return;
 	}
@@ -484,11 +517,11 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		if (split.size() > 1)
 		{
 			cPluginManager::Get()->RefreshPluginList();  // Refresh the plugin list, so that if the plugin was added just now, it is loadable
-			a_Output.Out(cPluginManager::Get()->LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin");
+			a_Output.OutLn(cPluginManager::Get()->LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin");
 		}
 		else
 		{
-			a_Output.Out("Usage: load <PluginFolder>");
+			a_Output.OutLn("Usage: load <PluginFolder>");
 		}
 		a_Output.Finished();
 		return;
@@ -498,11 +531,11 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		if (split.size() > 1)
 		{
 			cPluginManager::Get()->UnloadPlugin(split[1]);
-			a_Output.Out("Plugin unload scheduled");
+			a_Output.OutLn("Plugin unload scheduled");
 		}
 		else
 		{
-			a_Output.Out("Usage: unload <PluginFolder>");
+			a_Output.OutLn("Usage: unload <PluginFolder>");
 		}
 		a_Output.Finished();
 		return;
@@ -523,7 +556,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 				return false;
 			}
 		);
-		a_Output.Out("Destroyed all entities");
+		a_Output.OutLn("Destroyed all entities");
 		a_Output.Finished();
 		return;
 	}
@@ -538,7 +571,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 
 	else if (split[0].compare("luastats") == 0)
 	{
-		a_Output.Out(cLuaStateTracker::GetStats());
+		a_Output.OutLn(cLuaStateTracker::GetStats());
 		a_Output.Finished();
 		return;
 	}
@@ -548,7 +581,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		return;
 	}
 
-	a_Output.Out("Unknown command, type 'help' for all commands.");
+	a_Output.OutLn("Unknown command, type 'help' for all commands.");
 	a_Output.Finished();
 }
 
@@ -591,7 +624,8 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 	for (AStringPairs::const_iterator itr = Callback.m_Commands.begin(), end = Callback.m_Commands.end(); itr != end; ++itr)
 	{
 		const AStringPair & cmd = *itr;
-		a_Output.Out(Printf("%-*s - %s\n", static_cast<int>(Callback.m_MaxLen), cmd.first.c_str(), cmd.second.c_str()));
+		// Output the commands and their help strings, with all the commands aligned to the same width
+		a_Output.OutLn(fmt::format(FMT_STRING("{1:{0}s} - {2}"), Callback.m_MaxLen, cmd.first, cmd.second));
 	}  // for itr - Callback.m_Commands[]
 }
 
@@ -621,6 +655,7 @@ void cServer::BindBuiltInConsoleCommands(void)
 	cPluginManager * PlgMgr = cPluginManager::Get();
 	PlgMgr->BindConsoleCommand("help",            nullptr, handler, "Shows the available commands");
 	PlgMgr->BindConsoleCommand("reload",          nullptr, handler, "Reloads all plugins");
+	PlgMgr->BindConsoleCommand("reloadweb",       nullptr, handler, "Reloads the webadmin configuration");
 	PlgMgr->BindConsoleCommand("restart",         nullptr, handler, "Restarts the server cleanly");
 	PlgMgr->BindConsoleCommand("stop",            nullptr, handler, "Stops the server cleanly");
 	PlgMgr->BindConsoleCommand("chunkstats",      nullptr, handler, "Displays detailed chunk memory statistics");
@@ -636,17 +671,17 @@ void cServer::BindBuiltInConsoleCommands(void)
 void cServer::Shutdown(void)
 {
 	// Stop listening on all sockets:
-	for (auto srv: m_ServerHandles)
+	for (const auto & srv: m_ServerHandles)
 	{
 		srv->Close();
 	}
 	m_ServerHandles.clear();
 
 	// Notify the tick thread and wait for it to terminate:
-	m_bRestarting = true;
-	m_RestartEvent.Wait();
+	m_TickThread.Stop();
 
-	cRoot::Get()->SaveAllChunks();
+	// Save all chunks in all worlds, wait for chunks to be sent to the ChunkStorage queue for each world:
+	cRoot::Get()->SaveAllChunksNow();
 
 	// Remove all clients:
 	cCSLock Lock(m_CSClients);
@@ -677,7 +712,7 @@ void cServer::KickUser(int a_ClientID, const AString & a_Reason)
 
 
 
-void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const cUUID & a_UUID, const Json::Value & a_Properties)
+void cServer::AuthenticateUser(int a_ClientID, AString && a_Username, const cUUID & a_UUID, Json::Value && a_Properties)
 {
 	cCSLock Lock(m_CSClients);
 
@@ -688,17 +723,70 @@ void cServer::AuthenticateUser(int a_ClientID, const AString & a_Name, const cUU
 		return;
 	}
 
-	for (auto itr = m_Clients.begin(); itr != m_Clients.end(); ++itr)
+	for (const auto & Client : m_Clients)
 	{
-		if ((*itr)->GetUniqueID() == a_ClientID)
+		if (Client->GetUniqueID() == a_ClientID)
 		{
-			(*itr)->Authenticate(a_Name, a_UUID, a_Properties);
+			Client->Authenticate(std::move(a_Username), a_UUID, std::move(a_Properties));
 			return;
 		}
-	}  // for itr - m_Clients[]
+	}
 }
 
 
 
 
 
+void cServer::TickCommands(void)
+{
+	decltype(m_PendingCommands) PendingCommands;
+	{
+		cCSLock Lock(m_CSPendingCommands);
+		std::swap(PendingCommands, m_PendingCommands);
+	}
+
+	// Execute any pending commands:
+	for (const auto & Command : PendingCommands)
+	{
+		ExecuteConsoleCommand(Command.first, *Command.second);
+	}
+}
+
+
+
+
+
+void cServer::TickQueuedTasks(void)
+{
+	// Move the tasks to be executed to a seperate vector to avoid deadlocks on
+	// accessing m_Tasks
+	decltype(m_Tasks) Tasks;
+	{
+		cCSLock Lock(m_CSTasks);
+		if (m_Tasks.empty())
+		{
+			return;
+		}
+
+		// Partition everything to be executed by returning false to move to end
+		// of list if time reached
+		auto MoveBeginIterator = std::partition(
+			m_Tasks.begin(), m_Tasks.end(),
+			[this](const decltype(m_Tasks)::value_type & a_Task)
+			{
+				return a_Task.first >= m_UpTime;
+			});
+
+		// Cut all the due tasks from m_Tasks into Tasks:
+		Tasks.insert(
+			Tasks.end(), std::make_move_iterator(MoveBeginIterator),
+			std::make_move_iterator(m_Tasks.end()));
+		m_Tasks.erase(MoveBeginIterator, m_Tasks.end());
+	}
+
+	// Execute each task:
+	for (const auto & Task : Tasks)
+	{
+		Task.second(*this);
+	}  // for itr - m_Tasks[]
+}

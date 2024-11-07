@@ -40,11 +40,11 @@ public:
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
-	virtual void Destroyed() override;
-
+	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
+	virtual void OnRemoveFromWorld(cWorld & a_World) override;
+	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways) override;
 	int LastDamage(void) const { return m_LastDamage; }
 	ePayload GetPayload(void) const { return m_Payload; }
-
 
 protected:
 
@@ -55,9 +55,6 @@ protected:
 
 	/** Applies an acceleration to the minecart parallel to a_ForwardDirection but without allowing backward speed. */
 	void ApplyAcceleration(Vector3d a_ForwardDirection, double a_Acceleration);
-
-	// Overwrite to enforce speed limit
-	virtual void DoSetSpeed(double a_SpeedX, double a_SpeedY, double a_SpeedZ) override;
 
 	cMinecart(ePayload a_Payload, Vector3d a_Pos);
 
@@ -75,8 +72,8 @@ protected:
 	*/
 	void HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt);
 
-	/** Handles activator rails - placeholder for future implementation */
-	void HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt);
+	/** Handles activator rails */
+	virtual void HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt);
 
 	/** Snaps a mincecart to a rail's axis, resetting its speed
 		For curved rails, it changes the cart's direction as well as snapping it to axis */
@@ -92,14 +89,13 @@ protected:
 
 	/** Tests if this mincecart's bounding box is intersecting another entity's bounding box (collision) and pushes mincecart away if necessary */
 	bool TestEntityCollision(NIBBLETYPE a_RailMeta);
-
 } ;
 
 
 
 
 
-class cRideableMinecart :
+class cRideableMinecart final :
 	public cMinecart
 {
 	using Super = cMinecart;
@@ -108,26 +104,26 @@ public:
 
 	CLASS_PROTODEF(cRideableMinecart)
 
-	cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, int a_Height);
+	cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, int a_ContentHeight);
 
-	const cItem & GetContent(void) const {return m_Content;}
-	int GetBlockHeight(void) const {return m_Height;}
+	const cItem & GetContent(void) const { return m_Content; }
+	int GetBlockHeight(void) const { return m_ContentHeight; }
 
 	// cEntity overrides:
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 
 protected:
 
-
 	cItem m_Content;
-	int m_Height;
+	int m_ContentHeight;
 } ;
 
 
 
 
 
-class cMinecartWithChest :
+class cMinecartWithChest final :
 	public cMinecart,
 	public cItemGrid::cListener,
 	public cEntityWindowOwner
@@ -154,7 +150,6 @@ protected:
 
 	cItemGrid m_Contents;
 	void OpenNewWindow(void);
-	virtual void Destroyed() override;
 
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override
@@ -173,6 +168,8 @@ protected:
 	}
 
 	// cEntity overrides:
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 } ;
 
@@ -180,7 +177,7 @@ protected:
 
 
 
-class cMinecartWithFurnace :
+class cMinecartWithFurnace final :
 	public cMinecart
 {
 	using Super = cMinecart;
@@ -192,6 +189,7 @@ public:
 	cMinecartWithFurnace(Vector3d a_Pos);
 
 	// cEntity overrides:
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual void OnRightClicked(cPlayer & a_Player) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
@@ -213,22 +211,31 @@ private:
 
 
 
-class cMinecartWithTNT :
+class cMinecartWithTNT final :
 	public cMinecart
 {
 	using Super = cMinecart;
 
 public:
+
 	CLASS_PROTODEF(cMinecartWithTNT)
 
 	cMinecartWithTNT(Vector3d a_Pos);
+	void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+
+private:
+	int m_TNTFuseTicksLeft;
+	bool m_isTNTFused = false;
+
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+	void HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt) override;
 } ;
 
 
 
 
 
-class cMinecartWithHopper :
+class cMinecartWithHopper final :
 	public cMinecart
 {
 	using Super = cMinecart;
@@ -238,4 +245,8 @@ public:
 	CLASS_PROTODEF(cMinecartWithHopper)
 
 	cMinecartWithHopper(Vector3d a_Pos);
+
+private:
+
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 } ;

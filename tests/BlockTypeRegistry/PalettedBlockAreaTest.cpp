@@ -1,5 +1,4 @@
 #include "Globals.h"
-#include <tuple>
 #include "PalettedBlockArea.h"
 #include "../TestHelpers.h"
 
@@ -95,7 +94,7 @@ Used to be a function, but clang-3.5 didn't like it ("error: debug information f
 		{ \
 			for (int z = 0; z < 5; ++z) \
 			{ \
-				pbaA.setBlock({x, y, z}, Printf("A-%d-%d-%d", x, y, z), BlockState()); \
+				pbaA.setBlock({x, y, z}, fmt::format(FMT_STRING("A-{}-{}-{}"), x, y, z), BlockState()); \
 			} \
 		} \
 	} \
@@ -106,7 +105,7 @@ Used to be a function, but clang-3.5 didn't like it ("error: debug information f
 		{ \
 			for (int z = 0; z < 6; ++z) \
 			{ \
-				pbaB.setBlock({x, y, z}, Printf("B-%d-%d-%d", x, y, z), BlockState()); \
+				pbaB.setBlock({x, y, z}, fmt::format(FMT_STRING("B-{}-{}-{}"), x, y, z), BlockState()); \
 			} \
 		} \
 	} \
@@ -218,7 +217,7 @@ static void testPastingCompletelyInside()
 				TEST_EQUAL_MSG(
 					pbaA.block({x, y, z}).first,
 					expected[z][y][x],
-					Printf("{%d, %d, %d}, exp %s, got %s", x, y, z, expected[z][y][x].c_str(), pbaA.block({x, y, z}).first.c_str()).c_str()
+					fmt::format(FMT_STRING("{{{}, {}, {}}}, exp {}, got {}"), x, y, z, expected[z][y][x], pbaA.block({x, y, z}).first)
 				);
 			}
 		}
@@ -283,7 +282,7 @@ static void testPastingPositiveOverflow()
 				TEST_EQUAL_MSG(
 					pbaA.block({x, y, z}).first,
 					expected[z][y][x],
-					Printf("{%d, %d, %d}, exp %s, got %s", x, y, z, expected[z][y][x].c_str(), pbaA.block({x, y, z}).first.c_str()).c_str()
+					fmt::format(FMT_STRING("{{{}, {}, {}}}, exp {}, got {}"), x, y, z, expected[z][y][x], pbaA.block({x, y, z}).first)
 				);
 			}
 		}
@@ -348,7 +347,7 @@ static void testPastingNegativeOverflow()
 				TEST_EQUAL_MSG(
 					pbaA.block({x, y, z}).first,
 					expected[z][y][x],
-					Printf("{%d, %d, %d}, exp %s, got %s", x, y, z, expected[z][y][x].c_str(), pbaA.block({x, y, z}).first.c_str()).c_str()
+					fmt::format(FMT_STRING("{{{}, {}, {}}}, exp {}, got {}"), x, y, z, expected[z][y][x], pbaA.block({x, y, z}).first)
 				);
 			}
 		}
@@ -413,7 +412,7 @@ static void testPastingMixedOverflow()
 				TEST_EQUAL_MSG(
 					pbaA.block({x, y, z}).first,
 					expected[z][y][x],
-					Printf("{%d, %d, %d}, exp %s, got %s", x, y, z, expected[z][y][x].c_str(), pbaA.block({x, y, z}).first.c_str()).c_str()
+					fmt::format(FMT_STRING("{{{}, {}, {}}}, exp {}, got {}"), x, y, z, expected[z][y][x], pbaA.block({x, y, z}).first)
 				);
 			}
 		}

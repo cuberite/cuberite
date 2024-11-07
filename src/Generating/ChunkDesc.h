@@ -87,6 +87,24 @@ public:
 	/** Sets the shape in a_Shape to match the heightmap stored currently in m_HeightMap. */
 	void GetShapeFromHeight(Shape & a_Shape) const;
 
+	/** Returns the index into the internal shape array for the specified coords */
+	inline static size_t MakeShapeIndex(int a_X, int a_Y, int a_Z)
+	{
+		return static_cast<size_t>(a_Y + a_X * cChunkDef::Height + a_Z * cChunkDef::Height * cChunkDef::Width);
+	}
+
+	inline static void SetShapeIsSolidAt(Shape & a_Shape, int a_X, int a_Y, int a_Z, bool a_IsSolid)
+	{
+		auto index = MakeShapeIndex(a_X, a_Y, a_Z);
+		a_Shape[index] = a_IsSolid ? 1 : 0;
+	}
+
+	inline static bool GetShapeIsSolidAt(const Shape & a_Shape, int a_X, int a_Y, int a_Z)
+	{
+		auto index = MakeShapeIndex(a_X, a_Y, a_Z);
+		return a_Shape[index];
+	}
+
 	// tolua_begin
 
 	// Default generation:
@@ -229,10 +247,10 @@ public:
 	/** Compresses the metas from the BlockArea format (1 meta per byte) into regular format (2 metas per byte) */
 	void CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas);
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 	/** Verifies that the heightmap corresponds to blocktype contents; if not, asserts on that column */
 	void VerifyHeightmap(void);
-	#endif  // _DEBUG
+	#endif  // !NDEBUG
 
 private:
 	cChunkCoords m_Coords;

@@ -4,6 +4,8 @@
 // Implements the cPluginLua class representing a plugin written in Lua
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+#include "Defines.h"
+#include "Entities/Minecart.h"
 
 #ifdef __APPLE__
 	#define LUA_USE_MACOSX
@@ -35,7 +37,7 @@ extern "C"
 
 cPluginLua::cPluginLua(const AString & a_PluginDirectory, cDeadlockDetect & a_DeadlockDetect) :
 	cPlugin(a_PluginDirectory),
-	m_LuaState(Printf("plugin %s", a_PluginDirectory.c_str())),
+	m_LuaState(fmt::format(FMT_STRING("plugin {}"), a_PluginDirectory)),
 	m_DeadlockDetect(a_DeadlockDetect)
 {
 	m_LuaState.TrackInDeadlockDetect(a_DeadlockDetect);
@@ -90,8 +92,6 @@ bool cPluginLua::Load(void)
 		// Inject the identification global variables into the state:
 		lua_pushlightuserdata(m_LuaState, this);
 		lua_setglobal(m_LuaState, LUA_PLUGIN_INSTANCE_VAR_NAME);
-		lua_pushstring(m_LuaState, GetName().c_str());
-		lua_setglobal(m_LuaState, LUA_PLUGIN_NAME_VAR_NAME);
 
 		// Add the plugin's folder to the package.path and package.cpath variables (#693):
 		m_LuaState.AddPackagePath("path", GetLocalFolder() + "/?.lua");
@@ -108,7 +108,7 @@ bool cPluginLua::Load(void)
 	std::string PluginPath = GetLocalFolder() + "/";
 
 	// List all Lua files for this plugin. Info.lua has a special handling - make it the last to load:
-	AStringVector Files = cFile::GetFolderContents(PluginPath.c_str());
+	AStringVector Files = cFile::GetFolderContents(PluginPath);
 	AStringVector LuaFiles;
 	bool HasInfoLua = false;
 	for (AStringVector::const_iterator itr = Files.begin(), end = Files.end(); itr != end; ++itr)
@@ -143,7 +143,7 @@ bool cPluginLua::Load(void)
 		AString Path = PluginPath + *itr;
 		if (!m_LuaState.LoadFile(Path))
 		{
-			SetLoadError(Printf("Failed to load file %s.", itr->c_str()));
+			SetLoadError(fmt::format(FMT_STRING("Failed to load file {}."), *itr));
 			Close();
 			return false;
 		}
@@ -436,6 +436,7 @@ bool cPluginLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a_Can
 			case esOther:         hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, cLuaState::Return, res); break;
 			case esPlugin:        hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, cLuaState::Return, res); break;
 			case esPrimedTNT:     hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res); break;
+			case esTNTMinecart:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMinecartWithTNT *>    (a_SourceData), cLuaState::Return, res); break;
 			case esWitherBirth:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
 			case esWitherSkull:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res); break;
 			case esMax:
@@ -476,6 +477,7 @@ bool cPluginLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, bool & 
 			case esOther:         hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source,                                                         cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esPlugin:        hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source,                                                         cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esPrimedTNT:     hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esTNTMinecart:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMinecartWithTNT *>    (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esWitherBirth:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esWitherSkull:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esMax:
@@ -517,6 +519,15 @@ bool cPluginLua::OnHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper,
 bool cPluginLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_HOPPER_PUSHING_ITEM, &a_World, &a_Hopper, a_SrcSlotNum, &a_DstEntity, a_DstSlotNum);
+}
+
+
+
+
+
+bool cPluginLua::OnDropSpense(cWorld & a_World, cDropSpenserEntity & a_DropSpenser, int a_SlotNum)
+{
+	return CallSimpleHooks(cPluginManager::HOOK_DROPSPENSE, &a_World, &a_DropSpenser, a_SlotNum);
 }
 
 
@@ -583,7 +594,7 @@ bool cPluginLua::OnPlayerAnimation(cPlayer & a_Player, int a_Animation)
 
 
 
-bool cPluginLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_BREAKING_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta);
 }
@@ -592,7 +603,7 @@ bool cPluginLua::OnPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_B
 
 
 
-bool cPluginLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_BROKEN_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta);
 }
@@ -628,19 +639,19 @@ bool cPluginLua::OnPlayerFoodLevelChange(cPlayer & a_Player, int a_NewFoodLevel)
 
 
 
-bool cPluginLua::OnPlayerFished(cPlayer & a_Player, const cItems & a_Reward)
+bool cPluginLua::OnPlayerFished(cPlayer & a_Player, const cItems & a_Reward, const int ExperienceAmount)
 {
 	cItems reward(a_Reward);
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_FISHED, &a_Player, &reward);
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_FISHED, &a_Player, &reward, ExperienceAmount);
 }
 
 
 
 
 
-bool cPluginLua::OnPlayerFishing(cPlayer & a_Player, cItems & a_Reward)
+bool cPluginLua::OnPlayerFishing(cPlayer & a_Player, cItems & a_Reward, int & ExperienceAmount)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_FISHING, &a_Player, &a_Reward);
+	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_FISHING, &a_Player, &a_Reward, &ExperienceAmount);
 }
 
 
@@ -656,7 +667,7 @@ bool cPluginLua::OnPlayerJoined(cPlayer & a_Player)
 
 
 
-bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
+bool cPluginLua::OnPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, char a_Status)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_LEFT_CLICK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status);
 }
@@ -728,7 +739,7 @@ bool cPluginLua::OnPlayerCrouched(cPlayer & a_Player)
 
 
 
-bool cPluginLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginLua::OnPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_RIGHT_CLICK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 }
@@ -773,7 +784,7 @@ bool cPluginLua::OnPlayerTossingItem(cPlayer & a_Player)
 
 
 
-bool cPluginLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_USED_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta);
 }
@@ -782,7 +793,7 @@ bool cPluginLua::OnPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
-bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_USED_ITEM, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 }
@@ -791,7 +802,7 @@ bool cPluginLua::OnPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY
 
 
 
-bool cPluginLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_USING_BLOCK, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta);
 }
@@ -800,7 +811,7 @@ bool cPluginLua::OnPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_Bloc
 
 
 
-bool cPluginLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLAYER_USING_ITEM, &a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
 }
@@ -809,7 +820,7 @@ bool cPluginLua::OnPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_Block
 
 
 
-bool cPluginLua::OnPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message)
+bool cPluginLua::OnPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const ContiguousByteBufferView a_Message)
 {
 	return CallSimpleHooks(cPluginManager::HOOK_PLUGIN_MESSAGE, &a_Client, a_Channel, a_Message);
 }

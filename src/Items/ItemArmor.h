@@ -8,17 +8,14 @@
 
 
 
-class cItemArmorHandler:
+class cItemArmorHandler final :
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemArmorHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 
@@ -32,7 +29,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		int SlotNum;
 		if (ItemCategory::IsHelmet(a_HeldItem.m_ItemType))
@@ -63,14 +60,7 @@ public:
 		}
 
 		a_Player->GetInventory().SetArmorSlot(SlotNum, a_HeldItem.CopyOne());
-
-		cItem Item(a_HeldItem);
-		Item.m_ItemCount--;
-		if (Item.m_ItemCount <= 0)
-		{
-			Item.Empty();
-		}
-		a_Player->GetInventory().SetEquippedItem(Item);
+		a_Player->GetInventory().RemoveOneEquippedItem();
 		return true;
 	}
 
@@ -78,7 +68,7 @@ public:
 
 
 
-	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
+	virtual bool CanRepairWithRawMaterial(short a_ItemType) const override
 	{
 		switch (m_ItemType)
 		{
@@ -110,6 +100,7 @@ public:
 			{
 				return (a_ItemType == E_ITEM_GOLD);
 			}
+			case E_ITEM_ELYTRA:  // TODO: require Phantom Membrane instead of leather starting from protocol version 369 or 1.13 release
 			case E_ITEM_LEATHER_BOOTS:
 			case E_ITEM_LEATHER_CAP:
 			case E_ITEM_LEATHER_PANTS:

@@ -2,12 +2,10 @@
 #pragma once
 
 #include "BlockEntities/BlockEntity.h"
-#include "Entities/Entity.h"
 #include "ChunkData.h"
 
 #include "Simulator/FireSimulator.h"
 #include "Simulator/SandSimulator.h"
-#include "Simulator/RedstoneSimulator.h"
 
 #include "ChunkMap.h"
 
@@ -19,37 +17,22 @@ class cWorld;
 class cClientHandle;
 class cPlayer;
 class cChunkMap;
-class cBeaconEntity;
-class cBedEntity;
-class cBrewingstandEntity;
 class cBoundingBox;
-class cChestEntity;
 class cChunkDataCallback;
-class cCommandBlockEntity;
-class cDispenserEntity;
-class cFurnaceEntity;
-class cHopperEntity;
-class cNoteEntity;
-class cMobHeadEntity;
-class cFlowerPotEntity;
 class cBlockArea;
 class cBlockArea;
 class cFluidSimulatorData;
 class cMobCensus;
 class cMobSpawner;
-class cSetChunkData;
+class cRedstoneSimulatorChunkData;
 
-typedef std::list<cClientHandle *>                cClientHandleList;
+struct SetChunkData;
 
 // A convenience macro for calling GetChunkAndRelByAbsolute.
 #define PREPARE_REL_AND_CHUNK(Position, OriginalChunk) cChunk * Chunk; Vector3i Rel; bool RelSuccess = (OriginalChunk).GetChunkAndRelByAbsolute(Position, &Chunk, Rel)
-#define PREPARE_BLOCKDATA BLOCKTYPE BlockType; NIBBLETYPE BlockMeta;
 
 
-// This class is not to be used directly
-// Instead, call actions on cChunkMap (such as cChunkMap::SetBlock() etc.)
-class cChunk :
-	public cChunkDef  // The inheritance is "misused" here only to inherit the functions and constants defined in cChunkDef
+class cChunk
 {
 public:
 
@@ -63,12 +46,13 @@ public:
 
 	cChunk(
 		int a_ChunkX, int a_ChunkZ,   // Chunk coords
-		cChunkMap * a_ChunkMap, cWorld * a_World,   // Parent objects
-		cChunk * a_NeighborXM, cChunk * a_NeighborXP, cChunk * a_NeighborZM, cChunk * a_NeighborZP,  // Neighbor chunks
-		cAllocationPool<cChunkData::sChunkSection> & a_Pool
+		cChunkMap * a_ChunkMap, cWorld * a_World   // Parent objects
 	);
-	cChunk(cChunk & other) = delete;
+	cChunk(const cChunk & Other) = delete;
 	~cChunk();
+
+	/** Flushes the pending block (entity) queue, and clients' outgoing data buffers. */
+	void BroadcastPendingChanges(void);
 
 	/** Returns true iff the chunk block data is valid (loaded / generated) */
 	bool IsValid(void) const {return (m_Presence == cpPresent); }
@@ -80,19 +64,21 @@ public:
 	Wakes up any calls to cChunkMap::GetHeight() when setting to cpPresent. */
 	void SetPresence(ePresence a_Presence);
 
-	/** Called to indicate whether the chunk should be queued in the generator if it fails to load. Set by cChunkMap::GetChunk(). */
-	void SetShouldGenerateIfLoadFailed(bool a_ShouldGenerateIfLoadFailed);
-
 	/** Marks all clients attached to this chunk as wanting this chunk. Also sets presence to cpQueued. */
 	void MarkRegenerating(void);
 
 	/** Returns true iff the chunk has changed since it was last saved. */
 	bool IsDirty(void) const {return m_IsDirty; }
 
-	bool CanUnload(void);
+	bool CanUnload(void) const;
 
 	/** Returns true if the chunk could have been unloaded if it weren't dirty */
-	bool CanUnloadAfterSaving(void);
+	bool CanUnloadAfterSaving(void) const;
+
+	/** Called when the chunkmap unloads unused chunks.
+	Notifies contained entities that they are being unloaded and should for example, broadcast a destroy packet.
+	Not called during server shutdown; such cleanup during shutdown is unnecessary. */
+	void OnUnload();
 
 	bool IsLightValid(void) const {return m_IsLightValid; }
 
@@ -107,31 +93,24 @@ public:
 	void MarkSaved(void);  // Marks the chunk as saved, if it didn't change from the last call to MarkSaving()
 	void MarkLoaded(void);  // Marks the chunk as freshly loaded. Fails if the chunk is already valid
 
-	/** Marks the chunk as failed to load.
-	If m_ShouldGenerateIfLoadFailed is set, queues the chunk for generating. */
+	/** Queues the chunk for generating. */
 	void MarkLoadFailed(void);
 
 	/** Gets all chunk data, calls the a_Callback's methods for each data type */
-	void GetAllData(cChunkDataCallback & a_Callback);
+	void GetAllData(cChunkDataCallback & a_Callback) const;
 
 	/** Sets all chunk data as either loaded from the storage or generated.
 	BlockLight and BlockSkyLight are optional, if not present, chunk will be marked as unlighted.
 	Modifies the BlockEntity list in a_SetChunkData - moves the block entities into the chunk. */
-	void SetAllData(cSetChunkData & a_SetChunkData);
+	void SetAllData(SetChunkData && a_SetChunkData);
 
 	void SetLight(
 		const cChunkDef::BlockNibbles & a_BlockLight,
 		const cChunkDef::BlockNibbles & a_SkyLight
 	);
 
-	/** Copies m_BlockData into a_BlockTypes, only the block types */
-	void GetBlockTypes(BLOCKTYPE  * a_BlockTypes);
-
 	/** Writes the specified cBlockArea at the coords specified. Note that the coords may extend beyond the chunk! */
 	void WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes);
-
-	/** Returns true if there is a block entity at the coords specified */
-	bool HasBlockEntityAt(Vector3i a_BlockPos);
 
 	/** Sets or resets the internal flag that prevents chunk from being unloaded.
 	The flag is cumulative - it can be set multiple times and then needs to be un-set that many times
@@ -158,27 +137,14 @@ public:
 	void SetBlock(Vector3i a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
 
-	/** Queues block for ticking (m_ToTickQueue) */
-	void QueueTickBlock(Vector3i a_RelPos);
-
-	/** OBSOLETE, use the Vector3i-based overload instead.
-	Queues block for ticking (m_ToTickQueue) */
-	void QueueTickBlock(int a_RelX, int a_RelY, int a_RelZ)
+	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
+	void FastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
 	{
-		return QueueTickBlock({a_RelX, a_RelY, a_RelZ});
+		FastSetBlock(a_RelPos.x, a_RelPos.y, a_RelPos.z, a_BlockType, a_BlockMeta);
 	}
 
-	/** Queues all 6 neighbors of the specified block for ticking (m_ToTickQueue). If any are outside the chunk, relays the checking to the proper neighboring chunk */
-	void QueueTickBlockNeighbors(Vector3i a_RelPos);
-
-	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
-	void FastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta, bool a_SendToClients = true)
-	{
-		FastSetBlock(a_RelPos.x, a_RelPos.y, a_RelPos.z, a_BlockType, a_BlockMeta, a_SendToClients);
-	}
-
-	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetBlock({ a_RelX, a_RelY, a_RelZ }); }
-	BLOCKTYPE GetBlock(Vector3i a_RelCoords) const { return m_ChunkData.GetBlock(a_RelCoords); }
+	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const { return m_BlockData.GetBlock({ a_RelX, a_RelY, a_RelZ }); }
+	BLOCKTYPE GetBlock(Vector3i a_RelCoords) const { return m_BlockData.GetBlock(a_RelCoords); }
 
 	void GetBlockTypeMeta(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	void GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
@@ -186,11 +152,7 @@ public:
 		GetBlockTypeMeta({ a_RelX, a_RelY, a_RelZ }, a_BlockType, a_BlockMeta);
 	}
 
-	void GetBlockInfo(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
-	void GetBlockInfo(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
-	{
-		GetBlockInfo({ a_RelX, a_RelY, a_RelZ }, a_BlockType, a_Meta, a_SkyLight, a_BlockLight);
-	}
+	void GetBlockInfo(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
 
 	/** Convert absolute coordinates into relative coordinates.
 	Returns false on failure to obtain a valid chunk. Returns true otherwise.
@@ -236,12 +198,17 @@ public:
 	Sends the chunk to all relevant clients. */
 	void SetAreaBiome(int a_MinRelX, int a_MaxRelX, int a_MinRelZ, int a_MaxRelZ, EMCSBiome a_Biome);
 
-	void CollectPickupsByPlayer(cPlayer & a_Player);
+	int GetHeight( int a_X, int a_Z) const;
 
-	/** Sets the sign text. Returns true if successful. Also sends update packets to all clients in the chunk */
-	bool SetSignLines(int a_RelX, int a_RelY, int a_RelZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
+	/** Returns true if it is sunny at the specified location. This takes into account biomes. */
+	bool IsWeatherSunnyAt(int a_RelX, int a_RelZ) const;
 
-	int  GetHeight( int a_X, int a_Z);
+	/** Returns true if it is raining or storming at the specified location, taking into account biomes. */
+	bool IsWeatherWetAt(int a_RelX, int a_RelZ) const;
+
+	/** Returns true if it is raining or storming at the specified location,
+	and the rain reaches (the bottom of) the specified block position. */
+	bool IsWeatherWetAt(Vector3i a_Position) const;
 
 	void SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_Client);
 
@@ -263,101 +230,27 @@ public:
 	Returns an owning reference to the found entity. */
 	OwnedEntity RemoveEntity(cEntity & a_Entity);
 
-	bool HasEntity(UInt32 a_EntityID);
+	bool HasEntity(UInt32 a_EntityID) const;
 
 	/** Calls the callback for each entity; returns true if all entities processed, false if the callback aborted by returning true */
-	bool ForEachEntity(cEntityCallback a_Callback);  // Lua-accessible
+	bool ForEachEntity(cEntityCallback a_Callback) const;  // Lua-accessible
 
 	/** Calls the callback for each entity that has a nonempty intersection with the specified boundingbox.
 	Returns true if all entities processed, false if the callback aborted by returning true. */
-	bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback);  // Lua-accessible
+	bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback) const;  // Lua-accessible
 
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param. Returns true if entity found. */
-	bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback a_Callback, bool & a_CallbackResult);  // Lua-accessible
-
-	/** Calls the callback for each tyEntity; returns true if all block entities processed, false if the callback aborted by returning true
-	tBlocktypes are all blocktypes convertible to tyEntity which are to be called. If no block type is given the callback is called for every block entity
-	Accessible only from within Chunk.cpp */
-	template <class tyEntity, BLOCKTYPE... tBlocktype>
-	bool GenericForEachBlockEntity(cFunctionRef<bool(tyEntity &)> a_Callback);
+	bool DoWithEntityByID(UInt32 a_EntityID, cEntityCallback a_Callback, bool & a_CallbackResult) const;  // Lua-accessible
 
 	/** Calls the callback for each block entity; returns true if all block entities processed, false if the callback aborted by returning true */
 	bool ForEachBlockEntity(cBlockEntityCallback a_Callback);  // Lua-accessible
 
-	/** Calls the callback for each brewingstand; returns true if all brewingstands processed, false if the callback aborted by returning true */
-	bool ForEachBrewingstand(cBrewingstandCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for each chest; returns true if all chests processed, false if the callback aborted by returning true */
-	bool ForEachChest(cChestCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for each dispenser; returns true if all dispensers processed, false if the callback aborted by returning true */
-	bool ForEachDispenser(cDispenserCallback a_Callback);
-
-	/** Calls the callback for each dropper; returns true if all droppers processed, false if the callback aborted by returning true */
-	bool ForEachDropper(cDropperCallback a_Callback);
-
-	/** Calls the callback for each dropspenser; returns true if all dropspensers processed, false if the callback aborted by returning true */
-	bool ForEachDropSpenser(cDropSpenserCallback a_Callback);
-
-	/** Calls the callback for each furnace; returns true if all furnaces processed, false if the callback aborted by returning true */
-	bool ForEachFurnace(cFurnaceCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for the tyEntity at the specified coords; returns false if there's no such block entity at those coords, true if found
-	tBlocktype is a list of the blocktypes to be called. If no BLOCKTYPE template arguments are given the callback is called for any block entity
-	Accessible only from within Chunk.cpp */
-	template <class tyEntity, BLOCKTYPE... tBlocktype>
-	bool GenericDoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFunctionRef<bool(tyEntity &)> a_Callback);
-
-	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
-	bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
-	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the brewingstand at the specified coords; returns false if there's no brewingstand at those coords, true if found */
-	bool DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the bed at the specified coords; returns false if there's no bed at those coords, true if found */
-	bool DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found */
-	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dispenser at those coords or callback returns true, returns true if found */
-	bool DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback a_Callback);
-
-	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dropper at those coords or callback returns true, returns true if found */
-	bool DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback a_Callback);
-
-	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dropspenser at those coords or callback returns true, returns true if found */
-	bool DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback a_Callback);
-
-	/** Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found */
-	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for the hopper at the specified coords; returns false if there's no hopper at those coords or callback returns true, returns true if found */
-	bool DoWithHopperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cHopperCallback a_Callback);  // Lua-accessible
-
-	/** Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found */
-	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback a_Callback);
-
-	/** Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found */
-	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback a_Callback);
-
-	/** Calls the callback for the mob head block at the specified coords; returns false if there's no mob head block at those coords or callback returns true, returns true if found */
-	bool DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback a_Callback);
-
-	/** Calls the callback for the flower pot at the specified coords; returns false if there's no flower pot at those coords or callback returns true, returns true if found */
-	bool DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback a_Callback);
-
-	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
-	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Lua-accessible
+	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, and whatever the callback returns if found. */
+	bool DoWithBlockEntityAt(Vector3i a_Position, cBlockEntityCallback a_Callback);  // Lua-acessible
 
 	/** Use block entity on coordinate.
 	returns true if the use was successful, return false to use the block as a "normal" block */
 	bool UseBlockEntity(cPlayer * a_Player, int a_X, int a_Y, int a_Z);  // [x, y, z] in world block coords
-
-	void CalculateHeightmap(const BLOCKTYPE * a_BlockTypes);
 
 	void SendBlockEntity             (int a_BlockX, int a_BlockY, int a_BlockZ, cClientHandle & a_Client);
 
@@ -385,48 +278,36 @@ public:
 
 	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
 	{
-		return m_ChunkData.GetMeta({ a_RelX, a_RelY, a_RelZ });
+		return m_BlockData.GetMeta({ a_RelX, a_RelY, a_RelZ });
 	}
 
-	NIBBLETYPE GetMeta(Vector3i a_RelPos) const { return m_ChunkData.GetMeta(a_RelPos); }
+	NIBBLETYPE GetMeta(Vector3i a_RelPos) const { return m_BlockData.GetMeta(a_RelPos); }
 
-	void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true)
+	void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
 	{
-		SetMeta({ a_RelX, a_RelY, a_RelZ }, a_Meta, a_ShouldMarkDirty, a_ShouldInformClients);
+		SetMeta({ a_RelX, a_RelY, a_RelZ }, a_Meta);
 	}
 
-	/** Set a meta value, with the option of not informing the client and / or not marking dirty.
-	Used for setting metas that are of little value for saving to disk and / or for sending to the client,
-	such as leaf decay flags. */
-	inline void SetMeta(Vector3i a_RelPos, NIBBLETYPE a_Meta, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true)
+	inline void SetMeta(Vector3i a_RelPos, NIBBLETYPE a_Meta)
 	{
-		bool hasChanged = m_ChunkData.SetMeta(a_RelPos, a_Meta);
-		if (hasChanged)
-		{
-			if (a_ShouldMarkDirty)
-			{
-				MarkDirty();
-			}
-			if (a_ShouldInformClients)
-			{
-				m_PendingSendBlocks.push_back(sSetBlock(m_PosX, m_PosZ, a_RelPos.x, a_RelPos.y, a_RelPos.z, GetBlock(a_RelPos), a_Meta));
-			}
-		}
+		m_BlockData.SetMeta(a_RelPos, a_Meta);
+		MarkDirty();
+		m_PendingSendBlocks.emplace_back(m_PosX, m_PosZ, a_RelPos.x, a_RelPos.y, a_RelPos.z, GetBlock(a_RelPos), a_Meta);
 	}
 
 	/** Light alterations based on time */
 	NIBBLETYPE GetTimeAlteredLight(NIBBLETYPE a_Skylight) const;
 
 	/** Get the level of artificial light illuminating the block (0 - 15) */
-	inline NIBBLETYPE GetBlockLight(Vector3i a_RelPos) const { return m_ChunkData.GetBlockLight(a_RelPos); }
-	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetBlockLight({ a_RelX, a_RelY, a_RelZ }); }
+	inline NIBBLETYPE GetBlockLight(Vector3i a_RelPos) const { return m_LightData.GetBlockLight(a_RelPos); }
+	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetBlockLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15) independent of daytime. */
-	inline NIBBLETYPE GetSkyLight(Vector3i a_RelPos) const { return m_ChunkData.GetSkyLight(a_RelPos); }
-	inline NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_ChunkData.GetSkyLight({ a_RelX, a_RelY, a_RelZ }); }
+	inline NIBBLETYPE GetSkyLight(Vector3i a_RelPos) const { return m_LightData.GetSkyLight(a_RelPos); }
+	inline NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetSkyLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15), taking daytime into a account. */
-	inline NIBBLETYPE GetSkyLightAltered(Vector3i a_RelPos) const { return GetTimeAlteredLight(m_ChunkData.GetSkyLight(a_RelPos)); }
+	inline NIBBLETYPE GetSkyLightAltered(Vector3i a_RelPos) const { return GetTimeAlteredLight(m_LightData.GetSkyLight(a_RelPos)); }
 	inline NIBBLETYPE GetSkyLightAltered(int a_RelX, int a_RelY, int a_RelZ) const { return GetSkyLightAltered({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
@@ -525,20 +406,14 @@ public:
 		return UnboundedRelFastSetBlock({a_RelX, a_RelY, a_RelZ}, a_BlockType, a_BlockMeta);
 	}
 
-	/** Same as QueueTickBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s in such a case)
-	Ignores unsuccessful attempts */
-	void UnboundedQueueTickBlock(Vector3i a_RelPos);
-
 
 
 	// Per-chunk simulator data:
 	cFireSimulatorChunkData & GetFireSimulatorData (void) { return m_FireSimulatorData; }
-	cFluidSimulatorData *     GetWaterSimulatorData(void) { return m_WaterSimulatorData; }
-	cFluidSimulatorData *     GetLavaSimulatorData (void) { return m_LavaSimulatorData; }
+	cFluidSimulatorData * GetWaterSimulatorData(void) const { return m_WaterSimulatorData; }
+	cFluidSimulatorData * GetLavaSimulatorData (void) const { return m_LavaSimulatorData; }
 	cSandSimulatorChunkData & GetSandSimulatorData (void) { return m_SandSimulatorData; }
-
-	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) { return m_RedstoneSimulatorData; }
-	void SetRedstoneSimulatorData(cRedstoneSimulatorChunkData * a_Data) { m_RedstoneSimulatorData = a_Data; }
+	cRedstoneSimulatorChunkData * GetRedstoneSimulatorData(void) const { return m_RedstoneSimulatorData; }
 
 	/** Returns the block entity at the specified (absolute) coords.
 	Returns nullptr if no such BE or outside this chunk. */
@@ -565,9 +440,9 @@ public:
 	as at least one requests is active the chunk will be ticked). */
 	void SetAlwaysTicked(bool a_AlwaysTicked);
 
-	cChunkClientHandles GetAllClients(void) const
+	const auto & GetAllClients(void) const
 	{
-		return cChunkClientHandles(m_LoadedByClient);
+		return m_LoadedByClient;
 	}
 
 	/** Converts the coord relative to this chunk into an absolute coord.
@@ -577,6 +452,8 @@ public:
 		return cChunkDef::RelativeToAbsolute(a_RelBlockPosition, {m_PosX, m_PosZ});
 	}
 
+	/** Returns true if slimes should spawn in the chunk. */
+	bool IsSlimeChunk() const;
 
 private:
 
@@ -602,29 +479,38 @@ private:
 	/** Holds the presence status of the chunk - if it is present, or in the loader / generator queue, or unloaded */
 	ePresence m_Presence;
 
-	/** If the chunk fails to load, should it be queued in the generator or reset back to invalid? */
-	bool m_ShouldGenerateIfLoadFailed;
 	bool m_IsLightValid;   // True if the blocklight and skylight are calculated
 	bool m_IsDirty;        // True if the chunk has changed since it was last saved
 	bool m_IsSaving;       // True if the chunk is being saved
-	bool m_HasLoadFailed;  // True if chunk failed to load and hasn't been generated yet since then
 
-	std::vector<Vector3i> m_ToTickBlocks;
-	sSetBlockVector       m_PendingSendBlocks;  ///< Blocks that have changed and need to be sent to all clients
+	/** Blocks that have changed and need to be sent to all clients.
+	The protocol has a provision for coalescing block changes, and this is the buffer.
+	It will collect the block changes that occur in a tick, before being flushed in BroadcastPendingSendBlocks. */
+	sSetBlockVector m_PendingSendBlocks;
+
+	/** Block entities that have been touched and need to be sent to all clients.
+	Because block changes are buffered and we need to happen after them, this buffer exists too.
+	Pointers to block entities that were destroyed are guaranteed to be removed from this array by SetAllData, SetBlock, WriteBlockArea. */
+	std::vector<cBlockEntity *> m_PendingSendBlockEntities;
+
+	/** A queue of relative positions to call cBlockHandler::Check on.
+	Processed at the end of each tick by CheckBlocks. */
+	std::queue<Vector3i> m_BlocksToCheck;
 
 	// A critical section is not needed, because all chunk access is protected by its parent ChunkMap's csLayers
 	std::vector<cClientHandle *> m_LoadedByClient;
 	std::vector<OwnedEntity> m_Entities;
-	cBlockEntities               m_BlockEntities;
+	cBlockEntities m_BlockEntities;
 
 	/** Number of times the chunk has been requested to stay (by various cChunkStay objects); if zero, the chunk can be unloaded */
-	int m_StayCount;
+	unsigned m_StayCount;
 
 	int m_PosX, m_PosZ;
 	cWorld *    m_World;
 	cChunkMap * m_ChunkMap;
 
-	cChunkData m_ChunkData;
+	ChunkBlockData m_BlockData;
+	ChunkLightData m_LightData;
 
 	cChunkDef::HeightMap m_HeightMap;
 	cChunkDef::BiomeMap  m_BiomeMap;
@@ -643,38 +529,27 @@ private:
 	cFluidSimulatorData *   m_WaterSimulatorData;
 	cFluidSimulatorData *   m_LavaSimulatorData;
 	cSandSimulatorChunkData m_SandSimulatorData;
-
 	cRedstoneSimulatorChunkData * m_RedstoneSimulatorData;
 
 	/** If greater than zero, the chunk is ticked even if it has no clients.
 	Manipulated by the SetAlwaysTicked() function, allows for nested calls of the function.
 	This is the support for plugin-accessible chunk tick forcing. */
-	int m_AlwaysTicked;
-
+	unsigned m_AlwaysTicked;
 
 	// Pick up a random block of this chunk
 	void GetRandomBlockCoords(int & a_X, int & a_Y, int & a_Z);
 	void GetThreeRandomNumbers(int & a_X, int & a_Y, int & a_Z, int a_MaxX, int a_MaxY, int a_MaxZ);
 
-	void RemoveBlockEntity(cBlockEntity * a_BlockEntity);
-	void AddBlockEntity   (OwnedBlockEntity a_BlockEntity);
-
-	/** Add a block entity to the chunk without marking the chunk dirty */
-	void AddBlockEntityClean(OwnedBlockEntity a_BlockEntity);
-
-	/** Creates a block entity for each block that needs a block entity and doesn't have one already */
-	void CreateBlockEntities(void);
+	/** Takes ownership of a block entity, which MUST actually reside in this chunk. */
+	void AddBlockEntity(OwnedBlockEntity a_BlockEntity);
 
 	/** Wakes up each simulator for its specific blocks; through all the blocks in the chunk */
 	void WakeUpSimulators(void);
 
-	/** Sends m_PendingSendBlocks to all clients */
-	void BroadcastPendingBlockChanges(void);
-
 	/** Checks the block scheduled for checking in m_ToTickBlocks[] */
 	void CheckBlocks();
 
-	/** Ticks several random blocks in the chunk */
+	/** Ticks several random blocks in the chunk. */
 	void TickBlocks(void);
 
 	/** Adds snow to the top of snowy biomes and hydrates farmland / fills cauldrons in rainy biomes */
@@ -693,13 +568,5 @@ private:
 	void MoveEntityToNewChunk(OwnedEntity a_Entity);
 
 	/** Check m_Entities for cPlayer objects. */
-	bool HasPlayerEntities();
+	bool HasPlayerEntities() const;
 };
-
-typedef cChunk * cChunkPtr;
-
-typedef std::list<cChunkPtr> cChunkPtrList;
-
-
-
-

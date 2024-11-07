@@ -456,7 +456,10 @@ protected:
 			}
 			HasHadWater = true;
 		}  // for y
-		a_ChunkDesc.SetBlockType(a_RelX, 0, a_RelZ, E_BLOCK_BEDROCK);
+		if (a_ShapeColumn[0] > 0)
+		{
+			a_ChunkDesc.SetBlockType(a_RelX, 0, a_RelZ, E_BLOCK_BEDROCK);
+		}
 	}
 
 
@@ -582,10 +585,7 @@ protected:
 
 
 
-cTerrainCompositionGenPtr CreateCompoGenBiomal(int a_Seed)
+std::unique_ptr<cTerrainCompositionGen> CreateCompoGenBiomal(int a_Seed)
 {
-	return std::make_shared<cCompoGenBiomal>(a_Seed);
+	return std::make_unique<cCompoGenBiomal>(a_Seed);
 }
-
-
-

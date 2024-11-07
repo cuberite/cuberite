@@ -445,8 +445,8 @@ bool cBlockArea::IsValidCoords(const Vector3i & a_Coords) const
 bool cBlockArea::Read(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ, int a_DataTypes)
 {
 	ASSERT(IsValidDataTypeCombination(a_DataTypes));
-	ASSERT(cChunkDef::IsValidHeight(a_MinBlockY));
-	ASSERT(cChunkDef::IsValidHeight(a_MaxBlockY));
+	ASSERT(cChunkDef::IsValidHeight({a_MinBlockX, a_MinBlockY, a_MinBlockZ}));
+	ASSERT(cChunkDef::IsValidHeight({a_MaxBlockX, a_MaxBlockY, a_MaxBlockZ}));
 	ASSERT(a_MinBlockX <= a_MaxBlockX);
 	ASSERT(a_MinBlockY <= a_MaxBlockY);
 	ASSERT(a_MinBlockZ <= a_MaxBlockZ);
@@ -518,8 +518,8 @@ bool cBlockArea::Read(cForEachChunkProvider & a_ForEachChunkProvider, const Vect
 bool cBlockArea::Write(cForEachChunkProvider & a_ForEachChunkProvider, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
 {
 	ASSERT((a_DataTypes & GetDataTypes()) == a_DataTypes);  // Are you requesting only the data that I have?
-	ASSERT(cChunkDef::IsValidHeight(a_MinBlockY));
-	ASSERT(cChunkDef::IsValidHeight(a_MinBlockY + m_Size.y - 1));
+	ASSERT(cChunkDef::IsValidHeight({a_MinBlockX, a_MinBlockY, a_MinBlockZ}));
+	ASSERT(cChunkDef::IsValidHeight({a_MinBlockX, a_MinBlockY + m_Size.y - 1, a_MinBlockZ}));
 
 	return a_ForEachChunkProvider.WriteBlockArea(*this, a_MinBlockX, a_MinBlockY, a_MinBlockZ, a_DataTypes);
 }
@@ -1067,7 +1067,7 @@ void cBlockArea::RotateCCW(void)
 				auto NewIdx = MakeIndexForSize({ NewX, y, NewZ }, { m_Size.z, m_Size.y, m_Size.x });
 				auto OldIdx = MakeIndex(x, y, z);
 				NewTypes[NewIdx] = m_BlockTypes[OldIdx];
-				NewMetas[NewIdx] = BlockHandler(m_BlockTypes[OldIdx])->MetaRotateCCW(m_BlockMetas[OldIdx]);
+				NewMetas[NewIdx] = cBlockHandler::For(m_BlockTypes[OldIdx]).MetaRotateCCW(m_BlockMetas[OldIdx]);
 			}  // for y
 		}  // for z
 	}  // for x
@@ -1127,7 +1127,7 @@ void cBlockArea::RotateCW(void)
 				auto NewIdx = MakeIndexForSize({ NewX, y, NewZ }, { m_Size.z, m_Size.y, m_Size.x });
 				auto OldIdx = MakeIndex(x, y, z);
 				NewTypes[NewIdx] = m_BlockTypes[OldIdx];
-				NewMetas[NewIdx] = BlockHandler(m_BlockTypes[OldIdx])->MetaRotateCW(m_BlockMetas[OldIdx]);
+				NewMetas[NewIdx] = cBlockHandler::For(m_BlockTypes[OldIdx]).MetaRotateCW(m_BlockMetas[OldIdx]);
 			}  // for y
 		}  // for z
 	}  // for x
@@ -1185,8 +1185,8 @@ void cBlockArea::MirrorXY(void)
 				auto Idx1 = MakeIndex(x, y, z);
 				auto Idx2 = MakeIndex(x, y, MaxZ - z);
 				std::swap(m_BlockTypes[Idx1], m_BlockTypes[Idx2]);
-				NIBBLETYPE Meta1 = BlockHandler(m_BlockTypes[Idx2])->MetaMirrorXY(m_BlockMetas[Idx1]);
-				NIBBLETYPE Meta2 = BlockHandler(m_BlockTypes[Idx1])->MetaMirrorXY(m_BlockMetas[Idx2]);
+				NIBBLETYPE Meta1 = cBlockHandler::For(m_BlockTypes[Idx2]).MetaMirrorXY(m_BlockMetas[Idx1]);
+				NIBBLETYPE Meta2 = cBlockHandler::For(m_BlockTypes[Idx1]).MetaMirrorXY(m_BlockMetas[Idx2]);
 				m_BlockMetas[Idx1] = Meta2;
 				m_BlockMetas[Idx2] = Meta1;
 			}  // for x
@@ -1242,8 +1242,8 @@ void cBlockArea::MirrorXZ(void)
 				auto Idx1 = MakeIndex(x, y, z);
 				auto Idx2 = MakeIndex(x, MaxY - y, z);
 				std::swap(m_BlockTypes[Idx1], m_BlockTypes[Idx2]);
-				NIBBLETYPE Meta1 = BlockHandler(m_BlockTypes[Idx2])->MetaMirrorXZ(m_BlockMetas[Idx1]);
-				NIBBLETYPE Meta2 = BlockHandler(m_BlockTypes[Idx1])->MetaMirrorXZ(m_BlockMetas[Idx2]);
+				NIBBLETYPE Meta1 = cBlockHandler::For(m_BlockTypes[Idx2]).MetaMirrorXZ(m_BlockMetas[Idx1]);
+				NIBBLETYPE Meta2 = cBlockHandler::For(m_BlockTypes[Idx1]).MetaMirrorXZ(m_BlockMetas[Idx2]);
 				m_BlockMetas[Idx1] = Meta2;
 				m_BlockMetas[Idx2] = Meta1;
 			}  // for x
@@ -1299,8 +1299,8 @@ void cBlockArea::MirrorYZ(void)
 				auto Idx1 = MakeIndex(x, y, z);
 				auto Idx2 = MakeIndex(MaxX - x, y, z);
 				std::swap(m_BlockTypes[Idx1], m_BlockTypes[Idx2]);
-				NIBBLETYPE Meta1 = BlockHandler(m_BlockTypes[Idx2])->MetaMirrorYZ(m_BlockMetas[Idx1]);
-				NIBBLETYPE Meta2 = BlockHandler(m_BlockTypes[Idx1])->MetaMirrorYZ(m_BlockMetas[Idx2]);
+				NIBBLETYPE Meta1 = cBlockHandler::For(m_BlockTypes[Idx2]).MetaMirrorYZ(m_BlockMetas[Idx1]);
+				NIBBLETYPE Meta2 = cBlockHandler::For(m_BlockTypes[Idx1]).MetaMirrorYZ(m_BlockMetas[Idx2]);
 				m_BlockMetas[Idx1] = Meta2;
 				m_BlockMetas[Idx2] = Meta1;
 			}  // for x
@@ -2204,21 +2204,6 @@ bool cBlockArea::ForEachBlockEntity(cBlockEntityCallback a_Callback)
 
 
 
-cItems cBlockArea::PickupsFromBlock(Vector3i a_AbsPos, const cEntity * a_Digger, const cItem * a_Tool)
-{
-	auto relPos = a_AbsPos - m_Origin;
-	BLOCKTYPE blockType;
-	NIBBLETYPE blockMeta;
-	GetRelBlockTypeMeta(relPos.x, relPos.y, relPos.z, blockType, blockMeta);
-	auto blockEntity = GetBlockEntityRel(relPos);
-	auto handler = BlockHandler(blockType);
-	return handler->ConvertToPickups(blockMeta, blockEntity, a_Digger, a_Tool);
-}
-
-
-
-
-
 void cBlockArea::SetRelNibble(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Value, NIBBLETYPE * a_Array)
 {
 	if (a_Array == nullptr)
@@ -2804,7 +2789,7 @@ bool cBlockArea::cChunkReader::Coords(int a_ChunkX, int a_ChunkZ)
 
 
 
-void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
+void cBlockArea::cChunkReader::ChunkData(const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData)
 {
 	int SizeY = m_Area.m_Size.y;
 	int MinY = m_Origin.y;
@@ -2863,7 +2848,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlock({ InChunkX, InChunkY, InChunkZ });
+					m_Area.m_BlockTypes[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockData.GetBlock({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2884,7 +2869,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockMetas[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetMeta({ InChunkX, InChunkY, InChunkZ });
+					m_Area.m_BlockMetas[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockData.GetMeta({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2905,7 +2890,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetBlockLight({ InChunkX, InChunkY, InChunkZ });
+					m_Area.m_BlockLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_LightData.GetBlockLight({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y
@@ -2926,7 +2911,7 @@ void cBlockArea::cChunkReader::ChunkData(const cChunkData & a_BlockBuffer)
 				{
 					int InChunkX = BaseX + x;
 					int AreaX = OffX + x;
-					m_Area.m_BlockSkyLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_BlockBuffer.GetSkyLight({ InChunkX, InChunkY, InChunkZ });
+					m_Area.m_BlockSkyLight[m_Area.MakeIndex(AreaX, AreaY, AreaZ)] = a_LightData.GetSkyLight({ InChunkX, InChunkY, InChunkZ });
 				}  // for x
 			}  // for z
 		}  // for y

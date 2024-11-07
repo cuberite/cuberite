@@ -12,8 +12,16 @@
 
 
 
-cMapManager::cMapManager(cWorld * a_World)
-	: m_World(a_World)
+// 6000 ticks or 5 minutes
+#define MAP_DATA_SAVE_INTERVAL 6000
+
+
+
+
+
+cMapManager::cMapManager(cWorld * a_World) :
+	m_World(a_World),
+	m_TicksUntilNextSave(MAP_DATA_SAVE_INTERVAL)
 {
 	ASSERT(m_World != nullptr);
 }
@@ -48,6 +56,16 @@ void cMapManager::TickMaps()
 	for (auto & Map : m_MapData)
 	{
 		Map.Tick();
+	}
+
+	if (m_TicksUntilNextSave == 0)
+	{
+		m_TicksUntilNextSave = MAP_DATA_SAVE_INTERVAL;
+		SaveMapData();
+	}
+	else
+	{
+		m_TicksUntilNextSave--;
 	}
 }
 
@@ -149,11 +167,18 @@ void cMapManager::SaveMapData(void)
 	{
 		cMap & Map = *it;
 
-		cMapSerializer Serializer(m_World->GetDataPath(), &Map);
-
-		if (!Serializer.Save())
+		if (Map.m_Dirty)
 		{
-			LOGWARN("Could not save map #%i", Map.GetID());
+			cMapSerializer Serializer(m_World->GetDataPath(), &Map);
+
+			if (Serializer.Save())
+			{
+				Map.m_Dirty = false;
+			}
+			else
+			{
+				LOGWARN("Could not save map #%i", Map.GetID());
+			}
 		}
 	}
 }

@@ -2,19 +2,17 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
 
 
-class cBlockObserverHandler:
-	public cClearMetaOnDrop<cPitchYawRotator<cBlockHandler>>
+class cBlockObserverHandler final :
+	public cClearMetaOnDrop<cDisplacementYawRotator<cBlockHandler>>
 {
-	using Super = cClearMetaOnDrop<cPitchYawRotator<cBlockHandler>>;
+	using Super = cClearMetaOnDrop<cDisplacementYawRotator<cBlockHandler>>;
 
 public:
 
-	cBlockObserverHandler(BLOCKTYPE a_BlockType) : Super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
 	inline static Vector3i GetObservingFaceOffset(NIBBLETYPE a_Meta)
 	{

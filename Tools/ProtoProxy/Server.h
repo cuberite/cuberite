@@ -9,8 +9,20 @@
 
 #pragma once
 
+#include "Globals.h"
 #include "mbedTLS++/RsaPrivateKey.h"
 
+#ifdef _WIN32
+	#define SocketError WSAGetLastError()
+#else
+	typedef int SOCKET;
+	enum
+	{
+		INVALID_SOCKET = -1,
+	};
+	#define closesocket close
+	#define SocketError errno
+#endif
 
 
 
@@ -20,7 +32,7 @@ class cServer
 {
 	SOCKET m_ListenSocket;
 	cRsaPrivateKey m_PrivateKey;
-	AString m_PublicKeyDER;
+	ContiguousByteBuffer m_PublicKeyDER;
 	UInt16 m_ConnectPort;
 
 public:
@@ -30,7 +42,7 @@ public:
 	void Run(void);
 
 	cRsaPrivateKey & GetPrivateKey(void) { return m_PrivateKey; }
-	const AString & GetPublicKeyDER (void) { return m_PublicKeyDER; }
+	ContiguousByteBufferView GetPublicKeyDER (void) { return m_PublicKeyDER; }
 
 	UInt16 GetConnectPort(void) const { return m_ConnectPort; }
 } ;

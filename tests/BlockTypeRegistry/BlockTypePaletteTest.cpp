@@ -1,7 +1,7 @@
 #include "Globals.h"
 #include "../TestHelpers.h"
-#include "BlockTypePalette.h"
-#include "Stopwatch.h"
+#include "Bindings/BlockTypePalette.h"
+#include "OSSupport/Stopwatch.h"
 
 
 

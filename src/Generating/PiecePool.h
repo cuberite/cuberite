@@ -115,7 +115,7 @@ public:
 
 		/** Called when the piece pool is assigned to a generator,
 		so that the strategies may bind to the underlying subgenerators. */
-		virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) {}
+		virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) {}
 	};
 
 	typedef std::shared_ptr<cVerticalStrategy> cVerticalStrategyPtr;
@@ -142,11 +142,38 @@ public:
 
 		/** Called when the piece pool is assigned to a generator,
 		so that the limits may bind to the underlying subgenerators. */
-		virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) {}
+		virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) {}
 	};
 
 	typedef std::shared_ptr<cVerticalLimit> cVerticalLimitPtr;
 
+
+	/** Base class (interface) for piece modifiers. */
+	class cPieceModifier
+	{
+	public:
+		// Force a virtual destructor in descendants
+		virtual ~cPieceModifier() {}
+
+		/** Initializes the modifier's parameters from the string
+		representation. a_Params is the string containing only the parameters
+		If a_LogWarnings is true, logs any problems to the console.
+		Returns true if successful, false if the string parsing failed.
+		Used when loading the modifier from a file. */
+		virtual bool InitializeFromString(const AString & a_Params, bool a_LogWarnings) = 0;
+
+		/** Called prior to writing piece to a chunk, so that modifiers can modify blocks in the blockarea */
+		virtual void Modify(cBlockArea & a_Image, const Vector3i a_PiecePos, const int a_PieceNumRotations) = 0;
+
+		/** Called when the piece pool is assigned to a generator,
+		so that the modifiers can access world seed. */
+		virtual void AssignSeed(int a_Seed) {}
+	};
+
+
+	typedef std::shared_ptr<cPieceModifier> cPieceModifierPtr;
+
+	typedef std::vector<cPieceModifierPtr> cPieceModifiers;
 
 	/** The strategy used for vertical placement of this piece when it is used as a starting piece. */
 	cVerticalStrategyPtr m_VerticalStrategy;
@@ -154,6 +181,8 @@ public:
 	/** The checker that verifies each placement's vertical position. */
 	cVerticalLimitPtr m_VerticalLimit;
 
+	/** The modifiers which are modifying piece's blocks. */
+	cPieceModifiers m_Modifiers;
 
 	/** Returns all of the available connectors that the piece has.
 	Each connector has a (relative) position in the piece, and a type associated with it. */
@@ -183,7 +212,7 @@ public:
 
 	void SetVerticalStrategy(cVerticalStrategyPtr a_VerticalStrategy)
 	{
-		m_VerticalStrategy = a_VerticalStrategy;
+		m_VerticalStrategy = std::move(a_VerticalStrategy);
 	}
 
 	cVerticalStrategyPtr GetVerticalStrategy(void) const
@@ -196,6 +225,11 @@ public:
 		return m_VerticalLimit;
 	}
 
+	cPieceModifiers GetModifiers(void) const
+	{
+		return m_Modifiers;
+	}
+
 	/** Sets the vertical strategy based on the description in the string.
 	If a_LogWarnings is true, logs the parsing problems into the server console.
 	Returns true if successful, false if strategy parsing failed (no strategy assigned). */
@@ -205,6 +239,12 @@ public:
 	Returns true if successful, false if limit parsing failed (no limit assigned).
 	If a_LogWarnings is true, any problem is reported into the server console. */
 	bool SetVerticalLimitFromString(const AString & a_LimitDesc, bool a_LogWarnings);
+
+	/** Sets the modifiers with their params in the string.
+	If a_LogWarnings is true, logs the parsing problems into the server console.
+	Returns true if successful, false if strategy parsing failed (no strategy
+	assigned). */
+	bool SetPieceModifiersFromString(const AString & a_Definition, bool a_LogWarnings);
 
 	/** Returns a copy of the a_Pos after rotating the piece the specified number of CCW rotations. */
 	Vector3i RotatePos(const Vector3i & a_Pos, int a_NumCCWRotations) const;
@@ -328,8 +368,3 @@ protected:
 
 typedef std::unique_ptr<cPlacedPiece> cPlacedPiecePtr;
 typedef std::vector<cPlacedPiecePtr> cPlacedPieces;
-
-
-
-
-

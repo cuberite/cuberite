@@ -8,17 +8,14 @@
 
 
 
-class cItemBowHandler:
+class cItemBowHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemBowHandler(void):
-		Super(E_ITEM_BOW)
-	{
-	}
+	using Super::Super;
 
 
 
@@ -31,7 +28,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		ASSERT(a_Player != nullptr);
 
@@ -47,7 +44,7 @@ public:
 
 
 
-	virtual void OnItemShoot(cPlayer * a_Player, const Vector3i a_BlockPos, eBlockFace a_BlockFace) override
+	virtual void OnItemShoot(cPlayer * a_Player, const Vector3i a_BlockPos, eBlockFace a_BlockFace) const override
 	{
 		// Actual shot - produce the arrow with speed based on the number of ticks that the bow was charged
 		UNUSED(a_BlockPos);
@@ -70,7 +67,7 @@ public:
 		}
 
 		// Create the arrow entity:
-		auto Arrow = cpp14::make_unique<cArrowEntity>(*a_Player, Force * 2);
+		auto Arrow = std::make_unique<cArrowEntity>(*a_Player, Force * 2);
 		auto ArrowPtr = Arrow.get();
 		if (!ArrowPtr->Initialize(std::move(Arrow), *a_Player->GetWorld()))
 		{

@@ -86,32 +86,9 @@ extern "C" int luaopen_lxp(lua_State * a_LuaState)
 
 
 
-void cBlockInfo::sHandlerDeleter::operator () (cBlockHandler * a_Handler)
+bool cBlockInfo::IsSolid(BLOCKTYPE)
 {
-	delete a_Handler;
-}
-
-
-
-
-
-cBlockInfo::cBlockInfo()
-{
-}
-
-
-
-
-
-cBlockInfo::cBlockInfoArray::cBlockInfoArray()
-{
-	cBlockInfoArray & BlockInfos = *this;
-	// The piece-loading code uses the handlers for rotations, so we need valid handlers
-	// Insert dummy handlers:
-	for (size_t i = 0; i < BlockInfos.size(); i++)
-	{
-		BlockInfos[i].m_Handler.reset(new cBlockHandler(static_cast<BLOCKTYPE>(i)));
-	}
+	return false;
 }
 
 
@@ -126,15 +103,7 @@ cBoundingBox::cBoundingBox(double, double, double, double, double, double)
 
 
 
-cBlockHandler::cBlockHandler(BLOCKTYPE a_BlockType)
-{
-}
-
-
-
-
-
-cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP)
+cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) const
 {
 	return cBoundingBox(0, 0, 0, 0, 0, 0);
 }
@@ -143,22 +112,7 @@ cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a
 
 
 
-bool cBlockHandler::GetPlacementBlockTypeMeta(
-	cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-	const Vector3i a_BlockPos,
-	eBlockFace a_BlockFace,
-	const Vector3i a_CursorPos,
-	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-)
-{
-	return true;
-}
-
-
-
-
-
-void cBlockHandler::OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, const Vector3i a_RelPos)
+void cBlockHandler::OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, const Vector3i a_RelPos) const
 {
 }
 
@@ -166,23 +120,7 @@ void cBlockHandler::OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface
 
 
 
-void cBlockHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange)
-{
-}
-
-
-
-
-
-void cBlockHandler::OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-}
-
-
-
-
-
-void cBlockHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta)
+void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const
 {
 }
 
@@ -198,7 +136,7 @@ void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i
 
 
 
-cItems cBlockHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool)
+cItems cBlockHandler::ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const
 {
 	return cItems();
 }
@@ -207,7 +145,7 @@ cItems cBlockHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_
 
 
 
-bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk)
+bool cBlockHandler::CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const
 {
 	return true;
 }
@@ -216,7 +154,7 @@ bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a
 
 
 
-bool cBlockHandler::IsUseable()
+bool cBlockHandler::IsUseable() const
 {
 	return false;
 }
@@ -225,34 +163,16 @@ bool cBlockHandler::IsUseable()
 
 
 
-bool cBlockHandler::IsClickedThrough(void)
+bool cBlockHandler::DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, Vector3i a_Position, NIBBLETYPE a_Meta, eBlockFace a_ClickedBlockFace, bool a_ClickedDirectly) const
 {
-	return false;
+	return m_BlockType == E_BLOCK_AIR;
 }
 
 
 
 
 
-bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta)
-{
-	return (m_BlockType == E_BLOCK_AIR);
-}
-
-
-
-
-
-bool cBlockHandler::DoesDropOnUnsuitable(void)
-{
-	return true;
-}
-
-
-
-
-
-void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, Vector3i a_RelPos, cChunk & a_Chunk)
+void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, Vector3i a_RelPos, cChunk & a_Chunk) const
 {
 }
 
@@ -260,7 +180,7 @@ void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterf
 
 
 
-ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta)
+ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta) const
 {
 	return 0;
 }
@@ -269,9 +189,20 @@ ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta)
 
 
 
-bool cBlockHandler::IsInsideBlock(Vector3d a_Position, const NIBBLETYPE a_BlockMeta)
+bool cBlockHandler::IsInsideBlock(Vector3d a_Position, const NIBBLETYPE a_BlockMeta) const
 {
 	return true;
+}
+
+
+
+
+
+const cBlockHandler & cBlockHandler::For(BLOCKTYPE a_BlockType)
+{
+	// Dummy handler.
+	static cBlockHandler Handler(E_BLOCK_AIR);
+	return Handler;
 }
 
 
@@ -341,4 +272,13 @@ bool cLuaState::GetStackValue(int, cUUID *&)
 bool cUUID::FromString(const AString &)
 {
 	return true;
+}
+
+
+
+
+
+int BlockStringToType(const AString &)
+{
+	return 0;
 }
