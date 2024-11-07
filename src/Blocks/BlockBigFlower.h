@@ -55,8 +55,9 @@ private:
 	{
 		if (IsTopPart(a_Block))
 		{
+			const auto BottomPosition = a_Position.addedY(-1);
 			if (
-				(a_Position.y < 1) ||
+				!cChunkDef::IsValidHeight(BottomPosition) ||
 				(IsBlockBigFlower(a_Block))
 			)
 			{
@@ -135,7 +136,7 @@ private:
 		// Both parts can only that they're rooted in grass.
 
 		const auto RootPosition = a_Position.addedY(IsTopPart(a_Self) ? -2 : -1);
-		return (RootPosition.y >= 0) && IsBlockMaterialDirt(a_Chunk.GetBlock(RootPosition));
+		return cChunkDef::IsValidHeight(RootPosition) && IsBlockMaterialDirt(a_Chunk.GetBlock(RootPosition));
 	}
 
 

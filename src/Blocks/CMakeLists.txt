@@ -113,6 +113,6 @@ target_sources(
 	BroadcastInterface.h
 	ChunkInterface.h
 	GetHandlerCompileTimeTemplate.h
-	Mixins.h
+	Mixins/Mixins.h
 	WorldInterface.h
 )

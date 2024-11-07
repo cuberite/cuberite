@@ -95,7 +95,8 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_BlockToReplace) const override
 	{
-		return ((a_Position.y > 0) && (a_Chunk.GetBlock(a_Position.addedY(-1)) == BlockType::Farmland));
+		const auto BelowPos = a_Position.addedY(-1);
+		return (cChunkDef::IsValidHeight(BelowPos) && (a_Chunk.GetBlock(BelowPos) == BlockType::Farmland));
 	}
 
 

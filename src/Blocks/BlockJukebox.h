@@ -2,7 +2,7 @@
 #pragma once
 
 #include "BlockEntity.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
 
 
 

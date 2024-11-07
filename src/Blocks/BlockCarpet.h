@@ -52,7 +52,8 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Self) const override
 	{
-		return (a_Position.y > 0) && IsBlockAir(a_Chunk.GetBlock(a_Position.addedY(-1)));
+		const auto PosBelow = a_Position.addedY(-1);
+		return cChunkDef::IsValidHeight(PosBelow) && IsBlockAir(PosBelow);
 	}
 
 

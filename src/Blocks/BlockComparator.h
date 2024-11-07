@@ -4,16 +4,17 @@
 #include "BlockHandler.h"
 #include "BlockRedstoneRepeater.h"
 #include "BlockStairs.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
+#include "Mixins/SolidSurfaceUnderneath.h"
 
 
 
 
 
 class cBlockComparatorHandler final :
-	public cBlockHandler
+	public cSolidSurfaceUnderneath<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>
 {
-	using Super = cBlockHandler;
+	using Super = cSolidSurfaceUnderneath<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>;
 
 public:
 

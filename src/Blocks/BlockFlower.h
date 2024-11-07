@@ -2,15 +2,16 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "Mixins/DirtLikeUnderneath.h"
 
 
 
 
 
 class cBlockFlowerHandler final :
-	public cBlockHandler
+	public cDirtLikeUnderneath<cBlockHandler>
 {
-	using Super = cBlockHandler;
+	using Super = cDirtLikeUnderneath<cBlockHandler>;
 
 public:
 

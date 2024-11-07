@@ -2,7 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
 #include "../Entities/Player.h"
 #include "../UI/AnvilWindow.h"
 

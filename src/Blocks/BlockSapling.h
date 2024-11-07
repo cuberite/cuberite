@@ -4,15 +4,16 @@
 #include "BlockHandler.h"
 #include "BlockLeaves.h"
 #include "../FastRandom.h"
+#include "Mixins/DirtLikeUnderneath.h"
 
 
 
 
 
 class cBlockSaplingHandler final :
-	public cBlockHandler
+	public cDirtLikeUnderneath<cBlockHandler>
 {
-	using Super = cBlockHandler;
+	using Super = cDirtLikeUnderneath<cBlockHandler>;
 
 public:
 
@@ -67,7 +68,7 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Self) const override
 	{
-		return (a_Position.y > 0) && IsBlockMaterialDirt(a_Self);
+		return cChunkDef::IsValidHeight(a_Position) && IsBlockMaterialDirt(a_Self);
 	}
 
 

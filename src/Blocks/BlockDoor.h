@@ -5,7 +5,7 @@
 #include "../BlockInfo.h"
 #include "../Entities/Player.h"
 #include "../Chunk.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
 #include "ChunkInterface.h"
 #include "BlockSlab.h"
 
@@ -413,7 +413,7 @@ private:
 		const auto BasePosition = a_Position.addedY(IsTop(a_Self.Type()) ? -2 : -1);
 		auto BlockToReplace = a_Chunk.GetBlock(BasePosition);
 
-		return (BasePosition.y >= 0) && CanBeOn(BlockToReplace);
+		return cChunkDef::IsValidHeight(BasePosition) && CanBeOn(BlockToReplace);
 	}
 
 

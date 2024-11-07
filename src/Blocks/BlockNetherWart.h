@@ -64,7 +64,8 @@ private:
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
 		// Needs to be placed on top of a Soulsand block:
-		return ((a_Position.y > 0) && (a_Chunk.GetBlock(a_Position.addedY(-1)).Type() == BlockType::SoulSand));
+		const auto BasePos = a_Position.addedY(-1);
+		return (cChunkDef::IsValidHeight(BasePos) && (a_Chunk.GetBlock(BasePos).Type() == BlockType::SoulSand));
 	}
 
 

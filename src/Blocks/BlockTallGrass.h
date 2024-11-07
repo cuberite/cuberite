@@ -2,6 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "Mixins/DirtLikeUnderneath.h"
 #include "ChunkInterface.h"
 
 
@@ -10,9 +11,9 @@
 
 /** Handles the grass that is 1 block tall */
 class cBlockTallGrassHandler final :
-	public cBlockHandler
+	public cDirtLikeUnderneath<cBlockHandler>
 {
-	using Super = cBlockHandler;
+	using Super = cDirtLikeUnderneath<cBlockHandler>;
 
 public:
 
@@ -54,7 +55,7 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		if (a_Position.y <= 0)
+		if (!cChunkDef::IsValidHeight(a_Position))
 		{
 			return false;
 		}
@@ -70,7 +71,8 @@ private:
 	/** Growing a tall grass produces a big flower (2-block high fern or double-tall grass). */
 	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, char a_NumStages = 1) const override
 	{
-		if (a_RelPos.y > (cChunkDef::Height - 2))
+		const auto TopPos = a_RelPos.addedY(1);
+		if (!cChunkDef::IsValidHeight(TopPos))
 		{
 			return 0;
 		}

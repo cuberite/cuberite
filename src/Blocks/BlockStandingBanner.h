@@ -6,14 +6,16 @@
 #include "BlockHandler.h"
 #include "../BlockInfo.h"
 #include "BlockEntity.h"
+#include "Mixins/SolidSurfaceUnderneath.h"
 
 
 
 
 
 class cBlockStandingBannerHandler final :
-	public cBlockEntityHandler
+	public cSolidSurfaceUnderneath<cBlockEntityHandler>
 {
+	using Super = cSolidSurfaceUnderneath<cBlockEntityHandler>;
 
 public:
 	static inline bool IsBlockBanner(BlockState a_Block)
