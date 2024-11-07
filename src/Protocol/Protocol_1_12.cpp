@@ -307,19 +307,6 @@ namespace Metadata_1_12
 
 
 
-#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		if (!ByteBuf.Proc(Var))\
-		{\
-			return;\
-		} \
-	} while (false)
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_12:
 
@@ -948,8 +935,6 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtDonkey:
 		case mtMule:
 
-		case mtEndermite:
-
 		case mtEvoker:
 
 		case mtHusk:
@@ -978,6 +963,7 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}
 
+		case mtEndermite:
 		case mtGiant:
 		case mtSilverfish:
 		case mtSquid:

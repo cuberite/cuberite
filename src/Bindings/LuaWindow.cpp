@@ -7,7 +7,10 @@
 #include "../Entities/Player.h"
 #include "../UI/SlotArea.h"
 #include "PluginLua.h"
-#include "lua/src/lauxlib.h"  // Needed for LUA_REFNIL
+extern "C"
+{
+	#include "lua/src/lauxlib.h"  // Needed for LUA_REFNIL
+}
 #include "../Root.h"
 #include "../ClientHandle.h"
 

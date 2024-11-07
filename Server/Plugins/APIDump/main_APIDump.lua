@@ -136,7 +136,7 @@ local function CreateAPITables()
 		return res;
 	end
 
-	for i, v in pairs(_G) do
+	for i, v in pairs(getmetatable(_G).__index) do
 		if (
 			(v ~= _G) and           -- don't want the global namespace
 			(v ~= _G.packages) and  -- don't want any packages
@@ -1473,7 +1473,7 @@ end
 
 
 --- Returns the string with extra tabs and CR/LFs removed
-local function CleanUpDescription(a_Desc)
+function CleanUpDescription(a_Desc)
 	-- Get rid of indent and newlines, normalize whitespace:
 	local res = a_Desc:gsub("[\n\t]", "")
 	res = a_Desc:gsub("%s%s+", " ")
@@ -1858,6 +1858,9 @@ local function DumpApi()
 	-- Dump all available API objects in format used by ZeroBraneStudio API descriptions:
 	DumpAPIZBS(API)
 
+	-- Dump all available API objects in format used by Lua-Language-Server API descriptions:
+	DumpAPILLS(API);
+
 	-- Export the API in a format used by LuaCheck
 	DumpLuaCheck(API)
 
@@ -2041,6 +2044,56 @@ end
 
 
 
+--- Checks if any functions that are documented are present in the API
+-- Returns an array-table of strings representing the unexported symbol names
+-- If no unexported are found, returns no value.
+-- If an error occurs, returns true and error message.
+local function CheckUnexportedFunctions()
+	local res = {}
+
+	local API, Globals, Desc = PrepareApi()
+	for clsname, cls in pairs(Desc.Classes) do
+		if not(cls.IsExported) then
+			-- The whole class is not exported
+			table.insert(res, "class\t" .. clsname .. "\n");
+		else
+			if (cls.Functions ~= nil) then
+				for fnname, fnapi in pairs(cls.Functions) do
+					if not(fnapi.IsExported) then
+						table.insert(res, "func\t" .. clsname .. "." .. fnname);
+					end
+				end  -- for j, fn - cls.Functions[]
+			end
+			if (cls.Constants ~= nil) then
+				for cnname, cnapi in pairs(cls.Constants) do
+					if not(cnapi.IsExported) then
+						table.insert(res, "const\t" .. clsname .. "." .. cnname);
+					end
+				end  -- for j, fn - cls.Functions[]
+			end
+		end
+	end  -- for i, cls - a_APIDesc.Classes[]
+
+	table.sort(res)
+
+	-- Bail out if no items found:
+	if not(res[1]) then
+		return
+	end
+
+	-- Save any found items to a file:
+	local f = io.open("Unexported.lua", "w")
+	f:write(table.concat(res, "\n"))
+	f:write("\n")
+	f:close()
+
+	return res
+end
+
+
+
+
+
 
 local function HandleWebAdminDump(a_Request)
 	if (a_Request.PostParams["Dump"] ~= nil) then
@@ -2097,6 +2150,18 @@ local function HandleCmdApiCheck(a_Split, a_EntireCmd)
 			return true
 		else
 			LOGERROR("Found new undocumented symbols:\n" .. table.concat(newUndocumented, "\n"))
+			return true
+		end
+	end
+
+	LOG("Checking for unexported Objects...")
+	local unexported, msg = CheckUnexportedFunctions()
+	if (unexported) then
+		if (unexported == true) then
+			LOGERROR("Cannot check for unexported symbols: " .. (msg or "<no message>"))
+			return true
+		else
+			LOGERROR("Found unexported symbols:\n" .. table.concat(unexported, "\n"))
 			return true
 		end
 	end

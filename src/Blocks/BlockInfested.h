@@ -73,7 +73,7 @@ private:
 					return;
 				}
 			}
-			if (a_Digger->IsMob())
+			if (a_Digger->IsMob() || a_Digger->IsTNT())
 			{
 				return;
 			}

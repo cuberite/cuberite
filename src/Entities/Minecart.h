@@ -42,7 +42,7 @@ public:
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
-
+	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways) override;
 	int LastDamage(void) const { return m_LastDamage; }
 	ePayload GetPayload(void) const { return m_Payload; }
 
@@ -72,8 +72,8 @@ protected:
 	*/
 	void HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt);
 
-	/** Handles activator rails - placeholder for future implementation */
-	void HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt);
+	/** Handles activator rails */
+	virtual void HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt);
 
 	/** Snaps a mincecart to a rail's axis, resetting its speed
 		For curved rails, it changes the cart's direction as well as snapping it to axis */
@@ -89,7 +89,6 @@ protected:
 
 	/** Tests if this mincecart's bounding box is intersecting another entity's bounding box (collision) and pushes mincecart away if necessary */
 	bool TestEntityCollision(NIBBLETYPE a_RailMeta);
-
 } ;
 
 
@@ -222,10 +221,14 @@ public:
 	CLASS_PROTODEF(cMinecartWithTNT)
 
 	cMinecartWithTNT(Vector3d a_Pos);
+	void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 private:
+	int m_TNTFuseTicksLeft;
+	bool m_isTNTFused = false;
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+	void HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt) override;
 } ;
 
 

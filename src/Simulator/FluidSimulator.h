@@ -44,7 +44,7 @@ public:
 	cFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid);
 
 	/** Returns a unit vector in the direction the fluid is flowing or a zero-vector if not flowing. */
-	virtual Vector3f GetFlowingDirection(int a_X, int a_Y, int a_Z);
+	virtual Vector3f GetFlowingDirection(Vector3i a_Pos);
 
 	/** Creates a ChunkData object for the simulator to use. The simulator returns the correct object type. */
 	virtual cFluidSimulatorData * CreateChunkData(void) = 0;

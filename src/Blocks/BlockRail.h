@@ -1,5 +1,12 @@
-
 #pragma once
+
+#include "BlockHandler.h"
+#include "BlockType.h"
+#include "Mixins/Mixins.h"
+#include "Mixins/SolidSurfaceUnderneath.h"
+#include "../BlockInfo.h"
+#include "../Chunk.h"
+#include "ChunkDef.h"
 
 
 
@@ -17,9 +24,9 @@ enum ENUM_PURE
 
 
 class cBlockRailHandler final :
-	public cClearMetaOnDrop<cBlockHandler>
+	public cSolidSurfaceUnderneath<cClearMetaOnDrop<cBlockHandler>>
 {
-	using Super = cClearMetaOnDrop<cBlockHandler>;
+	using Super = cSolidSurfaceUnderneath<cClearMetaOnDrop<cBlockHandler>>;
 
 public:
 
@@ -156,7 +163,7 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, NIBBLETYPE a_Meta) const override
 	{
-		if ((a_Position.y <= 0) || !cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(a_Position.addedY(-1))))
+		if (!Super::CanBeAt(a_Chunk, a_Position, a_Meta))
 		{
 			return false;
 		}
@@ -187,6 +194,7 @@ private:
 				return cBlockInfo::FullyOccupiesVoxel(BlockType);
 			}
 		}
+
 		return true;
 	}
 
@@ -326,8 +334,10 @@ private:
 
 	static bool IsNotConnected(cChunkInterface  & a_ChunkInterface, Vector3i a_Pos, eBlockFace a_BlockFace, char a_Pure = 0)
 	{
-		AddFaceDirection(a_Pos.x, a_Pos.y, a_Pos.z, a_BlockFace, false);
+		a_Pos = AddFaceDirection(a_Pos, a_BlockFace, false);
+
 		NIBBLETYPE Meta;
+
 		if (!IsBlockRail(a_ChunkInterface.GetBlock(a_Pos)))
 		{
 			if (!IsBlockRail(a_ChunkInterface.GetBlock(a_Pos + Vector3i(0, 1, 0))) || (a_Pure != E_PURE_UPDOWN))

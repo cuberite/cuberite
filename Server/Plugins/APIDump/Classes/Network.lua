@@ -528,6 +528,10 @@ g_Server = nil
 						Name = "OwnPrivateKeyPassword",
 						Type = "string",
 					},
+					{
+						Name = "TrustedRootCAs",
+						Type = "string",
+					},
 				},
 				Returns =
 				{
@@ -541,7 +545,7 @@ g_Server = nil
 						IsOptional = true,
 					},
 				},
-				Notes = "Starts a TLS handshake on the link, as a client side of the TLS. The Own___ parameters specify the client certificate and its corresponding private key and password; all three parameters are optional and no client certificate is presented to the remote peer if they are not used or all empty. Once the TLS handshake is started by this call, all incoming data is first decrypted before being sent to the OnReceivedData callback, and all outgoing data is queued until the TLS handshake completes, and then sent encrypted over the link. Returns true on success, nil and optional error message on immediate failure.<br/><b>NOTE:</b> The TLS support in the API is currently experimental and shouldn't be considered safe - there's no peer certificate verification and the error reporting is only basic.",
+				Notes = "Starts a TLS handshake on the link, as a client side of the TLS. The Own___ parameters specify the client certificate and its corresponding private key and password; all three parameters are optional and no client certificate is presented to the remote peer if they are not used or all empty. Once the TLS handshake is started by this call, all incoming data is first decrypted before being sent to the OnReceivedData callback, and all outgoing data is queued until the TLS handshake completes, and then sent encrypted over the link. Returns true on success, nil and optional error message on immediate failure.<br/>The TrustedRootCAs is a string containing all certificates that should be trusted, in PEM format, concatenated and separated by a newline.<b>NOTE:</b> If TrustedRootCAs is empty or nil, the server's certificate will NOT be verified, which is UNSAFE!",
 			},
 			StartTLSServer =
 			{
@@ -1123,6 +1127,7 @@ end
 						<tr><td>OwnCert</td><td>The client certificate to use, if requested by the server. A string containing a PEM- or DER-encoded cert is expected.</td></tr>
 						<tr><td>OwnPrivKey</td><td>The private key appropriate for OwnCert. A string containing a PEM- or DER-encoded private key is expected.</td></tr>
 						<tr><td>OwnPrivKeyPassword</td><td>The password for OwnPrivKey. If not present or empty, no password is assumed.</td></tr>
+						<tr><td>TrustedRootCAs</td><td>The certificates of the Root CAs that are to be trusted, encoded in PEM format. Multiple certificates can be used by concatenating the certificates, separating them by newlines. If this option is not present or empty, the request will NOT check the server's certificate, which is UNSAFE!</td></tr>
 					</table>
 					<p>
 					Redirection:

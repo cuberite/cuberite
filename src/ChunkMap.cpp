@@ -763,7 +763,7 @@ bool cChunkMap::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 			res = false;
 			continue;
 		}
-		if (!cChunkDef::IsValidHeight(itr->m_RelY))
+		if (!cChunkDef::IsValidHeight(itr->GetRelativePos()))
 		{
 			continue;
 		}
@@ -1362,7 +1362,10 @@ void cChunkMap::Tick(std::chrono::milliseconds a_Dt)
 	// Do the magic of updating the world:
 	for (auto & Chunk : m_Chunks)
 	{
-		Chunk.second.Tick(a_Dt);
+		if (Chunk.second.ShouldBeTicked())
+		{
+			Chunk.second.Tick(a_Dt);
+		}
 	}
 
 	// Finally, only after all chunks are ticked, tell the client about all aggregated changes:
@@ -1488,7 +1491,7 @@ void cChunkMap::SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTi
 
 void cChunkMap::TrackInDeadlockDetect(cDeadlockDetect & a_DeadlockDetect, const AString & a_WorldName)
 {
-	a_DeadlockDetect.TrackCriticalSection(m_CSChunks, Printf("World %s chunkmap", a_WorldName.c_str()));
+	a_DeadlockDetect.TrackCriticalSection(m_CSChunks, fmt::format(FMT_STRING("World {} chunkmap"), a_WorldName));
 }
 
 

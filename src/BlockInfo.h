@@ -48,7 +48,7 @@ public:
 	/** Is this block solid (player cannot walk through)? */
 	static bool IsSolid(BLOCKTYPE Block);
 
-	/** Is a block transparent? (https://minecraft.gamepedia.com/Opacity) */
+	/** Is a block transparent? (https://minecraft.wiki/w/Opacity) */
 	static bool IsTransparent(BLOCKTYPE Block);
 
 	/** Can a spectator interact with this block? */
@@ -61,7 +61,6 @@ public:
 	static float GetHardness(BLOCKTYPE Block);
 };
 // tolua_end
-
 
 
 

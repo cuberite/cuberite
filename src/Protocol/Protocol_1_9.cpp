@@ -61,19 +61,6 @@ Implements the 1.9 protocol classes:
 
 
 
-#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		if (!ByteBuf.Proc(Var))\
-		{\
-			return;\
-		} \
-	} while (false)
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_0:
 
@@ -320,12 +307,15 @@ void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	const auto Delta = (a_Entity.GetPosition() - a_Entity.GetLastSentPosition()) * 32 * 128;
+	const auto Delta = (a_Entity.GetPosition() * 32 * 128).Floor() - (a_Entity.GetLastSentPosition() * 32 * 128).Floor();
 
-	// Limitations of a short
-	static const auto Max = std::numeric_limits<Int16>::max();
-
-	if ((std::abs(Delta.x) <= Max) && (std::abs(Delta.y) <= Max) && (std::abs(Delta.z) <= Max))
+	// Ensure that the delta has enough precision and is within range of a BEInt16:
+	if (
+		Delta.HasNonZeroLength() &&
+		cByteBuffer::CanBEInt16Represent(Delta.x) &&
+		cByteBuffer::CanBEInt16Represent(Delta.y) &&
+		cByteBuffer::CanBEInt16Represent(Delta.z)
+	)
 	{
 		const auto Move = static_cast<Vector3<Int16>>(Delta);
 
@@ -354,7 +344,8 @@ void cProtocol_1_9_0::SendEntityPosition(const cEntity & a_Entity)
 		return;
 	}
 
-	// Too big a movement, do a teleport
+	// Too big or small a movement, do a teleport.
+
 	cPacketizer Pkt(*this, pktTeleportEntity);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
 	Pkt.WriteBEDouble(a_Entity.GetPosX());
@@ -479,22 +470,42 @@ void cProtocol_1_9_0::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Da
 
 
 
-void cProtocol_1_9_0::SendPlayerMoveLook(void)
+void cProtocol_1_9_0::SendPlayerMoveLook (const Vector3d a_Pos, const float a_Yaw, const float a_Pitch, const bool a_IsRelative)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktPlayerMoveLook);
-	cPlayer * Player = m_Client->GetPlayer();
-	Pkt.WriteBEDouble(Player->GetPosX());
-	Pkt.WriteBEDouble(Player->GetPosY());
-	Pkt.WriteBEDouble(Player->GetPosZ());
-	Pkt.WriteBEFloat(static_cast<float>(Player->GetYaw()));
-	Pkt.WriteBEFloat(static_cast<float>(Player->GetPitch()));
-	Pkt.WriteBEUInt8(0);
+	Pkt.WriteBEDouble(a_Pos.x);
+	Pkt.WriteBEDouble(a_Pos.y);
+	Pkt.WriteBEDouble(a_Pos.z);
+	Pkt.WriteBEFloat(a_Yaw);
+	Pkt.WriteBEFloat(a_Pitch);
+
+	if (a_IsRelative)
+	{
+		// Set all bits to 1 - makes everything relative
+		Pkt.WriteBEUInt8(static_cast<UInt8>(-1));
+	}
+	else
+	{
+		// Set all bits to 0 - make everything absolute
+		Pkt.WriteBEUInt8(0);
+	}
+
 	Pkt.WriteVarInt32(++m_OutstandingTeleportId);
 
 	// This teleport ID hasn't been confirmed yet
 	m_IsTeleportIdConfirmed = false;
+}
+
+
+
+
+
+void cProtocol_1_9_0::SendPlayerMoveLook(void)
+{
+	cPlayer * Player = m_Client->GetPlayer();
+	SendPlayerMoveLook(Player->GetPosition(), static_cast<float>(Player->GetYaw()), static_cast<float>(Player->GetPitch()), false);
 }
 
 
@@ -557,16 +568,16 @@ void cProtocol_1_9_0::SendPlayerSpawn(const cPlayer & a_Player)
 
 
 
-void cProtocol_1_9_0::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
+void cProtocol_1_9_0::SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktSoundEffect);
 	Pkt.WriteString(a_SoundName);
 	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
-	Pkt.WriteBEInt32(static_cast<Int32>(a_X * 8.0));
-	Pkt.WriteBEInt32(static_cast<Int32>(a_Y * 8.0));
-	Pkt.WriteBEInt32(static_cast<Int32>(a_Z * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.x * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.y * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.z * 8.0));
 	Pkt.WriteBEFloat(a_Volume);
 	Pkt.WriteBEUInt8(static_cast<Byte>(a_Pitch * 63));
 }
@@ -611,16 +622,16 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 
 
 
-void cProtocol_1_9_0::SendThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
+void cProtocol_1_9_0::SendThunderbolt(Vector3i a_Origin)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktSpawnGlobalEntity);
 	Pkt.WriteVarInt32(0);  // EntityID = 0, always
 	Pkt.WriteBEUInt8(1);  // Type = Thunderbolt
-	Pkt.WriteBEDouble(a_BlockX);
-	Pkt.WriteBEDouble(a_BlockY);
-	Pkt.WriteBEDouble(a_BlockZ);
+	Pkt.WriteBEDouble(a_Origin.x);
+	Pkt.WriteBEDouble(a_Origin.y);
+	Pkt.WriteBEDouble(a_Origin.z);
 }
 
 
@@ -725,6 +736,9 @@ UInt32 cProtocol_1_9_0::GetPacketID(cProtocol::ePacketType a_Packet) const
 		{
 			break;
 		}
+
+		default:
+			break;
 	}
 	UNREACHABLE("Unsupported outgoing packet type");
 }
@@ -873,14 +887,14 @@ void cProtocol_1_9_0::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
 
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
+	Vector3i Position;
+	if (!a_ByteBuffer.ReadXYZPosition64(Position))
 	{
 		return;
 	}
 
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Face);
-	m_Client->HandleLeftClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), Status);
+	m_Client->HandleLeftClick(Position, FaceIntToBlockFace(Face), Status);
 }
 
 
@@ -889,8 +903,8 @@ void cProtocol_1_9_0::HandlePacketBlockDig(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_9_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
+	Vector3i Position;
+	if (!a_ByteBuffer.ReadXYZPosition64(Position))
 	{
 		return;
 	}
@@ -901,7 +915,7 @@ void cProtocol_1_9_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, CursorZ);
 
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), CursorX, CursorY, CursorZ, Hand == MAIN_HAND);
+	m_Client->HandleRightClick(Position, FaceIntToBlockFace(Face), {CursorX, CursorY, CursorZ}, Hand == MAIN_HAND);
 }
 
 
@@ -1003,7 +1017,7 @@ void cProtocol_1_9_0::HandlePacketPlayerPos(cByteBuffer & a_ByteBuffer)
 
 	if (m_IsTeleportIdConfirmed)
 	{
-		m_Client->HandlePlayerMove(PosX, PosY, PosZ, IsOnGround);
+		m_Client->HandlePlayerMove({PosX, PosY, PosZ}, IsOnGround);
 	}
 }
 
@@ -1022,7 +1036,7 @@ void cProtocol_1_9_0::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 
 	if (m_IsTeleportIdConfirmed)
 	{
-		m_Client->HandlePlayerMoveLook(PosX, PosY, PosZ, Yaw, Pitch, IsOnGround);
+		m_Client->HandlePlayerMoveLook({PosX, PosY, PosZ}, Yaw, Pitch, IsOnGround);
 	}
 }
 
@@ -1074,8 +1088,8 @@ void cProtocol_1_9_0::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_9_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 {
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
+	Vector3i Position;
+	if (!a_ByteBuffer.ReadXYZPosition64(Position))
 	{
 		return;
 	}
@@ -1087,7 +1101,7 @@ void cProtocol_1_9_0::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 		Lines[i] = Line;
 	}
 
-	m_Client->HandleUpdateSign(BlockX, BlockY, BlockZ, Lines[0], Lines[1], Lines[2], Lines[3]);
+	m_Client->HandleUpdateSign(Position, Lines[0], Lines[1], Lines[2], Lines[3]);
 }
 
 
@@ -1246,7 +1260,7 @@ void cProtocol_1_9_0::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, std
 		HANDLE_READ(a_ByteBuffer, ReadBool, bool, Conditional);
 		HANDLE_READ(a_ByteBuffer, ReadBool, bool, Automatic);
 
-		m_Client->HandleCommandBlockBlockChange(BlockX, BlockY, BlockZ, Command);
+		m_Client->HandleCommandBlockBlockChange({BlockX, BlockY, BlockZ}, Command);
 	}
 	else if (a_Channel == "PickItem")
 	{
@@ -2304,8 +2318,6 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 
 		case mtDonkey:
 
-		case mtEndermite:
-
 		case mtMule:
 
 		case mtStray:
@@ -2322,6 +2334,7 @@ void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_M
 
 		case mtCaveSpider:
 		case mtEnderDragon:
+		case mtEndermite:
 		case mtGiant:
 		case mtIronGolem:
 		case mtMooshroom:
@@ -2401,19 +2414,19 @@ cProtocol::Version cProtocol_1_9_2::GetProtocolVersion() const
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_9_4:
 
-void cProtocol_1_9_4::SendUpdateSign(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
+void cProtocol_1_9_4::SendUpdateSign(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	// 1.9.4 removed the update sign packet and now uses Update Block Entity
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
-	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockPos);
 	Pkt.WriteBEUInt8(9);  // Action 9 - update sign
 
 	cFastNBTWriter Writer;
-	Writer.AddInt("x",        a_BlockX);
-	Writer.AddInt("y",        a_BlockY);
-	Writer.AddInt("z",        a_BlockZ);
+	Writer.AddInt("x",        a_BlockPos.x);
+	Writer.AddInt("y",        a_BlockPos.y);
+	Writer.AddInt("z",        a_BlockPos.z);
 	Writer.AddString("id", "Sign");
 
 	Json::Value Line1;

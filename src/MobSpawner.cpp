@@ -79,7 +79,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		return false;
 	}
 
-	if (cChunkDef::IsValidHeight(a_RelPos.y - 1) && (a_Chunk->GetBlock(a_RelPos.addedY(-1)) == E_BLOCK_BEDROCK))
+	if (cChunkDef::IsValidHeight(a_RelPos.addedY(-1)) && (a_Chunk->GetBlock(a_RelPos.addedY(-1)) == E_BLOCK_BEDROCK))
 	{
 		return false;   // Make sure mobs do not spawn on bedrock.
 	}
@@ -220,7 +220,10 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 					(!cBlockInfo::IsTransparent(BlockBelow)) ||
 					(a_DisableSolidBelowCheck)) &&
 				(
-					(a_RelPos.y <= 40) ||
+					(
+						(a_RelPos.y <= 40) &&
+						a_Chunk->IsSlimeChunk()
+					) ||
 					(
 						(a_Biome == biSwampland) &&
 						(a_RelPos.y >= 50) &&

@@ -3,6 +3,9 @@
 
 #pragma once
 
+#include "ItemHandler.h"
+#include "Entities/ProjectileEntity.h"
+
 
 
 

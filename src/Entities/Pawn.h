@@ -33,6 +33,17 @@ public:
 	virtual void HandleFalling(void);
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 
+	/** Handles farmland trampling when hitting the ground.
+	Algorithm:
+	fall height <= 0.6875 blocks: no trampling
+	fall height > 0.6875 and <= 1.0625: 25% chance of trampling
+	fall height > 1.0625 and <= 1.5625: 66% chance of trampling
+	fall height > 1.5625: always trample
+	The values may differ from vanilla, they were determined experimentally.
+	Additionaly, mobs smaller than 0.512 cubic blocks won't trample.
+	*/
+	void HandleFarmlandTrampling(double a_FallHeight, BLOCKTYPE a_BlockAtFoot, BLOCKTYPE a_BlockBelow);
+
 	/** Tells all pawns which are targeting us to stop targeting us. */
 	void StopEveryoneFromTargetingMe();
 
@@ -80,7 +91,7 @@ public:
 	Checks for valid destinations in a cube of length 2 * a_HalfCubeWidth centred at a_Centre.
 	Returns true and places destination in a_Destination if successful.
 	Returns false if destination could be found after a_NumTries attempts.
-	Details at: https://minecraft.fandom.com/wiki/Enderman#Teleportation. */
+	Details at: https://minecraft.wiki/w/Enderman#Teleportation. */
 	static bool FindTeleportDestination(cWorld & a_World, const int a_HeightRequired, const unsigned int a_NumTries, Vector3d & a_Destination, Vector3i a_Centre, const int a_HalfCubeWidth);
 
 	// tolua_end

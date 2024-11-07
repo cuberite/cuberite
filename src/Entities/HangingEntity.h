@@ -31,10 +31,7 @@ public:  // tolua_export
 	static bool IsValidSupportBlock(BLOCKTYPE a_BlockType);  // tolua_export
 
 	/** Set the direction in which the entity is facing. */
-	void SetFacing(eBlockFace a_Facing)
-	{
-		m_Facing = cHangingEntity::BlockFaceToProtocolFace(a_Facing);
-	}
+	void SetFacing(eBlockFace a_Facing) { m_Facing = cHangingEntity::BlockFaceToProtocolFace(a_Facing); }  // tolua_export
 
 	/** Set the direction in which the entity is facing. */
 	void SetProtocolFacing(Byte a_Facing)

@@ -1700,7 +1700,7 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 		return;
 	}
 
-	// Pseudocode found at: https://minecraft.gamepedia.com/Enchanting_mechanics
+	// Pseudocode found at: https://minecraft.wiki/w/Enchanting_mechanics
 	const auto Bookshelves = std::min(GetBookshelvesCount(*a_Player.GetWorld()), 15U);
 
 	// A PRNG initialised using the player's enchantment seed.

@@ -109,6 +109,10 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 				continue;
 			}
 			case cProtocol::Version::v1_14:
+			case cProtocol::Version::v1_14_1:
+			case cProtocol::Version::v1_14_2:
+			case cProtocol::Version::v1_14_3:
+			case cProtocol::Version::v1_14_4:
 			{
 				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v477);
 				continue;
@@ -192,12 +196,16 @@ inline void cChunkDataSerializer::Serialize47(const int a_ChunkX, const int a_Ch
 	m_Packet.WriteBEInt32(a_ChunkX);
 	m_Packet.WriteBEInt32(a_ChunkZ);
 	m_Packet.WriteBool(true);      // "Ground-up continuous", or rather, "biome data present" flag
-	m_Packet.WriteBEUInt16(Bitmask.first);
+
+	// Minecraft 1.8 does not like completely empty packets
+	// Send one completely empty chunk section if this is the case
+	m_Packet.WriteBEUInt16(Bitmask.first ? Bitmask.first : 1);
 
 	// Write the chunk size:
+	// Account for the single empty section if sending an empty chunk
 	const int BiomeDataSize = cChunkDef::Width * cChunkDef::Width;
 	const size_t ChunkSize = (
-		Bitmask.second * (ChunkBlockData::SectionBlockCount * 2 + ChunkLightData::SectionLightCount * 2) +  // Blocks and lighting
+		(Bitmask.second ? Bitmask.second : 1) * (ChunkBlockData::SectionBlockCount * 2 + ChunkLightData::SectionLightCount * 2) +  // Blocks and lighting
 		BiomeDataSize    // Biome data
 	);
 	m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSize));
@@ -245,6 +253,19 @@ inline void cChunkDataSerializer::Serialize47(const int a_ChunkX, const int a_Ch
 			m_Packet.WriteBuf(SkyLights->data(), SkyLights->size());
 		}
 	});
+
+	// Serialize a single empty section if sending an empty chunk
+	if (!Bitmask.first)
+	{
+		// Block data (all air)
+		for (size_t i = 0; i < ChunkBlockData::SectionBlockCount * 2; i++)
+		{
+			m_Packet.WriteBEUInt8(0);
+		}
+		// Light data (XXX: sky light is not sent if in the nether)
+		m_Packet.WriteBuf(ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue);
+		m_Packet.WriteBuf(ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue);
+	}
 
 	// Write the biome data:
 	m_Packet.WriteBuf(a_BiomeMap, BiomeDataSize);
@@ -481,7 +502,7 @@ inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_C
 	// Write each chunk section...
 	ChunkDef_ForEachSection(a_BlockData, a_LightData,
 	{
-		m_Packet.WriteBEInt16(-1);
+		m_Packet.WriteBEInt16(ChunkBlockData::SectionBlockCount);  // a temp fix to make sure sections don't disappear
 		m_Packet.WriteBEUInt8(BitsPerEntry);
 		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
 		WriteBlockSectionSeamless<&Palette477>(Blocks, Metas, BitsPerEntry);

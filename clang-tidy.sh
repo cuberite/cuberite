@@ -2,9 +2,16 @@
 
 set -e
 
+LOCALSTRING="local"
+
+if [ "$3" = "$LOCALSTRING" ]; then
+  REGEX="/cuberite/src/\.?[^\.]"
+else
+  REGEX="cuberite_[^/\.]+/src/\.?[^\.]"
+fi
+
 FIXES_FILE="tidy-fixes.yaml"
-REGEX="cuberite_[^/\.]+/src/\.?[^\.]"
-ARGS="-header-filter $REGEX -quiet -export-fixes $FIXES_FILE "$@" $REGEX"
+ARGS="-header-filter $REGEX -quiet -export-fixes $FIXES_FILE $* $REGEX"
 
 # Generate the compilation database
 mkdir -p tidy-build

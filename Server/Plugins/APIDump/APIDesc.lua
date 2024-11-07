@@ -908,16 +908,6 @@ return
 					},
 					Notes = "Returns true if the chunk is set to use default height generator",
 				},
-				IsUsingDefaultStructures =
-				{
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if the chunk is set to use default structures",
-				},
 				RandomFillRelCuboid =
 				{
 					{
@@ -1257,17 +1247,6 @@ return
 						},
 					},
 					Notes = "Sets the chunk to use default height generator or not",
-				},
-				SetUseDefaultStructures =
-				{
-					Params =
-					{
-						{
-							Name = "ShouldUseDefaultStructures",
-							Type = "boolean",
-						},
-					},
-					Notes = "Sets the chunk to use default structures or not",
 				},
 				UpdateHeightmap =
 				{
@@ -2249,18 +2228,21 @@ end
 				Chaining example below for details.</p>
 				<p>
 				Each part of the composite chat message takes a "Style" parameter, this is a string that describes
-				the formatting. It uses the following strings, concatenated together:
+				the formatting. It uses the "standard" minecraft format code without the '&' symbole, concatenated
+				together:
 				<table>
 				<tr><th>String</th><th>Style</th></tr>
-				<tr><td>b</td><td>Bold text</td></tr>
-				<tr><td>i</td><td>Italic text</td></tr>
-				<tr><td>u</td><td>Underlined text</td></tr>
-				<tr><td>s</td><td>Strikethrough text</td></tr>
-				<tr><td>o</td><td>Obfuscated text</td></tr>
-				<tr><td>@X</td><td>color [0–9a–f], same as dye meta</td></tr>
+				<tr><td>l</td><td>Bold text</td></tr>
+				<tr><td>o</td><td>Italic text</td></tr>
+				<tr><td>n</td><td>Underlined text</td></tr>
+				<tr><td>m</td><td>Strikethrough text</td></tr>
+				<tr><td>k</td><td>Obfuscated text</td></tr>
+				<tr><td>r</td><td>Reset Style</td></tr>
+				<tr><td>[0-9a-f]</td><td>colors</td></tr>
 				</table>
+				You can escape the '&' character with an antislash in front of it. as follow: `I love Choco\&chips`
 				The following picture, taken from the Minecraft Wiki, illustrates the color codes:</p>
-				<img src="http://images.wikia.com/minecraft_gamepedia/images/archive/4/4c/20200824112326!Colors.png" />
+				<img src="https://static.wikia.nocookie.net/minecraft_gamepedia/images/7/7e/Minecraft_Formatting.gif/revision/latest/scale-to-width-down/292?cb=20200828001454" />
 			]],
 			Functions =
 			{
@@ -5392,6 +5374,10 @@ ValueName0=SomeOtherValue
 				The objects of this class are created empty. You need to either load a file using ReadFile(), or
 				insert values by hand. Then you can store the object's contents to a disk file using WriteFile(), or
 				just forget everything by destroying the object. Note that the file operations are quite slow.</p>
+				<p>
+				Cuberite will write the characters '\n' in place of line breaks in the values of the cIniFile when
+				it is being stored into a file. It will also replace '\n' with line breaks when it reads an INI
+				file.
 				<p>
 				For storing high-volume low-latency data, use the {{sqlite3}} class. For storing
 				hierarchically-structured data, use the XML format, using the LuaExpat parser in the {{lxp}} class.
@@ -8707,10 +8693,6 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-				EraseData =
-				{
-					Notes = "Erases all pixel data.",
-				},
 				GetCenterX =
 				{
 					Returns =
@@ -8998,16 +8980,6 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "If a map with the specified ID exists, calls the CallbackFunction for that map. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cMap|Map}})</pre> Returns true if the map was found and the callback called, false if map not found.",
-				},
-				GetNumMaps =
-				{
-					Returns =
-					{
-						{
-							Type = "number",
-						},
-					},
-					Notes = "Returns the number of registered maps.",
 				},
 			},
 		},
@@ -9774,7 +9746,7 @@ a_Player:OpenWindow(Window);
 								Type = "Vector3i",
 							},
 						},
-						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.fandom.com/wiki/Enderman#Teleportation}}.",
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.wiki/w/Enderman#Teleportation}}.",
 					},
 					{
 						Params =
@@ -9800,7 +9772,7 @@ a_Player:OpenWindow(Window);
 								Type = "cBoundingBox",
 							},
 						},
-						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.fandom.com/wiki/Enderman#Teleportation}}.",
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.wiki/w/Enderman#Teleportation}}.",
 					},
 					{
 						Params =
@@ -9826,7 +9798,7 @@ a_Player:OpenWindow(Window);
 								Type = "number",
 							},
 						},
-						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.fandom.com/wiki/Enderman#Teleportation}}.",
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.wiki/w/Enderman#Teleportation}}.",
 					},
 				},
 				HasEntityEffect =
@@ -11442,17 +11414,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Sets the dominant hand of the player.",
 				},
-				SetName =
-				{
-					Params =
-					{
-						{
-							Name = "Name",
-							Type = "string",
-						},
-					},
-					Notes = "Sets the player name. This rename will NOT be visible to any players already in the server who are close enough to see this player.",
-				},
 				SetNormalMaxSpeed =
 				{
 					Params =
@@ -12331,7 +12292,7 @@ end
 							Type = "cTeam",
 						},
 					},
-					Notes = "Registers a new team. Returns the {{cTeam}} instance, nil on error.",
+					Notes = "Registers a new team. Returns the {{cTeam}} instance, nil on error. For example if the team already exists.",
 				},
 				RemoveObjective =
 				{
@@ -13225,14 +13186,6 @@ end
 					},
 					Notes = "Generates a version 3, variant 1 UUID based on the md5 hash of Name."
 				},
-			},
-		},
-		cWebPlugin =
-		{
-			Desc = "",
-			Functions =
-			{
-
 			},
 		},
 		cWindow =
@@ -14353,13 +14306,13 @@ end
 								Type = "number",
 							},
 						},
-						Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}",
+						Notes = "<b>OBSOLETE</b>, use the vector version instead.",
 					},
 					{
 						Params =
 						{
 							{
-								Name = "BlockPos",
+								Name = "Position",
 								Type = "Vector3i",
 							},
 							{
@@ -14367,7 +14320,7 @@ end
 								Type = "eBlockFace",
 							},
 							{
-								Name = "IsInverse",
+								Name = "InvertDirection",
 								Type = "boolean",
 								IsOptional = true,
 							},
@@ -14375,11 +14328,10 @@ end
 						Returns =
 						{
 							{
-								Name = "BlockPos",
 								Type = "Vector3i",
 							},
 						},
-						Notes = "Returns the coords of a block adjacent to the specified block through the specified {{Globals#BlockFaces|face}}",
+						Notes = "By default, returns the coordinates adjacent to the specified block through the specified face. If inverted, returns the coordinates adjacent to the opposite face.",
 					},
 				},
 				Base64Decode =
@@ -17897,6 +17849,10 @@ end
 				{
 					Notes = "A mask that indicates the bits of the metadata that specify the facing of redstone repeaters.",
 				},
+				E_META_SPAWN_EGG_ENDERMITE =
+				{
+					Notes = "",
+				},
 				E_META_SPAWN_EGG_WITHER_SKELETON =
 				{
 					Notes = ""
@@ -18000,6 +17956,10 @@ end
 				esPrimedTNT =
 				{
 					Notes = "A TNT explosion. The SourceData param is the {{cTNTEntity|TNT entity}} object.",
+				},
+				esTNTMinecart =
+				{
+					Notes = "A TNT minecart explosion. The SourceData param is the {{cMinecartWithTNT|Minecart with TNT entity}} object.",
 				},
 				esWitherBirth =
 				{
@@ -19285,6 +19245,10 @@ end
 		{
 			FileName = "SettingUpZeroBrane.html",
 			Title = "Setting up the ZeroBrane Studio Lua IDE",
+		},
+		{
+			FileName = "SettingUpLuaLanguageServer.html",
+			Title = "Setting up Lua-Language-Server (VSCode/Emacs)"
 		},
 		{
 			FileName = "UsingChunkStays.html",

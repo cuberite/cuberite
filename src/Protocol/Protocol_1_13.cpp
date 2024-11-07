@@ -41,43 +41,13 @@ Implements the 1.13 protocol classes:
 
 
 
-#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		if (!ByteBuf.Proc(Var))\
-		{\
-			return;\
-		} \
-	} while (false)
-
-
-
-
-
-#define HANDLE_PACKET_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		{ \
-			if (!ByteBuf.Proc(Var)) \
-			{ \
-				ByteBuf.CheckValid(); \
-				return false; \
-			} \
-			ByteBuf.CheckValid(); \
-		} \
-	} while (false)
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_13:
 
-void cProtocol_1_13::SendBlockChange(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cProtocol_1_13::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	cPacketizer Pkt(*this, pktBlockChange);
-	Pkt.WriteXYZPosition64(a_BlockX, a_BlockY, a_BlockZ);
+	Pkt.WriteXYZPosition64(a_BlockPos);
 	Pkt.WriteVarInt32(GetProtocolBlockType(a_BlockType, a_BlockMeta));
 }
 
@@ -368,6 +338,9 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadata a_Metadata) const
 		case EntityMetadata::AreaEffectCloudParticleParameter1:
 		case EntityMetadata::AreaEffectCloudParticleParameter2:
 		case EntityMetadata::ZombieUnusedWasType: break;
+
+		default:
+			break;
 	}
 	UNREACHABLE("Retrieved invalid metadata for protocol");
 }
@@ -927,7 +900,11 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 
 		case cEntity::etItemFrame:
 		{
-			// TODO
+			const auto & Frame = static_cast<const cItemFrame &>(a_Entity);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemFrameItem, EntityMetadataType::Item);
+			WriteItem(a_Pkt, Frame.GetItem());
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemFrameRotation, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(Frame.GetItemRotation());
 			break;
 		}  // case etItemFrame
 
@@ -1326,8 +1303,6 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtDrowned:
 
-		case mtEndermite:
-
 		case mtEvoker:
 
 		case mtIllusioner:
@@ -1375,6 +1350,7 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}
 
+		case mtEndermite:
 		case mtGiant:
 		case mtSilverfish:
 		case mtSquid:

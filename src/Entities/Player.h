@@ -123,12 +123,12 @@ public:
 	float GetXpPercentage(void) const;
 
 	/** Calculates the amount of XP needed for a given level
-	Ref: https://minecraft.gamepedia.com/XP
+	Ref: https://minecraft.wiki/w/XP
 	*/
 	static int XpForLevel(int a_Level);
 
 	/** Inverse of XpForLevel
-	Ref: https://minecraft.gamepedia.com/XP
+	Ref: https://minecraft.wiki/w/XP
 	values are as per this with pre-calculations
 	*/
 	static int CalcLevelFromXp(int a_CurrentXp);
@@ -554,7 +554,7 @@ public:
 	/** Sends the block in the specified range around the specified coord to the client
 	as a block change packet.
 	The blocks in range (a_BlockX - a_Range, a_BlockX + a_Range) are sent (NY-metric). */
-	void SendBlocksAround(int a_BlockX, int a_BlockY, int a_BlockZ, int a_Range = 1);
+	void SendBlocksAround(Vector3i a_BlockPos, int a_Range = 1);
 
 	bool HasSkinPart(eSkinPart a_Part) const { return (m_SkinParts & a_Part) != 0; }
 	int GetSkinParts(void) const { return m_SkinParts; }
@@ -580,13 +580,13 @@ public:
 	/** Returns the progress mined per tick for the block a_Block as a fraction
 	(1 would be completely mined)
 	Depends on hardness values so check those are correct.
-	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
+	Source: https://minecraft.wiki/w/Breaking#Calculation */
 	float GetMiningProgressPerTick(BLOCKTYPE a_Block);
 
 	/** Given tool, enchantments, status effects, and world position
 	returns whether a_Block would be instantly mined.
 	Depends on hardness values so check those are correct.
-	Source: https://minecraft.gamepedia.com/Breaking#Instant_breaking */
+	Source: https://minecraft.wiki/w/Breaking#Instant_breaking */
 	bool CanInstantlyMine(BLOCKTYPE a_Block);
 
 	/** Adds an Item to the list of known items.
@@ -779,7 +779,7 @@ private:
 	If he has an enchanted tool with efficiency or he has a haste or mining fatique effect it gets multiplied by a specific factor depending on the strength of the effect or enchantment.
 	In he is in water it gets divided by 5 except if his tool is enchanted with aqua affinity.
 	If he is not on ground it also gets divided by 5.
-	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
+	Source: https://minecraft.wiki/w/Breaking#Calculation */
 	float GetDigSpeed(BLOCKTYPE a_Block);
 
 	/** Add the recipe Id to the known recipes.

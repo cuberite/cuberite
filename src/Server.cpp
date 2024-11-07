@@ -157,6 +157,7 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 	m_MaxPlayers = static_cast<size_t>(a_Settings.GetValueSetI("Server", "MaxPlayers", 100));
 	m_bIsHardcore = a_Settings.GetValueSetB("Server", "HardcoreEnabled", false);
 	m_bAllowMultiLogin = a_Settings.GetValueSetB("Server", "AllowMultiLogin", false);
+	m_RequireResourcePack = a_Settings.GetValueSetB("Server", "RequireResourcePack", false);
 	m_ResourcePackUrl = a_Settings.GetValueSet("Server", "ResourcePackUrl", "");
 	m_CustomRedirectUrl = a_Settings.GetValueSet("Server", "CustomRedirectUrl", "https://youtu.be/dQw4w9WgXcQ");
 
@@ -321,7 +322,7 @@ cTCPLink::cCallbacksPtr cServer::OnConnectionAccepted(const AString & a_RemoteIP
 	cClientHandlePtr NewHandle = std::make_shared<cClientHandle>(a_RemoteIPAddress, m_ClientViewDistance);
 	cCSLock Lock(m_CSClients);
 	m_Clients.push_back(NewHandle);
-	return std::move(NewHandle);
+	return NewHandle;
 }
 
 
@@ -488,7 +489,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		if (split.size() > 1)
 		{
 			cPluginManager::Get()->ReloadPlugin(split[1]);
-			a_Output.Out("Plugin reload scheduled");
+			a_Output.OutLn("Plugin reload scheduled");
 		}
 		else
 		{
@@ -500,14 +501,14 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 	else if (split[0] == "reloadplugins")
 	{
 		cPluginManager::Get()->ReloadPlugins();
-		a_Output.Out("Plugins reloaded");
+		a_Output.OutLn("Plugins reloaded");
 		a_Output.Finished();
 		return;
 	}
 	else if (split[0] == "reloadweb")
 	{
 		cRoot::Get()->GetWebAdmin()->Reload();
-		a_Output.Out("WebAdmin configuration reloaded");
+		a_Output.OutLn("WebAdmin configuration reloaded");
 		a_Output.Finished();
 		return;
 	}
@@ -516,11 +517,11 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		if (split.size() > 1)
 		{
 			cPluginManager::Get()->RefreshPluginList();  // Refresh the plugin list, so that if the plugin was added just now, it is loadable
-			a_Output.Out(cPluginManager::Get()->LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin");
+			a_Output.OutLn(cPluginManager::Get()->LoadPlugin(split[1]) ? "Plugin loaded" : "Error occurred loading plugin");
 		}
 		else
 		{
-			a_Output.Out("Usage: load <PluginFolder>");
+			a_Output.OutLn("Usage: load <PluginFolder>");
 		}
 		a_Output.Finished();
 		return;
@@ -530,11 +531,11 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		if (split.size() > 1)
 		{
 			cPluginManager::Get()->UnloadPlugin(split[1]);
-			a_Output.Out("Plugin unload scheduled");
+			a_Output.OutLn("Plugin unload scheduled");
 		}
 		else
 		{
-			a_Output.Out("Usage: unload <PluginFolder>");
+			a_Output.OutLn("Usage: unload <PluginFolder>");
 		}
 		a_Output.Finished();
 		return;
@@ -555,7 +556,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 				return false;
 			}
 		);
-		a_Output.Out("Destroyed all entities");
+		a_Output.OutLn("Destroyed all entities");
 		a_Output.Finished();
 		return;
 	}
@@ -570,7 +571,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 
 	else if (split[0].compare("luastats") == 0)
 	{
-		a_Output.Out(cLuaStateTracker::GetStats());
+		a_Output.OutLn(cLuaStateTracker::GetStats());
 		a_Output.Finished();
 		return;
 	}
@@ -580,7 +581,7 @@ void cServer::ExecuteConsoleCommand(const AString & a_Cmd, cCommandOutputCallbac
 		return;
 	}
 
-	a_Output.Out("Unknown command, type 'help' for all commands.");
+	a_Output.OutLn("Unknown command, type 'help' for all commands.");
 	a_Output.Finished();
 }
 
@@ -623,7 +624,8 @@ void cServer::PrintHelp(const AStringVector & a_Split, cCommandOutputCallback & 
 	for (AStringPairs::const_iterator itr = Callback.m_Commands.begin(), end = Callback.m_Commands.end(); itr != end; ++itr)
 	{
 		const AStringPair & cmd = *itr;
-		a_Output.Out(Printf("%-*s - %s\n", static_cast<int>(Callback.m_MaxLen), cmd.first.c_str(), cmd.second.c_str()));
+		// Output the commands and their help strings, with all the commands aligned to the same width
+		a_Output.OutLn(fmt::format(FMT_STRING("{1:{0}s} - {2}"), Callback.m_MaxLen, cmd.first, cmd.second));
 	}  // for itr - Callback.m_Commands[]
 }
 

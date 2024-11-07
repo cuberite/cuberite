@@ -229,6 +229,12 @@ bool cBlockPistonHandler::CanPushBlock(
 	Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
 )
 {
+	if (!cChunkDef::IsValidHeight(a_BlockPos))
+	{
+		// Can't push a void block.
+		return false;
+	}
+
 	const static std::array<Vector3i, 6> pushingDirs =
 	{
 		{
@@ -310,7 +316,7 @@ void cBlockPistonHandler::OnBroken(
 
 	const auto Extension = a_BlockPos + MetadataToOffset(a_OldBlockMeta);
 	if (
-		cChunkDef::IsValidHeight(Extension.y) &&
+		cChunkDef::IsValidHeight(Extension) &&
 		(a_ChunkInterface.GetBlock(Extension) == E_BLOCK_PISTON_EXTENSION)
 	)
 	{
@@ -335,7 +341,7 @@ void cBlockPistonHeadHandler::OnBroken(
 {
 	UNUSED(a_Digger);
 	const auto Base = a_BlockPos - cBlockPistonHandler::MetadataToOffset(a_OldBlockMeta);
-	if (!cChunkDef::IsValidHeight(Base.y))
+	if (!cChunkDef::IsValidHeight(Base))
 	{
 		return;
 	}

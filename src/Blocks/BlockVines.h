@@ -119,15 +119,16 @@ private:
 		}
 
 		// Check if vine above us, add its meta to MaxMeta:
-		if ((a_Position.y < cChunkDef::Height - 1) && (a_Chunk.GetBlock(a_Position.addedY(1)) == E_BLOCK_VINES))
+		const auto AbovePos = a_Position.addedY(1);
+		if (cChunkDef::IsValidHeight(AbovePos) && (a_Chunk.GetBlock(AbovePos) == E_BLOCK_VINES))
 		{
-			MaxMeta |= a_Chunk.GetMeta(a_Position.addedY(1));
+			MaxMeta |= a_Chunk.GetMeta(AbovePos);
 		}
 
 		NIBBLETYPE Common = a_CurrentMeta & MaxMeta;  // Neighbors that we have and are legal.
 		if (Common != a_CurrentMeta)
 		{
-			bool HasTop = (a_Position.y < (cChunkDef::Height - 1)) && IsBlockAttachable(a_Chunk.GetBlock(a_Position.addedY(1)));
+			bool HasTop = cChunkDef::IsValidHeight(AbovePos) && IsBlockAttachable(a_Chunk.GetBlock(AbovePos));
 			if ((Common == 0) && !HasTop)  // Meta equals 0 also means top. Make a last-ditch attempt to save the vine.
 			{
 				return VINE_LOST_SUPPORT;
@@ -199,7 +200,7 @@ private:
 
 		// Vine cannot grow down if at the bottom:
 		auto GrowPos = a_RelPos.addedY(-1);
-		if (!cChunkDef::IsValidHeight(GrowPos.y))
+		if (!cChunkDef::IsValidHeight(GrowPos))
 		{
 			return;
 		}
@@ -210,7 +211,7 @@ private:
 		if (Block == E_BLOCK_AIR)
 		{
 			auto WorldPos = a_Chunk.RelativeToAbsolute(GrowPos);
-			if (!a_PluginInterface.CallHookBlockSpread(WorldPos.x, WorldPos.y, WorldPos.z, ssVineSpread))
+			if (!a_PluginInterface.CallHookBlockSpread(WorldPos, ssVineSpread))
 			{
 				a_Chunk.UnboundedRelSetBlock(GrowPos, E_BLOCK_VINES, a_Chunk.GetMeta(a_RelPos));
 			}

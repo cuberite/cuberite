@@ -2,6 +2,11 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "DeprecatedBindings.h"
+extern "C"
+{
+	#include "lua/src/lua.h"
+	#include "lua/src/lauxlib.h"
+}
 #undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
 
@@ -500,7 +505,7 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 		}
 		#endif
 		{
-			bool res = self->SetSignLines(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4, Player);
+			bool res = self->SetSignLines({BlockX, BlockY, BlockZ}, Line1, Line2, Line3, Line4, Player);
 			tolua_pushboolean(LuaState, res ? 1 : 0);
 		}
 	}

@@ -40,9 +40,16 @@ public:
 
 	/** Creates a new link based on the given socket.
 	Used for connections accepted in a server using cNetwork::Listen().
+	a_Host is the hostname used for TLS SNI (can be empty in cases TLS is not used).
 	a_Address and a_AddrLen describe the remote peer that has connected.
 	The link is created disabled, you need to call Enable() to start the regular communication. */
-	cTCPLinkImpl(evutil_socket_t a_Socket, cCallbacksPtr a_LinkCallbacks, cServerHandleImplPtr a_Server, const sockaddr * a_Address, socklen_t a_AddrLen);
+	cTCPLinkImpl(
+		evutil_socket_t a_Socket,
+		cCallbacksPtr a_LinkCallbacks,
+		cServerHandleImplPtr a_Server,
+		const sockaddr * a_Address,
+		socklen_t a_AddrLen
+	);
 
 	/** Destroys the LibEvent handle representing the link. */
 	virtual ~cTCPLinkImpl() override;
@@ -68,7 +75,8 @@ public:
 	virtual void Close(void) override;
 	virtual AString StartTLSClient(
 		cX509CertPtr a_OwnCert,
-		cCryptoKeyPtr a_OwnPrivKey
+		cCryptoKeyPtr a_OwnPrivKey,
+		cX509CertPtr a_TrustedRootCAs
 	) override;
 	virtual AString StartTLSServer(
 		cX509CertPtr a_OwnCert,
@@ -150,6 +158,10 @@ protected:
 	/** The port of the local endpoint. Valid only after the socket has been connected. */
 	UInt16 m_LocalPort;
 
+	/** The original host parameter which was used for creating the link, either hostname or IP address.
+	Used for TLS SNI. */
+	AString m_RemoteHost;
+
 	/** The IP address of the remote endpoint. Valid only after the socket has been connected. */
 	AString m_RemoteIP;
 
@@ -174,7 +186,7 @@ protected:
 	Used for outgoing connections created using cNetwork::Connect().
 	To be used only by the Connect() factory function.
 	The link is created disabled, you need to call Enable() to start the regular communication. */
-	cTCPLinkImpl(const cCallbacksPtr a_LinkCallbacks);
+	cTCPLinkImpl(const std::string & a_Host, const cCallbacksPtr a_LinkCallbacks);
 
 	/** Callback that LibEvent calls when there's data available from the remote peer. */
 	static void ReadCallback(bufferevent * a_BufferEvent, void * a_Self);

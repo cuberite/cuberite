@@ -533,7 +533,7 @@ namespace
 	constexpr cDefaultItemHandler           ItemTerracottaHandler                      (E_BLOCK_TERRACOTTA);
 	constexpr cDefaultItemHandler           ItemTippedArrowHandler                     (E_ITEM_TIPPED_ARROW);
 	constexpr cDefaultItemHandler           ItemTNTHandler                             (E_BLOCK_TNT);
-	constexpr cDefaultItemHandler           ItemTorchBlockHandler                      (E_BLOCK_TORCH);
+	constexpr cItemTorchHandler             ItemTorchHandler                           (E_BLOCK_TORCH);
 	constexpr cDefaultItemHandler           ItemTotemOfUndyingHandler                  (E_ITEM_TOTEM_OF_UNDYING);
 	constexpr cItemChestHandler             ItemTrappedChestHandler                    (E_BLOCK_TRAPPED_CHEST);
 	constexpr cDefaultItemHandler           ItemTripwireHandler                        (E_BLOCK_TRIPWIRE);
@@ -806,7 +806,7 @@ const cItemHandler & cItemHandler::For(int a_ItemType)
 		case E_BLOCK_TALL_GRASS:                     return ItemTallGrassHandler;
 		case E_BLOCK_TERRACOTTA:                     return ItemTerracottaHandler;
 		case E_BLOCK_TNT:                            return ItemTNTHandler;
-		case E_BLOCK_TORCH:                          return ItemTorchBlockHandler;
+		case E_BLOCK_TORCH:                          return ItemTorchHandler;
 		case E_BLOCK_TRAPDOOR:                       return ItemOakTrapdoorHandler;
 		case E_BLOCK_TRAPPED_CHEST:                  return ItemTrappedChestHandler;
 		case E_BLOCK_TRIPWIRE:                       return ItemTripwireHandler;
@@ -1063,7 +1063,7 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 		NIBBLETYPE PlaceMeta;
 		const auto PlacePosition = AddFaceDirection(a_ClickedPosition, a_ClickedBlockFace);
 
-		if (!World.GetBlockTypeMeta(PlacePosition, PlaceBlock, PlaceMeta))
+		if (!cChunkDef::IsValidHeight(PlacePosition) || !World.GetBlockTypeMeta(PlacePosition, PlaceBlock, PlaceMeta))
 		{
 			// The block is being placed outside the world, ignore this packet altogether (GH #128):
 			return;
@@ -1075,7 +1075,7 @@ void cItemHandler::OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, c
 		{
 			// Tried to place a block into another?
 			// Happens when you place a block aiming at side of block with a torch on it or stem beside it.
-			a_Player.SendBlocksAround(PlacePosition.x, PlacePosition.y, PlacePosition.z, 2);
+			a_Player.SendBlocksAround(PlacePosition, 2);
 			a_Player.GetInventory().SendEquippedSlot();
 			return;
 		}

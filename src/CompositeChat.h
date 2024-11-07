@@ -21,12 +21,13 @@ Each part corresponds roughly to the behavior supported by the client messaging:
 	- clickable commands (suggest)
 Each part has a text assigned to it that can be styled. The style is specified using a string,
 each character / character combination in the string specifies the style to use:
-	- b = bold
-	- i = italic
-	- u = underlined
-	- s = strikethrough
-	- o = obfuscated
-	- @X = color X (X is 0 - 9 or a - f, same as dye meta
+	- (char from 0 - 9 or a - f) = color X
+	- k = obfuscated
+	- l = bold
+	- m = strikethrough
+	- n = underlined
+	- o = italic
+	- r = reset
 If the protocol version doesn't support all the features, it degrades gracefully.
 */
 class cCompositeChat
@@ -102,7 +103,7 @@ public:
 	cCompositeChat(void);
 
 	/** Creates a new chat message and parses the text into parts.
-	Recognizes "http:" and "https:" links and @color-codes.
+	Recognizes "http:" and "https:" links and &format-character.
 	Uses ParseText() for the actual parsing.
 	Exported manually due to ToLua++ generating extra output parameter. */
 	cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType = mtCustom);
@@ -121,15 +122,15 @@ public:
 
 	/** Adds a part that opens an URL when clicked.
 	The default style is underlined light blue text. */
-	void AddUrlPart(const AString & a_Text, const AString & a_Url, const AString & a_Style = "u@c");
+	void AddUrlPart(const AString & a_Text, const AString & a_Url, const AString & a_Style = "nc");
 
 	/** Adds a part that runs a command when clicked.
 	The default style is underlined light green text. */
-	void AddRunCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style = "u@a");
+	void AddRunCommandPart(const AString & a_Text, const AString & a_Command, const AString & a_Style = "na");
 
 	/** Adds a part that suggests a command (enters it into the chat message area, but doesn't send) when clicked.
 	The default style is underlined yellow text. */
-	void AddSuggestCommandPart(const AString & a_Text, const AString & a_SuggestedCommand, const AString & a_Style = "u@b");
+	void AddSuggestCommandPart(const AString & a_Text, const AString & a_SuggestedCommand, const AString & a_Style = "nb");
 
 	/** Adds a part that fully formats a specified achievement using client translatable strings
 	Takes achievement name and player awarded to. Displays as {player} has earned the achievement {achievement_name}.
@@ -137,7 +138,7 @@ public:
 	void AddShowAchievementPart(const AString & a_PlayerName, const AString & a_Achievement, const AString & a_Style = "");
 
 	/** Parses text into various parts, adds those.
-	Recognizes "http:" and "https:" URLs and @color-codes. */
+	Recognizes "http:" and "https:" URLs and &color-codes. */
 	void ParseText(const AString & a_ParseText);
 
 	/** Adds the "underline" style to each part that is an URL. */
@@ -185,8 +186,4 @@ protected:
 	/** Additional data pertaining to message type, for example, the name of a mtPrivateMsg sender */
 	AString m_AdditionalMessageTypeData;
 
-
-	/** Adds a_AddStyle to a_Style; overwrites the existing style if appropriate.
-	If the style already contains something that a_AddStyle overrides, it is erased first. */
-	void AddStyle(AString & a_Style, const AString & a_AddStyle);
 } ;  // tolua_export

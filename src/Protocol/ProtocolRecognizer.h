@@ -7,9 +7,9 @@
 
 
 // Adjust these if a new protocol is added or an old one is removed:
-#define MCS_CLIENT_VERSIONS "1.8.x-1.12.x"
-#define MCS_PROTOCOL_VERSIONS "47, 107, 108, 109, 110, 210, 315, 316, 335, 338, 340"
-#define MCS_LATEST_PROTOCOL_VERSION 340
+#define MCS_CLIENT_VERSIONS "1.8.x-1.14.4"
+#define MCS_PROTOCOL_VERSIONS "47, 107, 108, 109, 110, 210, 315, 316, 335, 338, 340, 393, 401, 477, 480, 485, 490, 498"
+#define MCS_LATEST_PROTOCOL_VERSION 498
 
 
 
@@ -74,10 +74,10 @@ private:
 	static UInt32 GetPacketID(cProtocol::ePacketType a_PacketType);
 
 	/* Status handler for unrecognised versions. */
-	void HandlePacketStatusRequest(cClientHandle & a_Client, cByteBuffer & a_Out);
+	void HandlePacketStatusRequest(cClientHandle & a_Client);
 
 	/* Ping handler for unrecognised versions. */
-	void HandlePacketStatusPing(cClientHandle & a_Client, cByteBuffer & a_Out);
+	void HandlePacketStatusPing(cClientHandle & a_Client);
 
 	/** Buffer for received protocol data. */
 	cByteBuffer m_Buffer;

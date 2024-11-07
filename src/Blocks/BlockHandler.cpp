@@ -7,7 +7,6 @@
 #include "BlockPluginInterface.h"
 #include "BlockAir.h"
 #include "BlockAnvil.h"
-#include "BlockBanner.h"
 #include "BlockBed.h"
 #include "BlockBigFlower.h"
 #include "BlockBookShelf.h"
@@ -89,6 +88,7 @@
 #include "BlockSnow.h"
 #include "BlockSponge.h"
 #include "BlockStairs.h"
+#include "BlockStandingBanner.h"
 #include "BlockStems.h"
 #include "BlockStone.h"
 #include "BlockSugarCane.h"
@@ -99,6 +99,7 @@
 #include "BlockTripwire.h"
 #include "BlockTripwireHook.h"
 #include "BlockVines.h"
+#include "BlockWallBanner.h"
 #include "BlockWallSign.h"
 #include "BlockWorkbench.h"
 
@@ -413,7 +414,7 @@ namespace
 	constexpr cDefaultBlockHandler            BlockStainedClayHandler           (E_BLOCK_STAINED_CLAY);
 	constexpr cBlockGlassHandler              BlockStainedGlassHandler          (E_BLOCK_STAINED_GLASS);
 	constexpr cBlockGlassHandler              BlockStainedGlassPaneHandler      (E_BLOCK_STAINED_GLASS_PANE);
-	constexpr cBlockBannerHandler             BlockStandingBannerHandler        (E_BLOCK_STANDING_BANNER);
+	constexpr cBlockStandingBannerHandler     BlockStandingBannerHandler        (E_BLOCK_STANDING_BANNER);
 	constexpr cBlockLavaHandler               BlockStationaryLavaHandler        (E_BLOCK_STATIONARY_LAVA);
 	constexpr cBlockWaterHandler              BlockStationaryWaterHandler       (E_BLOCK_STATIONARY_WATER);
 	constexpr cBlockPistonHandler             BlockStickyPistonHandler          (E_BLOCK_STICKY_PISTON);
@@ -434,7 +435,7 @@ namespace
 	constexpr cBlockTripwireHandler           BlockTripwireHandler              (E_BLOCK_TRIPWIRE);
 	constexpr cBlockTripwireHookHandler       BlockTripwireHookHandler          (E_BLOCK_TRIPWIRE_HOOK);
 	constexpr cBlockVinesHandler              BlockVinesHandler                 (E_BLOCK_VINES);
-	constexpr cBlockBannerHandler             BlockWallBannerHandler            (E_BLOCK_WALL_BANNER);
+	constexpr cBlockWallBannerHandler         BlockWallBannerHandler            (E_BLOCK_WALL_BANNER);
 	constexpr cBlockWallSignHandler           BlockWallsignHandler              (E_BLOCK_WALLSIGN);
 	constexpr cBlockWaterHandler              BlockWaterHandler                 (E_BLOCK_WATER);
 	constexpr cBlockGlazedTerracottaHandler   BlockWhiteGlazedTerracottaHandler (E_BLOCK_WHITE_GLAZED_TERRACOTTA);
@@ -486,7 +487,7 @@ void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector
 
 void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_NeighborPos, eBlockFace a_WhichNeighbor)
 {
-	if (!cChunkDef::IsValidHeight(a_NeighborPos.y))
+	if (!cChunkDef::IsValidHeight(a_NeighborPos))
 	{
 		return;
 	}

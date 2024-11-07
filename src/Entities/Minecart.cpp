@@ -6,6 +6,8 @@
 // Indiana Jones!
 
 #include "Globals.h"
+#include "ChunkDef.h"
+#include "Defines.h"
 #include "Minecart.h"
 #include "../BlockInfo.h"
 #include "../ClientHandle.h"
@@ -17,9 +19,12 @@
 #define NO_SPEED 0.0
 #define MAX_SPEED 8
 #define MAX_SPEED_NEGATIVE -MAX_SPEED
-
-
-
+#define DIR_NORTH_SOUTH 270
+#define DIR_EAST_WEST 180
+#define DIR_NORTH_WEST 315
+#define DIR_NORTH_EAST 225
+#define DIR_SOUTH_WEST 135
+#define DIR_SOUTH_EAST 45
 
 class cMinecartAttachCallback
 {
@@ -165,12 +170,26 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		return;
 	}
 
-	auto relPos = cChunkDef::AbsoluteToRelative(GetPosition());
+	// pos need floor, then call vec3i overload func
+	// if use default double -> int, will cast -1.xx -> -1(actually need to be -2)
+	auto relPos = cChunkDef::AbsoluteToRelative(GetPosition().Floor());
+
 	auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(relPos);
 	if (chunk == nullptr)
 	{
 		// Inside an unloaded chunk, bail out all processing
 		return;
+	}
+
+	if (m_bIsOnDetectorRail && !Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT).Equals(m_DetectorRailPosition))
+	{
+		// Check if the rail is still there
+		if (m_World->GetBlock(m_DetectorRailPosition) == E_BLOCK_DETECTOR_RAIL)
+		{
+			m_World->SetBlock(m_DetectorRailPosition, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
+		}
+
+		m_bIsOnDetectorRail = false;
 	}
 
 	BLOCKTYPE InsideType;
@@ -198,7 +217,6 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 	}
 
-	bool WasDetectorRail = false;
 	if (IsBlockRail(InsideType))
 	{
 		if (InsideType == E_BLOCK_RAIL)
@@ -213,12 +231,13 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		switch (InsideType)
 		{
 			case E_BLOCK_RAIL: HandleRailPhysics(InsideMeta, a_Dt); break;
-			case E_BLOCK_ACTIVATOR_RAIL: break;
+			case E_BLOCK_ACTIVATOR_RAIL: HandleActivatorRailPhysics(InsideMeta, a_Dt); break;
 			case E_BLOCK_POWERED_RAIL: HandlePoweredRailPhysics(InsideMeta); break;
 			case E_BLOCK_DETECTOR_RAIL:
 			{
+				m_DetectorRailPosition = Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
+				m_bIsOnDetectorRail = true;
 				HandleDetectorRailPhysics(InsideMeta, a_Dt);
-				WasDetectorRail = true;
 				break;
 			}
 			default: VERIFY(!"Unhandled rail type despite checking if block was rail!"); break;
@@ -231,17 +250,6 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		// Not on rail, default physics
 		SetPosY(floor(GetPosY()) + 0.35);  // HandlePhysics overrides this if minecart can fall, else, it is to stop ground clipping minecart bottom when off-rail
 		Super::HandlePhysics(a_Dt, *chunk);
-	}
-
-	if (m_bIsOnDetectorRail && !Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT).Equals(m_DetectorRailPosition))
-	{
-		m_World->SetBlock(m_DetectorRailPosition, E_BLOCK_DETECTOR_RAIL, m_World->GetBlockMeta(m_DetectorRailPosition) & 0x07);
-		m_bIsOnDetectorRail = false;
-	}
-	else if (WasDetectorRail)
-	{
-		m_bIsOnDetectorRail = true;
-		m_DetectorRailPosition = Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT);
 	}
 
 	// Enforce speed limit:
@@ -266,10 +274,10 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 	{
 		case E_META_RAIL_ZM_ZP:  // NORTHSOUTH
 		{
-			SetYaw(270);
+			SetYaw(DIR_NORTH_SOUTH);
 			SetPosY(floor(GetPosY()) + 0.55);
-			SetSpeedY(0);  // Don't move vertically as on ground
-			SetSpeedX(0);  // Correct diagonal movement from curved rails
+			SetSpeedY(NO_SPEED);  // Don't move vertically as on ground
+			SetSpeedX(NO_SPEED);  // Correct diagonal movement from curved rails
 
 			// Execute both the entity and block collision checks
 			auto BlckCol = TestBlockCollision(a_RailMeta);
@@ -297,7 +305,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		}
 		case E_META_RAIL_XM_XP:  // EASTWEST
 		{
-			SetYaw(180);
+			SetYaw(DIR_EAST_WEST);
 			SetPosY(floor(GetPosY()) + 0.55);
 			SetSpeedY(NO_SPEED);
 			SetSpeedZ(NO_SPEED);
@@ -325,8 +333,8 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		}
 		case E_META_RAIL_ASCEND_ZM:  // ASCEND NORTH
 		{
-			SetYaw(270);
-			SetSpeedX(0);
+			SetYaw(DIR_NORTH_SOUTH);
+			SetSpeedX(NO_SPEED);
 
 			auto BlckCol = TestBlockCollision(a_RailMeta);
 			auto EntCol = TestEntityCollision(a_RailMeta);
@@ -352,8 +360,8 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		}
 		case E_META_RAIL_ASCEND_ZP:  // ASCEND SOUTH
 		{
-			SetYaw(270);
-			SetSpeedX(0);
+			SetYaw(DIR_NORTH_SOUTH);
+			SetSpeedX(NO_SPEED);
 
 			auto BlckCol = TestBlockCollision(a_RailMeta);
 			auto EntCol = TestEntityCollision(a_RailMeta);
@@ -379,7 +387,7 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		}
 		case E_META_RAIL_ASCEND_XM:  // ASCEND EAST
 		{
-			SetYaw(180);
+			SetYaw(DIR_EAST_WEST);
 			SetSpeedZ(NO_SPEED);
 
 			auto BlckCol = TestBlockCollision(a_RailMeta);
@@ -404,8 +412,8 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		}
 		case E_META_RAIL_ASCEND_XP:  // ASCEND WEST
 		{
-			SetYaw(180);
-			SetSpeedZ(0);
+			SetYaw(DIR_EAST_WEST);
+			SetSpeedZ(NO_SPEED);
 
 			auto BlckCol = TestBlockCollision(a_RailMeta);
 			auto EntCol = TestEntityCollision(a_RailMeta);
@@ -429,9 +437,9 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		}
 		case E_META_RAIL_CURVED_ZM_XM:  // Ends pointing NORTH and WEST
 		{
-			SetYaw(315);  // Set correct rotation server side
+			SetYaw(DIR_NORTH_WEST);  // Set correct rotation server side
 			SetPosY(floor(GetPosY()) + 0.55);  // Levitate dat cart
-			SetSpeedY(0);
+			SetSpeedY(NO_SPEED);
 
 			auto BlckCol = TestBlockCollision(a_RailMeta);
 			auto EntCol = TestEntityCollision(a_RailMeta);
@@ -446,9 +454,9 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		}
 		case E_META_RAIL_CURVED_ZM_XP:  // Curved NORTH EAST
 		{
-			SetYaw(225);
+			SetYaw(DIR_NORTH_EAST);
 			SetPosY(floor(GetPosY()) + 0.55);
-			SetSpeedY(0);
+			SetSpeedY(NO_SPEED);
 
 			auto BlckCol = TestBlockCollision(a_RailMeta);
 			auto EntCol = TestEntityCollision(a_RailMeta);
@@ -461,9 +469,9 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		}
 		case E_META_RAIL_CURVED_ZP_XM:  // Curved SOUTH WEST
 		{
-			SetYaw(135);
+			SetYaw(DIR_SOUTH_WEST);
 			SetPosY(floor(GetPosY()) + 0.55);
-			SetSpeedY(0);
+			SetSpeedY(NO_SPEED);
 
 			auto BlckCol = TestBlockCollision(a_RailMeta);
 			auto EntCol = TestEntityCollision(a_RailMeta);
@@ -476,9 +484,9 @@ void cMinecart::HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::millisecon
 		}
 		case E_META_RAIL_CURVED_ZP_XP:  // Curved SOUTH EAST
 		{
-			SetYaw(45);
+			SetYaw(DIR_SOUTH_EAST);
 			SetPosY(floor(GetPosY()) + 0.55);
-			SetSpeedY(0);
+			SetSpeedY(NO_SPEED);
 
 			auto BlckCol = TestBlockCollision(a_RailMeta);
 			auto EntCol = TestEntityCollision(a_RailMeta);
@@ -502,17 +510,18 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 	// If the rail is powered set to speed up else slow down.
 	const bool IsRailPowered = ((a_RailMeta & 0x8) == 0x8);
 	const double Acceleration = IsRailPowered ? 1.0 : -2.0;
-
-	switch (a_RailMeta & 0x07)
+	// PoweredRail only has 5 status in low 3bit. so we need do a logical and to get correct powered rail meta data.
+	NIBBLETYPE PoweredRailMeta = a_RailMeta & 0x7;
+	switch (PoweredRailMeta)
 	{
 		case E_META_RAIL_ZM_ZP:  // NORTHSOUTH
 		{
-			SetYaw(270);
+			SetYaw(DIR_NORTH_SOUTH);
 			SetPosY(floor(GetPosY()) + 0.55);
 			SetSpeedY(0);
 			SetSpeedX(0);
 
-			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
+			bool BlckCol = TestBlockCollision(PoweredRailMeta), EntCol = TestEntityCollision(PoweredRailMeta);
 			if (EntCol || BlckCol)
 			{
 				return;
@@ -548,12 +557,12 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 		}
 		case E_META_RAIL_XM_XP:  // EASTWEST
 		{
-			SetYaw(180);
+			SetYaw(DIR_EAST_WEST);
 			SetPosY(floor(GetPosY()) + 0.55);
 			SetSpeedY(NO_SPEED);
 			SetSpeedZ(NO_SPEED);
 
-			bool BlckCol = TestBlockCollision(a_RailMeta), EntCol = TestEntityCollision(a_RailMeta);
+			bool BlckCol = TestBlockCollision(PoweredRailMeta), EntCol = TestEntityCollision(PoweredRailMeta);
 			if (EntCol || BlckCol)
 			{
 				return;
@@ -589,7 +598,7 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 		}
 		case E_META_RAIL_ASCEND_XM:  // ASCEND EAST
 		{
-			SetYaw(180);
+			SetYaw(DIR_EAST_WEST);
 			SetSpeedZ(NO_SPEED);
 
 			if (GetSpeedX() >= NO_SPEED)
@@ -606,7 +615,7 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 		}
 		case E_META_RAIL_ASCEND_XP:  // ASCEND WEST
 		{
-			SetYaw(180);
+			SetYaw(DIR_EAST_WEST);
 			SetSpeedZ(NO_SPEED);
 
 			if (GetSpeedX() > NO_SPEED)
@@ -623,7 +632,7 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 		}
 		case E_META_RAIL_ASCEND_ZM:  // ASCEND NORTH
 		{
-			SetYaw(270);
+			SetYaw(DIR_NORTH_SOUTH);
 			SetSpeedX(NO_SPEED);
 
 			if (GetSpeedZ() >= NO_SPEED)
@@ -640,7 +649,7 @@ void cMinecart::HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta)
 		}
 		case E_META_RAIL_ASCEND_ZP:  // ASCEND SOUTH
 		{
-			SetYaw(270);
+			SetYaw(DIR_NORTH_SOUTH);
 			SetSpeedX(NO_SPEED);
 
 			if (GetSpeedZ() > NO_SPEED)
@@ -678,6 +687,7 @@ void cMinecart::HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::mi
 void cMinecart::HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt)
 {
 	HandleRailPhysics(a_RailMeta & 0x07, a_Dt);
+	// TODO - shake minecart, throw entities out
 }
 
 
@@ -1285,6 +1295,24 @@ void cMinecart::OnRemoveFromWorld(cWorld & a_World)
 
 
 
+void cMinecart::HandleSpeedFromAttachee(float a_Forward, float a_Sideways)
+{
+	// limit normal minecart speed max lower than 4
+	// once speed is higher than 4, no more add speed.
+	if (GetSpeed().Length() > 4)
+	{
+		return;
+	}
+	Vector3d LookVector = m_Attachee->GetLookVector();
+	Vector3d ToAddSpeed = LookVector * (a_Forward * 0.4) ;
+	ToAddSpeed.y = 0;
+	AddSpeed(ToAddSpeed);
+}
+
+
+
+
+
 void cMinecart::ApplyAcceleration(Vector3d a_ForwardDirection, double a_Acceleration)
 {
 	double CurSpeed = GetSpeed().Dot(a_ForwardDirection);
@@ -1516,7 +1544,22 @@ cMinecartWithTNT::cMinecartWithTNT(Vector3d a_Pos):
 {
 }
 
-// TODO: Make it activate when passing over activator rail
+
+
+
+
+void cMinecartWithTNT::HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt)
+{
+	Super::HandleActivatorRailPhysics(a_RailMeta, a_Dt);
+
+	if ((a_RailMeta & 0x08) && !m_isTNTFused)
+	{
+		m_isTNTFused = true;
+		m_TNTFuseTicksLeft = 80;
+		m_World->BroadcastSoundEffect("entity.tnt.primed", GetPosition(), 1.0f, 1.0f);
+		m_World->BroadcastEntityAnimation(*this, EntityAnimation::MinecartTNTIgnites);
+	}
+}
 
 
 
@@ -1525,6 +1568,32 @@ cMinecartWithTNT::cMinecartWithTNT(Vector3d a_Pos):
 void cMinecartWithTNT::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
 	a_Drops.emplace_back(E_ITEM_MINECART_WITH_TNT);
+}
+
+
+
+
+
+void cMinecartWithTNT::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	Super::Tick(a_Dt, a_Chunk);
+	if (!IsTicking())
+	{
+		return;
+	}
+
+	if (m_isTNTFused)
+	{
+		if (m_TNTFuseTicksLeft > 0)
+		{
+			--m_TNTFuseTicksLeft;
+		}
+		else
+		{
+			Destroy();
+			m_World->DoExplosionAt(4.0, GetPosX(), GetPosY() + GetHeight() / 2, GetPosZ(), true, esTNTMinecart, this);
+		}
+	}
 }
 
 

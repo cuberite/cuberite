@@ -57,6 +57,7 @@ target_sources(
 	Root.cpp
 	Scoreboard.cpp
 	Server.cpp
+	SetChunkData.cpp
 	SpawnPrepare.cpp
 	StatisticsManager.cpp
 	StringCompression.cpp
@@ -190,6 +191,13 @@ SET_TARGET_PROPERTIES(${CMAKE_PROJECT_NAME} PROPERTIES
 	RUNTIME_OUTPUT_DIRECTORY_RELEASEPROFILE ${CMAKE_BINARY_DIR}/Server
 )
 
+
+
+# Enable "-rdynamic" on Linux, so that external Lua modules can import Lua API symbols from the main executable:
+# ( https://stackoverflow.com/questions/24015025/resolving-symbols-in-shared-object-to-executable )
+if (NOT WIN32)
+	target_link_options(${CMAKE_PROJECT_NAME} PRIVATE "-rdynamic")
+endif()
 
 
 MACRO(TO_NATIVE_PATH PATH OUT)

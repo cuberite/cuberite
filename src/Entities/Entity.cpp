@@ -16,6 +16,7 @@
 #include "../FastRandom.h"
 #include "../NetherPortalScanner.h"
 #include "../BoundingBox.h"
+#include "../WorldStorage/NamespaceSerializer.h"
 
 
 
@@ -441,7 +442,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 		bool MagicalCriticalHit = false;
 
 		// IsOnGround() only is false if the player is moving downwards
-		// Ref: https://minecraft.gamepedia.com/Damage#Critical_Hits
+		// Ref: https://minecraft.wiki/w/Damage#Critical_Hits
 		if (!Player->IsOnGround())
 		{
 			if ((a_TDI.DamageType == dtAttack) || (a_TDI.DamageType == dtArrowAttack))
@@ -493,13 +494,14 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 					case mtSpider:
 					case mtCaveSpider:
 					case mtSilverfish:
+					case mtEndermite:
 					{
 						MagicalCriticalHit = true;
 						a_TDI.FinalDamage += 2.5f * BaneOfArthropodsLevel;
 
 						// The duration of the effect is a random value between 1 and 1.5 seconds at level I,
 						// increasing the max duration by 0.5 seconds each level.
-						// Ref: https://minecraft.gamepedia.com/Enchanting#Bane_of_Arthropods
+						// Ref: https://minecraft.wiki/w/Enchanting#Bane_of_Arthropods
 						int Duration = 20 + GetRandomProvider().RandInt(BaneOfArthropodsLevel * 10);  // Duration in ticks.
 						Monster->AddEntityEffect(cEntityEffect::effSlowness, Duration, 4);
 
@@ -612,7 +614,7 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 int cEntity::GetRawDamageAgainst(const cEntity & a_Receiver)
 {
 	// Returns the hitpoints that this pawn can deal to a_Receiver using its equipped items
-	// Ref: https://minecraft.gamepedia.com/Damage#Dealing_damage as of 2012_12_20
+	// Ref: https://minecraft.wiki/w/Damage#Dealing_damage as of 2012_12_20
 	switch (this->GetEquippedWeapon().m_ItemType)
 	{
 		case E_ITEM_WOODEN_SWORD:    return 4;
@@ -658,7 +660,7 @@ void cEntity::ApplyArmorDamage(int DamageBlocked)
 
 bool cEntity::ArmorCoversAgainst(eDamageType a_DamageType)
 {
-	// Ref.: https://minecraft.gamepedia.com/Armor#Effects as of 2012_12_20
+	// Ref.: https://minecraft.wiki/w/Armor#Effects as of 2012_12_20
 	switch (a_DamageType)
 	{
 		case dtOnFire:
@@ -775,7 +777,7 @@ float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Da
 	}
 
 	// Add up all armor points:
-	// Ref.: https://minecraft.gamepedia.com/Armor#Defense_points
+	// Ref.: https://minecraft.wiki/w/Armor#Defense_points
 	int ArmorValue = 0;
 	int Toughness = 0;
 	switch (GetEquippedHelmet().m_ItemType)
@@ -812,7 +814,7 @@ float cEntity::GetArmorCoverAgainst(const cEntity * a_Attacker, eDamageType a_Da
 	}
 
 	// TODO: Special armor cases, such as wool, saddles, dog's collar
-	// Ref.: https://minecraft.gamepedia.com/Armor#Mob_armor as of 2012_12_20
+	// Ref.: https://minecraft.wiki/w/Armor#Mob_armor as of 2012_12_20
 
 	float Reduction = std::max(ArmorValue / 5.0f, ArmorValue - a_Damage / (2.0f + Toughness / 4.0f));
 	return (a_Damage * std::min(20.0f, Reduction) / 25.0f);
@@ -1130,7 +1132,7 @@ void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	}
 
 	// Get water direction
-	Vector3f WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection(BlockX, BlockY, BlockZ);
+	Vector3f WaterDir = m_World->GetWaterSimulator()->GetFlowingDirection({BlockX, BlockY, BlockZ});
 
 	m_WaterSpeed *= 0.9;  // Reduce speed each tick
 
@@ -1432,7 +1434,7 @@ bool cEntity::DetectPortal()
 		return false;
 	}
 
-	if (const auto Position = m_Position.Floor(); cChunkDef::IsValidHeight(Position.y))
+	if (const auto Position = m_Position.Floor(); cChunkDef::IsValidHeight(Position))
 	{
 		switch (GetWorld()->GetBlock(Position))
 		{
@@ -1795,7 +1797,7 @@ void cEntity::SetSize(const float a_Width, const float a_Height)
 
 void cEntity::HandleAir(void)
 {
-	// Ref.: https://minecraft.gamepedia.com/Chunk_format
+	// Ref.: https://minecraft.wiki/w/Chunk_format
 	// See if the entity is /submerged/ water (head is in water)
 	// Get the type of block the entity is standing in:
 
@@ -1969,7 +1971,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		return;
 	}
 
-	if (GetSpeed().SqrLength() > 0.001)
+	if (m_Speed.HasNonZeroLength())
 	{
 		// Movin'
 		m_World->BroadcastEntityVelocity(*this, a_Exclude);
@@ -1985,8 +1987,7 @@ void cEntity::BroadcastMovementUpdate(const cClientHandle * a_Exclude)
 		m_bHasSentNoSpeed = true;
 	}
 
-	Vector3i Diff = (GetPosition() * 32.0).Floor() - (m_LastSentPosition * 32.0).Floor();
-	if (Diff.HasNonZeroLength())  // Have we moved?
+	if ((m_Position - m_LastSentPosition).HasNonZeroLength())  // Have we moved?
 	{
 		m_World->BroadcastEntityPosition(*this, a_Exclude);
 
@@ -2364,16 +2365,7 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 		}
 		else
 		{
-			// Tamed ocelots are really cats in vanilla.
-			if (Monster->IsTame() && (Monster->GetClass() == AString("cOcelot")))
-			{
-				Name = "Cat";
-			}
-			else
-			{
-				Name = Monster->GetClass();
-				Name.erase(Name.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
-			}
+			Name = NamespaceSerializer::PrettifyEntityName(AString(NamespaceSerializer::From(Monster->GetMobType())), Monster->IsTame());
 		}
 	}
 	else
@@ -2411,9 +2403,9 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 				}
 				UNREACHABLE("Unsupported damage type");
 			}();
-		AString DeathMessage = Printf("%s %s", Name.c_str(), DamageText.c_str());
+		auto DeathMessage = fmt::format(FMT_STRING("{} {}"), Name, DamageText);
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (DeathMessage != AString(""))
+		if (!DeathMessage.empty())
 		{
 			GetWorld()->BroadcastChatDeath(DeathMessage);
 		}
@@ -2421,20 +2413,30 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 	else if (a_TDI.Attacker->IsPlayer())
 	{
 		cPlayer * Killer = static_cast<cPlayer *>(a_TDI.Attacker);
-		AString DeathMessage = Printf("%s was killed by %s", Name.c_str(), Killer->GetName().c_str());
+		auto DeathMessage = fmt::format(FMT_STRING("{0} was killed by {1}"), Name, Killer->GetName());
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (DeathMessage != AString(""))
+		if (!DeathMessage.empty())
 		{
 			GetWorld()->BroadcastChatDeath(DeathMessage);
 		}
-	}
-	else
+	}  // This will trigger if a player / tamed pet has been killed by another mob / tamed pet.
+	else if (a_TDI.Attacker->IsMob())
 	{
-		AString KillerClass = a_TDI.Attacker->GetClass();
-		KillerClass.erase(KillerClass.begin());  // Erase the 'c' of the class (e.g. "cWitch" -> "Witch")
-		AString DeathMessage = Printf("%s was killed by a %s", Name.c_str(), KillerClass.c_str());
+		cMonster * Monster = static_cast<cMonster *>(a_TDI.Attacker);
+
+		AString DeathMessage;
+		if (Monster->HasCustomName())
+		{
+			DeathMessage = fmt::format(FMT_STRING("{0} was killed by {1}"), Name, Monster->GetCustomName());
+		}
+		else
+		{
+			AString KillerName = NamespaceSerializer::PrettifyEntityName(AString(NamespaceSerializer::From(Monster->GetMobType())), Monster->IsTame());
+			DeathMessage = fmt::format(FMT_STRING("{0} was killed by a {1}"), Name, KillerName);
+		}
+
 		PluginManager->CallHookKilled(*this, a_TDI, DeathMessage);
-		if (DeathMessage != AString(""))
+		if (!DeathMessage.empty())
 		{
 			GetWorld()->BroadcastChatDeath(DeathMessage);
 		}

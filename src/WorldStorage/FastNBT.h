@@ -227,21 +227,21 @@ public:
 	inline Int16 GetShort(int a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Short);
-		return GetBEShort(GetData(a_Tag));
+		return NetworkBufToHost<Int16>(GetData(a_Tag));
 	}
 
 	/** Returns the value stored in an Int tag. Not valid for any other tag type. */
 	inline Int32 GetInt(int a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Int);
-		return GetBEInt(GetData(a_Tag));
+		return NetworkBufToHost<Int32>(GetData(a_Tag));
 	}
 
 	/** Returns the value stored in a Long tag. Not valid for any other tag type. */
 	inline Int64 GetLong(int a_Tag) const
 	{
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Long);
-		return NetworkToHostLong8(GetData(a_Tag));
+		return NetworkBufToHost<Int64>(GetData(a_Tag));
 	}
 
 	/** Returns the value stored in a Float tag. Not valid for any other tag type. */
@@ -256,10 +256,7 @@ public:
 		UNUSED_VAR(Check1);
 		UNUSED_VAR(Check2);
 
-		Int32 i = GetBEInt(GetData(a_Tag));
-		float f;
-		memcpy(&f, &i, sizeof(f));
-		return f;
+		return NetworkBufToHost<float>(GetData(a_Tag));
 	}
 
 	/** Returns the value stored in a Double tag. Not valid for any other tag type. */
@@ -273,7 +270,7 @@ public:
 		UNUSED_VAR(Check2);
 
 		ASSERT(m_Tags[static_cast<size_t>(a_Tag)].m_Type == TAG_Double);
-		return NetworkToHostDouble8(GetData(a_Tag));
+		return NetworkBufToHost<double>(GetData(a_Tag));
 	}
 
 	/** Returns the value stored in a String tag. Not valid for any other tag type. */

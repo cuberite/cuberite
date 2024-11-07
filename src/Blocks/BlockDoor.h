@@ -5,7 +5,7 @@
 #include "../BlockInfo.h"
 #include "../Entities/Player.h"
 #include "../Chunk.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
 #include "ChunkInterface.h"
 #include "BlockSlab.h"
 
@@ -191,14 +191,18 @@ private:
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
 		// CanBeAt is also called on placement, so the top part can't check for the bottom part.
-		// Both parts can only that their base is a valid block.
+		// Both parts can only check that the base of the door (i.e. -2 for a door top) is a valid block.
+		const auto BasePosition = a_Position.addedY(((a_Meta & 0x8) == 0x8) ? -2 : -1);
+		if (!cChunkDef::IsValidHeight(BasePosition))
+		{
+			return false;
+		}
 
 		BLOCKTYPE BlockType;
 		NIBBLETYPE BlockMeta;
-		const auto BasePosition = a_Position.addedY(((a_Meta & 0x8) == 0x8) ? -2 : -1);
 		a_Chunk.GetBlockTypeMeta(BasePosition, BlockType, BlockMeta);
 
-		return (BasePosition.y >= 0) && CanBeOn(BlockType, BlockMeta);
+		return CanBeOn(BlockType, BlockMeta);
 	}
 
 
@@ -216,9 +220,10 @@ private:
 		if ((Meta & 0x08) != 0)
 		{
 			// The coords are pointing at the top part of the door
-			if (a_BlockPos.y > 0)
+			const auto BottomPos = a_BlockPos.addedY(-1);
+			if (cChunkDef::IsValidHeight(BottomPos))
 			{
-				NIBBLETYPE DownMeta = a_ChunkInterface.GetBlockMeta(a_BlockPos.addedY(-1));
+				NIBBLETYPE DownMeta = a_ChunkInterface.GetBlockMeta(BottomPos);
 				return static_cast<NIBBLETYPE>((DownMeta & 0x07) | 0x08 | (Meta << 4));
 			}
 			// This is the top part of the door at the bottommost layer of the world, there's no bottom:
@@ -227,9 +232,10 @@ private:
 		else
 		{
 			// The coords are pointing at the bottom part of the door
-			if (a_BlockPos.y < cChunkDef::Height - 1)
+			const auto TopPos = a_BlockPos.addedY(1);
+			if (cChunkDef::IsValidHeight(TopPos))
 			{
-				NIBBLETYPE UpMeta = a_ChunkInterface.GetBlockMeta(a_BlockPos.addedY(1));
+				NIBBLETYPE UpMeta = a_ChunkInterface.GetBlockMeta(TopPos);
 				return static_cast<NIBBLETYPE>(Meta | (UpMeta << 4));
 			}
 			// This is the bottom part of the door at the topmost layer of the world, there's no top:

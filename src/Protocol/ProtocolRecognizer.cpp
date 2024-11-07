@@ -66,10 +66,14 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 		case cProtocol::Version::v1_13_1:  return "1.13.1";
 		case cProtocol::Version::v1_13_2:  return "1.13.2";
 		case cProtocol::Version::v1_14:    return "1.14";
+		case cProtocol::Version::v1_14_1:  return "1.14.1";
+		case cProtocol::Version::v1_14_2:  return "1.14.2";
+		case cProtocol::Version::v1_14_3:  return "1.14.3";
+		case cProtocol::Version::v1_14_4:  return "1.14.4";
 	}
 
 	ASSERT(!"Unknown protocol version");
-	return Printf("Unknown protocol (%d)", a_ProtocolVersion);
+	return fmt::format(FMT_STRING("Unknown protocol ({})"), a_ProtocolVersion);
 }
 
 
@@ -142,8 +146,6 @@ void cMultiVersionProtocol::HandleIncomingDataInOldPingResponseStage(cClientHand
 		return;
 	}
 
-	cByteBuffer OutPacketBuffer(6 KiB);
-
 	// Handle server list ping packets
 	for (;;)
 	{
@@ -162,11 +164,11 @@ void cMultiVersionProtocol::HandleIncomingDataInOldPingResponseStage(cClientHand
 
 		if ((PacketID == 0x00) && (PacketLen == 1))  // Request packet
 		{
-			HandlePacketStatusRequest(a_Client, OutPacketBuffer);
+			HandlePacketStatusRequest(a_Client);
 		}
 		else if ((PacketID == 0x01) && (PacketLen == 9))  // Ping packet
 		{
-			HandlePacketStatusPing(a_Client, OutPacketBuffer);
+			HandlePacketStatusPing(a_Client);
 		}
 		else
 		{
@@ -227,7 +229,7 @@ void cMultiVersionProtocol::SendDisconnect(cClientHandle & a_Client, const AStri
 		return;
 	}
 
-	const AString Message = Printf("{\"text\":\"%s\"}", EscapeString(a_Reason).c_str());
+	const AString Message = JsonUtils::SerializeSingleValueJsonObject("text", a_Reason);
 	const auto PacketID = GetPacketID(cProtocol::ePacketType::pktDisconnectDuringLogin);
 	cByteBuffer Out(
 		cByteBuffer::GetVarIntSize(PacketID) +
@@ -338,16 +340,22 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 		case static_cast<UInt32>(cProtocol::Version::v1_13_1): return std::make_unique<cProtocol_1_13_1>(&a_Client, ServerAddress, NextState);
 		case static_cast<UInt32>(cProtocol::Version::v1_13_2): return std::make_unique<cProtocol_1_13_2>(&a_Client, ServerAddress, NextState);
 		case static_cast<UInt32>(cProtocol::Version::v1_14):   return std::make_unique<cProtocol_1_14>  (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_1): return std::make_unique<cProtocol_1_14_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_2): return std::make_unique<cProtocol_1_14_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_3): return std::make_unique<cProtocol_1_14_3>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_14_4): return std::make_unique<cProtocol_1_14_4>(&a_Client, ServerAddress, NextState);
+
 		default:
 		{
 			LOGD("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",
-				a_Client.GetIPString().c_str(), ProtocolVersion, ProtocolVersion
+				a_Client.GetIPString(), ProtocolVersion, ProtocolVersion
 			);
 
 			if (NextState != cProtocol::State::Status)
 			{
 				throw TriedToJoinWithUnsupportedProtocolException(
-					Printf("Unsupported protocol version %u.\nTry connecting with Minecraft " MCS_CLIENT_VERSIONS, ProtocolVersion)
+					fmt::format(FMT_STRING("Unsupported protocol version {}.\nTry connecting with Minecraft {}"),
+					ProtocolVersion, MCS_CLIENT_VERSIONS)
 				);
 			}
 
@@ -403,7 +411,7 @@ UInt32 cMultiVersionProtocol::GetPacketID(cProtocol::ePacketType a_PacketType)
 
 
 
-void cMultiVersionProtocol::HandlePacketStatusRequest(cClientHandle & a_Client, cByteBuffer & a_Out)
+void cMultiVersionProtocol::HandlePacketStatusRequest(cClientHandle & a_Client)
 {
 	cServer * Server = cRoot::Get()->GetServer();
 	AString ServerDescription = Server->GetDescription();
@@ -434,22 +442,22 @@ void cMultiVersionProtocol::HandlePacketStatusRequest(cClientHandle & a_Client, 
 	ResponseValue["description"] = Description;
 	if (!Favicon.empty())
 	{
-		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+		ResponseValue["favicon"] = "data:image/png;base64," + Favicon;
 	}
-
 	AString Response = JsonUtils::WriteFastString(ResponseValue);
 
-	VERIFY(a_Out.WriteVarInt32(GetPacketID(cProtocol::ePacketType::pktStatusResponse)));
-	VERIFY(a_Out.WriteVarUTF8String(Response));
-
-	SendPacket(a_Client, a_Out);
+	// Send the response in a packet:
+	cByteBuffer out(Response.size() + 12);  // String + 2x VarInt + extra space for safety
+	VERIFY(out.WriteVarInt32(GetPacketID(cProtocol::ePacketType::pktStatusResponse)));
+	VERIFY(out.WriteVarUTF8String(Response));
+	SendPacket(a_Client, out);
 }
 
 
 
 
 
-void cMultiVersionProtocol::HandlePacketStatusPing(cClientHandle & a_Client, cByteBuffer & a_Out)
+void cMultiVersionProtocol::HandlePacketStatusPing(cClientHandle & a_Client)
 {
 	Int64 Timestamp;
 	if (!m_Buffer.ReadBEInt64(Timestamp))
@@ -457,8 +465,9 @@ void cMultiVersionProtocol::HandlePacketStatusPing(cClientHandle & a_Client, cBy
 		return;
 	}
 
-	VERIFY(a_Out.WriteVarInt32(GetPacketID(cProtocol::ePacketType::pktPingResponse)));
-	VERIFY(a_Out.WriteBEInt64(Timestamp));
-
-	SendPacket(a_Client, a_Out);
+	// Send the ping response packet:
+	cByteBuffer out(16);  // VarInt + Int64 + extra space for safety
+	VERIFY(out.WriteVarInt32(GetPacketID(cProtocol::ePacketType::pktPingResponse)));
+	VERIFY(out.WriteBEInt64(Timestamp));
+	SendPacket(a_Client, out);
 }

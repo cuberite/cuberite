@@ -69,11 +69,11 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_Position.y <= 0)
+		const auto BelowPos = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(BelowPos))
 		{
 			return false;
 		}
-		auto BelowPos = a_Position.addedY(-1);
 		auto BlockBelow = a_Chunk.GetBlock(BelowPos);
 		auto MetaBelow = a_Chunk.GetMeta(BelowPos);
 		return CanBeOn(BlockBelow, MetaBelow);

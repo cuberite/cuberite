@@ -4,6 +4,8 @@
 // Implements the cPluginLua class representing a plugin written in Lua
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
+#include "Defines.h"
+#include "Entities/Minecart.h"
 
 #ifdef __APPLE__
 	#define LUA_USE_MACOSX
@@ -18,7 +20,10 @@
 #include "../Root.h"
 #include "../WebAdmin.h"
 
-#include "lua/src/lauxlib.h"
+extern "C"
+{
+	#include "lua/src/lauxlib.h"
+}
 
 #undef TOLUA_TEMPLATE_BIND
 #include "tolua++/include/tolua++.h"
@@ -32,7 +37,7 @@
 
 cPluginLua::cPluginLua(const AString & a_PluginDirectory, cDeadlockDetect & a_DeadlockDetect) :
 	cPlugin(a_PluginDirectory),
-	m_LuaState(Printf("plugin %s", a_PluginDirectory.c_str())),
+	m_LuaState(fmt::format(FMT_STRING("plugin {}"), a_PluginDirectory)),
 	m_DeadlockDetect(a_DeadlockDetect)
 {
 	m_LuaState.TrackInDeadlockDetect(a_DeadlockDetect);
@@ -138,7 +143,7 @@ bool cPluginLua::Load(void)
 		AString Path = PluginPath + *itr;
 		if (!m_LuaState.LoadFile(Path))
 		{
-			SetLoadError(Printf("Failed to load file %s.", itr->c_str()));
+			SetLoadError(fmt::format(FMT_STRING("Failed to load file {}."), *itr));
 			Close();
 			return false;
 		}
@@ -431,6 +436,7 @@ bool cPluginLua::OnExploded(cWorld & a_World, double a_ExplosionSize, bool a_Can
 			case esOther:         hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, cLuaState::Return, res); break;
 			case esPlugin:        hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, cLuaState::Return, res); break;
 			case esPrimedTNT:     hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res); break;
+			case esTNTMinecart:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMinecartWithTNT *>    (a_SourceData), cLuaState::Return, res); break;
 			case esWitherBirth:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res); break;
 			case esWitherSkull:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res); break;
 			case esMax:
@@ -471,6 +477,7 @@ bool cPluginLua::OnExploding(cWorld & a_World, double & a_ExplosionSize, bool & 
 			case esOther:         hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source,                                                         cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esPlugin:        hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source,                                                         cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esPrimedTNT:     hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cTNTEntity *>          (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
+			case esTNTMinecart:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMinecartWithTNT *>    (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esWitherBirth:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cMonster *>            (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esWitherSkull:   hook->Call(&a_World, a_ExplosionSize, a_CanCauseFire, a_X, a_Y, a_Z, a_Source, static_cast<cWitherSkullEntity *>  (a_SourceData), cLuaState::Return, res, a_CanCauseFire, a_ExplosionSize); break;
 			case esMax:

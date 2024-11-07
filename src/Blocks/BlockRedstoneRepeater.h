@@ -2,9 +2,10 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "Mixins.h"
+#include "BlockType.h"
+#include "Mixins/Mixins.h"
+#include "Mixins/SolidSurfaceUnderneath.h"
 #include "ChunkInterface.h"
-#include "BlockSlab.h"
 #include "../Chunk.h"
 
 
@@ -12,9 +13,9 @@
 
 
 class cBlockRedstoneRepeaterHandler final :
-	public cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>
+	public cSolidSurfaceUnderneath<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>
 {
-	using Super = cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>;
+	using Super = cSolidSurfaceUnderneath<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>;
 
 public:
 
@@ -99,36 +100,6 @@ private:
 	virtual bool IsUseable(void) const override
 	{
 		return true;
-	}
-
-
-
-
-
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
-	{
-		if (a_Position.y <= 0)
-		{
-			return false;
-		}
-
-		BLOCKTYPE BelowBlock;
-		NIBBLETYPE BelowBlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_Position.addedY(-1), BelowBlock, BelowBlockMeta);
-
-		if (cBlockInfo::FullyOccupiesVoxel(BelowBlock))
-		{
-			return true;
-		}
-		else if (cBlockSlabHandler::IsAnySlabType(BelowBlock))
-		{
-			// Check if the slab is turned up side down
-			if ((BelowBlockMeta & 0x08) == 0x08)
-			{
-				return true;
-			}
-		}
-		return false;
 	}
 
 

@@ -684,21 +684,6 @@ void cChunk::SpawnMobs(cMobSpawner & a_MobSpawner)
 
 void cChunk::Tick(std::chrono::milliseconds a_Dt)
 {
-	const auto ShouldTick = ShouldBeTicked();
-
-	// If we are not valid, tick players and bailout
-	if (!ShouldTick)
-	{
-		for (const auto & Entity : m_Entities)
-		{
-			if (Entity->IsPlayer())
-			{
-				Entity->Tick(a_Dt, *this);
-			}
-		}
-		return;
-	}
-
 	TickBlocks();
 
 	// Tick all block entities in this chunk:
@@ -860,7 +845,7 @@ void cChunk::TickBlocks(void)
 	m_BlockToTick = cChunkDef::IndexToCoordinate(Random.RandInt<size_t>(cChunkDef::NumBlocks - 1));
 
 	// Choose a number of blocks for each section to randomly tick.
-	// http://minecraft.fandom.com/wiki/Tick#Random_tick
+	// http://minecraft.wiki/w/Tick#Random_tick
 	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 	{
 		const auto Section = m_BlockData.GetSection(Y);
@@ -910,7 +895,7 @@ void cChunk::ApplyWeatherToTop()
 	if (GetBlockLight(X, Height, Z) > 10)
 	{
 		// Snow only generates on blocks with a block light level of 10 or less.
-		// Ref: https://minecraft.gamepedia.com/Snow_(layer)#Snowfall
+		// Ref: https://minecraft.wiki/w/Snow_(layer)#Snowfall
 		return;
 	}
 
@@ -1022,7 +1007,7 @@ int cChunk::GrowPlantAt(Vector3i a_RelPos, int a_NumStages)
 
 bool cChunk::UnboundedRelGetBlock(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1043,7 +1028,7 @@ bool cChunk::UnboundedRelGetBlock(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NI
 
 bool cChunk::UnboundedRelGetBlockType(Vector3i a_RelPos, BLOCKTYPE & a_BlockType) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1064,7 +1049,7 @@ bool cChunk::UnboundedRelGetBlockType(Vector3i a_RelPos, BLOCKTYPE & a_BlockType
 
 bool cChunk::UnboundedRelGetBlockMeta(Vector3i a_RelPos, NIBBLETYPE & a_BlockMeta) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1085,7 +1070,7 @@ bool cChunk::UnboundedRelGetBlockMeta(Vector3i a_RelPos, NIBBLETYPE & a_BlockMet
 
 bool cChunk::UnboundedRelGetBlockBlockLight(Vector3i a_RelPos, NIBBLETYPE & a_BlockBlockLight) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1106,7 +1091,7 @@ bool cChunk::UnboundedRelGetBlockBlockLight(Vector3i a_RelPos, NIBBLETYPE & a_Bl
 
 bool cChunk::UnboundedRelGetBlockSkyLight(Vector3i a_RelPos, NIBBLETYPE & a_BlockSkyLight) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1127,7 +1112,7 @@ bool cChunk::UnboundedRelGetBlockSkyLight(Vector3i a_RelPos, NIBBLETYPE & a_Bloc
 
 bool cChunk::UnboundedRelGetBlockLights(Vector3i a_RelPos, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_SkyLight) const
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1149,7 +1134,7 @@ bool cChunk::UnboundedRelGetBlockLights(Vector3i a_RelPos, NIBBLETYPE & a_BlockL
 
 bool cChunk::UnboundedRelSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1170,7 +1155,7 @@ bool cChunk::UnboundedRelSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBB
 
 bool cChunk::UnboundedRelFastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
-	if (!cChunkDef::IsValidHeight(a_RelPos.y))
+	if (!cChunkDef::IsValidHeight(a_RelPos))
 	{
 		LOGWARNING("%s: requesting a block with a_RelY out of range: %d", __FUNCTION__, a_RelPos.y);
 		return false;
@@ -1401,7 +1386,7 @@ void cChunk::SendBlockTo(int a_RelX, int a_RelY, int a_RelZ, cClientHandle * a_C
 	}
 
 	const auto Position = PositionToWorldPosition(a_RelX, a_RelY, a_RelZ);
-	a_Client->SendBlockChange(Position.x, Position.y, Position.z, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
+	a_Client->SendBlockChange(Position, GetBlock(a_RelX, a_RelY, a_RelZ), GetMeta(a_RelX, a_RelY, a_RelZ));
 
 	// FS #268 - if a BlockEntity digging is cancelled by a plugin, the entire block entity must be re-sent to the client:
 	if (BlockEntity != nullptr)
@@ -1994,4 +1979,13 @@ NIBBLETYPE cChunk::GetTimeAlteredLight(NIBBLETYPE a_Skylight) const
 	a_Skylight -= m_World->GetSkyDarkness();
 	// Because NIBBLETYPE is unsigned, we clamp it to 0 .. 15 by checking for values above 15
 	return (a_Skylight < 16)? a_Skylight : 0;
+}
+
+
+
+
+
+bool cChunk::IsSlimeChunk() const
+{
+	return m_World->IsSlimeChunk(m_PosX, m_PosZ);
 }
