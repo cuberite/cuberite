@@ -31,14 +31,14 @@ public:
 	// tolua_end
 	// Conversion constructors where U is not the same as T leaving the copy-constructor implicitly generated
 	template <typename U, std::enable_if_t<(!std::is_same<U, T>::value) && ((!std::is_integral<T>::value) || (std::is_integral<U>::value)), bool> = true>
-	constexpr Vector3<T>(const Vector3<U> & a_Rhs):
+	constexpr Vector3(const Vector3<U> & a_Rhs):
 			x(static_cast<T>(a_Rhs.x)),
 			y(static_cast<T>(a_Rhs.y)),
 			z(static_cast<T>(a_Rhs.z))
 	{
 	}
 	template <typename U, std::enable_if_t<(!std::is_same<U, T>::value) && ((std::is_integral<T>::value) && (!std::is_integral<U>::value)), bool> = true>
-	constexpr Vector3<T>(const Vector3<U> & a_Rhs):
+	constexpr Vector3(const Vector3<U> & a_Rhs):
 			x(static_cast<T>(std::floor(a_Rhs.x))),
 			y(static_cast<T>(std::floor(a_Rhs.y))),
 			z(static_cast<T>(std::floor(a_Rhs.z)))
