@@ -125,10 +125,10 @@ int cCryptoKey::ParsePrivate(const void * a_Data, size_t a_NumBytes, const AStri
 	if (a_Password.empty())
 	{
 		return mbedtls_pk_parse_key(
-            &m_Pk,
-            reinterpret_cast<const unsigned char *>(keyData.data()), a_NumBytes + 1,
-            NULL, 0
-        );
+			&m_Pk,
+			reinterpret_cast<const unsigned char *>(keyData.data()), a_NumBytes + 1,
+			NULL, 0
+		);
 	}
 	else
 	{
