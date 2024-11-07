@@ -89,13 +89,14 @@ public:
 	/** Returns true iff the chunk is in the loader / generator queue. */
 	bool IsChunkQueued(int a_ChunkX, int a_ChunkZ) const;
 
-	bool      IsChunkValid       (int a_ChunkX, int a_ChunkZ) const;
-	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkZ) const;
-	
-	std::optional<int> GetHeight(int a_BlockX, int a_BlockZ);  // Returns nullopt if chunk not loaded / generated
 	bool IsWeatherSunnyAt(int a_BlockX, int a_BlockZ) const;
 	bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) const;
 	bool IsWeatherWetAt(Vector3i a_Position) const;
+
+	bool IsChunkValid       (int a_ChunkX, int a_ChunkZ) const;
+	bool HasChunkAnyClients (int a_ChunkX, int a_ChunkZ) const;
+
+	std::optional<int> GetHeight(int a_BlockX, int a_BlockZ);  // Returns nullopt if chunk not loaded / generated
 
 	/** Sets the block at the specified coords to the specified value.
 	The replacement doesn't trigger block updates, nor wake up simulators.

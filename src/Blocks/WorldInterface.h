@@ -79,7 +79,7 @@ public:
 
 	/** Returns true if it is raining or storming at the specified location,
 	and the rain reaches the specified block position.
-	Returns nullopt for unloaded chunks.
+	Returns the global weather state for unloaded chunks.
 	*/
 	virtual bool IsWeatherWetAtXYZ(Vector3i a_Pos) = 0;
 

@@ -757,10 +757,10 @@ void cWorld::GenerateRandomSpawn(int a_MaxSpawnRadius)
 			{
 				SetSpawn(PotentialSpawn.x, PotentialSpawn.y, PotentialSpawn.z);
 
-				auto ChunkPos = cChunkDef::BlockToChunk(GetSpawnPos());
+				auto ChunkPos = cChunkDef::BlockToChunk(PotentialSpawn);
 				cSpawnPrepare::PrepareChunks(*this, ChunkPos, a_MaxSpawnRadius);
 
-				FLOGINFO("World \"{}\":Generated spawnpoint position at {}", m_WorldName, GetSpawnPos());
+				FLOGINFO("World \"{}\":Generated spawnpoint position at {}", m_WorldName, PotentialSpawn);
 				return;
 			}
 		}

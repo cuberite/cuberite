@@ -144,11 +144,9 @@ void cFloater::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 					m_CountDownTime--;
 				}
 			}
-			else
+			else  // if the floater is underground it has a 50% chance of not decreasing the countdown.
 			{
-				// if underground, 50% chance of not decreasing the countdown.
-				auto Height = m_World->GetHeight(POSX_TOINT, POSZ_TOINT);
-				if (Height && (Height.value() < POSY_TOINT) && Random.RandBool())
+				if (Random.RandBool())
 				{
 					m_CountDownTime++;
 				}

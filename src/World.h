@@ -142,7 +142,7 @@ public:
 	cTickTimeLong GetWorldTickAge() const;
 
 	virtual void SetTimeOfDay(cTickTime a_TimeOfDay) override;
-	
+
 	/** Retrieves the world height at the specified coords; returns nullopt if chunk not loaded / generated */
 	virtual std::optional<int> GetHeight(int a_BlockX, int a_BlockZ) override;  // Exported in ManualBindings.cpp
 
@@ -840,8 +840,6 @@ public:
 	/** Returns true if it is raining or storming at the specified location.
 	This takes into account biomes. */
 	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) override;
-
-	// tolua_end
 
 	/** Returns true if it is raining or storming at the specified location,
 	and the rain reaches (the bottom of) the specified block position. */
