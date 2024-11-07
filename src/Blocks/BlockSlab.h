@@ -479,7 +479,7 @@ public:
 		}
 	}
 
-	static bool IsSlabDown(BlockState a_Block) { UNREACHABLE("unimplemented"); }
+	static bool IsSlabDown(BlockState a_Block) { return !IsSlabTop(a_Block); }
 
 	static bool IsSlabUpsideDown(BlockState a_Block) { UNREACHABLE("unimplemented"); }
 
