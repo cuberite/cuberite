@@ -29,12 +29,13 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_Position.y <= 0)
+		const auto BelowPos = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(BelowPos))
 		{
 			return false;
 		}
 
-		switch (a_Chunk.GetBlock(a_Position.addedY(-1)))
+		switch (a_Chunk.GetBlock(BelowPos))
 		{
 			case E_BLOCK_DIRT:
 			case E_BLOCK_GRASS:
@@ -43,16 +44,16 @@ private:
 			{
 				static const Vector3i Coords[] =
 				{
-					{-1, -1,  0},
-					{ 1, -1,  0},
-					{ 0, -1, -1},
-					{ 0, -1,  1},
+					{-1, 0,  0},
+					{ 1, 0,  0},
+					{ 0, 0, -1},
+					{ 0, 0,  1},
 				} ;
 				for (size_t i = 0; i < ARRAYCOUNT(Coords); i++)
 				{
 					BLOCKTYPE BlockType;
 					NIBBLETYPE BlockMeta;
-					if (!a_Chunk.UnboundedRelGetBlock(a_Position + Coords[i], BlockType, BlockMeta))
+					if (!a_Chunk.UnboundedRelGetBlock(BelowPos + Coords[i], BlockType, BlockMeta))
 					{
 						// Too close to the edge, cannot simulate
 						return true;
@@ -90,31 +91,36 @@ private:
 	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
 		// Check the total height of the sugarcane blocks here:
-		int top = a_RelPos.y + 1;
+		auto top = a_RelPos.addedY(1);
 		while (
-			(top < cChunkDef::Height) &&
-			(a_Chunk.GetBlock({a_RelPos.x, top, a_RelPos.z}) == E_BLOCK_SUGARCANE)
+			cChunkDef::IsValidHeight(top) &&
+			(a_Chunk.GetBlock(top) == E_BLOCK_SUGARCANE)
 		)
 		{
-			++top;
+			++top.y;
 		}
-		int bottom = a_RelPos.y - 1;
+		auto bottom = a_RelPos.addedY(-1);
 		while (
-			(bottom > 0) &&
-			(a_Chunk.GetBlock({a_RelPos.x, bottom, a_RelPos.z}) == E_BLOCK_SUGARCANE)
+			cChunkDef::IsValidHeight(bottom) &&
+			(a_Chunk.GetBlock(bottom) == E_BLOCK_SUGARCANE)
 		)
 		{
-			--bottom;
+			--bottom.y;
 		}
 
 		// Grow by at most a_NumStages, but no more than max height:
-		auto toGrow = std::min(a_NumStages, a_Chunk.GetWorld()->GetMaxSugarcaneHeight() + 1 - (top - bottom));
-		Vector3i topPos(a_RelPos.x, top, a_RelPos.z);
+		auto toGrow = std::min(a_NumStages, a_Chunk.GetWorld()->GetMaxSugarcaneHeight() + 1 - (top.y - bottom.y));
 		for (int i = 0; i < toGrow; i++)
 		{
-			if (a_Chunk.GetBlock(topPos.addedY(i)) == E_BLOCK_AIR)
+			const auto NewTop = top.addedY(i);
+			if (!cChunkDef::IsValidHeight(NewTop))
 			{
-				a_Chunk.SetBlock(topPos.addedY(i), E_BLOCK_SUGARCANE, 0);
+				return i;
+			}
+
+			if (a_Chunk.GetBlock(NewTop) == E_BLOCK_AIR)
+			{
+				a_Chunk.SetBlock(NewTop, E_BLOCK_SUGARCANE, 0);
 			}
 			else
 			{

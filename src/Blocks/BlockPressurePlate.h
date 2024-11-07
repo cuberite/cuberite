@@ -22,14 +22,15 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_Position.y <= 0)
+		const auto PosBelow = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(PosBelow))
 		{
 			return false;
 		}
 
 		BLOCKTYPE Block;
 		NIBBLETYPE BlockMeta;
-		a_Chunk.GetBlockTypeMeta(a_Position.addedY(-1), Block, BlockMeta);
+		a_Chunk.GetBlockTypeMeta(PosBelow, Block, BlockMeta);
 
 		// upside down slabs
 		if (cBlockSlabHandler::IsAnySlabType(Block))
