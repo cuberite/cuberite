@@ -115,7 +115,8 @@ public:
 	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta);
 
 	void SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	/** Get the block type and meta at the specified coords.
+	/** Get the block type and meta at the specified coords
+	Will always initialise a_BlockType and a_BlockMeta if called.
 	Returns false if the data could not be retrieved, either because the chunk is invalid or the height is invalid.
 	Otherwise, returns true. */
 	bool GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;

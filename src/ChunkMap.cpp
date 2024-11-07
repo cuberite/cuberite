@@ -597,6 +597,9 @@ bool cChunkMap::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, N
 {
 	if (!cChunkDef::IsValidHeight(a_BlockPos))
 	{
+		// Initialise the params to fulfil our contract.
+		a_BlockType = 0;
+		a_BlockMeta = 0;
 		return false;
 	}
 
@@ -610,6 +613,10 @@ bool cChunkMap::GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, N
 		Chunk->GetBlockTypeMeta(relPos, a_BlockType, a_BlockMeta);
 		return true;
 	}
+
+	// Initialise the params to fulfil our contract.
+	a_BlockType = 0;
+	a_BlockMeta = 0;
 	return false;
 }
 
