@@ -45,8 +45,10 @@ private:
 		NIBBLETYPE BlockMeta;
 		if (!a_Chunk.UnboundedRelGetBlock(LogPos, BlockType, BlockMeta))
 		{
+			// Don't pop if chunk not loaded.
 			return true;
 		}
+
 		return ((BlockType == E_BLOCK_LOG) && ((BlockMeta & 0x03) == E_META_LOG_JUNGLE));
 	}
 

@@ -191,7 +191,7 @@ private:
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
 		// CanBeAt is also called on placement, so the top part can't check for the bottom part.
-		// Both parts can only that the base of the door (i.e. -2 for a door top) is a valid block.
+		// Both parts can only check that the base of the door (i.e. -2 for a door top) is a valid block.
 		const auto BasePosition = a_Position.addedY(((a_Meta & 0x8) == 0x8) ? -2 : -1);
 		if (!cChunkDef::IsValidHeight(BasePosition))
 		{

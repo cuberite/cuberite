@@ -25,10 +25,10 @@ private:
 		if (IsMetaTopPart(a_Meta))
 		{
 			BLOCKTYPE BottomType;
-			auto RootPosition = a_Position.addedY(-1);
+			const auto BottomPosition = a_Position.addedY(-1);
 			if (
-				!cChunkDef::IsValidHeight(RootPosition) ||
-				!a_World.GetBlockTypeMeta(RootPosition, BottomType, a_Meta) ||
+				!cChunkDef::IsValidHeight(BottomPosition) ||
+				!a_World.GetBlockTypeMeta(BottomPosition, BottomType, a_Meta) ||
 				(BottomType != E_BLOCK_BIG_FLOWER)
 			)
 			{
