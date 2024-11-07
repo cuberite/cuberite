@@ -1539,8 +1539,7 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+			IsLarge = IsLarge && GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta) && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
@@ -1557,8 +1556,7 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+			IsLarge = IsLarge && GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta) && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
@@ -1576,8 +1574,7 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+			IsLarge = IsLarge && GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta) && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
@@ -1596,8 +1593,7 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+			IsLarge = IsLarge && GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta) && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
@@ -2044,7 +2040,10 @@ void cWorld::PlaceBlock(const Vector3i a_Position, const BLOCKTYPE a_BlockType, 
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
-	GetBlockTypeMeta(a_Position, BlockType, BlockMeta);
+	if (!GetBlockTypeMeta(a_Position, BlockType, BlockMeta))
+	{
+		return;
+	}
 
 	SetBlock(a_Position, a_BlockType, a_BlockMeta);
 
@@ -2070,7 +2069,10 @@ bool cWorld::DigBlock(Vector3i a_BlockPos, const cEntity * a_Digger)
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
-	GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta);
+	if (!GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta))
+	{
+		return false;
+	}
 
 	if (!m_ChunkMap.DigBlock(a_BlockPos))
 	{
@@ -2617,7 +2619,11 @@ bool cWorld::IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
-	GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, Block, Meta);
+	if (!GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, Block, Meta))
+	{
+		return false;
+	}
+
 	if ((Block != E_BLOCK_TRAPDOOR) && (Block != E_BLOCK_IRON_TRAPDOOR))
 	{
 		return false;
@@ -2634,7 +2640,11 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 {
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
-	GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, Block, Meta);
+	if (!GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, Block, Meta))
+	{
+		return false;
+	}
+
 	if ((Block != E_BLOCK_TRAPDOOR) && (Block != E_BLOCK_IRON_TRAPDOOR))
 	{
 		return false;

@@ -48,8 +48,12 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 
 		BLOCKTYPE pistonBlock;
 		NIBBLETYPE pistonMeta;
-		a_World.GetBlockTypeMeta(a_BlockPos, pistonBlock, pistonMeta);
-		a_World.BroadcastBlockAction(a_BlockPos, PistonExtendAction, pistonMeta, pistonBlock);
+		if (a_World.GetBlockTypeMeta(a_BlockPos, pistonBlock, pistonMeta))
+		{
+			a_World.BroadcastBlockAction(
+				a_BlockPos, PistonExtendAction, pistonMeta, pistonBlock
+			);
+		}
 	}
 
 	// Client expects the server to "play" the animation before setting the final blocks
@@ -60,9 +64,12 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 		{
 			BLOCKTYPE pistonBlock;
 			NIBBLETYPE pistonMeta;
-			World.GetBlockTypeMeta(a_BlockPos, pistonBlock, pistonMeta);
 
-			if ((pistonBlock != E_BLOCK_PISTON) && !IsSticky(pistonBlock))
+
+			if (
+				!World.GetBlockTypeMeta(a_BlockPos, pistonBlock, pistonMeta) ||
+				((pistonBlock != E_BLOCK_PISTON) && !IsSticky(pistonBlock))
+			)
 			{
 				// Ensure we operate on a piston to avoid spurious behaviour
 				// Note that the scheduled task may result in the block type of a_BlockPos changing
@@ -104,17 +111,23 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 	{
 		BLOCKTYPE pistonBlock;
 		NIBBLETYPE pistonMeta;
-		a_World.GetBlockTypeMeta(a_BlockPos, pistonBlock, pistonMeta);
-		a_World.BroadcastBlockAction(a_BlockPos, PistonRetractAction, pistonMeta, pistonBlock);
+		if (a_World.GetBlockTypeMeta(a_BlockPos, pistonBlock, pistonMeta))
+		{
+			a_World.BroadcastBlockAction(
+				a_BlockPos, PistonRetractAction, pistonMeta, pistonBlock
+			);
+		}
 	}
 
 	a_World.ScheduleTask(1_tick, [a_BlockPos](cWorld & World)
 		{
 			BLOCKTYPE pistonBlock;
 			NIBBLETYPE pistonMeta;
-			World.GetBlockTypeMeta(a_BlockPos, pistonBlock, pistonMeta);
 
-			if ((pistonBlock != E_BLOCK_PISTON) && !IsSticky(pistonBlock))
+			if (
+				!World.GetBlockTypeMeta(a_BlockPos, pistonBlock, pistonMeta) ||
+				((pistonBlock != E_BLOCK_PISTON) && !IsSticky(pistonBlock))
+			)
 			{
 				// Ensure we operate on a piston to avoid spurious behaviour
 				// Note that the scheduled task may result in the block type of a_BlockPos changing
@@ -189,19 +202,20 @@ void cBlockPistonHandler::PushBlocks(
 	NIBBLETYPE moveMeta;
 	for (auto & moveBlockPos : sortedBlocks)
 	{
-		a_World.GetBlockTypeMeta(moveBlockPos, moveBlock, moveMeta);
-
-		if (cBlockInfo::IsPistonBreakable(moveBlock))
+		if (a_World.GetBlockTypeMeta(moveBlockPos, moveBlock, moveMeta))
 		{
-			// Block is breakable, drop it:
-			a_World.DropBlockAsPickups(moveBlockPos, nullptr, nullptr);
-		}
-		else
-		{
-			// Not breakable, just move it
-			a_World.SetBlock(moveBlockPos, E_BLOCK_AIR, 0);
-			moveBlockPos += a_PushDir;
-			a_World.SetBlock(moveBlockPos, moveBlock, moveMeta);
+			if (cBlockInfo::IsPistonBreakable(moveBlock))
+			{
+				// Block is breakable, drop it:
+				a_World.DropBlockAsPickups(moveBlockPos, nullptr, nullptr);
+			}
+			else
+			{
+				// Not breakable, just move it
+				a_World.SetBlock(moveBlockPos, E_BLOCK_AIR, 0);
+				moveBlockPos += a_PushDir;
+				a_World.SetBlock(moveBlockPos, moveBlock, moveMeta);
+			}
 		}
 	}
 }
@@ -232,7 +246,10 @@ bool cBlockPistonHandler::CanPushBlock(
 
 	BLOCKTYPE currBlock;
 	NIBBLETYPE currMeta;
-	a_World.GetBlockTypeMeta(a_BlockPos, currBlock, currMeta);
+	if (!a_World.GetBlockTypeMeta(a_BlockPos, currBlock, currMeta))
+	{
+		return !a_RequirePushable;
+	}
 
 	if (currBlock == E_BLOCK_AIR)
 	{
