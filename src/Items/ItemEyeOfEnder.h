@@ -35,7 +35,12 @@ public:
 		// Try to fill an End Portal Frame block:
 		if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{
-			auto DestBlock = a_World->GetBlock(a_ClickedBlockPos);
+			BlockState DestBlock;
+			if(a_World->GetBlock(a_ClickedBlockPos, DestBlock))
+			{
+				return false;
+			}
+			
 			if (DestBlock.Type() == BlockType::EndPortalFrame)
 			{
 				if (EndPortalFrame::Eye(DestBlock))

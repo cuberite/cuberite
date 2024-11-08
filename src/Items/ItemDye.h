@@ -76,7 +76,12 @@ public:
 			}
 
 			// Cocoa (brown dye) can be planted on jungle logs:
-			auto ClickedBlock = a_World->GetBlock(a_ClickedBlockPos);
+
+			BlockState ClickedBlock;
+			if(World.GetBlock(a_ClickedBlockPos, ClickedBlock))
+			{
+				return false;
+			}
 
 			// Check if the block that the player clicked is a jungle log.
 			if (ClickedBlock.Type() != BlockType::JungleLog)

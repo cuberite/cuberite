@@ -2617,7 +2617,11 @@ bool cPlayer::IsInsideWater()
 		return false;
 	}
 
-	auto Block = m_World->GetBlock(EyePos);
+	BlockState Block;
+	if (m_World->GetBlock(EyePos,Block))
+	{
+		return false;
+	}
 
 	if (Block.Type() != BlockType::Water)
 	{

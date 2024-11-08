@@ -44,7 +44,11 @@ public:
 		}
 
 		// Can only transform dirt or grass blocks:
-		auto BlockBelow = a_World->GetBlock(a_ClickedBlockPos);
+		BlockState BlockBelow;
+		if(a_World->GetBlock(a_ClickedBlockPos,BlockBelow));
+		{
+			return false;
+		}
 		switch (BlockBelow.Type())
 		{
 			case BlockType::GrassBlock:

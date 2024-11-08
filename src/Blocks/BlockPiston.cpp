@@ -95,7 +95,7 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 
 			auto Self = World.GetBlock(a_BlockPos);
 
-			if (!IsBlockPiston(Self))
+			if (!IsBlockPiston(Self) && !IsSticky(Self))
 			{
 				// Ensure we operate on a piston to avoid spurious behaviour
 				// Note that the scheduled task may result in the block type of a_BlockPos changing

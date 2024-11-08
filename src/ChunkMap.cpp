@@ -476,6 +476,11 @@ void cChunkMap::CollectPickupsByEntity(cEntity & a_Entity)
 
 BlockState cChunkMap::GetBlock(Vector3i a_BlockPos) const
 {
+	if (!cChunkDef::IsValidHeight(a_BlockPos))
+	{
+		return 0;
+	}
+
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto RelPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 
@@ -495,6 +500,11 @@ BlockState cChunkMap::GetBlock(Vector3i a_BlockPos) const
 
 LIGHTTYPE cChunkMap::GetBlockSkyLight(Vector3i a_BlockPos) const
 {
+	if (!cChunkDef::IsValidHeight(a_BlockPos))
+	{
+		return 0;
+	}
+
 	auto chunkPos = cChunkDef::BlockToChunk(a_BlockPos);
 	auto RelPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkPos);
 
@@ -550,6 +560,14 @@ void cChunkMap::SetBlock(Vector3i a_BlockPos, BlockState a_Block)
 
 bool cChunkMap::GetBlock(Vector3i a_BlockPos, BlockState & a_Block) const
 {
+	if (!cChunkDef::IsValidHeight(a_BlockPos))
+	{
+		// Initialise the params to fulfil our contract.
+		a_BlockType = 0;
+		a_BlockMeta = 0;
+		return false;
+	}
+
 	auto chunkCoord = cChunkDef::BlockToChunk(a_BlockPos);
 	auto RelPos = cChunkDef::AbsoluteToRelative(a_BlockPos, chunkCoord);
 
@@ -560,6 +578,10 @@ bool cChunkMap::GetBlock(Vector3i a_BlockPos, BlockState & a_Block) const
 		a_Block = Chunk->GetBlock(RelPos);
 		return true;
 	}
+
+	// Initialise the params to fulfil our contract.
+	a_BlockType = 0;
+	a_BlockMeta = 0;
 	return false;
 }
 

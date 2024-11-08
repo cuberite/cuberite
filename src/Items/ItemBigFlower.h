@@ -27,7 +27,11 @@ public:
 
 		const auto & World = *a_Player.GetWorld();
 		const auto TopPos = a_PlacePosition.addedY(1);
-		auto BlockToReplace = World.GetBlock(TopPos);
+		BlockState BlockToReplace;
+		if(World.GetBlock(TopPos, BlockToReplace))
+		{
+			return false;
+		}
 
 		if (!cBlockHandler::For(BlockToReplace.Type()).DoesIgnoreBuildCollision(World, a_HeldItem, TopPos, BlockToReplace, a_ClickedBlockFace, false))
 		{

@@ -32,8 +32,11 @@ public:
 		eBlockFace a_ClickedBlockFace
 	) const override
 	{
-		auto BrokenBlock = a_World->GetBlock(a_ClickedBlockPos);
-
+		BlockState BrokenBlock;
+		if(a_World->GetBlock(a_ClickedBlockPos, BrokenBlock))
+		{
+			return false;
+		}
 		if (cBlockLeavesHandler::IsBlockLeaves(BrokenBlock))
 		{
 			a_World->DropBlockAsPickups(a_ClickedBlockPos, a_Player, &a_HeldItem);
