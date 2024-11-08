@@ -152,9 +152,6 @@ function(set_exe_flags TARGET)
 		target_compile_options(
 			${TARGET} PRIVATE
 
-			# Warnings-as-errors only on Clang for now:
-			-Werror
-
 			# TODO: actually fix the warnings instead of disabling them
 			# or at least disable on a file-level basis:
 			-Wno-missing-noreturn -Wno-padded -Wno-implicit-fallthrough
@@ -168,6 +165,16 @@ function(set_exe_flags TARGET)
 			-Wno-string-conversion -Wno-c++98-compat-pedantic -Wno-c++2a-compat-pedantic -Wno-documentation
 			-Wno-documentation-unknown-command -Wno-reserved-id-macro -Wno-error=unused-command-line-argument
 		)
+
+		# Werror only for debug builds
+		if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+			target_compile_options(
+				${TARGET} PRIVATE
+
+				# Warnings-as-errors only on Clang for now:
+				-Werror
+			)
+		endif()
 
 		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 7 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13)
 			target_compile_options(
@@ -193,6 +200,12 @@ function(set_exe_flags TARGET)
 
 				# TODO: fix
 				-Wno-reserved-identifier
+			)
+		endif()
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16)
+			target_compile_options(
+				${TARGET} PRIVATE
+				-Wno-unsafe-buffer-usage
 			)
 		endif()
 	endif()

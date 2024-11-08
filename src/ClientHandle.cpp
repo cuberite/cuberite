@@ -74,6 +74,7 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_IPString(a_IPString),
 	m_Player(nullptr),
 	m_CachedSentChunk(std::numeric_limits<decltype(m_CachedSentChunk.m_ChunkX)>::max(), std::numeric_limits<decltype(m_CachedSentChunk.m_ChunkZ)>::max()),
+	m_ProxyConnection(false),
 	m_HasSentDC(false),
 	m_LastStreamedChunkX(std::numeric_limits<decltype(m_LastStreamedChunkX)>::max()),  // bogus chunk coords to force streaming upon login
 	m_LastStreamedChunkZ(std::numeric_limits<decltype(m_LastStreamedChunkZ)>::max()),
@@ -149,11 +150,11 @@ AString cClientHandle::FormatChatPrefix(
 {
 	if (ShouldAppendChatPrefixes)
 	{
-		return Printf("%s[%s] %s", m_Color1.c_str(), a_ChatPrefixS.c_str(), m_Color2.c_str());
+		return fmt::format(FMT_STRING("{}[{}] {}"), m_Color1, a_ChatPrefixS, m_Color2);
 	}
 	else
 	{
-		return Printf("%s", m_Color1.c_str());
+		return m_Color1;
 	}
 }
 
@@ -178,11 +179,11 @@ AString cClientHandle::FormatMessageType(bool ShouldAppendChatPrefixes, eMessage
 		{
 			if (ShouldAppendChatPrefixes)
 			{
-				return Printf("%s[MSG: %s] %s%s", cChatColor::LightBlue, a_AdditionalData.c_str(), cChatColor::White, cChatColor::Italic);
+				return fmt::format(FMT_STRING("{}[MSG: {}] {}{}"), cChatColor::LightBlue, a_AdditionalData, cChatColor::White, cChatColor::Italic);
 			}
 			else
 			{
-				return Printf("%s: %s", a_AdditionalData.c_str(), cChatColor::LightBlue);
+				return fmt::format(FMT_STRING("{}: {}"), a_AdditionalData, cChatColor::LightBlue);
 			}
 		}
 		case mtMaxPlusOne: break;
@@ -448,8 +449,8 @@ void cClientHandle::FinishAuthenticate()
 
 	if (!cRoot::Get()->GetPluginManager()->CallHookPlayerJoined(*m_Player))
 	{
-		cRoot::Get()->BroadcastChatJoin(Printf("%s has joined the game", m_Username.c_str()));
-		LOGINFO("Player %s has joined the game", m_Username.c_str());
+		cRoot::Get()->BroadcastChatJoin(fmt::format(FMT_STRING("{} has joined the game"), m_Username));
+		LOGINFO("Player %s has joined the game", m_Username);
 	}
 
 	// TODO: this accesses the world spawn from the authenticator thread
@@ -731,14 +732,11 @@ void cClientHandle::HandlePing(void)
 	http://wiki.vg/Protocol#Legacy_Server_List_Ping suggests that servers SHOULD handle this packet */
 
 	// Somebody tries to retrieve information about the server
-	AString Reply;
 	const cServer & Server = *cRoot::Get()->GetServer();
 
-	Printf(Reply, "%s%s%zu%s%zu",
-		Server.GetDescription().c_str(),
-		cChatColor::Delimiter,
-		Server.GetNumPlayers(),
-		cChatColor::Delimiter,
+	auto Reply = fmt::format(FMT_STRING("{}{}{}{}{}"),
+		Server.GetDescription(), cChatColor::Delimiter,
+		Server.GetNumPlayers(),  cChatColor::Delimiter,
 		Server.GetMaxPlayers()
 	);
 	Kick(Reply);
@@ -1256,7 +1254,10 @@ void cClientHandle::HandleBlockDigStarted(Vector3i a_BlockPos, eBlockFace a_Bloc
 
 	BLOCKTYPE DiggingBlock;
 	NIBBLETYPE DiggingMeta;
-	m_Player->GetWorld()->GetBlockTypeMeta(a_BlockPos, DiggingBlock, DiggingMeta);
+	if (!m_Player->GetWorld()->GetBlockTypeMeta(a_BlockPos, DiggingBlock, DiggingMeta))
+	{
+		return;
+	}
 
 	if (
 		m_Player->IsGameModeCreative() &&
@@ -1324,7 +1325,10 @@ void cClientHandle::HandleBlockDigFinished(Vector3i a_BlockPos, eBlockFace a_Blo
 
 	BLOCKTYPE DugBlock;
 	NIBBLETYPE DugMeta;
-	m_Player->GetWorld()->GetBlockTypeMeta(a_BlockPos, DugBlock, DugMeta);
+	if (!m_Player->GetWorld()->GetBlockTypeMeta(a_BlockPos, DugBlock, DugMeta))
+	{
+		return;
+	}
 
 	if (!m_Player->IsGameModeCreative())
 	{
@@ -3361,7 +3365,7 @@ void cClientHandle::AddWantedChunk(int a_ChunkX, int a_ChunkZ)
 void cClientHandle::PacketBufferFull(void)
 {
 	// Too much data in the incoming queue, the server is probably too busy, kick the client:
-	LOGERROR("Too much data in queue for client \"%s\" @ %s, kicking them.", m_Username.c_str(), m_IPString.c_str());
+	LOGERROR("Too much data in queue for client \"%s\" @ %s, kicking them.", m_Username, m_IPString);
 	SendDisconnect("The server is busy; please try again later.");
 }
 
@@ -3371,11 +3375,9 @@ void cClientHandle::PacketBufferFull(void)
 
 void cClientHandle::PacketUnknown(UInt32 a_PacketType)
 {
-	LOGERROR("Unknown packet type 0x%x from client \"%s\" @ %s", a_PacketType, m_Username.c_str(), m_IPString.c_str());
+	LOGERROR("Unknown packet type 0x%x from client \"%s\" @ %s", a_PacketType, m_Username, m_IPString);
 
-	AString Reason;
-	Printf(Reason, "Unknown [C->S] PacketType: 0x%x", a_PacketType);
-	SendDisconnect(Reason);
+	SendDisconnect(fmt::format(FMT_STRING("Unknown [C->S] PacketType: 0x{:x}"), a_PacketType));
 }
 
 
@@ -3384,7 +3386,7 @@ void cClientHandle::PacketUnknown(UInt32 a_PacketType)
 
 void cClientHandle::PacketError(UInt32 a_PacketType)
 {
-	LOGERROR("Protocol error while parsing packet type 0x%02x; disconnecting client \"%s\"", a_PacketType, m_Username.c_str());
+	LOGERROR("Protocol error while parsing packet type 0x%02x; disconnecting client \"%s\"", a_PacketType, m_Username);
 	SendDisconnect("Protocol error");
 }
 

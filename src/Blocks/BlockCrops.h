@@ -65,7 +65,7 @@ private:
 			}
 			case E_BLOCK_CROPS:
 			{
-				// https://minecraft.fandom.com/wiki/Seeds_(Wheat)
+				// https://minecraft.wiki/w/Seeds_(Wheat)
 				Res.Add(E_ITEM_WHEAT);
 				const auto SeedCount = CalculateSeedCount(1, 3, ToolFortuneLevel(a_Tool));
 				Res.Add(E_ITEM_SEEDS, SeedCount);
@@ -73,19 +73,19 @@ private:
 			}
 			case E_BLOCK_CARROTS:
 			{
-				// https://minecraft.gamepedia.com/Carrot#Breaking
+				// https://minecraft.wiki/w/Carrot#Breaking
 				const auto CarrotCount = CalculateSeedCount(1, 4, ToolFortuneLevel(a_Tool));
 				Res.Add(E_ITEM_CARROT, CarrotCount);
 				break;
 			}
 			case E_BLOCK_POTATOES:
 			{
-				// https://minecraft.gamepedia.com/Potato#Breaking
+				// https://minecraft.wiki/w/Potato#Breaking
 				const auto PotatoCount = CalculateSeedCount(2, 3, ToolFortuneLevel(a_Tool));
 				Res.Add(E_ITEM_POTATO, PotatoCount);
 				if (rand.RandBool(0.02))
 				{
-					// https://minecraft.gamepedia.com/Poisonous_Potato#Obtaining
+					// https://minecraft.wiki/w/Poisonous_Potato#Obtaining
 					// With a 2% chance, drop a poisonous potato as well:
 					Res.Add(E_ITEM_POISONOUS_POTATO);
 				}
@@ -118,7 +118,14 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		return (a_Position.y > 0) && (a_Chunk.GetBlock(a_Position.addedY(-1)) == E_BLOCK_FARMLAND);
+		const auto BlockBelow = a_Position.addedY(-1);
+
+		if (!cChunkDef::IsValidHeight(BlockBelow))
+		{
+			return false;
+		}
+
+		return a_Chunk.GetBlock(BlockBelow) == E_BLOCK_FARMLAND;
 	}
 
 

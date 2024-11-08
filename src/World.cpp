@@ -95,8 +95,8 @@ cWorld::cLock::cLock(const cWorld & a_World) :
 ////////////////////////////////////////////////////////////////////////////////
 // cWorld::cTickThread:
 
-cWorld::cTickThread::cTickThread(cWorld & a_World) :
-	Super(Printf("World Ticker (%s)", a_World.GetName().c_str())),
+cWorld::cTickThread::cTickThread(cWorld & a_World):
+	Super(fmt::format(FMT_STRING("World Ticker ({})"), a_World.GetName())),
 	m_World(a_World)
 {
 }
@@ -105,7 +105,7 @@ cWorld::cTickThread::cTickThread(cWorld & a_World) :
 
 
 
-void cWorld::cTickThread::Execute(void)
+void cWorld::cTickThread::Execute()
 {
 	auto LastTime = std::chrono::steady_clock::now();
 	auto TickTime = std::chrono::duration_cast<std::chrono::milliseconds>(1_tick);
@@ -216,7 +216,7 @@ cWorld::cWorld(
 	m_Lighting(*this),
 	m_TickThread(*this)
 {
-	LOGD("cWorld::cWorld(\"%s\")", a_WorldName.c_str());
+	LOGD("cWorld::cWorld(\"%s\")", a_WorldName);
 
 	cFile::CreateFolderRecursive(m_DataPath);
 
@@ -227,13 +227,13 @@ cWorld::cWorld(
 	Serializer.Load();
 
 	// Track the CSs used by this world in the deadlock detector:
-	a_DeadlockDetect.TrackCriticalSection(m_CSTasks, Printf("World %s tasks",   m_WorldName.c_str()));
+	a_DeadlockDetect.TrackCriticalSection(m_CSTasks, fmt::format(FMT_STRING("World {} tasks"), m_WorldName));
 
 	// Load world settings from the ini file
 	cIniFile IniFile;
 	if (!IniFile.ReadFile(m_IniFileName))
 	{
-		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName.c_str());
+		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName);
 
 		// TODO: More descriptions for each key
 		IniFile.AddHeaderComment(" This is the per-world configuration file, managing settings such as generators, simulators, and spawn points");
@@ -1539,8 +1539,7 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+			IsLarge = IsLarge && GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta) && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
@@ -1557,8 +1556,7 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+			IsLarge = IsLarge && GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta) && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
@@ -1576,8 +1574,7 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+			IsLarge = IsLarge && GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta) && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
@@ -1596,8 +1593,7 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_Meta)
 		{
 			NIBBLETYPE meta;
 			BLOCKTYPE type;
-			GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta);
-			IsLarge = IsLarge && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
+			IsLarge = IsLarge && GetBlockTypeMeta(a_BlockPos.addedXZ(x, z), type, meta) && (type == E_BLOCK_SAPLING) && ((meta & 0x07) == a_Meta);
 		}
 	}
 
@@ -2044,7 +2040,10 @@ void cWorld::PlaceBlock(const Vector3i a_Position, const BLOCKTYPE a_BlockType, 
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
-	GetBlockTypeMeta(a_Position, BlockType, BlockMeta);
+	if (!GetBlockTypeMeta(a_Position, BlockType, BlockMeta))
+	{
+		return;
+	}
 
 	SetBlock(a_Position, a_BlockType, a_BlockMeta);
 
@@ -2070,7 +2069,10 @@ bool cWorld::DigBlock(Vector3i a_BlockPos, const cEntity * a_Digger)
 {
 	BLOCKTYPE BlockType;
 	NIBBLETYPE BlockMeta;
-	GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta);
+	if (!GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta))
+	{
+		return false;
+	}
 
 	if (!m_ChunkMap.DigBlock(a_BlockPos))
 	{
@@ -2617,7 +2619,11 @@ bool cWorld::IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
-	GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, Block, Meta);
+	if (!GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, Block, Meta))
+	{
+		return false;
+	}
+
 	if ((Block != E_BLOCK_TRAPDOOR) && (Block != E_BLOCK_IRON_TRAPDOOR))
 	{
 		return false;
@@ -2634,7 +2640,11 @@ bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Op
 {
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
-	GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, Block, Meta);
+	if (!GetBlockTypeMeta({ a_BlockX, a_BlockY, a_BlockZ }, Block, Meta))
+	{
+		return false;
+	}
+
 	if ((Block != E_BLOCK_TRAPDOOR) && (Block != E_BLOCK_IRON_TRAPDOOR))
 	{
 		return false;
@@ -3080,17 +3090,15 @@ cRedstoneSimulator * cWorld::InitializeRedstoneSimulator(cIniFile & a_IniFile)
 
 cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock)
 {
-	AString SimulatorNameKey;
-	Printf(SimulatorNameKey, "%sSimulator", a_FluidName);
-	AString SimulatorSectionName;
-	Printf(SimulatorSectionName, "%sSimulator", a_FluidName);
+	auto SimulatorNameKey = fmt::format(FMT_STRING("{}Simulator"), a_FluidName);
+	auto SimulatorSectionName = fmt::format(FMT_STRING("{}Simulator"), a_FluidName);
 
 	bool IsWater = (strcmp(a_FluidName, "Water") == 0);  // Used for defaults
 	AString DefaultSimulatorName = ((GetDimension() == dimNether) && IsWater) ? "Vaporise" : "Vanilla";
 	AString SimulatorName = a_IniFile.GetValueSet("Physics", SimulatorNameKey, DefaultSimulatorName);
 	if (SimulatorName.empty())
 	{
-		LOGWARNING("[Physics] %s not present or empty in %s, using the default of \"%s\".", SimulatorNameKey.c_str(), GetIniFileName().c_str(), DefaultSimulatorName.c_str());
+		LOGWARNING("[Physics] %s not present or empty in %s, using the default of \"%s\".", SimulatorNameKey, GetIniFileName(), DefaultSimulatorName);
 		SimulatorName = DefaultSimulatorName;
 	}
 	cFluidSimulator * res = nullptr;
@@ -3228,4 +3236,14 @@ void cWorld::cChunkGeneratorCallbacks::CallHookChunkGenerated (cChunkDesc & a_Ch
 	cPluginManager::Get()->CallHookChunkGenerated(
 		*m_World, a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), &a_ChunkDesc
 	);
+}
+
+
+
+
+
+bool cWorld::IsSlimeChunk(int a_ChunkX, int a_ChunkZ) const
+{
+	cNoise Noise(GetSeed());
+	return (Noise.IntNoise2DInt(a_ChunkX, a_ChunkZ) / 8) % 10 == 0;  // 10% chance
 }

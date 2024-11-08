@@ -64,6 +64,10 @@ private:
 
 	cWorld * m_World;
 
+	/** How long till the map data will be saved
+	Default save interval is #defined in MAP_DATA_SAVE_INTERVAL */
+	unsigned int m_TicksUntilNextSave;
+
 };  // tolua_export
 
 

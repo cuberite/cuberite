@@ -23,14 +23,15 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_Position.y <= 0)
+		const auto BasePos = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(BasePos))
 		{
 			return false;
 		}
 
 		// TODO: Cannot be at too much daylight
 
-		switch (a_Chunk.GetBlock(a_Position.addedY(-1)))
+		switch (a_Chunk.GetBlock(BasePos))
 		{
 			case E_BLOCK_GLASS:
 			case E_BLOCK_CACTUS:

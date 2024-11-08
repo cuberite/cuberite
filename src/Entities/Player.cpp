@@ -982,6 +982,13 @@ void cPlayer::Respawn(void)
 		TeleportToCoords(m_RespawnPosition.x, m_RespawnPosition.y, m_RespawnPosition.z);
 	}
 
+	// The Notchian client enters a weird glitched state when trying to "resurrect" dead players
+	// To prevent that, destroy the existing client-side entity, and create a new one with the same ID
+	// This does not make any difference to more modern clients
+	m_World->BroadcastDestroyEntity(*this, &*m_ClientHandle);
+	m_World->BroadcastSpawnEntity(*this, &*m_ClientHandle);
+
+
 	SetVisible(true);
 }
 
@@ -1682,7 +1689,7 @@ AString cPlayer::GetSuffix(void) const
 
 
 
-AString cPlayer::GetPlayerListName(void) const
+AString cPlayer::GetPlayerListName() const
 {
 	const AString & Color = GetColor();
 
@@ -1692,7 +1699,7 @@ AString cPlayer::GetPlayerListName(void) const
 	}
 	else if ((GetName().length() <= 14) && !Color.empty())
 	{
-		return Printf("%s%s", Color.c_str(), GetName().c_str());
+		return fmt::format(FMT_STRING("{}{}"), Color, GetName());
 	}
 	else
 	{
@@ -2069,7 +2076,7 @@ void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
 		return;
 	}
 
-	// Ref: https://minecraft.gamepedia.com/Enchanting#Unbreaking
+	// Ref: https://minecraft.wiki/w/Enchanting#Unbreaking
 	unsigned int UnbreakingLevel = Item.m_Enchantments.GetLevel(cEnchantments::enchUnbreaking);
 	double chance = ItemCategory::IsArmor(Item.m_ItemType)
 		? (0.6 + (0.4 / (UnbreakingLevel + 1))) : (1.0 / (UnbreakingLevel + 1));
@@ -2115,7 +2122,7 @@ void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
 
 void cPlayer::HandleFood(void)
 {
-	// Ref.: https://minecraft.gamepedia.com/Hunger
+	// Ref.: https://minecraft.wiki/w/Hunger
 
 	if (IsGameModeCreative() || IsGameModeSpectator())
 	{
@@ -2587,9 +2594,10 @@ bool cPlayer::IsInsideWater()
 
 	BLOCKTYPE Block;
 	NIBBLETYPE Meta;
-	m_World->GetBlockTypeMeta(EyePos, Block, Meta);
-
-	if ((Block != E_BLOCK_WATER) && (Block != E_BLOCK_STATIONARY_WATER))
+	if (
+		!m_World->GetBlockTypeMeta(GetEyePosition().Floor(), Block, Meta) ||
+		((Block != E_BLOCK_WATER) && (Block != E_BLOCK_STATIONARY_WATER))
+	)
 	{
 		return false;
 	}
@@ -2606,7 +2614,7 @@ bool cPlayer::IsInsideWater()
 
 float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 {
-	// Based on: https://minecraft.gamepedia.com/Breaking#Speed
+	// Based on: https://minecraft.wiki/w/Breaking#Speed
 
 	// Get the base speed multiplier of the equipped tool for the mined block
 	float MiningSpeed = GetEquippedItem().GetHandler().GetBlockBreakingStrength(a_Block);
@@ -2672,7 +2680,7 @@ float cPlayer::GetDigSpeed(BLOCKTYPE a_Block)
 
 float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 {
-	// Based on https://minecraft.gamepedia.com/Breaking#Calculation
+	// Based on https://minecraft.wiki/w/Breaking#Calculation
 	// If we know it's instantly breakable then quit here:
 	if (cBlockInfo::IsOneHitDig(a_Block))
 	{
@@ -2695,7 +2703,7 @@ float cPlayer::GetMiningProgressPerTick(BLOCKTYPE a_Block)
 
 bool cPlayer::CanInstantlyMine(BLOCKTYPE a_Block)
 {
-	// Based on: https://minecraft.gamepedia.com/Breaking#Calculation
+	// Based on: https://minecraft.wiki/w/Breaking#Calculation
 
 	// If the dig speed is greater than 30 times the hardness, then the wiki says we can instantly mine:
 	return GetDigSpeed(a_Block) > (30 * cBlockInfo::GetHardness(a_Block));
@@ -3092,8 +3100,8 @@ void cPlayer::OnRemoveFromWorld(cWorld & a_World)
 
 		if (!cRoot::Get()->GetPluginManager()->CallHookPlayerDestroyed(*this))
 		{
-			cRoot::Get()->BroadcastChatLeave(Printf("%s has left the game", GetName().c_str()));
-			LOGINFO("Player %s has left the game", GetName().c_str());
+			cRoot::Get()->BroadcastChatLeave(fmt::format(FMT_STRING("{} has left the game"), GetName()));
+			LOGINFO("Player %s has left the game", GetName());
 		}
 
 		// Remove ourself from everyone's lists:

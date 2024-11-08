@@ -1,19 +1,20 @@
 
-// BlockBanner.h
+// BlockStandingBanner.h
 
 #pragma once
 
 #include "../BlockInfo.h"
 #include "BlockEntity.h"
+#include "Mixins/SolidSurfaceUnderneath.h"
 
 
 
 
 
-class cBlockBannerHandler final :
-	public cBlockEntityHandler
+class cBlockStandingBannerHandler final :
+	public cSolidSurfaceUnderneath<cBlockEntityHandler>
 {
-	using Super = cBlockEntityHandler;
+	using Super = cSolidSurfaceUnderneath<cBlockEntityHandler>;
 
 public:
 
@@ -23,20 +24,6 @@ public:
 	{
 		// Drops handled by the block entity:
 		return {};
-	}
-
-
-
-
-
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
-	{
-		if (a_Position.y < 1)
-		{
-			return false;
-		}
-
-		return cBlockInfo::IsSolid(a_Chunk.GetBlock(a_Position.addedY(-1)));
 	}
 
 

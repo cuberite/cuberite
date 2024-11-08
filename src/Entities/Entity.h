@@ -610,7 +610,7 @@ protected:
 	/** Stores the air drag that is applied to the entity every tick, measured in speed ratio per tick
 	Acts as air friction and slows down flight
 	Will be interpolated if the server tick rate varies
-	Data: https://minecraft.gamepedia.com/Entity#Motion_of_entities */
+	Data: https://minecraft.wiki/w/Entity#Motion_of_entities */
 	float m_AirDrag;
 
 	/** Last position sent to client via the Relative Move or Teleport packets (not Velocity)

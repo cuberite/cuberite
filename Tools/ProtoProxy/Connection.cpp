@@ -43,7 +43,7 @@
 		{ \
 			return false; \
 		} \
-	} while(false)
+	} while (false)
 
 #define HANDLE_SERVER_PACKET_READ(Proc, Type, Var) \
 	Type Var; \
@@ -52,7 +52,7 @@
 		{ \
 			return false; \
 		} \
-	} while(false)
+	} while (false)
 
 #define CLIENTSEND(...) SendData(m_ClientSocket, __VA_ARGS__, "Client")
 #define SERVERSEND(...) SendData(m_ServerSocket, __VA_ARGS__, "Server")
@@ -151,7 +151,8 @@ AString PrintableAbsIntTriplet(int a_X, int a_Y, int a_Z, double a_Divisor = 32)
 
 AString PrintableAbsIntTriplet(int a_X, int a_Y, int a_Z, double a_Divisor)
 {
-	return Printf("<%d, %d, %d> ~ {%.02f, %.02f, %.02f}",
+	return fmt::format(
+		FMT_STRING("<{}, {}, {}> ~ {{{}, {}, {}}}"),
 		a_X, a_Y, a_Z,
 		static_cast<double>(a_X) / a_Divisor, static_cast<double>(a_Y) / a_Divisor, static_cast<double>(a_Z) / a_Divisor
 	);
@@ -214,7 +215,7 @@ cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 		mkdir("Logs", 0777);
 	#endif
 
-	Printf(m_LogNameBase, "Logs/Log_%d_%d", static_cast<int>(time(nullptr)), static_cast<int>(a_ClientSocket));
+	m_LogNameBase = fmt::format(FMT_STRING("Logs/Log_{}_{}"), time(nullptr), a_ClientSocket);
 	AString fnam(m_LogNameBase);
 	fnam.append(".log");
 	#ifdef _WIN32
@@ -223,7 +224,7 @@ cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 		m_LogFile = fopen(fnam.c_str(), "w");
 	#endif
 	Log("Log file created");
-	printf("Connection is logged to file \"%s\"\n", fnam.c_str());
+	fmt::print(FMT_STRING("Connection is logged to file \"{}\"\n"), fnam);
 }
 
 
@@ -1795,12 +1796,12 @@ bool cConnection::HandleServerKick(void)
 
 		if (Split.size() == 6)
 		{
-			Log("  Preamble: \"%s\"", Split[0].c_str());
-			Log("  Protocol version: \"%s\"", Split[1].c_str());
-			Log("  Server version: \"%s\"", Split[2].c_str());
-			Log("  MOTD: \"%s\"", Split[3].c_str());
-			Log("  Cur players: \"%s\"", Split[4].c_str());
-			Log("  Max players: \"%s\"", Split[5].c_str());
+			Log("  Preamble: \"%s\"", Split[0]);
+			Log("  Protocol version: \"%s\"", Split[1]);
+			Log("  Server version: \"%s\"", Split[2]);
+			Log("  MOTD: \"%s\"", Split[3]);
+			Log("  Cur players: \"%s\"", Split[4]);
+			Log("  Max players: \"%s\"", Split[5]);
 
 			// Modify the MOTD to show that it's being ProtoProxied:
 			Reason.assign(Split[0]);
@@ -1809,7 +1810,7 @@ bool cConnection::HandleServerKick(void)
 			Reason.push_back(0);
 			Reason.append(Split[2]);
 			Reason.push_back(0);
-			Reason.append(Printf("ProtoProxy: %s", Split[3].c_str()));
+			Reason.append(fmt::format(FMT_STRING("ProtoProxy: {}"), Split[3]));
 			Reason.push_back(0);
 			Reason.append(Split[4]);
 			Reason.push_back(0);
@@ -1829,7 +1830,7 @@ bool cConnection::HandleServerKick(void)
 	}
 	else
 	{
-		Log("  Reason = \"%s\"", Reason.c_str());
+		Log("  Reason = \"%s\"", Reason);
 	}
 	COPY_TO_CLIENT();
 	return true;
@@ -2407,6 +2408,7 @@ bool cConnection::HandleServerStatistics(void)
 
 
 
+
 bool cConnection::HandleServerStatusPing(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEInt64, Int64, Time);
@@ -2548,8 +2550,7 @@ bool cConnection::HandleServerUpdateTileEntity(void)
 	DataLog(Data.data(), Data.size(), "  Data (%u bytes)", DataLength);
 
 	// Save metadata to a file:
-	AString fnam;
-	Printf(fnam, "%s_tile_%08x.nbt", m_LogNameBase.c_str(), m_ItemIdx++);
+	auto fnam = fmt::format(FMT_STRING("{}_tile_{:08x}.nbt"), m_LogNameBase, m_ItemIdx++);
 	FILE * f = fopen(fnam.c_str(), "wb");
 	if (f != nullptr)
 	{
@@ -2691,7 +2692,7 @@ bool cConnection::ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc)
 	a_Buffer.ReadBEInt8(ItemCount);  // We already know we can read these bytes - we checked before.
 	a_Buffer.ReadBEInt16(ItemDamage);
 	a_Buffer.ReadBEUInt16(MetadataLength);
-	Printf(a_ItemDesc, "%d:%d * %d", ItemType, ItemDamage, ItemCount);
+	a_ItemDesc = fmt::format(FMT_STRING("{}:{} * {}"), ItemType, ItemDamage, ItemCount);
 	if (MetadataLength <= 0)
 	{
 		return true;
@@ -2704,17 +2705,16 @@ bool cConnection::ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc)
 	}
 	AString MetaHex;
 	CreateHexDump(MetaHex, Metadata.data(), Metadata.size(), 16);
-	AppendPrintf(a_ItemDesc, "; %u bytes of meta:\n%s", MetadataLength, MetaHex.c_str());
+	a_ItemDesc.append(fmt::format(FMT_STRING("; {} bytes of meta:\n{}"), MetadataLength, MetaHex));
 
 	// Save metadata to a file:
-	AString fnam;
-	Printf(fnam, "%s_item_%08x.nbt", m_LogNameBase.c_str(), m_ItemIdx++);
+	auto fnam = fmt::format(FMT_STRING("{}_item_{:08x}.nbt"), m_LogNameBase, m_ItemIdx++);
 	FILE * f = fopen(fnam.c_str(), "wb");
 	if (f != nullptr)
 	{
 		fwrite(Metadata.data(), 1, Metadata.size(), f);
 		fclose(f);
-		AppendPrintf(a_ItemDesc, "\n    (saved to file \"%s\")", fnam.c_str());
+		a_ItemDesc.append(fmt::format(FMT_STRING("\n    (saved to file \"{}\")"), fnam));
 	}
 
 	return true;

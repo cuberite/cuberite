@@ -1230,8 +1230,6 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 		case mtDonkey:
 		case mtMule:
 
-		case mtEndermite:
-
 		case mtEvoker:
 
 		case mtLlama:
@@ -1254,6 +1252,7 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 
 		case mtCaveSpider:
 		case mtEnderDragon:
+		case mtEndermite:
 		case mtGiant:
 		case mtIronGolem:
 		case mtMooshroom:

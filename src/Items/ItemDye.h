@@ -54,10 +54,12 @@ public:
 			// Cocoa (brown dye) can be planted on jungle logs:
 			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;
-			a_World->GetBlockTypeMeta(a_ClickedBlockPos, BlockType, BlockMeta);
 
 			// Check if the block that the player clicked is a jungle log.
-			if ((BlockType != E_BLOCK_LOG) || ((BlockMeta & 0x03) != E_META_LOG_JUNGLE))
+			if (
+				!a_World->GetBlockTypeMeta(a_ClickedBlockPos, BlockType, BlockMeta) ||
+				((BlockType != E_BLOCK_LOG) || ((BlockMeta & 0x03) != E_META_LOG_JUNGLE))
+			)
 			{
 				return false;
 			}
@@ -88,7 +90,7 @@ public:
 
 
 	/** Attempts to use the bonemeal on the plant at the specified (absolute) position.
-	The effect of fertilization depends on the plant: https://minecraft.gamepedia.com/Bone_Meal#Fertilizer
+	The effect of fertilization depends on the plant: https://minecraft.wiki/w/Bone_Meal#Fertilizer
 		- grow a few stages
 		- grow 1 stage with a chance
 		- drop pickups without destroying the plant
@@ -270,7 +272,7 @@ public:
 		a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_Position, 0);
 	}
 
-	/** Grows a biome-dependent flower according to https://minecraft.gamepedia.com/Flower#Flower_biomes */
+	/** Grows a biome-dependent flower according to https://minecraft.wiki/w/Flower#Flower_biomes */
 	static void GrowFlower(cWorld & a_World, const Vector3i a_Position)
 	{
 		auto & Random = GetRandomProvider();

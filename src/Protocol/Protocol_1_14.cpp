@@ -9,6 +9,7 @@ Implements the 1.14 protocol classes:
 #include "Globals.h"
 #include "Protocol_1_14.h"
 #include "Packetizer.h"
+#include "JsonUtils.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
@@ -18,6 +19,7 @@ Implements the 1.14 protocol classes:
 #include "../BlockEntities/BlockEntity.h"
 
 #include "../Entities/ArrowEntity.h"
+#include "../Entities/ItemFrame.h"
 #include "../Mobs/Bat.h"
 #include "../Entities/Boat.h"
 #include "../Mobs/Chicken.h"
@@ -440,7 +442,7 @@ void cProtocol_1_14::SendWindowOpen(const cWindow & a_Window)
 			}
 		}
 
-		Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_Window.GetWindowTitle().c_str()));
+		Pkt.WriteString(JsonUtils::SerializeSingleValueJsonObject("text", a_Window.GetWindowTitle()));
 	}
 }
 
@@ -1212,7 +1214,11 @@ void cProtocol_1_14::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 
 		case cEntity::etItemFrame:
 		{
-			// TODO
+			const auto & Frame = static_cast<const cItemFrame &>(a_Entity);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemFrameItem, EntityMetadataType::Item);
+			WriteItem(a_Pkt, Frame.GetItem());
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemFrameRotation, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(Frame.GetItemRotation());
 			break;
 		}  // case etItemFrame
 
@@ -1601,8 +1607,6 @@ void cProtocol_1_14::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtDrowned:
 
-		case mtEndermite:
-
 		case mtEvoker:
 
 		case mtIllusioner:
@@ -1650,6 +1654,7 @@ void cProtocol_1_14::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}
 
+		case mtEndermite:
 		case mtGiant:
 		case mtSilverfish:
 		case mtSquid:

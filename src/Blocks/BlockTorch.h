@@ -7,7 +7,7 @@
 #include "BlockType.h"
 #include "ChunkInterface.h"
 #include "Defines.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
 
 
 
@@ -126,7 +126,7 @@ private:
 		NIBBLETYPE NeighborBlockMeta;
 		if (!a_Chunk.UnboundedRelGetBlock(NeighborRelPos, NeighborBlockType, NeighborBlockMeta))
 		{
-			// Neighbor in an unloaded chunk, bail out without changint this.
+			// Neighbor in an unloaded chunk, bail out without changing this.
 			return false;
 		}
 

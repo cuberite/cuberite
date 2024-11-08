@@ -195,7 +195,7 @@ private:
 		const auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
 
 		// Search for water in a close proximity:
-		// Ref.: https://minecraft.gamepedia.com/Farmland#Hydration
+		// Ref.: https://minecraft.wiki/w/Farmland#Hydration
 		// TODO: Rewrite this to use the chunk and its neighbors directly
 		cBlockArea Area;
 		if (!Area.Read(*a_Chunk.GetWorld(), WorldPos - Vector3i(4, 0, 4), WorldPos + Vector3i(4, 1, 4)))

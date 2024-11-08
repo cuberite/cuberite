@@ -97,6 +97,9 @@
 	#define PLATFORM_CRYPTOGRAPHY 0
 
 	#include <arpa/inet.h>
+	#include <netinet/in.h>
+	#include <netinet/tcp.h>
+	#include <sys/socket.h>
 	#include <unistd.h>
 #endif
 
@@ -387,9 +390,21 @@ auto ToUnsigned(T a_Val)
 	return static_cast<std::make_unsigned_t<T>>(a_Val);
 }
 
+// https://stackoverflow.com/questions/1666802/is-there-a-class-macro-in-c
+constexpr std::string_view methodName(std::string_view a_PrettyFunction)
+{
+	size_t Bracket = a_PrettyFunction.rfind("(");
+	size_t Space = a_PrettyFunction.rfind(" ", Bracket) + 1;
 
+	return a_PrettyFunction.substr(Space, Bracket - Space);
+}
 
+// https://stackoverflow.com/questions/48857887/pretty-function-in-visual-c
+#if !defined(__PRETTY_FUNCTION__) && !defined(__GNUC__)
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
 
+#define __METHOD_NAME__ methodName(__PRETTY_FUNCTION__)
 
 // Common headers (part 2, with macros):
 #include "Vector3.h"

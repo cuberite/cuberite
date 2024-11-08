@@ -25,9 +25,10 @@ private:
 		if (IsMetaTopPart(a_Meta))
 		{
 			BLOCKTYPE BottomType;
+			const auto BottomPosition = a_Position.addedY(-1);
 			if (
-				(a_Position.y < 1) ||
-				!a_World.GetBlockTypeMeta(a_Position - Vector3i(0, 1, 0), BottomType, a_Meta) ||
+				!cChunkDef::IsValidHeight(BottomPosition) ||
+				!a_World.GetBlockTypeMeta(BottomPosition, BottomType, a_Meta) ||
 				(BottomType != E_BLOCK_BIG_FLOWER)
 			)
 			{
@@ -104,7 +105,7 @@ private:
 		// Both parts can only that they're rooted in grass.
 
 		const auto RootPosition = a_Position.addedY(IsMetaTopPart(a_Meta) ? -2 : -1);
-		return (RootPosition.y >= 0) && IsBlockTypeOfDirt(a_Chunk.GetBlock(RootPosition));
+		return cChunkDef::IsValidHeight(RootPosition) && IsBlockTypeOfDirt(a_Chunk.GetBlock(RootPosition));
 	}
 
 

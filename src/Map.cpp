@@ -23,29 +23,29 @@ cMap::cMap(unsigned int a_ID, cWorld * a_World):
 	m_Scale(3),
 	m_CenterX(0),
 	m_CenterZ(0),
-	m_World(a_World)
+	m_Dirty(false),  // This constructor is for an empty map object which will be filled by the caller with the correct values - it does not need saving.
+	m_World(a_World),
+	m_Name(fmt::format(FMT_STRING("map_{}"), m_ID))
 {
 	m_Data.assign(m_Width * m_Height, E_BASE_COLOR_TRANSPARENT);
-
-	Printf(m_Name, "map_%i", m_ID);
 }
 
 
 
 
 
-cMap::cMap(unsigned int a_ID, int a_CenterX, int a_CenterZ, cWorld * a_World, unsigned int a_Scale)
-	: m_ID(a_ID)
-	, m_Width(cChunkDef::Width * 8)
-	, m_Height(cChunkDef::Width * 8)
-	, m_Scale(a_Scale)
-	, m_CenterX(a_CenterX)
-	, m_CenterZ(a_CenterZ)
-	, m_World(a_World)
+cMap::cMap(unsigned int a_ID, int a_CenterX, int a_CenterZ, cWorld * a_World, unsigned int a_Scale):
+	m_ID(a_ID),
+	m_Width(cChunkDef::Width * 8),
+	m_Height(cChunkDef::Width * 8),
+	m_Scale(a_Scale),
+	m_CenterX(a_CenterX),
+	m_CenterZ(a_CenterZ),
+	m_Dirty(true),  // This constructor is for creating a brand new map in game, it will always need saving.
+	m_World(a_World),
+	m_Name(fmt::format(FMT_STRING("map_{}"), m_ID))
 {
 	m_Data.assign(m_Width * m_Height, E_BASE_COLOR_TRANSPARENT);
-
-	Printf(m_Name, "map_%i", m_ID);
 }
 
 
@@ -225,7 +225,13 @@ bool cMap::SetPixel(unsigned int a_X, unsigned int a_Z, cMap::ColorID a_Data)
 {
 	if ((a_X < m_Width) && (a_Z < m_Height))
 	{
-		m_Data[a_Z * m_Width + a_X] = a_Data;
+		auto index = a_Z * m_Width + a_X;
+
+		if (m_Data[index] != a_Data)
+		{
+			m_Data[index] = a_Data;
+			m_Dirty = true;
+		}
 
 		return true;
 	}

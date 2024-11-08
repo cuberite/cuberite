@@ -5,6 +5,7 @@
 #include "Cow.h"
 #include "Creeper.h"
 #include "Enderman.h"
+#include "Endermite.h"
 #include "EnderDragon.h"
 #include "Ghast.h"
 #include "Giant.h"

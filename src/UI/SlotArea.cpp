@@ -1065,9 +1065,12 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 
 	BLOCKTYPE Block;
 	NIBBLETYPE BlockMeta;
-	a_Player.GetWorld()->GetBlockTypeMeta(BlockPos, Block, BlockMeta);
 
-	if (!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) && GetRandomProvider().RandBool(0.12))
+	if (
+		a_Player.GetWorld()->GetBlockTypeMeta(BlockPos, Block, BlockMeta) &&
+		!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) &&
+		GetRandomProvider().RandBool(0.12)
+	)
 	{
 		NIBBLETYPE Orientation = BlockMeta & 0x3;
 		NIBBLETYPE AnvilDamage = BlockMeta >> 2;
@@ -1697,7 +1700,7 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 		return;
 	}
 
-	// Pseudocode found at: https://minecraft.gamepedia.com/Enchanting_mechanics
+	// Pseudocode found at: https://minecraft.wiki/w/Enchanting_mechanics
 	const auto Bookshelves = std::min(GetBookshelvesCount(*a_Player.GetWorld()), 15U);
 
 	// A PRNG initialised using the player's enchantment seed.

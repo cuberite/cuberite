@@ -9,6 +9,7 @@ Options that can be set via the Options parameter to the cUrlClient calls:
 "OwnCert":            The client certificate to use, if requested by the server. Any string that can be parsed by cX509Cert.
 "OwnPrivKey":         The private key appropriate for OwnCert. Any string that can be parsed by cCryptoKey.
 "OwnPrivKeyPassword": The password for OwnPrivKey. If not present or empty, no password is assumed.
+"TrustedRootCAs":     The trusted root CA certificates (\n-delimited concatenated PEM format) to be used for peer cert verification. If not present, peer cert is not verified.
 
 Behavior:
 - If a redirect is received, and redirection is allowed, the redirection is reported via OnRedirecting() callback
@@ -86,7 +87,7 @@ public:
 		for such a response; instead, the redirect is silently attempted. */
 		virtual void OnRedirecting(const AString & a_NewLocation) {}
 	};
-	typedef std::unique_ptr<cCallbacks> cCallbacksPtr;
+	using cCallbacksPtr = std::shared_ptr<cCallbacks>;
 
 
 	/** Used for HTTP status codes. */
@@ -115,17 +116,17 @@ public:
 		const AString & a_URL,
 		cCallbacksPtr && a_Callbacks,
 		AStringMap && a_Headers,
-		AString && a_Body,
-		AStringMap && a_Options
+		const AString & a_Body,
+		const AStringMap & a_Options
 	);
 
 	/** Alias for Request("GET", ...) */
 	static std::pair<bool, AString> Get(
 		const AString & a_URL,
 		cCallbacksPtr && a_Callbacks,
-		AStringMap a_Headers = AStringMap(),
-		const AString & a_Body = AString(),
-		AStringMap a_Options = AStringMap()
+		AStringMap && a_Headers = {},
+		const AString & a_Body = {},
+		const AStringMap & a_Options = {}
 	);
 
 	/** Alias for Request("POST", ...) */
@@ -133,8 +134,8 @@ public:
 		const AString & a_URL,
 		cCallbacksPtr && a_Callbacks,
 		AStringMap && a_Headers,
-		AString && a_Body,
-		AStringMap && a_Options
+		const AString & a_Body,
+		const AStringMap & a_Options = {}
 	);
 
 	/** Alias for Request("PUT", ...) */
@@ -142,8 +143,43 @@ public:
 		const AString & a_URL,
 		cCallbacksPtr && a_Callbacks,
 		AStringMap && a_Headers,
-		AString && a_Body,
-		AStringMap && a_Options
+		const AString & a_Body,
+		const AStringMap & a_Options = {}
+	);
+
+	/** Sends a generic request and block until a response is received or an error occurs.
+	The first returned value specifies whether the response was received successfully.
+	If successful, the second value provides the actual response data. */
+	static std::pair<bool, AString> BlockingRequest(
+		const AString & a_Method,
+		const AString & a_URL,
+		AStringMap && a_Headers = {},
+		const AString & a_Body = {},
+		const AStringMap & a_Options = {}
+	);
+
+	/** Alias for BlockingRequest("GET", ...) */
+	static std::pair<bool, AString> BlockingGet(
+		const AString & a_URL,
+		AStringMap a_Headers = {},
+		const AString & a_Body = {},
+		const AStringMap & a_Options = {}
+	);
+
+	/** Alias for BlockingRequest("POST", ...) */
+	static std::pair<bool, AString> BlockingPost(
+		const AString & a_URL,
+		AStringMap && a_Headers,
+		const AString & a_Body,
+		const AStringMap & a_Options = {}
+	);
+
+	/** Alias for BlockingRequest("PUT", ...) */
+	static std::pair<bool, AString> BlockingPut(
+		const AString & a_URL,
+		AStringMap && a_Headers,
+		const AString & a_Body,
+		const AStringMap & a_Options = {}
 	);
 };
 

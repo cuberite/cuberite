@@ -5375,6 +5375,10 @@ ValueName0=SomeOtherValue
 				insert values by hand. Then you can store the object's contents to a disk file using WriteFile(), or
 				just forget everything by destroying the object. Note that the file operations are quite slow.</p>
 				<p>
+				Cuberite will write the characters '\n' in place of line breaks in the values of the cIniFile when
+				it is being stored into a file. It will also replace '\n' with line breaks when it reads an INI
+				file.
+				<p>
 				For storing high-volume low-latency data, use the {{sqlite3}} class. For storing
 				hierarchically-structured data, use the XML format, using the LuaExpat parser in the {{lxp}} class.
 			]],
@@ -9742,7 +9746,7 @@ a_Player:OpenWindow(Window);
 								Type = "Vector3i",
 							},
 						},
-						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.fandom.com/wiki/Enderman#Teleportation}}.",
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.wiki/w/Enderman#Teleportation}}.",
 					},
 					{
 						Params =
@@ -9768,7 +9772,7 @@ a_Player:OpenWindow(Window);
 								Type = "cBoundingBox",
 							},
 						},
-						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.fandom.com/wiki/Enderman#Teleportation}}.",
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.wiki/w/Enderman#Teleportation}}.",
 					},
 					{
 						Params =
@@ -9794,7 +9798,7 @@ a_Player:OpenWindow(Window);
 								Type = "number",
 							},
 						},
-						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.fandom.com/wiki/Enderman#Teleportation}}.",
+						Notes = "Function to find suitable teleport destination in or below box. Returns true and places result in Destination if found, otherwise returns false. Details at: {{https://minecraft.wiki/w/Enderman#Teleportation}}.",
 					},
 				},
 				HasEntityEffect =
@@ -12288,7 +12292,7 @@ end
 							Type = "cTeam",
 						},
 					},
-					Notes = "Registers a new team. Returns the {{cTeam}} instance, nil on error.",
+					Notes = "Registers a new team. Returns the {{cTeam}} instance, nil on error. For example if the team already exists.",
 				},
 				RemoveObjective =
 				{
@@ -17845,6 +17849,10 @@ end
 				{
 					Notes = "A mask that indicates the bits of the metadata that specify the facing of redstone repeaters.",
 				},
+				E_META_SPAWN_EGG_ENDERMITE =
+				{
+					Notes = "",
+				},
 				E_META_SPAWN_EGG_WITHER_SKELETON =
 				{
 					Notes = ""
@@ -19237,6 +19245,10 @@ end
 		{
 			FileName = "SettingUpZeroBrane.html",
 			Title = "Setting up the ZeroBrane Studio Lua IDE",
+		},
+		{
+			FileName = "SettingUpLuaLanguageServer.html",
+			Title = "Setting up Lua-Language-Server (VSCode/Emacs)"
 		},
 		{
 			FileName = "UsingChunkStays.html",
