@@ -563,8 +563,7 @@ bool cChunkMap::GetBlock(Vector3i a_BlockPos, BlockState & a_Block) const
 	if (!cChunkDef::IsValidHeight(a_BlockPos))
 	{
 		// Initialise the params to fulfil our contract.
-		a_BlockType = 0;
-		a_BlockMeta = 0;
+		a_Block= 0;
 		return false;
 	}
 
@@ -580,8 +579,7 @@ bool cChunkMap::GetBlock(Vector3i a_BlockPos, BlockState & a_Block) const
 	}
 
 	// Initialise the params to fulfil our contract.
-	a_BlockType = 0;
-	a_BlockMeta = 0;
+	a_Block= 0;
 	return false;
 }
 
