@@ -9,38 +9,26 @@
 
 
 
-class cItemDoorHandler :
+class cItemDoorHandler final:
 	public cItemHandler
 {
+	using Super = cItemHandler;
+
 public:
-	cItemDoorHandler(int a_ItemType) :
-		cItemHandler(a_ItemType)
+
+	constexpr cItemDoorHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 
 	}
 
 
-	virtual bool GetBlocksToPlace(
-		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		sSetBlockVector & a_BlocksToSet
-	) override
+
+
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
 		// Vanilla only allows door placement while clicking on the top face of the block below the door:
-		if (a_BlockFace != BLOCK_FACE_TOP)
-		{
-			return false;
-		}
-
-		// Door (bottom block) can be placed in Y range of [1, 254]:
-		if ((a_BlockY < 1) || (a_BlockY >= cChunkDef::Height - 2))
-		{
-			return false;
-		}
-
-		// The door needs a compatible block below it:
-		if (!cBlockDoorHandler::CanBeOn(a_World.GetBlock(a_BlockX, a_BlockY - 1, a_BlockZ), a_World.GetBlockMeta(a_BlockX, a_BlockY - 1, a_BlockZ)))
+		if (a_ClickedBlockFace != BLOCK_FACE_TOP)
 		{
 			return false;
 		}
@@ -56,44 +44,50 @@ public:
 			case E_ITEM_JUNGLE_DOOR:   BlockType = E_BLOCK_JUNGLE_DOOR;   break;
 			case E_ITEM_DARK_OAK_DOOR: BlockType = E_BLOCK_DARK_OAK_DOOR; break;
 			case E_ITEM_ACACIA_DOOR:   BlockType = E_BLOCK_ACACIA_DOOR;   break;
-			default:
+			default: UNREACHABLE("Unhandled door type");
+		}
+
+		const auto & World = *a_Player.GetWorld();
+		const auto UpperBlockPosition = a_PlacePosition.addedY(1);
+
+		// Check the block that will get replaced by the door:
+		{
+			BLOCKTYPE TopType;
+			NIBBLETYPE TopMeta;
+			if (!World.GetBlockTypeMeta(UpperBlockPosition, TopType, TopMeta))
 			{
-				ASSERT(!"Unhandled door type");
+				return false;
+			}
+
+			if (!cBlockHandler::For(TopType).DoesIgnoreBuildCollision(World, a_HeldItem, UpperBlockPosition, TopMeta, a_ClickedBlockFace, false))
+			{
 				return false;
 			}
 		}
 
-		// Check the two blocks that will get replaced by the door:
-		BLOCKTYPE LowerBlockType = a_World.GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		BLOCKTYPE UpperBlockType = a_World.GetBlock(a_BlockX, a_BlockY + 1, a_BlockZ);
-		if (
-			!cBlockDoorHandler::CanReplaceBlock(LowerBlockType) ||
-			!cBlockDoorHandler::CanReplaceBlock(UpperBlockType))
-		{
-			return false;
-		}
-
 		// Get the coords of the neighboring blocks:
-		NIBBLETYPE LowerBlockMeta = cBlockDoorHandler::PlayerYawToMetaData(a_Player.GetYaw());
+		NIBBLETYPE LowerBlockMeta = cBlockDoorHandler::YawToMetaData(a_Player.GetYaw());
 		Vector3i RelDirToOutside = cBlockDoorHandler::GetRelativeDirectionToOutside(LowerBlockMeta);
 		Vector3i LeftNeighborPos = RelDirToOutside;
 		LeftNeighborPos.TurnCW();
-		LeftNeighborPos.Move(a_BlockX, a_BlockY, a_BlockZ);
+		LeftNeighborPos.Move(a_PlacePosition);
 		Vector3i RightNeighborPos = RelDirToOutside;
 		RightNeighborPos.TurnCCW();
-		RightNeighborPos.Move(a_BlockX, a_BlockY, a_BlockZ);
+		RightNeighborPos.Move(a_PlacePosition);
 
 		// Decide whether the hinge is on the left (default) or on the right:
 		NIBBLETYPE UpperBlockMeta = 0x08;
-		BLOCKTYPE LeftNeighborBlock = a_World.GetBlock(LeftNeighborPos);
-		BLOCKTYPE RightNeighborBlock = a_World.GetBlock(RightNeighborPos);
+		BLOCKTYPE LeftNeighborBlock = World.GetBlock(LeftNeighborPos);
+		BLOCKTYPE RightNeighborBlock = World.GetBlock(RightNeighborPos);
+
 		/*
 		// DEBUG:
-		FLOGD("Door being placed at {0}", Vector3i{a_BlockX, a_BlockY, a_BlockZ});
+		FLOGD("Door being placed at {0}", a_PlacePosition);
 		FLOGD("RelDirToOutside: {0}", RelDirToOutside);
 		FLOGD("Left neighbor at {0}: {1} ({2})", LeftNeighborPos, LeftNeighborBlock, ItemTypeToString(LeftNeighborBlock));
 		FLOGD("Right neighbor at {0}: {1} ({2})", RightNeighborPos, RightNeighborBlock, ItemTypeToString(RightNeighborBlock));
 		*/
+
 		if (
 			cBlockDoorHandler::IsDoorBlockType(LeftNeighborBlock) ||   // The block to the left is a door block
 			(
@@ -108,13 +102,17 @@ public:
 		}
 
 		// Set the blocks:
-		a_BlocksToSet.emplace_back(a_BlockX, a_BlockY, a_BlockZ, BlockType, LowerBlockMeta);
-		a_BlocksToSet.emplace_back(a_BlockX, a_BlockY + 1, a_BlockZ, BlockType, UpperBlockMeta);
-		return true;
+		return a_Player.PlaceBlocks(
+		{
+			{ a_PlacePosition, BlockType, LowerBlockMeta },
+			{ UpperBlockPosition, BlockType, UpperBlockMeta }
+		});
 	}
 
 
-	virtual bool IsPlaceable(void) override
+
+
+	virtual bool IsPlaceable(void) const override
 	{
 		return true;
 	}

@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BeaconEntity.h"
+#include "../BlockInfo.h"
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
 #include "../UI/BeaconWindow.h"
@@ -12,7 +13,7 @@
 
 
 cBeaconEntity::cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	super(a_BlockType, a_BlockMeta, a_Pos, 1, 1, a_World),
+	Super(a_BlockType, a_BlockMeta, a_Pos, 1, 1, a_World),
 	m_IsActive(false),
 	m_BeaconLevel(0),
 	m_PrimaryEffect(cEntityEffect::effNoEffect),
@@ -105,7 +106,7 @@ bool cBeaconEntity::SetPrimaryEffect(cEntityEffect::eType a_Effect)
 	// Send window update:
 	if (GetWindow() != nullptr)
 	{
-		GetWindow()->SetProperty(1, m_PrimaryEffect);
+		GetWindow()->SetProperty(1, static_cast<short>(m_PrimaryEffect));
 	}
 	return true;
 }
@@ -127,7 +128,7 @@ bool cBeaconEntity::SetSecondaryEffect(cEntityEffect::eType a_Effect)
 	// Send window update:
 	if (GetWindow() != nullptr)
 	{
-		GetWindow()->SetProperty(2, m_SecondaryEffect);
+		GetWindow()->SetProperty(2, static_cast<short>(m_SecondaryEffect));
 	}
 	return true;
 }
@@ -205,7 +206,7 @@ void cBeaconEntity::UpdateBeacon(void)
 					(std::abs(Distance.z) <= 20)
 				)
 				{
-					a_Player.AwardAchievement(eStatistic::achFullBeacon);
+					a_Player.AwardAchievement(CustomStatistic::AchFullBeacon);
 				}
 				return false;
 			}
@@ -224,7 +225,7 @@ void cBeaconEntity::GiveEffects(void)
 		return;
 	}
 
-	int Radius = m_BeaconLevel * 10 + 10;
+	double Radius = static_cast<double>(m_BeaconLevel) * 10 + 10;
 	short EffectLevel = 0;
 	if ((m_BeaconLevel >= 4) && (m_PrimaryEffect == m_SecondaryEffect))
 	{
@@ -233,28 +234,22 @@ void cBeaconEntity::GiveEffects(void)
 
 	bool HasSecondaryEffect = (m_BeaconLevel >= 4) && (m_PrimaryEffect != m_SecondaryEffect) && (m_SecondaryEffect > 0);
 
-	Vector3d BeaconPosition(m_Pos);
-	GetWorld()->ForEachPlayer([=](cPlayer & a_Player)
+	auto Area = cBoundingBox(m_Pos, Radius, Radius + static_cast<double>(cChunkDef::Height), -Radius);
+	GetWorld()->ForEachEntityInBox(Area, [&](cEntity & a_Entity)
+	{
+		if (!a_Entity.IsPlayer())
 		{
-			auto PlayerPosition = a_Player.GetPosition();
-			if (PlayerPosition.y > BeaconPosition.y)
-			{
-				PlayerPosition.y = BeaconPosition.y;
-			}
-
-			// TODO: Vanilla minecraft uses an AABB check instead of a radius one
-			if ((PlayerPosition - BeaconPosition).Length() <= Radius)
-			{
-				a_Player.AddEntityEffect(m_PrimaryEffect, 180, EffectLevel);
-
-				if (HasSecondaryEffect)
-				{
-					a_Player.AddEntityEffect(m_SecondaryEffect, 180, 0);
-				}
-			}
 			return false;
 		}
-	);
+		auto & Player = static_cast<cPlayer &>(a_Entity);
+		Player.AddEntityEffect(m_PrimaryEffect, 180, EffectLevel);
+
+		if (HasSecondaryEffect)
+		{
+			Player.AddEntityEffect(m_SecondaryEffect, 180, 0);
+		}
+		return false;
+	});
 }
 
 
@@ -263,13 +258,27 @@ void cBeaconEntity::GiveEffects(void)
 
 void cBeaconEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	super::CopyFrom(a_Src);
+	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cBeaconEntity &>(a_Src);
 	m_BeaconLevel = src.m_BeaconLevel;
 	m_Contents.CopyFrom(src.m_Contents);
 	m_IsActive = src.m_IsActive;
 	m_PrimaryEffect = src.m_PrimaryEffect;
 	m_SecondaryEffect = src.m_SecondaryEffect;
+}
+
+
+
+
+
+void cBeaconEntity::OnRemoveFromWorld()
+{
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		// Tell window its owner is destroyed:
+		Window->OwnerDestroyed();
+	}
 }
 
 
@@ -287,8 +296,10 @@ void cBeaconEntity::SendTo(cClientHandle & a_Client)
 
 bool cBeaconEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	// Update the beacon every 4 seconds
-	if ((GetWorld()->GetWorldAge() % 80) == 0)
+	using namespace std::chrono_literals;
+
+	// Update the beacon every 4 seconds:
+	if ((GetWorld()->GetWorldTickAge() % 4s) == 0s)
 	{
 		UpdateBeacon();
 		GiveEffects();
@@ -302,6 +313,8 @@ bool cBeaconEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 {
+	a_Player->GetStatistics().Custom[CustomStatistic::InteractWithBeacon]++;
+
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
 	{
@@ -319,7 +332,3 @@ bool cBeaconEntity::UsedBy(cPlayer * a_Player)
 	}
 	return true;
 }
-
-
-
-

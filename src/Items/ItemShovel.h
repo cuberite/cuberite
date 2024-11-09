@@ -12,18 +12,18 @@
 
 
 
-class cItemShovelHandler : public cItemHandler
+class cItemShovelHandler final:
+	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
+
 public:
-	cItemShovelHandler(int a_ItemType)
-		: cItemHandler(a_ItemType)
-	{
-	}
+
+	using Super::Super;
 
 
 
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) const override
 	{
 		switch (a_Action)
 		{
@@ -38,20 +38,20 @@ public:
 
 
 
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) const override
 	{
 		if (a_BlockType == E_BLOCK_SNOW)
 		{
 			return true;
 		}
-		return super::CanHarvestBlock(a_BlockType);
+		return Super::CanHarvestBlock(a_BlockType);
 	}
 
 
 
 
 
-	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
+	virtual bool CanRepairWithRawMaterial(short a_ItemType) const override
 	{
 		switch (m_ItemType)
 		{
@@ -68,7 +68,7 @@ public:
 
 
 
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) override
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) const override
 	{
 		switch (a_Block)
 		{
@@ -96,6 +96,6 @@ public:
 				break;
 			}
 		}
-		return super::GetBlockBreakingStrength(a_Block);
+		return Super::GetBlockBreakingStrength(a_Block);
 	}
 };

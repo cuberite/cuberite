@@ -7,6 +7,7 @@
 #include "Globals.h"
 
 #include "FloodyFluidSimulator.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../Chunk.h"
 #include "../BlockArea.h"
@@ -37,7 +38,7 @@ cFloodyFluidSimulator::cFloodyFluidSimulator(
 	int a_TickDelay,
 	int a_NumNeighborsForSource
 ) :
-	super(a_World, a_Fluid, a_StationaryFluid, a_TickDelay),
+	Super(a_World, a_Fluid, a_StationaryFluid, a_TickDelay),
 	m_Falloff(a_Falloff),
 	m_NumNeighborsForSource(a_NumNeighborsForSource)
 {
@@ -298,17 +299,13 @@ void cFloodyFluidSimulator::SpreadToNeighbor(cChunk * a_NearChunk, int a_RelX, i
 	// Wash away the block there, if possible:
 	if (CanWashAway(BlockType))
 	{
-		cBlockHandler * Handler = BlockHandler(BlockType);
-		if (Handler->DoesDropOnUnsuitable())
-		{
-			m_World.DropBlockAsPickups(absPos, nullptr, nullptr);
-		}
+		m_World.DropBlockAsPickups(absPos, nullptr, nullptr);
 	}  // if (CanWashAway)
 
 	// Spread:
 	FLUID_FLOG("  Spreading to {0} with meta {1}", absPos, a_NewMeta);
 	a_NearChunk->SetBlock(relPos, m_FluidBlock, a_NewMeta);
-	m_World.GetSimulatorManager()->WakeUp(absPos, a_NearChunk);
+	m_World.GetSimulatorManager()->WakeUp(*a_NearChunk, relPos);
 
 	HardenBlock(a_NearChunk, relPos, m_FluidBlock, a_NewMeta);
 }

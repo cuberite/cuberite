@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "FireSimulator.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../Defines.h"
 #include "../Chunk.h"
@@ -35,12 +36,7 @@
 
 
 
-#ifdef __clang__
-	#pragma clang diagnostic push
-	#pragma clang diagnostic ignored "-Wglobal-constructors"
-#endif
-
-static const Vector3i gCrossCoords[] =
+static constexpr Vector3i gCrossCoords[] =
 {
 	{ 1, 0,  0},
 	{-1, 0,  0},
@@ -52,7 +48,7 @@ static const Vector3i gCrossCoords[] =
 
 
 
-static const Vector3i gNeighborCoords[] =
+static constexpr Vector3i gNeighborCoords[] =
 {
 	{ 1,  0,  0},
 	{-1,  0,  0},
@@ -60,11 +56,7 @@ static const Vector3i gNeighborCoords[] =
 	{ 0, -1,  0},
 	{ 0,  0,  1},
 	{ 0,  0, -1},
-} ;
-
-#ifdef __clang__
-	#pragma clang diagnostic pop
-#endif
+};
 
 
 
@@ -87,14 +79,6 @@ cFireSimulator::cFireSimulator(cWorld & a_World, cIniFile & a_IniFile) :
 
 
 
-cFireSimulator::~cFireSimulator()
-{
-}
-
-
-
-
-
 void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
 {
 	cCoordWithIntList & Data = a_Chunk->GetFireSimulatorData();
@@ -103,7 +87,6 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 	for (cCoordWithIntList::iterator itr = Data.begin(); itr != Data.end();)
 	{
 		Vector3i relPos(itr->x, itr->y, itr->z);
-		auto absPos = a_Chunk->RelativeToAbsolute(relPos);
 		auto blockType = a_Chunk->GetBlock(relPos);
 
 		if (!IsAllowedBlock(blockType))
@@ -117,12 +100,16 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		auto BurnsForever = ((relPos.y > 0) && DoesBurnForever(a_Chunk->GetBlock(relPos.addedY(-1))));
 		auto BlockMeta = a_Chunk->GetMeta(relPos);
 
-		auto Raining = std::any_of(std::begin(gCrossCoords), std::end(gCrossCoords),
-			[this, absPos](Vector3i cc)
+		auto Raining = std::any_of(std::begin(gCrossCoords), std::end(gCrossCoords), [a_Chunk, relPos](Vector3i cc)
+		{
+			auto Adjusted = relPos + cc;
+			const auto Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(Adjusted);
+			if ((Chunk != nullptr) && Chunk->IsValid())
 			{
-				return (m_World.IsWeatherWetAtXYZ(absPos + cc));
+				return Chunk->IsWeatherWetAt(Adjusted);
 			}
-		);
+			return false;
+		});
 
 		// Randomly burn out the fire if it is raining:
 		if (!BurnsForever && Raining && GetRandomProvider().RandBool(CHANCE_BASE_RAIN_EXTINGUISH + (BlockMeta * CHANCE_AGE_M_RAIN_EXTINGUISH)))
@@ -145,6 +132,16 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 
 		// FIRE_FLOG("FS: Fire at {0} is stepping", absPos);
 
+		// TODO: Add some randomness into this
+		const auto BurnStep = GetBurnStepTime(a_Chunk, relPos);
+		if (BurnStep == 0)
+		{
+			// Fire has no fuel or ground block, extinguish flame
+			a_Chunk->SetBlock(relPos, E_BLOCK_AIR, 0);
+			itr = Data.erase(itr);
+			continue;
+		}
+
 		// Has the fire burnt out?
 		if (BlockMeta == 0x0f)
 		{
@@ -162,7 +159,7 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			a_Chunk->SetMeta(relPos, BlockMeta + 1);
 		}
 
-		itr->Data = GetBurnStepTime(a_Chunk, relPos);  // TODO: Add some randomness into this
+		itr->Data = BurnStep;
 		++itr;
 	}  // for itr - Data[]
 }
@@ -237,34 +234,35 @@ bool cFireSimulator::DoesBurnForever(BLOCKTYPE a_BlockType)
 
 
 
-void cFireSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
+void cFireSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
-	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
-	{
-		return;
-	}
-
-	int RelX = a_Block.x - a_Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = a_Block.z - a_Chunk->GetPosZ() * cChunkDef::Width;
-	BLOCKTYPE BlockType = a_Chunk->GetBlock(RelX, a_Block.y, RelZ);
-	if (!IsAllowedBlock(BlockType))
+	if (!IsAllowedBlock(a_Block))
 	{
 		return;
 	}
 
 	// Check for duplicates:
-	cFireSimulatorChunkData & ChunkData = a_Chunk->GetFireSimulatorData();
+	cFireSimulatorChunkData & ChunkData = a_Chunk.GetFireSimulatorData();
 	for (cCoordWithIntList::iterator itr = ChunkData.begin(), end = ChunkData.end(); itr != end; ++itr)
 	{
-		if ((itr->x == RelX) && (itr->y == a_Block.y) && (itr->z == RelZ))
+		const Vector3i ItrPos{itr->x, itr->y, itr->z};
+		if (ItrPos == a_Position)
 		{
-			// Already present, skip adding
+			// Block already present, check if burn step should decrease
+			// This means if fuel is removed, then the fire burns out sooner
+			const auto NewBurnStep = GetBurnStepTime(&a_Chunk, a_Position);
+			if (itr->Data > NewBurnStep)
+			{
+				FIRE_FLOG("FS: Block lost its fuel at {0}", a_Block);
+				itr->Data = NewBurnStep;
+			}
+
 			return;
 		}
 	}  // for itr - ChunkData[]
 
 	FIRE_FLOG("FS: Adding block {0}", a_Block);
-	ChunkData.push_back(cCoordWithInt(RelX, a_Block.y, RelZ, 100));
+	ChunkData.emplace_back(a_Position.x, a_Position.y, a_Position.z, 100);
 }
 
 
@@ -306,8 +304,6 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, Vector3i a_RelPos)
 	{
 		// Checked through everything, nothing was flammable
 		// If block below isn't solid, we can't have fire, it would be a non-fueled fire
-		// SetBlock just to make sure fire doesn't spawn
-		a_Chunk->SetBlock(a_RelPos, E_BLOCK_AIR, 0);
 		return 0;
 	}
 	return static_cast<int>(m_BurnStepTimeNonfuel);
@@ -346,7 +342,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, Vector3i a_RelPos)
 				if (CanStartFireInBlock(a_Chunk, dstRelPos))
 				{
 					auto dstAbsPos = a_Chunk->RelativeToAbsolute(dstRelPos);
-					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, dstAbsPos.x, dstAbsPos.y, dstAbsPos.z, ssFireSpread))
+					if (cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, dstAbsPos, ssFireSpread))
 					{
 						return;
 					}
@@ -367,14 +363,21 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos)
 {
 	for (auto & coord : gNeighborCoords)
 	{
-		BLOCKTYPE  BlockType;
 		auto relPos = a_RelPos + coord;
-		auto neighbor = a_Chunk->GetRelNeighborChunkAdjustCoords(relPos);
-		if (neighbor == nullptr)
+
+		if (!cChunkDef::IsValidHeight(relPos))
 		{
 			continue;
 		}
-		BlockType = neighbor->GetBlock(relPos);
+
+		const auto neighbor = a_Chunk->GetRelNeighborChunkAdjustCoords(relPos);
+
+		if ((neighbor == nullptr) || !neighbor->IsValid())
+		{
+			continue;
+		}
+
+		BLOCKTYPE BlockType = neighbor->GetBlock(relPos);
 
 		if (!IsFuel(BlockType))
 		{
@@ -385,12 +388,12 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos)
 		if (BlockType == E_BLOCK_TNT)
 		{
 			neighbor->SetBlock(relPos, E_BLOCK_AIR, 0);
-			m_World.SpawnPrimedTNT(absPos, 0);
+			m_World.SpawnPrimedTNT(Vector3d(absPos) + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom
 			return;
 		}
 
 		bool ShouldReplaceFuel = (GetRandomProvider().RandBool(m_ReplaceFuelChance * (1.0 / MAX_CHANCE_REPLACE_FUEL)));
-		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, absPos.x, absPos.y, absPos.z, ssFireSpread))
+		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, absPos, ssFireSpread))
 		{
 			neighbor->SetBlock(relPos, E_BLOCK_FIRE, 0);
 		}

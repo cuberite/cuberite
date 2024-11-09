@@ -19,20 +19,24 @@ Declares the 1.10 protocol classes:
 
 
 
-class cProtocol_1_10_0 :
+class cProtocol_1_10_0:
 	public cProtocol_1_9_4
 {
-	typedef cProtocol_1_9_4 Super;
+	using Super = cProtocol_1_9_4;
 
 public:
-	cProtocol_1_10_0(cClientHandle * a_Client, const AString &a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
-	virtual void SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
-
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
+	using Super::Super;
 
 protected:
-	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
-	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) override;
-	virtual void WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity) override;
+
+	virtual void SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch) override;
+
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
+	virtual Version GetProtocolVersion() const override;
+
+	virtual void HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer) override;
+
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
+	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const override;
 };

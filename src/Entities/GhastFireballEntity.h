@@ -22,7 +22,7 @@ class cGhastFireballEntity :
 {
 	// tolua_end
 
-	using super = cProjectileEntity;
+	using Super = cProjectileEntity;
 
 public:  // tolua_export
 

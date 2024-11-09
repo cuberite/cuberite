@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "LineBlockTracer.h"
+#include "BlockInfo.h"
 #include "World.h"
 #include "Chunk.h"
 #include "BoundingBox.h"
@@ -14,22 +15,12 @@
 
 
 cLineBlockTracer::cLineBlockTracer(cWorld & a_World, cCallbacks & a_Callbacks) :
-	super(a_World, a_Callbacks),
-	m_StartX(0.0),
-	m_StartY(0.0),
-	m_StartZ(0.0),
-	m_EndX(0.0),
-	m_EndY(0.0),
-	m_EndZ(0.0),
-	m_DiffX(0.0),
-	m_DiffY(0.0),
-	m_DiffZ(0.0),
-	m_DirX(0),
-	m_DirY(0),
-	m_DirZ(0),
-	m_CurrentX(0),
-	m_CurrentY(0),
-	m_CurrentZ(0),
+	Super(a_World, a_Callbacks),
+	m_Start(),
+	m_End(),
+	m_Diff(),
+	m_Dir(),
+	m_Current(),
 	m_CurrentFace(BLOCK_FACE_NONE)
 {
 }
@@ -38,10 +29,10 @@ cLineBlockTracer::cLineBlockTracer(cWorld & a_World, cCallbacks & a_Callbacks) :
 
 
 
-bool cLineBlockTracer::Trace(cWorld & a_World, cBlockTracer::cCallbacks & a_Callbacks, const Vector3d & a_Start, const Vector3d & a_End)
+bool cLineBlockTracer::Trace(cWorld & a_World, cBlockTracer::cCallbacks & a_Callbacks, const Vector3d a_Start, const Vector3d a_End)
 {
 	cLineBlockTracer Tracer(a_World, a_Callbacks);
-	return Tracer.Trace(a_Start.x, a_Start.y, a_Start.z, a_End.x, a_End.y, a_End.z);
+	return Tracer.Trace(a_Start, a_End);
 }
 
 
@@ -63,7 +54,7 @@ bool cLineBlockTracer::LineOfSightTrace(cWorld & a_World, const Vector3d & a_Sta
 			m_IsLavaOpaque(a_IsLavaOpaque)
 		{}
 
-		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+		virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 		{
 			switch (a_BlockType)
 			{
@@ -107,7 +98,7 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 		{
 		}
 
-		virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+		virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 		{
 			if (!cBlockInfo::IsSolid(a_BlockType))
 			{
@@ -115,9 +106,9 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 			}
 
 			// We hit a solid block, calculate the exact hit coords and abort trace:
-			m_HitBlockCoords.Set(a_BlockX, a_BlockY, a_BlockZ);
+			m_HitBlockCoords = a_BlockPos;
 			m_HitBlockFace = a_EntryFace;
-			cBoundingBox bb(a_BlockX, a_BlockX + 1, a_BlockY, a_BlockY + 1, a_BlockZ, a_BlockZ + 1);  // Bounding box of the block hit
+			cBoundingBox bb(a_BlockPos, a_BlockPos + Vector3i(1, 1, 1));  // Bounding box of the block hit
 			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
 			eBlockFace Face;  // Face hit
 			if (!bb.CalcLineIntersection(m_Start, m_End, LineCoeff, Face))
@@ -143,64 +134,46 @@ bool cLineBlockTracer::FirstSolidHitTrace(
 
 
 
-bool cLineBlockTracer::Trace(cWorld & a_World, cBlockTracer::cCallbacks &a_Callbacks, double a_StartX, double a_StartY, double a_StartZ, double a_EndX, double a_EndY, double a_EndZ)
-{
-	cLineBlockTracer Tracer(a_World, a_Callbacks);
-	return Tracer.Trace(a_StartX, a_StartY, a_StartZ, a_EndX, a_EndY, a_EndZ);
-}
-
-
-
-
-
-bool cLineBlockTracer::Trace(double a_StartX, double a_StartY, double a_StartZ, double a_EndX, double a_EndY, double a_EndZ)
+bool cLineBlockTracer::Trace(const Vector3d a_Start, const Vector3d a_End)
 {
 	// Initialize the member veriables:
-	m_StartX = a_StartX;
-	m_StartY = a_StartY;
-	m_StartZ = a_StartZ;
-	m_EndX = a_EndX;
-	m_EndY = a_EndY;
-	m_EndZ = a_EndZ;
-	m_DirX = (m_StartX < m_EndX) ? 1 : -1;
-	m_DirY = (m_StartY < m_EndY) ? 1 : -1;
-	m_DirZ = (m_StartZ < m_EndZ) ? 1 : -1;
+	m_Start = a_Start;
+	m_End = a_End;
+	m_Dir.x = (m_Start.x < m_End.x) ? 1 : -1;
+	m_Dir.y = (m_Start.y < m_End.y) ? 1 : -1;
+	m_Dir.z = (m_Start.z < m_End.z) ? 1 : -1;
 	m_CurrentFace = BLOCK_FACE_NONE;
 
 	// Check the start coords, adjust into the world:
-	if (m_StartY < 0)
+	if (m_Start.y < 0)
 	{
-		if (m_EndY < 0)
+		if (m_End.y < 0)
 		{
 			// Nothing to trace
 			m_Callbacks->OnNoMoreHits();
 			return true;
 		}
 		FixStartBelowWorld();
-		m_Callbacks->OnIntoWorld(m_StartX, m_StartY, m_StartZ);
+		m_Callbacks->OnIntoWorld(m_Start);
 	}
-	else if (m_StartY >= cChunkDef::Height)
+	else if (m_Start.y >= cChunkDef::Height)
 	{
-		if (m_EndY >= cChunkDef::Height)
+		if (m_End.y >= cChunkDef::Height)
 		{
 			m_Callbacks->OnNoMoreHits();
 			return true;
 		}
 		FixStartAboveWorld();
-		m_Callbacks->OnIntoWorld(m_StartX, m_StartY, m_StartZ);
+		m_Callbacks->OnIntoWorld(m_Start);
 	}
 
-	m_CurrentX = FloorC(m_StartX);
-	m_CurrentY = FloorC(m_StartY);
-	m_CurrentZ = FloorC(m_StartZ);
+	m_Current = m_Start.Floor();
 
-	m_DiffX = m_EndX - m_StartX;
-	m_DiffY = m_EndY - m_StartY;
-	m_DiffZ = m_EndZ - m_StartZ;
+	m_Diff = m_End -  m_Start;
 
 	// The actual trace is handled with ChunkMapCS locked by calling our ChunkCallback for the specified chunk
-	int BlockX = FloorC(m_StartX);
-	int BlockZ = FloorC(m_StartZ);
+	int BlockX = FloorC(m_Start.x);
+	int BlockZ = FloorC(m_Start.z);
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(BlockX, BlockZ, ChunkX, ChunkZ);
 	return m_World->DoWithChunk(ChunkX, ChunkZ, [this](cChunk & a_Chunk) { return ChunkCallback(&a_Chunk); });
@@ -215,8 +188,8 @@ void cLineBlockTracer::FixStartAboveWorld(void)
 	// We must set the start Y to less than cChunkDef::Height so that it is considered inside the world later on
 	// Therefore we use an EPS-offset from the height, as small as reasonably possible.
 	const double Height = static_cast<double>(cChunkDef::Height) - 0.00001;
-	CalcXZIntersection(Height, m_StartX, m_StartZ);
-	m_StartY = Height;
+	CalcXZIntersection(Height, m_Start.x, m_Start.z);
+	m_Start.y = Height;
 }
 
 
@@ -225,8 +198,8 @@ void cLineBlockTracer::FixStartAboveWorld(void)
 
 void cLineBlockTracer::FixStartBelowWorld(void)
 {
-	CalcXZIntersection(0, m_StartX, m_StartZ);
-	m_StartY = 0;
+	CalcXZIntersection(0, m_Start.x, m_Start.z);
+	m_Start.y = 0;
 }
 
 
@@ -235,9 +208,9 @@ void cLineBlockTracer::FixStartBelowWorld(void)
 
 void cLineBlockTracer::CalcXZIntersection(double a_Y, double & a_IntersectX, double & a_IntersectZ)
 {
-	double Ratio = (m_StartY - a_Y) / (m_StartY - m_EndY);
-	a_IntersectX = m_StartX + (m_EndX - m_StartX) * Ratio;
-	a_IntersectZ = m_StartZ + (m_EndZ - m_StartZ) * Ratio;
+	double Ratio = (m_Start.y - a_Y) / (m_Start.y - m_End.y);
+	a_IntersectX = m_Start.x + (m_End.x - m_Start.x) * Ratio;
+	a_IntersectZ = m_Start.z + (m_End.z - m_Start.z) * Ratio;
 }
 
 
@@ -258,10 +231,10 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 
 	// Calculate the next YZ wall hit:
 	double Coeff = 1;
-	if (std::abs(m_DiffX) > EPS)
+	if (std::abs(m_Diff.x) > EPS)
 	{
-		double DestX = (m_DirX > 0) ? (m_CurrentX + 1) : m_CurrentX;
-		double CoeffX = (DestX - m_StartX) / m_DiffX;
+		double DestX = (m_Dir.x > 0) ? (m_Current.x + 1) : m_Current.x;
+		double CoeffX = (DestX - m_Start.x) / m_Diff.x;
 		if (CoeffX <= 1)  // We need to include equality for the last block in the trace
 		{
 			Coeff = CoeffX;
@@ -270,10 +243,10 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 	}
 
 	// If the next XZ wall hit is closer, use it instead:
-	if (std::abs(m_DiffY) > EPS)
+	if (std::abs(m_Diff.y) > EPS)
 	{
-		double DestY = (m_DirY > 0) ? (m_CurrentY + 1) : m_CurrentY;
-		double CoeffY = (DestY - m_StartY) / m_DiffY;
+		double DestY = (m_Dir.y > 0) ? (m_Current.y + 1) : m_Current.y;
+		double CoeffY = (DestY - m_Start.y) / m_Diff.y;
 		if (CoeffY <= Coeff)  // We need to include equality for the last block in the trace
 		{
 			Coeff = CoeffY;
@@ -282,10 +255,10 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 	}
 
 	// If the next XY wall hit is closer, use it instead:
-	if (std::abs(m_DiffZ) > EPS)
+	if (std::abs(m_Diff.z) > EPS)
 	{
-		double DestZ = (m_DirZ > 0) ? (m_CurrentZ + 1) : m_CurrentZ;
-		double CoeffZ = (DestZ - m_StartZ) / m_DiffZ;
+		double DestZ = (m_Dir.z > 0) ? (m_Current.z + 1) : m_Current.z;
+		double CoeffZ = (DestZ - m_Start.z) / m_Diff.z;
 		if (CoeffZ <= Coeff)  // We need to include equality for the last block in the trace
 		{
 			Direction = dirZ;
@@ -295,9 +268,9 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 	// Based on the wall hit, adjust the current coords
 	switch (Direction)
 	{
-		case dirX:    m_CurrentX += m_DirX; m_CurrentFace = (m_DirX > 0) ? BLOCK_FACE_XM : BLOCK_FACE_XP; break;
-		case dirY:    m_CurrentY += m_DirY; m_CurrentFace = (m_DirY > 0) ? BLOCK_FACE_YM : BLOCK_FACE_YP; break;
-		case dirZ:    m_CurrentZ += m_DirZ; m_CurrentFace = (m_DirZ > 0) ? BLOCK_FACE_ZM : BLOCK_FACE_ZP; break;
+		case dirX:    m_Current.x += m_Dir.x; m_CurrentFace = (m_Dir.x > 0) ? BLOCK_FACE_XM : BLOCK_FACE_XP; break;
+		case dirY:    m_Current.y += m_Dir.y; m_CurrentFace = (m_Dir.y > 0) ? BLOCK_FACE_YM : BLOCK_FACE_YP; break;
+		case dirZ:    m_Current.z += m_Dir.z; m_CurrentFace = (m_Dir.z > 0) ? BLOCK_FACE_ZM : BLOCK_FACE_ZP; break;
 		case dirNONE: return false;
 	}
 	return true;
@@ -309,17 +282,13 @@ bool cLineBlockTracer::MoveToNextBlock(void)
 
 bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 {
-	ASSERT((m_CurrentY >= 0) && (m_CurrentY < cChunkDef::Height));  // This should be provided by FixStartAboveWorld() / FixStartBelowWorld()
+	ASSERT((m_Current.y >= 0) && (m_Current.y < cChunkDef::Height));  // This should be provided by FixStartAboveWorld() / FixStartBelowWorld()
 
 	// This is the actual line tracing loop.
 	for (;;)
 	{
-		// Report the current block through the callbacks:
-		if (a_Chunk == nullptr)
-		{
-			m_Callbacks->OnNoChunk();
-			return false;
-		}
+		// Our caller (DoWithChunk callback) should never give nothing:
+		ASSERT(a_Chunk != nullptr);
 
 		// Move to next block
 		if (!MoveToNextBlock())
@@ -329,12 +298,12 @@ bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 			return true;
 		}
 
-		if ((m_CurrentY < 0) || (m_CurrentY >= cChunkDef::Height))
+		if ((m_Current.y < 0) || (m_Current.y >= cChunkDef::Height))
 		{
 			// We've gone out of the world, that's the end of this trace
 			double IntersectX, IntersectZ;
-			CalcXZIntersection(m_CurrentY, IntersectX, IntersectZ);
-			if (m_Callbacks->OnOutOfWorld(IntersectX, m_CurrentY, IntersectZ))
+			CalcXZIntersection(m_Current.y, IntersectX, IntersectZ);
+			if (m_Callbacks->OnOutOfWorld({IntersectX, double(m_Current.y), IntersectZ}))
 			{
 				// The callback terminated the trace
 				return false;
@@ -344,34 +313,34 @@ bool cLineBlockTracer::ChunkCallback(cChunk * a_Chunk)
 		}
 
 		// Update the current chunk
-		a_Chunk = a_Chunk->GetNeighborChunk(m_CurrentX, m_CurrentZ);
+		a_Chunk = a_Chunk->GetNeighborChunk(m_Current.x, m_Current.z);
 		if (a_Chunk == nullptr)
 		{
 			m_Callbacks->OnNoChunk();
 			return false;
 		}
 
+		// Report the current block through the callbacks:
 		if (a_Chunk->IsValid())
 		{
 			BLOCKTYPE BlockType;
 			NIBBLETYPE BlockMeta;
-			int RelX = m_CurrentX - a_Chunk->GetPosX() * cChunkDef::Width;
-			int RelZ = m_CurrentZ - a_Chunk->GetPosZ() * cChunkDef::Width;
-			a_Chunk->GetBlockTypeMeta(RelX, m_CurrentY, RelZ, BlockType, BlockMeta);
-			if (m_Callbacks->OnNextBlock(m_CurrentX, m_CurrentY, m_CurrentZ, BlockType, BlockMeta, m_CurrentFace))
+			int RelX = m_Current.x - a_Chunk->GetPosX() * cChunkDef::Width;
+			int RelZ = m_Current.z - a_Chunk->GetPosZ() * cChunkDef::Width;
+			a_Chunk->GetBlockTypeMeta(RelX, m_Current.y, RelZ, BlockType, BlockMeta);
+			if (m_Callbacks->OnNextBlock(m_Current, BlockType, BlockMeta, m_CurrentFace))
 			{
 				// The callback terminated the trace
 				return false;
 			}
 		}
-		else if (m_Callbacks->OnNextBlockNoData(m_CurrentX, m_CurrentY, m_CurrentZ, m_CurrentFace))
+		else if (m_Callbacks->OnNextBlockNoData(m_Current, m_CurrentFace))
 		{
 			// The callback terminated the trace
 			return false;
 		}
 	}
 }
-
 
 
 

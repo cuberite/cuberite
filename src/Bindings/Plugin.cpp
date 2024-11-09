@@ -45,7 +45,7 @@ void cPlugin::Unload(void)
 
 AString cPlugin::GetLocalFolder(void) const
 {
-	return std::string("Plugins/") + m_FolderName;
+	return "Plugins" + cFile::GetPathSeparator() + m_FolderName;
 }
 
 

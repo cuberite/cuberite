@@ -1,20 +1,14 @@
-cmake_minimum_required(VERSION 3.0.2)
-enable_testing()
-add_definitions(-DTEST_GLOBALS=1)
-
-include_directories(${CMAKE_SOURCE_DIR}/src/)
-
-add_definitions(-DTEST_GLOBALS=1)
+include_directories(${PROJECT_SOURCE_DIR}/src/)
 
 set (SHARED_SRCS
-	${CMAKE_SOURCE_DIR}/src/ByteBuffer.cpp
-	${CMAKE_SOURCE_DIR}/src/StringUtils.cpp
+	${PROJECT_SOURCE_DIR}/src/ByteBuffer.cpp
+	${PROJECT_SOURCE_DIR}/src/StringUtils.cpp
 )
 
 set (SHARED_HDRS
 	../TestHelpers.h
-	${CMAKE_SOURCE_DIR}/src/ByteBuffer.h
-	${CMAKE_SOURCE_DIR}/src/StringUtils.h
+	${PROJECT_SOURCE_DIR}/src/ByteBuffer.h
+	${PROJECT_SOURCE_DIR}/src/StringUtils.h
 )
 
 set (SRCS

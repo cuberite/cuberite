@@ -5,31 +5,29 @@
 
 
 
-class cItemMilkHandler:
+class cItemMilkHandler final:
 	public cItemHandler
 {
-	typedef cItemHandler super;
-public:
-	cItemMilkHandler():
-		super(E_ITEM_MILK)
-	{
-	}
+	using Super = cItemHandler;
 
-	virtual bool IsDrinkable(short a_ItemDamage) override
+public:
+
+	using Super::Super;
+
+	virtual bool IsDrinkable(short a_ItemDamage) const override
 	{
 		UNUSED(a_ItemDamage);
 		return true;
 	}
 
-	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) const override
 	{
 		UNUSED(a_Item);
 		a_Player->ClearEntityEffects();
 
 		if (!a_Player->IsGameModeCreative())
 		{
-			a_Player->GetInventory().RemoveOneEquippedItem();
-			a_Player->GetInventory().AddItem(E_ITEM_BUCKET);
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_BUCKET));
 		}
 		return true;
 	}

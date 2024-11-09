@@ -16,12 +16,13 @@
 
 
 
-class cEnderChestWindow :
+class cEnderChestWindow:
 	public cWindow
 {
-	typedef cWindow super;
+	using Super = cWindow;
 
 public:
+
 	cEnderChestWindow(cEnderChestEntity * a_EnderChest);
 
 	virtual ~cEnderChestWindow() override;

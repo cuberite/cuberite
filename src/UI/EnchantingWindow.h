@@ -15,30 +15,34 @@
 
 
 
-class cEnchantingWindow :
+class cSlotAreaEnchanting;
+
+
+
+
+
+class cEnchantingWindow final :
 	public cWindow
 {
-	typedef cWindow super;
+	using Super = cWindow;
 
 public:
-	cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ);
 
-	virtual void SetProperty(short a_Property, short a_Value, cPlayer & a_Player) override;
+	cEnchantingWindow(Vector3i a_BlockPos, const AString & a_Title);
 
-	virtual void SetProperty(short a_Property, short a_Value) override;
+	/** Sends enchantment properties to the client.
+	If the property represents a level requirement, stores it for later GetProperty retrieval. */
+	virtual void SetProperty(size_t a_Property, short a_Value) override;
 
-	/** Return the value of a property */
-	short GetPropertyValue(short a_Property);
+	/** Return the level requirement of the given enchantment slot. */
+	short GetProperty(size_t a_Property);
 
 	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
 
-	cSlotArea * m_SlotArea;
+	cSlotAreaEnchanting * m_SlotArea;
 
 protected:
-	short m_PropertyValue[3];
-	int m_BlockX, m_BlockY, m_BlockZ;
+
+	std::array<short, 3> m_PropertyValue;
+	Vector3i m_BlockPos;
 };
-
-
-
-

@@ -21,21 +21,19 @@ class cHopperEntity :
 {
 	// tolua_end
 
-	using super = cBlockEntityWithItems;
+	using Super = cBlockEntityWithItems;
 
 	// tolua_begin
 
 public:
+
 	enum
 	{
 		ContentsHeight = 1,
-		ContentsWidth  = 5,
-		TICKS_PER_TRANSFER = 8,  ///< How many ticks at minimum between two item transfers to or from the hopper
+		ContentsWidth  = 5
 	} ;
 
 	// tolua_end
-
-	BLOCKENTITY_PROTODEF(cHopperEntity)
 
 	/** Constructor used for normal operation */
 	cHopperEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
@@ -45,10 +43,12 @@ public:
 	Exported in ManualBindings.cpp. */
 	std::pair<bool, Vector3i> GetOutputBlockPos(NIBBLETYPE a_BlockMeta);
 
+	void SetLocked(bool a_Value);
+
 protected:
 
-	Int64 m_LastMoveItemsInTick;
-	Int64 m_LastMoveItemsOutTick;
+	cTickTimeLong m_LastMoveItemsInTick;
+	cTickTimeLong m_LastMoveItemsOutTick;
 
 	// cBlockEntity overrides:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
@@ -60,13 +60,13 @@ protected:
 	void OpenNewWindow(void);
 
 	/** Moves items from the container above it into this hopper. Returns true if the contents have changed. */
-	bool MoveItemsIn(cChunk & a_Chunk, Int64 a_CurrentTick);
+	bool MoveItemsIn(cChunk & a_Chunk, cTickTimeLong a_CurrentTick);
 
 	/** Moves pickups from above this hopper into it. Returns true if the contents have changed. */
-	bool MovePickupsIn(cChunk & a_Chunk, Int64 a_CurrentTick);
+	bool MovePickupsIn(cChunk & a_Chunk);
 
 	/** Moves items out from this hopper into the destination. Returns true if the contents have changed. */
-	bool MoveItemsOut(cChunk & a_Chunk, Int64 a_CurrentTick);
+	bool MoveItemsOut(cChunk & a_Chunk, cTickTimeLong a_CurrentTick);
 
 	/** Moves items from a chest (dblchest) above the hopper into this hopper. Returns true if contents have changed. */
 	bool MoveItemsFromChest(cChunk & a_Chunk);
@@ -91,8 +91,8 @@ protected:
 
 	/** Moves one piece to the specified entity's contents' slot. Returns true if contents have changed. */
 	bool MoveItemsToSlot(cBlockEntityWithItems & a_Entity, int a_DstSlotNum);
+
+private:
+
+	bool m_Locked;
 } ;  // tolua_export
-
-
-
-

@@ -18,7 +18,7 @@ const size_t QUEUE_SKIP_LIMIT = 500;
 
 
 cChunkGeneratorThread::cChunkGeneratorThread(void) :
-	Super("cChunkGeneratorThread"),
+	Super("Chunk Generator"),
 	m_Generator(nullptr),
 	m_PluginInterface(nullptr),
 	m_ChunkSink(nullptr)
@@ -85,7 +85,7 @@ void cChunkGeneratorThread::QueueGenerateChunk(
 		{
 			LOGWARN("WARNING: Adding chunk %s to generation queue; Queue is too big! (%zu)", a_Coords.ToString().c_str(), m_Queue.size());
 		}
-		m_Queue.push_back(QueueItem{a_Coords, a_ForceRegeneration, a_Callback});
+		m_Queue.emplace_back(a_Coords, a_ForceRegeneration, a_Callback);
 	}
 
 	m_Event.Set();
@@ -121,10 +121,10 @@ void cChunkGeneratorThread::WaitForQueueEmpty(void)
 
 
 
-int cChunkGeneratorThread::GetQueueLength(void) const
+size_t cChunkGeneratorThread::GetQueueLength(void) const
 {
 	cCSLock Lock(m_CS);
-	return static_cast<int>(m_Queue.size());
+	return m_Queue.size();
 }
 
 
@@ -250,15 +250,10 @@ void cChunkGeneratorThread::DoGenerate(cChunkCoords a_Coords)
 	m_Generator->Generate(ChunkDesc);
 	m_PluginInterface->CallHookChunkGenerated(ChunkDesc);
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 		// Verify that the generator has produced valid data:
 		ChunkDesc.VerifyHeightmap();
 	#endif
 
 	m_ChunkSink->OnChunkGenerated(ChunkDesc);
 }
-
-
-
-
-

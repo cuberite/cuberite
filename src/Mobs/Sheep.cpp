@@ -12,7 +12,7 @@
 
 
 cSheep::cSheep(int a_Color) :
-	super("Sheep", mtSheep, "entity.sheep.hurt", "entity.sheep.death", 0.6, 1.3),
+	Super("Sheep", mtSheep, "entity.sheep.hurt", "entity.sheep.death", "entity.sheep.ambient", 0.9f, 1.3f),
 	m_IsSheared(false),
 	m_WoolColor(a_Color),
 	m_TimeToStopEating(-1)
@@ -42,7 +42,7 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 	if (!m_IsSheared)
 	{
-		a_Drops.push_back(cItem(E_BLOCK_WOOL, 1, static_cast<short>(m_WoolColor)));
+		a_Drops.emplace_back(E_BLOCK_WOOL, static_cast<char>(1), static_cast<short>(m_WoolColor));
 	}
 
 	unsigned int LootingLevel = 0;
@@ -59,7 +59,7 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 void cSheep::OnRightClicked(cPlayer & a_Player)
 {
-	super::OnRightClicked(a_Player);
+	Super::OnRightClicked(a_Player);
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
 	if ((EquippedItem.m_ItemType == E_ITEM_SHEARS) && !IsSheared() && !IsBaby())
@@ -91,7 +91,7 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 
 void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -113,11 +113,11 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		if (m_TimeToStopEating == 0)
 		{
-			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS)  // Make sure grass hasn't been destroyed in the meantime
+			if (m_World->GetBlock({ PosX, PosY, PosZ }) == E_BLOCK_GRASS)  // Make sure grass hasn't been destroyed in the meantime
 			{
 				// The sheep ate the grass so we change it to dirt
-				m_World->SetBlock(PosX, PosY, PosZ, E_BLOCK_DIRT, 0);
-				GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, {PosX, PosY, PosX}, E_BLOCK_GRASS);
+				m_World->SetBlock({ PosX, PosY, PosZ }, E_BLOCK_DIRT, 0);
+				GetWorld()->BroadcastSoundParticleEffect(EffectID::PARTICLE_BLOCK_BREAK, { PosX, PosY, PosZ }, E_BLOCK_GRASS);
 				m_IsSheared = false;
 				m_World->BroadcastEntityMetadata(*this);
 			}
@@ -127,9 +127,9 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		if (GetRandomProvider().RandBool(1.0 / 600.0))
 		{
-			if (m_World->GetBlock(PosX, PosY, PosZ) == E_BLOCK_GRASS)
+			if (m_World->GetBlock({ PosX, PosY, PosZ }) == E_BLOCK_GRASS)
 			{
-				m_World->BroadcastEntityStatus(*this, esSheepEating);
+				m_World->BroadcastEntityAnimation(*this, EntityAnimation::SheepEatsGrass);
 				m_TimeToStopEating = 40;
 			}
 		}
@@ -140,7 +140,7 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-void cSheep::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a_Parent2)
+void cSheep::InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2)
 {
 	static const struct
 	{
@@ -167,12 +167,10 @@ void cSheep::InheritFromParents(cPassiveMonster * a_Parent1, cPassiveMonster * a
 		)
 		{
 			SetFurColor(ColorInheritance[i].Child);
-			m_World->BroadcastEntityMetadata(*this);
 			return;
 		}
 	}
 	SetFurColor(GetRandomProvider().RandBool() ? Parent1->GetFurColor() : Parent2->GetFurColor());
-	m_World->BroadcastEntityMetadata(*this);
 }
 
 

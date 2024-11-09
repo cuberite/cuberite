@@ -7,15 +7,18 @@
 
 
 
-class cSkeleton :
+class cSkeleton:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
-	cSkeleton(bool IsWither);
+
+	cSkeleton();
 
 	CLASS_PROTODEF(cSkeleton)
+
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual bool Attack(std::chrono::milliseconds a_Dt) override;
@@ -23,14 +26,10 @@ public:
 
 	virtual bool IsUndead(void) override { return true; }
 
-	bool IsWither(void) const { return m_bIsWither; }
+	bool IsChargingBow() const { return m_ChargingBow; }
 
 private:
 
-	bool m_bIsWither;
+	bool m_ChargingBow;
 
 } ;
-
-
-
-

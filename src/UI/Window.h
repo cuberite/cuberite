@@ -142,11 +142,7 @@ public:
 
 	/** Updates a numerical property associated with the window. Typically used for furnace progressbars.
 	Sends the UpdateWindowProperty packet to all clients of the window */
-	virtual void SetProperty(short a_Property, short a_Value);
-
-	/** Updates a numerical property associated with the window. Typically used for furnace progressbars.
-	Sends the UpdateWindowProperty packet only to the specified player */
-	virtual void SetProperty(short a_Property, short a_Value, cPlayer & a_Player);
+	virtual void SetProperty(size_t a_Property, short a_Value);
 
 	// tolua_end
 
@@ -179,6 +175,7 @@ public:
 	void SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_RelativeSlotNum);
 
 protected:
+
 	cSlotAreas m_SlotAreas;
 
 	char    m_WindowID;
@@ -225,9 +222,5 @@ protected:
 
 	/** Distributes a_NumToEachSlot items into the slots specified in a_SlotNums; returns the total number of items distributed.
 	@param a_LimitItems if false, no checks are performed on a_Item.m_ItemCount. */
-	int DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int a_NumToEachSlot, const cSlotNums & a_SlotNums, bool a_LimitItems = true);
+	char DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, char a_NumToEachSlot, const cSlotNums & a_SlotNums, bool a_LimitItems = true);
 } ;  // tolua_export
-
-
-
-

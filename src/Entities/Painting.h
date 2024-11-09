@@ -13,7 +13,7 @@ class cPainting :
 {
 	// tolua_end
 
-	using super = cHangingEntity;
+	using Super = cHangingEntity;
 
 public:  // tolua_export
 
@@ -28,11 +28,7 @@ private:
 
 	virtual void SpawnOn(cClientHandle & a_Client) override;
 	virtual void GetDrops(cItems & a_Items, cEntity * a_Killer) override;
-	virtual void KilledBy(TakeDamageInfo & a_TDI) override
-	{
-		super::KilledBy(a_TDI);
-		Destroy();
-	}
+	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 
 	AString m_Name;
 

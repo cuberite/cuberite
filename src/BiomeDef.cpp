@@ -3,7 +3,9 @@
 
 // Implements biome helper functions
 
+
 #include "Globals.h"
+#include "BiomeDef.h"
 
 
 
@@ -209,6 +211,53 @@ bool IsBiomeCold(EMCSBiome a_Biome)
 		case biMegaSpruceTaiga:
 		case biMegaSpruceTaigaHills:
 		case biExtremeHillsPlusM:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+bool IsBiomeMountain(EMCSBiome a_Biome)
+{
+	switch (a_Biome)
+	{
+		case biExtremeHills:
+		case biExtremeHillsEdge:
+		case biExtremeHillsM:
+		case biExtremeHillsPlus:
+		case biExtremeHillsPlusM:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
+}
+
+
+
+
+
+bool IsBiomeMesa(EMCSBiome a_Biome)
+{
+	switch (a_Biome)
+	{
+		case biMesa:
+		case biMesaPlateauF:
+		case biMesaPlateau:
+		case biMesaBryce:
+		case biMesaPlateauFM:
+		case biMesaPlateauM:
 		{
 			return true;
 		}

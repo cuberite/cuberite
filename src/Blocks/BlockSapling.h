@@ -3,28 +3,24 @@
 
 #include "BlockHandler.h"
 #include "../FastRandom.h"
+#include "Mixins/DirtLikeUnderneath.h"
 
 
 
 
 
-class cBlockSaplingHandler :
-	public cBlockHandler
+class cBlockSaplingHandler final :
+	public cDirtLikeUnderneath<cBlockHandler>
 {
-	using super = cBlockHandler;
+	using Super = cDirtLikeUnderneath<cBlockHandler>;
 
 public:
 
-	cBlockSaplingHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// The low 3 bits store the sapling type; bit 0x08 is the growth timer (not used in pickups)
 		return cItem(m_BlockType, 1, a_BlockMeta & 0x07);
@@ -34,35 +30,31 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual void OnUpdate(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cBlockPluginInterface & a_PluginInterface,
+		cChunk & a_Chunk,
+		const Vector3i a_RelPos
+	) const override
 	{
-		return (a_RelY > 0) && IsBlockTypeOfDirt(a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ));
-	}
-
-
-
-
-
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
-	{
-		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
-		NIBBLETYPE Light = std::max(a_Chunk.GetBlockLight(a_RelX, a_RelY, a_RelZ), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelX, a_RelY, a_RelZ)));
+		auto Meta = a_Chunk.GetMeta(a_RelPos);
+		auto Light = std::max(a_Chunk.GetBlockLight(a_RelPos), a_Chunk.GetTimeAlteredLight(a_Chunk.GetSkyLight(a_RelPos)));
 
 		// Only grow if we have the right amount of light
 		if (Light > 8)
 		{
 			auto & random = GetRandomProvider();
 			// Only grow if we are in the right growth stage and have the right amount of space around them.
-			if (((Meta & 0x08) != 0) && random.RandBool(0.45) && CanGrowAt(a_Chunk, a_RelX, a_RelY, a_RelZ, Meta))
+			if (((Meta & 0x08) != 0) && random.RandBool(0.45) && CanGrowAt(a_Chunk, a_RelPos.x, a_RelPos.y, a_RelPos.z, Meta))
 			{
-				int BlockX = a_RelX + a_Chunk.GetPosX() * cChunkDef::Width;
-				int BlockZ = a_RelZ + a_Chunk.GetPosZ() * cChunkDef::Width;
-				a_Chunk.GetWorld()->GrowTree(BlockX, a_RelY, BlockZ);
+				auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
+				a_Chunk.GetWorld()->GrowTree(WorldPos);
 			}
 			// Only move to the next growth stage if we haven't gone there yet
 			else if (((Meta & 0x08) == 0) && random.RandBool(0.45))
 			{
-				a_Chunk.SetMeta(a_RelX, a_RelY, a_RelZ, Meta | 0x08);
+				a_Chunk.SetMeta(a_RelPos, Meta | 0x08);
 			}
 		}
 	}
@@ -71,7 +63,7 @@ public:
 
 
 
-	bool CanGrowAt(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
+	static bool CanGrowAt(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
 	{
 		a_Meta = a_Meta & 0x07;
 		int CheckHeight = 0;
@@ -185,7 +177,7 @@ public:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
 	{
 		auto blockMeta = a_Chunk.GetMeta(a_RelPos);
 		auto typeMeta = blockMeta & 0x07;
@@ -206,7 +198,7 @@ public:
 		}
 
 		// The sapling is grown, now it becomes a tree:
-		a_Chunk.GetWorld()->GrowTreeFromSapling(a_Chunk.RelativeToAbsolute(a_RelPos), blockMeta);
+		a_Chunk.GetWorld()->GrowTreeFromSapling(a_Chunk.RelativeToAbsolute(a_RelPos));
 		return res + 1;
 	}
 
@@ -214,19 +206,13 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 7;
 	}
 
-
-
-
-
-private:
-
-	bool IsLargeTree(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
+	static bool IsLargeTree(cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
 	{
 		BLOCKTYPE type;
 		NIBBLETYPE meta;

@@ -13,6 +13,10 @@
 #include "mbedTLS++/AesCfb128Decryptor.h"
 #include "mbedTLS++/AesCfb128Encryptor.h"
 
+#ifndef _WIN32
+	typedef int SOCKET;
+#endif
+
 
 
 
@@ -59,11 +63,21 @@ public:
 
 	void Run(void);
 
-	void Log(const char * a_Format, fmt::ArgList);
-	FMT_VARIADIC(void, Log, const char *)
+	void vLog(const char * a_Format, fmt::printf_args a_ArgList);
 
-	void DataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::ArgList);
-	FMT_VARIADIC(void, DataLog, const void *, size_t, const char *)
+	template <typename... Args>
+	void Log(const char * a_Format, const Args & ... a_Args)
+	{
+		vLog(a_Format, fmt::make_printf_args(a_Args...));
+	}
+
+	void vDataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::printf_args a_ArgList);
+
+	template <typename... Args>
+	void DataLog(const void * a_Data, size_t a_Size, const char * a_Format, const Args & ... a_Args)
+	{
+		vDataLog(a_Data, a_Size, a_Format, fmt::make_printf_args(a_Args...));
+	}
 
 	void LogFlush(void);
 
@@ -75,7 +89,7 @@ protected:
 	cAesCfb128Decryptor m_ServerDecryptor;
 	cAesCfb128Encryptor m_ServerEncryptor;
 
-	AString m_ServerEncryptionBuffer;  // Buffer for the data to be sent to the server once encryption is established
+	ContiguousByteBuffer m_ServerEncryptionBuffer;  // Buffer for the data to be sent to the server once encryption is established
 
 	/** Set to true when PACKET_PING is received from the client; will cause special parsing for server kick */
 	bool m_HasClientPinged;
@@ -109,13 +123,13 @@ protected:
 	double GetRelativeTime(void);
 
 	/** Sends data to the specified socket. If sending fails, prints a fail message using a_Peer and returns false. */
-	bool SendData(SOCKET a_Socket, const char * a_Data, size_t a_Size, const char * a_Peer);
+	bool SendData(SOCKET a_Socket, ContiguousByteBufferView a_Data, const char * a_Peer);
 
 	/** Sends data to the specified socket. If sending fails, prints a fail message using a_Peer and returns false. */
 	bool SendData(SOCKET a_Socket, cByteBuffer & a_Data, const char * a_Peer);
 
 	/** Sends data to the specfied socket, after encrypting it using a_Encryptor. If sending fails, prints a fail message using a_Peer and returns false */
-	bool SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, const char * a_Data, size_t a_Size, const char * a_Peer);
+	bool SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, ContiguousByteBuffer & a_Data, const char * a_Peer);
 
 	/** Sends data to the specfied socket, after encrypting it using a_Encryptor. If sending fails, prints a fail message using a_Peer and returns false */
 	bool SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer);

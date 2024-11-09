@@ -4,7 +4,7 @@ set -e
 
 # This script cross-compiles cuberite for the android platform. It uses
 # the following enviroment variables
-#   CMAKE: Should be the path to a cmake executable of version 3.7+
+#   CMAKE: Should be the path to a cmake executable of version 3.12.4+
 #   NDK: Should be the path to the android ndk root
 #   (optional) TYPE: either Release or Debug, sets the build type
 #   (optional) THREADS: The number of threads to use, default 4
@@ -40,7 +40,7 @@ if [ -z "$THREADS" ]; then
 	THREADS="4"
 fi
 
-cd $BASEDIR
+cd "$BASEDIR"
 
 case "$1" in
 
@@ -93,11 +93,12 @@ case "$1" in
 	;;
 esac
 
-mkdir -p $BUILDDIR
-cd $BUILDDIR
-"$CMAKE" $BASEDIR/../android -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \
+mkdir -p "$BUILDDIR"
+cd "$BUILDDIR"
+"$CMAKE" "$BASEDIR/../android" -DCMAKE_TOOLCHAIN_FILE="$NDK/build/cmake/android.toolchain.cmake" \
     -DANDROID_ABI="$1" \
     -DANDROID_NATIVE_API_LEVEL="$APILEVEL" \
-    -DCMAKE_BUILD_TYPE="$TYPE"
+    -DCMAKE_BUILD_TYPE="$TYPE" \
+	-DWHOLE_PROGRAM_OPTIMISATION=No
 
 make -j "$THREADS"

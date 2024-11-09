@@ -13,6 +13,14 @@
 
 
 
+#ifdef __FreeBSD__
+	#include <netinet/in.h>
+#endif
+
+
+
+
+
 // fwd:
 class cTCPLink;
 typedef std::shared_ptr<cTCPLink> cTCPLinkPtr;
@@ -105,7 +113,8 @@ public:
 	Returns empty string on success, non-empty error description on failure. */
 	virtual AString StartTLSClient(
 		cX509CertPtr a_OwnCert,
-		cCryptoKeyPtr a_OwnPrivKey
+		cCryptoKeyPtr a_OwnPrivKey,
+		cX509CertPtr a_TrustedRootCAs
 	) = 0;
 
 	/** Starts a TLS handshake as a server connection.
@@ -132,7 +141,7 @@ protected:
 
 	/** Creates a new link, with the specified callbacks. */
 	cTCPLink(cCallbacksPtr a_Callbacks):
-		m_Callbacks(a_Callbacks)
+		m_Callbacks(std::move(a_Callbacks))
 	{
 	}
 };
@@ -354,7 +363,6 @@ public:
 	/** Returns all local IP addresses for network interfaces currently available. */
 	static AStringVector EnumLocalIPAddresses(void);
 };
-
 
 
 

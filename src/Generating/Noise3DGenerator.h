@@ -20,12 +20,13 @@
 
 
 
-class cNoise3DGenerator :
+class cNoise3DGenerator:
 	public cChunkGenerator
 {
-	typedef cChunkGenerator Super;
+	using Super = cChunkGenerator;
 
 public:
+
 	cNoise3DGenerator();
 	virtual ~cNoise3DGenerator() override;
 
@@ -135,7 +136,7 @@ class cBiomalNoise3DComposable :
 	public cTerrainShapeGen
 {
 public:
-	cBiomalNoise3DComposable(int a_Seed, cBiomeGenPtr a_BiomeGen);
+	cBiomalNoise3DComposable(int a_Seed, cBiomeGen & a_BiomeGen);
 
 	void Initialize(cIniFile & a_IniFile);
 
@@ -160,7 +161,7 @@ protected:
 	cOctavedNoise<cInterpolNoise<Interp5Deg>> m_BaseNoise;
 
 	/** The underlying biome generator. */
-	cBiomeGenPtr m_BiomeGen;
+	cBiomeGen & m_BiomeGen;
 
 	/** Block height of the sealevel, used for composing the terrain. */
 	int m_SeaLevel;
@@ -206,7 +207,3 @@ protected:
 	virtual void GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape) override;
 	virtual void InitializeShapeGen(cIniFile & a_IniFile) override { Initialize(a_IniFile); }
 } ;
-
-
-
-

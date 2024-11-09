@@ -15,7 +15,7 @@ cPrefabStructure::cPrefabStructure(
 	int a_GridX, int a_GridZ,
 	int a_OriginX, int a_OriginZ,
 	cPlacedPieces && a_Pieces,
-	cTerrainHeightGenPtr a_HeightGen
+	cTerrainHeightGen & a_HeightGen
 ):
 	Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 	m_Pieces(std::move(a_Pieces)),
@@ -55,11 +55,7 @@ void cPrefabStructure::PlacePieceOnGround(cPlacedPiece & a_Piece)
 	int BlockY;
 	cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 	cChunkDef::HeightMap HeightMap;
-	m_HeightGen->GenHeightMap({ChunkX, ChunkZ}, HeightMap);
+	m_HeightGen.GenHeightMap({ChunkX, ChunkZ}, HeightMap);
 	int TerrainHeight = cChunkDef::GetHeight(HeightMap, BlockX, BlockZ);
 	a_Piece.MoveToGroundBy(TerrainHeight - FirstConnector.m_Pos.y + 1);
 }
-
-
-
-

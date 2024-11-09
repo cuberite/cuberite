@@ -9,51 +9,62 @@
 
 
 
-class cItemItemFrameHandler :
+class cItemItemFrameHandler final:
 	public cItemHandler
 {
-public:
-	cItemItemFrameHandler(int a_ItemType)
-		: cItemHandler(a_ItemType)
-	{
+	using Super = cItemHandler;
 
-	}
+public:
+
+	using Super::Super;
+
+
 
 
 
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
-	) override
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace
+	) const override
 	{
-		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_BlockFace == BLOCK_FACE_YP) || (a_BlockFace == BLOCK_FACE_YM))
+		// Can only place on a side face:
+		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockFace == BLOCK_FACE_YP) || (a_ClickedBlockFace == BLOCK_FACE_YM))
 		{
-			// Client sends this if clicked on top or bottom face
 			return false;
 		}
 
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);  // Make sure block that will be occupied is free
-		BLOCKTYPE Block = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
-		AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, true);  // We want the clicked block, so go back again
-
-		if (Block == E_BLOCK_AIR)
+		// Make sure the support block is a valid block to place an item frame on:
+		if (!cHangingEntity::IsValidSupportBlock(a_World->GetBlock(a_ClickedBlockPos)))
 		{
-			auto ItemFrame = cpp14::make_unique<cItemFrame>(a_BlockFace, Vector3i{a_BlockX, a_BlockY, a_BlockZ});
-			auto ItemFramePtr = ItemFrame.get();
-			if (!ItemFramePtr->Initialize(std::move(ItemFrame), *a_World))
-			{
-				return false;
-			}
-
-			if (!a_Player->IsGameModeCreative())
-			{
-				a_Player->GetInventory().RemoveOneEquippedItem();
-			}
-
-			return true;
-
+			return false;
 		}
-		return false;
+
+		// Make sure block that will be occupied by the item frame is free now:
+		const auto PlacePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+		BLOCKTYPE Block = a_World->GetBlock(PlacePos);
+		if (Block != E_BLOCK_AIR)
+		{
+			return false;
+		}
+
+		// An item frame, centred so pickups spawn nicely.
+		auto ItemFrame = std::make_unique<cItemFrame>(a_ClickedBlockFace, Vector3d(0.5, 0.5, 0.5) + PlacePos);
+		auto ItemFramePtr = ItemFrame.get();
+		if (!ItemFramePtr->Initialize(std::move(ItemFrame), *a_World))
+		{
+			return false;
+		}
+
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->GetInventory().RemoveOneEquippedItem();
+		}
+
+		return true;
 	}
 };
 

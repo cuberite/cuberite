@@ -140,7 +140,7 @@ public:
 			m_Title(a_Title),
 			m_UrlPath(a_UrlPath),
 			m_PluginName(a_PluginName),
-			m_Callback(a_Callback)
+			m_Callback(std::move(a_Callback))
 		{
 		}
 	};
@@ -259,6 +259,9 @@ protected:
 	Creates a default file if it doesn't exist.
 	Returns true if webadmin is enabled, false if disabled. */
 	bool LoadIniFile(void);
+
+	/** Checks inside the webadmin.ini file if there are users configured. */
+	bool HasUsers();
 
 	/** Handles requests coming to the "/webadmin" or "/~webadmin" URLs */
 	void HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request);

@@ -42,20 +42,20 @@ protected:
 
 
 /** A simple cache that stores N most recently generated chunks' biomes; N being settable upon creation */
-class cBioGenCache :
+class cBioGenCache:
 	public cBiomeGen
 {
-	typedef cBiomeGen super;
+	using Super = cBiomeGen;
 
 public:
 
-	cBioGenCache(cBiomeGenPtr a_BioGenToCache, size_t a_CacheSize);
-	virtual ~cBioGenCache() override = default;
-
+	cBioGenCache(cBiomeGen & a_BioGenToCache, size_t a_CacheSize);
 
 protected:
 
-	cBiomeGenPtr m_BioGenToCache;
+	friend class cBioGenMulticache;
+
+	cBiomeGen & m_BioGenToCache;
 
 	struct sCacheData
 	{
@@ -87,28 +87,28 @@ protected:
 
 
 
-class cBioGenMulticache :
+class cBioGenMulticache:
 	public cBiomeGen
 {
-
-	typedef cBiomeGen super;
+	using Super = cBiomeGen;
 
 public:
 	/* Creates a new multicache - a cache that divides the caching into several sub-caches based on the chunk coords.
 	This allows us to use shorter cache depths with faster lookups for more covered area. (#381)
 	a_SubCacheSize defines the size of each sub-cache
 	a_NumSubCaches defines how many sub-caches are used for the multicache. */
-	cBioGenMulticache(cBiomeGenPtr a_BioGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches);
+	cBioGenMulticache(std::unique_ptr<cBiomeGen> a_BioGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches);
 
 protected:
-	typedef std::vector<cBiomeGenPtr> cBiomeGenPtrs;
-
 
 	/** Number of sub-caches. Pulled out of m_Caches.size() for faster access. */
 	size_t m_NumSubCaches;
 
 	/** Individual sub-caches. */
-	cBiomeGenPtrs m_Caches;
+	std::vector<std::unique_ptr<cBioGenCache>> m_Caches;
+
+	/** The underlying biome generator. */
+	std::unique_ptr<cBiomeGen> m_Underlying;
 
 
 	virtual void GenBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) override;
@@ -120,12 +120,13 @@ protected:
 
 
 /** Base class for generators that use a list of available biomes. This class takes care of the list. */
-class cBiomeGenList :
+class cBiomeGenList:
 	public cBiomeGen
 {
-	typedef cBiomeGen super;
+	using Super = cBiomeGen;
 
 protected:
+
 	// List of biomes that the generator is allowed to generate:
 	typedef std::vector<EMCSBiome> EMCSBiomes;
 	EMCSBiomes m_Biomes;
@@ -139,12 +140,13 @@ protected:
 
 
 
-class cBioGenCheckerboard :
+class cBioGenCheckerboard:
 	public cBiomeGenList
 {
-	typedef cBiomeGenList super;
+	using Super = cBiomeGenList;
 
 protected:
+
 	int m_BiomeSize;
 
 	// cBiomeGen overrides:
@@ -156,18 +158,20 @@ protected:
 
 
 
-class cBioGenVoronoi :
+class cBioGenVoronoi:
 	public cBiomeGenList
 {
-	typedef cBiomeGenList super;
+	using Super = cBiomeGenList;
 
 public:
+
 	cBioGenVoronoi(int a_Seed) :
 		m_Voronoi(a_Seed)
 	{
 	}
 
 protected:
+
 	cVoronoiMap m_Voronoi;
 
 	// cBiomeGen overrides:
@@ -181,13 +185,14 @@ protected:
 
 
 
-class cBioGenDistortedVoronoi :
+class cBioGenDistortedVoronoi:
 	public cBiomeGenList
 {
-	typedef cBiomeGenList super;
+	using Super = cBiomeGenList;
 
 public:
-	cBioGenDistortedVoronoi(int a_Seed) :
+
+	cBioGenDistortedVoronoi(int a_Seed):
 		m_Noise(a_Seed),
 		m_Voronoi(a_Seed),
 		m_CellSize(0)
@@ -216,12 +221,13 @@ protected:
 
 
 
-class cBioGenMultiStepMap :
+class cBioGenMultiStepMap:
 	public cBiomeGen
 {
-	typedef cBiomeGen super;
+	using Super = cBiomeGen;
 
 public:
+
 	cBioGenMultiStepMap(int a_Seed);
 
 protected:
@@ -276,12 +282,13 @@ protected:
 
 
 
-class cBioGenTwoLevel :
+class cBioGenTwoLevel:
 	public cBiomeGen
 {
-	typedef cBiomeGen super;
+	using Super = cBiomeGen;
 
 public:
+
 	cBioGenTwoLevel(int a_Seed);
 
 protected:
@@ -317,7 +324,3 @@ protected:
 	a_DistLevel is either 0 or 1; zero when it is at the edge of the small Voronoi cell, 1 near the center */
 	EMCSBiome SelectBiome(int a_BiomeGroup, size_t a_BiomeIdx, int a_DistLevel);
 } ;
-
-
-
-

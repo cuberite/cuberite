@@ -12,8 +12,7 @@
 
 
 cBrewingstandEntity::cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
-	m_IsDestroyed(false),
+	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_IsBrewing(false),
 	m_TimeBrewed(0),
 	m_RemainingFuel(0)
@@ -25,45 +24,29 @@ cBrewingstandEntity::cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 
 
 
-cBrewingstandEntity::~cBrewingstandEntity()
-{
-	// Tell window its owner is destroyed
-	cWindow * Window = GetWindow();
-	if (Window != nullptr)
-	{
-		Window->OwnerDestroyed();
-	}
-}
-
-
-
-
-
-void cBrewingstandEntity::Destroy()
-{
-	m_IsDestroyed = true;
-	super::Destroy();
-}
-
-
-
-
-
 void cBrewingstandEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	super::CopyFrom(a_Src);
+	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cBrewingstandEntity &>(a_Src);
 	m_IsBrewing = src.m_IsBrewing;
-	for (size_t i = 0; i < ARRAYCOUNT(m_CurrentBrewingRecipes); ++i)
-	{
-		m_CurrentBrewingRecipes[i] = src.m_CurrentBrewingRecipes[i];
-	}
-	for (size_t i = 0; i < ARRAYCOUNT(m_Results); ++i)
-	{
-		m_Results[i] = src.m_Results[i];
-	}
+	m_CurrentBrewingRecipes = src.m_CurrentBrewingRecipes;
+	m_Results = src.m_Results;
 	m_TimeBrewed = src.m_TimeBrewed;
 	m_RemainingFuel = src.m_RemainingFuel;
+}
+
+
+
+
+
+void cBrewingstandEntity::OnRemoveFromWorld()
+{
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		// Tell window its owner is destroyed:
+		Window->OwnerDestroyed();
+	}
 }
 
 
@@ -128,18 +111,19 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		// Loop over all bottle slots and update available bottles
 		const cBrewingRecipes::cRecipe * Recipe = nullptr;
-		for (int i = 0; i < 3; i++)
+		for (std::size_t i = 0; i < 3; i++)
 		{
-			if (m_Contents.GetSlot(i).IsEmpty() || (m_CurrentBrewingRecipes[i] == nullptr))
+			if (m_Contents.GetSlot(static_cast<int>(i)).IsEmpty() || (m_CurrentBrewingRecipes[i] == nullptr))
 			{
 				continue;
 			}
 
 			Recipe = m_CurrentBrewingRecipes[i];
-			m_Contents.SetSlot(i, Recipe->Output.CopyOne());
+			m_Contents.SetSlot(static_cast<int>(i), Recipe->Output.CopyOne());
 		}
 
 		// Brewing process completed
+		m_World->BroadcastSoundEffect("block.brewing_stand.brew", m_Pos, 1.0f, 1.0f);
 		cPluginManager::Get()->CallHookBrewingCompleted(*m_World, *this);
 		return true;
 	}
@@ -155,6 +139,8 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 {
+	a_Player->GetStatistics().Custom[CustomStatistic::InteractWithBrewingstand]++;
+
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)
 	{
@@ -186,7 +172,7 @@ bool cBrewingstandEntity::UsedBy(cPlayer * a_Player)
 
 
 
-void cBrewingstandEntity::BroadcastProgress(short a_ProgressbarID, short a_Value)
+void cBrewingstandEntity::BroadcastProgress(size_t a_ProgressbarID, short a_Value)
 {
 	cWindow * Window = GetWindow();
 	if (Window != nullptr)
@@ -201,12 +187,7 @@ void cBrewingstandEntity::BroadcastProgress(short a_ProgressbarID, short a_Value
 
 void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 {
-	super::OnSlotChanged(a_ItemGrid, a_SlotNum);
-
-	if (m_IsDestroyed)
-	{
-		return;
-	}
+	Super::OnSlotChanged(a_ItemGrid, a_SlotNum);
 
 	ASSERT(a_ItemGrid == &m_Contents);
 
@@ -247,9 +228,9 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	cBrewingRecipes * BR = cRoot::Get()->GetBrewingRecipes();
 	const cBrewingRecipes::cRecipe * Recipe = nullptr;
 	bool Stop = true;
-	for (int i = 0; i < 3; i++)
+	for (std::size_t i = 0; i < 3; i++)
 	{
-		if (GetSlot(i).IsEmpty())
+		if (GetSlot(static_cast<int>(i)).IsEmpty())
 		{
 			m_CurrentBrewingRecipes[i] = nullptr;
 			m_Results[i].Clear();
@@ -259,14 +240,14 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		if (m_CurrentBrewingRecipes[i] != nullptr)
 		{
 			Recipe = m_CurrentBrewingRecipes[i];
-			if (Recipe->Ingredient.IsEqual(GetSlot(bsIngredient)) && Recipe->Input.IsEqual(GetSlot(i)))
+			if (Recipe->Ingredient.IsEqual(GetSlot(bsIngredient)) && Recipe->Input.IsEqual(GetSlot(static_cast<int>(i))))
 			{
 				Stop = false;
 				continue;
 			}
 		}
 
-		Recipe = BR->GetRecipeFrom(m_Contents.GetSlot(i), m_Contents.GetSlot(bsIngredient));
+		Recipe = BR->GetRecipeFrom(m_Contents.GetSlot(static_cast<int>(i)), m_Contents.GetSlot(bsIngredient));
 		if (Recipe != nullptr)
 		{
 			// Found a brewing recipe for the items
@@ -301,8 +282,8 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 void cBrewingstandEntity::UpdateProgressBars(bool a_ForceUpdate)
 {
-	/** Sending an update every 3th tick, using a higher value lets look the progressbar ugly */
-	if (!a_ForceUpdate && (m_World->GetWorldAge() % 3 != 0))
+	// Send an update every 3rd tick, using a higher value makes the progressbar look ugly:
+	if (!a_ForceUpdate && ((m_World->GetWorldTickAge() % 3_tick) != 0_tick))
 	{
 		return;
 	}
@@ -336,13 +317,13 @@ void cBrewingstandEntity::LoadRecipes(void)
 
 	cBrewingRecipes * BR = cRoot::Get()->GetBrewingRecipes();
 	const cBrewingRecipes::cRecipe * Recipe = nullptr;
-	for (int i = 0; i < 3; i++)
+	for (std::size_t i = 0; i < 3; i++)
 	{
-		if (GetSlot(i).IsEmpty())
+		if (GetSlot(static_cast<int>(i)).IsEmpty())
 		{
 			continue;
 		}
-		Recipe = BR->GetRecipeFrom(GetSlot(i), GetSlot(bsIngredient));
+		Recipe = BR->GetRecipeFrom(GetSlot(static_cast<int>(i)), GetSlot(bsIngredient));
 		if (Recipe != nullptr)
 		{
 			m_CurrentBrewingRecipes[i] = Recipe;

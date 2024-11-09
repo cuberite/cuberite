@@ -5,12 +5,8 @@
 
 #include "Globals.h"
 
+#include "Endianness.h"
 #include "fmt/printf.h"
-
-#ifdef _MSC_VER
-	// Under MSVC, link to WinSock2 (needed by RawBEToUTF8's byteswapping)
-	#pragma comment(lib, "ws2_32.lib")
-#endif
 
 
 
@@ -46,27 +42,6 @@ static unsigned char HexToDec(char a_HexChar)
 		case 'F': return 15;
 	}
 	return 0xff;
-}
-
-
-
-
-
-AString & Printf(AString & str, const char * format, fmt::ArgList args)
-{
-	ASSERT(format != nullptr);
-	str = fmt::sprintf(format, args);
-	return str;
-}
-
-
-
-
-
-AString Printf(const char * format, fmt::ArgList args)
-{
-	ASSERT(format != nullptr);
-	return fmt::sprintf(format, args);
 }
 
 
@@ -350,13 +325,24 @@ void ReplaceString(AString & iHayStack, const AString & iNeedle, const AString &
 
 
 
-AString & RawBEToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8)
+void ReplaceURL(AString & iHayStack, const AString & iNeedle, const AString & iReplaceWith)
+{
+	auto ReplaceWith = URLEncode(iReplaceWith);
+	ReplaceString(iHayStack, iNeedle, ReplaceWith);
+}
+
+
+
+
+
+AString & RawBEUTF16ToUTF8(const char * a_RawData, size_t a_NumShorts, AString & a_UTF8)
 {
 	a_UTF8.clear();
 	a_UTF8.reserve(3 * a_NumShorts / 2);  // a quick guess of the resulting size
 	for (size_t i = 0; i < a_NumShorts; i++)
 	{
-		a_UTF8.append(UnicodeCharToUtf8(GetBEUShort(&a_RawData[i * 2])));
+		auto UTF16 = NetworkBufToHost<UInt16>(reinterpret_cast<const std::byte *>(&a_RawData[i * 2]));
+		a_UTF8.append(UnicodeCharToUtf8(UTF16));
 	}
 	return a_UTF8;
 }
@@ -512,11 +498,7 @@ static bool isLegalUTF8(const unsigned char * source, int length)
 		}
 		case 1: if ((*source >= 0x80) && (*source < 0xc2)) return false;
 	}
-	if (*source > 0xf4)
-	{
-		return false;
-	}
-	return true;
+	return (*source <= 0xf4);
 }
 
 
@@ -630,18 +612,18 @@ format binary data this way:
 */
 AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, size_t a_BytesPerLine)
 {
-	fmt::MemoryWriter Output;
+	fmt::memory_buffer Output;
 	/* If formatting the data from the comment above:
 		Hex holds:   "31 32 33 34 35 36 37 38 39 30 61 62 63 64 65 66 "
 		Chars holds: "1234567890abcdef" */
-	fmt::MemoryWriter Hex, Chars;
+	fmt::memory_buffer Hex, Chars;
 
 	if (a_Size > 0)
 	{
 		// Same as std::ceil(static_cast<float>(a_Size) / a_BytesPerLine);
 		const size_t NumLines = a_Size / a_BytesPerLine + (a_Size % a_BytesPerLine != 0);
 		const size_t CharsPerLine = 14 + 4 * a_BytesPerLine;
-		Output.buffer().reserve(NumLines * CharsPerLine);
+		Output.reserve(NumLines * CharsPerLine);
 	}
 
 	for (size_t i = 0; i < a_Size; i += a_BytesPerLine)
@@ -650,12 +632,20 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, siz
 		for (size_t j = 0; j < k; j++)
 		{
 			Byte c = (static_cast<const Byte *>(a_Data))[i + j];
-			Hex << HEX(c >> 4) << HEX(c & 0xf) << ' ';
-			Chars << ((c >= ' ') ? static_cast<char>(c) : '.');
+			Hex.push_back(HEX(c >> 4));
+			Hex.push_back(HEX(c & 0xf));
+			Hex.push_back(' ');
+			Chars.push_back((c >= ' ') ? static_cast<char>(c) : '.');
 		}  // for j
 
 		// Write Hex with a dynamic fixed width
-		Output.write("{0:08x}: {1:{2}}   {3}\n", i, Hex.c_str(), a_BytesPerLine * 3, Chars.c_str());
+		auto HexStr = fmt::string_view(Hex.data(), Hex.size());
+		auto CharsStr = fmt::string_view(Chars.data(), Chars.size());
+		fmt::format_to(
+			Output, "{0:08x}: {1:{2}}   {3}\n",
+			i, HexStr, a_BytesPerLine * 3, CharsStr
+		);
+
 		Hex.clear();
 		Chars.clear();
 	}  // for i
@@ -798,7 +788,7 @@ AString URLEncode(const AString & a_Text)
 	AString res;
 	auto len = a_Text.size();
 	res.reserve(len);
-	static const char HEX[] = "0123456789abcdef";
+	static const char HEX[] = "0123456789ABCDEF";
 	for (size_t i = 0; i < len; ++i)
 	{
 		if (isalnum(a_Text[i]))
@@ -953,48 +943,6 @@ AString Base64Encode(const AString & a_Input)
 
 
 
-short GetBEShort(const char * a_Mem)
-{
-	const Byte * Bytes = reinterpret_cast<const Byte *>(a_Mem);
-	return static_cast<short>((Bytes[0] << 8) | Bytes[1]);
-}
-
-
-
-
-
-unsigned short GetBEUShort(const char * a_Mem)
-{
-	const Byte * Bytes = reinterpret_cast<const Byte *>(a_Mem);
-	return static_cast<unsigned short>((Bytes[0] << 8) | Bytes[1]);
-}
-
-
-
-
-
-int GetBEInt(const char * a_Mem)
-{
-	const Byte * Bytes = reinterpret_cast<const Byte *>(a_Mem);
-	return (Bytes[0] << 24) | (Bytes[1] << 16) | (Bytes[2] << 8) | Bytes[3];
-}
-
-
-
-
-
-void SetBEInt(char * a_Mem, Int32 a_Value)
-{
-	a_Mem[0] = a_Value >> 24;
-	a_Mem[1] = static_cast<char>((a_Value >> 16) & 0xff);
-	a_Mem[2] = static_cast<char>((a_Value >> 8) & 0xff);
-	a_Mem[3] = static_cast<char>(a_Value & 0xff);
-}
-
-
-
-
-
 bool SplitZeroTerminatedStrings(const AString & a_Strings, AStringVector & a_Output)
 {
 	a_Output.clear();
@@ -1029,7 +977,7 @@ AStringVector MergeStringVectors(const AStringVector & a_Strings1, const AString
 	AStringVector res = a_Strings1;
 
 	// Add each item from strings2 that is not already present:
-	for (auto item : a_Strings2)
+	for (const auto & item : a_Strings2)
 	{
 		if (std::find(res.begin(), res.end(), item) == res.end())
 		{
@@ -1071,11 +1019,7 @@ bool StringToFloat(const AString & a_String, float & a_Num)
 {
 	char *err;
 	a_Num = strtof(a_String.c_str(), &err);
-	if (*err != 0)
-	{
-		return false;
-	}
-	return true;
+	return (*err == 0);
 }
 
 

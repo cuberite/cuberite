@@ -8,79 +8,66 @@
 
 
 
-class cItemSeedsHandler :
+class cItemSeedsHandler:
 	public cItemHandler
 {
+	using Super = cItemHandler;
+
 public:
-	cItemSeedsHandler(int a_ItemType) :
-		cItemHandler(a_ItemType)
+
+	constexpr cItemSeedsHandler(int a_ItemType):
+		Super(a_ItemType)
 	{
 
 	}
 
-	virtual bool IsPlaceable(void) override
+
+
+
+
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
+	{
+		// Only allow planting seeds from the top side of the block:
+		if (a_ClickedBlockFace != BLOCK_FACE_TOP)
+		{
+			return false;
+		}
+
+		BLOCKTYPE BlockType;
+
+		// Get the produce block based on the seed item:
+		switch (m_ItemType)
+		{
+			case E_ITEM_BEETROOT_SEEDS: BlockType = E_BLOCK_BEETROOTS;    break;
+			case E_ITEM_CARROT:         BlockType = E_BLOCK_CARROTS;      break;
+			case E_ITEM_MELON_SEEDS:    BlockType = E_BLOCK_MELON_STEM;   break;
+			case E_ITEM_POTATO:         BlockType = E_BLOCK_POTATOES;     break;
+			case E_ITEM_PUMPKIN_SEEDS:  BlockType = E_BLOCK_PUMPKIN_STEM; break;
+			case E_ITEM_SEEDS:          BlockType = E_BLOCK_CROPS;        break;
+			default:                    UNREACHABLE("Unsupported seed type");
+		}
+
+		return a_Player.PlaceBlock(a_PlacePosition, BlockType, 0);
+	}
+
+
+
+
+
+	virtual bool IsPlaceable(void) const override
 	{
 		return true;
 	}
 
-	virtual bool IsFood(void) override
-	{
-		switch (m_ItemType)  // Special cases, both a seed and food
-		{
-			case E_ITEM_CARROT:
-			case E_ITEM_POTATO: return true;
-			default:            return false;
-		}
-	}
-
-	virtual FoodInfo GetFoodInfo(const cItem * a_Item) override
-	{
-		UNUSED(a_Item);
-		switch (m_ItemType)
-		{
-			case E_ITEM_CARROT: return FoodInfo(3, 3.6);
-			case E_ITEM_POTATO: return FoodInfo(1, 0.6);
-			default:            return FoodInfo(0, 0);
-		}
-	}
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		if (a_BlockFace != BLOCK_FACE_TOP)
-		{
-			// Only allow planting seeds from the top side of the block
-			return false;
-		}
-
-		// Only allow placement on farmland
-		int X = a_BlockX;
-		int Y = a_BlockY;
-		int Z = a_BlockZ;
-		AddFaceDirection(X, Y, Z, a_BlockFace, true);
-		if (a_World->GetBlock(X, Y, Z) != E_BLOCK_FARMLAND)
-		{
-			return false;
-		}
-
-		a_BlockMeta = 0;
-		switch (m_ItemType)
-		{
-			case E_ITEM_BEETROOT_SEEDS: a_BlockType = E_BLOCK_BEETROOTS;    return true;
-			case E_ITEM_CARROT:         a_BlockType = E_BLOCK_CARROTS;      return true;
-			case E_ITEM_MELON_SEEDS:    a_BlockType = E_BLOCK_MELON_STEM;   return true;
-			case E_ITEM_POTATO:         a_BlockType = E_BLOCK_POTATOES;     return true;
-			case E_ITEM_PUMPKIN_SEEDS:  a_BlockType = E_BLOCK_PUMPKIN_STEM; return true;
-			case E_ITEM_SEEDS:          a_BlockType = E_BLOCK_CROPS;        return true;
-			default:                    a_BlockType = E_BLOCK_AIR;          return true;
-		}
-	}
+protected:
+	~cItemSeedsHandler() = default;
 } ;
 
+class cItemSimpleSeedsHandler final:
+	public cItemSeedsHandler
+{
+	using cItemSeedsHandler::cItemSeedsHandler;
+};
 
 
 

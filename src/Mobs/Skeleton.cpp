@@ -9,9 +9,9 @@
 
 
 
-cSkeleton::cSkeleton(bool IsWither) :
-	super("Skeleton", mtSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", 0.6, 1.8),
-	m_bIsWither(IsWither)
+cSkeleton::cSkeleton(void) :
+	Super("Skeleton", mtSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", "entity.skeleton.ambient", 0.6f, 1.99f),
+	m_ChargingBow(false)
 {
 }
 
@@ -26,21 +26,33 @@ void cSkeleton::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	if (IsWither())
-	{
-		AddRandomUncommonDropItem(a_Drops, 33.0f, E_ITEM_COAL);
-		cItems RareDrops;
-		RareDrops.Add(cItem(E_ITEM_HEAD, 1, 1));
-		AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
-	}
-	else
-	{
-		AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_ARROW);
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_ARROW);
 
-	}
 	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_BONE);
 	AddRandomArmorDropItem(a_Drops, LootingLevel);
 	AddRandomWeaponDropItem(a_Drops, LootingLevel);
+}
+
+
+
+
+
+void cSkeleton::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	Super::Tick(a_Dt, a_Chunk);
+
+	if (!IsTicking())
+	{
+		// The base class tick destroyed us
+		return;
+	}
+
+	if (m_ChargingBow && (m_EMState == IDLE))
+	{
+		// releasing bow if no more target is found
+		m_ChargingBow = false;
+		m_World->BroadcastEntityMetadata(*this);
+	}
 }
 
 
@@ -51,18 +63,30 @@ bool cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 {
 	StopMovingToPosition();  // Todo handle this in a better way, the skeleton does some uneeded recalcs due to inStateChasing
 	auto & Random = GetRandomProvider();
+
+	if (!m_ChargingBow)
+	{
+		// updating pulling animation
+		m_ChargingBow = true;
+		m_World->BroadcastEntityMetadata(*this);
+	}
+
 	if ((GetTarget() != nullptr) && (m_AttackCoolDownTicksLeft == 0))
 	{
 		Vector3d Inaccuracy = Vector3d(Random.RandReal<double>(-0.25, 0.25), Random.RandReal<double>(-0.25, 0.25), Random.RandReal<double>(-0.25, 0.25));
 		Vector3d Speed = (GetTarget()->GetPosition() + Inaccuracy - GetPosition()) * 5;
 		Speed.y += Random.RandInt(-1, 1);
 
-		auto Arrow = cpp14::make_unique<cArrowEntity>(this, GetPosition().addedY(1), Speed);
+		auto Arrow = std::make_unique<cArrowEntity>(this, GetPosition().addedY(1), Speed);
 		auto ArrowPtr = Arrow.get();
 		if (!ArrowPtr->Initialize(std::move(Arrow), *m_World))
 		{
 			return false;
 		}
+
+		// releasing bow after arrow was shot
+		m_ChargingBow = false;
+		m_World->BroadcastEntityMetadata(*this);
 
 		ResetAttackCooldown();
 		return true;
@@ -76,10 +100,6 @@ bool cSkeleton::Attack(std::chrono::milliseconds a_Dt)
 
 void cSkeleton::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	super::SpawnOn(a_ClientHandle);
+	Super::SpawnOn(a_ClientHandle);
 	a_ClientHandle.SendEntityEquipment(*this, 0, cItem(E_ITEM_BOW));
 }
-
-
-
-

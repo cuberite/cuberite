@@ -2,33 +2,32 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "../BlockInfo.h"
 
 
 
 
 
-class cItemSwordHandler :
+class cItemSwordHandler final :
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
+
 public:
-	cItemSwordHandler(int a_ItemType)
-	: cItemHandler(a_ItemType)
-	{
-	}
 
+	using Super::Super;
 
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) override
+	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) const override
 	{
 		if (a_BlockType == E_BLOCK_COBWEB)
 		{
 			return true;
 		}
-		return super::CanHarvestBlock(a_BlockType);
+		return Super::CanHarvestBlock(a_BlockType);
 	}
 
 
-	virtual bool CanRepairWithRawMaterial(short a_ItemType) override
+	virtual bool CanRepairWithRawMaterial(short a_ItemType) const override
 	{
 		switch (m_ItemType)
 		{
@@ -42,7 +41,7 @@ public:
 	}
 
 
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) const override
 	{
 		switch (a_Action)
 		{
@@ -55,7 +54,7 @@ public:
 
 
 
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) override
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) const override
 	{
 		if (a_Block == E_BLOCK_COBWEB)
 		{
@@ -66,7 +65,6 @@ public:
 			if (
 				IsBlockMaterialPlants(a_Block) ||
 				IsBlockMaterialVine(a_Block)   ||
-				IsBlockMaterialCoral(a_Block)  ||
 				IsBlockMaterialLeaves(a_Block) ||
 				IsBlockMaterialGourd(a_Block)
 			)

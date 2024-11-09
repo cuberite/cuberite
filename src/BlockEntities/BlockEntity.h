@@ -1,36 +1,20 @@
 
 #pragma once
 
-
-
-
-
-/** Place this macro in the declaration of each cBlockEntity descendant. */
-#define BLOCKENTITY_PROTODEF(classname) \
-	virtual bool IsA(const char * a_ClassName) const override \
-	{ \
-		return ((a_ClassName != nullptr) && ((strcmp(a_ClassName, #classname) == 0) || super::IsA(a_ClassName))); \
-	} \
-	virtual const char * GetClass() const override \
-	{ \
-		return #classname; \
-	} \
-	static const char * GetClassStatic() \
-	{ \
-		return #classname; \
-	} \
-	virtual const char * GetParentClass() const override \
-	{ \
-		return super::GetClass(); \
-	}
+#include "ChunkDef.h"
 
 
 
 
 
 class cChunk;
+class cItems;
 class cPlayer;
 class cWorld;
+class cBlockEntity;
+
+using OwnedBlockEntity = std::unique_ptr<cBlockEntity>;
+using cBlockEntities = std::unordered_map<size_t, OwnedBlockEntity>;
 
 
 
@@ -40,63 +24,65 @@ class cWorld;
 class cBlockEntity
 {
 protected:
-	cBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World) :
-		m_Pos(a_Pos),
-		m_RelX(a_Pos.x - cChunkDef::Width * FAST_FLOOR_DIV(a_Pos.x, cChunkDef::Width)),
-		m_RelZ(a_Pos.z - cChunkDef::Width * FAST_FLOOR_DIV(a_Pos.z, cChunkDef::Width)),
-		m_BlockType(a_BlockType),
-		m_BlockMeta(a_BlockMeta),
-		m_World(a_World)
-	{
-	}
+
+	cBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 public:
+
 	// tolua_end
 
-	virtual ~cBlockEntity() {}  // force a virtual destructor in all descendants
-
-	virtual void Destroy() {}
-
-	void SetWorld(cWorld * a_World)
-	{
-		m_World = a_World;
-	}
-
-	/** Updates the internally stored position.
-	Note that this should not ever be used for world-contained block entities, it is meant only for when BEs in a cBlockArea are manipulated.
-	Asserts that the block entity is not assigned to a world. */
-	void SetPos(Vector3i a_NewPos);
-
-	/** Returns true if the specified blocktype is supposed to have an associated block entity. */
-	static bool IsBlockEntityBlockType(BLOCKTYPE a_BlockType);
-
-	/** Creates a new block entity for the specified block type at the specified absolute pos.
-	If a_World is valid, then the entity is created bound to that world
-	Returns nullptr for unknown block types. */
-	static cBlockEntity * CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World = nullptr);
+	virtual ~cBlockEntity() = default;  // force a virtual destructor in all descendants
 
 	/** Makes an exact copy of this block entity, except for its m_World (set to nullptr), and at a new position.
 	Uses CopyFrom() to copy the properties. */
-	cBlockEntity * Clone(Vector3i a_Pos);
+	OwnedBlockEntity Clone(Vector3i a_Pos);
+
+	/** Returns the contents of this block entity that it would drop if broken.
+	Note that the block handler will usually handle pickups for the block itself, in addition to any items returned here. */
+	virtual cItems ConvertToPickups() const;
 
 	/** Copies all properties of a_Src into this entity, except for its m_World and location.
 	Each non-abstract descendant should override to copy its specific properties, and call
 	Super::CopyFrom(a_Src) to copy the common ones. */
 	virtual void CopyFrom(const cBlockEntity & a_Src);
 
-	static const char * GetClassStatic()  // Needed for ManualBindings's ForEach templates
-	{
-		return "cBlockEntity";
-	}
+	/** Creates a new block entity for the specified block type at the specified absolute pos.
+	If a_World is valid, then the entity is created bound to that world
+	Returns nullptr for unknown block types. */
+	static OwnedBlockEntity CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World = nullptr);
 
-	/** Returns true if the object is the specified class, or its descendant. */
-	virtual bool IsA(const char * a_ClassName) const { return (strcmp(a_ClassName, "cBlockEntity") == 0); }
+	/** Called when this block entity's associated block is destroyed.
+	It is guaranteed that this function is called before OnRemoveFromWorld. */
+	virtual void Destroy();
 
-	/** Returns the name of the topmost class (the most descendant). Used for Lua bindings to push the correct object type. */
-	virtual const char * GetClass() const { return GetClassStatic(); }
+	/** Returns true if the specified blocktype is supposed to have an associated block entity. */
+	static bool IsBlockEntityBlockType(BLOCKTYPE a_BlockType);
 
-	/** Returns the name of the parent class, or empty string if no parent class. */
-	virtual const char * GetParentClass() const { return ""; }
+	/** Called when the block entity object is added to a world. */
+	virtual void OnAddToWorld(cWorld & a_World, cChunk & a_Chunk);
+
+	/** Called when the block entity object is removed from a world.
+	This occurs when the chunk it resides in is unloaded, or when the associated block is destroyed.
+	If it is the latter, Destroy() is guaranteed to be called first. */
+	virtual void OnRemoveFromWorld();
+
+	/** Sends the packet defining the block entity to the client specified.
+	To send to all eligible clients, use cWorld::BroadcastBlockEntity() */
+	virtual void SendTo(cClientHandle & a_Client) = 0;
+
+	/** Updates the internally stored position.
+	Note that this should not ever be used for world-contained block entities, it is meant only for when BEs in a cBlockArea are manipulated.
+	Asserts that the block entity is not assigned to a world. */
+	void SetPos(Vector3i a_NewPos);
+
+	void SetWorld(cWorld * a_World);
+
+	/** Ticks the entity; returns true if the chunk should be marked as dirty as a result of this ticking. By default does nothing. */
+	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
+
+	/** Called when a player uses this entity; should open the UI window.
+	returns true if the use was successful, return false to use the block as a "normal" block */
+	virtual bool UsedBy(cPlayer * a_Player) = 0;
 
 	// tolua_begin
 
@@ -113,27 +99,12 @@ public:
 	cWorld * GetWorld() const { return m_World; }
 
 	int GetChunkX() const { return FAST_FLOOR_DIV(m_Pos.x, cChunkDef::Width); }
-	int GetChunkZ() const { return FAST_FLOOR_DIV(m_Pos.y, cChunkDef::Width); }
+	int GetChunkZ() const { return FAST_FLOOR_DIV(m_Pos.z, cChunkDef::Width); }
 
 	int GetRelX() const { return m_RelX; }
 	int GetRelZ() const { return m_RelZ; }
 
 	// tolua_end
-
-	/** Called when a player uses this entity; should open the UI window.
-	returns true if the use was successful, return false to use the block as a "normal" block */
-	virtual bool UsedBy( cPlayer * a_Player) = 0;
-
-	/** Sends the packet defining the block entity to the client specified.
-	To send to all eligible clients, use cWorld::BroadcastBlockEntity() */
-	virtual void SendTo(cClientHandle & a_Client) = 0;
-
-	/** Ticks the entity; returns true if the chunk should be marked as dirty as a result of this ticking. By default does nothing. */
-	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
-	{
-		UNUSED(a_Dt);
-		return false;
-	}
 
 
 protected:
@@ -154,7 +125,3 @@ protected:
 
 	cWorld * m_World;
 } ;  // tolua_export
-
-
-
-

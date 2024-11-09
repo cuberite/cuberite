@@ -17,7 +17,9 @@
 #include "Generating/ChunkDesc.h"
 #include "DeadlockDetect.h"
 #include "Entities/Entity.h"
+#include "Entities/EnderCrystal.h"
 #include "Mobs/Monster.h"
+#include "Mobs/EnderDragon.h"
 #include "Simulator/FluidSimulator.h"
 #include "Simulator/FireSimulator.h"
 #include "MobSpawner.h"
@@ -93,30 +95,6 @@ extern "C" int luaopen_lxp(lua_State * a_LuaState)
 
 
 
-void cBlockInfo::sHandlerDeleter::operator () (cBlockHandler * a_Handler)
-{
-	delete a_Handler;
-}
-
-
-
-
-
-cBlockInfo::cBlockInfoArray::cBlockInfoArray()
-{
-	cBlockInfoArray & BlockInfos = *this;
-	// The piece-loading code uses the handlers for rotations, so we need valid handlers
-	// Insert dummy handlers:
-	for (size_t i = 0; i < BlockInfos.size(); i++)
-	{
-		BlockInfos[i].m_Handler.reset(new cBlockHandler(static_cast<BLOCKTYPE>(i)));
-	}
-}
-
-
-
-
-
 cBoundingBox::cBoundingBox(double, double, double, double, double, double)
 {
 }
@@ -125,15 +103,7 @@ cBoundingBox::cBoundingBox(double, double, double, double, double, double)
 
 
 
-cBlockHandler::cBlockHandler(BLOCKTYPE a_BlockType)
-{
-}
-
-
-
-
-
-cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP)
+cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) const
 {
 	return cBoundingBox(0, 0, 0, 0, 0, 0);
 }
@@ -142,21 +112,7 @@ cBoundingBox cBlockHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a
 
 
 
-bool cBlockHandler::GetPlacementBlockTypeMeta(
-	cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-	int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-	int a_CursorX, int a_CursorY, int a_CursorZ,
-	BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-)
-{
-	return true;
-}
-
-
-
-
-
-void cBlockHandler::OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_BlockX, int a_BlockY, int a_BlockZ)
+void cBlockHandler::OnUpdate(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, const Vector3i a_RelPos) const
 {
 }
 
@@ -164,23 +120,7 @@ void cBlockHandler::OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface 
 
 
 
-void cBlockHandler::OnPlacedByPlayer(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, const sSetBlock & a_BlockChange)
-{
-}
-
-
-
-
-
-void cBlockHandler::OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-}
-
-
-
-
-
-void cBlockHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta)
+void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const
 {
 }
 
@@ -196,7 +136,7 @@ void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i
 
 
 
-cItems cBlockHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool)
+cItems cBlockHandler::ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const
 {
 	return cItems();
 }
@@ -205,7 +145,7 @@ cItems cBlockHandler::ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_
 
 
 
-bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, int a_BlockY, int a_BlockZ, const cChunk & a_Chunk)
+bool cBlockHandler::CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const
 {
 	return true;
 }
@@ -214,7 +154,7 @@ bool cBlockHandler::CanBeAt(cChunkInterface & a_ChunkInterface, int a_BlockX, in
 
 
 
-bool cBlockHandler::IsUseable()
+bool cBlockHandler::IsUseable() const
 {
 	return false;
 }
@@ -223,34 +163,16 @@ bool cBlockHandler::IsUseable()
 
 
 
-bool cBlockHandler::IsClickedThrough(void)
+bool cBlockHandler::DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, Vector3i a_Position, NIBBLETYPE a_Meta, eBlockFace a_ClickedBlockFace, bool a_ClickedDirectly) const
 {
-	return false;
+	return m_BlockType == E_BLOCK_AIR;
 }
 
 
 
 
 
-bool cBlockHandler::DoesIgnoreBuildCollision(cChunkInterface & a_ChunkInterface, Vector3i a_Pos, cPlayer & a_Player, NIBBLETYPE a_Meta)
-{
-	return (m_BlockType == E_BLOCK_AIR);
-}
-
-
-
-
-
-bool cBlockHandler::DoesDropOnUnsuitable(void)
-{
-	return true;
-}
-
-
-
-
-
-void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, Vector3i a_RelPos, cChunk & a_Chunk)
+void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterface & a_PluginInterface, Vector3i a_RelPos, cChunk & a_Chunk) const
 {
 }
 
@@ -258,7 +180,7 @@ void cBlockHandler::Check(cChunkInterface & a_ChunkInterface, cBlockPluginInterf
 
 
 
-ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta)
+ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta) const
 {
 	return 0;
 }
@@ -267,7 +189,7 @@ ColourID cBlockHandler::GetMapBaseColourID(NIBBLETYPE a_Meta)
 
 
 
-bool cBlockHandler::IsInsideBlock(Vector3d a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta)
+bool cBlockHandler::IsInsideBlock(Vector3d a_Position, const NIBBLETYPE a_BlockMeta) const
 {
 	return true;
 }
@@ -276,7 +198,18 @@ bool cBlockHandler::IsInsideBlock(Vector3d a_Position, const BLOCKTYPE a_BlockTy
 
 
 
-cBlockEntity * cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World)
+const cBlockHandler & cBlockHandler::For(BLOCKTYPE a_BlockType)
+{
+	// Dummy handler.
+	static cBlockHandler Handler(E_BLOCK_AIR);
+	return Handler;
+}
+
+
+
+
+
+OwnedBlockEntity cBlockEntity::CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World)
 {
 	return nullptr;
 }
@@ -318,7 +251,7 @@ bool cBlockEntity::IsBlockEntityBlockType(BLOCKTYPE a_BlockType)
 
 
 
-cBlockEntity * cBlockEntity::Clone(Vector3i a_Pos)
+OwnedBlockEntity cBlockEntity::Clone(Vector3i a_Pos)
 {
 	return nullptr;
 }
@@ -379,6 +312,15 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_Type)
 
 
 
+void cMonster::CheckEventLostPlayer(std::chrono::milliseconds a_Dt)
+{
+
+}
+
+
+
+
+
 bool cFluidSimulator::CanWashAway(BLOCKTYPE a_BlockType)
 {
 	return false;
@@ -408,4 +350,687 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, s
 std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 {
 	return {};
+}
+
+
+
+
+
+cItem::cItem()
+{
+}
+
+
+
+
+
+cItem::cItem(
+	short a_ItemType,
+	char a_ItemCount,
+	short a_ItemDamage,
+	const AString & a_Enchantments,
+	const AString & a_CustomName,
+	const AStringVector & a_LoreTable
+)
+{
+}
+
+
+
+
+
+void cItem::Empty()
+{
+}
+
+
+
+
+
+cEnderCrystal::cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom):
+	Super(etEnderCrystal, a_Pos, 1.0, 1.0)
+{
+}
+
+
+
+
+
+void cEnderCrystal::SpawnOn(class cClientHandle & a_ClientHandle)
+{
+}
+
+
+
+
+
+
+void cEnderCrystal::Tick(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+
+void cEnderCrystal::KilledBy(struct TakeDamageInfo & a_TakeDamageInfo)
+{
+}
+
+
+
+
+
+cEntity::cEntity(enum cEntity::eEntityType a_EntityType, class Vector3<double> a_Pos, float a_Height, float a_Width)
+{
+}
+
+
+
+
+
+bool cEntity::Initialize(class std::unique_ptr<class cEntity,struct std::default_delete<class cEntity> > a_Entity,class cWorld & a_World)
+{
+	return true;
+}
+
+
+
+
+
+void cEntity::OnAddToWorld(class cWorld & a_World)
+{
+}
+
+
+
+
+
+void cEntity::OnRemoveFromWorld(class cWorld & a_World)
+{
+}
+
+
+
+
+
+bool cEntity::IsA(char const * a_Type)const
+{
+	return true;
+}
+
+
+
+
+
+char const * cEntity::GetParentClass(void) const
+{
+	return "";
+}
+
+
+
+
+
+void cEntity::HandleSpeedFromAttachee(float a_SpeedX,float a_SpeedZ)
+{
+}
+
+
+
+
+
+
+void cEntity::Destroy(void)
+{
+}
+
+
+
+
+
+
+bool cEntity::DoTakeDamage(struct TakeDamageInfo & a_TakeDamageInfo)
+{
+	return true;
+}
+
+
+
+
+
+
+int cEntity::GetRawDamageAgainst(class cEntity const & a_Entity)
+{
+	return 0;
+}
+
+
+
+
+
+
+bool cEntity::ArmorCoversAgainst(enum eDamageType a_DamageType)
+{
+	return true;
+}
+
+
+
+
+
+
+float cEntity::GetArmorCoverAgainst(class cEntity const * a_Entity,enum eDamageType a_DamageType,int a_Value)
+{
+	return 0.0f;
+}
+
+
+
+
+
+char const * cEntity::GetClass(void) const
+{
+	return "";
+}
+
+
+
+
+
+float cEntity::GetEnchantmentCoverAgainst(class cEntity const * a_Entity,enum eDamageType a_DamageType,int a_Value)
+{
+	return 0.0f;
+}
+
+
+
+
+
+
+float cEntity::GetEnchantmentBlastKnockbackReduction(void)
+{
+	return 0.0f;
+}
+
+
+
+
+
+
+double cEntity::GetKnockbackAmountAgainst(class cEntity const & a_Entity)
+{
+	return 0.0f;
+}
+
+
+
+
+
+
+void cEntity::ApplyArmorDamage(int)
+{
+}
+
+
+
+
+
+
+void cEntity::KilledBy(struct TakeDamageInfo & a_TakeDamageInfo)
+{
+}
+
+
+
+
+
+
+void cEntity::Heal(int a_Value)
+{
+}
+
+
+
+
+
+
+void cEntity::Tick(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+
+void cEntity::HandlePhysics(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+
+void cEntity::TickBurning(class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+
+void cEntity::DetectCacti(void)
+{
+}
+
+
+
+
+
+
+bool cEntity::DetectPortal(void)
+{
+	return true;
+}
+
+
+
+
+
+
+void cEntity::TickInVoid(class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+
+void cEntity::OnStartedBurning(void)
+{
+}
+
+
+
+
+
+
+void cEntity::OnFinishedBurning(void)
+{
+}
+
+
+
+
+
+
+void cEntity::TeleportToEntity(class cEntity & a_Entity)
+{
+}
+
+
+
+
+
+
+void cEntity::TeleportToCoords(double a_XPos, double a_YPos, double a_ZPos)
+{
+}
+
+
+
+
+
+
+void cEntity::BroadcastMovementUpdate(class cClientHandle const * a_ClientHandle)
+{
+}
+
+
+
+
+
+
+void cEntity::AttachTo(class cEntity & a_Entity)
+{
+}
+
+
+
+
+
+
+void cEntity::Detach(void)
+{
+}
+
+
+
+
+
+
+void cEntity::SetSpeed(double a_XSpeed, double a_YSpeed, double a_ZSpeed)
+{
+}
+
+
+
+
+
+void cEntity::DetectMagma(void)
+{
+}
+
+
+
+
+
+bool cEntity::MoveToWorld(cWorld & a_World, Vector3d a_NewPosition, bool a_SetPortalCooldown, bool a_ShouldSendRespawn)
+{
+    return false;
+}
+
+
+
+
+
+
+void cEntity::HandleAir(void)
+{
+}
+
+
+
+
+
+
+void cEntity::SetSwimState(class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+
+void cEntity::ResetPosition(class Vector3<double> a_Pos)
+{
+}
+
+
+
+
+
+void cEntity::OnDetach()
+{
+
+}
+
+
+
+
+
+cPawn::cPawn(enum cEntity::eEntityType, float a_Width, float a_Height) :
+	cEntity(etMonster, Vector3d(), a_Height, a_Width)
+{
+}
+
+
+
+
+
+bool cPawn::IsFireproof(void) const
+{
+	return true;
+}
+
+
+
+
+
+bool cPawn::IsInvisible(void) const
+{
+	return true;
+}
+
+
+
+
+
+void cPawn::HandleAir(void)
+{
+}
+
+
+
+
+void cPawn::HandleFalling()
+{
+}
+
+
+
+
+
+void cPawn::KilledBy(struct TakeDamageInfo & a_TakeDamageInfo)
+{
+}
+
+
+
+void cPawn::OnRemoveFromWorld(cWorld & a_World)
+{
+}
+
+
+
+
+
+void cPawn::ResetPosition(class Vector3<double>)
+{
+}
+
+
+
+
+
+void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+cMonster::cMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, float a_Width, float a_Height) :
+	cPawn(etMonster, a_Width, a_Height),
+	m_PathFinder(a_Width, a_Height)
+{
+}
+
+
+
+cPathFinder::cPathFinder(float a_Width, float a_Height)
+{
+
+}
+
+
+
+
+
+void cMonster::OnRemoveFromWorld(class cWorld & a_World)
+{
+}
+
+
+
+
+
+
+void cMonster::Tick(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+void cMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+void cMonster::InStateChasing(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+void cMonster::SpawnOn(class cClientHandle & a_ClientHandle)
+{
+}
+
+
+
+
+
+bool cMonster::DoTakeDamage(struct TakeDamageInfo & a_TakeDamageInfo)
+{
+	return true;
+}
+
+
+
+
+
+void cMonster::KilledBy(struct TakeDamageInfo & a_TakeDamageInfo)
+{
+}
+
+
+
+
+
+void cMonster::OnRightClicked(class cPlayer & a_Player)
+{
+}
+
+
+
+
+
+void cMonster::HandleFalling(void)
+{
+}
+
+
+
+
+
+void cMonster::MoveToPosition(class Vector3<double> const & a_Pos)
+{
+}
+
+
+
+
+
+void cMonster::CheckEventSeePlayer(class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+bool cMonster::IsNetherNative(void)
+{
+	return false;
+}
+
+
+
+
+
+bool cMonster::IsUndead(void)
+{
+	return false;
+}
+
+
+
+
+
+void cMonster::EventLosePlayer(void)
+{
+}
+
+
+
+
+
+void cMonster::InStateIdle(std::chrono::milliseconds a_Dt ,class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt ,class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+cAggressiveMonster::cAggressiveMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, float a_Width, float a_Height) :
+	cMonster(a_StringA, a_MonsterType, a_StringB, a_StringC, a_StringD, a_Width, a_Height)
+{
+}
+
+
+
+
+
+void cAggressiveMonster::Tick(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+void cAggressiveMonster::InStateChasing(std::chrono::milliseconds a_Dt, class cChunk & a_Chunk)
+{
+}
+
+
+
+
+
+
+void cAggressiveMonster::EventSeePlayer(class cPlayer *,class cChunk &)
+{
+}
+
+
+
+
+
+bool cAggressiveMonster::Attack(std::chrono::milliseconds a_Dt)
+{
+	return true;
 }

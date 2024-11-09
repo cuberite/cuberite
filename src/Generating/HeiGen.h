@@ -28,8 +28,7 @@ class cHeiGenCache :
 	public cTerrainHeightGen
 {
 public:
-	cHeiGenCache(cTerrainHeightGenPtr a_HeiGenToCache, size_t a_CacheSize);
-	virtual ~cHeiGenCache() override = default;
+	cHeiGenCache(cTerrainHeightGen & a_HeiGenToCache, size_t a_CacheSize);
 
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap) override;
@@ -51,7 +50,7 @@ protected:
 	} ;
 
 	/** The terrain height generator that is being cached. */
-	cTerrainHeightGenPtr m_HeiGenToCache;
+	cTerrainHeightGen & m_HeiGenToCache;
 
 	// To avoid moving large amounts of data for the MRU behavior, we MRU-ize indices to an array of the actual data
 	size_t                  m_CacheSize;
@@ -73,7 +72,7 @@ class cHeiGenMultiCache:
 	public cTerrainHeightGen
 {
 public:
-	cHeiGenMultiCache(cTerrainHeightGenPtr a_HeightGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches);
+	cHeiGenMultiCache(std::unique_ptr<cTerrainHeightGen> a_HeightGenToCache, size_t a_SubCacheSize, size_t a_NumSubCaches);
 
 	// cTerrainHeightGen overrides:
 	virtual void GenHeightMap(cChunkCoords a_ChunkCoords, cChunkDef::HeightMap & a_HeightMap) override;
@@ -83,9 +82,6 @@ public:
 	bool GetHeightAt(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ, HEIGHTTYPE & a_Height);
 
 protected:
-	typedef std::shared_ptr<cHeiGenCache> cHeiGenCachePtr;
-	typedef std::vector<cHeiGenCachePtr> cHeiGenCachePtrs;
-
 
 	/** The coefficient used to turn Z coords into index (x + Coeff * z). */
 	static const size_t m_CoeffZ = 5;
@@ -94,7 +90,10 @@ protected:
 	size_t m_NumSubCaches;
 
 	/** The individual sub-caches. */
-	cHeiGenCachePtrs m_SubCaches;
+	std::vector<std::unique_ptr<cHeiGenCache>> m_SubCaches;
+
+	/** The underlying height generator. */
+	std::unique_ptr<cTerrainHeightGen> m_Underlying;
 };
 
 
@@ -167,13 +166,14 @@ protected:
 
 
 
-class cHeiGenBiomal :
+class cHeiGenBiomal:
 	public cTerrainHeightGen
 {
-	typedef cTerrainHeightGen Super;
+	using Super = cTerrainHeightGen;
 
 public:
-	cHeiGenBiomal(int a_Seed, cBiomeGenPtr a_BiomeGen) :
+
+	cHeiGenBiomal(int a_Seed, cBiomeGen & a_BiomeGen):
 		m_Noise(a_Seed),
 		m_BiomeGen(a_BiomeGen)
 	{
@@ -191,8 +191,8 @@ protected:
 
 	typedef cChunkDef::BiomeMap BiomeNeighbors[3][3];
 
-	cNoise       m_Noise;
-	cBiomeGenPtr m_BiomeGen;
+	cNoise m_Noise;
+	cBiomeGen & m_BiomeGen;
 
 	// Per-biome terrain generator parameters:
 	struct sGenParam
@@ -207,7 +207,3 @@ protected:
 
 	NOISE_DATATYPE GetHeightAt(int a_RelX, int a_RelZ, int a_ChunkX, int a_ChunkZ, const BiomeNeighbors & a_BiomeNeighbors);
 } ;
-
-
-
-

@@ -20,7 +20,7 @@ class cPickup :
 {
 	// tolua_end
 
-	using super = cEntity;
+	using Super = cEntity;
 
 public:  // tolua_export
 
@@ -33,7 +33,7 @@ public:  // tolua_export
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
-	bool CollectedBy(cPlayer & a_Dest);  // tolua_export
+	bool CollectedBy(cEntity & a_Dest);  // tolua_export
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 

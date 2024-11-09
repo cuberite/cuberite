@@ -18,7 +18,7 @@ logs can overwrite others(leaves), but others shouldn't overwrite logs. This is 
 #pragma once
 
 #include "../Noise/Noise.h"
-
+#include "../ChunkDef.h"  // For sSetBlockVector
 
 
 
@@ -82,14 +82,26 @@ void GetDarkoakTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetB
 /** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random large birch tree */
 void GetTallBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
-/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random conifer tree */
-void GetConiferTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random conifer tree. The probability to get a large pine is higher than a spruce tree */
+void GetConiferTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large = false);
 
-/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random spruce (short conifer, two layers of leaves) */
-void GetSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random spruce */
+void GetSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large = false);
 
-/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random pine (tall conifer, little leaves at top) */
-void GetPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random pine */
+void GetPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks, bool a_Large = false);
+
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random small spruce (short conifer, two layers of leaves) */
+void GetSmallSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random small pine (tall conifer, little leaves at top) */
+void GetSmallPineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random large spruce (short conifer, multiple layers of leaves) */
+void GetLargeSpruceTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+
+/** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random large pine (tall conifer, little leaves at top) */
+void GetLargePineTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
 
 /** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random swampland tree */
 void GetSwampTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
@@ -105,3 +117,9 @@ void GetLargeJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, s
 
 /** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a small jungle tree (1x1 trunk) */
 void GetSmallJungleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+
+/** Fills a_LogBlocks and a_OtherBlocks with the blocks required to form the red mushroom */
+void GetRedMushroomTreeImage(Vector3i vector3, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);
+
+/** Fills a_LogBlocks and a_OtherBlocks with the blocks required to form the brown mushroom */
+void GetBrownMushroomTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);

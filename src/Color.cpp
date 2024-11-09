@@ -54,7 +54,7 @@ void cColor::SetBlue(unsigned char a_Blue)
 
 unsigned char cColor::GetRed() const
 {
-	return (m_Color & COLOR_RED_BITS) >> COLOR_RED_OFFSET;
+	return static_cast<unsigned char>((m_Color & COLOR_RED_BITS) >> COLOR_RED_OFFSET);
 }
 
 

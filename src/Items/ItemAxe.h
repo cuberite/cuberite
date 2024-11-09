@@ -2,24 +2,24 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "../BlockInfo.h"
 
 
 
 
 
-class cItemAxeHandler :
+class cItemAxeHandler final :
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
+
 public:
-	cItemAxeHandler(int a_ItemType)
-	: cItemHandler(a_ItemType)
-	{
-	}
+
+	using Super::Super;
 
 
 
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) const override
 	{
 		switch (a_Action)
 		{
@@ -32,11 +32,11 @@ public:
 
 
 
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) override
+	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) const override
 	{
 		if (!IsBlockMaterialWood(a_Block) && !IsBlockMaterialPlants(a_Block) && !IsBlockMaterialVine(a_Block))
 		{
-			return super::GetBlockBreakingStrength(a_Block);
+			return Super::GetBlockBreakingStrength(a_Block);
 		}
 		else
 		{

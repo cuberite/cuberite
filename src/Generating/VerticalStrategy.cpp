@@ -16,21 +16,6 @@ static const int SEED_OFFSET = 135;
 
 
 
-
-
-// Emit a warning if the first param is true
-#define CONDWARNING(ShouldLog, Fmt, ...) \
-	do { \
-		if (ShouldLog) \
-		{ \
-			LOGWARNING(Fmt, __VA_ARGS__); \
-		} \
-	} while (false)
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // Globals:
 
@@ -38,37 +23,40 @@ static const int SEED_OFFSET = 135;
 Returns true if successful, false on failure.
 If a_LogWarnings is true, outputs failure reasons to console.
 The range is returned in a_Min and a_Range, they are left unchanged if the range value is not present in the string. */
-static bool ParseRange(const AString & a_Params, int & a_Min, int & a_Range, bool a_LogWarnings)
+namespace VerticalStrategy
 {
-	auto params = StringSplitAndTrim(a_Params, "|");
-	if (params.size() == 0)
+	static bool ParseRange(const AString & a_Params, int & a_Min, int & a_Range, bool a_LogWarnings)
 	{
-		// No params, generate directly on top:
+		auto params = StringSplitAndTrim(a_Params, "|");
+		if (params.size() == 0)
+		{
+			// No params, generate directly on top:
+			return true;
+		}
+		if (!StringToInteger(params[0], a_Min))
+		{
+			// Failed to parse the min rel height:
+			CONDWARNING(a_LogWarnings, "Cannot parse minimum height from string \"%s\"!", params[0].c_str());
+			return false;
+		}
+		if (params.size() == 1)
+		{
+			// Only one param was given, there's no range
+			return true;
+		}
+		int maxHeight = a_Min;
+		if (!StringToInteger(params[1], maxHeight))
+		{
+			CONDWARNING(a_LogWarnings, "Cannot parse maximum height from string \"%s\"!", params[1].c_str());
+			return false;
+		}
+		if (maxHeight < a_Min)
+		{
+			std::swap(maxHeight, a_Min);
+		}
+		a_Range = maxHeight - a_Min + 1;
 		return true;
 	}
-	if (!StringToInteger(params[0], a_Min))
-	{
-		// Failed to parse the min rel height:
-		CONDWARNING(a_LogWarnings, "Cannot parse minimum height from string \"%s\"!", params[0].c_str());
-		return false;
-	}
-	if (params.size() == 1)
-	{
-		// Only one param was given, there's no range
-		return true;
-	}
-	int maxHeight = a_Min;
-	if (!StringToInteger(params[1], maxHeight))
-	{
-		CONDWARNING(a_LogWarnings, "Cannot parse maximum height from string \"%s\"!", params[1].c_str());
-		return false;
-	}
-	if (maxHeight < a_Min)
-	{
-		std::swap(maxHeight, a_Min);
-	}
-	a_Range = maxHeight - a_Min + 1;
-	return true;
 }
 
 
@@ -159,7 +147,7 @@ public:
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_TerrainHeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_TerrainHeightGen, int a_SeaLevel) override
 	{
 		m_Seed = a_Seed + SEED_OFFSET;
 	}
@@ -202,14 +190,14 @@ public:
 		// Params: "<MinRelativeHeight>|<MaxRelativeHeight>", all optional
 		m_MinRelHeight = 0;
 		m_RelHeightRange = 1;
-		return ParseRange(a_Params, m_MinRelHeight, m_RelHeightRange, a_LogWarnings);
+		return VerticalStrategy::ParseRange(a_Params, m_MinRelHeight, m_RelHeightRange, a_LogWarnings);
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_HeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel) override
 	{
 		m_Seed = a_Seed + SEED_OFFSET;
-		m_HeightGen = a_HeightGen;
+		m_HeightGen = &a_HeightGen;
 	}
 
 protected:
@@ -217,7 +205,7 @@ protected:
 	int m_Seed;
 
 	/** Height generator from which the top of the terrain is read. */
-	cTerrainHeightGenPtr m_HeightGen;
+	cTerrainHeightGen * m_HeightGen;
 
 	/** Minimum relative height at which the prefab is placed. */
 	int m_MinRelHeight;
@@ -258,14 +246,14 @@ public:
 		// Params: "<MinRelativeHeight>|<MaxRelativeHeight>", all optional
 		m_MinRelHeight = 0;
 		m_RelHeightRange = 1;
-		return ParseRange(a_Params, m_MinRelHeight, m_RelHeightRange, a_LogWarnings);
+		return VerticalStrategy::ParseRange(a_Params, m_MinRelHeight, m_RelHeightRange, a_LogWarnings);
 	}
 
 
-	virtual void AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_HeightGen, int a_SeaLevel) override
+	virtual void AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel) override
 	{
 		m_Seed = a_Seed + SEED_OFFSET;
-		m_HeightGen = a_HeightGen;
+		m_HeightGen = &a_HeightGen;
 		m_SeaLevel = a_SeaLevel;
 	}
 
@@ -274,7 +262,7 @@ protected:
 	int m_Seed;
 
 	/** Height generator from which the top of the terrain is read. */
-	cTerrainHeightGenPtr m_HeightGen;
+	cTerrainHeightGen * m_HeightGen;
 
 	/** The sea level used by the world. */
 	int m_SeaLevel;
@@ -339,7 +327,3 @@ cPiece::cVerticalStrategyPtr CreateVerticalStrategyFromString(const AString & a_
 
 	return Strategy;
 }
-
-
-
-

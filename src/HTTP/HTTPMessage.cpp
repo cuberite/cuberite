@@ -70,7 +70,7 @@ void cHTTPMessage::AddHeader(const AString & a_Key, const AString & a_Value)
 // cHTTPOutgoingResponse:
 
 cHTTPOutgoingResponse::cHTTPOutgoingResponse(void) :
-	super(mkResponse)
+	Super(mkResponse)
 {
 }
 

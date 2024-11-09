@@ -85,6 +85,20 @@ void cSha1Checksum::Finalize(cSha1Checksum::Checksum & a_Output)
 
 
 
+void cSha1Checksum::DigestToHex(const Checksum & a_Digest, AString & a_Out)
+{
+	a_Out.clear();
+	a_Out.reserve(40);
+	for (int i = 0; i < 20; i++)
+	{
+		a_Out.append(fmt::format(FMT_STRING("{:02x}"), a_Digest[i]));
+	}
+}
+
+
+
+
+
 void cSha1Checksum::DigestToJava(const Checksum & a_Digest, AString & a_Out)
 {
 	Checksum Digest;
@@ -109,7 +123,7 @@ void cSha1Checksum::DigestToJava(const Checksum & a_Digest, AString & a_Out)
 	a_Out.reserve(40);
 	for (int i = 0; i < 20; i++)
 	{
-		AppendPrintf(a_Out, "%02x", Digest[i]);
+		a_Out.append(fmt::format(FMT_STRING("{:02x}"), Digest[i]));
 	}
 	while ((a_Out.length() > 0) && (a_Out[0] == '0'))
 	{

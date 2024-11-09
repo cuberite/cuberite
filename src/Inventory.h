@@ -71,9 +71,10 @@ public:
 	/** Adds as many items out of a_ItemStack as can fit.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;
 	if a_AllowNewStacks is set to true, empty slots can be used for the rest.
+	Fills existing stacks first and fills the hotbar before the main inventory.
 	Returns the number of items that fit.
 	*/
-	int AddItem(const cItem & a_ItemStack, bool a_AllowNewStacks = true);
+	char AddItem(const cItem & a_ItemStack, bool a_AllowNewStacks = true);
 
 	/** Same as AddItem, but works on an entire list of item stacks.
 	The a_ItemStackList is modified to reflect the leftover items.
@@ -81,14 +82,24 @@ public:
 	if a_AllowNewStacks is set to true, empty slots can be used for the rest.
 	Returns the total number of items that fit.
 	*/
-	int AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks);
+	char AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks);
 
 	/** Removes the specified item from the inventory, as many as possible, up to a_ItemStack.m_ItemCount.
 	Returns the number of items that were removed. */
 	int RemoveItem(const cItem & a_ItemStack);
 
+	/** Finds an item based on ItemType and ItemDamage (<- defines the itemType, too) */
+	cItem * FindItem(const cItem & a_RecipeItem);
+
 	/** Removes one item out of the currently equipped item stack, returns true if successful, false if empty-handed */
 	bool RemoveOneEquippedItem(void);
+
+	/** Removes one item from the the current equipped item stack, and attempts to add the specified item stack
+	back to the same slot. If it is not possible to place the item in the same slot, optionally (default true) tries to
+	place the specified item elsewhere in the inventory. Returns the number of items successfully added. If the
+	currently equipped slot is empty, its contents are simply set to the given Item.
+	*/
+	int ReplaceOneEquippedItem(const cItem & a_Item, bool a_TryOtherSlots = true);
 
 	/** Returns the number of items of type a_Item that are stored */
 	int HowManyItems(const cItem & a_Item);
@@ -143,6 +154,8 @@ public:
 	void          SetHotbarSlot(int a_HotBarSlotNum, const cItem & a_Item);
 	/** Sets current item in shield slot */
 	void          SetShieldSlot(const cItem & a_Item);
+	/** Sets current item in the equipped hotbar slot */
+	void          SetEquippedItem(const cItem & a_Item);
 	/** Sets equiped item to the a_SlotNum slot number */
 	void          SetEquippedSlotNum(int a_SlotNum);
 	/** Returns slot number of equiped item */
@@ -152,7 +165,7 @@ public:
 	If the slot is empty, ignores the call.
 	Returns the new count, or -1 if the slot number is invalid.
 	*/
-	int ChangeSlotCount(int a_SlotNum, int a_AddToCount);
+	char ChangeSlotCount(int a_SlotNum, char a_AddToCount);
 
 	/** Adds the specified damage to the specified item; deletes the item and returns true if the item broke. */
 	bool DamageItem(int a_SlotNum, short a_Amount);
@@ -200,7 +213,3 @@ protected:
 	// cItemGrid::cListener override:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
 };  // tolua_export
-
-
-
-

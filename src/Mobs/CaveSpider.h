@@ -6,13 +6,14 @@
 
 
 
-class cCaveSpider :
+class cCaveSpider:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
-	cCaveSpider(void);
+
+	cCaveSpider();
 
 	CLASS_PROTODEF(cCaveSpider)
 

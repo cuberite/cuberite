@@ -9,7 +9,7 @@
 
 
 cExpBottleEntity::cExpBottleEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed) :
-	super(pkExpBottle, a_Creator, a_Pos, 0.25, 0.25)
+	Super(pkExpBottle, a_Creator, a_Pos, 0.25f, 0.25f)
 {
 	SetSpeed(a_Speed);
 }

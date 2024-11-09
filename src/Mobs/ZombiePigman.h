@@ -6,23 +6,22 @@
 
 
 
-class cZombiePigman :
+class cZombiePigman:
 	public cPassiveAggressiveMonster
 {
-	typedef cPassiveAggressiveMonster super;
+	using Super = cPassiveAggressiveMonster;
 
 public:
-	cZombiePigman(void);
+
+	cZombiePigman();
 
 	CLASS_PROTODEF(cZombiePigman)
 
+private:
+
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
+	virtual bool IsUndead(void) override { return true; }
+	virtual bool IsNetherNative(void) override { return true; }
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-
-	virtual bool IsUndead(void) override { return true; }
 } ;
-
-
-
-

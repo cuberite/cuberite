@@ -7,69 +7,31 @@
 
 
 
-class cItemRedstoneDustHandler : public cItemHandler
+class cItemRedstoneDustHandler final:
+	public cItemHandler
 {
+	using Super = cItemHandler;
+
 public:
-	cItemRedstoneDustHandler(int a_ItemType)
-		: cItemHandler(a_ItemType)
+
+	using Super::Super;
+
+
+
+
+
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
+		return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_REDSTONE_WIRE, 0);
 	}
 
-	virtual bool IsPlaceable(void) override
+
+
+
+
+	virtual bool IsPlaceable(void) const override
 	{
 		return true;
-	}
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		// Check if coords are out of range:
-		if ((a_BlockY <= 0) || (a_BlockY >= cChunkDef::Height))
-		{
-			return false;
-		}
-
-		// Check the block below, if it supports dust on top of it:
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
-		if (!a_World->GetBlockTypeMeta(a_BlockX, a_BlockY - 1, a_BlockZ, BlockType, BlockMeta))
-		{
-			return false;
-		}
-		if (!IsBlockTypeUnderSuitable(BlockType, BlockMeta))
-		{
-			return false;
-		}
-
-		a_BlockType = E_BLOCK_REDSTONE_WIRE;
-		a_BlockMeta = 0;
-		return true;
-	}
-
-
-	/** Returns true if the specified block type / meta is suitable to have redstone dust on top of it. */
-	static bool IsBlockTypeUnderSuitable(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-	{
-		if (cBlockInfo::FullyOccupiesVoxel(a_BlockType))
-		{
-			return true;
-		}
-
-		switch (a_BlockType)
-		{
-			case E_BLOCK_RED_SANDSTONE_SLAB:
-			case E_BLOCK_WOODEN_SLAB:
-			case E_BLOCK_STONE_SLAB:
-			{
-				// Slabs can support redstone if they're upside down:
-				return ((a_BlockMeta & 0x08) != 0);
-			}
-		}
-		return false;
 	}
 } ;
 

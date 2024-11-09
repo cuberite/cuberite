@@ -2,6 +2,7 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "SandSimulator.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../Defines.h"
 #include "../Entities/FallingBlock.h"
@@ -42,7 +43,7 @@ void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			continue;
 		}
 
-		BLOCKTYPE BlockBelow = (itr->y > 0) ? a_Chunk->GetBlock(itr->x, itr->y - 1, itr->z) : E_BLOCK_AIR;
+		BLOCKTYPE BlockBelow = (itr->y > 0) ? a_Chunk->GetBlock(itr->x, itr->y - 1, itr->z) : static_cast<BLOCKTYPE>(E_BLOCK_AIR);
 		if (CanStartFallingThrough(BlockBelow))
 		{
 			if (m_IsInstantFall)
@@ -61,12 +62,7 @@ void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			);
 			*/
 
-			auto FallingBlock = cpp14::make_unique<cFallingBlock>(Pos, BlockType, a_Chunk->GetMeta(itr->x, itr->y, itr->z));
-			auto FallingBlockPtr = FallingBlock.get();
-			if (!FallingBlockPtr->Initialize(std::move(FallingBlock), m_World))
-			{
-				continue;
-			}
+			m_World.SpawnFallingBlock(Pos, BlockType, a_Chunk->GetMeta(itr->x, itr->y, itr->z));
 			a_Chunk->SetBlock({itr->x, itr->y, itr->z}, E_BLOCK_AIR, 0);
 		}
 	}
@@ -78,54 +74,25 @@ void cSandSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 
 
 
-bool cSandSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
+void cSandSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
 {
-	switch (a_BlockType)
-	{
-		case E_BLOCK_ANVIL:
-		case E_BLOCK_CONCRETE_POWDER:
-		case E_BLOCK_DRAGON_EGG:
-		case E_BLOCK_GRAVEL:
-		case E_BLOCK_SAND:
-		{
-			return true;
-		}
-		default:
-		{
-			return false;
-		}
-	}
-}
-
-
-
-
-
-void cSandSimulator::AddBlock(Vector3i a_Block, cChunk * a_Chunk)
-{
-	if ((a_Chunk == nullptr) || !a_Chunk->IsValid())
-	{
-		return;
-	}
-	int RelX = a_Block.x - a_Chunk->GetPosX() * cChunkDef::Width;
-	int RelZ = a_Block.z - a_Chunk->GetPosZ() * cChunkDef::Width;
-	if (!IsAllowedBlock(a_Chunk->GetBlock(RelX, a_Block.y, RelZ)))
+	if (!IsAllowedBlock(a_Block))
 	{
 		return;
 	}
 
 	// Check for duplicates:
-	cSandSimulatorChunkData & ChunkData = a_Chunk->GetSandSimulatorData();
+	cSandSimulatorChunkData & ChunkData = a_Chunk.GetSandSimulatorData();
 	for (cSandSimulatorChunkData::iterator itr = ChunkData.begin(); itr != ChunkData.end(); ++itr)
 	{
-		if ((itr->x == RelX) && (itr->y == a_Block.y) && (itr->z == RelZ))
+		if ((itr->x == a_Position.x) && (itr->y == a_Position.y) && (itr->z == a_Position.z))
 		{
 			return;
 		}
 	}
 
 	m_TotalBlocks += 1;
-	ChunkData.push_back(cCoordWithInt(RelX, a_Block.y, RelZ));
+	ChunkData.emplace_back(a_Position.x, a_Position.y, a_Position.z);
 }
 
 
@@ -269,11 +236,11 @@ void cSandSimulator::FinishFalling(
 {
 	ASSERT(a_BlockY < cChunkDef::Height);
 
-	BLOCKTYPE CurrentBlockType = a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ);
+	BLOCKTYPE CurrentBlockType = a_World->GetBlock({ a_BlockX, a_BlockY, a_BlockZ });
 	if ((a_FallingBlockType == E_BLOCK_ANVIL) || IsReplacedOnRematerialization(CurrentBlockType))
 	{
 		// Rematerialize the material here:
-		a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, a_FallingBlockType, a_FallingBlockMeta);
+		a_World->SetBlock({ a_BlockX, a_BlockY, a_BlockZ }, a_FallingBlockType, a_FallingBlockMeta);
 		if (a_FallingBlockType == E_BLOCK_ANVIL)
 		{
 			a_World->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_LAND, {a_BlockX, a_BlockY, a_BlockZ}, 0);
@@ -283,13 +250,36 @@ void cSandSimulator::FinishFalling(
 
 	// Create a pickup instead:
 	cItems Pickups;
-	Pickups.Add(static_cast<ENUM_ITEM_ID>(a_FallingBlockType), 1, a_FallingBlockMeta);
+	Pickups.Add(static_cast<ENUM_ITEM_TYPE>(a_FallingBlockType), 1, a_FallingBlockMeta);
 	a_World->SpawnItemPickups(
 		Pickups,
 		static_cast<double>(a_BlockX) + 0.5,
 		static_cast<double>(a_BlockY) + 0.5,
 		static_cast<double>(a_BlockZ) + 0.5
 	);
+}
+
+
+
+
+
+bool cSandSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
+{
+	switch (a_BlockType)
+	{
+		case E_BLOCK_ANVIL:
+		case E_BLOCK_CONCRETE_POWDER:
+		case E_BLOCK_DRAGON_EGG:
+		case E_BLOCK_GRAVEL:
+		case E_BLOCK_SAND:
+		{
+			return true;
+		}
+		default:
+		{
+			return false;
+		}
+	}
 }
 
 

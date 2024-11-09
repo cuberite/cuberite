@@ -14,7 +14,7 @@ struct cMonsterConfig::sAttributesStruct
 	AString m_Name;
 	int     m_SightDistance;
 	int     m_AttackDamage;
-	int     m_AttackRange;
+	double  m_AttackRange;
 	double  m_AttackRate;
 	double  m_MaxHealth;
 	double  m_DefaultWalkSpeed;

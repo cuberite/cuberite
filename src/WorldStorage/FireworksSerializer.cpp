@@ -2,12 +2,13 @@
 #include "Globals.h"
 #include "FireworksSerializer.h"
 #include "../WorldStorage/FastNBT.h"
+#include "../BlockType.h"
 
 
 
 
 
-void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFastNBTWriter & a_Writer, const ENUM_ITEM_ID a_Type)
+void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFastNBTWriter & a_Writer, const ENUM_ITEM_TYPE a_Type)
 {
 	switch (a_Type)
 	{
@@ -58,7 +59,7 @@ void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFa
 
 
 
-void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNBT & a_NBT, int a_TagIdx, const ENUM_ITEM_ID a_Type)
+void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNBT & a_NBT, int a_TagIdx, const ENUM_ITEM_TYPE a_Type)
 {
 	if (a_TagIdx < 0)
 	{
@@ -104,10 +105,10 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 							continue;
 						}
 
-						const char * ColourData = (a_NBT.GetData(explosiontag));
+						const auto * ColourData = (a_NBT.GetData(explosiontag));
 						for (size_t i = 0; i < DataLength; i += 4)
 						{
-							a_FireworkItem.m_Colours.push_back(GetBEInt(ColourData + i));
+							a_FireworkItem.m_Colours.push_back(NetworkBufToHost<Int32>(ColourData + i));
 						}
 					}
 					else if (ExplosionName == "FadeColors")
@@ -120,10 +121,10 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 							continue;
 						}
 
-						const char * FadeColourData = (a_NBT.GetData(explosiontag));
+						const auto * FadeColourData = (a_NBT.GetData(explosiontag));
 						for (size_t i = 0; i < DataLength; i += 4)
 						{
-							a_FireworkItem.m_FadeColours.push_back(GetBEInt(FadeColourData + i));
+							a_FireworkItem.m_FadeColours.push_back(NetworkBufToHost<Int32>(FadeColourData + i));
 						}
 					}
 				}
@@ -164,12 +165,10 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 AString cFireworkItem::ColoursToString(const cFireworkItem & a_FireworkItem)
 {
 	AString Result;
-
-	for (std::vector<int>::const_iterator itr = a_FireworkItem.m_Colours.begin(); itr != a_FireworkItem.m_Colours.end(); ++itr)
+	for (const auto col: a_FireworkItem.m_Colours)
 	{
-		AppendPrintf(Result, "%i;", *itr);
+		Result.append(fmt::format(FMT_STRING("{};"), col));
 	}
-
 	return Result;
 }
 
@@ -199,12 +198,10 @@ void cFireworkItem::ColoursFromString(const AString & a_String, cFireworkItem & 
 AString cFireworkItem::FadeColoursToString(const cFireworkItem & a_FireworkItem)
 {
 	AString Result;
-
-	for (std::vector<int>::const_iterator itr = a_FireworkItem.m_FadeColours.begin(); itr != a_FireworkItem.m_FadeColours.end(); ++itr)
+	for (const auto col: a_FireworkItem.m_FadeColours)
 	{
-		AppendPrintf(Result, "%i;", *itr);
+		Result.append(fmt::format(FMT_STRING("{};"), col));
 	}
-
 	return Result;
 }
 

@@ -13,6 +13,7 @@ return
 			{ Name = "Player", Type = "{{cPlayer}}", Notes = "The player who has moved. The object already has the new position stored in it." },
 			{ Name = "OldPosition", Type = "{{Vector3d}}", Notes = "The old position." },
 			{ Name = "NewPosition", Type = "{{Vector3d}}", Notes = "The new position." },
+			{ Name = "PreviousIsOnGround", Type = "{{boolean}}", Notes = "Specifies if the player was standing on a solid block." },
 		},
 		Returns = [[
 			If the function returns true, movement is prohibited.</p>

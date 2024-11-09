@@ -506,7 +506,7 @@ void cNoise3DComposable::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape 
 ////////////////////////////////////////////////////////////////////////////////
 // cBiomalNoise3DComposable:
 
-cBiomalNoise3DComposable::cBiomalNoise3DComposable(int a_Seed, cBiomeGenPtr a_BiomeGen) :
+cBiomalNoise3DComposable::cBiomalNoise3DComposable(int a_Seed, cBiomeGen & a_BiomeGen) :
 	m_ChoiceNoise(a_Seed),
 	m_DensityNoiseA(a_Seed + 1),
 	m_DensityNoiseB(a_Seed + 2),
@@ -654,7 +654,7 @@ void cBiomalNoise3DComposable::CalcBiomeParamArrays(cChunkCoords a_ChunkCoords, 
 	{
 		for (int x = 0; x < 3; x++)
 		{
-			m_BiomeGen->GenBiomes({a_ChunkCoords.m_ChunkX + x - 1, a_ChunkCoords.m_ChunkZ + z - 1}, neighborBiomes[x + 3 * z]);
+			m_BiomeGen.GenBiomes({a_ChunkCoords.m_ChunkX + x - 1, a_ChunkCoords.m_ChunkZ + z - 1}, neighborBiomes[x + 3 * z]);
 		}
 	}
 
@@ -791,8 +791,3 @@ void cBiomalNoise3DComposable::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::
 		}  // for x
 	}  // for z
 }
-
-
-
-
-

@@ -9,10 +9,6 @@
 
 #pragma once
 
-
-
-
-
 // tolua_begin
 /** Biome IDs
 The first batch corresponds to the clientside biomes, used by MineCraft.
@@ -150,6 +146,12 @@ extern bool IsBiomeVeryCold(EMCSBiome a_Biome);
 (has snow and snowfall at higher elevations but not at regular heights).
 Doesn't report Very Cold biomes, use IsBiomeVeryCold() for those. */
 extern bool IsBiomeCold(EMCSBiome a_Biome);
+
+/** Returns true if the biome is mountainous (mutations of the extreme hills biome) */
+extern bool IsBiomeMountain(EMCSBiome a_Biome);
+
+/** Returns true if the biome is Mesa or one of its mutations. */
+extern bool IsBiomeMesa(EMCSBiome a_Biome);
 
 /** Returns the height when a biome when a biome starts snowing. */
 extern int GetSnowStartHeight(EMCSBiome a_Biome);

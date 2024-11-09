@@ -8,19 +8,8 @@
 
 
 cThrownSnowballEntity::cThrownSnowballEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
-	super(pkSnowball, a_Creator, a_Pos, 0.25, 0.25),
-	m_DestroyTimer(-1)
+	Super(pkSnowball, a_Creator, a_Pos, a_Speed, 0.25f, 0.25f)
 {
-	SetSpeed(a_Speed);
-}
-
-
-
-
-
-void cThrownSnowballEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
-{
-	m_DestroyTimer = 2;
 }
 
 
@@ -29,44 +18,33 @@ void cThrownSnowballEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitF
 
 void cThrownSnowballEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
-	super::OnHitEntity(a_EntityHit, a_HitPos);
+	Super::OnHitEntity(a_EntityHit, a_HitPos);
 
-	int TotalDamage = 0;
-	if (a_EntityHit.IsMob())
+	int Damage = 0;
+	if (a_EntityHit.IsMob() && (static_cast<cMonster &>(a_EntityHit).GetMobType() == mtBlaze))
 	{
-		eMonsterType MobType = static_cast<cMonster &>(a_EntityHit).GetMobType();
-		if (MobType == mtBlaze)
-		{
-			TotalDamage = 3;
-		}
+		// Blazes take 3 damage:
+		Damage = 3;
 	}
-	// TODO: If entity is Ender Crystal, destroy it
-	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), TotalDamage, 1);
+	else if (a_EntityHit.IsEnderCrystal())
+	{
+		// Endercrystals are destroyed:
+		Damage = CeilC(a_EntityHit.GetHealth());
+	}
 
-	m_DestroyTimer = 5;
+	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, 1);
+	m_World->BroadcastEntityAnimation(*this, EntityAnimation::SnowballPoofs);
+	Destroy();
 }
 
 
 
 
 
-void cThrownSnowballEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cThrownSnowballEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
-	if (m_DestroyTimer > 0)
-	{
-		m_DestroyTimer--;
-		if (m_DestroyTimer == 0)
-		{
-			Destroy();
-			return;
-		}
-	}
-	else
-	{
-		super::Tick(a_Dt, a_Chunk);
-	}
+	Super::OnHitSolidBlock(a_HitPos, a_HitFace);
+
+	m_World->BroadcastEntityAnimation(*this, EntityAnimation::SnowballPoofs);
+	Destroy();
 }
-
-
-
-

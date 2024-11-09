@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "Defines.h"
+#include "ChunkDef.h"
 
 
 
@@ -167,17 +169,6 @@ public:
 
 	const cColorList & GetData(void) const { return m_Data; }
 
-	static const char * GetClassStatic(void)  // Needed for ManualBindings's DoWith templates
-	{
-		return "cMap";
-	}
-
-	const char * GetClass(void)  // Needed for ManualBindings' DoWith templates
-	{
-		return "cMap";
-	}
-
-
 private:
 
 	/** Update the specified pixel. */
@@ -194,6 +185,8 @@ private:
 	int m_CenterX;
 	int m_CenterZ;
 
+	bool m_Dirty;
+
 	/** Column-major array of colours */
 	cColorList m_Data;
 
@@ -205,6 +198,7 @@ private:
 
 	AString m_Name;
 
+	friend class cMapManager;
 	friend class cMapSerializer;
 
 };  // tolua_export

@@ -8,13 +8,14 @@
 
 
 // tolua_begin
-class cExpOrb :
+class cExpOrb:
 	public cEntity
 {
-	typedef cEntity super;
-
-public:
 	// tolua_end
+
+	using Super = cEntity;
+
+public:  // tolua_export
 
 	CLASS_PROTODEF(cExpOrb)
 

@@ -7,7 +7,6 @@
 
 #include "FastNBT.h"
 #include "SchematicFileSerializer.h"
-#include "../StringCompression.h"
 #include "../OSSupport/GZipFile.h"
 
 
@@ -17,118 +16,59 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cSchematicFileSerializer:
 
-bool cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, const AString & a_FileName)
+void cSchematicFileSerializer::LoadFromSchematicFile(cBlockArea & a_BlockArea, const std::string & a_FileName)
 {
-	// Un-GZip the contents:
-	AString Contents;
-	cGZipFile File;
-	if (!File.Open(a_FileName, cGZipFile::fmRead))
-	{
-		LOG("Cannot open the schematic file \"%s\".", a_FileName.c_str());
-		return false;
-	}
-	int NumBytesRead = File.ReadRestOfFile(Contents);
-	if (NumBytesRead < 0)
-	{
-		LOG("Cannot read GZipped data in the schematic file \"%s\", error %d", a_FileName.c_str(), NumBytesRead);
-		return false;
-	}
-	File.Close();
+	const auto Data = GZipFile::ReadRestOfFile(a_FileName);
+	const cParsedNBT NBT(Data.GetView());
 
-	// Parse the NBT:
-	cParsedNBT NBT(Contents.data(), Contents.size());
 	if (!NBT.IsValid())
 	{
-		LOG("Cannot parse the NBT in the schematic file \"%s\".", a_FileName.c_str());
-		return false;
+		throw std::runtime_error(fmt::format("Cannot parse the NBT in the schematic file \"{}\".", a_FileName));
 	}
 
-	return LoadFromSchematicNBT(a_BlockArea, NBT);
+	LoadFromSchematicNBT(a_BlockArea, NBT);
 }
 
 
 
 
 
-bool cSchematicFileSerializer::LoadFromSchematicString(cBlockArea & a_BlockArea, const AString & a_SchematicData)
+void cSchematicFileSerializer::LoadFromSchematicString(cBlockArea & a_BlockArea, const ContiguousByteBufferView a_SchematicData)
 {
-	// Uncompress the data:
-	AString UngzippedData;
-	if (UncompressStringGZIP(a_SchematicData.data(), a_SchematicData.size(), UngzippedData) != Z_OK)
-	{
-		LOG("%s: Cannot unGZip the schematic data.", __FUNCTION__);
-		return false;
-	}
+	const auto Extracted = Compression::Extractor().ExtractGZip(a_SchematicData);
+	const cParsedNBT NBT(Extracted.GetView());
 
-	// Parse the NBT:
-	cParsedNBT NBT(UngzippedData.data(), UngzippedData.size());
 	if (!NBT.IsValid())
 	{
-		LOG("%s: Cannot parse the NBT in the schematic data.", __FUNCTION__);
-		return false;
+		throw std::runtime_error("Cannot parse the NBT in the schematic data.");
 	}
 
-	return LoadFromSchematicNBT(a_BlockArea, NBT);
+	LoadFromSchematicNBT(a_BlockArea, NBT);
 }
 
 
 
 
 
-bool cSchematicFileSerializer::SaveToSchematicFile(const cBlockArea & a_BlockArea, const AString & a_FileName)
+void cSchematicFileSerializer::SaveToSchematicFile(const cBlockArea & a_BlockArea, const std::string & a_FileName)
 {
-	// Serialize into NBT data:
-	AString NBT = SaveToSchematicNBT(a_BlockArea);
-	if (NBT.empty())
-	{
-		LOG("%s: Cannot serialize the area into an NBT representation for file \"%s\".", __FUNCTION__, a_FileName.c_str());
-		return false;
-	}
-
-	// Save to file
-	cGZipFile File;
-	if (!File.Open(a_FileName, cGZipFile::fmWrite))
-	{
-		LOG("%s: Cannot open file \"%s\" for writing.", __FUNCTION__, a_FileName.c_str());
-		return false;
-	}
-	if (!File.Write(NBT))
-	{
-		LOG("%s: Cannot write data to file \"%s\".", __FUNCTION__, a_FileName.c_str());
-		return false;
-	}
-	return true;
+	GZipFile::Write(a_FileName, SaveToSchematicNBT(a_BlockArea));
 }
 
 
 
 
 
-bool cSchematicFileSerializer::SaveToSchematicString(const cBlockArea & a_BlockArea, AString & a_Out)
+Compression::Result cSchematicFileSerializer::SaveToSchematicString(const cBlockArea & a_BlockArea)
 {
-	// Serialize into NBT data:
-	AString NBT = SaveToSchematicNBT(a_BlockArea);
-	if (NBT.empty())
-	{
-		LOG("%s: Cannot serialize the area into an NBT representation.", __FUNCTION__);
-		return false;
-	}
-
-	// Gzip the data:
-	int res = CompressStringGZIP(NBT.data(), NBT.size(), a_Out);
-	if (res != Z_OK)
-	{
-		LOG("%s: Cannot Gzip the area data NBT representation: %d", __FUNCTION__, res);
-		return false;
-	}
-	return true;
+	return Compression::Compressor().CompressGZip(SaveToSchematicNBT(a_BlockArea));
 }
 
 
 
 
 
-bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cParsedNBT & a_NBT)
+void cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, const cParsedNBT & a_NBT)
 {
 	int TMaterials = a_NBT.FindChildByName(a_NBT.GetRoot(), "Materials");
 	if ((TMaterials > 0) && (a_NBT.GetType(TMaterials) == TAG_String))
@@ -136,8 +76,7 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 		AString Materials = a_NBT.GetString(TMaterials);
 		if (Materials.compare("Alpha") != 0)
 		{
-			LOG("Materials tag is present and \"%s\" instead of \"Alpha\". Possibly a wrong-format schematic file.", Materials.c_str());
-			return false;
+			throw std::runtime_error(fmt::format("Materials tag is present and \"{}\" instead of \"Alpha\". Possibly a wrong-format schematic file.", Materials));
 		}
 	}
 	int TSizeX = a_NBT.FindChildByName(a_NBT.GetRoot(), "Width");
@@ -150,30 +89,28 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 		(a_NBT.GetType(TSizeZ) != TAG_Short)
 	)
 	{
-		LOG("Dimensions are missing from the schematic file (%d, %d, %d), (%d, %d, %d)",
+		throw std::runtime_error(fmt::format(
+			"Dimensions are missing from the schematic file ({}, {}, {}), ({}, {}, {})",
 			TSizeX, TSizeY, TSizeZ,
 			(TSizeX >= 0) ? a_NBT.GetType(TSizeX) : -1,
 			(TSizeY >= 0) ? a_NBT.GetType(TSizeY) : -1,
 			(TSizeZ >= 0) ? a_NBT.GetType(TSizeZ) : -1
-		);
-		return false;
+		));
 	}
 
 	int SizeX = a_NBT.GetShort(TSizeX);
 	int SizeY = a_NBT.GetShort(TSizeY);
 	int SizeZ = a_NBT.GetShort(TSizeZ);
-	if ((SizeX < 1) || (SizeX > 65535) || (SizeY < 1) || (SizeY > cChunkDef::Height) || (SizeZ < 1) || (SizeZ > 65535))
+	if ((SizeX < 1) || (SizeX > 65535) || (SizeY < 1) || (SizeY > 65535) || (SizeZ < 1) || (SizeZ > 65535))
 	{
-		LOG("Dimensions are invalid in the schematic file: %d, %d, %d", SizeX, SizeY, SizeZ);
-		return false;
+		throw std::runtime_error(fmt::format("Dimensions are invalid in the schematic file: {}, {}, {}", SizeX, SizeY, SizeZ));
 	}
 
 	int TBlockTypes = a_NBT.FindChildByName(a_NBT.GetRoot(), "Blocks");
 	int TBlockMetas = a_NBT.FindChildByName(a_NBT.GetRoot(), "Data");
 	if ((TBlockTypes < 0) || (a_NBT.GetType(TBlockTypes) != TAG_ByteArray))
 	{
-		LOG("BlockTypes are invalid in the schematic file: %d", TBlockTypes);
-		return false;
+		throw std::runtime_error(fmt::format("BlockTypes are invalid in the schematic file: {}", TBlockTypes));
 	}
 	bool AreMetasPresent = (TBlockMetas > 0) && (a_NBT.GetType(TBlockMetas) == TAG_ByteArray);
 
@@ -222,15 +159,13 @@ bool cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, cP
 		}
 		memcpy(a_BlockArea.GetBlockMetas(), a_NBT.GetData(TBlockMetas), NumMetaBytes);
 	}
-
-	return true;
 }
 
 
 
 
 
-AString cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockArea)
+ContiguousByteBuffer cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockArea)
 {
 	cFastNBTWriter Writer("Schematic");
 	Writer.AddShort("Width",  static_cast<Int16>(a_BlockArea.m_Size.x));
@@ -267,9 +202,5 @@ AString cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockA
 	Writer.EndList();
 	Writer.Finish();
 
-	return Writer.GetResult();
+	return ContiguousByteBuffer(Writer.GetResult());
 }
-
-
-
-

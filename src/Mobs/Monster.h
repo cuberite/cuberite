@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../Entities/Pawn.h"
+#include "../UUID.h"
 #include "MonsterTypes.h"
 #include "PathFinder.h"
 
@@ -12,10 +13,16 @@ class cClientHandle;
 
 
 // tolua_begin
-class cMonster :
+class cMonster:
 	public cPawn
 {
-	typedef cPawn super;
+
+	// tolua_end
+
+	using Super = cPawn;
+
+	// tolua_begin
+
 public:
 
 	enum eFamily
@@ -25,8 +32,7 @@ public:
 		mfAmbient  = 2,  // Bats
 		mfWater    = 3,  // Squid, Guardian
 
-		mfNoSpawn,
-		mfUnhandled,  // Nothing. Be sure this is the last and the others are in order
+		mfNoSpawn
 	} ;
 
 	// tolua_end
@@ -39,15 +45,11 @@ public:
 	a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs 2012_12_22))
 	a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
 	*/
-	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, double a_Width, double a_Height);
-
-	virtual ~cMonster() override;
-
-	virtual void OnRemoveFromWorld(cWorld & a_World) override;
-
-	virtual void Destroyed() override;
+	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height);
 
 	CLASS_PROTODEF(cMonster)
+
+	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 
 	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
 
@@ -106,19 +108,23 @@ public:
 	/** Reads the monster configuration for the specified monster name and assigns it to this object. */
 	void GetMonsterConfig(const AString & a_Name);
 
+	/** Returns whether this mob spawns in the Nether in Vanilla.
+	This is a fixed value and is not affected by custom mob spawning settings. */
+	virtual bool IsNetherNative(void);
+
 	/** Returns whether this mob is undead (skeleton, zombie, etc.) */
 	virtual bool IsUndead(void);
 
 	virtual void EventLosePlayer(void);
-	virtual void CheckEventLostPlayer(void);
+	virtual void CheckEventLostPlayer(std::chrono::milliseconds a_Dt);
 
 	virtual void InStateIdle    (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual void InStateChasing (std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 	virtual void InStateEscaping(std::chrono::milliseconds a_Dt, cChunk & a_Chunk);
 
-	int GetAttackRate() { return static_cast<int>(m_AttackRate); }
-	void SetAttackRate(float a_AttackRate) { m_AttackRate = a_AttackRate; }
-	void SetAttackRange(int a_AttackRange) { m_AttackRange = a_AttackRange; }
+	double GetAttackRate() { return m_AttackRate; }
+	void SetAttackRate(double a_AttackRate) { m_AttackRate = a_AttackRate; }
+	void SetAttackRange(double a_AttackRange) { m_AttackRange = a_AttackRange; }
 	void SetAttackDamage(int a_AttackDamage) { m_AttackDamage = a_AttackDamage; }
 	void SetSightDistance(int a_SightDistance) { m_SightDistance = a_SightDistance; }
 
@@ -187,10 +193,10 @@ public:
 	/** Returns the mob family based on the type */
 	static eFamily FamilyFromType(eMonsterType a_MobType);
 
-	/** Returns the spawn delay (number of game ticks between spawn attempts) for the given mob family */
-	static int GetSpawnDelay(cMonster::eFamily a_MobFamily);
-
 	// tolua_end
+
+	/** Returns the spawn delay (number of game ticks between spawn attempts) for the given mob family */
+	static cTickTime GetSpawnDelay(cMonster::eFamily a_MobFamily);
 
 	/**  Translates the MobType enum to the vanilla nbt name */
 	static AString MobTypeToVanillaNBT(eMonsterType a_MobType);
@@ -213,6 +219,38 @@ public:
 
 	/** Returns if this mob last target was a player to avoid destruction on player quit */
 	bool WasLastTargetAPlayer() const { return m_WasLastTargetAPlayer; }
+
+	/* the breeding processing */
+
+	/** Returns the items that the animal of this class follows when a player holds it in hand. */
+	virtual void GetFollowedItems(cItems & a_Items) { }
+
+	/** Returns the items that make the animal breed - this is usually the same as the ones that make the animal follow, but not necessarily. */
+	virtual void GetBreedingItems(cItems & a_Items) { GetFollowedItems(a_Items); }
+
+	/** Called after the baby is born, allows the baby to inherit the parents' properties (color, etc.) */
+	virtual void InheritFromParents(cMonster * a_Parent1, cMonster * a_Parent2) { }
+
+	/** Returns the partner which the monster is currently mating with. */
+	cMonster * GetPartner(void) const { return m_LovePartner; }
+
+	/** Start the mating process. Causes the monster to keep bumping into the partner until m_MatingTimer reaches zero. */
+	void EngageLoveMode(cMonster * a_Partner);
+
+	/** Finish the mating process. Called after a baby is born. Resets all breeding related timers and sets m_LoveCooldown to 20 minutes. */
+	void ResetLoveMode();
+
+	/** Returns whether the monster has just been fed and is ready to mate. If this is "true" and GetPartner isn't "nullptr", then the monster is mating. */
+	bool IsInLove() const { return (m_LoveTimer > 0); }
+
+	/** Returns whether the monster is tired of breeding and is in the cooldown state. */
+	bool IsInLoveCooldown() const { return (m_LoveCooldown > 0); }
+
+	/** Does the whole love and breeding processing */
+	void LoveTick(void);
+
+	/** Right click call to process feeding */
+	void RightClickFeed(cPlayer & a_Player);
 
 protected:
 
@@ -270,12 +308,14 @@ protected:
 
 	AString m_SoundHurt;
 	AString m_SoundDeath;
+	AString m_SoundAmbient;
 
-	float m_AttackRate;
+	double m_AttackRate;
 	int m_AttackDamage;
-	int m_AttackRange;
+	double m_AttackRange;
 	int m_AttackCoolDownTicksLeft;
 	int m_SightDistance;
+	std::chrono::milliseconds m_LoseSightAbandonTargetTimer;
 
 	float m_DropChanceWeapon;
 	float m_DropChanceHelmet;
@@ -291,6 +331,8 @@ protected:
 	double m_RelativeWalkSpeed;
 	double m_DefaultWalkSpeed;
 	double m_DefaultRunSpeed;
+
+	int m_AmbientSoundTimer;
 
 	int m_Age;
 	int m_AgingTimer;
@@ -324,7 +366,22 @@ protected:
 	/** Adds weapon that is equipped with the chance saved in m_DropChance[...] (this will be greter than 1 if picked up or 0.085 + (0.01 per LootingLevel) if born with) to the drop */
 	void AddRandomWeaponDropItem(cItems & a_Drops, unsigned int a_LootingLevel);
 
-	virtual void DoMoveToWorld(const cEntity::sWorldChangeInfo & a_WorldChangeInfo) override;
+	/* The breeding processing */
+
+	/** The monster's breeding partner. */
+	cMonster * m_LovePartner;
+
+	/** Remembers the player is was last fed by for statistics tracking */
+	cUUID m_Feeder;
+
+	/** If above 0, the monster is in love mode, and will breed if a nearby monster is also in love mode. Decrements by 1 per tick till reaching zero. */
+	int m_LoveTimer;
+
+	/** If above 0, the monster is in cooldown mode and will refuse to breed. Decrements by 1 per tick till reaching zero. */
+	int m_LoveCooldown;
+
+	/** The monster is engaged in mating, once this reaches zero, a baby will be born. Decrements by 1 per tick till reaching zero, then a baby is made and ResetLoveMode() is called. */
+	int m_MatingTimer;
 
 private:
 	/** A pointer to the entity this mobile is aiming to reach.

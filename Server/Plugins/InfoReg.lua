@@ -1,7 +1,11 @@
 
 -- InfoReg.lua
 
--- Implements registration functions that process g_PluginInfo
+--[[
+Implements functions that process the standard PluginInfo description and register command handlers.
+The description is either given as a parameter to the registration functions, or read from the standard
+names gPluginInfo or g_PluginInfo.
+--]]
 
 
 
@@ -99,8 +103,12 @@ end
 
 
 
---- Registers all commands specified in the g_PluginInfo.Commands
-function RegisterPluginInfoCommands()
+--- Registers all commands specified in the aPluginInfo.Commands
+-- If aPluginInfo is not given, gPluginInfo or g_PluginInfo is used
+function RegisterPluginInfoCommands(aPluginInfo)
+	-- If no info given, assume the default name for the global variable
+	aPluginInfo = aPluginInfo or g_PluginInfo or gPluginInfo
+
 	-- A sub-function that registers all subcommands of a single command, using the command's Subcommands table
 	-- The a_Prefix param already contains the space after the previous command
 	-- a_Level is the depth of the subcommands being registered, with 1 being the top level command
@@ -122,7 +130,7 @@ function RegisterPluginInfoCommands()
 			end
 
 			if (Handler == nil) then
-				LOGWARNING(g_PluginInfo.Name .. ": Invalid handler for command " .. CmdName .. ", command will not be registered.")
+				LOGWARNING(aPluginInfo.Name .. ": Invalid handler for command " .. CmdName .. ", command will not be registered.")
 			else
 				local HelpString
 				if (info.HelpString ~= nil) then
@@ -160,8 +168,8 @@ function RegisterPluginInfoCommands()
 	end
 
 	-- Loop through all commands in the plugin info, register each:
-	if (g_PluginInfo.Commands) then
-		RegisterSubcommands("", g_PluginInfo.Commands, 1)
+	if (aPluginInfo.Commands) then
+		RegisterSubcommands("", aPluginInfo.Commands, 1)
 	end
 end
 
@@ -169,8 +177,12 @@ end
 
 
 
---- Registers all console commands specified in the g_PluginInfo.ConsoleCommands
-function RegisterPluginInfoConsoleCommands()
+--- Registers all console commands specified in the aPluginInfo.ConsoleCommands
+-- If aPluginInfo is not given, gPluginInfo or g_PluginInfo is used
+function RegisterPluginInfoConsoleCommands(aPluginInfo)
+	-- If no info given, assume the default name for the global variable
+	aPluginInfo = aPluginInfo or g_PluginInfo or gPluginInfo
+
 	-- A sub-function that registers all subcommands of a single command, using the command's Subcommands table
 	-- The a_Prefix param already contains the space after the previous command
 	local function RegisterSubcommands(a_Prefix, a_Subcommands, a_Level)
@@ -193,8 +205,8 @@ function RegisterPluginInfoConsoleCommands()
 	end
 
 	-- Loop through all commands in the plugin info, register each:
-	if (g_PluginInfo.ConsoleCommands) then
-		RegisterSubcommands("", g_PluginInfo.ConsoleCommands, 1)
+	if (aPluginInfo.ConsoleCommands) then
+		RegisterSubcommands("", aPluginInfo.ConsoleCommands, 1)
 	end
 end
 

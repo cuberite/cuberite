@@ -2,58 +2,71 @@
 #pragma once
 
 #include "ItemHandler.h"
-#include "../World.h"
-#include "../Blocks/BlockBed.h"
+#include "Blocks/BlockBed.h"
+#include "BlockEntities/BedEntity.h"
 
 
 
 
 
-class cItemBedHandler :
+class cItemBedHandler final :
 	public cItemHandler
 {
+	using Super = cItemHandler;
+
 public:
-	cItemBedHandler(int a_ItemType) :
-		cItemHandler(a_ItemType)
+
+	using Super::Super;
+
+
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
-	}
+		const auto BlockMeta = cBlockBedHandler::YawToMetaData(a_Player.GetYaw());
+		const auto HeadPosition = a_PlacePosition + cBlockBedHandler::MetaDataToDirection(BlockMeta);
 
-
-	virtual bool IsPlaceable(void) override
-	{
-		return true;
-	}
-
-
-	virtual bool GetBlocksToPlace(
-		cWorld & a_World, cPlayer & a_Player, const cItem & a_EquippedItem,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		sSetBlockVector & a_BlocksToPlace
-	) override
-	{
-		// Can only be placed on the floor:
-		if (a_BlockFace != BLOCK_FACE_TOP)
+		auto & World = *a_Player.GetWorld();
+		BLOCKTYPE HeadType;
+		NIBBLETYPE HeadMeta;
+		if (!World.GetBlockTypeMeta(HeadPosition, HeadType, HeadMeta))
 		{
 			return false;
 		}
 
-		// The "foot" block:
-		NIBBLETYPE BlockMeta = cBlockBedHandler::RotationToMetaData(a_Player.GetYaw());
-		a_BlocksToPlace.emplace_back(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_BED, BlockMeta);
-
+		// Vanilla only allows beds to be placed into air.
 		// Check if there is empty space for the "head" block:
-		// (Vanilla only allows beds to be placed into air)
-		Vector3i Direction = cBlockBedHandler::MetaDataToDirection(BlockMeta);
-		if (a_World.GetBlock(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z) != E_BLOCK_AIR)
+		if (!cBlockHandler::For(HeadType).DoesIgnoreBuildCollision(World, a_HeldItem, HeadPosition, HeadMeta, a_ClickedBlockFace, false))
 		{
 			return false;
 		}
-		a_BlocksToPlace.emplace_back(a_BlockX + Direction.x, a_BlockY, a_BlockZ + Direction.z, E_BLOCK_BED, BlockMeta | 0x08);
+
+		// The "foot", and the "head" block:
+		if (
+			!a_Player.PlaceBlocks(
+			{
+				{ a_PlacePosition, E_BLOCK_BED, BlockMeta },
+				{ HeadPosition, E_BLOCK_BED, static_cast<NIBBLETYPE>(BlockMeta | 0x08) }
+			})
+		)
+		{
+			return false;
+		}
+
+		auto SetColor = [&a_HeldItem](cBlockEntity & a_BlockEntity)
+		{
+			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_BED);
+
+			static_cast<cBedEntity &>(a_BlockEntity).SetColor(a_HeldItem.m_ItemDamage);
+			return false;
+		};
+		World.DoWithBlockEntityAt(a_PlacePosition, SetColor);
+		World.DoWithBlockEntityAt(HeadPosition, SetColor);
+
 		return true;
 	}
-} ;
 
 
-
-
+	virtual bool IsPlaceable(void) const override
+	{
+		return true;
+	}
+};

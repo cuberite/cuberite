@@ -3,6 +3,7 @@
 
 #include "EnderChestEntity.h"
 #include "json/json.h"
+#include "../BlockInfo.h"
 #include "../Item.h"
 #include "../Entities/Player.h"
 #include "../UI/EnderChestWindow.h"
@@ -14,7 +15,7 @@
 
 
 cEnderChestEntity::cEnderChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	cBlockEntityWindowOwner(this)
 {
 	ASSERT(a_BlockType == E_BLOCK_ENDER_CHEST);
@@ -24,23 +25,23 @@ cEnderChestEntity::cEnderChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMe
 
 
 
-cEnderChestEntity::~cEnderChestEntity()
+void cEnderChestEntity::SendTo(cClientHandle & a_Client)
 {
-	cWindow * Window = GetWindow();
-	if (Window != nullptr)
-	{
-		Window->OwnerDestroyed();
-	}
+	// Send a dummy "number of players with chest open" packet to make the chest visible:
+	a_Client.SendBlockAction(m_Pos, 1, 0, m_BlockType);
 }
 
 
 
 
 
-void cEnderChestEntity::SendTo(cClientHandle & a_Client)
+void cEnderChestEntity::OnRemoveFromWorld()
 {
-	// Send a dummy "number of players with chest open" packet to make the chest visible:
-	a_Client.SendBlockAction(m_Pos.x, m_Pos.y, m_Pos.z, 1, 0, m_BlockType);
+	const auto Window = GetWindow();
+	if (Window != nullptr)
+	{
+		Window->OwnerDestroyed();
+	}
 }
 
 
@@ -52,7 +53,7 @@ bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 	if (
 		(GetPosY() < cChunkDef::Height - 1) &&
 		(
-			!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPosX(), GetPosY() + 1, GetPosZ())) ||
+			!cBlockInfo::IsTransparent(GetWorld()->GetBlock(GetPos().addedY(1))) ||
 			!cOcelot::IsCatSittingOnBlock(GetWorld(), Vector3d(GetPos()))
 		)
 	)
@@ -60,6 +61,9 @@ bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 		// Obstruction, don't open
 		return false;
 	}
+
+	a_Player->GetStatistics().Custom[CustomStatistic::OpenEnderchest]++;
+
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();
 	if (Window == nullptr)

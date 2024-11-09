@@ -57,7 +57,7 @@ void cPluginManager::RefreshPluginList(void)
 {
 	// Get a list of currently available folders:
 	AString PluginsPath = GetPluginsPath() + "/";
-	AStringVector Contents = cFile::GetFolderContents(PluginsPath.c_str());
+	AStringVector Contents = cFile::GetFolderContents(PluginsPath);
 	AStringVector Folders;
 	for (auto & item: Contents)
 	{
@@ -154,8 +154,9 @@ void cPluginManager::ReloadPluginsNow(cSettingsRepositoryInterface & a_Settings)
 void cPluginManager::InsertDefaultPlugins(cSettingsRepositoryInterface & a_Settings)
 {
 	a_Settings.AddKeyName("Plugins");
-	a_Settings.AddValue("Plugins", "Plugin", "Core");
-	a_Settings.AddValue("Plugins", "Plugin", "ChatLog");
+	a_Settings.AddValue("Plugins", "Core", "1");
+	a_Settings.AddValue("Plugins", "ChatLog", "1");
+	a_Settings.AddValue("Plugins", "ProtectionAreas", "0");
 }
 
 
@@ -164,35 +165,54 @@ void cPluginManager::InsertDefaultPlugins(cSettingsRepositoryInterface & a_Setti
 
 void cPluginManager::Tick(float a_Dt)
 {
-	// Unload plugins that have been scheduled for unloading:
-	AStringVector PluginsToUnload;
+	decltype(m_PluginsNeedAction) PluginsNeedAction;
 	{
-		cCSLock Lock(m_CSPluginsToUnload);
-		std::swap(m_PluginsToUnload, PluginsToUnload);
+		cCSLock Lock(m_CSPluginsNeedAction);
+		std::swap(m_PluginsNeedAction, PluginsNeedAction);
 	}
-	for (auto & folder: PluginsToUnload)
+
+	// Process deferred actions:
+	for (auto & CurrentPlugin : PluginsNeedAction)
 	{
-		bool HasUnloaded = false;
-		bool HasFound = false;
-		for (auto & plugin: m_Plugins)
+		auto & Action = CurrentPlugin.first;
+		auto & Folder = CurrentPlugin.second;
+
+		bool WasLoaded = false;
+		bool WasFound = false;
+		for (auto & Plugin: m_Plugins)
 		{
-			if (plugin->GetFolderName() == folder)
+			if (Plugin->GetFolderName() == Folder)
 			{
-				HasFound = true;
-				if (plugin->IsLoaded())
+				WasFound = true;
+				if (Plugin->IsLoaded())
 				{
-					plugin->Unload();
-					HasUnloaded = true;
+					switch (Action)
+					{
+						case PluginAction::Reload :
+						{
+							// Reload plugins by unloading, then loading:
+							Plugin->Unload();
+							Plugin->Load();
+							break;
+						}
+						case PluginAction::Unload :
+						{
+							// Unload plugins that have been scheduled for unloading:
+							Plugin->Unload();
+							break;
+						}
+					}
+					WasLoaded = true;
 				}
 			}
 		}
-		if (!HasFound)
+		if (!WasFound)
 		{
-			LOG("Cannot unload plugin in folder \"%s\", there's no such plugin folder", folder.c_str());
+			LOG("Cannot act on plugin in folder \"%s\", there's no such plugin folder", Folder.c_str());
 		}
-		else if (!HasUnloaded)
+		else if (!WasLoaded)
 		{
-			LOG("Cannot unload plugin in folder \"%s\", it has not been loaded.", folder.c_str());
+			LOG("Cannot act on plugin in folder \"%s\", it has not been loaded.", Folder.c_str());
 		}
 	}  // for plugin - m_Plugins[]
 
@@ -234,11 +254,11 @@ bool cPluginManager::GenericCallHook(PluginHook a_HookName, HookFunction a_HookF
 
 
 
-bool cPluginManager::CallHookBlockSpread(cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source)
+bool cPluginManager::CallHookBlockSpread(cWorld & a_World, Vector3i a_BlockPos, eSpreadSource a_Source)
 {
 	return GenericCallHook(HOOK_BLOCK_SPREAD, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnBlockSpread(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Source);
+			return a_Plugin->OnBlockSpread(a_World, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Source);
 		}
 	);
 }
@@ -315,14 +335,14 @@ bool cPluginManager::CallHookChat(cPlayer & a_Player, AString & a_Message)
 		case crError:
 		{
 			// An error in the plugin has prevented the command from executing. Report the error to the player:
-			a_Player.SendMessageFailure(Printf("Something went wrong while executing command \"%s\"", a_Message.c_str()));
+			a_Player.SendMessageFailure(fmt::format(FMT_STRING("Something went wrong while executing command \"{}\""), a_Message));
 			return true;
 		}
 
 		case crNoPermission:
 		{
 			// The player is not allowed to execute this command
-			a_Player.SendMessageFailure(Printf("Forbidden command; insufficient privileges: \"%s\"", a_Message.c_str()));
+			a_Player.SendMessageFailure(fmt::format(FMT_STRING("Forbidden command; insufficient privileges: \"{}\""), a_Message));
 			return true;
 		}
 
@@ -338,8 +358,8 @@ bool cPluginManager::CallHookChat(cPlayer & a_Player, AString & a_Message)
 	{
 		AStringVector Split(StringSplit(a_Message, " "));
 		ASSERT(!Split.empty());  // This should not happen - we know there's at least one char in the message so the split needs to be at least one item long
-		a_Player.SendMessageInfo(Printf("Unknown command: \"%s\"", a_Message.c_str()));
-		LOGINFO("Player %s issued an unknown command: \"%s\"", a_Player.GetName().c_str(), a_Message.c_str());
+		a_Player.SendMessageInfo(fmt::format(FMT_STRING("Unknown command: \"{}\""), a_Message));
+		LOGINFO("Player %s issued an unknown command: \"%s\"", a_Player.GetName(), a_Message);
 		return true;  // Cancel sending
 	}
 
@@ -521,7 +541,7 @@ bool cPluginManager::CallHookExecuteCommand(cPlayer * a_Player, const AStringVec
 		if (world != nullptr)
 		{
 			worldName = world->GetName();
-			worldAge = world->GetWorldAge();
+			worldAge = world->GetWorldAge().count();
 		}
 		else
 		{
@@ -612,6 +632,19 @@ bool cPluginManager::CallHookHopperPushingItem(cWorld & a_World, cHopperEntity &
 
 
 
+bool cPluginManager::CallHookDropSpense(cWorld & a_World, cDropSpenserEntity & a_DropSpenser, int a_SlotNum)
+{
+	return GenericCallHook(HOOK_DROPSPENSE, [&](cPlugin * a_Plugin)
+		{
+			return a_Plugin->OnDropSpense(a_World, a_DropSpenser, a_SlotNum);
+		}
+	);
+}
+
+
+
+
+
 bool cPluginManager::CallHookKilled(cEntity & a_Victim, TakeDamageInfo & a_TDI, AString & a_DeathMessage)
 {
 	return GenericCallHook(HOOK_KILLED, [&](cPlugin * a_Plugin)
@@ -677,11 +710,11 @@ bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation
 
 
 
-bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	return GenericCallHook(HOOK_PLAYER_BREAKING_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerBreakingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerBreakingBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_BlockType, a_BlockMeta);
 		}
 	);
 }
@@ -690,11 +723,11 @@ bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, int a_Block
 
 
 
-bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	return GenericCallHook(HOOK_PLAYER_BROKEN_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerBrokenBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerBrokenBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_BlockType, a_BlockMeta);
 		}
 	);
 }
@@ -742,11 +775,11 @@ bool cPluginManager::CallHookPlayerFoodLevelChange(cPlayer & a_Player, int a_New
 
 
 
-bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems & a_Reward)
+bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems & a_Reward, const int ExperienceAmount)
 {
 	return GenericCallHook(HOOK_PLAYER_FISHED, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerFished(a_Player, a_Reward);
+			return a_Plugin->OnPlayerFished(a_Player, a_Reward, ExperienceAmount);
 		}
 	);
 }
@@ -755,11 +788,11 @@ bool cPluginManager::CallHookPlayerFished(cPlayer & a_Player, const cItems & a_R
 
 
 
-bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, cItems a_Reward)
+bool cPluginManager::CallHookPlayerFishing(cPlayer & a_Player, cItems & a_Reward, int & ExperienceAmount)
 {
 	return GenericCallHook(HOOK_PLAYER_FISHING, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerFishing(a_Player, a_Reward);
+			return a_Plugin->OnPlayerFishing(a_Player, a_Reward, ExperienceAmount);
 		}
 	);
 }
@@ -781,11 +814,11 @@ bool cPluginManager::CallHookPlayerJoined(cPlayer & a_Player)
 
 
 
-bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, char a_Status)
+bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, char a_Status)
 {
 	return GenericCallHook(HOOK_PLAYER_LEFT_CLICK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerLeftClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_Status);
+			return a_Plugin->OnPlayerLeftClick(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_Status);
 		}
 	);
 }
@@ -794,11 +827,11 @@ bool cPluginManager::CallHookPlayerLeftClick(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition)
+bool cPluginManager::CallHookPlayerMoving(cPlayer & a_Player, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition, bool a_PreviousIsOnGround)
 {
 	return GenericCallHook(HOOK_PLAYER_MOVING, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerMoving(a_Player, a_OldPosition, a_NewPosition);
+			return a_Plugin->OnPlayerMoving(a_Player, a_OldPosition, a_NewPosition, a_PreviousIsOnGround);
 		}
 	);
 }
@@ -846,11 +879,24 @@ bool cPluginManager::CallHookPlayerPlacingBlock(cPlayer & a_Player, const sSetBl
 
 
 
-bool cPluginManager::CallHookPlayerRightClick(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginManager::CallHookPlayerCrouched(cPlayer & a_Player)
+{
+	return GenericCallHook(HOOK_PLAYER_CROUCHED, [&](cPlugin * a_Plugin)
+		{
+			return a_Plugin->OnPlayerCrouched(a_Player);
+		}
+	);
+}
+
+
+
+
+
+bool cPluginManager::CallHookPlayerRightClick(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos)
 {
 	return GenericCallHook(HOOK_PLAYER_RIGHT_CLICK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerRightClick(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			return a_Plugin->OnPlayerRightClick(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z);
 		}
 	);
 }
@@ -911,11 +957,11 @@ bool cPluginManager::CallHookPlayerTossingItem(cPlayer & a_Player)
 
 
 
-bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	return GenericCallHook(HOOK_PLAYER_USED_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsedBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerUsedBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z, a_BlockType, a_BlockMeta);
 		}
 	);
 }
@@ -924,11 +970,11 @@ bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos)
 {
 	return GenericCallHook(HOOK_PLAYER_USED_ITEM, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsedItem(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			return a_Plugin->OnPlayerUsedItem(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z);
 		}
 	);
 }
@@ -937,11 +983,11 @@ bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, int a_BlockX, in
 
 
 
-bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 {
 	return GenericCallHook(HOOK_PLAYER_USING_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsingBlock(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerUsingBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z, a_BlockType, a_BlockMeta);
 		}
 	);
 }
@@ -950,11 +996,11 @@ bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, int a_BlockX, 
 
 
 
-bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, char a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos)
 {
 	return GenericCallHook(HOOK_PLAYER_USING_ITEM, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsingItem(a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace, a_CursorX, a_CursorY, a_CursorZ);
+			return a_Plugin->OnPlayerUsingItem(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z);
 		}
 	);
 }
@@ -963,7 +1009,7 @@ bool cPluginManager::CallHookPlayerUsingItem(cPlayer & a_Player, int a_BlockX, i
 
 
 
-bool cPluginManager::CallHookPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const AString & a_Message)
+bool cPluginManager::CallHookPluginMessage(cClientHandle & a_Client, const AString & a_Channel, const ContiguousByteBufferView a_Message)
 {
 	return GenericCallHook(HOOK_PLUGIN_MESSAGE, [&](cPlugin * a_Plugin)
 		{
@@ -1025,11 +1071,11 @@ bool cPluginManager::CallHookPreCrafting(cPlayer & a_Player, cCraftingGrid & a_G
 
 
 
-bool cPluginManager::CallHookProjectileHitBlock(cProjectileEntity & a_Projectile, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_Face, const Vector3d & a_BlockHitPos)
+bool cPluginManager::CallHookProjectileHitBlock(cProjectileEntity & a_Projectile, Vector3i a_BlockPos, eBlockFace a_Face, const Vector3d & a_BlockHitPos)
 {
 	return GenericCallHook(HOOK_PROJECTILE_HIT_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnProjectileHitBlock(a_Projectile, a_BlockX, a_BlockY, a_BlockZ, a_Face, a_BlockHitPos);
+			return a_Plugin->OnProjectileHitBlock(a_Projectile, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Face, a_BlockHitPos);
 		}
 	);
 }
@@ -1129,11 +1175,11 @@ bool cPluginManager::CallHookTakeDamage(cEntity & a_Receiver, TakeDamageInfo & a
 
 
 
-bool cPluginManager::CallHookUpdatingSign(cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4, cPlayer * a_Player)
+bool cPluginManager::CallHookUpdatingSign(cWorld & a_World, Vector3i a_BlockPos, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4, cPlayer * a_Player)
 {
 	return GenericCallHook(HOOK_UPDATING_SIGN, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnUpdatingSign(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
+			return a_Plugin->OnUpdatingSign(a_World, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
 		}
 	);
 }
@@ -1142,11 +1188,11 @@ bool cPluginManager::CallHookUpdatingSign(cWorld & a_World, int a_BlockX, int a_
 
 
 
-bool cPluginManager::CallHookUpdatedSign(cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
+bool cPluginManager::CallHookUpdatedSign(cWorld & a_World, Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
 {
 	return GenericCallHook(HOOK_UPDATED_SIGN, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnUpdatedSign(a_World, a_BlockX, a_BlockY, a_BlockZ, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
+			return a_Plugin->OnUpdatedSign(a_World, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Line1, a_Line2, a_Line3, a_Line4, a_Player);
 		}
 	);
 }
@@ -1290,8 +1336,18 @@ void cPluginManager::UnloadPluginsNow()
 
 void cPluginManager::UnloadPlugin(const AString & a_PluginFolder)
 {
-	cCSLock Lock(m_CSPluginsToUnload);
-	m_PluginsToUnload.push_back(a_PluginFolder);
+	cCSLock Lock(m_CSPluginsNeedAction);
+	m_PluginsNeedAction.emplace_back(PluginAction::Unload, a_PluginFolder);
+}
+
+
+
+
+
+void cPluginManager::ReloadPlugin(const AString & a_PluginFolder)
+{
+	cCSLock Lock(m_CSPluginsNeedAction);
+	m_PluginsNeedAction.emplace_back(PluginAction::Reload, a_PluginFolder);
 }
 
 
@@ -1387,7 +1443,7 @@ bool cPluginManager::BindCommand(
 
 	auto & reg = m_Commands[a_Command];
 	reg.m_Plugin     = a_Plugin;
-	reg.m_Handler    = a_Handler;
+	reg.m_Handler    = std::move(a_Handler);
 	reg.m_Permission = a_Permission;
 	reg.m_HelpString = a_HelpString;
 	return true;
@@ -1494,7 +1550,7 @@ bool cPluginManager::BindConsoleCommand(
 
 	auto & reg = m_ConsoleCommands[a_Command];
 	reg.m_Plugin     = a_Plugin;
-	reg.m_Handler    = a_Handler;
+	reg.m_Handler    = std::move(a_Handler);
 	reg.m_Permission = "";
 	reg.m_HelpString = a_HelpString;
 	return true;
@@ -1720,19 +1776,37 @@ AStringVector cPluginManager::GetFoldersToLoad(cSettingsRepositoryInterface & a_
 		InsertDefaultPlugins(a_Settings);
 	}
 
-	// Get the list of plugins to load:
 	AStringVector res;
-	auto Values = a_Settings.GetValues("Plugins");
-	for (auto NameValue : Values)
+
+	// Get the old format plugin list, and migrate it.
+	// Upgrade path added on 2020-03-27
+	auto OldValues = a_Settings.GetValues("Plugins");
+	for (const auto & NameValue : OldValues)
 	{
 		AString ValueName = NameValue.first;
 		if (ValueName.compare("Plugin") == 0)
 		{
 			AString PluginFile = NameValue.second;
-			if (!PluginFile.empty())
+			if (
+				!PluginFile.empty() &&
+				(PluginFile != "0") &&
+				(PluginFile != "1")
+			)
 			{
-				res.push_back(PluginFile);
+				a_Settings.DeleteValue("Plugins", ValueName);
+				a_Settings.SetValue("Plugins", PluginFile, "1");
 			}
+		}
+	}  // for i - ini values
+
+	// Get the list of plugins to load:
+	auto Values = a_Settings.GetValues("Plugins");
+	for (const auto & NameValue : Values)
+	{
+		AString Enabled = NameValue.second;
+		if (Enabled == "1")
+		{
+			res.push_back(NameValue.first);
 		}
 	}  // for i - ini values
 

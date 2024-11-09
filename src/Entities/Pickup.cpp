@@ -7,10 +7,12 @@
 
 #include "Pickup.h"
 #include "Player.h"
+#include "../Mobs/Villager.h"
 #include "../ClientHandle.h"
 #include "../World.h"
 #include "../Server.h"
 #include "../Bindings/PluginManager.h"
+#include "../Registries/Items.h"
 #include "../Root.h"
 #include "../Chunk.h"
 
@@ -43,8 +45,8 @@ public:
 		cItem & Item = OtherPickup.GetItem();
 		if ((Distance < 1.2) && Item.IsEqual(m_Pickup->GetItem()) && OtherPickup.CanCombine())
 		{
-			short CombineCount = Item.m_ItemCount;
-			if ((CombineCount + m_Pickup->GetItem().m_ItemCount) > Item.GetMaxStackSize())
+			short CombineCount = static_cast<short>(Item.m_ItemCount);
+			if ((CombineCount + static_cast<short>(m_Pickup->GetItem().m_ItemCount)) > static_cast<short>(Item.GetMaxStackSize()))
 			{
 				CombineCount = Item.GetMaxStackSize() - m_Pickup->GetItem().m_ItemCount;
 			}
@@ -55,14 +57,11 @@ public:
 			}
 
 			m_Pickup->GetItem().AddCount(static_cast<char>(CombineCount));
-			Item.m_ItemCount -= CombineCount;
+			Item.m_ItemCount -= static_cast<char>(CombineCount);
 
 			if (Item.m_ItemCount <= 0)
 			{
-				/* Experimental: show animation pickups getting together */
-				auto Diff = (m_Pickup->GetPosition() * 32.0).Floor() - (EntityPos * 32.0).Floor();
-				a_Entity.GetWorld()->BroadcastEntityRelMove(a_Entity, Vector3<char>(Diff));
-				/* End of experimental animation */
+				a_Entity.GetWorld()->BroadcastCollectEntity(a_Entity, *m_Pickup, static_cast<unsigned>(CombineCount));
 				a_Entity.Destroy();
 
 				// Reset the timer
@@ -97,7 +96,7 @@ protected:
 // cPickup:
 
 cPickup::cPickup(Vector3d a_Pos, const cItem & a_Item, bool IsPlayerCreated, Vector3f a_Speed, int a_LifetimeTicks, bool a_CanCombine):
-	super(etPickup, a_Pos, 0.2, 0.2),
+	Super(etPickup, a_Pos, 0.25f, 0.25f),
 	m_Timer(0),
 	m_Item(a_Item),
 	m_bCollected(false),
@@ -118,7 +117,8 @@ cPickup::cPickup(Vector3d a_Pos, const cItem & a_Item, bool IsPlayerCreated, Vec
 
 void cPickup::SpawnOn(cClientHandle & a_Client)
 {
-	a_Client.SendPickupSpawn(*this);
+	a_Client.SendSpawnEntity(*this);
+	a_Client.SendEntityMetadata(*this);
 }
 
 
@@ -127,7 +127,7 @@ void cPickup::SpawnOn(cClientHandle & a_Client)
 
 void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -204,19 +204,25 @@ bool cPickup::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return true;
 	}
 
-	return super::DoTakeDamage(a_TDI);
+	return Super::DoTakeDamage(a_TDI);
 }
 
 
 
 
 
-bool cPickup::CollectedBy(cPlayer & a_Dest)
+bool cPickup::CollectedBy(cEntity & a_Dest)
 {
 	if (m_bCollected)
 	{
 		// LOG("Pickup %d cannot be collected by \"%s\", because it has already been collected.", m_UniqueID, a_Dest->GetName().c_str());
 		return false;  // It's already collected!
+	}
+
+	// This type of entity can't pickup items
+	if (!a_Dest.IsPawn())
+	{
+		return false;
 	}
 
 	// Two seconds if player created the pickup (vomiting), half a second if anything else
@@ -226,43 +232,82 @@ bool cPickup::CollectedBy(cPlayer & a_Dest)
 		return false;  // Not old enough
 	}
 
-	// If the player is a spectator, he cannot collect anything
-	if (a_Dest.IsGameModeSpectator())
+	// Checking for villagers
+	if (!a_Dest.IsPlayer() && a_Dest.IsMob())
 	{
-		return false;
-	}
 
-	if (cRoot::Get()->GetPluginManager()->CallHookCollectingPickup(a_Dest, *this))
-	{
-		// LOG("Pickup %d cannot be collected by \"%s\", because a plugin has said no.", m_UniqueID, a_Dest->GetName().c_str());
-		return false;
-	}
-
-	int NumAdded = a_Dest.GetInventory().AddItem(m_Item);
-	if (NumAdded > 0)
-	{
-		// Check achievements
-		switch (m_Item.m_ItemType)
+		auto & Mob = static_cast<cMonster &>(a_Dest);
+		if (Mob.GetMobType() == mtVillager)
 		{
-			case E_BLOCK_LOG:      a_Dest.AwardAchievement(achMineWood); break;
-			case E_ITEM_LEATHER:   a_Dest.AwardAchievement(achKillCow);  break;
-			case E_ITEM_DIAMOND:   a_Dest.AwardAchievement(achDiamonds); break;
-			case E_ITEM_BLAZE_ROD: a_Dest.AwardAchievement(achBlazeRod); break;
-			default: break;
+			// Villagers only pickup food
+			if (!ItemCategory::IsVillagerFood(m_Item.m_ItemType))
+			{
+				return false;
+			}
+
+			auto & Villager = static_cast<cVillager &>(Mob);
+			char NumAdded = Villager.GetInventory().AddItem(m_Item);
+			if (NumAdded > 0)
+			{
+				m_Item.m_ItemCount -= NumAdded;
+				m_World->BroadcastCollectEntity(*this, a_Dest, static_cast<unsigned>(NumAdded));
+
+				// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
+				m_World->BroadcastSoundEffect("entity.item.pickup", GetPosition(), 0.3f, (1.2f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+				if (m_Item.m_ItemCount <= 0)
+				{
+					// All of the pickup has been collected, schedule the pickup for destroying
+					m_bCollected = true;
+				}
+				m_Timer = std::chrono::milliseconds(0);
+				return true;
+			}
+			// Pickup cannot be collected because the entity has not enough space
+			return false;
+		}
+	}
+	else if (a_Dest.IsPlayer())
+	{
+		auto & Player = static_cast<cPlayer &>(a_Dest);
+
+		// If the player is a spectator, he cannot collect anything
+		if (Player.IsGameModeSpectator())
+		{
+			return false;
 		}
 
-		m_Item.m_ItemCount -= NumAdded;
-		m_World->BroadcastCollectEntity(*this, a_Dest, NumAdded);
-
-		// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
-		m_World->BroadcastSoundEffect("entity.item.pickup", GetPosition(), 0.5, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
-		if (m_Item.m_ItemCount <= 0)
+		if (cRoot::Get()->GetPluginManager()->CallHookCollectingPickup(Player, *this))
 		{
-			// All of the pickup has been collected, schedule the pickup for destroying
-			m_bCollected = true;
+			// LOG("Pickup %d cannot be collected by \"%s\", because a plugin has said no.", m_UniqueID, a_Dest->GetName().c_str());
+			return false;
 		}
-		m_Timer = std::chrono::milliseconds(0);
-		return true;
+
+		char NumAdded = Player.GetInventory().AddItem(m_Item);
+		if (NumAdded > 0)
+		{
+			// Check achievements
+			switch (m_Item.m_ItemType)
+			{
+				case E_BLOCK_LOG:      Player.AwardAchievement(CustomStatistic::AchMineWood); break;
+				case E_ITEM_LEATHER:   Player.AwardAchievement(CustomStatistic::AchKillCow);  break;
+				case E_ITEM_DIAMOND:   Player.AwardAchievement(CustomStatistic::AchDiamonds); break;
+				case E_ITEM_BLAZE_ROD: Player.AwardAchievement(CustomStatistic::AchBlazeRod); break;
+				default: break;
+			}
+
+			m_Item.m_ItemCount -= NumAdded;
+			m_World->BroadcastCollectEntity(*this, a_Dest, static_cast<unsigned>(NumAdded));
+
+			// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
+			m_World->BroadcastSoundEffect("entity.item.pickup", GetPosition(), 0.3f, (1.2f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+			if (m_Item.m_ItemCount <= 0)
+			{
+				// All of the pickup has been collected, schedule the pickup for destroying
+				m_bCollected = true;
+			}
+			m_Timer = std::chrono::milliseconds(0);
+			return true;
+		}
 	}
 
 	// LOG("Pickup %d cannot be collected by \"%s\", because there's no space in the inventory.", a_Dest->GetName().c_str(), m_UniqueID);

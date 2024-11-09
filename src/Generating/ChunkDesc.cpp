@@ -572,13 +572,13 @@ void cChunkDesc::RandomFillRelCuboid(
 
 cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 {
-	auto Idx = static_cast<size_t>(cChunkDef::MakeIndex(a_RelX, a_RelY, a_RelZ));
-	auto itr = m_BlockEntities.find(Idx);
+	const auto Idx = cChunkDef::MakeIndex(a_RelX, a_RelY, a_RelZ);
+	const auto itr = m_BlockEntities.find(Idx);
 
 	if (itr != m_BlockEntities.end())
 	{
 		// Already in the list:
-		cBlockEntity * BlockEntity = itr->second;
+		cBlockEntity * BlockEntity = itr->second.get();
 		if (BlockEntity->GetBlockType() == GetBlockType(a_RelX, a_RelY, a_RelZ))
 		{
 			// Correct type, already present. Return it:
@@ -595,14 +595,14 @@ cBlockEntity * cChunkDesc::GetBlockEntity(int a_RelX, int a_RelY, int a_RelZ)
 	int AbsZ = a_RelZ + m_Coords.m_ChunkZ * cChunkDef::Width;
 
 	// The block entity is not created yet, try to create it and add to list:
-	cBlockEntity * be = cBlockEntity::CreateByBlockType(GetBlockType(a_RelX, a_RelY, a_RelZ), GetBlockMeta(a_RelX, a_RelY, a_RelZ), {AbsX, a_RelY, AbsZ});
+	auto be = cBlockEntity::CreateByBlockType(GetBlockType(a_RelX, a_RelY, a_RelZ), GetBlockMeta(a_RelX, a_RelY, a_RelZ), {AbsX, a_RelY, AbsZ});
 	if (be == nullptr)
 	{
 		// No block entity for this block type
 		return nullptr;
 	}
-	m_BlockEntities.insert({ Idx, be });
-	return be;
+	auto res = m_BlockEntities.emplace(Idx, std::move(be));
+	return res.first->second.get();
 }
 
 
@@ -647,7 +647,7 @@ void cChunkDesc::CompressBlockMetas(cChunkDef::BlockNibbles & a_DestMetas)
 
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 
 void cChunkDesc::VerifyHeightmap(void)
 {
@@ -669,7 +669,7 @@ void cChunkDesc::VerifyHeightmap(void)
 	}  // for x
 }
 
-#endif  // _DEBUG
+#endif  // !NDEBUG
 
 
 

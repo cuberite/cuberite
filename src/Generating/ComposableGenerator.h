@@ -30,11 +30,6 @@ class cTerrainShapeGen;
 class cTerrainHeightGen;
 class cTerrainCompositionGen;
 class cFinishGen;
-typedef std::shared_ptr<cBiomeGen>              cBiomeGenPtr;
-typedef std::shared_ptr<cTerrainShapeGen>       cTerrainShapeGenPtr;
-typedef std::shared_ptr<cTerrainHeightGen>      cTerrainHeightGenPtr;
-typedef std::shared_ptr<cTerrainCompositionGen> cTerrainCompositionGenPtr;
-typedef std::shared_ptr<cFinishGen>             cFinishGenPtr;
 
 
 
@@ -60,7 +55,7 @@ public:
 	a_CacheOffByDefault gets set to whether the cache should be disabled by default.
 	Used in BiomeVisualiser, too.
 	Implemented in BioGen.cpp! */
-	static cBiomeGenPtr CreateBiomeGen(
+	static std::unique_ptr<cBiomeGen> CreateBiomeGen(
 		cIniFile & a_IniFile,
 		int a_Seed,
 		bool & a_CacheOffByDefault
@@ -96,9 +91,9 @@ public:
 	a_CacheOffByDefault gets set to whether the cache should be disabled by default
 	Implemented in ShapeGen.cpp!
 	*/
-	static cTerrainShapeGenPtr CreateShapeGen(
+	static std::unique_ptr<cTerrainShapeGen> CreateShapeGen(
 		cIniFile & a_IniFile,
-		cBiomeGenPtr a_BiomeGen,
+		cBiomeGen & a_BiomeGen,
 		int a_Seed,
 		bool & a_CacheOffByDefault
 	);
@@ -135,9 +130,9 @@ public:
 	}
 
 	/** Creates a cTerrainHeightGen descendant based on the INI file settings. */
-	static cTerrainHeightGenPtr CreateHeightGen(
+	static std::unique_ptr<cTerrainHeightGen> CreateHeightGen(
 		cIniFile & a_IniFile,
-		cBiomeGenPtr a_BiomeGen,
+		cBiomeGen & a_BiomeGen,
 		int a_Seed,
 		bool & a_CacheOffByDefault
 	);
@@ -167,10 +162,10 @@ public:
 	/** Creates the correct TerrainCompositionGen descendant based on the ini file settings and the seed provided.
 	a_BiomeGen is the underlying biome generator, some composition generators may depend on it providing additional biomes around the chunk
 	a_ShapeGen is the underlying shape generator, some composition generators may depend on it providing additional shape around the chunk. */
-	static cTerrainCompositionGenPtr CreateCompositionGen(
+	static std::unique_ptr<cTerrainCompositionGen> CreateCompositionGen(
 		cIniFile & a_IniFile,
-		cBiomeGenPtr a_BiomeGen,
-		cTerrainShapeGenPtr a_ShapeGen,
+		cBiomeGen & a_BiomeGen,
+		cTerrainShapeGen & a_ShapeGen,
 		int a_Seed
 	);
 } ;
@@ -194,18 +189,17 @@ public:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) = 0;
 } ;
 
-typedef std::list<cFinishGenPtr> cFinishGenList;
 
 
 
 
-
-class cComposableGenerator :
+class cComposableGenerator:
 	public cChunkGenerator
 {
-	typedef cChunkGenerator Super;
+	using Super = cChunkGenerator;
 
 public:
+
 	cComposableGenerator();
 
 	// cChunkGenerator::cGenerator overrides:
@@ -222,19 +216,19 @@ protected:
 
 	// The generator's composition:
 	/** The biome generator. */
-	cBiomeGenPtr m_BiomeGen;
+	std::unique_ptr<cBiomeGen> m_BiomeGen;
 
 	/** The terrain shape generator. */
-	cTerrainShapeGenPtr m_ShapeGen;
+	std::unique_ptr<cTerrainShapeGen> m_ShapeGen;
 
 	/** The terrain composition generator. */
-	cTerrainCompositionGenPtr m_CompositionGen;
+	std::unique_ptr<cTerrainCompositionGen> m_CompositionGen;
 
 	/** The cache for the heights of the composited terrain. */
-	cTerrainHeightGenPtr m_CompositedHeightCache;
+	std::unique_ptr<cTerrainHeightGen> m_CompositedHeightCache;
 
 	/** The finisher generators, in the order in which they are applied. */
-	cFinishGenList m_FinishGens;
+	std::vector<std::unique_ptr<cFinishGen>> m_FinishGens;
 
 
 	/** Reads the BiomeGen settings from the ini and initializes m_BiomeGen accordingly */
@@ -249,7 +243,3 @@ protected:
 	/** Reads the finishers from the ini and initializes m_FinishGens accordingly */
 	void InitFinishGens(cIniFile & a_IniFile);
 } ;
-
-
-
-

@@ -28,12 +28,9 @@ class cBlockEntityWithItems :
 {
 	// tolua_end
 
-	using super = cBlockEntity;
+	using Super = cBlockEntity;
 
 public:  // tolua_export
-
-	BLOCKENTITY_PROTODEF(cBlockEntityWithItems)
-
 
 	cBlockEntityWithItems(
 		BLOCKTYPE a_BlockType,                      // Type of the block that the entity represents
@@ -44,6 +41,7 @@ public:  // tolua_export
 	);
 
 	// cBlockEntity overrides:
+	virtual cItems ConvertToPickups() const override;
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 
 	// tolua_begin
@@ -63,12 +61,9 @@ public:  // tolua_export
 	const cItemGrid & GetContents(void) const { return m_Contents; }
 
 protected:
+
 	cItemGrid m_Contents;
 
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override;
 } ;  // tolua_export
-
-
-
-

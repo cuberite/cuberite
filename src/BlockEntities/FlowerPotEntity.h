@@ -16,17 +16,14 @@
 
 
 // tolua_begin
-
 class cFlowerPotEntity :
 	public cBlockEntity
 {
 	// tolua_end
 
-	using super = cBlockEntity;
+	using Super = cBlockEntity;
 
 public:  // tolua_export
-
-	BLOCKENTITY_PROTODEF(cFlowerPotEntity)
 
 	/** Creates a new flowerpot entity at the specified block coords. a_World may be nullptr */
 	cFlowerPotEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
@@ -46,7 +43,7 @@ public:  // tolua_export
 	// tolua_end
 
 	// cBlockEntity overrides:
-	virtual void Destroy(void) override;
+	virtual cItems ConvertToPickups() const override;
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
@@ -57,7 +54,3 @@ private:
 
 	cItem m_Item;
 } ;  // tolua_export
-
-
-
-

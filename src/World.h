@@ -1,10 +1,6 @@
 
 #pragma once
 
-#define MAX_PLAYERS 65535
-
-#include <functional>
-
 #include "Simulator/SimulatorManager.h"
 #include "ChunkMap.h"
 #include "WorldStorage/WorldStorage.h"
@@ -26,6 +22,8 @@
 
 
 
+
+
 class cFireSimulator;
 class cFluidSimulator;
 class cSandSimulator;
@@ -33,30 +31,14 @@ class cRedstoneSimulator;
 class cItem;
 class cPlayer;
 class cClientHandle;
-typedef std::shared_ptr<cClientHandle> cClientHandlePtr;
-typedef std::list<cClientHandlePtr> cClientHandlePtrs;
-typedef std::list<cClientHandle *> cClientHandles;
 class cEntity;
 class cChunkGenerator;  // The thread responsible for generating chunks
-class cBeaconEntity;
-class cBrewingstandEntity;
-class cChestEntity;
 class cCuboid;
-class cDispenserEntity;
-class cFlowerPotEntity;
-class cFurnaceEntity;
-class cNoteEntity;
-class cMobHeadEntity;
 class cCompositeChat;
-class cSetChunkData;
 class cDeadlockDetect;
 class cUUID;
 
-typedef std::list< cPlayer * > cPlayerList;
-typedef std::list< std::pair< std::unique_ptr<cPlayer>, cWorld * > > cAwaitingPlayerList;
-
-typedef std::unique_ptr<cSetChunkData> cSetChunkDataPtr;
-typedef std::vector<cSetChunkDataPtr> cSetChunkDataPtrs;
+struct SetChunkData;
 
 
 
@@ -73,18 +55,25 @@ public:
 	// tolua_end
 
 	/** A simple RAII locker for the chunkmap - locks the chunkmap in its constructor, unlocks it in the destructor */
-	class cLock :
+	class cLock:
 		public cCSLock
 	{
-		typedef cCSLock super;
+		using Super = cCSLock;
 	public:
-		cLock(cWorld & a_World);
+		cLock(const cWorld & a_World);
 	};
 
-	static const char * GetClassStatic(void)  // Needed for ManualBindings's ForEach templates
-	{
-		return "cWorld";
-	}
+	/** Construct the world and read settings from its ini file.
+	@param a_DeadlockDetect is used for tracking this world's age, detecting a possible deadlock.
+	@param a_WorldNames is a list of all world names, used to validate linked worlds
+	*/
+	cWorld(
+		const AString & a_WorldName, const AString & a_DataPath,
+		cDeadlockDetect & a_DeadlockDetect, const AStringVector & a_WorldNames,
+		eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = {}
+	);
+
+	virtual ~cWorld() override;
 
 	// tolua_begin
 
@@ -106,24 +95,14 @@ public:
 		BroadcastTimeUpdate();
 	}
 
-	virtual Int64 GetWorldAge (void) const override { return std::chrono::duration_cast<cTickTimeLong>(m_WorldAge).count(); }
-	virtual int GetTimeOfDay(void) const override { return std::chrono::duration_cast<cTickTime>(m_TimeOfDay).count(); }
-
 	void SetTicksUntilWeatherChange(int a_WeatherInterval)
 	{
 		m_WeatherInterval = a_WeatherInterval;
 	}
 
-	virtual void SetTimeOfDay(int a_TimeOfDay) override
-	{
-		m_TimeOfDay = cTickTime(a_TimeOfDay);
-		UpdateSkyDarkness();
-		BroadcastTimeUpdate();
-	}
-
 	/** Returns the default weather interval for the specific weather type.
 	Returns -1 for any unknown weather. */
-	int GetDefaultWeatherInterval(eWeather a_Weather);
+	int GetDefaultWeatherInterval(eWeather a_Weather) const;
 
 	/** Returns the current game mode. Partly OBSOLETE, you should use IsGameModeXXX() functions wherever applicable */
 	eGameMode GetGameMode(void) const { return m_GameMode; }
@@ -142,6 +121,9 @@ public:
 
 	bool IsPVPEnabled(void) const { return m_bEnabledPVP; }
 
+	/** Returns true if farmland trampling is enabled */
+	bool IsFarmlandTramplingEnabled(void) const { return m_bFarmlandTramplingEnabled; }
+
 	bool IsDeepSnowEnabled(void) const { return m_IsDeepSnowEnabled; }
 
 	bool ShouldLavaSpawnFire(void) const { return m_ShouldLavaSpawnFire; }
@@ -155,6 +137,13 @@ public:
 
 	// tolua_end
 
+	virtual cTickTime GetTimeOfDay(void) const override;
+	virtual cTickTimeLong GetWorldAge(void) const override;
+	cTickTimeLong GetWorldDate() const;
+	cTickTimeLong GetWorldTickAge() const;
+
+	virtual void SetTimeOfDay(cTickTime a_TimeOfDay) override;
+
 	/** Retrieves the world height at the specified coords; returns false if chunk not loaded / generated */
 	bool TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height);  // Exported in ManualBindings.cpp
 
@@ -165,6 +154,7 @@ public:
 	virtual void BroadcastBlockAction        (Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
 	virtual void BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, Int8 a_Stage, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastBlockEntity        (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr) override;  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
+	virtual void BroadcastBossBarUpdateHealth(const cEntity & a_Entity, UInt32 a_UniqueID, float a_FractionFilled) override;
 
 	// tolua_begin
 	virtual void BroadcastChat       (const AString & a_Message, const cClientHandle * a_Exclude = nullptr, eMessageType a_ChatPrefix = mtCustom) override;
@@ -177,7 +167,7 @@ public:
 	virtual void BroadcastChat       (const cCompositeChat & a_Message, const cClientHandle * a_Exclude = nullptr) override;
 	// tolua_end
 
-	virtual void BroadcastCollectEntity              (const cEntity & a_Pickup, const cPlayer & a_Player, int a_Count, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastDestroyEntity              (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void BroadcastEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration, const cClientHandle * a_Exclude = nullptr) override;
@@ -185,19 +175,19 @@ public:
 	virtual void BroadcastEntityHeadLook             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastEntityLook                 (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastEntityMetadata             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
-	virtual void BroadcastEntityRelMove              (const cEntity & a_Entity, Vector3<Int8> a_RelMove, const cClientHandle * a_Exclude = nullptr) override;
-	virtual void BroadcastEntityRelMoveLook          (const cEntity & a_Entity, Vector3<Int8> a_RelMove, const cClientHandle * a_Exclude = nullptr) override;
-	virtual void BroadcastEntityStatus               (const cEntity & a_Entity, Int8 a_Status, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastEntityPosition             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
+	void         BroadcastEntityProperties           (const cEntity & a_Entity);
 	virtual void BroadcastEntityVelocity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
-	virtual void BroadcastEntityAnimation            (const cEntity & a_Entity, Int8 a_Animation, const cClientHandle * a_Exclude = nullptr) override;  // tolua_export
+	virtual void BroadcastEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation, const cClientHandle * a_Exclude = nullptr) override;  // tolua_export
 	virtual void BroadcastLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
 	virtual void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
 	virtual void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
 	virtual void BroadcastPlayerListAddPlayer        (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer) override;  // tolua_export
 	virtual void BroadcastPlayerListRemovePlayer     (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) override;
-	virtual void BroadcastPlayerListUpdateGameMode   (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) override;
-	virtual void BroadcastPlayerListUpdatePing       (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastPlayerListUpdateGameMode   (const cPlayer & a_Player, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastPlayerListUpdatePing       () override;
 	virtual void BroadcastRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
 	virtual void BroadcastScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
@@ -205,11 +195,9 @@ public:
 	virtual void BroadcastSoundEffect                (const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
 	virtual void BroadcastSoundParticleEffect        (const EffectID a_EffectID, Vector3i a_SrcPos, int a_Data, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
 	virtual void BroadcastSpawnEntity                (cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
-	virtual void BroadcastTeleportEntity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastThunderbolt                (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastTimeUpdate                 (const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastUnleashEntity              (const cEntity & a_Entity) override;
-	virtual void BroadcastUseBed                     (const cEntity & a_Entity, Vector3i a_BlockPos) override;
 	virtual void BroadcastWeather                    (eWeather a_Weather, const cClientHandle * a_Exclude = nullptr) override;
 
 	virtual cBroadcastInterface & GetBroadcastManager(void) override
@@ -225,8 +213,8 @@ public:
 	void MarkChunkSaved (int a_ChunkX, int a_ChunkZ);
 
 	/** Puts the chunk data into a queue to be set into the chunkmap in the tick thread.
-	If the chunk data doesn't contain valid biomes, the biomes are calculated before adding the data into the queue. */
-	void QueueSetChunkData(cSetChunkDataPtr a_SetChunkData);
+	Modifies the a_SetChunkData - moves the entities contained in it into the queue. */
+	void QueueSetChunkData(SetChunkData && a_SetChunkData);
 
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,
@@ -237,9 +225,6 @@ public:
 	/** Calls the callback with the chunk's data, if available (with ChunkCS locked).
 	Returns true if the chunk was reported successfully, false if not (chunk not present or callback failed). */
 	bool GetChunkData(cChunkCoords a_Coords, cChunkDataCallback & a_Callback) const;
-
-	/** Gets the chunk's blocks, only the block types */
-	bool GetChunkBlockTypes(int a_ChunkX, int a_ChunkZ, BLOCKTYPE * a_BlockTypes);
 
 	/** Returns true iff the chunk is in the loader / generator queue. */
 	bool IsChunkQueued(int a_ChunkX, int a_ChunkZ) const;
@@ -252,23 +237,7 @@ public:
 	/** Queues a task to unload unused chunks onto the tick thread. The prefferred way of unloading. */
 	void QueueUnloadUnusedChunks(void);  // tolua_export
 
-	void CollectPickupsByPlayer(cPlayer & a_Player);
-
-	/** Adds the player to the world.
-	Uses a queue to store the player object until the Tick thread processes the addition event.
-	Also adds the player as an entity in the chunkmap, and the player's ClientHandle, if any, for ticking.
-	If a_OldWorld is provided, a corresponding ENTITY_CHANGED_WORLD event is triggerred after the addition. */
-	void AddPlayer(std::unique_ptr<cPlayer> a_Player, cWorld * a_OldWorld = nullptr);
-
-	/** Removes the player from the world.
-	Removes the player from the addition queue, too, if appropriate.
-	If the player has a ClientHandle, the ClientHandle is removed from all chunks in the world and will not be ticked by this world anymore.
-	@return An owning reference to the given player. */
-	std::unique_ptr<cPlayer> RemovePlayer(cPlayer & a_Player);
-
-#ifdef _DEBUG
-	bool IsPlayerReferencedInWorldOrChunk(cPlayer & a_Player);
-#endif
+	void CollectPickupsByEntity(cEntity & a_Entity);
 
 	/** Calls the callback for each player in the list; returns true if all players processed, false if the callback aborted by returning true */
 	virtual bool ForEachPlayer(cPlayerListCallback a_Callback) override;  // >> EXPORTED IN MANUALBINDINGS <<
@@ -289,12 +258,9 @@ public:
 	void SendPlayerList(cPlayer * a_DestPlayer);  // Sends playerlist to the player
 
 	/** Adds the entity into its appropriate chunk; takes ownership of the entity ptr.
-	The entity is added lazily - this function only puts it in a queue that is then processed by the Tick thread. */
-	void AddEntity(OwnedEntity a_Entity);
-
-	/** Returns true if an entity with the specified UniqueID exists in the world.
-	Note: Only loaded chunks are considered. */
-	bool HasEntity(UInt32 a_UniqueID);
+	The entity is added lazily - this function only puts it in a queue that is then processed by the Tick thread.
+	If a_OldWorld is provided, a corresponding ENTITY_CHANGED_WORLD event is triggerred after the addition. */
+	void AddEntity(OwnedEntity a_Entity, cWorld * a_OldWorld = nullptr);
 
 	/** Removes the entity from the world.
 	Returns an owning reference to the found entity. */
@@ -310,6 +276,9 @@ public:
 	Returns true if all entities processed, false if the callback aborted by returning true.
 	If any chunk in the box is missing, ignores the entities in that chunk silently. */
 	virtual bool ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a_Callback) override;  // Exported in ManualBindings.cpp
+
+	/** Returns the number of players currently in this world. */
+	size_t GetPlayerCount() const;
 
 	/** Calls the callback if the entity with the specified ID is found, with the entity object as the callback param.
 	Returns true if entity found and callback returned false. */
@@ -329,17 +298,11 @@ public:
 
 	/** Sends the chunk to the client specified, if the client doesn't have the chunk yet.
 	If chunk not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid + lighted). */
-	void SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client);
+	void SendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client);
 
 	/** Sends the chunk to the client specified, even if the client already has the chunk.
 	If the chunk's not valid, the request is postponed (ChunkSender will send that chunk when it becomes valid + lighted). */
-	void ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::eChunkPriority a_Priority, cClientHandle * a_Client);
-
-	/** Removes client from ChunkSender's queue of chunks to be sent */
-	void RemoveClientFromChunkSender(cClientHandle * a_Client);
-
-	/** Touches the chunk, causing it to be loaded or generated */
-	void TouchChunk(int a_ChunkX, int a_ChunkZ);
+	void ForceSendChunkTo(int a_ChunkX, int a_ChunkZ, cChunkSender::Priority a_Priority, cClientHandle * a_Client);
 
 	/** Queues the chunk for preparing - making sure that it's generated and lit.
 	The specified chunk is queued to be loaded or generated, and lit if needed.
@@ -351,10 +314,14 @@ public:
 	void ChunkLoadFailed(int a_ChunkX, int a_ChunkZ);
 
 	/** Sets the sign text, asking plugins for permission first. a_Player is the player who this change belongs to, may be nullptr. Returns true if sign text changed. */
-	bool SetSignLines(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = nullptr);  // Exported in ManualBindings.cpp
+	bool SetSignLines(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = nullptr);  // Exported in ManualBindings.cpp
 
 	/** Sets the command block command. Returns true if command changed. */
 	bool SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command);  // tolua_export
+	bool SetCommandBlockCommand(Vector3i a_BlockPos, const AString & a_Command)
+	{
+		return SetCommandBlockCommand(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_Command);
+	}
 
 	/** Is the trapdoor open? Returns false if there is no trapdoor at the specified coords. */
 	bool IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ);                                      // tolua_export
@@ -362,10 +329,10 @@ public:
 	/** Set the state of a trapdoor. Returns true if the trapdoor was updated, false if there was no trapdoor at those coords. */
 	bool SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open);                        // tolua_export
 
-	/** Regenerate the given chunk: */
+	/** Regenerate the given chunk. */
 	void RegenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 
-	/** Generates the given chunk */
+	/** Generates the given chunk. */
 	void GenerateChunk(int a_ChunkX, int a_ChunkZ);  // tolua_export
 
 	/** Queues a chunk for lighting; a_Callback is called after the chunk is lighted */
@@ -379,139 +346,55 @@ public:
 	/** Calls the callback for each loaded chunk. Returns true if all chunks have been processed successfully */
 	bool ForEachLoadedChunk(cFunctionRef<bool(int, int)> a_Callback);
 
-	// tolua_begin
-
 	/** Sets the block at the specified coords to the specified value.
 	Full processing, incl. updating neighbors, is performed. */
 	void SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Sets the block at the specified coords to the specified value.
-	Full processing, incl. updating neighbors, is performed. */
-	void SetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-	{
-		return SetBlock({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_BlockMeta);
-	}
 
 	/** Sets the block at the specified coords to the specified value.
 	The replacement doesn't trigger block updates, nor wake up simulators.
 	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block) */
 	void FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
-		m_ChunkMap->FastSetBlock(a_BlockPos, a_BlockType, a_BlockMeta);
-	}
-
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Sets the block at the specified coords to the specified value.
-	The replacement doesn't trigger block updates, nor wake up simulators.
-	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block) */
-	void FastSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-	{
-		return FastSetBlock({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_BlockMeta);
+		m_ChunkMap.FastSetBlock(a_BlockPos, a_BlockType, a_BlockMeta);
 	}
 
 	/** Returns the block type at the specified position.
 	Returns 0 if the chunk is not valid. */
-	BLOCKTYPE GetBlock(Vector3i a_BlockPos)
+	BLOCKTYPE GetBlock(Vector3i a_BlockPos) const
 	{
-		return m_ChunkMap->GetBlock(a_BlockPos);
-	}
-
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Returns the block type at the specified position.
-	Returns 0 if the chunk is not valid. */
-	BLOCKTYPE GetBlock(int a_BlockX, int a_BlockY, int a_BlockZ)
-	{
-		return m_ChunkMap->GetBlock({a_BlockX, a_BlockY, a_BlockZ});
+		return m_ChunkMap.GetBlock(a_BlockPos);
 	}
 
 	/** Returns the block meta at the specified position.
 	Returns 0 if the chunk is not valid. */
-	NIBBLETYPE GetBlockMeta(Vector3i a_BlockPos)
+	NIBBLETYPE GetBlockMeta(Vector3i a_BlockPos) const
 	{
-		return m_ChunkMap->GetBlockMeta(a_BlockPos);
-	}
-
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Returns the block meta at the specified position.
-	Returns 0 if the chunk is not valid. */
-	NIBBLETYPE GetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ)
-	{
-		return m_ChunkMap->GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
+		return m_ChunkMap.GetBlockMeta(a_BlockPos);
 	}
 
 	/** Sets the meta for the specified block, while keeping the blocktype.
-	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
-	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
 	Ignored if the chunk is invalid. */
-	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true);
-
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Sets the meta for the specified block, while keeping the blocktype.
-	If a_ShouldMarkDirty is true, the chunk is marked dirty by this change (false is used eg. by water turning still).
-	If a_ShouldInformClients is true, the change is broadcast to all clients of the chunk.
-	Ignored if the chunk is invalid. */
-	void SetBlockMeta(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_MetaData, bool a_ShouldMarkDirty = true, bool a_ShouldInformClients = true)
-	{
-		return SetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}, a_MetaData, a_ShouldMarkDirty, a_ShouldInformClients);
-	}
+	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData);
 
 	/** Returns the sky light value at the specified block position.
 	The sky light is "raw" - not affected by time-of-day.
 	Returns 0 if chunk not valid. */
-	NIBBLETYPE GetBlockSkyLight(Vector3i a_BlockPos);
-
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Returns the sky light value at the specified block position.
-	The sky light is "raw" - not affected by time-of-day.
-	Returns 0 if chunk not valid. */
-	NIBBLETYPE GetBlockSkyLight(int a_BlockX, int a_BlockY, int a_BlockZ)
-	{
-		return GetBlockSkyLight({a_BlockX, a_BlockY, a_BlockZ});
-	}
+	NIBBLETYPE GetBlockSkyLight(Vector3i a_BlockPos) const;
 
 	/** Returns the block-light value at the specified block position.
 	Returns 0 if chunk not valid. */
-	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos);
-
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Returns the block-light value at the specified block position.
-	Returns 0 if chunk not valid. */
-	NIBBLETYPE GetBlockBlockLight(int a_BlockX, int a_BlockY, int a_BlockZ)
-	{
-		return GetBlockBlockLight({a_BlockX, a_BlockY, a_BlockZ});
-	}
-
-	// tolua_end
+	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos) const;
 
 	/** Retrieves the block type and meta at the specified coords.
 	Stores the result into a_BlockType and a_BlockMeta.
 	Returns true if successful, false if chunk not present.
 	TODO: Export in ManualBindings_World.cpp. */
-	bool GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta);
-
-	/** OBSOLETE, use the Vector3i-based overload instead.
-	Retrieves the block type and meta at the specified coords.
-	Stores the result into a_BlockType and a_BlockMeta.
-	Returns true if successful, false if chunk not present.
-	Exported in ManualBindings_World.cpp. */
-	bool GetBlockTypeMeta(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
-	{
-		return GetBlockTypeMeta({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_BlockMeta);
-	}
+	bool GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 
 	/** Queries the whole block specification from the world.
 	Returns true if all block info was retrieved successfully, false if not (invalid chunk / bad position).
 	Exported in ManualBindings_World.cpp. */
-	bool GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight);
-
-	/** Queries the whole block specification from the world.
-	Returns true if all block info was retrieved successfully, false if not (invalid chunk / bad position).
-	Exported in ManualBindings_World.cpp. */
-	bool GetBlockInfo(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight)
-	{
-		return GetBlockInfo({a_BlockX, a_BlockY, a_BlockZ}, a_BlockType, a_Meta, a_SkyLight, a_BlockLight);
-	}
+	bool GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
 
 	// TODO: NIBBLETYPE GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);
 
@@ -563,14 +446,22 @@ public:
 
 	/** Spawns an falling block entity at the given position.
 	Returns the UniqueID of the spawned falling block, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnFallingBlock(Vector3i a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	UInt32 SpawnFallingBlock(Vector3d a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
 
-	/** OBSOLETE, use the Vector3i-based overload instead.
+	/** Spawns an falling block entity at the given position.
+	Returns the UniqueID of the spawned falling block, or cEntity::INVALID_ID on failure. */
+	UInt32 SpawnFallingBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	{
+		// When creating from a block position (Vector3i), move the spawn point to the middle of the block by adding (0.5, 0, 0.5)
+		return SpawnFallingBlock(Vector3d(0.5, 0, 0.5) + a_BlockPos, a_BlockType, a_BlockMeta);
+	}
+
+	/** OBSOLETE, use the Vector3-based overload instead.
 	Spawns an falling block entity at the given position.
 	Returns the UniqueID of the spawned falling block, or cEntity::INVALID_ID on failure. */
 	UInt32 SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
 	{
-		return SpawnFallingBlock({a_X, a_Y, a_Z}, a_BlockType, a_BlockMeta);
+		return SpawnFallingBlock(Vector3i{a_X, a_Y, a_Z}, a_BlockType, a_BlockMeta);
 	}
 
 	/** Spawns an minecart at the given coordinates.
@@ -625,46 +516,48 @@ public:
 	// tolua_begin
 
 	// DEPRECATED, use the vector-parametered version instead.
-	UInt32 SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1)
+	UInt32 SpawnPrimedTNT(double a_X, double a_Y, double a_Z, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1, bool a_ShouldPlayFuseSound = true)
 	{
 		LOGWARNING("cWorld::SpawnPrimedTNT(double, double, double) is deprecated, use cWorld::SpawnPrimedTNT(Vector3d) instead.");
-		return SpawnPrimedTNT({a_X, a_Y, a_Z}, a_FuseTimeInSec, a_InitialVelocityCoeff);
+		return SpawnPrimedTNT({a_X, a_Y, a_Z}, a_FuseTimeInSec, a_InitialVelocityCoeff, a_ShouldPlayFuseSound);
 	}
 
 	/** Spawns a new primed TNT entity at the specified block coords and specified fuse duration.
 	Initial velocity is given based on the relative coefficient provided.
 	Returns the UniqueID of the created entity, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1);
+	UInt32 SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTimeInSec = 80, double a_InitialVelocityCoeff = 1, bool a_ShouldPlayFuseSound = true);
+
+	/** Spawns a new ender crystal at the specified block coords.
+	Returns the UniqueID of the created entity, or cEntity::INVALID_ID on failure. */
+	UInt32 SpawnEnderCrystal(Vector3d a_Pos, bool a_ShowBottom);
 
 	// tolua_end
 
-	/** Performs the specified single-block set operations simultaneously, as if SetBlock() was called for each item.
-	Is more efficient than calling SetBlock() multiple times.
+	/** Replaces the specified block with another, and calls the OnPlaced block handler.
+	The OnBroken block handler is called for the replaced block. Wakes up the simulators.
 	If the chunk for any of the blocks is not loaded, the set operation is ignored silently. */
-	void SetBlocks(const sSetBlockVector & a_Blocks);
-
-	/** Replaces world blocks with a_Blocks, if they are of type a_FilterBlockType */
-	void ReplaceBlocks(const sSetBlockVector & a_Blocks, BLOCKTYPE a_FilterBlockType);
+	void PlaceBlock(const Vector3i a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta);
 
 	/** Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read. */
 	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
 
+	using cWorldInterface::SendBlockTo;
+
 	// tolua_begin
 
-	/** Replaces the specified block with air, and calls the apropriate block handlers (OnBreaking(), OnBroken()).
-	Wakes up the simulators.
-	Doesn't produce pickups, use DropBlockAsPickups() for that instead.
+	/** Replaces the specified block with air, and calls the OnBroken block handler.
+	Wakes up the simulators. Doesn't produce pickups, use DropBlockAsPickups() for that instead.
 	Returns true on success, false if the chunk is not loaded. */
-	bool DigBlock(Vector3i a_BlockPos);
+	bool DigBlock(Vector3i a_BlockPos, const cEntity * a_Digger = nullptr);
 
 	/** OBSOLETE, use the Vector3-based overload instead.
 	Replaces the specified block with air, and calls the apropriate block handlers (OnBreaking(), OnBroken()).
 	Wakes up the simulators.
 	Doesn't produce pickups, use DropBlockAsPickups() for that instead.
 	Returns true on success, false if the chunk is not loaded. */
-	bool DigBlock(int a_X, int a_Y, int a_Z)
+	bool DigBlock(int a_X, int a_Y, int a_Z, cEntity * a_Digger = nullptr)
 	{
-		return DigBlock({a_X, a_Y, a_Z});
+		return DigBlock({a_X, a_Y, a_Z}, a_Digger);
 	}
 
 	/** Digs the specified block, and spawns the appropriate pickups for it.
@@ -681,31 +574,23 @@ public:
 	Returns an empty cItems object if the chunk is not present. */
 	cItems PickupsFromBlock(Vector3i a_BlockPos, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr);
 
-	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, cPlayer & a_Player) override;
+	/** Sends the block at the specified coords to the player.
+	Used mainly when plugins disable block-placing or block-breaking, to restore the previous block. */
+	virtual void SendBlockTo(int a_X, int a_Y, int a_Z, const cPlayer & a_Player) override;
 
 	/** Set default spawn at the given coordinates.
 	Returns false if the new spawn couldn't be stored in the INI file. */
-	bool SetSpawn(double a_X, double a_Y, double a_Z);
+	bool SetSpawn(int a_X, int a_Y, int a_Z);
 
-	double GetSpawnX(void) const { return m_SpawnX; }
-	double GetSpawnY(void) const { return m_SpawnY; }
-	double GetSpawnZ(void) const { return m_SpawnZ; }
+	int GetSpawnX(void) const { return m_SpawnX; }
+	int GetSpawnY(void) const { return m_SpawnY; }
+	int GetSpawnZ(void) const { return m_SpawnZ; }
 
 	/** Wakes up the simulators for the specified block */
 	virtual void WakeUpSimulators(Vector3i a_Block) override;
 
 	/** Wakes up the simulators for the specified area of blocks */
 	void WakeUpSimulatorsInArea(const cCuboid & a_Area);
-
-	// DEPRECATED, use vector-parametered version instead
-	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
-	{
-		LOGWARNING("cWorld::WakeUpSimulators(int, int, int) is deprecated, use cWorld::WakeUpSimulators(Vector3i) instead.");
-		WakeUpSimulators({a_BlockX, a_BlockY, a_BlockZ});
-	}
-
-	// DEPRECATED, use vector-parametered version instead
-	void WakeUpSimulatorsInArea(int a_MinBlockX, int a_MaxBlockX, int a_MinBlockY, int a_MaxBlockY, int a_MinBlockZ, int a_MaxBlockZ);
 
 	// tolua_end
 
@@ -718,74 +603,20 @@ public:
 	/** Calls the callback for each block entity in the specified chunk; returns true if all block entities processed, false if the callback aborted by returning true */
 	bool ForEachBlockEntityInChunk(int a_ChunkX, int a_ChunkZ, cBlockEntityCallback a_Callback);  // Exported in ManualBindings.cpp
 
-	/** Calls the callback for each brewingstand in the specified chunk; returns true if all brewingstands processed, false if the callback aborted by returning true */
-	bool ForEachBrewingstandInChunk(int a_ChunkX, int a_ChunkZ, cBrewingstandCallback a_Callback);  // Exported in ManualBindings.cpp
-
-	/** Calls the callback for each chest in the specified chunk; returns true if all chests processed, false if the callback aborted by returning true */
-	bool ForEachChestInChunk(int a_ChunkX, int a_ChunkZ, cChestCallback a_Callback);  // Exported in ManualBindings.cpp
-
-	/** Calls the callback for each dispenser in the specified chunk; returns true if all dispensers processed, false if the callback aborted by returning true */
-	bool ForEachDispenserInChunk(int a_ChunkX, int a_ChunkZ, cDispenserCallback a_Callback);
-
-	/** Calls the callback for each dropper in the specified chunk; returns true if all droppers processed, false if the callback aborted by returning true */
-	bool ForEachDropperInChunk(int a_ChunkX, int a_ChunkZ, cDropperCallback a_Callback);
-
-	/** Calls the callback for each dropspenser in the specified chunk; returns true if all dropspensers processed, false if the callback aborted by returning true */
-	bool ForEachDropSpenserInChunk(int a_ChunkX, int a_ChunkZ, cDropSpenserCallback a_Callback);
-
-	/** Calls the callback for each furnace in the specified chunk; returns true if all furnaces processed, false if the callback aborted by returning true */
-	bool ForEachFurnaceInChunk(int a_ChunkX, int a_ChunkZ, cFurnaceCallback a_Callback);  // Exported in ManualBindings.cpp
-
 	/** Does an explosion with the specified strength at the specified coordinates.
 	Executes the HOOK_EXPLODING and HOOK_EXPLODED hooks as part of the processing.
-	a_SourceData exact type depends on the a_Source, see the declaration of the esXXX constants in BlockID.h for details.
+	a_SourceData exact type depends on the a_Source, see the declaration of the esXXX constants in Defines.h for details.
 	Exported to Lua manually in ManualBindings_World.cpp in order to support the variable a_SourceData param. */
 	virtual void DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_BlockY, double a_BlockZ, bool a_CanCauseFire, eExplosionSource a_Source, void * a_SourceData) override;
 
-	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, true if found */
-	virtual bool DoWithBlockEntityAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBlockEntityCallback a_Callback) override;  // Exported in ManualBindings.cpp
-
-	/** Calls the callback for the beacon at the specified coords; returns false if there's no beacon at those coords, true if found */
-	bool DoWithBeaconAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBeaconCallback a_Callback);  // Exported in ManualBindings.cpp
-
-	/** Calls the callback for the bed at the specified coords; returns false if there's no bed at those coords, true if found */
-	virtual bool DoWithBedAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBedCallback a_Callback) override;  // Exported in ManualBindings.cpp
-
-	/** Calls the callback for the brewingstand at the specified coords; returns false if there's no brewingstand at those coords, true if found */
-	bool DoWithBrewingstandAt(int a_BlockX, int a_BlockY, int a_BlockZ, cBrewingstandCallback a_Callback);  // Lua-acessible
-
-	/** Calls the callback for the chest at the specified coords; returns false if there's no chest at those coords, true if found */
-	bool DoWithChestAt(int a_BlockX, int a_BlockY, int a_BlockZ, cChestCallback a_Callback);  // Exported in ManualBindings.cpp
-
-	/** Calls the callback for the dispenser at the specified coords; returns false if there's no dispenser at those coords or callback returns true, returns true if found */
-	bool DoWithDispenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDispenserCallback a_Callback);  // Exported in ManualBindings.cpp
-
-	/** Calls the callback for the dropper at the specified coords; returns false if there's no dropper at those coords or callback returns true, returns true if found */
-	bool DoWithDropperAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropperCallback a_Callback);  // Exported in ManualBindings.cpp
-
-	/** Calls the callback for the dropspenser at the specified coords; returns false if there's no dropspenser at those coords or callback returns true, returns true if found */
-	bool DoWithDropSpenserAt(int a_BlockX, int a_BlockY, int a_BlockZ, cDropSpenserCallback a_Callback);  // Exported in ManualBindings.cpp
-
-	/** Calls the callback for the furnace at the specified coords; returns false if there's no furnace at those coords or callback returns true, returns true if found */
-	bool DoWithFurnaceAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFurnaceCallback a_Callback);  // Exported in ManualBindings.cpp
-
-	/** Calls the callback for the noteblock at the specified coords; returns false if there's no noteblock at those coords or callback returns true, returns true if found */
-	bool DoWithNoteBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cNoteBlockCallback a_Callback);  // Exported in ManualBindings.cpp
-
-	/** Calls the callback for the command block at the specified coords; returns false if there's no command block at those coords or callback returns true, returns true if found */
-	bool DoWithCommandBlockAt(int a_BlockX, int a_BlockY, int a_BlockZ, cCommandBlockCallback a_Callback);  // Exported in ManualBindings.cpp
-
-	/** Calls the callback for the mob head block at the specified coords; returns false if there's no mob head block at those coords or callback returns true, returns true if found */
-	bool DoWithMobHeadAt(int a_BlockX, int a_BlockY, int a_BlockZ, cMobHeadCallback a_Callback);  // Exported in ManualBindings.cpp
-
-	/** Calls the callback for the flower pot at the specified coords; returns false if there's no flower pot at those coords or callback returns true, returns true if found */
-	bool DoWithFlowerPotAt(int a_BlockX, int a_BlockY, int a_BlockZ, cFlowerPotCallback a_Callback);  // Exported in ManualBindings.cpp
+	/** Calls the callback for the block entity at the specified coords; returns false if there's no block entity at those coords, and whatever the callback returns if found. */
+	virtual bool DoWithBlockEntityAt(Vector3i a_Position, cBlockEntityCallback a_Callback) override;  // Exported in ManualBindings.cpp
 
 	/** Retrieves the test on the sign at the specified coords; returns false if there's no sign at those coords, true if found */
 	bool GetSignLines (int a_BlockX, int a_BlockY, int a_BlockZ, AString & a_Line1, AString & a_Line2, AString & a_Line3, AString & a_Line4);  // Exported in ManualBindings.cpp
 
 	/** a_Player is using block entity at [x, y, z], handle that: */
-	void UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) {m_ChunkMap->UseBlockEntity(a_Player, a_BlockX, a_BlockY, a_BlockZ); }  // tolua_export
+	void UseBlockEntity(cPlayer * a_Player, int a_BlockX, int a_BlockY, int a_BlockZ) { m_ChunkMap.UseBlockEntity(a_Player, a_BlockX, a_BlockY, a_BlockZ); }  // tolua_export
 
 	/** Calls the callback for the chunk specified, with ChunkMapCS locked.
 	Returns false if the chunk doesn't exist, otherwise returns the same value as the callback */
@@ -800,30 +631,25 @@ public:
 	Returns true if the tree is imprinted successfully, false otherwise. */
 	bool GrowTreeImage(const sSetBlockVector & a_Blocks);
 
-	// tolua_begin
-
 	/** Grows a tree at the specified coords.
 	If the specified block is a sapling, the tree is grown from that sapling.
 	Otherwise a tree is grown based on the biome.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTree(int a_BlockX, int a_BlockY, int a_BlockZ);
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space).
+	Exported in DeprecatedBindings due to the obsolete int-based overload. */
+	bool GrowTree(Vector3i a_BlockPos);
 
-	/** Grows a tree at the specified coords, based on the sapling meta provided.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTreeFromSapling(Vector3i a_BlockPos, NIBBLETYPE a_SaplingMeta)
-	{
-		// TODO: Change the implementation to use Vector3i, once cTree uses Vector3i-based functions
-		return GrowTreeFromSapling(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_SaplingMeta);
-	}
-
-	/** OBSOLETE, use the Vector3-based overload instead.
-	Grows a tree at the specified coords, based on the sapling meta provided.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTreeFromSapling(int a_BlockX, int a_BlockY, int a_BlockZ, NIBBLETYPE a_SaplingMeta);
+	/** Grows a tree from the sapling at the specified coords.
+	If the sapling is a part of a large-tree sapling (2x2), a large tree growth is attempted.
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space).
+	Exported in DeprecatedBindings due to the obsolete int-based overload and obsolete additional SaplingMeta param. */
+	bool GrowTreeFromSapling(Vector3i a_BlockPos);
 
 	/** Grows a tree at the specified coords, based on the biome in the place.
-	Returns true if the tree was grown, false if not (invalid chunk, insufficient space). */
-	bool GrowTreeByBiome(int a_BlockX, int a_BlockY, int a_BlockZ);
+	Returns true if the tree was grown, false if not (invalid chunk, insufficient space).
+	Exported in DeprecatedBindings due to the obsolete int-based overload. */
+	bool GrowTreeByBiome(Vector3i a_BlockPos);
+
+	// tolua_begin
 
 	/** Grows the plant at the specified position by at most a_NumStages.
 	The block's Grow handler is invoked.
@@ -841,17 +667,9 @@ public:
 	bool GrowRipePlant(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_IsByBonemeal = false)
 	{
 		UNUSED(a_IsByBonemeal);
-		return GrowRipePlant({a_BlockX, a_BlockY, a_BlockZ});
+		LOGWARNING("Warning: cWorld:GrowRipePlant function expects Vector3i-based coords rather than int-based coords. Emulating old-style call.");
+		return GrowRipePlant({ a_BlockX, a_BlockY, a_BlockZ });
 	}
-
-	/** Grows a cactus present at the block specified by the amount of blocks specified, up to the max height specified in the config; returns the amount of blocks the cactus grew inside this call */
-	int GrowCactus(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
-
-	/** Grows a melon or a pumpkin next to the block specified (assumed to be the stem); returns true if the pumpkin or melon sucessfully grew. */
-	bool GrowMelonPumpkin(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType);
-
-	/** Grows a sugarcane present at the block specified by the amount of blocks specified, up to the max height specified in the config; returns the amount of blocks the sugarcane grew inside this call */
-	int GrowSugarcane(int a_BlockX, int a_BlockY, int a_BlockZ, int a_NumBlocksToGrow);
 
 	/** Returns the biome at the specified coords. Reads the biome from the chunk, if loaded, otherwise uses the world generator to provide the biome value */
 	EMCSBiome GetBiomeAt(int a_BlockX, int a_BlockZ);
@@ -933,7 +751,7 @@ public:
 	void QueueTask(std::function<void(cWorld &)> a_Task);  // Exported in ManualBindings.cpp
 
 	/** Queues a lambda task onto the tick thread, with the specified delay. */
-	void ScheduleTask(int a_DelayTicks, std::function<void(cWorld &)> a_Task);
+	void ScheduleTask(cTickTime a_DelayTicks, std::function<void(cWorld &)> a_Task);
 
 	/** Returns the number of chunks loaded	 */
 	size_t GetNumChunks() const;  // tolua_export
@@ -945,7 +763,7 @@ public:
 	void GetChunkStats(int & a_NumValid, int & a_NumDirty, int & a_NumInLightingQueue);
 
 	// Various queues length queries (cannot be const, they lock their CS):
-	inline int GetGeneratorQueueLength     (void) { return m_Generator.GetQueueLength();   }    // tolua_export
+	inline size_t GetGeneratorQueueLength  (void) { return m_Generator.GetQueueLength();   }    // tolua_export
 	inline size_t GetLightingQueueLength   (void) { return m_Lighting.GetQueueLength();    }    // tolua_export
 	inline size_t GetStorageLoadQueueLength(void) { return m_Storage.GetLoadQueueLength(); }    // tolua_export
 	inline size_t GetStorageSaveQueueLength(void) { return m_Storage.GetSaveQueueLength(); }    // tolua_export
@@ -993,10 +811,7 @@ public:
 	bool IsWeatherSunny(void) const { return (m_Weather == wSunny); }
 
 	/** Returns true if it is sunny at the specified location. This takes into account biomes. */
-	bool IsWeatherSunnyAt(int a_BlockX, int a_BlockZ)
-	{
-		return (IsWeatherSunny() || IsBiomeNoDownfall(GetBiomeAt(a_BlockX, a_BlockZ)));
-	}
+	bool IsWeatherSunnyAt(int a_BlockX, int a_BlockZ) const;
 
 	/** Returns true if the current weather is rainy. */
 	bool IsWeatherRain(void) const { return (m_Weather == wRain); }
@@ -1021,29 +836,24 @@ public:
 
 	/** Returns true if it is raining or storming at the specified location.
 	This takes into account biomes. */
-	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) override
-	{
-		auto Biome = GetBiomeAt(a_BlockX, a_BlockZ);
-		return (IsWeatherWet() && !IsBiomeNoDownfall(Biome) && !IsBiomeCold(Biome));
-	}
+	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) override;
 
-	/** Returns true if the specified location has wet weather (rain or storm),
-	using the same logic as IsWeatherWetAt, except that any rain-blocking blocks
-	above the specified position will block the precipitation and this function
-	will return false. */
-	virtual bool IsWeatherWetAtXYZ(Vector3i a_Pos);
+	/** Returns true if it is raining or storming at the specified location,
+	and the rain reaches (the bottom of) the specified block position. */
+	virtual bool IsWeatherWetAtXYZ(Vector3i a_Position) override;
 
 	/** Returns the seed of the world. */
-	int GetSeed(void) { return m_Generator.GetSeed(); }
+	int GetSeed(void) const { return m_Generator.GetSeed(); }
 
 	// tolua_end
 
 	cChunkGeneratorThread & GetGenerator(void) { return m_Generator; }
 	cWorldStorage &   GetStorage  (void) { return m_Storage; }
-	cChunkMap *       GetChunkMap (void) { return m_ChunkMap.get(); }
+	cChunkMap *       GetChunkMap (void) { return &m_ChunkMap; }
 
-	/** Sets the blockticking to start at the specified block. Only one blocktick per chunk may be set, second call overwrites the first call */
-	void SetNextBlockTick(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
+	/** Causes the specified block to be ticked on the next Tick() call.
+	Only one block coord per chunk may be set, a second call overwrites the first call */
+	void SetNextBlockToTick(const Vector3i a_BlockPos);  // tolua_export
 
 	int GetMaxSugarcaneHeight(void) const { return m_MaxSugarcaneHeight; }  // tolua_export
 	int GetMaxCactusHeight   (void) const { return m_MaxCactusHeight; }     // tolua_export
@@ -1082,15 +892,17 @@ public:
 	as at least one requests is active the chunk will be ticked). */
 	void SetChunkAlwaysTicked(int a_ChunkX, int a_ChunkZ, bool a_AlwaysTicked = true);  // tolua_export
 
+	/** Returns true if slimes should spawn in the chunk. */
+	bool IsSlimeChunk(int a_ChunkX, int a_ChunkZ) const;  // tolua_export
 private:
 
-	friend class cRoot;
-
-	class cTickThread :
+	class cTickThread:
 		public cIsThread
 	{
-		typedef cIsThread super;
+		using Super = cIsThread;
+
 	public:
+
 		cTickThread(cWorld & a_World);
 
 	protected:
@@ -1099,6 +911,8 @@ private:
 		// cIsThread overrides:
 		virtual void Execute(void) override;
 	} ;
+
+
 
 	/** Implementation of the callbacks that the ChunkGenerator uses to store new chunks and interface to plugins */
 	class cChunkGeneratorCallbacks :
@@ -1150,9 +964,9 @@ private:
 	eDimension m_Dimension;
 
 	bool m_IsSpawnExplicitlySet;
-	double m_SpawnX;
-	double m_SpawnY;
-	double m_SpawnZ;
+	int m_SpawnX;
+	int m_SpawnY;
+	int m_SpawnZ;
 
 	// Variables defining the minimum and maximum size for a nether portal
 	int m_MinNetherPortalWidth;
@@ -1166,19 +980,29 @@ private:
 	bool   m_IsDaylightCycleEnabled;
 
 	/** The age of the world.
-	Monotonic, always increasing each game tick, persistent across server restart. */
+	Monotonic, always increasing each game tick, persistent across server restart.
+	We need sub-tick precision here, that's why we store the time in milliseconds and calculate ticks off of it. */
 	std::chrono::milliseconds m_WorldAge;
 
-	std::chrono::milliseconds  m_TimeOfDay;
-	cTickTimeLong  m_LastTimeUpdate;    // The tick in which the last time update has been sent.
-	cTickTimeLong  m_LastChunkCheck;        // The last WorldAge (in ticks) in which unloading and possibly saving was triggered
-	cTickTimeLong  m_LastSave;          // The last WorldAge (in ticks) in which save-all was triggerred
+	/** The fully controllable age of the world.
+	A value used to calculate the current day, and time of day. Settable by plugins and players, and persistent.
+	We need sub-tick precision here, that's why we store the time in milliseconds and calculate ticks off of it. */
+	std::chrono::milliseconds m_WorldDate;
+
+	/** The time since this world began, in ticks.
+	Monotonic, but does not persist across restarts.
+	Used for less important but heavy tasks that run periodically. These tasks don't need to follow wallclock time, and slowing their rate down if TPS drops is desirable. */
+	cTickTimeLong m_WorldTickAge;
+
+	std::chrono::milliseconds m_LastChunkCheck;  // The last WorldAge in which unloading and possibly saving was triggered.
+	std::chrono::milliseconds m_LastSave;  // The last WorldAge in which save-all was triggerred.
 	std::map<cMonster::eFamily, cTickTimeLong> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
 
 	NIBBLETYPE m_SkyDarkness;
 
 	eGameMode m_GameMode;
 	bool m_bEnabledPVP;
+	bool m_bFarmlandTramplingEnabled;
 	bool m_IsDeepSnowEnabled;
 	bool m_ShouldLavaSpawnFire;
 	bool m_VillagersShouldHarvestCrops;
@@ -1193,14 +1017,14 @@ private:
 	std::unique_ptr<cFireSimulator>      m_FireSimulator;
 	cRedstoneSimulator * m_RedstoneSimulator;
 
-	cCriticalSection m_CSPlayers;
-	cPlayerList      m_Players;
+	// Protect with chunk map CS
+	std::vector<cPlayer *> m_Players;
 
-	cWorldStorage    m_Storage;
+	cWorldStorage m_Storage;
 
 	unsigned int m_MaxPlayers;
 
-	std::unique_ptr<cChunkMap> m_ChunkMap;
+	cChunkMap m_ChunkMap;
 
 	bool m_bAnimals;
 	std::set<eMonsterType> m_AllowedMobs;
@@ -1213,6 +1037,7 @@ private:
 
 	int  m_MaxCactusHeight;
 	int  m_MaxSugarcaneHeight;
+	/* TODO: Enable when functionality exists again
 	bool m_IsBeetrootsBonemealable;
 	bool m_IsCactusBonemealable;
 	bool m_IsCarrotsBonemealable;
@@ -1227,6 +1052,7 @@ private:
 	bool m_IsSugarcaneBonemealable;
 	bool m_IsBigFlowerBonemealable;
 	bool m_IsTallGrassBonemealable;
+	*/
 
 	/** Whether command blocks are enabled or not */
 	bool m_bCommandBlocksEnabled;
@@ -1267,50 +1093,24 @@ private:
 	cCriticalSection m_CSTasks;
 
 	/** Tasks that have been queued onto the tick thread, possibly to be executed at target tick in the future; guarded by m_CSTasks */
-	std::vector<std::pair<Int64, std::function<void(cWorld &)>>> m_Tasks;
-
-	/** Guards m_Clients */
-	cCriticalSection  m_CSClients;
-
-	/** List of clients in this world, these will be ticked by this world */
-	cClientHandlePtrs m_Clients;
-
-	/** Clients that are scheduled for removal (ticked in another world), waiting for TickClients() to remove them */
-	cClientHandles m_ClientsToRemove;
-
-	/** Clients that are scheduled for adding, waiting for TickClients to add them */
-	cClientHandlePtrs m_ClientsToAdd;
+	std::vector<std::pair<std::chrono::milliseconds, std::function<void(cWorld &)>>> m_Tasks;
 
 	/** Guards m_EntitiesToAdd */
 	cCriticalSection m_CSEntitiesToAdd;
 
 	/** List of entities that are scheduled for adding, waiting for the Tick thread to add them. */
-	cEntityList m_EntitiesToAdd;
-
-	/** Guards m_PlayersToAdd */
-	cCriticalSection m_CSPlayersToAdd;
-
-	/** List of players that are scheduled for adding, waiting for the Tick thread to add them. */
-	cAwaitingPlayerList m_PlayersToAdd;
+	std::vector<std::pair<OwnedEntity, cWorld *>> m_EntitiesToAdd;
 
 	/** CS protecting m_SetChunkDataQueue. */
 	cCriticalSection m_CSSetChunkDataQueue;
 
 	/** Queue for the chunk data to be set into m_ChunkMap by the tick thread. Protected by m_CSSetChunkDataQueue */
-	cSetChunkDataPtrs m_SetChunkDataQueue;
-
-	/** Construct the world and read settings from its ini file.
-	@param a_DeadlockDetect is used for tracking this world's age, detecting a possible deadlock.
-	@param a_WorldNames is a list of all world names, used to validate linked worlds
-	*/
-	cWorld(
-		const AString & a_WorldName, const AString & a_DataPath,
-		cDeadlockDetect & a_DeadlockDetect, const AStringVector & a_WorldNames,
-		eDimension a_Dimension = dimOverworld, const AString & a_LinkedOverworldName = {}
-	);
-	virtual ~cWorld() override;
+	std::vector<SetChunkData> m_SetChunkDataQueue;
 
 	void Tick(std::chrono::milliseconds a_Dt, std::chrono::milliseconds a_LastTickDurationMSec);
+
+	/** Ticks all clients that are in this world. */
+	void TickClients(std::chrono::milliseconds a_Dt);
 
 	/** Handles the weather in each tick */
 	void TickWeather(float a_Dt);
@@ -1318,11 +1118,15 @@ private:
 	/** Handles the mob spawning / moving / destroying each tick */
 	void TickMobs(std::chrono::milliseconds a_Dt);
 
+	/** Sets the chunk data queued in the m_SetChunkDataQueue queue into their chunk. */
+	void TickQueuedChunkDataSets();
+
+	/** Adds the entities queued in the m_EntitiesToAdd queue into their chunk.
+	If the entity was a player, he is also added to the m_Players list. */
+	void TickQueuedEntityAdditions(void);
+
 	/** Executes all tasks queued onto the tick thread */
 	void TickQueuedTasks(void);
-
-	/** Ticks all clients that are in this world */
-	void TickClients(float a_Dt);
 
 	/** Unloads all chunks immediately. */
 	void UnloadUnusedChunks(void);
@@ -1334,10 +1138,14 @@ private:
 
 	/** Can the specified coordinates be used as a spawn point?
 	Returns true if spawn position is valid and sets a_Y to the valid spawn height */
-	bool CanSpawnAt(double a_X, double & a_Y, double a_Z);
+	bool CanSpawnAt(int a_X, int & a_Y, int a_Z);
 
 	/** Check if player starting point is acceptable */
-	bool CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ);
+	bool CheckPlayerSpawnPoint(int a_PosX, int a_PosY, int a_PosZ)
+	{
+		return CheckPlayerSpawnPoint({a_PosX, a_PosY, a_PosZ});
+	}
+	bool CheckPlayerSpawnPoint(Vector3i a_Pos);
 
 	/** Chooses a reasonable transition from the current weather to a new weather */
 	eWeather ChooseNewWeather(void);
@@ -1348,19 +1156,11 @@ private:
 	/** Creates a new redstone simulator. */
 	cRedstoneSimulator * InitializeRedstoneSimulator(cIniFile & a_IniFile);
 
-	/** Adds the players queued in the m_PlayersToAdd queue into the m_Players list.
-	Assumes it is called from the Tick thread. */
-	void AddQueuedPlayers(void);
-
 	/** Sets mob spawning values if nonexistant to their dimension specific defaults */
 	void InitializeAndLoadMobSpawningValues(cIniFile & a_IniFile);
 
-	/** Sets the specified chunk data into the chunkmap. Called in the tick thread.
-	Modifies the a_SetChunkData - moves the entities contained in it into the chunk. */
-	void SetChunkData(cSetChunkData & a_SetChunkData);
-
 	/** Checks if the sapling at the specified block coord is a part of a large-tree sapling (2x2).
-	If so, adjusts the X and Z coords so that they point to the northwest (XM ZM) corner of the sapling area and returns true.
+	If so, adjusts the coords so that they point to the northwest (XM ZM) corner of the sapling area and returns true.
 	Returns false if not a part of large-tree sapling. */
-	bool GetLargeTreeAdjustment(int & a_BlockX, int & a_BlockY, int & a_BlockZ, NIBBLETYPE a_SaplingMeta);
+	bool GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_SaplingMeta);
 };  // tolua_export

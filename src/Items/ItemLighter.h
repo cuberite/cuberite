@@ -9,72 +9,68 @@
 
 
 
-class cItemLighterHandler :
+class cItemLighterHandler final:
 	public cItemHandler
 {
+	using Super = cItemHandler;
+
 public:
-	cItemLighterHandler(int a_ItemType) :
-		cItemHandler(a_ItemType)
-	{
-	}
+
+	using Super::Super;
+
+
 
 
 
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
-	) override
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace
+	) const override
 	{
-		if (a_BlockFace < 0)
+		if (a_ClickedBlockFace < 0)
 		{
 			return false;
 		}
 
 		if (!a_Player->IsGameModeCreative())
 		{
-			switch (m_ItemType)
+			if (m_ItemType == E_ITEM_FLINT_AND_STEEL)
 			{
-				case E_ITEM_FLINT_AND_STEEL:
-				{
-					a_Player->UseEquippedItem();
-					break;
-				}
-				case E_ITEM_FIRE_CHARGE:
-				{
-					a_Player->GetInventory().RemoveOneEquippedItem();
-					break;
-				}
-				default:
-				{
-					ASSERT(!"Unknown Lighter Item!");
-				}
+				a_Player->UseEquippedItem();
+			}
+			else  // Fire charge.
+			{
+				a_Player->GetInventory().RemoveOneEquippedItem();
 			}
 		}
 
-		switch (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ))
+		// Activate TNT if we clicked on it while not crouched:
+		if ((a_World->GetBlock(a_ClickedBlockPos) == E_BLOCK_TNT) && !a_Player->IsCrouched())
 		{
-			case E_BLOCK_TNT:
+			a_World->DigBlock(a_ClickedBlockPos, a_Player);
+			a_World->SpawnPrimedTNT(Vector3d(a_ClickedBlockPos) + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom
+			return false;
+		}
+
+		const auto FirePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
+		if (!cChunkDef::IsValidHeight(FirePos))
+		{
+			return false;
+		}
+
+		// Light a fire next to / on top of the block if air:
+		if (a_World->GetBlock(FirePos) == E_BLOCK_AIR)
+		{
+			a_World->PlaceBlock(FirePos, E_BLOCK_FIRE, 0);
+
+			// The client plays flint and steel sounds, only need to handle fire charges:
+			if (m_ItemType == E_ITEM_FIRE_CHARGE)
 			{
-				// Activate the TNT:
-				a_World->BroadcastSoundEffect("entity.tnt.primed", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 1.0f, 1.0f);
-				a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_AIR, 0);
-				a_World->SpawnPrimedTNT({a_BlockX + 0.5, a_BlockY + 0.5, a_BlockZ + 0.5});  // 80 ticks to boom
-				break;
-			}
-			default:
-			{
-				// Light a fire next to / on top of the block if air:
-				AddFaceDirection(a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-				if ((a_BlockY < 0) || (a_BlockY >= cChunkDef::Height))
-				{
-					break;
-				}
-				if (a_World->GetBlock(a_BlockX, a_BlockY, a_BlockZ) == E_BLOCK_AIR)
-				{
-					a_World->SetBlock(a_BlockX, a_BlockY, a_BlockZ, E_BLOCK_FIRE, 0);
-					a_World->BroadcastSoundEffect("item.flintandsteel.use", Vector3d(a_BlockX, a_BlockY, a_BlockZ), 1.0F, 1.04F);
-					break;
-				}
+				a_World->BroadcastSoundEffect("item.firecharge.use", FirePos, 1.0f, 1.04f);
 			}
 		}
 

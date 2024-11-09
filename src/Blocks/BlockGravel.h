@@ -7,37 +7,37 @@
 
 
 
-class cBlockGravelHandler :
+class cBlockGravelHandler final :
 	public cBlockHandler
 {
 public:
-	cBlockGravelHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
+
+	using cBlockHandler::cBlockHandler;
+
+private:
+
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
+		if (ToolHasSilkTouch(a_Tool))
+		{
+			return cItem(E_BLOCK_GRAVEL);
+		}
+
+		// Denominator of probability from wiki, don't let it go below 1.
+		const auto Denominator = std::max(10 - 3 * ToolFortuneLevel(a_Tool), 1);
+		if (GetRandomProvider().RandBool(1.0 / Denominator))
+		{
+			return cItem(E_ITEM_FLINT);
+		}
+
+		return cItem(E_BLOCK_GRAVEL);
 	}
 
 
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
-	{
-		// TODO: Handle the Fortune and Silk touch enchantments here
-		if (GetRandomProvider().RandBool(0.10))
-		{
-			return cItem(E_ITEM_FLINT, 1, 0);
-		}
-		else
-		{
-			return cItem(E_BLOCK_GRAVEL, 1, 0);
-		}
-	}
-
-
-
-
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 11;

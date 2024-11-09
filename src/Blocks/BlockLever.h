@@ -2,35 +2,45 @@
 
 #include "BlockHandler.h"
 #include "../Chunk.h"
-#include "Mixins.h"
+#include "Blocks/BlockStairs.h"
+#include "ChunkDef.h"
+#include "Defines.h"
+#include "Mixins/Mixins.h"
 #include "BlockSlab.h"
 
 
-class cBlockLeverHandler :
+class cBlockLeverHandler final :
 	public cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false>
 {
-	using super = cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false>;
+	using Super = cMetaRotator<cBlockHandler, 0x07, 0x04, 0x01, 0x03, 0x02, false>;
 
 public:
 
-	cBlockLeverHandler(BLOCKTYPE a_BlockType) :
-		super(a_BlockType)
+	using Super::Super;
+
+	/** Extracts the ON bit from metadata and returns if true if it is set */
+	static bool IsLeverOn(NIBBLETYPE a_BlockMeta)
 	{
+		return ((a_BlockMeta & 0x8) == 0x8);
 	}
 
+private:
 
-
-
-
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) const override
 	{
-		Vector3i Coords(a_BlockX, a_BlockY, a_BlockZ);
 		// Flip the ON bit on / off using the XOR bitwise operation
-		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(Coords) ^ 0x08);
+		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockPos) ^ 0x08);
 
-		a_ChunkInterface.SetBlockMeta(Coords.x, Coords.y, Coords.z, Meta);
-		a_WorldInterface.WakeUpSimulators(Coords);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.lever.click", Vector3d(Coords), 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
+		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
+		a_WorldInterface.WakeUpSimulators(a_BlockPos);
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.lever.click", a_BlockPos, 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
 		return true;
 	}
 
@@ -38,7 +48,7 @@ public:
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Reset meta to zero:
 		return cItem(E_BLOCK_LEVER, 1, 0);
@@ -48,7 +58,7 @@ public:
 
 
 
-	virtual bool IsUseable(void) override
+	virtual bool IsUseable(void) const override
 	{
 		return true;
 	}
@@ -57,42 +67,7 @@ public:
 
 
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = LeverDirectionToMetaData(a_BlockFace);
-		return true;
-	}
-
-
-
-
-
-	inline static NIBBLETYPE LeverDirectionToMetaData(eBlockFace a_Dir)
-	{
-		// Determine lever direction:
-		switch (a_Dir)
-		{
-			case BLOCK_FACE_YP:   return 0x6;
-			case BLOCK_FACE_XP:   return 0x1;
-			case BLOCK_FACE_XM:   return 0x2;
-			case BLOCK_FACE_ZP:   return 0x3;
-			case BLOCK_FACE_ZM:   return 0x4;
-			case BLOCK_FACE_YM:   return 0x0;
-			case BLOCK_FACE_NONE: return 0x6;
-		}
-		UNREACHABLE("Unsupported block face");
-	}
-
-
-
-
-
+	/** Converts the leve block's meta to the block face of the neighbor to which the lever is attached. */
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
 		switch (a_Meta & 0x7)
@@ -117,36 +92,56 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		NIBBLETYPE Meta = a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ);
-
-		eBlockFace Face = BlockMetaDataToBlockFace(Meta);
-
-		AddFaceDirection(a_RelX, a_RelY, a_RelZ, Face, true);
-
-		if ((a_RelY < 0) || (a_RelY >= cChunkDef::Height -1))
+		// Find the type of block the lever is attached to:
+		auto NeighborFace = BlockMetaDataToBlockFace(a_Meta);
+		auto NeighborPos = AddFaceDirection(a_Position, NeighborFace, true);
+		if (!cChunkDef::IsValidHeight(NeighborPos))
+		{
+			return false;
+		}
+		BLOCKTYPE NeighborBlockType;
+		NIBBLETYPE NeighborMeta;
+		if (!a_Chunk.UnboundedRelGetBlock(NeighborPos, NeighborBlockType, NeighborMeta))
 		{
 			return false;
 		}
 
-		BLOCKTYPE BlockIsOn;
-		a_Chunk.UnboundedRelGetBlock(a_RelX, a_RelY, a_RelZ, BlockIsOn, Meta);
-
-
-		if (cBlockInfo::FullyOccupiesVoxel(BlockIsOn))
+		// Allow any full block or the "good" side of a half-slab:
+		if (cBlockInfo::FullyOccupiesVoxel(NeighborBlockType))
 		{
 			return true;
 		}
-		else if (cBlockSlabHandler::IsAnySlabType(BlockIsOn))
+		else if (cBlockSlabHandler::IsAnySlabType(NeighborBlockType))
 		{
-			// Check if the slab is turned up side down
-			if (((Meta & 0x08) == 0x08) && (Face == BLOCK_FACE_TOP))
+			return (
+				(((NeighborMeta & 0x08) == 0x08) && (NeighborFace == BLOCK_FACE_TOP)) ||
+				(((NeighborMeta & 0x08) == 0)    && (NeighborFace == BLOCK_FACE_BOTTOM))
+			);
+		}
+		else if (cBlockStairsHandler::IsAnyStairType(NeighborBlockType))
+		{
+			switch (NeighborFace)
 			{
-				return true;
+				case eBlockFace::BLOCK_FACE_YM:
+					return !(NeighborMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
+				case eBlockFace::BLOCK_FACE_YP:
+					return (NeighborMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
+				case eBlockFace::BLOCK_FACE_XP:
+					return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_XP);
+				case eBlockFace::BLOCK_FACE_XM:
+					return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_XM);
+				case eBlockFace::BLOCK_FACE_ZP:
+					return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_ZP);
+				case eBlockFace::BLOCK_FACE_ZM:
+					return ((NeighborMeta & 0b11) == E_BLOCK_STAIRS_ZM);
+				default:
+				{
+					return false;
+				}
 			}
 		}
-
 		return false;
 	}
 
@@ -154,7 +149,7 @@ public:
 
 
 
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override
 	{
 		switch (a_Meta)
 		{
@@ -164,7 +159,7 @@ public:
 			case 0x05: return 0x06;  // Ground rotation
 			case 0x06: return 0x05;
 
-			default:  return super::MetaRotateCCW(a_Meta);  // Wall Rotation
+			default:  return Super::MetaRotateCCW(a_Meta);  // Wall Rotation
 		}
 	}
 
@@ -172,7 +167,7 @@ public:
 
 
 
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) const override
 	{
 		switch (a_Meta)
 		{
@@ -182,7 +177,7 @@ public:
 			case 0x05: return 0x06;  // Ground rotation
 			case 0x06: return 0x05;
 
-			default:  return super::MetaRotateCW(a_Meta);  // Wall Rotation
+			default:  return Super::MetaRotateCW(a_Meta);  // Wall Rotation
 		}
 	}
 
@@ -190,20 +185,10 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 0;
-	}
-
-
-
-
-
-	/** Extracts the ON bit from metadata and returns if true if it is set */
-	static bool IsLeverOn(NIBBLETYPE a_BlockMeta)
-	{
-		return ((a_BlockMeta & 0x8) == 0x8);
 	}
 } ;
 

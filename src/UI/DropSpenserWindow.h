@@ -19,7 +19,7 @@
 class cDropSpenserWindow :
 	public cWindow
 {
-	using super = cWindow;
+	using Super = cWindow;
 
 public:
 	cDropSpenserWindow(cDropSpenserEntity * a_DropSpenser);

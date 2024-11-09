@@ -1,6 +1,7 @@
 #include "Globals.h"
 
 #include "FallingBlock.h"
+#include "../BlockInfo.h"
 #include "../World.h"
 #include "../ClientHandle.h"
 #include "../Simulator/SandSimulator.h"
@@ -10,11 +11,10 @@
 
 
 
-cFallingBlock::cFallingBlock(Vector3i a_BlockPosition, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
-	super(etFallingBlock, Vector3d(0.5, 0, 0.5) + a_BlockPosition, 0.98, 0.98),
+cFallingBlock::cFallingBlock(Vector3d a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta):
+	Super(etFallingBlock, a_Position, 0.98f, 0.98f),
 	m_BlockType(a_BlockType),
-	m_BlockMeta(a_BlockMeta),
-	m_OriginalPosition(a_BlockPosition)
+	m_BlockMeta(a_BlockMeta)
 {
 	SetGravity(-16.0f);
 	SetAirDrag(0.02f);
@@ -26,7 +26,7 @@ cFallingBlock::cFallingBlock(Vector3i a_BlockPosition, BLOCKTYPE a_BlockType, NI
 
 void cFallingBlock::SpawnOn(cClientHandle & a_ClientHandle)
 {
-	a_ClientHandle.SendSpawnFallingBlock(*this);
+	a_ClientHandle.SendSpawnEntity(*this);
 }
 
 

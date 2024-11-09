@@ -26,7 +26,7 @@ class cSplashPotionEntity :
 {
 	// tolua_end
 
-	using super = cProjectileEntity;
+	using Super = cProjectileEntity;
 
 public:  // tolua_export
 
@@ -52,45 +52,18 @@ public:  // tolua_export
 	cEntityEffect        GetEntityEffect(void)     const { return m_EntityEffect; }
 	void SetEntityEffect(cEntityEffect a_EntityEffect) { m_EntityEffect = a_EntityEffect; }
 
-protected:
+private:
 
 	cEntityEffect::eType m_EntityEffectType;
 	cEntityEffect m_EntityEffect;
 	int m_PotionColor;
 	cItem m_Item;
 
-
-	// cProjectileEntity overrides:
-	virtual void OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace) override;
-	virtual void OnHitEntity    (cEntity & a_EntityHit, Vector3d a_HitPos) override;
-	virtual void Tick           (std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override
-	{
-		if (m_DestroyTimer > 0)
-		{
-			m_DestroyTimer--;
-			if (m_DestroyTimer == 0)
-			{
-				Destroy();
-				return;
-			}
-		}
-		else
-		{
-			super::Tick(a_Dt, a_Chunk);
-		}
-	}
-
 	/** Splashes the potion, fires its particle effects and sounds
 	@param a_HitPos     The position where the potion will splash */
 	void Splash(Vector3d a_HitPos);
 
-	virtual void SpawnOn(cClientHandle & a_Client) override;
-
-private:
-	/** Time in ticks to wait for the hit animation to begin before destroying */
-	int m_DestroyTimer;
+	// cProjectileEntity overrides:
+	virtual void OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos) override;
+	virtual void OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace) override;
 } ;  // tolua_export
-
-
-
-

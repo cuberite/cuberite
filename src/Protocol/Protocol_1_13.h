@@ -5,7 +5,10 @@
 Declares the 1.13 protocol classes:
 	- cProtocol_1_13
 		- release 1.13 protocol (#393)
-(others may be added later in the future for the 1.13 release series)
+	- cProtocol_1_13_1
+		- release 1.13.1 protocol (#401)
+	- cProtocol_1_13_2
+		- release 1.13.2 protocol (#404)
 */
 
 
@@ -15,67 +18,98 @@ Declares the 1.13 protocol classes:
 #pragma once
 
 #include "Protocol_1_12.h"
+#include "Packetizer.h"
+#include "Palettes/Upgrade.h"
 
 
 
 
 
-// fwd:
-class BlockTypePalette;
-
-
-
-
-
-class cProtocol_1_13 :
+class cProtocol_1_13:
 	public cProtocol_1_12_2
 {
-	typedef cProtocol_1_12_2 Super;
+	using Super = cProtocol_1_12_2;
 
 public:
-	cProtocol_1_13(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State);
 
-	virtual void Initialize(cClientHandle & a_Client) override;
-
+	using Super::Super;
 
 protected:
 
-	/** The palette used to transform internal block type palette into the protocol-specific ID. */
-	std::shared_ptr<const BlockTypePalette> m_BlockTypePalette;
-
-	/** Temporary hack for initial 1.13+ support while keeping BLOCKTYPE data:
-	Map of the BLOCKTYPE#META to the protocol-specific NetBlockID. */
-	std::map<UInt32, UInt32> m_BlockTypeMap;
-
-
-	/** Returns the string identifying the palettes' version, such as "1.13" or "1.14.4".
-	The palettes for that version are loaded into m_BlockTypePalette and m_ItemTypePalette. */
-	virtual AString GetPaletteVersion() const;
-
-	// Outgoing packet type translation:
-	virtual UInt32 GetPacketID(ePacketType a_PacketType) override;
-
-	// Packet receiving:
-	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
-	virtual void HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer) override;
-	virtual void HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer) override;
-
-	// Packet sending:
-	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual void SendBlockChange                (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
-	virtual void SendChunkData                  (int a_ChunkX, int a_ChunkZ, cChunkDataSerializer & a_Serializer) override;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
-	virtual void SendParticleEffect             (const AString & a_ParticleName, float a_SrcX, float a_SrcY, float a_SrcZ, float a_OffsetX, float a_OffsetY, float a_OffsetZ, float a_ParticleData, int a_ParticleAmount) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
-	virtual void SendPluginMessage              (const AString & a_Channel, const AString & a_Message) override;
 	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
-	virtual void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch) override;
-	virtual void SendStatistics                 (const cStatManager & a_Manager) override;
+	virtual void SendStatistics                 (const StatisticsManager & a_Manager) override;
 	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
+	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata) const;
+	virtual UInt8 GetEntityMetadataID(EntityMetadataType a_FieldType) const;
+	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const;
+	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
+	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const;
+	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
+	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) const;
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
+	virtual UInt32 GetProtocolStatisticType(CustomStatistic a_Statistic) const;
+	virtual Version GetProtocolVersion() const override;
 
-	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) override;
-	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) override;
-	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) override;
+	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
+	virtual void HandlePacketNameItem(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer) override;
+	virtual void HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer);
+	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, std::string_view a_Channel) override;
+
+	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) const override;
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, EntityMetadata a_Metadata, EntityMetadataType a_FieldType) const;
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
+	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const override;
+	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const override;
+};
+
+
+
+
+
+class cProtocol_1_13_1 :
+	public cProtocol_1_13
+{
+	using Super = cProtocol_1_13;
+
+public:
+
+	using Super::Super;
+
+protected:
+
+	virtual void SendBossBarAdd(UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
+	virtual void SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
+
+	virtual std::pair<short, short> GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
+	virtual UInt32 GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override;
+	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) const override;
+	virtual UInt32 GetProtocolStatisticType(CustomStatistic a_Statistic) const override;
+	virtual Version GetProtocolVersion() const override;
+};
+
+
+
+
+
+class cProtocol_1_13_2 :
+	public cProtocol_1_13_1
+{
+	using Super = cProtocol_1_13_1;
+
+public:
+
+	using Super::Super;
+
+protected:
+
+	virtual Version GetProtocolVersion() const override;
+	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) const override;
+	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const override;
 };

@@ -6,6 +6,7 @@
 #include "Globals.h"
 #include "VillageGen.h"
 #include "PieceGeneratorBFSTree.h"
+#include "../BlockInfo.h"
 
 
 
@@ -36,16 +37,18 @@ per-village density setting, the cVillage class itself implements the cPiecePool
 calls to the underlying cVillagePiecePool, after processing the density check.
 */
 
-class cVillagePiecePool :
+class cVillagePiecePool:
 	public cPrefabPiecePool
 {
-	typedef cPrefabPiecePool super;
+	using Super = cPrefabPiecePool;
+
 public:
+
 	cVillagePiecePool(
 		const cPrefab::sDef * a_PieceDefs,         size_t a_NumPieceDefs,
 		const cPrefab::sDef * a_StartingPieceDefs, size_t a_NumStartingPieceDefs
-	) :
-		super(a_PieceDefs, a_NumPieceDefs, a_StartingPieceDefs, a_NumStartingPieceDefs)
+	):
+		Super(a_PieceDefs, a_NumPieceDefs, a_StartingPieceDefs, a_NumStartingPieceDefs)
 	{
 		AddRoadPieces();
 	}
@@ -106,13 +109,14 @@ public:
 
 
 
-class cVillageGen::cVillage :
+class cVillageGen::cVillage:
 	public cGridStructGen::cStructure,
 	protected cPiecePool
 {
-	typedef cGridStructGen::cStructure super;
+	using Super = cGridStructGen::cStructure;
 
 public:
+
 	cVillage(
 		int a_Seed,
 		int a_GridX, int a_GridZ,
@@ -121,9 +125,9 @@ public:
 		int a_MaxSize,
 		int a_Density,
 		cVillagePiecePool & a_Prefabs,
-		cTerrainHeightGenPtr a_HeightGen
-	) :
-		super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
+		cTerrainHeightGen & a_HeightGen
+	):
+		Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 		m_Seed(a_Seed),
 		m_Noise(a_Seed),
 		m_MaxSize(a_MaxSize),
@@ -165,7 +169,7 @@ protected:
 	cVillagePiecePool & m_Prefabs;
 
 	/** The underlying height generator, used for placing the structures on top of the terrain. */
-	cTerrainHeightGenPtr m_HeightGen;
+	cTerrainHeightGen & m_HeightGen;
 
 	/** The village pieces, placed by the generator. */
 	cPlacedPieces m_Pieces;
@@ -178,7 +182,7 @@ protected:
 		// Each intersecting prefab is placed on ground, then drawn
 		// Each intersecting road is drawn by replacing top soil blocks with gravel / sandstone blocks
 		cChunkDef::HeightMap HeightMap;  // Heightmap for this chunk, used by roads
-		m_HeightGen->GenHeightMap(a_Chunk.GetChunkCoords(), HeightMap);
+		m_HeightGen.GenHeightMap(a_Chunk.GetChunkCoords(), HeightMap);
 		for (cPlacedPieces::iterator itr = m_Pieces.begin(), end = m_Pieces.end(); itr != end; ++itr)
 		{
 			const cPrefab & Prefab = static_cast<const cPrefab &>((*itr)->GetPiece());
@@ -208,7 +212,7 @@ protected:
 		int BlockY;
 		cChunkDef::AbsoluteToRelative(BlockX, BlockY, BlockZ, ChunkX, ChunkZ);
 		cChunkDef::HeightMap HeightMap;
-		m_HeightGen->GenHeightMap({ChunkX, ChunkZ}, HeightMap);
+		m_HeightGen.GenHeightMap({ChunkX, ChunkZ}, HeightMap);
 		int TerrainHeight = cChunkDef::GetHeight(HeightMap, BlockX, BlockZ);
 		a_Piece.MoveToGroundBy(TerrainHeight - FirstConnector.m_Pos.y + 1);
 	}
@@ -333,12 +337,12 @@ cVillageGen::cVillageGen(
 	int a_MaxSize,
 	int a_MinDensity,
 	int a_MaxDensity,
-	cBiomeGenPtr a_BiomeGen,
-	cTerrainHeightGenPtr a_HeightGen,
+	cBiomeGen & a_BiomeGen,
+	cTerrainHeightGen & a_HeightGen,
 	int a_SeaLevel,
 	const AStringVector & a_PrefabsToLoad
 ) :
-	super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSize, a_MaxSize, 100),
+	Super(a_Seed, a_GridSize, a_GridSize, a_MaxOffset, a_MaxOffset, a_MaxSize, a_MaxSize, 100),
 	m_RandNoise(a_Seed + 1000),
 	m_MaxDepth(a_MaxDepth),
 	m_MaxSize(a_MaxSize),
@@ -350,13 +354,13 @@ cVillageGen::cVillageGen(
 	for (const auto & toLoad: a_PrefabsToLoad)
 	{
 		auto prefabs = std::make_shared<cVillagePiecePool>();
-		auto fileName = Printf("Prefabs%sVillages%s%s.cubeset", cFile::GetPathSeparator().c_str(), cFile::GetPathSeparator().c_str(), toLoad.c_str());
+		auto fileName = fmt::format(FMT_STRING("Prefabs{0}Villages{0}{1}.cubeset"), cFile::GetPathSeparator(), toLoad);
 		if (prefabs->LoadFromFile(fileName, true))
 		{
 			if (NoCaseCompare(prefabs->GetIntendedUse(), "village") != 0)
 			{
 				LOGWARNING("Village generator: File %s is intended for use in \"%s\", rather than villages. Loading the file, but the generator may behave unexpectedly.",
-					fileName.c_str(), prefabs->GetIntendedUse().c_str()
+					fileName, prefabs->GetIntendedUse()
 				);
 			}
 			prefabs->AssignGens(a_Seed, m_BiomeGen, m_HeightGen, a_SeaLevel);
@@ -375,7 +379,7 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_GridX, int a_Gr
 	int ChunkX, ChunkZ;
 	cChunkDef::BlockToChunk(a_OriginX, a_OriginZ, ChunkX, ChunkZ);
 	cChunkDef::BiomeMap Biomes;
-	m_BiomeGen->GenBiomes({ChunkX, ChunkZ}, Biomes);
+	m_BiomeGen.GenBiomes({ChunkX, ChunkZ}, Biomes);
 
 	// Get a list of pools that support each biome within the chunk:
 	// If just one column's biome is not allowed, the pool is not used because it's likely that an unfriendly biome is too close
@@ -420,7 +424,3 @@ cGridStructGen::cStructurePtr cVillageGen::CreateStructure(int a_GridX, int a_Gr
 	// Create a village based on the chosen prefabs:
 	return cStructurePtr(new cVillage(m_Seed, a_GridX, a_GridZ, a_OriginX, a_OriginZ, m_MaxDepth, m_MaxSize, Density, *pool.get(), m_HeightGen));
 }
-
-
-
-

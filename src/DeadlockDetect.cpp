@@ -21,7 +21,7 @@ const int CYCLE_MILLISECONDS = 100;
 
 
 cDeadlockDetect::cDeadlockDetect(void) :
-	super("DeadlockDetect"),
+	Super("Deadlock Detector"),
 	m_IntervalSec(1000)
 {
 }
@@ -51,18 +51,18 @@ cDeadlockDetect::~cDeadlockDetect()
 
 
 
-bool cDeadlockDetect::Start(int a_IntervalSec)
+void cDeadlockDetect::Start(int a_IntervalSec)
 {
 	m_IntervalSec = a_IntervalSec;
 
 	// Read the initial world data:
 	cRoot::Get()->ForEachWorld([=](cWorld & a_World)
-		{
-			SetWorldAge(a_World.GetName(), a_World.GetWorldAge());
-			return false;
-		}
-	);
-	return super::Start();
+	{
+		SetWorldAge(a_World.GetName(), a_World.GetWorldAge());
+		return false;
+	});
+
+	Super::Start();
 }
 
 
@@ -72,7 +72,7 @@ bool cDeadlockDetect::Start(int a_IntervalSec)
 void cDeadlockDetect::TrackCriticalSection(cCriticalSection & a_CS, const AString & a_Name)
 {
 	cCSLock lock(m_CS);
-	m_TrackedCriticalSections.emplace_back(std::make_pair(&a_CS, a_Name));
+	m_TrackedCriticalSections.emplace_back(&a_CS, a_Name);
 }
 
 
@@ -103,11 +103,10 @@ void cDeadlockDetect::Execute(void)
 	{
 		// Check the world ages:
 		cRoot::Get()->ForEachWorld([=](cWorld & a_World)
-			{
-				CheckWorldAge(a_World.GetName(), a_World.GetWorldAge());
-				return false;
-			}
-		);
+		{
+			CheckWorldAge(a_World.GetName(), a_World.GetWorldAge());
+			return false;
+		});
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(CYCLE_MILLISECONDS));
 	}  // while (should run)
@@ -117,7 +116,7 @@ void cDeadlockDetect::Execute(void)
 
 
 
-void cDeadlockDetect::SetWorldAge(const AString & a_WorldName, Int64 a_Age)
+void cDeadlockDetect::SetWorldAge(const AString & a_WorldName, const cTickTimeLong a_Age)
 {
 	m_WorldAges[a_WorldName].m_Age = a_Age;
 	m_WorldAges[a_WorldName].m_NumCyclesSame = 0;
@@ -127,7 +126,7 @@ void cDeadlockDetect::SetWorldAge(const AString & a_WorldName, Int64 a_Age)
 
 
 
-void cDeadlockDetect::CheckWorldAge(const AString & a_WorldName, Int64 a_Age)
+void cDeadlockDetect::CheckWorldAge(const AString & a_WorldName, const cTickTimeLong a_Age)
 {
 	WorldAges::iterator itr = m_WorldAges.find(a_WorldName);
 	if (itr == m_WorldAges.end())
@@ -157,14 +156,14 @@ void cDeadlockDetect::CheckWorldAge(const AString & a_WorldName, Int64 a_Age)
 
 
 
-void cDeadlockDetect::DeadlockDetected(const AString & a_WorldName, Int64 a_WorldAge)
+void cDeadlockDetect::DeadlockDetected(const AString & a_WorldName, const cTickTimeLong a_WorldAge)
 {
 	LOGERROR("Deadlock detected: world %s has been stuck at age %lld. Aborting the server.",
-		a_WorldName.c_str(), static_cast<long long>(a_WorldAge)
+		a_WorldName.c_str(), static_cast<long long>(a_WorldAge.count())
 	);
 	ListTrackedCSs();
 	ASSERT(!"Deadlock detected");
-	abort();
+	std::abort();
 }
 
 
@@ -182,7 +181,3 @@ void cDeadlockDetect::ListTrackedCSs(void)
 		);
 	}
 }
-
-
-
-

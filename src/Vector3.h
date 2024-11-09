@@ -17,8 +17,8 @@ public:
 	T x, y, z;
 
 
-	inline Vector3(void) : x(0), y(0), z(0) {}
-	inline Vector3(T a_x, T a_y, T a_z) : x(a_x), y(a_y), z(a_z) {}
+	constexpr Vector3(void) : x(0), y(0), z(0) {}
+	constexpr Vector3(T a_x, T a_y, T a_z) : x(a_x), y(a_y), z(a_z) {}
 
 
 	#ifdef TOLUA_EXPOSITION  // Hardcoded copy constructors (tolua++ does not support function templates .. yet)
@@ -30,8 +30,20 @@ public:
 
 	// tolua_end
 	// Conversion constructors where U is not the same as T leaving the copy-constructor implicitly generated
-	template <typename U, typename = typename std::enable_if<!std::is_same<U, T>::value>::type>
-	Vector3(const Vector3<U> & a_Rhs): x(static_cast<T>(a_Rhs.x)), y(static_cast<T>(a_Rhs.y)), z(static_cast<T>(a_Rhs.z)) {}
+	template <typename U, std::enable_if_t<(!std::is_same<U, T>::value) && ((!std::is_integral<T>::value) || (std::is_integral<U>::value)), bool> = true>
+	constexpr Vector3(const Vector3<U> & a_Rhs):
+			x(static_cast<T>(a_Rhs.x)),
+			y(static_cast<T>(a_Rhs.y)),
+			z(static_cast<T>(a_Rhs.z))
+	{
+	}
+	template <typename U, std::enable_if_t<(!std::is_same<U, T>::value) && ((std::is_integral<T>::value) && (!std::is_integral<U>::value)), bool> = true>
+	constexpr Vector3(const Vector3<U> & a_Rhs):
+			x(static_cast<T>(std::floor(a_Rhs.x))),
+			y(static_cast<T>(std::floor(a_Rhs.y))),
+			z(static_cast<T>(std::floor(a_Rhs.z)))
+	{
+	}
 	// tolua_begin
 
 	inline void Set(T a_x, T a_y, T a_z)
@@ -175,6 +187,16 @@ public:
 			FloorC(x),
 			FloorC(y),
 			FloorC(z)
+		);
+	}
+
+	/** Returns a new Vector3i with coords set to std::ceil() of this vector's coords. */
+	inline Vector3<int> Ceil() const
+	{
+		return Vector3<int>(
+			CeilC(x),
+			CeilC(y),
+			CeilC(z)
 		);
 	}
 
@@ -374,22 +396,6 @@ public:
 		z = -z;
 	}
 
-	// tolua_end
-
-	/** Allows formatting a Vector<T> using the same format specifiers as for T
-	e.g. `fmt::format("{0:0.2f}", Vector3f{0.0231f, 1.2146f, 1.0f}) == "{0.02, 1.21, 1.00}"` */
-	template <typename ArgFormatter>
-	friend void format_arg(fmt::BasicFormatter<char, ArgFormatter> & a_Formatter, const char *& a_FormatStr, Vector3 a_Vec)
-	{
-		std::array<T, 3> Data{{a_Vec.x, a_Vec.y, a_Vec.z}};
-
-		a_Formatter.writer() << '{';
-		fmt::format_arg(a_Formatter, a_FormatStr, fmt::join(Data.cbegin(), Data.cend(), ", "));
-		a_Formatter.writer() << '}';
-	}
-
-	// tolua_begin
-
 	/** The max difference between two coords for which the coords are assumed equal. */
 	static const double EPS;
 
@@ -397,6 +403,47 @@ public:
 	static const double NO_INTERSECTION;
 };
 // tolua_end
+
+
+
+
+
+/** Allows formatting a Vector<T> using the same format specifiers as for T
+e.g. `fmt::format("{0:0.2f}", Vector3f{0.0231f, 1.2146f, 1.0f}) == "{0.02, 1.21, 1.00}"` */
+template <typename What>
+class fmt::formatter<Vector3<What>> : public fmt::formatter<What>
+{
+	using Super = fmt::formatter<What>;
+
+	template <typename FormatContext, size_t Len>
+	void Write(FormatContext & a_Ctx, const char (& a_Str)[Len])
+	{
+		const auto Itr = std::copy_n(&a_Str[0], Len - 1, a_Ctx.out());
+		a_Ctx.advance_to(Itr);
+	}
+
+	template <typename FormatContext>
+	void Write(FormatContext & a_Ctx, const What & a_Arg)
+	{
+		const auto Itr = Super::format(a_Arg, a_Ctx);
+		a_Ctx.advance_to(Itr);
+	}
+
+public:
+
+	template <typename FormatContext>
+	auto format(const Vector3<What> & a_Vec, FormatContext & a_Ctx)
+	{
+		Write(a_Ctx, "{");
+		Write(a_Ctx, a_Vec.x);
+		Write(a_Ctx, ", ");
+		Write(a_Ctx, a_Vec.y);
+		Write(a_Ctx, ", ");
+		Write(a_Ctx, a_Vec.z);
+		Write(a_Ctx, "}");
+		return a_Ctx.out();
+	}
+};
 
 
 
@@ -452,9 +499,3 @@ typedef Vector3<int>    Vector3i;
 
 
 typedef std::vector<Vector3i> cVector3iArray;
-
-
-
-
-
-

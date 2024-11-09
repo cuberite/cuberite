@@ -7,36 +7,18 @@
 
 
 
-class cBlockPortalHandler :
+class cBlockPortalHandler final :
 	public cBlockHandler
 {
+	using Super = cBlockHandler;
+
 public:
-	cBlockPortalHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
-	{
-	}
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		// We set to zero so MCS doesn't stop you from building weird portals like vanilla does
-		// CanBeAt doesn't do anything if meta is zero
-		// We set to zero because the client sends meta = 2 to the server (it calculates rotation itself)
+	using Super::Super;
 
-		a_BlockType = m_BlockType;
-		a_BlockMeta = 0;
-		return true;
-	}
+private:
 
-
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// No pickups
 		return {};
@@ -46,27 +28,35 @@ public:
 
 
 
-	virtual void OnUpdate(cChunkInterface & cChunkInterface, cWorldInterface & a_WorldInterface, cBlockPluginInterface & a_PluginInterface, cChunk & a_Chunk, int a_RelX, int a_RelY, int a_RelZ) override
+	virtual void OnUpdate(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cBlockPluginInterface & a_PluginInterface,
+		cChunk & a_Chunk,
+		const Vector3i a_RelPos
+	) const override
 	{
+		// Spawn zombie pigmen with a 0.05% chance:
 		if (GetRandomProvider().RandBool(0.9995))
 		{
 			return;
 		}
-
-		int PosX = a_Chunk.GetPosX() * cChunkDef::Width + a_RelX;
-		int PosZ = a_Chunk.GetPosZ() * cChunkDef::Width + a_RelZ;
-
-		a_WorldInterface.SpawnMob(PosX, a_RelY, PosZ, mtZombiePigman, false);
+		auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
+		a_WorldInterface.SpawnMob(WorldPos.x, WorldPos.y, WorldPos.z, mtZombiePigman, false);
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+
+
+
+
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if ((a_RelY <= 0) || (a_RelY >= cChunkDef::Height - 1))
+		if (!cChunkDef::IsValidHeight(a_Position.addedY(-1)) || !cChunkDef::IsValidHeight(a_Position.addedY(1)))
 		{
-			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1
+			return false;  // Must be 1 away from the boundary, there will always be another portal or an obsidian between the portal block and the boundary.
 		}
 
-		switch (a_Chunk.GetMeta(a_RelX, a_RelY, a_RelZ))
+		switch (a_Meta)
 		{
 			case 0x1:
 			{
@@ -83,8 +73,7 @@ public:
 				for (const auto & Direction : PortalCheck)
 				{
 					BLOCKTYPE Block;
-					a_Chunk.UnboundedRelGetBlockType(a_RelX + Direction.x, a_RelY + Direction.y, a_RelZ + Direction.z, Block);
-
+					a_Chunk.UnboundedRelGetBlockType(a_Position + Direction, Block);
 					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
 					{
 						return false;
@@ -107,8 +96,7 @@ public:
 				for (const auto & Direction : PortalCheck)
 				{
 					BLOCKTYPE Block;
-					a_Chunk.UnboundedRelGetBlockType(a_RelX + Direction.x, a_RelY + Direction.y, a_RelZ + Direction.z, Block);
-
+					a_Chunk.UnboundedRelGetBlockType(a_Position + Direction, Block);
 					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
 					{
 						return false;
@@ -120,7 +108,11 @@ public:
 		return true;
 	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 24;

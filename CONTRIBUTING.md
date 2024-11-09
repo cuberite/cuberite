@@ -14,20 +14,15 @@ When contributing, you must follow our code conventions. Otherwise, CI builds wi
 
 Here are the conventions:
 
- - We use the subset of C++11 supported by MSVC 2013 (ask if you think that something outside of this subset would be useful)
- - All new public functions in all classes need documenting comments on what they do and what behavior they follow, use doxy-comments formatted as `/** Description */`. Do not use asterisks on additional lines in multi-line comments.
+ - We use C++17.
+ - Please use **tabs for indentation and spaces for alignment**. This means that if it's at line start, it's a tab; if it's in the middle of a line, it's a space.
+ - All functions in all classes need documenting comments on what they do and what behavior they follow, use doxy-comments formatted as `/** Description */`. Do not use asterisks on additional lines in multi-line comments.
  - Use spaces after the comment markers: `// Comment` instead of `//Comment`. A comment must be prefixed with two spaces if it's on the same line with code:
    - `SomeFunction()<Space><Space>//<Space>Note the two spaces prefixed to me and the space after the slashes.`
  - All variable names and function names use CamelCase style, with the exception of single letter variables.  
    - `ThisIsAProperFunction()` `This_is_bad()` `this_is_bad()` `GoodVariableName` `badVariableName`.
- - All member variables start with `m_`, all function parameters start with `a_`, all class names start with `c`.
+ - All private member variables start with `m_`, function parameters start with `a_`, class names start with `c`.
    - `class cMonster { int m_Health; int DecreaseHealth(int a_Amount); }`
- - Function parameters that are coordinates should be passed using an appropriate storage container, and not as three separate arguments.
-   - e.g. for a block position, Vector3i. For an entity position, Vector3d. For a chunk coordinate, cChunkCoords.
-   - For a 3-dimensional box of blocks, use cCuboid. For an axis-aligned bounding box, use cBoundingBox.
- - Parameters smaller than 4 elements (e.g. Vector3, cChunkCoords) should be passed by value. All other parameters should be passed by const reference, where applicable.
-   - `Foo(Vector3d a_Param1, const cCuboid & a_Param2)`
-   - See the discussion in issue #3853
  - Put spaces after commas. `Vector3d(1, 2, 3)` instead of `Vector3d(1,2,3)`
  - Put spaces before and after every operator, except unary operators.
    - `a = b + c;`
@@ -37,27 +32,33 @@ Here are the conventions:
  - Add those extra parentheses to conditions, especially in C++:
    - `if ((a == 1) && ((b == 2) || (c == 3)))` instead of ambiguous `if (a == 1 && b == 2 || c == 3)`
    - This helps prevent mistakes such as `if (a & 1 == 0)`
+ - Alpha-sort stuff that makes sense alpha-sorting—long lists of similar items etc.
+ - White space is free, so use it freely.
+   - "freely" as in "plentifully", not "arbitrarily".
+ - All `case` statements inside a `switch` need an extra indent.
+ - Each and every control statement deserves its braces. This helps maintainability later on when the file is edited, lines added or removed - the control logic doesn't break so easily.
+   - The only exception: a `switch` statement with all `case` statements being a single short statement is allowed to use the short brace-less form.
+   - These two rules really mean that indent is governed by braces.
+ - Function parameters that are coordinates should be passed using an appropriate storage container, and not as three separate arguments.
+   - e.g. for a block position, Vector3i. For an entity position, Vector3d. For a chunk coordinate, cChunkCoords.
+   - For a 3-dimensional box of blocks, use cCuboid. For an axis-aligned bounding box, use cBoundingBox.
+ - Parameters smaller than 4 elements (e.g. Vector3, cChunkCoords) should be passed by value. All other parameters should be passed by const reference, where applicable.
+   - `Foo(Vector3d a_Param1, const cCuboid & a_Param2)`
+   - See the discussion in issue #3853
  - Use the provided wrappers for OS stuff:
-   - Threading is done by inheriting from `cIsThread`, thread synchronization through `cCriticalSection` and `cEvent`, file access and filesystem operations through the `cFile` class, high-precision timers through `cTimer`, high-precision sleep through `cSleep`
+   - Threading is done by inheriting from `cIsThread`, thread synchronization through `cCriticalSection` and `cEvent`, file access and filesystem operations through the `cFile` class, high-precision timing through `cStopwatch`
  - No magic numbers, use named constants:
-   - `E_ITEM_XXX`, `E_BLOCK_XXX` and `E_META_XXX` for items and blocks
-   - `cEntity::etXXX` for entity types, `cMonster::mtXXX` for mob types
-   - `dimNether`, `dimOverworld` and `dimEnd` for world dimension
-   - `gmSurvival`, `gmCreative`, `gmAdventure` for game modes
-   - `wSunny`, `wRain`, `wThunderstorm` for weather
-   - `cChunkDef::Width`, `cChunkDef::Height` for chunk dimensions (C++)
+   - `E_ITEM_XXX`, `E_BLOCK_XXX` and `E_META_XXX` for items and blocks.
+   - `cEntity::etXXX` for entity types, `cMonster::mtXXX` for mob types.
+   - `dimNether`, `dimOverworld` and `dimEnd` for world dimension.
+   - `gmSurvival`, `gmCreative`, `gmAdventure` for game modes.
+   - `wSunny`, `wRain`, `wThunderstorm` for weather.
+   - `cChunkDef::Width`, `cChunkDef::Height` for chunk dimensions (C++).
    - etc.
  - Instead of checking for a specific value, use an `IsXXX` function, if available:
-   - `cPlayer:IsGameModeCreative()` instead of` (cPlayer:GetGameMode() == gmCreative)` (the player can also inherit the gamemode from the world, which the value-d condition doesn't catch)
- - Please use **tabs for indentation and spaces for alignment**. This means that if it's at line start, it's a tab; if it's in the middle of a line, it's a space
- - Alpha-sort stuff that makes sense alpha-sorting - long lists of similar items etc.
- - White space is free, so use it freely
-   - "freely" as in "plentifully", not "arbitrarily"
- - All `case` statements inside a `switch` need an extra indent
- - Each and every control statement deserves its braces. This helps maintainability later on when the file is edited, lines added or removed - the control logic doesn't break so easily
-   - The only exception: a `switch` statement with all `case` statements being a single short statement is allowed to use the short brace-less form
-   - These two rules really mean that indent is governed by braces
- - Add an empty last line in all source files (GCC and Git can complain otherwise)
+   - `cPlayer:IsGameModeCreative()` instead of` (cPlayer:GetGameMode() == gmCreative)` (the player can also inherit the gamemode from the world, which the value-d condition doesn't catch).
+ - All `#include` directives are specified relative to the root source directory.
+ - Add an empty last line in all source files (GCC and Git can complain otherwise).
 
 Pre-commit Hook
 ---------------

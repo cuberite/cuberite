@@ -27,20 +27,21 @@ namespace Json
 
 
 
-class cAuthenticator :
+class cAuthenticator:
 	public cIsThread
 {
-	typedef cIsThread super;
+	using Super = cIsThread;
 
 public:
-	cAuthenticator(void);
+
+	cAuthenticator();
 	virtual ~cAuthenticator() override;
 
 	/** (Re-)read server and address from INI: */
 	void ReadSettings(cSettingsRepositoryInterface & a_Settings);
 
 	/** Queues a request for authenticating a user. If the auth fails, the user will be kicked */
-	void Authenticate(int a_ClientID, const AString & a_UserName, const AString & a_ServerHash);
+	void Authenticate(int a_ClientID, std::string_view a_Username, std::string_view a_ServerHash);
 
 	/** Starts the authenticator thread. The thread may be started and stopped repeatedly */
 	void Start(cSettingsRepositoryInterface & a_Settings);
@@ -57,7 +58,7 @@ private:
 		AString m_Name;
 		AString m_ServerID;
 
-		cUser(int a_ClientID, const AString & a_Name, const AString & a_ServerID) :
+		cUser(int a_ClientID, const std::string_view a_Name, const std::string_view a_ServerID) :
 			m_ClientID(a_ClientID),
 			m_Name(a_Name),
 			m_ServerID(a_ServerID)
@@ -65,7 +66,7 @@ private:
 		}
 	};
 
-	typedef std::deque<cUser> cUserList;
+	using cUserList = std::deque<cUser>;
 
 	cCriticalSection m_CS;
 	cUserList        m_Queue;
@@ -88,7 +89,7 @@ private:
 
 	/** Returns true if the user authenticated okay, false on error
 	Returns the case-corrected username, UUID, and properties (eg. skin). */
-	bool AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, cUUID & a_UUID, Json::Value & a_Properties);
+	bool AuthWithYggdrasil(AString & a_UserName, const AString & a_ServerId, cUUID & a_UUID, Json::Value & a_Properties) const;
 };
 
 

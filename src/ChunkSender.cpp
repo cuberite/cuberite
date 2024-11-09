@@ -11,7 +11,6 @@
 #include "ChunkSender.h"
 #include "World.h"
 #include "BlockEntities/BlockEntity.h"
-#include "Protocol/ChunkDataSerializer.h"
 #include "ClientHandle.h"
 #include "Chunk.h"
 
@@ -34,7 +33,7 @@ class cNotifyChunkSender :
 			a_Coords.m_ChunkX, a_Coords.m_ChunkZ,
 			[&ChunkSender] (cChunk & a_Chunk) -> bool
 			{
-				ChunkSender.QueueSendChunkTo(a_Chunk.GetPosX(), a_Chunk.GetPosZ(), cChunkSender::E_CHUNK_PRIORITY_MIDHIGH, a_Chunk.GetAllClients());
+				ChunkSender.QueueSendChunkTo(a_Chunk.GetPosX(), a_Chunk.GetPosZ(), cChunkSender::Priority::High, a_Chunk.GetAllClients());
 				return true;
 			}
 		);
@@ -60,8 +59,9 @@ public:
 // cChunkSender:
 
 cChunkSender::cChunkSender(cWorld & a_World) :
-	super("ChunkSender"),
-	m_World(a_World)
+	Super("Chunk Sender"),
+	m_World(a_World),
+	m_Serializer(m_World.GetDimension())
 {
 }
 
@@ -82,14 +82,14 @@ void cChunkSender::Stop(void)
 {
 	m_ShouldTerminate = true;
 	m_evtQueue.Set();
-	super::Stop();
+	Super::Stop();
 }
 
 
 
 
 
-void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cClientHandle * a_Client)
+void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, cClientHandle * a_Client)
 {
 	ASSERT(a_Client != nullptr);
 	{
@@ -99,18 +99,18 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 		if (iter != m_ChunkInfo.end())
 		{
 			auto & info = iter->second;
-			if (info.m_Priority > a_Priority)
+			if (info.m_Priority < a_Priority)  // Was the chunk's priority boosted?
 			{
 				m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
 				info.m_Priority = a_Priority;
 			}
-			info.m_Clients.insert(a_Client);
+			info.m_Clients.insert(a_Client->shared_from_this());
 		}
 		else
 		{
 			m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
 			auto info = sSendChunk{Chunk, a_Priority};
-			info.m_Clients.insert(a_Client);
+			info.m_Clients.insert(a_Client->shared_from_this());
 			m_ChunkInfo.emplace(Chunk, info);
 		}
 	}
@@ -121,7 +121,7 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 
 
 
-void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a_Priority, cChunkClientHandles a_Clients)
+void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, Priority a_Priority, const std::vector<cClientHandle *> & a_Clients)
 {
 	{
 		cChunkCoords Chunk{a_ChunkX, a_ChunkZ};
@@ -130,40 +130,28 @@ void cChunkSender::QueueSendChunkTo(int a_ChunkX, int a_ChunkZ, eChunkPriority a
 		if (iter != m_ChunkInfo.end())
 		{
 			auto & info = iter->second;
-			if (info.m_Priority > a_Priority)
+			if (info.m_Priority < a_Priority)  // Was the chunk's priority boosted?
 			{
 				m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
 				info.m_Priority = a_Priority;
 			}
-			info.m_Clients.insert(a_Clients.begin(), a_Clients.end());
+			for (const auto & Client : a_Clients)
+			{
+				info.m_Clients.insert(Client->shared_from_this());
+			}
 		}
 		else
 		{
 			m_SendChunks.push(sChunkQueue{a_Priority, Chunk});
 			auto info = sSendChunk{Chunk, a_Priority};
-			info.m_Clients.insert(a_Clients.begin(), a_Clients.end());
+			for (const auto & Client : a_Clients)
+			{
+				info.m_Clients.insert(Client->shared_from_this());
+			}
 			m_ChunkInfo.emplace(Chunk, info);
 		}
 	}
 	m_evtQueue.Set();
-}
-
-
-
-
-
-void cChunkSender::RemoveClient(cClientHandle * a_Client)
-{
-	{
-		cCSLock Lock(m_CS);
-		for (auto && pair : m_ChunkInfo)
-		{
-			auto && clients = pair.second.m_Clients;
-			clients.erase(a_Client);  // nop for sets that do not contain a_Client
-		}
-	}
-	m_evtQueue.Set();
-	m_evtRemoved.Wait();  // Wait for all remaining instances of a_Client to be processed (Execute() makes a copy of m_ChunkInfo)
 }
 
 
@@ -189,16 +177,13 @@ void cChunkSender::Execute(void)
 					continue;
 				}
 
-				std::unordered_set<cClientHandle *> clients;
-				std::swap(itr->second.m_Clients, clients);
+				auto clients = std::move(itr->second.m_Clients);
 				m_ChunkInfo.erase(itr);
 
 				cCSUnlock Unlock(Lock);
 				SendChunk(Chunk.m_ChunkX, Chunk.m_ChunkZ, clients);
 			}
 		}
-
-		m_evtRemoved.SetAll();  // Notify all waiting threads that all clients are processed and thus safe to destroy
 	}  // while (!m_ShouldTerminate)
 }
 
@@ -206,19 +191,25 @@ void cChunkSender::Execute(void)
 
 
 
-void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cClientHandle *> a_Clients)
+void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, const WeakClients & a_Clients)
 {
+	// Contains strong pointers to clienthandles.
+	std::vector<std::shared_ptr<cClientHandle>> Clients;
+
 	// Ask the client if it still wants the chunk:
-	for (auto itr = a_Clients.begin(); itr != a_Clients.end();)
+	for (const auto & WeakClient : a_Clients)
 	{
-		if (!(*itr)->WantsSendChunk(a_ChunkX, a_ChunkZ))
+		auto Client = WeakClient.lock();
+		if ((Client != nullptr) && Client->WantsSendChunk(a_ChunkX, a_ChunkZ))
 		{
-			itr = a_Clients.erase(itr);
+			Clients.push_back(std::move(Client));
 		}
-		else
-		{
-			itr++;
-		}
+	}
+
+	// Bail early if every requester disconnected:
+	if (Clients.empty())
+	{
+		return;
 	}
 
 	// If the chunk has no clients, no need to packetize it:
@@ -236,7 +227,7 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 	// If the chunk is not lighted, queue it for relighting and get notified when it's ready:
 	if (!m_World.IsChunkLighted(a_ChunkX, a_ChunkZ))
 	{
-		m_World.QueueLightChunk(a_ChunkX, a_ChunkZ, cpp14::make_unique<cNotifyChunkSender>(*this, m_World));
+		m_World.QueueLightChunk(a_ChunkX, a_ChunkZ, std::make_unique<cNotifyChunkSender>(*this, m_World));
 		return;
 	}
 
@@ -245,24 +236,49 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, std::unordered_set<cCli
 	{
 		return;
 	}
-	cChunkDataSerializer Data(m_Data, m_BiomeMap, m_World.GetDimension());
 
-	for (const auto client : a_Clients)
+	// Send:
+	m_Serializer.SendToClients(a_ChunkX, a_ChunkZ, m_BlockData, m_LightData, m_BiomeMap, Clients);
+
+	for (const auto & Client : Clients)
 	{
-		// Send:
-		client->SendChunkData(a_ChunkX, a_ChunkZ, Data);
-
 		// Send block-entity packets:
 		for (const auto & Pos : m_BlockEntities)
 		{
-			m_World.SendBlockEntity(Pos.x, Pos.y, Pos.z, *client);
+			m_World.SendBlockEntity(Pos.x, Pos.y, Pos.z, *Client);
 		}  // for itr - m_Packets[]
 
-	}
-	m_Data.Clear();
-	m_BlockEntities.clear();
+		// Send entity packets:
+		for (const auto EntityID : m_EntityIDs)
+		{
+			m_World.DoWithEntityByID(EntityID, [Client](cEntity & a_Entity)
+			{
+				/*
+				// DEBUG:
+				LOGD("cChunkSender: Entity #%d (%s) at [%f, %f, %f] spawning for player \"%s\"",
+					a_Entity.GetUniqueID(), a_Entity.GetClass(),
+					a_Entity.GetPosition().x, a_Entity.GetPosition().y, a_Entity.GetPosition().z,
+					Client->GetUsername().c_str()
+				);
+				*/
 
-	// TODO: Send entity spawn packets
+				/* This check looks highly suspect.
+				Its purpose is to check the client still has a valid player object associated,
+				since the player destroys itself when the client is destroyed.
+				It's done within the world lock to ensure correctness.
+				A better way involves fixing chunk sending (GH #3696) to obviate calling SpawnOn from this thread in the first place. */
+				if (!Client->IsDestroyed())
+				{
+					a_Entity.SpawnOn(*Client);
+				}
+
+				return true;
+			});
+		}
+	}
+
+	m_BlockEntities.clear();
+	m_EntityIDs.clear();
 }
 
 
@@ -278,23 +294,23 @@ void cChunkSender::BlockEntity(cBlockEntity * a_Entity)
 
 
 
-void cChunkSender::Entity(cEntity *)
+void cChunkSender::Entity(cEntity * a_Entity)
 {
-	// Nothing needed yet, perhaps in the future when we save entities into chunks we'd like to send them upon load, too ;)
+	m_EntityIDs.push_back(a_Entity->GetUniqueID());
 }
 
 
 
 
 
-void cChunkSender::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
+void cChunkSender::BiomeMap(const cChunkDef::BiomeMap & a_BiomeMap)
 {
 	for (size_t i = 0; i < ARRAYCOUNT(m_BiomeMap); i++)
 	{
-		if ((*a_BiomeMap)[i] < 255)
+		if (a_BiomeMap[i] < 255)
 		{
 			// Normal MC biome, copy as-is:
-			m_BiomeMap[i] = static_cast<unsigned char>((*a_BiomeMap)[i]);
+			m_BiomeMap[i] = static_cast<unsigned char>(a_BiomeMap[i]);
 		}
 		else
 		{
@@ -303,7 +319,3 @@ void cChunkSender::BiomeData(const cChunkDef::BiomeMap * a_BiomeMap)
 		}
 	}  // for i - m_BiomeMap[]
 }
-
-
-
-

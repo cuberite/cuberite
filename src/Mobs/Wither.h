@@ -7,13 +7,14 @@
 
 
 
-class cWither :
+class cWither:
 	public cAggressiveMonster
 {
-	typedef cAggressiveMonster super;
+	using Super = cAggressiveMonster;
 
 public:
-	cWither(void);
+
+	cWither();
 
 	CLASS_PROTODEF(cWither)
 
@@ -25,12 +26,12 @@ public:
 	bool IsArmored(void) const;
 
 	// cEntity overrides
-	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
-
+	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual bool IsUndead(void) override { return true; }
+	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
+	virtual void SpawnOn(cClientHandle & a_Client) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 private:
 
@@ -38,7 +39,3 @@ private:
 	unsigned int m_WitherInvulnerableTicks;
 
 } ;
-
-
-
-

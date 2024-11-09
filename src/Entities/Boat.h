@@ -15,10 +15,14 @@
 
 // tolua_begin
 
-class cBoat :
+class cBoat:
 	public cEntity
 {
-	typedef cEntity super;
+	// tolua_end
+
+	using Super = cEntity;
+
+	// tolua_begin
 
 public:
 	enum eMaterial
@@ -44,6 +48,7 @@ public:
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways) override;
+	virtual void HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 	int GetLastDamage(void) const { return m_LastDamage; }
 	int GetForwardDirection(void) const { return m_ForwardDirection; }

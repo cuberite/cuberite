@@ -1,7 +1,8 @@
 
 #pragma once
 
-#include "BlockHandler.h"
+#include "Blocks/BlockHandler.h"
+#include "Items/ItemHandler.h"
 
 
 
@@ -10,36 +11,48 @@
 class cBlockOreHandler :
 	public cBlockHandler
 {
-	typedef cBlockHandler super;
+	using Super = cBlockHandler;
+
 public:
-	cBlockOreHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
-	{
-	}
 
+	using Super::Super;
 
+protected:
 
+	~cBlockOreHandler() = default;
 
+private:
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// If using silk-touch, drop self rather than the resource:
 		if (ToolHasSilkTouch(a_Tool))
 		{
-			return cItem(m_BlockType);
+			switch (m_BlockType)
+			{
+				// If it was a glowing redstone ore, drop a normal redstone ore:
+				case E_BLOCK_REDSTONE_ORE_GLOWING:   return cItem(E_BLOCK_REDSTONE_ORE);
+				default:                             return cItem(m_BlockType);
+			}
 		}
 
-		// TODO: Handle the Fortune enchantment here
-		auto & random = GetRandomProvider();
+		const auto FortuneLevel = ToolFortuneLevel(a_Tool);
+
+		if ((m_BlockType == E_BLOCK_REDSTONE_ORE) || (m_BlockType == E_BLOCK_REDSTONE_ORE_GLOWING))
+		{   // Redstone follows the discrete random distribution, unlike other ores
+			const auto DropNum = FortuneDiscreteRandom(4, 5, FortuneLevel);
+			return cItem(E_ITEM_REDSTONE_DUST, DropNum);
+		}
+
+		auto & Random = GetRandomProvider();
+		const auto DropMult = std::max(static_cast<char>(1), FloorC<char>(Random.RandReal(FortuneLevel + 2.0)));
 		switch (m_BlockType)
 		{
-			case E_BLOCK_LAPIS_ORE:            return cItem(E_ITEM_DYE, random.RandInt<char>(4, 8), 4);
-			case E_BLOCK_REDSTONE_ORE:         return cItem(E_ITEM_REDSTONE_DUST, random.RandInt<char>(4, 5), 0);
-			case E_BLOCK_REDSTONE_ORE_GLOWING: return cItem(E_ITEM_REDSTONE_DUST, random.RandInt<char>(4, 5), 0);
-			case E_BLOCK_DIAMOND_ORE:          return cItem(E_ITEM_DIAMOND);
-			case E_BLOCK_EMERALD_ORE:          return cItem(E_ITEM_EMERALD);
-			case E_BLOCK_COAL_ORE:             return cItem(E_ITEM_COAL);
-			case E_BLOCK_NETHER_QUARTZ_ORE:    return cItem(E_ITEM_NETHER_QUARTZ);
+			case E_BLOCK_LAPIS_ORE:            return cItem(E_ITEM_DYE, DropMult * Random.RandInt<char>(4, 9), 4);
+			case E_BLOCK_DIAMOND_ORE:          return cItem(E_ITEM_DIAMOND, DropMult);
+			case E_BLOCK_EMERALD_ORE:          return cItem(E_ITEM_EMERALD, DropMult);
+			case E_BLOCK_COAL_ORE:             return cItem(E_ITEM_COAL, DropMult);
+			case E_BLOCK_NETHER_QUARTZ_ORE:    return cItem(E_ITEM_NETHER_QUARTZ, DropMult);
 			case E_BLOCK_CLAY:                 return cItem(E_ITEM_CLAY, 4);
 			default:
 			{
@@ -52,26 +65,42 @@ public:
 
 
 
-	virtual void OnPlayerBrokeBlock(
+	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		cPlayer & a_Player, Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta
-	) override
+		Vector3i a_BlockPos,
+		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
+	) const override
 	{
-		if (!a_Player.IsGameModeSurvival())
+		if (a_Digger == nullptr)
+		{
+			return;
+		}
+		if (!a_Digger->IsPlayer())
+		{
+			return;
+		}
+
+		const auto Player = static_cast<const cPlayer *>(a_Digger);
+		if (!Player->IsGameModeSurvival())
 		{
 			// Don't drop XP unless the player is in survival mode.
 			return;
 		}
 
-		if (a_Player.GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) != 0)
+		if (Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) != 0)
 		{
 			// Don't drop XP when the ore is mined with the Silk Touch enchantment
 			return;
 		}
 
-		auto & random = GetRandomProvider();
-		int reward = 0;
+		if (!Player->GetEquippedItem().GetHandler().CanHarvestBlock(m_BlockType))
+		{
+			return;
+		}
+
+		auto & Random = GetRandomProvider();
+		int Reward = 0;
 
 		switch (a_OldBlockType)
 		{
@@ -79,36 +108,36 @@ public:
 			case E_BLOCK_LAPIS_ORE:
 			{
 				// Lapis and nether quartz get 2 - 5 experience
-				reward = random.RandInt(2, 5);
+				Reward = Random.RandInt(2, 5);
 				break;
 			}
 			case E_BLOCK_REDSTONE_ORE:
 			case E_BLOCK_REDSTONE_ORE_GLOWING:
 			{
 				// Redstone gets 1 - 5 experience
-				reward = random.RandInt(1, 5);
+				Reward = Random.RandInt(1, 5);
 				break;
 			}
 			case E_BLOCK_DIAMOND_ORE:
 			case E_BLOCK_EMERALD_ORE:
 			{
 				// Diamond and emerald get 3 - 7 experience
-				reward = random.RandInt(3, 7);
+				Reward = Random.RandInt(3, 7);
 				break;
 			}
 			case E_BLOCK_COAL_ORE:
 			{
 				// Coal gets 0 - 2 experience
-				reward = random.RandInt(2);
+				Reward = Random.RandInt(2);
 				break;
 			}
 
 			default: break;
 		}
 
-		if (reward > 0)
+		if (Reward > 0)
 		{
-			a_WorldInterface.SpawnSplitExperienceOrbs(Vector3d(0.5, 0.5, 0.5) + a_BlockPos, reward);
+			a_WorldInterface.SpawnSplitExperienceOrbs(Vector3d(0.5, 0.5, 0.5) + a_BlockPos, Reward);
 		}
 	}
 } ;
@@ -116,3 +145,11 @@ public:
 
 
 
+
+class cDefaultOreHandler final :
+	public cBlockOreHandler
+{
+public:
+
+	using cBlockOreHandler::cBlockOreHandler;
+};

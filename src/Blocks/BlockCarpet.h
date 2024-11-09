@@ -14,48 +14,28 @@
 
 
 
-class cBlockCarpetHandler :
+class cBlockCarpetHandler final :
 	public cBlockHandler
 {
-	using super = cBlockHandler;
+	using Super = cBlockHandler;
 
 public:
 
-	cBlockCarpetHandler(BLOCKTYPE a_BlockType) :
-		super(a_BlockType)
+	using Super::Super;
+
+private:
+
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
+		const auto PosBelow = a_Position.addedY(-1);
+		return cChunkDef::IsValidHeight(PosBelow) && (a_Chunk.GetBlock(PosBelow) != E_BLOCK_AIR);
 	}
 
 
 
 
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = a_Player.GetEquippedItem().m_ItemDamage & 0x0f;
-		return true;
-	}
-
-
-
-
-
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
-	{
-		return (a_RelY > 0) && (a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ) != E_BLOCK_AIR);
-	}
-
-
-
-
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		switch (a_Meta)
 		{

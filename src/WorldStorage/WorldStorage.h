@@ -14,15 +14,13 @@
 
 #include "../OSSupport/IsThread.h"
 #include "../OSSupport/Queue.h"
-
+#include "ChunkDef.h"
 
 
 
 
 // fwd:
 class cWorld;
-
-typedef cQueue<cChunkCoordsWithCallback> cChunkCoordsQueue;
 
 
 
@@ -51,23 +49,21 @@ typedef std::list<cWSSchema *> cWSSchemaList;
 
 
 /** The actual world storage class */
-class cWorldStorage :
+class cWorldStorage:
 	public cIsThread
 {
-	typedef cIsThread super;
+	using Super = cIsThread;
 
 public:
 
-	cWorldStorage(void);
+	cWorldStorage();
 	virtual ~cWorldStorage() override;
 
-	/** Queues a chunk to be loaded, asynchronously.
-	The callback, if specified, will be called with the result of the load operation. */
-	void QueueLoadChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback = nullptr);
+	/** Queues a chunk to be loaded, asynchronously. */
+	void QueueLoadChunk(int a_ChunkX, int a_ChunkZ);
 
-	/** Queues a chunk to be saved, asynchronously.
-	The callback, if specified, will be called with the result of the save operation. */
-	void QueueSaveChunk(int a_ChunkX, int a_ChunkZ, cChunkCoordCallback * a_Callback = nullptr);
+	/** Queues a chunk to be saved, asynchronously. */
+	void QueueSaveChunk(int a_ChunkX, int a_ChunkZ);
 
 	/** Initializes the storage schemas, ready to be started. */
 	void Initialize(cWorld & a_World, const AString & a_StorageSchemaName, int a_StorageCompressionFactor);
@@ -84,8 +80,8 @@ protected:
 	cWorld * m_World;
 	AString  m_StorageSchemaName;
 
-	cChunkCoordsQueue  m_LoadQueue;
-	cChunkCoordsQueue m_SaveQueue;
+	cQueue<cChunkCoords> m_LoadQueue;
+	cQueue<cChunkCoords> m_SaveQueue;
 
 	/** All the storage schemas (all used for loading) */
 	cWSSchemaList m_Schemas;
@@ -104,10 +100,10 @@ protected:
 
 	virtual void Execute(void) override;
 
-	/** Loads one chunk from the queue (if any queued); returns true if there are more chunks in the load queue */
+	/** Loads one chunk from the queue (if any queued); returns true if there was a chunk in the queue to load */
 	bool LoadOneChunk(void);
 
-	/** Saves one chunk from the queue (if any queued); returns true if there are more chunks in the save queue */
+	/** Saves one chunk from the queue (if any queued); returns true if there was a chunk in the queue to save */
 	bool SaveOneChunk(void);
 } ;
 

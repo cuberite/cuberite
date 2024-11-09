@@ -4,8 +4,7 @@
 
 #include "Globals.h"
 #include "MapSerializer.h"
-#include "../StringCompression.h"
-#include "zlib/zlib.h"
+#include "OSSupport/GZipFile.h"
 #include "FastNBT.h"
 
 #include "../Map.h"
@@ -18,36 +17,20 @@
 cMapSerializer::cMapSerializer(const AString & a_WorldName, cMap * a_Map):
 	m_Map(a_Map)
 {
-	AString DataPath;
-	Printf(DataPath, "%s%cdata", a_WorldName.c_str(), cFile::PathSeparator());
-
-	Printf(m_Path, "%s%cmap_%i.dat", DataPath.c_str(), cFile::PathSeparator(), a_Map->GetID());
-
-	cFile::CreateFolder(FILE_IO_PREFIX + DataPath);
+	auto DataPath = fmt::format(FMT_STRING("{}{}data"), a_WorldName, cFile::PathSeparator());
+	m_Path = fmt::format(FMT_STRING("{}{}map_{}.dat"), DataPath, cFile::PathSeparator(), a_Map->GetID());
+	cFile::CreateFolder(DataPath);
 }
 
 
 
 
 
-bool cMapSerializer::Load(void)
+bool cMapSerializer::Load()
 {
-	AString Data = cFile::ReadWholeFile(FILE_IO_PREFIX + m_Path);
-	if (Data.empty())
-	{
-		return false;
-	}
+	const auto Data = GZipFile::ReadRestOfFile(m_Path);
+	const cParsedNBT NBT(Data.GetView());
 
-	AString Uncompressed;
-	int res = UncompressStringGZIP(Data.data(), Data.size(), Uncompressed);
-
-	if (res != Z_OK)
-	{
-		return false;
-	}
-
-	// Parse the NBT data:
-	cParsedNBT NBT(Uncompressed.data(), Uncompressed.size());
 	if (!NBT.IsValid())
 	{
 		// NBT Parsing failed
@@ -64,32 +47,15 @@ bool cMapSerializer::Load(void)
 bool cMapSerializer::Save(void)
 {
 	cFastNBTWriter Writer;
-
 	SaveMapToNBT(Writer);
-
 	Writer.Finish();
 
-	#ifdef _DEBUG
-	cParsedNBT TestParse(Writer.GetResult().data(), Writer.GetResult().size());
+	#ifndef NDEBUG
+	cParsedNBT TestParse(Writer.GetResult());
 	ASSERT(TestParse.IsValid());
-	#endif  // _DEBUG
+	#endif  // !NDEBUG
 
-	cFile File;
-	if (!File.Open(FILE_IO_PREFIX + m_Path, cFile::fmWrite))
-	{
-		return false;
-	}
-
-	AString Compressed;
-	int res = CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
-
-	if (res != Z_OK)
-	{
-		return false;
-	}
-
-	File.Write(Compressed.data(), Compressed.size());
-	File.Close();
+	GZipFile::Write(m_Path, Writer.GetResult());
 
 	return true;
 }
@@ -202,21 +168,18 @@ bool cMapSerializer::LoadMapFromNBT(const cParsedNBT & a_NBT)
 
 cIDCountSerializer::cIDCountSerializer(const AString & a_WorldName) : m_MapCount(0)
 {
-	AString DataPath;
-	Printf(DataPath, "%s%cdata", a_WorldName.c_str(), cFile::PathSeparator());
-
-	Printf(m_Path, "%s%cidcounts.dat", DataPath.c_str(), cFile::PathSeparator());
-
-	cFile::CreateFolder(FILE_IO_PREFIX + DataPath);
+	auto DataPath = fmt::format(FMT_STRING("{}{}data"), a_WorldName, cFile::PathSeparator());
+	m_Path = fmt::format(FMT_STRING("{}{}idcounts.dat"), DataPath, cFile::PathSeparator());
+	cFile::CreateFolder(DataPath);
 }
 
 
 
 
 
-bool cIDCountSerializer::Load(void)
+bool cIDCountSerializer::Load()
 {
-	AString Data = cFile::ReadWholeFile(FILE_IO_PREFIX + m_Path);
+	AString Data = cFile::ReadWholeFile(m_Path);
 	if (Data.empty())
 	{
 		return false;
@@ -225,7 +188,7 @@ bool cIDCountSerializer::Load(void)
 	// NOTE: idcounts.dat is not compressed (raw format)
 
 	// Parse the NBT data:
-	cParsedNBT NBT(Data.data(), Data.size());
+	cParsedNBT NBT({ reinterpret_cast<const std::byte *>(Data.data()), Data.size() });
 	if (!NBT.IsValid())
 	{
 		// NBT Parsing failed
@@ -260,13 +223,13 @@ bool cIDCountSerializer::Save(void)
 
 	Writer.Finish();
 
-	#ifdef _DEBUG
-	cParsedNBT TestParse(Writer.GetResult().data(), Writer.GetResult().size());
+	#ifndef NDEBUG
+	cParsedNBT TestParse(Writer.GetResult());
 	ASSERT(TestParse.IsValid());
-	#endif  // _DEBUG
+	#endif  // !NDEBUG
 
 	cFile File;
-	if (!File.Open(FILE_IO_PREFIX + m_Path, cFile::fmWrite))
+	if (!File.Open(m_Path, cFile::fmWrite))
 	{
 		return false;
 	}
@@ -278,11 +241,3 @@ bool cIDCountSerializer::Save(void)
 
 	return true;
 }
-
-
-
-
-
-
-
-

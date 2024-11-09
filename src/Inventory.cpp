@@ -78,7 +78,7 @@ int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int
 	}
 
 	char NumLeft = a_ItemStack.m_ItemCount;
-	int MaxStack = ItemHandler(a_ItemStack.m_ItemType)->GetMaxStackSize();
+	char MaxStack = a_ItemStack.GetMaxStackSize();
 	for (int i = a_BeginSlotNum; i <= a_EndSlotNum; i++)
 	{
 		const cItem & Slot = GetSlot(i);
@@ -103,10 +103,12 @@ int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int
 
 
 
-int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
+char cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
 {
+	m_Owner.AddKnownItem(a_Item);
+
 	cItem ToAdd(a_Item);
-	int res = 0;
+	char res = 0;
 
 	// When the item is a armor, try to set it directly to the armor slot.
 	if (ItemCategory::IsArmor(a_Item.m_ItemType))
@@ -121,35 +123,38 @@ int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
 		}
 	}
 
-	for (int SlotIdx = 0; SlotIdx < m_InventorySlots.GetNumSlots(); ++SlotIdx)
-	{
-		auto & Slot = m_InventorySlots.GetSlot(SlotIdx);
-		if (Slot.IsEqual(a_Item))
-		{
-			cItemHandler Handler(Slot.m_ItemType);
-			int AmountToAdd = std::min(static_cast<char>(Handler.GetMaxStackSize() - Slot.m_ItemCount), ToAdd.m_ItemCount);
-			res += AmountToAdd;
-
-			cItem SlotAdjusted(Slot);
-			SlotAdjusted.m_ItemCount += AmountToAdd;
-			m_InventorySlots.SetSlot(SlotIdx, SlotAdjusted);
-
-			ToAdd.m_ItemCount -= AmountToAdd;
-			if (ToAdd.m_ItemCount == 0)
-			{
-				return res;
-			}
-		}
-	}
-
-	res += m_HotbarSlots.AddItem(ToAdd, a_AllowNewStacks);
+	// Add to existing stacks in the hotbar.
+	res += m_HotbarSlots.AddItem(ToAdd, false);
 	ToAdd.m_ItemCount = static_cast<char>(a_Item.m_ItemCount - res);
 	if (ToAdd.m_ItemCount == 0)
 	{
 		return res;
 	}
 
-	res += m_InventorySlots.AddItem(ToAdd, a_AllowNewStacks);
+	// Add to existing stacks in main inventory.
+	res += m_InventorySlots.AddItem(ToAdd, false);
+	ToAdd.m_ItemCount = static_cast<char>(a_Item.m_ItemCount - res);
+	if (ToAdd.m_ItemCount == 0)
+	{
+		return res;
+	}
+
+	// All existing stacks are now filled.
+	if (!a_AllowNewStacks)
+	{
+		return res;
+	}
+
+	// Try adding new stacks to the hotbar.
+	res += m_HotbarSlots.AddItem(ToAdd, true);
+	ToAdd.m_ItemCount = static_cast<char>(a_Item.m_ItemCount - res);
+	if (ToAdd.m_ItemCount == 0)
+	{
+		return res;
+	}
+
+	// Try adding new stacks to the main inventory.
+	res += m_InventorySlots.AddItem(ToAdd, true);
 	return res;
 }
 
@@ -157,12 +162,12 @@ int cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
 
 
 
-int cInventory::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks)
+char cInventory::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks)
 {
-	int TotalAdded = 0;
+	char TotalAdded = 0;
 	for (cItems::iterator itr = a_ItemStackList.begin(); itr != a_ItemStackList.end();)
 	{
-		int NumAdded = AddItem(*itr, a_AllowNewStacks);
+		char NumAdded = AddItem(*itr, a_AllowNewStacks);
 		if (itr->m_ItemCount == NumAdded)
 		{
 			itr = a_ItemStackList.erase(itr);
@@ -183,7 +188,7 @@ int cInventory::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks)
 
 int cInventory::RemoveItem(const cItem & a_ItemStack)
 {
-	int RemovedItems = m_ShieldSlots.RemoveItem(a_ItemStack);
+	char RemovedItems = m_ShieldSlots.RemoveItem(a_ItemStack);
 
 	if (RemovedItems < a_ItemStack.m_ItemCount)
 	{
@@ -204,6 +209,26 @@ int cInventory::RemoveItem(const cItem & a_ItemStack)
 
 
 
+cItem * cInventory::FindItem(const cItem & a_RecipeItem)
+{
+	cItem * Item = m_ShieldSlots.FindItem(a_RecipeItem);
+	if (Item != nullptr)
+	{
+		return Item;
+	}
+	Item = m_HotbarSlots.FindItem(a_RecipeItem);
+	if (Item != nullptr)
+	{
+		return Item;
+	}
+
+	return 	m_InventorySlots.FindItem(a_RecipeItem);
+}
+
+
+
+
+
 bool cInventory::RemoveOneEquippedItem(void)
 {
 	if (m_HotbarSlots.GetSlot(m_EquippedSlotNum).IsEmpty())
@@ -213,6 +238,49 @@ bool cInventory::RemoveOneEquippedItem(void)
 
 	m_HotbarSlots.ChangeSlotCount(m_EquippedSlotNum, -1);
 	return true;
+}
+
+
+
+
+
+int cInventory::ReplaceOneEquippedItem(const cItem & a_Item, bool a_TryOtherSlots)
+{
+	// Ignore whether there was an item in the slot to remove.
+	RemoveOneEquippedItem();
+
+	auto EquippedItem = GetEquippedItem();
+	if (EquippedItem.IsEmpty())
+	{
+		SetEquippedItem(a_Item);
+		return a_Item.m_ItemCount;
+	}
+
+	// Handle case when equipped item is the same as the replacement item.
+	cItem ItemsToAdd = a_Item;
+	if (EquippedItem.IsEqual(ItemsToAdd))
+	{
+		auto AmountToAdd = std::min(static_cast<char>(ItemsToAdd.GetMaxStackSize() - EquippedItem.m_ItemCount), ItemsToAdd.m_ItemCount);
+
+		EquippedItem.m_ItemCount += AmountToAdd;
+		SetEquippedItem(EquippedItem);
+		ItemsToAdd.m_ItemCount -= AmountToAdd;
+	}
+
+	auto ItemsAdded = a_Item.m_ItemCount - ItemsToAdd.m_ItemCount;
+
+	if (ItemsToAdd.m_ItemCount == 0)
+	{
+		return ItemsAdded;
+	}
+
+	if (!a_TryOtherSlots)
+	{
+		return ItemsAdded;
+	}
+
+	// Try the rest of the inventory.
+	return AddItem(ItemsToAdd) + ItemsAdded;
 }
 
 
@@ -294,6 +362,15 @@ void cInventory::SetHotbarSlot(int a_HotBarSlotNum, const cItem & a_Item)
 void cInventory::SetShieldSlot(const cItem & a_Item)
 {
 	m_ShieldSlots.SetSlot(0, a_Item);
+}
+
+
+
+
+
+void cInventory::SetEquippedItem(const cItem & a_Item)
+{
+	SetHotbarSlot(GetEquippedSlotNum(), a_Item);
 }
 
 
@@ -418,7 +495,7 @@ bool cInventory::DamageEquippedItem(short a_Amount)
 
 
 
-int cInventory::ChangeSlotCount(int a_SlotNum, int a_AddToCount)
+char cInventory::ChangeSlotCount(int a_SlotNum, char a_AddToCount)
 {
 	int GridSlotNum = 0;
 	cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
@@ -611,7 +688,7 @@ void cInventory::UpdateItems(void)
 	const cItem & Slot = GetEquippedItem();
 	if (!Slot.IsEmpty())
 	{
-		ItemHandler(Slot.m_ItemType)->OnUpdate(m_Owner.GetWorld(), &m_Owner, Slot);
+		Slot.GetHandler().OnUpdate(m_Owner.GetWorld(), &m_Owner, Slot);
 	}
 }
 
@@ -807,7 +884,3 @@ void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 	SendSlot(Base + a_SlotNum);
 }
-
-
-
-

@@ -15,6 +15,8 @@
 
 
 
+#pragma once
+
 #include "ComposableGenerator.h"
 #include "../Noise/Noise.h"
 #include "../ProbabDistrib.h"
@@ -104,7 +106,7 @@ public:
 		BiomeInfo(int a_MinNumClumpsPerChunk, int a_MaxNumClumpsPerChunk, std::vector<FoliageInfo> a_Blocks) :
 			m_MinNumClumpsPerChunk(a_MinNumClumpsPerChunk),
 			m_MaxNumClumpsPerChunk(a_MaxNumClumpsPerChunk),
-			m_Blocks(a_Blocks)
+			m_Blocks(std::move(a_Blocks))
 		{}
 	};
 
@@ -118,10 +120,10 @@ public:
 
 	/** Parses a string and puts a vector with a length of biMaxVariantBiome in a_Output.
 	The format of the string is "<Biomes separated with a comma>;<Blocks separated with a comma>". This can also be repeated with a | */
-	static void ParseConfigurationString(AString a_String, std::vector<BiomeInfo> & a_Output);
+	static void ParseConfigurationString(const AString & a_String, std::vector<BiomeInfo> & a_Output);
 
 	/** Parses an inifile in search for all clumps */
-	static std::vector<BiomeInfo> ParseIniFile(cIniFile & a_IniFile, AString a_ClumpPrefix);
+	static std::vector<BiomeInfo> ParseIniFile(cIniFile & a_IniFile, const AString & a_ClumpPrefix);
 protected:
 
 	cNoise m_Noise;
@@ -130,7 +132,7 @@ protected:
 	/** The maximum number of foliage per clump */
 	const int MAX_NUM_FOLIAGE = 8;
 
-	/** The mininum number of foliage per clump */
+	/** The minimum number of foliage per clump */
 	const int MIN_NUM_FOLIAGE = 4;
 
 	/** The maximum range a foliage can be placed from the center of the clump */
@@ -179,35 +181,10 @@ protected:
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
-	int GetBiomeDensity(EMCSBiome a_Biome)
-	{
-		switch (a_Biome)
-		{
-			case biSavanna:
-			case biSavannaM:
-			case biSavannaPlateau:
-			case biSavannaPlateauM:
-			case biPlains:
-			{
-				return 70;
-			}
-
-			case biExtremeHillsEdge:
-			case biExtremeHillsPlus:
-			case biExtremeHills:
-			case biExtremeHillsPlusM:
-			case biExtremeHillsM:
-			case biIceMountains:
-			{
-				return 3;
-			}
-
-			default:
-			{
-				return 20;
-			}
-		}
-	}
+	static bool CanFernGrow(EMCSBiome a_Biome);
+	static bool CanLargeFernGrow(EMCSBiome a_Biome);
+	static int GetBiomeDensity(EMCSBiome a_Biome);
+	static bool CanGrassGrow(EMCSBiome a_Biome);
 };
 
 
@@ -487,9 +464,10 @@ Note that this class uses the "Nest" terminology for individual packs of ore, it
 class cFinishGenOres:
 	public cFinishGen
 {
-	typedef cFinishGen Super;
+	using Super = cFinishGen;
 
 public:
+
 	struct OreInfo
 	{
 		BLOCKTYPE  m_BlockType;  // The type of the nest.
@@ -574,12 +552,13 @@ protected:
 
 
 
-class cFinishGenOreNests :
+class cFinishGenOreNests:
 	public cFinishGenOres
 {
-	typedef cFinishGenOres Super;
+	using Super = cFinishGenOres;
 
 public:
+
 	cFinishGenOreNests(int a_Seed, const OreInfos & a_OreInfos):
 		Super(a_Seed, a_OreInfos)
 	{}
@@ -602,17 +581,17 @@ protected:
 class cFinishGenOrePockets:
 	public cFinishGenOres
 {
-	typedef cFinishGenOres Super;
+	using Super = cFinishGenOres;
 
 public:
+
 	cFinishGenOrePockets(int a_Seed, const OreInfos & a_OreInfos):
 		Super(a_Seed, a_OreInfos)
 	{}
 
 	/** Reads the configuration from the specified INI file.
-	a_GenName is the name of the generator (this class may be used for OrePockets and DirtPockets, each has a different default).
-	Returns true on success, false and logs errors to console on failure. */
-	bool Initialize(cIniFile & a_IniFile, const AString & a_GenName);
+	a_GenName is the name of the generator (this class may be used for OrePockets and DirtPockets, each has a different default). */
+	void Initialize(cIniFile & a_IniFile, const AString & a_GenName);
 
 protected:
 
@@ -655,3 +634,14 @@ protected:
 
 
 
+
+class cFinishGenForestRocks:
+	public cFinishGen
+{
+public:
+	cFinishGenForestRocks(int a_Seed, cIniFile & a_IniFile);
+	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
+
+private:
+	cNoise m_Noise;
+};

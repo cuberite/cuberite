@@ -7,32 +7,28 @@
 
 
 
-class cBlockMelonHandler :
+class cBlockMelonHandler final :
 	public cBlockHandler
 {
-	using super = cBlockHandler;
+	using Super = cBlockHandler;
 
 public:
 
-	cBlockMelonHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
+	using Super::Super;
+
+private:
+
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
+		const auto DropNum = FortuneDiscreteRandom(3, 7, ToolFortuneLevel(a_Tool), 9);
+		return cItem(E_ITEM_MELON_SLICE, DropNum);
 	}
 
 
 
 
 
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
-	{
-		return cItem(E_ITEM_MELON_SLICE, GetRandomProvider().RandInt<char>(3, 7), 0);
-	}
-
-
-
-
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 19;

@@ -8,7 +8,7 @@
 
 
 cCaveSpider::cCaveSpider(void) :
-	super("CaveSpider", mtCaveSpider, "entity.spider.hurt", "entity.spider.death", 0.7, 0.5)
+	Super("CaveSpider", mtCaveSpider, "entity.spider.hurt", "entity.spider.death", "entity.spider.ambient", 0.7f, 0.5f)
 {
 }
 
@@ -18,14 +18,14 @@ cCaveSpider::cCaveSpider(void) :
 
 void cCaveSpider::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
 		return;
 	}
 
-	m_EMPersonality = (GetWorld()->GetTimeOfDay() < (12000 + 1000)) ? PASSIVE : AGGRESSIVE;
+	m_EMPersonality = (GetWorld()->GetTimeOfDay() < 13000_tick) ? PASSIVE : AGGRESSIVE;
 }
 
 
@@ -34,7 +34,7 @@ void cCaveSpider::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 bool cCaveSpider::Attack(std::chrono::milliseconds a_Dt)
 {
-	if (!super::Attack(a_Dt))
+	if (!Super::Attack(a_Dt))
 	{
 		return false;
 	}

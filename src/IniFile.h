@@ -30,10 +30,14 @@
 
 // tolua_begin
 
-class cIniFile : public cSettingsRepositoryInterface
+class cIniFile:
+	public cSettingsRepositoryInterface
 {
 private:
-	typedef cSettingsRepositoryInterface Super;
+
+	// tolua_end
+
+	using Super = cSettingsRepositoryInterface;
 
 
 	bool m_IsCaseInsensitive;
@@ -57,6 +61,8 @@ private:
 	/** Removes the UTF-8 BOMs (Byte order makers), if present. */
 	void RemoveBom(AString & a_line) const;
 
+	// tolua_begin
+
 public:
 
 	// NOTE: This has to be present for ToLua++'s parser to output the noID constant into the API
@@ -71,7 +77,6 @@ public:
 	cIniFile(void);
 
 	// tolua_end
-	virtual ~cIniFile() override = default;
 
 	virtual std::vector<std::pair<AString, AString>> GetValues(AString a_keyName) override;
 

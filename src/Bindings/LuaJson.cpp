@@ -9,6 +9,7 @@
 #include "LuaState.h"
 #include "tolua++/include/tolua++.h"
 #include "json/json.h"
+#include "../JsonUtils.h"
 
 
 
@@ -28,7 +29,8 @@ Keeps track of the error message and the problematic value's path in the table.
 class CannotSerializeException:
 	public std::runtime_error
 {
-	typedef std::runtime_error Super;
+	using Super = std::runtime_error;
+
 public:
 	/** Constructs a new instance of the exception based on the provided values directly. */
 	explicit CannotSerializeException(const AString & a_ValueName, const char * a_ErrorMsg):
@@ -40,7 +42,7 @@ public:
 	/** Constructs a new instance of the exception based on the provided values directly. */
 	explicit CannotSerializeException(int a_ValueIndex, const char * a_ErrorMsg):
 		Super(a_ErrorMsg),
-		m_ValueName(Printf("%d", a_ValueIndex))
+		m_ValueName(fmt::format(FMT_STRING("{}"), a_ValueIndex))
 	{
 	}
 
@@ -56,7 +58,7 @@ public:
 	Used for prefixing the value name's path along the call stack that lead to the main exception. */
 	explicit CannotSerializeException(const CannotSerializeException & a_Parent, int a_ValueNamePrefixIndex):
 		Super(a_Parent.what()),
-		m_ValueName(Printf("%d", a_ValueNamePrefixIndex) + "." + a_Parent.m_ValueName)
+		m_ValueName(fmt::format(FMT_STRING("{}"), a_ValueNamePrefixIndex) + "." + a_Parent.m_ValueName)
 	{
 	}
 
@@ -294,10 +296,10 @@ static int tolua_cJson_Parse(lua_State * a_LuaState)
 
 	// Parse the string:
 	Json::Value root;
-	Json::Reader reader;
-	if (!reader.parse(input, root, false))
+	AString ParseError;
+	if (!JsonUtils::ParseString(input, root, &ParseError))
 	{
-		L.Push(cLuaState::Nil, Printf("Parsing Json failed: %s", reader.getFormattedErrorMessages().c_str()));
+		L.Push(cLuaState::Nil, fmt::format(FMT_STRING("Parsing Json failed: {}"), ParseError));
 		return 2;
 	}
 
@@ -336,7 +338,10 @@ static int tolua_cJson_Serialize(lua_State * a_LuaState)
 	catch (const CannotSerializeException & exc)
 	{
 		lua_pushnil(L);
-		L.Push(Printf("Cannot serialize into Json, value \"%s\" caused an error \"%s\"", exc.GetValueName().c_str(), exc.what()));
+		L.Push(fmt::format(
+			FMT_STRING("Cannot serialize into Json, value \"{}\" caused an error \"{}\""),
+			exc.GetValueName(), exc.what()
+		));
 		return 2;
 	}
 	lua_pop(L, 1);

@@ -7,32 +7,26 @@
 
 
 
-class cItemLeavesHandler :
+class cItemLeavesHandler final :
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
-	cItemLeavesHandler(int a_ItemType)
-		: cItemHandler(a_ItemType)
-	{
-	}
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+	using Super::Super;
+
+
+
+
+
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
-		bool res = super::GetPlacementBlockTypeMeta(
-			a_World, a_Player,
-			a_BlockX, a_BlockY, a_BlockZ, a_BlockFace,
-			a_CursorX, a_CursorY, a_CursorZ,
-			a_BlockType, a_BlockMeta
+		return a_Player.PlaceBlock(
+			a_PlacePosition,
+			static_cast<BLOCKTYPE>(m_ItemType),
+			static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage | 0x4)  // 0x4 bit set means this is a player-placed leaves block, not to be decayed.
 		);
-		a_BlockMeta = a_BlockMeta | 0x4;  // 0x4 bit set means this is a player-placed leaves block, not to be decayed
-		return res;
 	}
 } ;
 

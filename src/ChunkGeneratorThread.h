@@ -1,7 +1,7 @@
 #pragma once
 
 #include "OSSupport/IsThread.h"
-
+#include "ChunkDef.h"
 
 
 
@@ -93,7 +93,7 @@ public:
 
 	void WaitForQueueEmpty();
 
-	int GetQueueLength() const;
+	size_t GetQueueLength() const;
 
 	int GetSeed() const;
 

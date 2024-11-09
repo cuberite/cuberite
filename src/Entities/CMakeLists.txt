@@ -1,5 +1,6 @@
+target_sources(
+	${CMAKE_PROJECT_NAME} PRIVATE
 
-SET (SRCS
 	ArrowEntity.cpp
 	Boat.cpp
 	EnderCrystal.cpp
@@ -26,9 +27,8 @@ SET (SRCS
 	ThrownEggEntity.cpp
 	ThrownEnderPearlEntity.cpp
 	ThrownSnowballEntity.cpp
-	WitherSkullEntity.cpp)
+	WitherSkullEntity.cpp
 
-SET (HDRS
 	ArrowEntity.h
 	Boat.h
 	EnderCrystal.h
@@ -55,9 +55,5 @@ SET (HDRS
 	ThrownEggEntity.h
 	ThrownEnderPearlEntity.h
 	ThrownSnowballEntity.h
-	WitherSkullEntity.h)
-
-if(NOT MSVC)
-	add_library(Entities ${SRCS} ${HDRS})
-	target_link_libraries(Entities fmt::fmt WorldStorage)
-endif()
+	WitherSkullEntity.h
+)

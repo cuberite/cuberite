@@ -32,18 +32,22 @@ protected:
 	cPerlinNoise m_Perlin;
 
 	// XYZ size of the "island", in blocks:
-	int m_IslandSizeX;
-	int m_IslandSizeY;
-	int m_IslandSizeZ;
+	int m_MainIslandSize;
+	int m_IslandThickness;
+	int m_IslandYOffset;
 
 	// XYZ Frequencies of the noise functions:
-	NOISE_DATATYPE m_FrequencyX;
-	NOISE_DATATYPE m_FrequencyY;
-	NOISE_DATATYPE m_FrequencyZ;
+	NOISE_DATATYPE m_MainIslandFrequencyX;
+	NOISE_DATATYPE m_MainIslandFrequencyY;
+	NOISE_DATATYPE m_MainIslandFrequencyZ;
+	NOISE_DATATYPE m_MainIslandMinThreshold;
 
-	// Minimum and maximum chunk coords for chunks inside the island area. Chunks outside won't get calculated at all
-	int m_MinChunkX, m_MaxChunkX;
-	int m_MinChunkZ, m_MaxChunkZ;
+	// XYZ Frequencies of the noise functions on the smaller islands:
+	NOISE_DATATYPE m_SmallIslandFrequencyX;
+	NOISE_DATATYPE m_SmallIslandFrequencyY;
+	NOISE_DATATYPE m_SmallIslandFrequencyZ;
+	NOISE_DATATYPE m_SmallIslandMinThreshold;
+
 
 	// Noise array for the last chunk (in the noise range)
 	cChunkCoords m_LastChunkCoords;
@@ -56,15 +60,11 @@ protected:
 	/** Generates the m_NoiseArray array for the current chunk */
 	void GenerateNoiseArray(void);
 
-	/** Returns true if the chunk is outside of the island's dimensions */
-	bool IsChunkOutsideRange(cChunkCoords a_ChunkCoords);
-
-
 	// cTerrainShapeGen overrides:
 	virtual void GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape) override;
+	virtual void InitializeShapeGen(cIniFile & a_IniFile) override;
 
 
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) override;
-	virtual void InitializeCompoGen(cIniFile & a_IniFile) override;
 } ;

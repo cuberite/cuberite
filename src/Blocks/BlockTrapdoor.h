@@ -2,28 +2,24 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
 #include "../EffectID.h"
 
 
 
 
-class cBlockTrapdoorHandler :
-	public cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>
+class cBlockTrapdoorHandler final :
+	public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>
 {
-	using super = cClearMetaOnDrop<cMetaRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>;
+	using Super = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x01, 0x02, 0x00, 0x03, false>>;
 
 public:
 
-	cBlockTrapdoorHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-	virtual bool IsUseable(void) override
+	virtual bool IsUseable(void) const override
 	{
 		return true;
 	}
@@ -32,7 +28,14 @@ public:
 
 
 
-	virtual bool OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override
+	virtual bool OnUse(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace,
+		const Vector3i a_CursorPos
+	) const override
 	{
 		if (m_BlockType == E_BLOCK_IRON_TRAPDOOR)
 		{
@@ -41,54 +44,32 @@ public:
 		}
 
 		// Flip the ON bit on / off using the XOR bitwise operation
-		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ}) ^ 0x04);
-		a_ChunkInterface.SetBlockMeta(a_BlockX, a_BlockY, a_BlockZ, Meta);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, { a_BlockX, a_BlockY, a_BlockZ }, 0, a_Player.GetClientHandle());
+		NIBBLETYPE Meta = (a_ChunkInterface.GetBlockMeta(a_BlockPos) ^ 0x04);
+		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, a_BlockPos, 0, a_Player.GetClientHandle());
 
 		return true;
 	}
 
-	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+
+
+
+
+	virtual void OnCancelRightClick(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace
+	) const override
 	{
 		UNUSED(a_ChunkInterface);
-		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+		a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
 	}
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		a_BlockType = m_BlockType;
-		a_BlockMeta = BlockFaceToMetaData(a_BlockFace);
 
-		if (a_CursorY > 7)
-		{
-			a_BlockMeta |= 0x8;
-		}
-		return true;
-	}
 
-	inline static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
-	{
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_ZP: return 0x1;
-			case BLOCK_FACE_ZM: return 0x0;
-			case BLOCK_FACE_XP: return 0x3;
-			case BLOCK_FACE_XM: return 0x2;
-			case BLOCK_FACE_NONE:
-			case BLOCK_FACE_YM:
-			case BLOCK_FACE_YP:
-			{
-				ASSERT(!"Unhandled block face!");
-				return 0;
-			}
-		}
-		UNREACHABLE("Unsupported block face");
-	}
+
 
 	inline static eBlockFace BlockMetaDataToBlockFace(NIBBLETYPE a_Meta)
 	{
@@ -106,19 +87,11 @@ public:
 		}
 	}
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
-	{
-		NIBBLETYPE Meta;
-		a_Chunk.UnboundedRelGetBlockMeta(a_RelX, a_RelY, a_RelZ, Meta);
 
-		AddFaceDirection(a_RelX, a_RelY, a_RelZ, BlockMetaDataToBlockFace(Meta), true);
-		BLOCKTYPE BlockIsOn;
-		a_Chunk.UnboundedRelGetBlockType(a_RelX, a_RelY, a_RelZ, BlockIsOn);
 
-		return ((a_RelY > 0) && cBlockInfo::IsSolid(BlockIsOn));
-	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		switch (m_BlockType)

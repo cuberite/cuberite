@@ -8,6 +8,7 @@
 
 
 
+
 class cClientHandle;
 
 
@@ -20,7 +21,7 @@ class cBrewingstandEntity :
 {
 	// tolua_end
 
-	using super = cBlockEntityWithItems;
+	using Super = cBlockEntityWithItems;
 
 	// tolua_begin
 
@@ -40,16 +41,12 @@ public:
 
 	// tolua_end
 
-	BLOCKENTITY_PROTODEF(cBrewingstandEntity)
-
 	/** Constructor used for normal operation */
 	cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
-	virtual ~cBrewingstandEntity() override;
-
-	//  cBlockEntity overrides:
-	virtual void Destroy() override;
+	// cBlockEntity overrides:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
+	virtual void OnRemoveFromWorld() override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 	virtual bool Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
@@ -81,7 +78,7 @@ public:
 	const cItem & GetFuelSlot(void) const { return GetSlot(bsFuel); }
 
 	/** Get the expected result item for the given slot number */
-	const cItem & GetResultItem(int a_SlotNumber) { return m_Results[a_SlotNumber]; }
+	const cItem & GetResultItem(size_t a_SlotNumber) { return m_Results[a_SlotNumber]; }
 
 	/** Sets the item in the left bottle slot  */
 	void SetLeftBottleSlot(const cItem & a_Item) { SetSlot(bsLeftBottle, a_Item); }
@@ -112,11 +109,7 @@ public:
 	/** Gets the recipes. Will be called if the brewing stand gets loaded from the world. */
 	void LoadRecipes(void);
 
-
 protected:
-
-	/** Set to true when the brewing stand entity has been destroyed to prevent the block being set again */
-	bool m_IsDestroyed;
 
 	/** Set to true if the brewing stand is brewing an item */
 	bool m_IsBrewing;
@@ -125,10 +118,10 @@ protected:
 	const short m_NeedBrewingTime = 400;
 
 	/** Store the current brewing recipes */
-	const cBrewingRecipes::cRecipe * m_CurrentBrewingRecipes[3] = {};
+	std::array<const cBrewingRecipes::cRecipe *, 3> m_CurrentBrewingRecipes = {};
 
 	/** Result items for the  bottle inputs */
-	cItem m_Results[3];
+	std::array<cItem, 3> m_Results;
 
 	/** Amount of ticks that the current item has been brewed */
 	short m_TimeBrewed;
@@ -137,17 +130,11 @@ protected:
 	short m_RemainingFuel;
 
 	/** Sends the specified progressbar value to all clients of the window */
-	void BroadcastProgress(short a_ProgressbarID, short a_Value);
+	void BroadcastProgress(size_t a_ProgressbarID, short a_Value);
 
 	// /** Broadcasts progressbar updates, if needed */
 	void UpdateProgressBars(bool a_ForceUpdate = false);
 
 	// cItemGrid::cListener overrides:
 	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
-
 } ;  // tolua_export
-
-
-
-
-

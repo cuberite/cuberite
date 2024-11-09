@@ -21,11 +21,9 @@ class cSignEntity :
 {
 	// tolua_end
 
-	using super = cBlockEntity;
+	using Super = cBlockEntity;
 
 public:  // tolua_export
-
-	BLOCKENTITY_PROTODEF(cSignEntity)
 
 	/** Creates a new empty sign entity at the specified block coords and block type (wall or standing). a_World may be nullptr */
 	cSignEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
@@ -36,10 +34,10 @@ public:  // tolua_export
 	void SetLines(const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 
 	/** Sets individual line (zero-based index) */
-	void SetLine(int a_Index, const AString & a_Line);
+	void SetLine(size_t a_Index, const AString & a_Line);
 
 	/** Retrieves individual line (zero-based index) */
-	AString GetLine(int a_Index) const;
+	AString GetLine(size_t a_Index) const;
 
 	// tolua_end
 
@@ -50,9 +48,5 @@ public:  // tolua_export
 
 private:
 
-	AString  m_Line[4];
+	std::array<AString, 4> m_Line;
 } ;  // tolua_export
-
-
-
-

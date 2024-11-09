@@ -23,11 +23,9 @@ class cMobHeadEntity :
 {
 	// tolua_end
 
-	using super = cBlockEntity;
+	using Super = cBlockEntity;
 
 public:  // tolua_export
-
-	BLOCKENTITY_PROTODEF(cMobHeadEntity)
 
 	/** Creates a new mob head entity at the specified block coords. a_World may be nullptr */
 	cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
@@ -69,11 +67,6 @@ public:  // tolua_export
 	/** Returns the player UUID of the mob head */
 	cUUID GetOwnerUUID(void) const { return m_OwnerUUID; }  // Exported in ManualBindings.cpp
 
-	// cBlockEntity overrides:
-	virtual void CopyFrom(const cBlockEntity & a_Src) override;
-	virtual bool UsedBy(cPlayer * a_Player) override;
-	virtual void SendTo(cClientHandle & a_Client) override;
-
 private:
 
 	eMobHeadType m_Type;
@@ -83,8 +76,10 @@ private:
 	cUUID   m_OwnerUUID;
 	AString m_OwnerTexture;
 	AString m_OwnerTextureSignature;
+
+	// cBlockEntity overrides:
+	virtual cItems ConvertToPickups() const override;
+	virtual void CopyFrom(const cBlockEntity & a_Src) override;
+	virtual void SendTo(cClientHandle & a_Client) override;
+	virtual bool UsedBy(cPlayer * a_Player) override;
 } ;  // tolua_export
-
-
-
-

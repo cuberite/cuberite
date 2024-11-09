@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "ChunkDef.h"
+
 /*
 // Needed Fwds: cPath
 enum class ePathFinderStatus;
@@ -15,7 +17,6 @@ class cPath;
 	#include "PathFinderIrrlicht_Head.h"
 #endif
 
-#include <unordered_map>
 
 //fwd: ../Chunk.h
 class cChunk;

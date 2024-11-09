@@ -11,94 +11,20 @@
 
 #include "BlockHandler.h"
 #include "ChunkInterface.h"
+#include "../BlockInfo.h"
 #include "../Entities/Player.h"
+#include "../BlockInfo.h"
 
 
 
-class cBlockSlabHandler :
+class cBlockSlabHandler final :
 	public cBlockHandler
 {
-	using super = cBlockHandler;
+	using Super = cBlockHandler;
 
 public:
 
-	cBlockSlabHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
-	{
-	}
-
-
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
-	{
-		// Reset the "top half" flag:
-		return cItem(m_BlockType, 1, a_BlockMeta & 0x07);
-	}
-
-
-
-
-
-	virtual bool GetPlacementBlockTypeMeta(
-		cChunkInterface & a_ChunkInterface, cPlayer & a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
-	{
-		a_BlockType = m_BlockType;
-		NIBBLETYPE Meta = static_cast<NIBBLETYPE>(a_Player.GetEquippedItem().m_ItemDamage);
-
-		// Set the correct metadata based on player equipped item (i.e. a_BlockMeta not initialised yet)
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_TOP:
-			{
-				// Bottom half slab block
-				a_BlockMeta = Meta & 0x7;
-				break;
-			}
-			case BLOCK_FACE_BOTTOM:
-			{
-				// Top half slab block
-				a_BlockMeta = Meta | 0x8;
-				break;
-			}
-			case BLOCK_FACE_EAST:
-			case BLOCK_FACE_NORTH:
-			case BLOCK_FACE_SOUTH:
-			case BLOCK_FACE_WEST:
-			{
-				if (a_CursorY > 7)
-				{
-					// Cursor at top half of block, place top slab
-					a_BlockMeta = Meta | 0x8; break;
-				}
-				else
-				{
-					// Cursor at bottom half of block, place bottom slab
-					a_BlockMeta = Meta & 0x7; break;
-				}
-			}
-			case BLOCK_FACE_NONE: return false;
-		}  // switch (a_BlockFace)
-
-		// Check if the block at the coordinates is a single slab. Eligibility for combining has already been processed in ClientHandle
-		// Changed to-be-placed to a double slab if we are clicking on a single slab, as opposed to placing one for the first time
-		if (IsAnySlabType(a_ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ})))
-		{
-			a_BlockType = GetDoubleSlabType(m_BlockType);
-			a_BlockMeta = a_BlockMeta & 0x7;
-		}
-
-		return true;
-	}
-
-
-
-
+	using Super::Super;
 
 	/** Returns true if the specified blocktype is one of the slabs handled by this handler */
 	static bool IsAnySlabType(BLOCKTYPE a_BlockType)
@@ -111,11 +37,47 @@ public:
 		);
 	}
 
+private:
+
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	{
+		// Reset the "top half" flag:
+		return cItem(m_BlockType, 1, a_BlockMeta & 0x07);
+	}
+
+
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
+	{
+		/* Double slab combining uses build collision checks to replace single slabs with double slabs in the right conditions.
+		For us to be replaced, the player must be:
+		1. Placing the same slab material.
+		2. Placing the same slab sub-kind (and existing slab is single). */
+		if ((m_BlockType != a_HeldItem.m_ItemType) || ((a_Meta & 0x07) != a_HeldItem.m_ItemDamage))
+		{
+			return false;
+		}
+
+		const bool IsTopSlab = (a_Meta & 0x08) == 0x08;
+		const auto CanClickCombine = ((a_ClickedBlockFace == BLOCK_FACE_TOP) && !IsTopSlab) || ((a_ClickedBlockFace == BLOCK_FACE_BOTTOM) && IsTopSlab);
+
+		/* When the player clicks on us directly, we'll combine if we're
+		a bottom slab and he clicked the top, or vice versa. Clicking on the sides will not combine.
+		However, when indirectly clicked (on the side of another block, that caused placement to go to us)
+		the conditions are exactly the opposite. */
+		return a_ClickedDirectly ? CanClickCombine : !CanClickCombine;
+	}
 
 
 
 
-	virtual void OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace) override
+
+	virtual void OnCancelRightClick(
+		cChunkInterface & a_ChunkInterface,
+		cWorldInterface & a_WorldInterface,
+		cPlayer & a_Player,
+		const Vector3i a_BlockPos,
+		eBlockFace a_BlockFace
+	) const override
 	{
 		if ((a_BlockFace == BLOCK_FACE_NONE) || (a_Player.GetEquippedItem().m_ItemType != static_cast<short>(m_BlockType)))
 		{
@@ -123,32 +85,14 @@ public:
 		}
 
 		// Sends the slab back to the client. It's to refuse a doubleslab placement. */
-		a_Player.GetWorld()->SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
+		a_Player.GetWorld()->SendBlockTo(a_BlockPos, a_Player);
 	}
 
 
 
 
 
-	/** Converts the single-slab blocktype to its equivalent double-slab blocktype */
-	static BLOCKTYPE GetDoubleSlabType(BLOCKTYPE a_SingleSlabBlockType)
-	{
-		switch (a_SingleSlabBlockType)
-		{
-			case E_BLOCK_STONE_SLAB: return E_BLOCK_DOUBLE_STONE_SLAB;
-			case E_BLOCK_WOODEN_SLAB: return E_BLOCK_DOUBLE_WOODEN_SLAB;
-			case E_BLOCK_RED_SANDSTONE_SLAB: return E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB;
-			case E_BLOCK_PURPUR_SLAB: return E_BLOCK_PURPUR_DOUBLE_SLAB;
-		}
-		ASSERT(!"Unhandled slab type!");
-		return E_BLOCK_AIR;
-	}
-
-
-
-
-
-	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) override
+	virtual NIBBLETYPE MetaMirrorXZ(NIBBLETYPE a_Meta) const override
 	{
 		// Toggle the 4th bit - up / down:
 		return (a_Meta ^ 0x08);
@@ -158,7 +102,7 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		a_Meta &= 0x7;
 
@@ -220,13 +164,13 @@ public:
 
 
 
-	virtual bool IsInsideBlock(Vector3d a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta) override
+	virtual bool IsInsideBlock(Vector3d a_Position, const NIBBLETYPE a_BlockMeta) const override
 	{
-		if (a_BlockMeta & 0x8)  // top half
+		if (a_BlockMeta & 0x08)  // top half
 		{
 			return true;
 		}
-		return cBlockHandler::IsInsideBlock(a_Position, a_BlockType, a_BlockMeta);
+		return cBlockHandler::IsInsideBlock(a_Position, a_BlockMeta);
 	}
 } ;
 
@@ -234,23 +178,18 @@ public:
 
 
 
-class cBlockDoubleSlabHandler :
+class cBlockDoubleSlabHandler final :
 	public cBlockHandler
 {
-	using super = cBlockHandler;
+	using Super = cBlockHandler;
 
 public:
 
-	cBlockDoubleSlabHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		BLOCKTYPE Block = GetSingleSlabType(m_BlockType);
 		return cItem(Block, 2, a_BlockMeta & 0x7);
@@ -277,10 +216,10 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		// For doule slabs, the meta values are the same. Only the meaning of the 4th bit changes, but that's ignored in the below handler
-		return BlockHandler(GetSingleSlabType(m_BlockType))->GetMapBaseColourID(a_Meta);
+		return cBlockHandler::For(GetSingleSlabType(m_BlockType)).GetMapBaseColourID(a_Meta);
 	}
 } ;
 

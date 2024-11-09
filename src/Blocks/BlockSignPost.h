@@ -8,22 +8,18 @@
 
 
 
-class cBlockSignPostHandler:
+class cBlockSignPostHandler final :
 	public cBlockHandler
 {
-	using super = cBlockHandler;
+	using Super = cBlockHandler;
 
 public:
 
-	cBlockSignPostHandler(BLOCKTYPE a_BlockType):
-		super(a_BlockType)
-	{
-	}
+	using Super::Super;
 
+private:
 
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		return cItem(E_ITEM_SIGN, 1, 0);
 	}
@@ -32,41 +28,41 @@ public:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, int a_RelX, int a_RelY, int a_RelZ, const cChunk & a_Chunk) override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
 	{
-		if (a_RelY <= 0)
+		const auto BelowPos = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(BelowPos))
 		{
 			return false;
 		}
-		BLOCKTYPE Type = a_Chunk.GetBlock(a_RelX, a_RelY - 1, a_RelZ);
 
-		return ((Type == E_BLOCK_SIGN_POST) || (Type == E_BLOCK_WALLSIGN) || cBlockInfo::IsSolid(Type));
+		BLOCKTYPE Type = a_Chunk.GetBlock(BelowPos);
+		return (Type == E_BLOCK_SIGN_POST) || (Type == E_BLOCK_WALLSIGN) || cBlockInfo::IsSolid(Type);
 	}
 
-	static NIBBLETYPE RotationToMetaData(double a_Rotation)
-	{
-		a_Rotation += 180 + (180 / 16);  // So it's not aligned with axis
-		if (a_Rotation > 360)
-		{
-			a_Rotation -= 360;
-		}
 
-		a_Rotation = (a_Rotation / 360) * 16;
 
-		return (static_cast<char>(a_Rotation)) % 16;
-	}
 
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) override
+
+	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) const override
 	{
 		return (a_Meta + 4) & 0x0f;
 	}
 
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) override
+
+
+
+
+	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override
 	{
 		return (a_Meta + 12) & 0x0f;
 	}
 
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) override
+
+
+
+
+	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) const override
 	{
 		// Mirrors signs over the XY plane (North-South Mirroring)
 
@@ -75,7 +71,11 @@ public:
 		return (a_Meta < 0x08) ? (0x08 - a_Meta) : (0x18 - a_Meta);
 	}
 
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) override
+
+
+
+
+	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) const override
 	{
 		// Mirrors signs over the YZ plane (East-West Mirroring)
 
@@ -84,7 +84,11 @@ public:
 		return 0x0f - a_Meta;
 	}
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+
+
+
+
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 13;

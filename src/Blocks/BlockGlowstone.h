@@ -7,38 +7,33 @@
 
 
 
-class cBlockGlowstoneHandler :
+class cBlockGlowstoneHandler final :
 	public cBlockHandler
 {
 public:
-	cBlockGlowstoneHandler(BLOCKTYPE a_BlockType)
-		: cBlockHandler(a_BlockType)
-	{
-	}
 
+	using cBlockHandler::cBlockHandler;
 
+private:
 
-
-
-	virtual cItems ConvertToPickups(NIBBLETYPE a_BlockMeta, cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool) override
+	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Drop self only when using silk-touch:
 		if (ToolHasSilkTouch(a_Tool))
 		{
-			return cItem(E_BLOCK_GLOWSTONE, 1, 0);
+			return cItem(E_BLOCK_GLOWSTONE);
 		}
-		else
-		{
-			// TODO: Handle the Fortune enchantment here
-			return cItem(E_ITEM_GLOWSTONE_DUST, GetRandomProvider().RandInt<char>(2, 4), 0);
-		}
+
+		// Number of dust to drop, capped at the max amount of 4.
+		const auto DropNum = FortuneDiscreteRandom(2, 4, ToolFortuneLevel(a_Tool), 4);
+		return cItem(E_ITEM_GLOWSTONE_DUST, DropNum);
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) override
+	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
 	{
 		UNUSED(a_Meta);
 		return 2;

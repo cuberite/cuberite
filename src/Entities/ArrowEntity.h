@@ -22,7 +22,7 @@ class cArrowEntity :
 {
 	// tolua_end
 
-	using super = cProjectileEntity;
+	using Super = cProjectileEntity;
 
 	// tolua_begin
 
@@ -38,6 +38,8 @@ public:
 	} ;
 
 	// tolua_end
+
+	static constexpr float ARROW_WATER_FRICTION = 50.0f;    ///< Value used to calculate arrow speed in water
 
 	CLASS_PROTODEF(cArrowEntity)
 
@@ -92,12 +94,6 @@ protected:
 	/** Timer for pickup collection animation or five minute timeout */
 	std::chrono::milliseconds m_Timer;
 
-	/** Timer for client arrow position confirmation via TeleportEntity */
-	std::chrono::milliseconds m_HitGroundTimer;
-
-	// Whether the arrow has already been teleported into the proper position in the ground.
-	bool m_HasTeleported;
-
 	/** If true, the arrow is in the process of being collected - don't go to anyone else */
 	bool m_bIsCollected;
 
@@ -109,5 +105,8 @@ protected:
 	virtual void OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos) override;
 	virtual void CollectedBy(cPlayer & a_Player) override;
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
+
+	// cEntity overrides:
+	virtual bool DoesPreventBlockPlacement(void) const override;
 
 };  // tolua_export

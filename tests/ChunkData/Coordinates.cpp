@@ -9,26 +9,8 @@
 /** Performs the entire cChunkData coordinates test. */
 static void test()
 {
-	class cMockAllocationPool
-		: public cAllocationPool<cChunkData::sChunkSection>
 	{
-		virtual cChunkData::sChunkSection * Allocate() override
-		{
-			return new cChunkData::sChunkSection();
-		}
-
-		virtual void Free(cChunkData::sChunkSection * a_Ptr) override
-		{
-			delete a_Ptr;
-		}
-
-		virtual bool DoIsEqual(const cAllocationPool<cChunkData::sChunkSection> &) const NOEXCEPT override
-		{
-			return false;
-		}
-	} Pool;
-	{
-		cChunkData buffer(Pool);
+		ChunkBlockData buffer;
 
 		// Empty chunks
 		buffer.SetBlock({ 0, 0, 0 }, 0xAB);
@@ -43,6 +25,26 @@ static void test()
 		// Notloaded segments
 		TEST_EQUAL(buffer.GetBlock({ 0, 32, 0 }), 0x0);
 		TEST_EQUAL(buffer.GetMeta({ 0, 48, 0 }), 0x0);
+
+		// Out of range GetBlock
+		TEST_ASSERTS(
+			buffer.GetBlock({ -1, 0, 0 });
+		);
+		TEST_ASSERTS(
+			buffer.GetBlock({ 0, -1, 0 });
+		);
+		TEST_ASSERTS(
+			buffer.GetBlock({ 0, 0, -1 });
+		);
+		TEST_ASSERTS(
+			buffer.GetBlock({ 256, 0, 0 });
+		);
+		TEST_ASSERTS(
+			buffer.GetBlock({ 0, 256, 0 });
+		);
+		TEST_ASSERTS(
+			buffer.GetBlock({ 0, 0, 256 });
+		);
 
 		// Out of range SetBlock
 		TEST_ASSERTS(
@@ -63,6 +65,27 @@ static void test()
 		TEST_ASSERTS(
 			buffer.SetBlock({ 0, 0, 256 }, 0)
 		);
+
+		// Out of range GetMeta
+		TEST_ASSERTS(
+			buffer.GetMeta({ -1, 0, 0 });
+		);
+		TEST_ASSERTS(
+			buffer.GetMeta({ 0, -1, 0 });
+		);
+		TEST_ASSERTS(
+			buffer.GetMeta({ 0, 0, -1 });
+		);
+		TEST_ASSERTS(
+			buffer.GetMeta({ 256, 0, 0 });
+		);
+		TEST_ASSERTS(
+			buffer.GetMeta({ 0, 256, 0 });
+		);
+		TEST_ASSERTS(
+			buffer.GetMeta({ 0, 0, 256 });
+		);
+
 		// Out of range SetMeta
 		TEST_ASSERTS(
 			buffer.SetMeta({ -1, 0, 0 }, 0)
@@ -82,26 +105,10 @@ static void test()
 		TEST_ASSERTS(
 			buffer.SetMeta({ 0, 0, 256 }, 0)
 		);
-
-		// Reading out of range blocks should return air
-		TEST_EQUAL(buffer.GetBlock({  -1,   0,   0 }), 0);
-		TEST_EQUAL(buffer.GetBlock({   0,  -1,   0 }), 0);
-		TEST_EQUAL(buffer.GetBlock({   0,   0,  -1 }), 0);
-		TEST_EQUAL(buffer.GetBlock({ 256,   0,   0 }), 0);
-		TEST_EQUAL(buffer.GetBlock({   0, 256,   0 }), 0);
-		TEST_EQUAL(buffer.GetBlock({   0,   0, 256 }), 0);
-
-		// Reading out of range metas should return 0
-		TEST_EQUAL(buffer.GetMeta({  -1,   0,   0 }), 0);
-		TEST_EQUAL(buffer.GetMeta({   0,  -1,   0 }), 0);
-		TEST_EQUAL(buffer.GetMeta({   0,   0,  -1 }), 0);
-		TEST_EQUAL(buffer.GetMeta({ 256,   0,   0 }), 0);
-		TEST_EQUAL(buffer.GetMeta({   0, 256,   0 }), 0);
-		TEST_EQUAL(buffer.GetMeta({   0,   0, 256 }), 0);
 	}
 
 	{
-		cChunkData buffer(Pool);
+		ChunkBlockData buffer;
 
 		// Zero's
 		buffer.SetBlock({ 0, 0, 0 }, 0x0);
@@ -118,9 +125,9 @@ static void test()
 
 	{
 		// Operator =
-		cChunkData buffer(Pool);
+		ChunkBlockData buffer;
 		buffer.SetBlock({ 0, 0, 0 }, 0x42);
-		cChunkData copy(Pool);
+		ChunkBlockData copy;
 		copy = std::move(buffer);
 		TEST_EQUAL(copy.GetBlock({ 0, 0, 0 }), 0x42);
 	}

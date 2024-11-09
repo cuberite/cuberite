@@ -21,12 +21,13 @@
 */
 
 cOcelot::cOcelot(void) :
-	super("Ocelot", mtOcelot, "entity.cat.hurt", "entity.cat.death", 0.6, 0.8),
+	Super("Ocelot", mtOcelot, "entity.cat.hurt", "entity.cat.death", "entity.cat.ambient", 0.6f, 0.7f),
 	m_IsSitting(false),
 	m_IsTame(false),
 	m_IsBegging(false),
 	m_CatType(ctWildOcelot),
-	m_OwnerName("")
+	m_CheckPlayerTickCount(),
+	m_OwnerName()
 {
 }
 
@@ -36,7 +37,7 @@ cOcelot::cOcelot(void) :
 
 void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -166,25 +167,23 @@ void cOcelot::OnRightClicked(cPlayer & a_Player)
 					SetIsTame(true);
 					SetOwner(a_Player.GetName(), a_Player.GetUUID());
 					SetCatType(static_cast<eCatType>(Random.RandInt<int>(1, 3)));
-					m_World->BroadcastEntityStatus(*this, esWolfTamed);
-					m_World->BroadcastParticleEffect("heart", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+					m_World->BroadcastEntityAnimation(*this, EntityAnimation::OcelotTrusts);
 				}
 				else
 				{
 					// Taming failed
-					m_World->BroadcastEntityStatus(*this, esWolfTaming);
-					m_World->BroadcastParticleEffect("smoke", static_cast<Vector3f>(GetPosition()), Vector3f{}, 0, 5);
+					m_World->BroadcastEntityAnimation(*this, EntityAnimation::OcelotDistrusts);
 				}
 			}
 		}
 		else
 		{
-			super::OnRightClicked(a_Player);
+			Super::OnRightClicked(a_Player);
 		}
 	}
 	else if (a_Player.GetUUID() == m_OwnerUUID)
 	{
-		super::OnRightClicked(a_Player);
+		Super::OnRightClicked(a_Player);
 		SetIsSitting(!IsSitting());
 	}
 	m_World->BroadcastEntityMetadata(*this);
@@ -220,5 +219,5 @@ bool cOcelot::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	return super::DoTakeDamage(a_TDI);
+	return Super::DoTakeDamage(a_TDI);
 }

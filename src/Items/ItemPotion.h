@@ -4,34 +4,41 @@
 #include "../Entities/EntityEffect.h"
 
 
-class cItemPotionHandler:
+class cItemPotionHandler final:
 	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
 
-	cItemPotionHandler():
-		super(E_ITEM_POTION)
-	{
-	}
+	using Super::Super;
+
+
+
 
 
 	// cItemHandler overrides:
-	virtual bool IsDrinkable(short a_ItemDamage) override
+	virtual bool IsDrinkable(short a_ItemDamage) const override
 	{
 		// Drinkable potion if 13th lowest bit is set
-		// Ref.: https://minecraft.gamepedia.com/Potions#Data_value_table
+		// Ref.: https://minecraft.wiki/w/Potions#Data_value_table
 		return cEntityEffect::IsPotionDrinkable(a_ItemDamage);
 	}
 
 
+
+
+
 	virtual bool OnItemUse(
-		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace
-	) override
+		cWorld * a_World,
+		cPlayer * a_Player,
+		cBlockPluginInterface & a_PluginInterface,
+		const cItem & a_HeldItem,
+		const Vector3i a_ClickedBlockPos,
+		eBlockFace a_ClickedBlockFace
+	) const override
 	{
-		short PotionDamage = a_Item.m_ItemDamage;
+		short PotionDamage = a_HeldItem.m_ItemDamage;
 
 		// Do not throw non-splash potions:
 		if (cEntityEffect::IsPotionDrinkable(PotionDamage))
@@ -40,7 +47,10 @@ public:
 		}
 
 		Vector3d Pos = a_Player->GetThrowStartPos();
-		Vector3d Speed = a_Player->GetLookVector() * 7;
+		Vector3d Speed = a_Player->GetLookVector() * 14;
+
+		// Play sound
+		a_World->BroadcastSoundEffect("entity.arrow.shoot", a_Player->GetPosition() - Vector3d(0, a_Player->GetHeight(), 0), 0.5f, 0.4f / GetRandomProvider().RandReal(0.8f, 1.2f));
 
 		if (a_World->CreateProjectile(Pos.x, Pos.y, Pos.z, cProjectileEntity::pkSplashPotion, a_Player, &a_Player->GetEquippedItem(), &Speed) == cEntity::INVALID_ID)
 		{
@@ -56,7 +66,10 @@ public:
 	}
 
 
-	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
+
+
+
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) const override
 	{
 		short PotionDamage = a_Item->m_ItemDamage;
 
@@ -74,8 +87,7 @@ public:
 
 		if (!a_Player->IsGameModeCreative())
 		{
-			a_Player->GetInventory().RemoveOneEquippedItem();
-			a_Player->GetInventory().AddItem(E_ITEM_GLASS_BOTTLE);
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_GLASS_BOTTLE));
 		}
 		return true;
 	}

@@ -16,10 +16,12 @@ Implements the 1.10 protocol classes:
 #include "../Root.h"
 #include "../Server.h"
 #include "../ClientHandle.h"
+#include "../JsonUtils.h"
 
 #include "../WorldStorage/FastNBT.h"
 
 #include "../Entities/Boat.h"
+#include "../Entities/EnderCrystal.h"
 #include "../Entities/ExpOrb.h"
 #include "../Entities/Minecart.h"
 #include "../Entities/FallingBlock.h"
@@ -33,6 +35,7 @@ Implements the 1.10 protocol classes:
 
 #include "../Mobs/IncludeAllMonsters.h"
 
+#include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/CommandBlockEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
@@ -291,25 +294,20 @@ namespace Metadata
 
 
 
-cProtocol_1_10_0::cProtocol_1_10_0(cClientHandle * a_Client, const AString & a_ServerAddress, UInt16 a_ServerPort, UInt32 a_State) :
-	Super(a_Client, a_ServerAddress, a_ServerPort, a_State)
-{
-}
 
+////////////////////////////////////////////////////////////////////////////////
+// cProtocol_1_10_0:
 
-
-
-
-void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch)
+void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktSoundEffect);
 	Pkt.WriteString(a_SoundName);
 	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
-	Pkt.WriteBEInt32(FloorC(a_X * 8.0));
-	Pkt.WriteBEInt32(FloorC(a_Y * 8.0));
-	Pkt.WriteBEInt32(FloorC(a_Z * 8.0));
+	Pkt.WriteBEInt32(FloorC(a_Origin.x * 8.0));
+	Pkt.WriteBEInt32(FloorC(a_Origin.y * 8.0));
+	Pkt.WriteBEInt32(FloorC(a_Origin.z * 8.0));
 	Pkt.WriteBEFloat(a_Volume);
 	Pkt.WriteBEFloat(a_Pitch);
 }
@@ -318,53 +316,39 @@ void cProtocol_1_10_0::SendSoundEffect(const AString & a_SoundName, double a_X, 
 
 
 
-void cProtocol_1_10_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
+UInt32 cProtocol_1_10_0::GetProtocolMobType(const eMonsterType a_MobType) const
 {
-	cServer * Server = cRoot::Get()->GetServer();
-	AString ServerDescription = Server->GetDescription();
-	auto NumPlayers = static_cast<signed>(Server->GetNumPlayers());
-	auto MaxPlayers = static_cast<signed>(Server->GetMaxPlayers());
-	AString Favicon = Server->GetFaviconData();
-	cRoot::Get()->GetPluginManager()->CallHookServerPing(*m_Client, ServerDescription, NumPlayers, MaxPlayers, Favicon);
-
-	// Version:
-	Json::Value Version;
-	Version["name"] = "Cuberite 1.10";
-	Version["protocol"] = 210;
-
-	// Players:
-	Json::Value Players;
-	Players["online"] = NumPlayers;
-	Players["max"] = MaxPlayers;
-	// TODO: Add "sample"
-
-	// Description:
-	Json::Value Description;
-	Description["text"] = ServerDescription.c_str();
-
-	// Create the response:
-	Json::Value ResponseValue;
-	ResponseValue["version"] = Version;
-	ResponseValue["players"] = Players;
-	ResponseValue["description"] = Description;
-	m_Client->ForgeAugmentServerListPing(ResponseValue);
-	if (!Favicon.empty())
+	switch (a_MobType)
 	{
-		ResponseValue["favicon"] = Printf("data:image/png;base64,%s", Favicon.c_str());
+		case mtPolarBear: return 102;
+		default:          return Super::GetProtocolMobType(a_MobType);
 	}
-
-	Json::FastWriter Writer;
-	AString Response = Writer.write(ResponseValue);
-
-	cPacketizer Pkt(*this, pktStatusResponse);
-	Pkt.WriteString(Response);
 }
 
 
 
 
 
-void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
+cProtocol::Version cProtocol_1_10_0::GetProtocolVersion() const
+{
+	return Version::v1_10_0;
+}
+
+
+
+
+
+void cProtocol_1_10_0::HandlePacketResourcePackStatus(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Status);
+	m_Client->HandleResourcePack(Status);
+}
+
+
+
+
+
+void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
 {
 	using namespace Metadata;
 
@@ -417,7 +401,7 @@ void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 
 			a_Pkt.WriteBEUInt8(PLAYER_MAIN_HAND);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetMainHand()));
+			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
 			break;
 		}
 		case cEntity::etPickup:
@@ -558,128 +542,38 @@ void cProtocol_1_10_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 			break;
 		}  // case etItemFrame
 
-		default:
+		case cEntity::etEnderCrystal:
 		{
-			break;
-		}
-	}
-}
-
-
-
-
-
-void cProtocol_1_10_0::WriteBlockEntity(cPacketizer & a_Pkt, const cBlockEntity & a_BlockEntity)
-{
-	cFastNBTWriter Writer;
-
-	switch (a_BlockEntity.GetBlockType())
-	{
-		case E_BLOCK_BEACON:
-		{
-			auto & BeaconEntity = static_cast<const cBeaconEntity &>(a_BlockEntity);
-			Writer.AddInt("x", BeaconEntity.GetPosX());
-			Writer.AddInt("y", BeaconEntity.GetPosY());
-			Writer.AddInt("z", BeaconEntity.GetPosZ());
-			Writer.AddInt("Primary", BeaconEntity.GetPrimaryEffect());
-			Writer.AddInt("Secondary", BeaconEntity.GetSecondaryEffect());
-			Writer.AddInt("Levels", BeaconEntity.GetBeaconLevel());
-			Writer.AddString("id", "Beacon");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
-
-		case E_BLOCK_COMMAND_BLOCK:
-		{
-			auto & CommandBlockEntity = static_cast<const cCommandBlockEntity &>(a_BlockEntity);
-			Writer.AddByte("TrackOutput", 1);  // Neither I nor the MC wiki has any idea about this
-			Writer.AddInt("SuccessCount", CommandBlockEntity.GetResult());
-			Writer.AddInt("x", CommandBlockEntity.GetPosX());
-			Writer.AddInt("y", CommandBlockEntity.GetPosY());
-			Writer.AddInt("z", CommandBlockEntity.GetPosZ());
-			Writer.AddString("Command", CommandBlockEntity.GetCommand().c_str());
-			// You can set custom names for windows in Vanilla
-			// For a command block, this would be the 'name' prepended to anything it outputs into global chat
-			// MCS doesn't have this, so just leave it @ '@'. (geddit?)
-			Writer.AddString("CustomName", "@");
-			Writer.AddString("id", "Control");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			if (!CommandBlockEntity.GetLastOutput().empty())
+			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
+			a_Pkt.WriteBEUInt8(ENDER_CRYSTAL_BEAM_TARGET);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_OPTIONAL_POSITION);
+			a_Pkt.WriteBool(EnderCrystal.DisplaysBeam());
+			if (EnderCrystal.DisplaysBeam())
 			{
-				Writer.AddString("LastOutput", Printf("{\"text\":\"%s\"}", CommandBlockEntity.GetLastOutput().c_str()));
+				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
 			}
+			a_Pkt.WriteBEUInt8(ENDER_CRYSTAL_SHOW_BOTTOM);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
 			break;
-		}
-
-		case E_BLOCK_HEAD:
-		{
-			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
-			Writer.AddInt("x", MobHeadEntity.GetPosX());
-			Writer.AddInt("y", MobHeadEntity.GetPosY());
-			Writer.AddInt("z", MobHeadEntity.GetPosZ());
-			Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
-			Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
-			Writer.AddString("id", "Skull");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-
-			// The new Block Entity format for a Mob Head. See: https://minecraft.gamepedia.com/Head#Block_entity
-			Writer.BeginCompound("Owner");
-			Writer.AddString("Id", MobHeadEntity.GetOwnerUUID().ToShortString());
-			Writer.AddString("Name", MobHeadEntity.GetOwnerName());
-			Writer.BeginCompound("Properties");
-			Writer.BeginList("textures", TAG_Compound);
-			Writer.BeginCompound("");
-			Writer.AddString("Signature", MobHeadEntity.GetOwnerTextureSignature());
-			Writer.AddString("Value", MobHeadEntity.GetOwnerTexture());
-			Writer.EndCompound();
-			Writer.EndList();
-			Writer.EndCompound();
-			Writer.EndCompound();
-			break;
-		}
-
-		case E_BLOCK_FLOWER_POT:
-		{
-			auto & FlowerPotEntity = static_cast<const cFlowerPotEntity &>(a_BlockEntity);
-			Writer.AddInt("x", FlowerPotEntity.GetPosX());
-			Writer.AddInt("y", FlowerPotEntity.GetPosY());
-			Writer.AddInt("z", FlowerPotEntity.GetPosZ());
-			Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
-			Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
-			Writer.AddString("id", "FlowerPot");  // "Tile Entity ID" - MC wiki; vanilla server always seems to send this though
-			break;
-		}
-
-		case E_BLOCK_MOB_SPAWNER:
-		{
-			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
-			Writer.AddInt("x", MobSpawnerEntity.GetPosX());
-			Writer.AddInt("y", MobSpawnerEntity.GetPosY());
-			Writer.AddInt("z", MobSpawnerEntity.GetPosZ());
-			Writer.BeginCompound("SpawnData");
-				Writer.AddString("id", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
-			Writer.EndCompound();
-			Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
-			Writer.AddString("id", "MobSpawner");
-			break;
-		}
+		}  // case etEnderCrystal
 
 		default:
 		{
 			break;
 		}
 	}
-
-	Writer.Finish();
-	a_Pkt.WriteBuf(Writer.GetResult().data(), Writer.GetResult().size());
 }
 
 
 
 
 
-void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
+void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const
 {
 	using namespace Metadata;
 
-	// Living Enitiy Metadata
+	// Living entity metadata
 	if (a_Mob.HasCustomName())
 	{
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
@@ -892,9 +786,13 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 		case mtSkeleton:
 		{
 			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
-			a_Pkt.WriteBEUInt8(SKELETON_TYPE);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Skeleton.IsWither() ? 1 : 0);
+			a_Pkt.WriteBEUInt8(LIVING_ACTIVE_HAND);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEUInt8(Skeleton.IsChargingBow() ? 0x01 : 0x00);
+
+			a_Pkt.WriteBEUInt8(SKELETON_ARMS_SWINGING);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Skeleton.IsChargingBow());
 			break;
 		}  // case mtSkeleton
 
@@ -940,6 +838,14 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtWither
 
+		case mtWitherSkeleton:
+		{
+			a_Pkt.WriteBEUInt8(SKELETON_TYPE);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(1);  // Is wither skeleton
+			break;
+		}  // case mtWitherSkeleton
+
 		case mtWolf:
 		{
 			auto & Wolf = static_cast<const cWolf &>(a_Mob);
@@ -978,6 +884,7 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtWolf
 
+		case mtHusk:
 		case mtZombie:
 		{
 			auto & Zombie = static_cast<const cZombie &>(a_Mob);
@@ -987,11 +894,11 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 
 			a_Pkt.WriteBEUInt8(ZOMBIE_TYPE);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Zombie.IsVillagerZombie() ? 1 : 0);  // TODO: This actually encodes the zombie villager profession, but that isn't implemented yet.
+			a_Pkt.WriteVarInt32(0);
 
 			a_Pkt.WriteBEUInt8(ZOMBIE_CONVERTING);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Zombie.IsConverting());
+			a_Pkt.WriteBool(false);
 			break;
 		}  // case mtZombie
 
@@ -1004,6 +911,62 @@ void cProtocol_1_10_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtZombiePigman
 
-		default: break;
+		case mtZombieVillager:
+		{
+			auto & ZombieVillager = reinterpret_cast<const cZombieVillager &>(a_Mob);
+			a_Pkt.WriteBEUInt8(ZOMBIE_IS_BABY);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(ZombieVillager.IsBaby());
+
+			a_Pkt.WriteBEUInt8(ZOMBIE_TYPE);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
+			a_Pkt.WriteVarInt32(ZombieVillager.GetProfession());
+
+			a_Pkt.WriteBEUInt8(ZOMBIE_CONVERTING);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(ZombieVillager.ConversionTime() != -1);
+			break;
+		}  // case mtZombieVillager
+
+		case mtBlaze:
+		case mtElderGuardian:
+		case mtGuardian:
+		{
+			// TODO: Mobs with extra fields that aren't implemented
+			break;
+		}
+		case mtCat:
+
+		case mtPolarBear:
+
+		case mtShulker:
+
+		case mtDonkey:
+		case mtMule:
+		case mtSkeletonHorse:
+		case mtZombieHorse:
+		{
+			// Todo: Mobs not added yet. Grouped ones have the same metadata
+			ASSERT(!"cProtocol_1_10::WriteMobMetadata: received unimplemented type");
+			break;
+		}
+
+		case mtCaveSpider:
+		case mtEnderDragon:
+		case mtEndermite:
+		case mtGiant:
+		case mtIronGolem:
+		case mtMooshroom:
+		case mtSilverfish:
+		case mtSnowGolem:
+		case mtStray:
+		case mtSpider:
+		case mtSquid:
+		{
+			// Entities without additional metadata
+			break;
+		}
+
+		default: UNREACHABLE("cProtocol_1_10::WriteMobMetadata: received mob of invalid type");
 	}  // switch (a_Mob.GetType())
 }

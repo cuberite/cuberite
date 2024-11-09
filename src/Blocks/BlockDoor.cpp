@@ -7,31 +7,33 @@
 
 
 
-cBlockDoorHandler::cBlockDoorHandler(BLOCKTYPE a_BlockType):
-	super(a_BlockType)
+void cBlockDoorHandler::OnBroken(
+		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+		Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType,
+		NIBBLETYPE a_OldBlockMeta,
+		const cEntity * a_Digger
+) const
 {
-}
+	UNUSED(a_Digger);
+	// A part of the multiblock door was broken; the relevant half will drop any pickups as required.
+	// All that is left to do is to delete the other half of the multiblock.
 
-
-
-
-
-void cBlockDoorHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta)
-{
 	if ((a_OldBlockMeta & 0x08) != 0)
 	{
-		// Was upper part of door
-		if ((a_BlockPos.y > 0) && IsDoorBlockType(a_ChunkInterface.GetBlock(a_BlockPos.addedY(-1))))
+		const auto Lower = a_BlockPos.addedY(-1);
+		if ((Lower.y >= 0) && IsDoorBlockType(a_ChunkInterface.GetBlock(Lower)))
 		{
-			a_ChunkInterface.DropBlockAsPickups(a_BlockPos.addedY(-1));
+			// Was upper part of door, remove lower:
+			a_ChunkInterface.SetBlock(Lower, E_BLOCK_AIR, 0);
 		}
 	}
 	else
 	{
-		// Was lower part
-		if ((a_BlockPos.y < cChunkDef::Height - 1) && IsDoorBlockType(a_ChunkInterface.GetBlock(a_BlockPos.addedY(1))))
+		const auto Upper = a_BlockPos.addedY(1);
+		if ((Upper.y < cChunkDef::Height) && IsDoorBlockType(a_ChunkInterface.GetBlock(Upper)))
 		{
-			a_ChunkInterface.DropBlockAsPickups(a_BlockPos.addedY(1));
+			// Was lower part, remove upper:
+			a_ChunkInterface.SetBlock(Upper, E_BLOCK_AIR, 0);
 		}
 	}
 }
@@ -40,15 +42,20 @@ void cBlockDoorHandler::OnBroken(cChunkInterface & a_ChunkInterface, cWorldInter
 
 
 
-bool cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ)
+bool cBlockDoorHandler::OnUse(
+	cChunkInterface & a_ChunkInterface,
+	cWorldInterface & a_WorldInterface,
+	cPlayer & a_Player,
+	const Vector3i a_BlockPos,
+	eBlockFace a_BlockFace,
+	const Vector3i a_CursorPos
+) const
 {
 	UNUSED(a_WorldInterface);
 	UNUSED(a_BlockFace);
-	UNUSED(a_CursorX);
-	UNUSED(a_CursorY);
-	UNUSED(a_CursorZ);
+	UNUSED(a_CursorPos);
 
-	switch (a_ChunkInterface.GetBlock({a_BlockX, a_BlockY, a_BlockZ}))
+	switch (a_ChunkInterface.GetBlock(a_BlockPos))
 	{
 		default:
 		{
@@ -61,15 +68,17 @@ bool cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterfac
 		case E_BLOCK_SPRUCE_DOOR:
 		case E_BLOCK_OAK_DOOR:
 		{
-			ChangeDoor(a_ChunkInterface, a_BlockX, a_BlockY, a_BlockZ);
-			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_DOOR_OPEN, {a_BlockX, a_BlockY, a_BlockZ}, 0, a_Player.GetClientHandle());
+			ChangeDoor(a_ChunkInterface, a_BlockPos);
+			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_DOOR_OPEN, a_BlockPos, 0, a_Player.GetClientHandle());
 			break;
 		}
-		// Prevent iron door from opening on player click
 		case E_BLOCK_IRON_DOOR:
 		{
-			OnCancelRightClick(a_ChunkInterface, a_WorldInterface, a_Player, a_BlockX, a_BlockY, a_BlockZ, a_BlockFace);
-			break;
+			// Prevent iron door from opening on player click (#2415):
+			OnCancelRightClick(a_ChunkInterface, a_WorldInterface, a_Player, a_BlockPos, a_BlockFace);
+
+			// Allow placement actions to instead take place:
+			return false;
 		}
 	}
 
@@ -80,22 +89,29 @@ bool cBlockDoorHandler::OnUse(cChunkInterface & a_ChunkInterface, cWorldInterfac
 
 
 
-void cBlockDoorHandler::OnCancelRightClick(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace)
+void cBlockDoorHandler::OnCancelRightClick(
+	cChunkInterface & a_ChunkInterface,
+	cWorldInterface & a_WorldInterface,
+	cPlayer & a_Player,
+	const Vector3i a_BlockPos,
+	eBlockFace a_BlockFace
+) const
 {
 	UNUSED(a_ChunkInterface);
+	UNUSED(a_BlockFace);
 
-	a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY, a_BlockZ, a_Player);
-	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta({a_BlockX, a_BlockY, a_BlockZ});
+	a_WorldInterface.SendBlockTo(a_BlockPos, a_Player);
+	NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
 
-	if (Meta & 0x8)
+	if (Meta & 0x08)
 	{
-		// Current block is top of the door
-		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY - 1, a_BlockZ, a_Player);
+		// Current block is top of the door, send the bottom part:
+		a_WorldInterface.SendBlockTo(a_BlockPos.addedY(-1), a_Player);
 	}
 	else
 	{
-		// Current block is bottom of the door
-		a_WorldInterface.SendBlockTo(a_BlockX, a_BlockY + 1, a_BlockZ, a_Player);
+		// Current block is bottom of the door, send the top part:
+		a_WorldInterface.SendBlockTo(a_BlockPos.addedY(1), a_Player);
 	}
 }
 
@@ -103,7 +119,7 @@ void cBlockDoorHandler::OnCancelRightClick(cChunkInterface & a_ChunkInterface, c
 
 
 
-cBoundingBox cBlockDoorHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP)
+cBoundingBox cBlockDoorHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTYPE a_XP, BLOCKTYPE a_YM, BLOCKTYPE a_YP, BLOCKTYPE a_ZM, BLOCKTYPE a_ZP) const
 {
 	// Doors can be placed inside the player
 	return cBoundingBox(0, 0, 0, 0, 0, 0);
@@ -113,7 +129,7 @@ cBoundingBox cBlockDoorHandler::GetPlacementCollisionBox(BLOCKTYPE a_XM, BLOCKTY
 
 
 
-NIBBLETYPE cBlockDoorHandler::MetaRotateCCW(NIBBLETYPE a_Meta)
+NIBBLETYPE cBlockDoorHandler::MetaRotateCCW(NIBBLETYPE a_Meta) const
 {
 	if (a_Meta & 0x08)
 	{
@@ -123,7 +139,7 @@ NIBBLETYPE cBlockDoorHandler::MetaRotateCCW(NIBBLETYPE a_Meta)
 	else
 	{
 		// Rotate the bottom block
-		return super::MetaRotateCCW(a_Meta);
+		return Super::MetaRotateCCW(a_Meta);
 	}
 }
 
@@ -131,7 +147,7 @@ NIBBLETYPE cBlockDoorHandler::MetaRotateCCW(NIBBLETYPE a_Meta)
 
 
 
-NIBBLETYPE cBlockDoorHandler::MetaRotateCW(NIBBLETYPE a_Meta)
+NIBBLETYPE cBlockDoorHandler::MetaRotateCW(NIBBLETYPE a_Meta) const
 {
 	if (a_Meta & 0x08)
 	{
@@ -141,7 +157,7 @@ NIBBLETYPE cBlockDoorHandler::MetaRotateCW(NIBBLETYPE a_Meta)
 	else
 	{
 		// Rotate the bottom block
-		return super::MetaRotateCW(a_Meta);
+		return Super::MetaRotateCW(a_Meta);
 	}
 }
 
@@ -149,7 +165,7 @@ NIBBLETYPE cBlockDoorHandler::MetaRotateCW(NIBBLETYPE a_Meta)
 
 
 
-NIBBLETYPE cBlockDoorHandler::MetaMirrorXY(NIBBLETYPE a_Meta)
+NIBBLETYPE cBlockDoorHandler::MetaMirrorXY(NIBBLETYPE a_Meta) const
 {
 	/*
 	Top bit (0x08) contains door block position (Top / Bottom). Only Bottom blocks contain position data
@@ -183,7 +199,7 @@ NIBBLETYPE cBlockDoorHandler::MetaMirrorXY(NIBBLETYPE a_Meta)
 
 
 
-NIBBLETYPE cBlockDoorHandler::MetaMirrorYZ(NIBBLETYPE a_Meta)
+NIBBLETYPE cBlockDoorHandler::MetaMirrorYZ(NIBBLETYPE a_Meta) const
 {
 	// Top bit (0x08) contains door panel type (Top / Bottom panel)  Only Bottom panels contain position data
 	// Return a_Meta if panel is a top panel (0x08 bit is set to 1)

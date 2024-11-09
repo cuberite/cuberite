@@ -22,11 +22,9 @@ class cCommandBlockEntity :
 {
 	// tolua_end
 
-	using super = cBlockEntity;
+	using Super = cBlockEntity;
 
 public:  // tolua_export
-
-	BLOCKENTITY_PROTODEF(cCommandBlockEntity)
 
 	/** Creates a new empty command block entity */
 	cCommandBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
@@ -73,7 +71,3 @@ private:
 
 	NIBBLETYPE m_Result;
 } ;  // tolua_export
-
-
-
-

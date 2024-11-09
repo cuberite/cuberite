@@ -1,65 +1,50 @@
 
 #pragma once
 
-#include "RedstoneHandler.h"
 #include "../../BlockEntities/NoteEntity.h"
 
 
 
 
 
-class cNoteBlockHandler : public cRedstoneHandler
+namespace NoteBlockHandler
 {
-	typedef cRedstoneHandler super;
-public:
-
-	virtual unsigned char GetPowerDeliveredToPosition(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType) const override
+	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
 	{
-		UNUSED(a_World);
-		UNUSED(a_World);
+		UNUSED(a_Chunk);
 		UNUSED(a_Position);
 		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
 		UNUSED(a_QueryPosition);
 		UNUSED(a_QueryBlockType);
+		UNUSED(IsLinked);
 		return 0;
 	}
 
-	virtual unsigned char GetPowerLevel(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	static void Update(cChunk & a_Chunk, cChunk &, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
 	{
-		UNUSED(a_World);
-		UNUSED(a_Position);
-		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
-		return 0;
-	}
+		// LOGD("Evaluating sparky the magical note block (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, Power);
 
-	virtual cVector3iArray Update(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, PoweringData a_PoweringData) const override
-	{
-		// LOGD("Evaluating sparky the magical note block (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, a_PoweringData.PowerLevel);
-
-		auto Previous = static_cast<cIncrementalRedstoneSimulator *>(a_World.GetRedstoneSimulator())->GetChunkData()->ExchangeUpdateOncePowerData(a_Position, a_PoweringData);
-		if ((Previous.PowerLevel != 0) || (a_PoweringData.PowerLevel == 0))
+		const auto Previous = DataForChunk(a_Chunk).ExchangeUpdateOncePowerData(a_Position, Power);
+		if ((Previous != 0) || (Power == 0))
 		{
 			// If we're already powered or received an update of no power, don't make a sound
-			return {};
+			return;
 		}
 
-		a_World.DoWithNoteBlockAt(a_Position.x, a_Position.y, a_Position.z, [](cNoteEntity & a_NoteBlock)
-			{
-				a_NoteBlock.MakeSound();
-				return false;
-			}
-		);
+		a_Chunk.DoWithBlockEntityAt(a_Position, [](cBlockEntity & a_BlockEntity)
+		{
+			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_NOTE_BLOCK);
 
-		return {};
+			static_cast<cNoteEntity &>(a_BlockEntity).MakeSound();
+			return false;
+		});
 	}
 
-	virtual cVector3iArray GetValidSourcePositions(cWorld & a_World, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const override
+	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
 	{
-		UNUSED(a_World);
+		UNUSED(a_Chunk);
 		UNUSED(a_BlockType);
 		UNUSED(a_Meta);
-		return GetAdjustedRelatives(a_Position, GetRelativeAdjacents());
+		InvokeForAdjustedRelatives(Callback, a_Position, RelativeAdjacents);
 	}
 };

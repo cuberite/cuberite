@@ -17,9 +17,11 @@
 class cTwoHeights:
 	public cTerrainShapeGen
 {
-	typedef cTerrainShapeGen super;
+	using Super = cTerrainShapeGen;
+
 public:
-	cTwoHeights(int a_Seed, cBiomeGenPtr a_BiomeGen):
+
+	cTwoHeights(int a_Seed, cBiomeGen & a_BiomeGen):
 		m_Seed(a_Seed),
 		m_Choice(a_Seed),
 		m_HeightA(a_Seed + 1, a_BiomeGen),
@@ -111,11 +113,7 @@ protected:
 
 
 
-cTerrainShapeGenPtr CreateShapeGenTwoHeights(int a_Seed, cBiomeGenPtr a_BiomeGen)
+std::unique_ptr<cTerrainShapeGen> CreateShapeGenTwoHeights(int a_Seed, cBiomeGen & a_BiomeGen)
 {
-	return std::make_shared<cTwoHeights>(a_Seed, a_BiomeGen);
+	return std::make_unique<cTwoHeights>(a_Seed, a_BiomeGen);
 }
-
-
-
-

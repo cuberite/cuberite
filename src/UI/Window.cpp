@@ -28,15 +28,13 @@ Byte cWindow::m_WindowIDCounter = 0;
 
 
 cWindow::cWindow(WindowType a_WindowType, const AString & a_WindowTitle) :
-	m_WindowID(static_cast<char>((++m_WindowIDCounter) % 127)),
+	m_WindowID(((++m_WindowIDCounter) % 127) + 1),
 	m_WindowType(a_WindowType),
 	m_WindowTitle(a_WindowTitle),
 	m_IsDestroyed(false),
 	m_Owner(nullptr)
 {
-	// The window ID is signed in protocol 1.7, unsigned in protocol 1.8. Keep out of trouble by using only 7 bits:
-	// Ref.: https://forum.cuberite.org/thread-1876.html
-	ASSERT((m_WindowID >= 0) && (m_WindowID < 127));
+	ASSERT((m_WindowID > 0) && (m_WindowID <= 127));
 
 	if (a_WindowType == wtInventory)
 	{
@@ -349,9 +347,77 @@ bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 
 
 
+void cWindow::BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum)
+{
+	// Translate local slot num into global slot num:
+	int SlotNum = 0;
+	bool HasFound = false;
+	for (cSlotAreas::const_iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	{
+		if (a_Area == *itr)
+		{
+			SlotNum += a_LocalSlotNum;
+			HasFound = true;
+			break;
+		}
+		SlotNum += (*itr)->GetNumSlots();
+	}  // for itr - m_SlotAreas[]
+	if (!HasFound)
+	{
+		LOGWARNING("%s: Invalid slot area parameter", __FUNCTION__);
+		ASSERT(!"Invalid slot area");
+		return;
+	}
+
+	// Broadcast the update packet:
+	cCSLock Lock(m_CS);
+	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
+	{
+		(*itr)->GetClientHandle()->SendInventorySlot(m_WindowID, static_cast<short>(SlotNum), *a_Area->GetSlot(a_LocalSlotNum, **itr));
+	}  // for itr - m_OpenedBy[]
+}
+
+
+
+
+
+void cWindow::SendWholeWindow(cClientHandle & a_Client)
+{
+	a_Client.SendWholeInventory(*this);
+}
+
+
+
+
+
+void cWindow::BroadcastWholeWindow(void)
+{
+	cCSLock Lock(m_CS);
+	for (auto Player : m_OpenedBy)
+	{
+		SendWholeWindow(*Player->GetClientHandle());
+	}
+}
+
+
+
+
+
+void cWindow::SetProperty(size_t a_Property, short a_Value)
+{
+	cCSLock Lock(m_CS);
+	for (auto Player : m_OpenedBy)
+	{
+		Player->GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
+	}
+}
+
+
+
+
+
 void cWindow::OwnerDestroyed()
 {
-	m_Owner = nullptr;
 	// Close window for each player. Note that the last one needs special handling
 	while (m_OpenedBy.size() > 1)
 	{
@@ -570,9 +636,9 @@ void cWindow::OnLeftPaintEnd(cPlayer & a_Player)
 
 	const cSlotNums & SlotNums = a_Player.GetInventoryPaintSlots();
 	cItem ToDistribute(a_Player.GetDraggingItem());
-	int ToEachSlot = static_cast<int>(ToDistribute.m_ItemCount) / static_cast<int>(SlotNums.size());
+	char ToEachSlot = ToDistribute.m_ItemCount / static_cast<char>(SlotNums.size());
 
-	int NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, ToEachSlot, SlotNums);
+	char NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, ToEachSlot, SlotNums);
 
 	// Remove the items distributed from the dragging item:
 	a_Player.GetDraggingItem().m_ItemCount -= NumDistributed;
@@ -600,7 +666,7 @@ void cWindow::OnRightPaintEnd(cPlayer & a_Player)
 	const cSlotNums & SlotNums = a_Player.GetInventoryPaintSlots();
 	cItem ToDistribute(a_Player.GetDraggingItem());
 
-	int NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, 1, SlotNums);
+	char NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, 1, SlotNums);
 
 	// Remove the items distributed from the dragging item:
 	a_Player.GetDraggingItem().m_ItemCount -= NumDistributed;
@@ -630,7 +696,7 @@ void cWindow::OnMiddlePaintEnd(cPlayer & a_Player)
 
 	// Fill available slots with full stacks of the dragging item
 	const auto & DraggingItem = a_Player.GetDraggingItem();
-	auto StackSize = ItemHandler(DraggingItem.m_ItemType)->GetMaxStackSize();
+	auto StackSize = DraggingItem.GetMaxStackSize();
 	if (0 < DistributeItemToSlots(a_Player, DraggingItem, StackSize, a_Player.GetInventoryPaintSlots(), false))
 	{
 		// If any items were distibuted, set dragging item empty
@@ -644,7 +710,7 @@ void cWindow::OnMiddlePaintEnd(cPlayer & a_Player)
 
 
 
-int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int a_NumToEachSlot, const cSlotNums & a_SlotNums, bool a_LimitItems)
+char cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, char a_NumToEachSlot, const cSlotNums & a_SlotNums, bool a_LimitItems)
 {
 	if (a_LimitItems && (static_cast<size_t>(a_Item.m_ItemCount) < a_SlotNums.size()))
 	{
@@ -654,7 +720,7 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 	}
 
 	// Distribute to individual slots, keep track of how many items were actually distributed (full stacks etc.)
-	int NumDistributed = 0;
+	char NumDistributed = 0;
 	for (cSlotNums::const_iterator itr = a_SlotNums.begin(), end = a_SlotNums.end(); itr != end; ++itr)
 	{
 		int LocalSlotNum = 0;
@@ -667,19 +733,19 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 
 		// Modify the item at the slot
 		cItem AtSlot(*Area->GetSlot(LocalSlotNum, a_Player));
-		int MaxStack = AtSlot.GetMaxStackSize();
+		char MaxStack = AtSlot.GetMaxStackSize();
 		if (AtSlot.IsEmpty())
 		{
 			// Empty, just move all of it there:
 			cItem ToStore(a_Item);
-			ToStore.m_ItemCount = static_cast<char>(std::min(a_NumToEachSlot, static_cast<int>(MaxStack)));
+			ToStore.m_ItemCount = std::min<char>(a_NumToEachSlot, MaxStack);
 			Area->SetSlot(LocalSlotNum, a_Player, ToStore);
 			NumDistributed += ToStore.m_ItemCount;
 		}
 		else if (AtSlot.IsEqual(a_Item))
 		{
 			// Occupied, add and cap at MaxStack:
-			int CanStore = std::min(a_NumToEachSlot, static_cast<int>(MaxStack) - AtSlot.m_ItemCount);
+			char CanStore = std::min<char>(a_NumToEachSlot, MaxStack - AtSlot.m_ItemCount);
 			AtSlot.m_ItemCount += CanStore;
 			Area->SetSlot(LocalSlotNum, a_Player, AtSlot);
 			NumDistributed += CanStore;
@@ -687,85 +753,3 @@ int cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, int
 	}  // for itr - SlotNums[]
 	return NumDistributed;
 }
-
-
-
-
-
-void cWindow::BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum)
-{
-	// Translate local slot num into global slot num:
-	int SlotNum = 0;
-	bool HasFound = false;
-	for (cSlotAreas::const_iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
-	{
-		if (a_Area == *itr)
-		{
-			SlotNum += a_LocalSlotNum;
-			HasFound = true;
-			break;
-		}
-		SlotNum += (*itr)->GetNumSlots();
-	}  // for itr - m_SlotAreas[]
-	if (!HasFound)
-	{
-		LOGWARNING("%s: Invalid slot area parameter", __FUNCTION__);
-		ASSERT(!"Invalid slot area");
-		return;
-	}
-
-	// Broadcast the update packet:
-	cCSLock Lock(m_CS);
-	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
-	{
-		(*itr)->GetClientHandle()->SendInventorySlot(m_WindowID, static_cast<short>(SlotNum), *a_Area->GetSlot(a_LocalSlotNum, **itr));
-	}  // for itr - m_OpenedBy[]
-}
-
-
-
-
-
-void cWindow::SendWholeWindow(cClientHandle & a_Client)
-{
-	a_Client.SendWholeInventory(*this);
-}
-
-
-
-
-
-void cWindow::BroadcastWholeWindow(void)
-{
-	cCSLock Lock(m_CS);
-	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
-	{
-		SendWholeWindow(*(*itr)->GetClientHandle());
-	}  // for itr - m_OpenedBy[]
-}
-
-
-
-
-
-void cWindow::SetProperty(short a_Property, short a_Value)
-{
-	cCSLock Lock(m_CS);
-	for (cPlayerList::iterator itr = m_OpenedBy.begin(), end = m_OpenedBy.end(); itr != end; ++itr)
-	{
-		(*itr)->GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
-	}  // for itr - m_OpenedBy[]
-}
-
-
-
-
-
-void cWindow::SetProperty(short a_Property, short a_Value, cPlayer & a_Player)
-{
-	a_Player.GetClientHandle()->SendWindowProperty(*this, a_Property, a_Value);
-}
-
-
-
-

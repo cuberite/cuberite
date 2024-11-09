@@ -30,6 +30,7 @@ reduced in complexity in order for this generator to be useful, so the caves' sh
 
 #include "Globals.h"
 #include "Caves.h"
+#include "../BlockInfo.h"
 
 
 
@@ -104,9 +105,9 @@ public:
 		cChunkDef::HeightMap & a_HeightMap
 	);
 
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 	AString ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) const;
-	#endif  // _DEBUG
+	#endif  // !NDEBUG
 } ;
 
 typedef std::vector<cCaveTunnel *> cCaveTunnels;
@@ -116,12 +117,13 @@ typedef std::vector<cCaveTunnel *> cCaveTunnels;
 
 
 /** A collection of connected tunnels, possibly branching. */
-class cStructGenWormNestCaves::cCaveSystem :
+class cStructGenWormNestCaves::cCaveSystem:
 	public cGridStructGen::cStructure
 {
-	typedef cGridStructGen::cStructure super;
+	using Super = cGridStructGen::cStructure;
 
 public:
+
 	// The generating block position; is read directly in cStructGenWormNestCaves::GetCavesForChunk()
 	int m_BlockX;
 	int m_BlockZ;
@@ -161,8 +163,8 @@ cCaveTunnel::cCaveTunnel(
 	cNoise & a_Noise
 )
 {
-	m_Points.push_back(cCaveDefPoint(a_BlockStartX, a_BlockStartY, a_BlockStartZ, a_StartRadius));
-	m_Points.push_back(cCaveDefPoint(a_BlockEndX,   a_BlockEndY,   a_BlockEndZ,   a_EndRadius));
+	m_Points.emplace_back(a_BlockStartX, a_BlockStartY, a_BlockStartZ, a_StartRadius);
+	m_Points.emplace_back(a_BlockEndX,   a_BlockEndY,   a_BlockEndZ,   a_EndRadius);
 
 	if ((a_BlockStartY <= 0) && (a_BlockEndY <= 0))
 	{
@@ -214,7 +216,7 @@ void cCaveTunnel::Randomize(cNoise & a_Noise)
 			int y = (itr->m_BlockY + PrevY) / 2 + (Random % (len / 2 + 1) - len / 4);
 			Random /= 256;
 			int z = (itr->m_BlockZ + PrevZ) / 2 + (Random % (len + 1) - len / 2);
-			Pts.push_back(cCaveDefPoint(x, y, z, Rad));
+			Pts.emplace_back(x, y, z, Rad);
 			Pts.push_back(*itr);
 			PrevX = itr->m_BlockX;
 			PrevY = itr->m_BlockY;
@@ -266,8 +268,8 @@ bool cCaveTunnel::RefineDefPoints(const cCaveDefPoints & a_Src, cCaveDefPoints &
 		int dr = itr->m_Radius - PrevR;
 		int Rad1 = std::max(PrevR + 1 * dr / 4, 1);
 		int Rad2 = std::max(PrevR + 3 * dr / 4, 1);
-		a_Dst.push_back(cCaveDefPoint(PrevX + 1 * dx / 4, PrevY + 1 * dy / 4, PrevZ + 1 * dz / 4, Rad1));
-		a_Dst.push_back(cCaveDefPoint(PrevX + 3 * dx / 4, PrevY + 3 * dy / 4, PrevZ + 3 * dz / 4, Rad2));
+		a_Dst.emplace_back(PrevX + 1 * dx / 4, PrevY + 1 * dy / 4, PrevZ + 1 * dz / 4, Rad1);
+		a_Dst.emplace_back(PrevX + 3 * dx / 4, PrevY + 3 * dy / 4, PrevZ + 3 * dz / 4, Rad2);
 		PrevX = itr->m_BlockX;
 		PrevY = itr->m_BlockY;
 		PrevZ = itr->m_BlockZ;
@@ -334,7 +336,7 @@ void cCaveTunnel::FinishLinear(void)
 
 			for (;;)
 			{
-				m_Points.push_back(cCaveDefPoint(PrevX, PrevY, PrevZ, R));
+				m_Points.emplace_back(PrevX, PrevY, PrevZ, R);
 
 				if (PrevX == x1)
 				{
@@ -366,7 +368,7 @@ void cCaveTunnel::FinishLinear(void)
 
 			for (;;)
 			{
-				m_Points.push_back(cCaveDefPoint(PrevX, PrevY, PrevZ, R));
+				m_Points.emplace_back(PrevX, PrevY, PrevZ, R);
 
 				if (PrevY == y1)
 				{
@@ -400,7 +402,7 @@ void cCaveTunnel::FinishLinear(void)
 
 			for (;;)
 			{
-				m_Points.push_back(cCaveDefPoint(PrevX, PrevY, PrevZ, R));
+				m_Points.emplace_back(PrevX, PrevY, PrevZ, R);
 
 				if (PrevZ == z1)
 				{
@@ -511,7 +513,7 @@ void cCaveTunnel::ProcessChunk(
 				{
 					if (cChunkDef::GetBlock(a_BlockTypes, x, y, z) == E_BLOCK_SAND)
 					{
-						int Index = cChunkDef::MakeIndexNoCheck(x, y, z);
+						const auto Index = cChunkDef::MakeIndex(x, y, z);
 						if (a_BlockMetas[Index] == 1)
 						{
 							a_BlockMetas[Index] = 0;
@@ -528,7 +530,7 @@ void cCaveTunnel::ProcessChunk(
 	}  // for itr - m_Points[]
 
 	/*
-	#ifdef _DEBUG
+	#ifndef NDEBUG
 	// For debugging purposes, outline the shape of the cave using glowstone, after carving the entire cave:
 	for (cCaveDefPoints::const_iterator itr = m_Points.begin(), end = m_Points.end(); itr != end; ++itr)
 	{
@@ -543,7 +545,7 @@ void cCaveTunnel::ProcessChunk(
 			cChunkDef::SetBlock(a_BlockTypes, DifX, itr->m_BlockY, DifZ, E_BLOCK_GLOWSTONE);
 		}
 	}  // for itr - m_Points[]
-	#endif  // _DEBUG
+	#endif  // !NDEBUG
 	//*/
 }
 
@@ -551,22 +553,22 @@ void cCaveTunnel::ProcessChunk(
 
 
 
-#ifdef _DEBUG
+#ifndef NDEBUG
 AString cCaveTunnel::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) const
 {
 	AString SVG;
 	SVG.reserve(m_Points.size() * 20 + 200);
-	AppendPrintf(SVG, "<path style=\"fill:none;stroke:#%06x;stroke-width:1px;\"\nd=\"", a_Color);
+	SVG.append(fmt::format(FMT_STRING("<path style=\"fill:none;stroke:#{:06x};stroke-width:1px;\"\nd=\""), a_Color));
 	char Prefix = 'M';  // The first point needs "M" prefix, all the others need "L"
 	for (cCaveDefPoints::const_iterator itr = m_Points.begin(); itr != m_Points.end(); ++itr)
 	{
-		AppendPrintf(SVG, "%c %d, %d ", Prefix, a_OffsetX + itr->m_BlockX, a_OffsetZ + itr->m_BlockZ);
+		SVG.append(fmt::format(FMT_STRING("{} {}, {} "), Prefix, a_OffsetX + itr->m_BlockX, a_OffsetZ + itr->m_BlockZ));
 		Prefix = 'L';
 	}
 	SVG.append("\"/>\n");
 	return SVG;
 }
-#endif  // _DEBUG
+#endif  // !NDEBUG
 
 
 
@@ -576,7 +578,7 @@ AString cCaveTunnel::ExportAsSVG(int a_Color, int a_OffsetX, int a_OffsetZ) cons
 // cStructGenWormNestCaves::cCaveSystem:
 
 cStructGenWormNestCaves::cCaveSystem::cCaveSystem(int a_GridX, int a_GridZ, int a_OriginX, int a_OriginZ, int a_MaxOffset, int a_Size, cNoise & a_Noise) :
-	super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
+	Super(a_GridX, a_GridZ, a_OriginX, a_OriginZ),
 	m_Size(a_Size)
 {
 	int Num = 1 + a_Noise.IntNoise2DInt(a_OriginX, a_OriginZ) % 3;

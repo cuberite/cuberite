@@ -7,6 +7,7 @@
 
 #include "../Bindings/PluginManager.h"
 #include "ProjectileEntity.h"
+#include "../BlockInfo.h"
 #include "../ClientHandle.h"
 #include "../LineBlockTracer.h"
 #include "../BoundingBox.h"
@@ -24,13 +25,6 @@
 #include "WitherSkullEntity.h"
 #include "SplashPotionEntity.h"
 #include "Player.h"
-
-
-
-
-
-/** Converts an angle in radians into a byte representation used by the network protocol */
-#define ANGLE_TO_PROTO(X) static_cast<Byte>(X * 255 / 360)
 
 
 
@@ -56,7 +50,7 @@ protected:
 	double m_SlowdownCoeff;
 
 	// cCallbacks overrides:
-	virtual bool OnNextBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
 	{
 		/*
 		// DEBUG:
@@ -71,7 +65,7 @@ protected:
 		if (cBlockInfo::IsSolid(a_BlockType))
 		{
 			// The projectile hit a solid block, calculate the exact hit coords:
-			cBoundingBox bb(a_BlockX, a_BlockX + 1, a_BlockY, a_BlockY + 1, a_BlockZ, a_BlockZ + 1);  // Bounding box of the block hit
+			cBoundingBox bb(a_BlockPos, a_BlockPos + Vector3i(1, 1, 1));  // Bounding box of the block hit
 			const Vector3d LineStart = m_Projectile->GetPosition();  // Start point for the imaginary line that goes through the block hit
 			const Vector3d LineEnd = LineStart + m_Projectile->GetSpeed();  // End point for the imaginary line that goes through the block hit
 			double LineCoeff = 0;  // Used to calculate where along the line an intersection with the bounding box occurs
@@ -81,7 +75,7 @@ protected:
 			{
 				Vector3d Intersection = LineStart + m_Projectile->GetSpeed() * LineCoeff;  // Point where projectile goes into the hit block
 
-				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, a_BlockX, a_BlockY, a_BlockZ, Face, Intersection))
+				if (cPluginManager::Get()->CallHookProjectileHitBlock(*m_Projectile, a_BlockPos, Face, Intersection))
 				{
 					return false;
 				}
@@ -153,7 +147,7 @@ public:
 			}
 		}
 
-		cBoundingBox EntBox(a_Entity.GetPosition(), a_Entity.GetWidth() / 2, a_Entity.GetHeight());
+		auto EntBox = a_Entity.GetBoundingBox();
 
 		// Instead of colliding the bounding box with another bounding box in motion, we collide an enlarged bounding box with a hairline.
 		// The results should be good enough for our purposes
@@ -173,7 +167,8 @@ public:
 				!a_Entity.IsPlayer() ||
 				static_cast<cPlayer &>(a_Entity).IsGameModeSpectator()
 			) &&
-			!a_Entity.IsBoat()
+			!a_Entity.IsBoat() &&
+			!a_Entity.IsEnderCrystal()
 		)
 		{
 			// Not an entity that interacts with a projectile
@@ -224,8 +219,8 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cProjectileEntity:
 
-cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, double a_Width, double a_Height):
-	super(etProjectile, a_Pos, a_Width, a_Height),
+cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, float a_Width, float a_Height):
+	Super(etProjectile, a_Pos, a_Width, a_Height),
 	m_ProjectileKind(a_Kind),
 	m_CreatorData(
 		((a_Creator != nullptr) ? a_Creator->GetUniqueID() : cEntity::INVALID_ID),
@@ -242,17 +237,12 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d
 
 
 
-cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed, double a_Width, double a_Height):
-	super(etProjectile, a_Pos, a_Width, a_Height),
-	m_ProjectileKind(a_Kind),
-	m_CreatorData(a_Creator->GetUniqueID(), a_Creator->IsPlayer() ? static_cast<cPlayer *>(a_Creator)->GetName() : "", a_Creator->GetEquippedWeapon().m_Enchantments),
-	m_IsInGround(false)
+cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed, float a_Width, float a_Height):
+	cProjectileEntity(a_Kind, a_Creator, a_Pos, a_Width, a_Height)
 {
 	SetSpeed(a_Speed);
 	SetYawFromSpeed();
 	SetPitchFromSpeed();
-	SetGravity(-12.0f);
-	SetAirDrag(0.01f);
 }
 
 
@@ -275,15 +265,15 @@ std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(
 
 	switch (a_Kind)
 	{
-		case pkArrow:         return cpp14::make_unique<cArrowEntity>           (a_Creator, a_Pos, Speed);
-		case pkEgg:           return cpp14::make_unique<cThrownEggEntity>       (a_Creator, a_Pos, Speed);
-		case pkEnderPearl:    return cpp14::make_unique<cThrownEnderPearlEntity>(a_Creator, a_Pos, Speed);
-		case pkSnowball:      return cpp14::make_unique<cThrownSnowballEntity>  (a_Creator, a_Pos, Speed);
-		case pkGhastFireball: return cpp14::make_unique<cGhastFireballEntity>   (a_Creator, a_Pos, Speed);
-		case pkFireCharge:    return cpp14::make_unique<cFireChargeEntity>      (a_Creator, a_Pos, Speed);
-		case pkExpBottle:     return cpp14::make_unique<cExpBottleEntity>       (a_Creator, a_Pos, Speed);
-		case pkSplashPotion:  return cpp14::make_unique<cSplashPotionEntity>    (a_Creator, a_Pos, Speed, *a_Item);
-		case pkWitherSkull:   return cpp14::make_unique<cWitherSkullEntity>     (a_Creator, a_Pos, Speed);
+		case pkArrow:         return std::make_unique<cArrowEntity>           (a_Creator, a_Pos, Speed);
+		case pkEgg:           return std::make_unique<cThrownEggEntity>       (a_Creator, a_Pos, Speed);
+		case pkEnderPearl:    return std::make_unique<cThrownEnderPearlEntity>(a_Creator, a_Pos, Speed);
+		case pkSnowball:      return std::make_unique<cThrownSnowballEntity>  (a_Creator, a_Pos, Speed);
+		case pkGhastFireball: return std::make_unique<cGhastFireballEntity>   (a_Creator, a_Pos, Speed);
+		case pkFireCharge:    return std::make_unique<cFireChargeEntity>      (a_Creator, a_Pos, Speed);
+		case pkExpBottle:     return std::make_unique<cExpBottleEntity>       (a_Creator, a_Pos, Speed);
+		case pkSplashPotion:  return std::make_unique<cSplashPotionEntity>    (a_Creator, a_Pos, Speed, *a_Item);
+		case pkWitherSkull:   return std::make_unique<cWitherSkullEntity>     (a_Creator, a_Pos, Speed);
 		case pkFirework:
 		{
 			ASSERT(a_Item != nullptr);
@@ -292,9 +282,8 @@ std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(
 				return nullptr;
 			}
 
-			return cpp14::make_unique<cFireworkEntity>(a_Creator, a_Pos, *a_Item);
+			return std::make_unique<cFireworkEntity>(a_Creator, a_Pos, *a_Item);
 		}
-		case pkFishingFloat: break;
 	}
 
 	LOGWARNING("%s: Unknown projectile kind: %d", __FUNCTION__, a_Kind);
@@ -358,7 +347,6 @@ AString cProjectileEntity::GetMCAClassName(void) const
 		case pkSplashPotion:  return "SplashPotion";
 		case pkWitherSkull:   return "WitherSkull";
 		case pkFirework:      return "Firework";
-		case pkFishingFloat:  return "";  // Unknown, perhaps MC doesn't save this?
 	}
 	UNREACHABLE("Unsupported projectile kind");
 }
@@ -369,7 +357,7 @@ AString cProjectileEntity::GetMCAClassName(void) const
 
 void cProjectileEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	super::Tick(a_Dt, a_Chunk);
+	Super::Tick(a_Dt, a_Chunk);
 	if (!IsTicking())
 	{
 		// The base class tick destroyed us
@@ -454,8 +442,7 @@ void cProjectileEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a
 
 void cProjectileEntity::SpawnOn(cClientHandle & a_Client)
 {
-	// Default spawning - use the projectile kind to spawn an object:
-	a_Client.SendSpawnObject(*this, m_ProjectileKind, 12, ANGLE_TO_PROTO(GetYaw()), ANGLE_TO_PROTO(GetPitch()));
+	a_Client.SendSpawnEntity(*this);
 	a_Client.SendEntityMetadata(*this);
 }
 
@@ -468,7 +455,4 @@ void cProjectileEntity::CollectedBy(cPlayer & a_Dest)
 	// Overriden in arrow
 	UNUSED(a_Dest);
 }
-
-
-
 

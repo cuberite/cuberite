@@ -8,21 +8,8 @@
 
 
 cThrownEggEntity::cThrownEggEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
-	super(pkEgg, a_Creator, a_Pos, 0.25, 0.25),
-	m_DestroyTimer(-1)
+	Super(pkEgg, a_Creator, a_Pos, a_Speed, 0.25f, 0.25f)
 {
-	SetSpeed(a_Speed);
-}
-
-
-
-
-
-void cThrownEggEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
-{
-	TrySpawnChicken(a_HitPos);
-
-	m_DestroyTimer = 2;
 }
 
 
@@ -31,41 +18,39 @@ void cThrownEggEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 
 void cThrownEggEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 {
-	int TotalDamage = 0;
-	// If entity is an Ender Dragon or Ender Crystal, it is damaged.
-	if (
-		(a_EntityHit.IsMob() && (static_cast<cMonster &>(a_EntityHit).GetMobType() == mtEnderDragon)) ||
-		a_EntityHit.IsEnderCrystal()
-	)
+	Super::OnHitEntity(a_EntityHit, a_HitPos);
+
+	int Damage = 0;
+	if (a_EntityHit.IsMob() && (static_cast<cMonster &>(a_EntityHit).GetMobType() == mtEnderDragon))
 	{
-		TotalDamage = 1;
+		// Enderdragons take 1 damage:
+		Damage = 1;
+	}
+	else if (a_EntityHit.IsEnderCrystal())
+	{
+		// Endercrystals are destroyed:
+		Damage = CeilC(a_EntityHit.GetHealth());
 	}
 
-	TrySpawnChicken(a_HitPos);
-	a_EntityHit.TakeDamage(dtRangedAttack, this, TotalDamage, 1);
+	a_EntityHit.TakeDamage(dtRangedAttack, GetCreatorUniqueID(), Damage, 1);
+	m_World->BroadcastEntityAnimation(*this, EntityAnimation::EggCracks);
 
-	m_DestroyTimer = 5;
+	TrySpawnChicken(a_HitPos);
+	Destroy();
 }
 
 
 
 
 
-void cThrownEggEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+void cThrownEggEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 {
-	if (m_DestroyTimer > 0)
-	{
-		m_DestroyTimer--;
-		if (m_DestroyTimer == 0)
-		{
-			Destroy();
-			return;
-		}
-	}
-	else
-	{
-		super::Tick(a_Dt, a_Chunk);
-	}
+	Super::OnHitSolidBlock(a_HitPos, a_HitFace);
+
+	m_World->BroadcastEntityAnimation(*this, EntityAnimation::EggCracks);
+
+	TrySpawnChicken(a_HitPos);
+	Destroy();
 }
 
 
@@ -87,7 +72,3 @@ void cThrownEggEntity::TrySpawnChicken(Vector3d a_HitPos)
 		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, mtChicken, true);
 	}
 }
-
-
-
-

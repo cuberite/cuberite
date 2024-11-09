@@ -7,22 +7,17 @@
 
 
 cMagmaCube::cMagmaCube(int a_Size) :
-	super("MagmaCube", mtMagmaCube, Printf("entity.%smagmacube.hurt", GetSizeName(a_Size).c_str()), Printf("entity.%smagmacube.death", GetSizeName(a_Size).c_str()), 0.6 * a_Size, 0.6 * a_Size),
+	Super(
+		"MagmaCube",
+		mtMagmaCube,
+		fmt::format(FMT_STRING("entity.{}magmacube.hurt"),  GetSizeName(a_Size)),
+		fmt::format(FMT_STRING("entity.{}magmacube.death"), GetSizeName(a_Size)),
+		"",
+		0.51f * a_Size,
+		0.51f * a_Size
+	),
 	m_Size(a_Size)
 {
-}
-
-
-
-
-
-void cMagmaCube::GetDrops(cItems & a_Drops, cEntity * a_Killer)
-{
-	UNUSED(a_Killer);
-	if (GetSize() > 1)
-	{
-		AddRandomUncommonDropItem(a_Drops, 25.0f, E_ITEM_MAGMA_CREAM);
-	}
 }
 
 
@@ -36,4 +31,17 @@ AString cMagmaCube::GetSizeName(int a_Size)
 		return "small_";
 	}
 	return "";
+}
+
+
+
+
+
+void cMagmaCube::GetDrops(cItems & a_Drops, cEntity * a_Killer)
+{
+	UNUSED(a_Killer);
+	if (GetSize() > 1)
+	{
+		AddRandomUncommonDropItem(a_Drops, 25.0f, E_ITEM_MAGMA_CREAM);
+	}
 }

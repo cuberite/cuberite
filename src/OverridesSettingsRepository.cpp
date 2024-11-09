@@ -2,9 +2,9 @@
 #include "Globals.h"
 #include "OverridesSettingsRepository.h"
 
-cOverridesSettingsRepository::cOverridesSettingsRepository(std::unique_ptr<cSettingsRepositoryInterface> a_Main, std::unique_ptr<cSettingsRepositoryInterface> a_Overrides) :
+cOverridesSettingsRepository::cOverridesSettingsRepository(std::unique_ptr<cSettingsRepositoryInterface> a_Main, cSettingsRepositoryInterface & a_Overrides) :
 	m_Main(std::move(a_Main)),
-	m_Overrides(std::move(a_Overrides))
+	m_Overrides(&a_Overrides)
 {
 }
 
@@ -112,7 +112,7 @@ std::vector<std::pair<AString, AString>> cOverridesSettingsRepository::GetValues
 
 	auto ret = overrides;
 
-	for (auto mainpair : main)
+	for (const auto & mainpair : main)
 	{
 		bool found = false;
 		for (const auto & overridepair : overrides)
@@ -123,7 +123,7 @@ std::vector<std::pair<AString, AString>> cOverridesSettingsRepository::GetValues
 				break;
 			}
 		}
-		if (found == false)
+		if (!found)
 		{
 			ret.push_back(mainpair);
 		}

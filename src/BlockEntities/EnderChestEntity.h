@@ -15,16 +15,14 @@ class cEnderChestEntity :
 {
 	// tolua_end
 
-	using super = cBlockEntity;
+	using Super = cBlockEntity;
 
 public:  // tolua_export
 
-	BLOCKENTITY_PROTODEF(cEnderChestEntity)
-
 	cEnderChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
-	virtual ~cEnderChestEntity() override;
 
 	// cBlockEntity overrides:
+	virtual void OnRemoveFromWorld() override;
 	virtual bool UsedBy(cPlayer * a_Player) override;
 	virtual void SendTo(cClientHandle & a_Client) override;
 
@@ -34,7 +32,3 @@ public:  // tolua_export
 	/** Opens a new enderchest window for this enderchest */
 	void OpenNewWindow(void);
 } ;  // tolua_export
-
-
-
-

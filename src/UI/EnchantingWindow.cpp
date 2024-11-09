@@ -11,14 +11,12 @@
 
 
 
-cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
-	cWindow(wtEnchantment, "Enchant"),
+cEnchantingWindow::cEnchantingWindow(Vector3i a_BlockPos, const AString & a_Title) :
+	cWindow(wtEnchantment, a_Title),
 	m_SlotArea(),
-	m_BlockX(a_BlockX),
-	m_BlockY(a_BlockY),
-	m_BlockZ(a_BlockZ)
+	m_BlockPos(a_BlockPos)
 {
-	m_SlotArea = new cSlotAreaEnchanting(*this, m_BlockX, m_BlockY, m_BlockZ);
+	m_SlotArea = new cSlotAreaEnchanting(*this, m_BlockPos);
 	m_SlotAreas.push_back(m_SlotArea);
 	m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 	m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
@@ -28,46 +26,23 @@ cEnchantingWindow::cEnchantingWindow(int a_BlockX, int a_BlockY, int a_BlockZ) :
 
 
 
-void cEnchantingWindow::SetProperty(short a_Property, short a_Value, cPlayer & a_Player)
+void cEnchantingWindow::SetProperty(size_t a_Property, short a_Value)
 {
-	if ((a_Property < 0) || (static_cast<size_t>(a_Property) >= ARRAYCOUNT(m_PropertyValue)))
+	if (a_Property < m_PropertyValue.size())
 	{
-		ASSERT(!"a_Property is invalid");
-		return;
+		m_PropertyValue[a_Property] = a_Value;
 	}
 
-	m_PropertyValue[a_Property] = a_Value;
-	super::SetProperty(a_Property, a_Value, a_Player);
+	Super::SetProperty(a_Property, a_Value);
 }
 
 
 
 
 
-void cEnchantingWindow::SetProperty(short a_Property, short a_Value)
+short cEnchantingWindow::GetProperty(size_t a_Property)
 {
-	if ((a_Property < 0) || (static_cast<size_t>(a_Property) >= ARRAYCOUNT(m_PropertyValue)))
-	{
-		ASSERT(!"a_Property is invalid");
-		return;
-	}
-
-	m_PropertyValue[a_Property] = a_Value;
-	super::SetProperty(a_Property, a_Value);
-}
-
-
-
-
-
-short cEnchantingWindow::GetPropertyValue(short a_Property)
-{
-	if ((a_Property < 0) || (static_cast<size_t>(a_Property) >= ARRAYCOUNT(m_PropertyValue)))
-	{
-		ASSERT(!"a_Property is invalid");
-		return 0;
-	}
-
+	ASSERT(a_Property < m_PropertyValue.size());
 	return m_PropertyValue[a_Property];
 }
 
@@ -84,13 +59,13 @@ void cEnchantingWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer
 		// Enchanting Area
 		AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
 		AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
-		super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
+		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
 	}
 	else
 	{
 		// Inventory or Hotbar
 		AreasInOrder.push_back(m_SlotAreas[0]);  /* Enchanting */
-		super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 	}
 }
 

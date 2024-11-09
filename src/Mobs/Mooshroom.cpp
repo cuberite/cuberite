@@ -9,7 +9,7 @@
 
 
 cMooshroom::cMooshroom(void) :
-	super("Mooshroom", mtMooshroom, "entity.cow.hurt", "entity.cow.death", 0.9, 1.3)
+	Super("Mooshroom", mtMooshroom, "entity.cow.hurt", "entity.cow.death", "entity.cow.ambient", 0.9f, 1.4f)
 {
 }
 
@@ -43,18 +43,18 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 	{
 		case E_ITEM_BUCKET:
 		{
+			// Milk the cow.
 			if (!a_Player.IsGameModeCreative())
 			{
-				a_Player.GetInventory().RemoveOneEquippedItem();
-				a_Player.GetInventory().AddItem(E_ITEM_MILK);
+				a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_MILK));
 			}
 		} break;
 		case E_ITEM_BOWL:
 		{
+			// Soup the cow.
 			if (!a_Player.IsGameModeCreative())
 			{
-				a_Player.GetInventory().RemoveOneEquippedItem();
-				a_Player.GetInventory().AddItem(E_ITEM_MUSHROOM_SOUP);
+				a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_MUSHROOM_SOUP));
 			}
 		} break;
 		case E_ITEM_SHEARS:
@@ -65,7 +65,7 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 			}
 
 			cItems Drops;
-			Drops.push_back(cItem(E_BLOCK_RED_MUSHROOM, 5, 0));
+			Drops.emplace_back(E_BLOCK_RED_MUSHROOM, static_cast<char>(5), static_cast<char>(0));
 			m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 			m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtCow, false);
 			Destroy();

@@ -16,6 +16,7 @@
 
 // fwd:
 struct tolua_Error;
+class cPluginLua;
 
 
 
@@ -50,8 +51,12 @@ public:
 	// Helper functions:
 	static cPluginLua * GetLuaPlugin(lua_State * L);
 	static int tolua_do_error(lua_State * L, const char * a_pMsg, tolua_Error * a_pToLuaError);
-	static int lua_do_error(lua_State * L, const char * a_pFormat, fmt::ArgList a_ArgList);
-	FMT_VARIADIC(static int, lua_do_error, lua_State *, const char *)
+	static int vlua_do_error(lua_State * L, const char * a_pFormat, fmt::printf_args a_ArgList);
+	template <typename... Args>
+	static int lua_do_error(lua_State * L, const char * a_Format, const Args & ... a_Args)
+	{
+		return vlua_do_error(L, a_Format, fmt::make_printf_args(a_Args...));
+	}
 
 
 	/** Binds the DoWith(ItemName) functions of regular classes. */
@@ -206,228 +211,6 @@ public:
 
 
 
-	/** Template for the bindings for the DoWithXYZAt(X, Y, Z) functions that don't need to check their coords. */
-	template <
-		class SELF,
-		class ITEM,
-		bool (SELF::*DoWithFn)(int, int, int, cFunctionRef<bool(ITEM &)>)
-	>
-	static int DoWithXYZ(lua_State * tolua_S)
-	{
-		// Check params:
-		cLuaState L(tolua_S);
-		if (
-			!L.CheckParamNumber(2, 4) ||
-			!L.CheckParamFunction(5) ||
-			!L.CheckParamEnd(6)
-		)
-		{
-			return 0;
-		}
-
-		// Get parameters:
-		SELF * Self = nullptr;
-		int BlockX = 0;
-		int BlockY = 0;
-		int BlockZ = 0;
-		cLuaState::cRef FnRef;
-		L.GetStackValues(1, Self, BlockX, BlockY, BlockZ, FnRef);
-		if (Self == nullptr)
-		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
-		}
-		if (!FnRef.IsValid())
-		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #5");
-		}
-
-		// Call the DoWith function:
-		bool res = (Self->*DoWithFn)(BlockX, BlockY, BlockZ, [&](ITEM & a_Item)
-			{
-				bool ret = false;
-				L.Call(FnRef, &a_Item, cLuaState::Return, ret);
-				return ret;
-			}
-		);
-
-		// Push the result as the return value:
-		L.Push(res);
-		return 1;
-	}
-
-
-
-
-
-	/** Template for the bindings for the DoWithXYZAt(X, Y, Z) functions that need to check their coords. */
-	template <
-		class SELF,
-		class ITEM,
-		bool (SELF::*DoWithFn)(int, int, int, cFunctionRef<bool(ITEM &)>),
-		bool (SELF::*CoordCheckFn)(int, int, int) const
-	>
-	static int DoWithXYZ(lua_State * tolua_S)
-	{
-		// Check params:
-		cLuaState L(tolua_S);
-		if (
-			!L.CheckParamNumber(2, 4) ||
-			!L.CheckParamFunction(5) ||
-			!L.CheckParamEnd(6)
-		)
-		{
-			return 0;
-		}
-
-		// Get parameters:
-		SELF * Self = nullptr;
-		int BlockX = 0;
-		int BlockY = 0;
-		int BlockZ = 0;
-		cLuaState::cRef FnRef;
-		L.GetStackValues(1, Self, BlockX, BlockY, BlockZ, FnRef);
-		if (Self == nullptr)
-		{
-			return L.ApiParamError("Invalid 'self'");
-		}
-		if (!FnRef.IsValid())
-		{
-			return L.ApiParamError("Expected a valid callback function for parameter #5");
-		}
-		if (!(Self->*CoordCheckFn)(BlockX, BlockY, BlockZ))
-		{
-			return L.FApiParamError("The provided coordinates ({0}) are not valid",
-				Vector3i{BlockX, BlockY, BlockZ}
-			);
-		}
-
-		// Call the DoWith function:
-		bool res = (Self->*DoWithFn)(BlockX, BlockY, BlockZ, [&](ITEM & a_Item)
-			{
-				bool ret = false;
-				L.Call(FnRef, &a_Item, cLuaState::Return, ret);
-				return ret;
-			}
-		);
-
-		// Push the result as the return value:
-		L.Push(res);
-		return 1;
-	}
-
-
-
-
-
-	template <
-		class Ty1,
-		class Ty2,
-		bool (Ty1::*ForEachFn)(int, int, cFunctionRef<bool(Ty2 &)>)
-	>
-	static int ForEachInChunk(lua_State * tolua_S)
-	{
-		// Check params:
-		cLuaState L(tolua_S);
-		if (
-			!L.CheckParamNumber(2, 3) ||
-			!L.CheckParamFunction(4) ||
-			!L.CheckParamEnd(5)
-		)
-		{
-			return 0;
-		}
-
-		// Get parameters:
-		Ty1 * Self = nullptr;
-		int ChunkX = 0;
-		int ChunkZ = 0;
-		cLuaState::cRef FnRef;
-		L.GetStackValues(1, Self, ChunkX, ChunkZ, FnRef);
-		if (Self == nullptr)
-		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
-		}
-		if (!FnRef.IsValid())
-		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #4");
-		}
-
-		// Call the DoWith function:
-		bool res = (Self->*ForEachFn)(ChunkX, ChunkZ, [&](Ty2 & a_Item)
-			{
-				bool ret = false;
-				L.Call(FnRef, &a_Item, cLuaState::Return, ret);
-				return ret;
-			}
-		);
-
-		// Push the result as the return value:
-		L.Push(res);
-		return 1;
-	}
-
-
-
-
-
-	template <
-		class Ty1,
-		class Ty2,
-		bool (Ty1::*ForEachFn)(const cBoundingBox &, cFunctionRef<bool(Ty2 &)>)
-	>
-	static int ForEachInBox(lua_State * tolua_S)
-	{
-		// Check params:
-		cLuaState L(tolua_S);
-		if (
-			!L.CheckParamUserType(1, "cWorld") ||
-			!L.CheckParamUserType(2, "cBoundingBox") ||
-			!L.CheckParamFunction(3) ||
-			!L.CheckParamEnd(4)
-		)
-		{
-			return 0;
-		}
-
-		// Get the params:
-		Ty1 * Self = nullptr;
-		cBoundingBox * Box = nullptr;
-		cLuaState::cRef FnRef;
-		L.GetStackValues(1, Self, Box, FnRef);
-		if ((Self == nullptr) || (Box == nullptr))
-		{
-			LOGWARNING("Invalid world (%p) or boundingbox (%p)", static_cast<void *>(Self), static_cast<void *>(Box));
-			L.LogStackTrace();
-			return 0;
-		}
-		if (!FnRef.IsValid())
-		{
-			return lua_do_error(tolua_S, "Error in function call '#funcname#': Expected a valid callback function for parameter #2");
-		}
-
-		bool res = (Self->*ForEachFn)(*Box, [&](Ty2 & a_Item)
-			{
-				bool ret = false;
-				if (!L.Call(FnRef, &a_Item, cLuaState::Return, ret))
-				{
-					LOGWARNING("Failed to call Lua callback");
-					L.LogStackTrace();
-					return true;  // Abort enumeration
-				}
-
-				return ret;
-			}
-		);
-
-		// Push the result as the return value:
-		L.Push(res);
-		return 1;
-	}
-
-
-
-
-
 	template <
 		class Ty1,
 		class Ty2,
@@ -515,7 +298,3 @@ public:
 		return 1;
 	}
 };
-
-
-
-

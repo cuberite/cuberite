@@ -22,12 +22,13 @@ enum class eRabbitType : UInt8
 
 
 
-class cRabbit :
+class cRabbit:
 	public cPassiveMonster
 {
-	typedef cPassiveMonster super;
+	using Super = cPassiveMonster;
 
 public:
+
 	cRabbit();
 	cRabbit(eRabbitType Type, int MoreCarrotTicks = 0);
 

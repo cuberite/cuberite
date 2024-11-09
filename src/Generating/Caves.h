@@ -62,13 +62,15 @@ protected:
 
 
 
-class cStructGenWormNestCaves :
+class cStructGenWormNestCaves:
 	public cGridStructGen
 {
-	typedef cGridStructGen super;
+	using Super = cGridStructGen;
+
 public:
+
 	cStructGenWormNestCaves(int a_Seed, int a_Size = 64, int a_Grid = 96, int a_MaxOffset = 128) :
-		super(a_Seed, a_Grid, a_Grid, a_MaxOffset, a_MaxOffset, a_Size, a_Size, 100),
+		Super(a_Seed, a_Grid, a_Grid, a_MaxOffset, a_MaxOffset, a_Size, a_Size, 100),
 		m_Size(a_Size),
 		m_MaxOffset(a_MaxOffset),
 		m_Grid(a_Grid)
@@ -76,6 +78,7 @@ public:
 	}
 
 protected:
+
 	class cCaveSystem;  // fwd: Caves.cpp
 
 	int          m_Size;  // relative size of the cave systems' caves. Average number of blocks of each initial tunnel

@@ -7,36 +7,22 @@
 
 
 
-class cItemSaplingHandler : public cItemHandler
+class cItemSaplingHandler final :
+	public cItemHandler
 {
-	typedef cItemHandler super;
+	using Super = cItemHandler;
 
 public:
-	cItemSaplingHandler(int a_ItemType)
-		: cItemHandler(a_ItemType)
-	{
 
-	}
+	using Super::Super;
 
-	virtual bool GetPlacementBlockTypeMeta(
-		cWorld * a_World, cPlayer * a_Player,
-		int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace,
-		int a_CursorX, int a_CursorY, int a_CursorZ,
-		BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta
-	) override
+
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
-		bool res = super::GetPlacementBlockTypeMeta(
-			a_World, a_Player,
-			a_BlockX, a_BlockY, a_BlockZ, a_BlockFace,
-			a_CursorX, a_CursorY, a_CursorZ,
-			a_BlockType, a_BlockMeta
+		return a_Player.PlaceBlock(
+			a_PlacePosition,
+			static_cast<BLOCKTYPE>(m_ItemType),
+			static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage & 0x07)  // Allow only the lowest 3 bits (top bit is for growth).
 		);
-		// Only the lowest 3 bits are important
-		a_BlockMeta = a_BlockMeta & 0x7;
-		return res;
 	}
 } ;
-
-
-
-

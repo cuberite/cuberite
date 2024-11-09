@@ -11,22 +11,6 @@
 #include "../StringCompression.h"
 
 
-
-
-
-// Conditionally log a warning
-#define CONDWARNING(ShouldLog, ...) \
-	do { \
-		if (ShouldLog) \
-		{ \
-			LOGWARNING(__VA_ARGS__); \
-		} \
-	} while (false)
-
-
-
-
-
 /** Returns the map of string => eMergeStrategy used when translating cubeset file merge strategies. */
 static std::map<AString, cBlockArea::eMergeStrategy> & GetMergeStrategyMap(void)
 {
@@ -72,15 +56,6 @@ cPrefabPiecePool::cPrefabPiecePool(
 	{
 		AddStartingPieceDefs(a_StartingPieceDefs, a_NumStartingPieceDefs, a_DefaultStartingPieceHeight);
 	}
-}
-
-
-
-
-
-cPrefabPiecePool::cPrefabPiecePool(const AString & a_FileName, bool a_LogWarnings)
-{
-	LoadFromFile(a_FileName, a_LogWarnings);
 }
 
 
@@ -137,7 +112,7 @@ void cPrefabPiecePool::AddStartingPieceDefs(
 )
 {
 	ASSERT(a_StartingPieceDefs != nullptr);
-	auto verticalStrategy = CreateVerticalStrategyFromString(Printf("Fixed|%d", a_DefaultPieceHeight), false);
+	auto verticalStrategy = CreateVerticalStrategyFromString(fmt::format(FMT_STRING("Fixed|{}"), a_DefaultPieceHeight), false);
 	for (size_t i = 0; i < a_NumStartingPieceDefs; i++)
 	{
 		cPrefab * Prefab = new cPrefab(a_StartingPieceDefs[i]);
@@ -174,21 +149,28 @@ bool cPrefabPiecePool::LoadFromString(const AString & a_Contents, const AString 
 	// If the contents start with GZip signature, ungzip and retry:
 	if (a_Contents.substr(0, 3) == "\x1f\x8b\x08")
 	{
-		AString Uncompressed;
-		auto res = UncompressStringGZIP(a_Contents.data(), a_Contents.size(), Uncompressed);
-		if (res == Z_OK)
+		try
 		{
-			return LoadFromString(Uncompressed, a_FileName, a_LogWarnings);
+			const auto Extracted = Compression::Extractor().ExtractGZip(
+			{
+				reinterpret_cast<const std::byte *>(a_Contents.data()), a_Contents.size()
+			});
+
+			// Here we do an extra std::string conversion, hardly efficient, but...
+			// Better would be refactor into LoadFromByteView for the GZip decompression path, and getting cFile to support std::byte.
+			// ...so it'll do for now.
+
+			return LoadFromString(std::string(Extracted.GetStringView()), a_FileName, a_LogWarnings);
 		}
-		else
+		catch (const std::exception & Oops)
 		{
-			CONDWARNING(a_LogWarnings, "Failed to decompress Gzip data in file %s: %d", a_FileName.c_str(), res);
+			CONDWARNING(a_LogWarnings, "Failed to decompress Gzip data in file %s. %s", a_FileName.c_str(), Oops.what());
 			return false;
 		}
 	}
 
 	// Search the first 8 KiB of the file for the format auto-detection string:
-	auto Header = a_Contents.substr(0, 8192);
+	const auto Header = a_Contents.substr(0, 8 KiB);
 	if (Header.find("CubesetFormatVersion =") != AString::npos)
 	{
 		return LoadFromCubeset(a_Contents, a_FileName, a_LogWarnings);
@@ -204,7 +186,7 @@ bool cPrefabPiecePool::LoadFromString(const AString & a_Contents, const AString 
 bool cPrefabPiecePool::LoadFromCubeset(const AString & a_Contents, const AString & a_FileName, bool a_LogWarnings)
 {
 	// Load the file in the Lua interpreter:
-	cLuaState Lua(Printf("LoadablePiecePool %s", a_FileName.c_str()));
+	cLuaState Lua(fmt::format(FMT_STRING("LoadablePiecePool {}"), a_FileName));
 	Lua.Create();
 	cLuaState::cLock lock(Lua);
 	if (!Lua.LoadString(a_Contents, a_FileName, a_LogWarnings))
@@ -217,7 +199,7 @@ bool cPrefabPiecePool::LoadFromCubeset(const AString & a_Contents, const AString
 	int Version = 0;
 	if (!Lua.GetNamedGlobal("Cubeset.Metadata.CubesetFormatVersion", Version))
 	{
-		CONDWARNING(a_LogWarnings, "Cannot load cubeset %s, it doesn't contain version information.", a_FileName.c_str());
+		CONDWARNING(a_LogWarnings, "Cannot load cubeset %s, it doesn't contain version information.", a_FileName);
 		return false;
 	}
 
@@ -228,7 +210,7 @@ bool cPrefabPiecePool::LoadFromCubeset(const AString & a_Contents, const AString
 	}
 
 	// Unknown version:
-	CONDWARNING(a_LogWarnings, "Cannot load cubeset %s, version (%d) not supported.", a_FileName.c_str(), Version);
+	CONDWARNING(a_LogWarnings, "Cannot load cubeset %s, version (%d) not supported.", a_FileName, Version);
 	return false;
 }
 
@@ -298,7 +280,7 @@ bool cPrefabPiecePool::LoadCubesetPieceVer1(const AString & a_FileName, cLuaStat
 	AString PieceName;
 	if (!a_LuaState.GetNamedValue("OriginData.ExportName", PieceName))
 	{
-		Printf(PieceName, "Piece #%d", a_PieceIndex);
+		PieceName = fmt::format(FMT_STRING("Piece #{}"), a_PieceIndex);
 	}
 
 	// Read the hitbox dimensions:
@@ -312,7 +294,7 @@ bool cPrefabPiecePool::LoadCubesetPieceVer1(const AString & a_FileName, cLuaStat
 		!a_LuaState.GetNamedValue("Hitbox.MaxZ", Hitbox.p2.z)
 	)
 	{
-		CONDWARNING(a_LogWarnings, "Cannot load piece %s from file %s, it's missing hitbox information", PieceName.c_str(), a_FileName.c_str());
+		CONDWARNING(a_LogWarnings, "Cannot load piece %s from file %s, it's missing hitbox information", PieceName, a_FileName);
 		return false;
 	}
 
@@ -349,7 +331,7 @@ bool cPrefabPiecePool::LoadCubesetPieceVer1(const AString & a_FileName, cLuaStat
 		if (prefab->GetVerticalStrategy() == nullptr)
 		{
 			CONDWARNING(a_LogWarnings, "Starting prefab %s in file %s doesn't have its VerticalStrategy set. Setting to Fixed|150.",
-				PieceName.c_str(), a_FileName.c_str()
+				PieceName, a_FileName
 			);
 			VERIFY(prefab->SetVerticalStrategyFromString("Fixed|150", false));
 		}
@@ -391,14 +373,18 @@ std::unique_ptr<cPrefab> cPrefabPiecePool::LoadPrefabFromCubesetVer1(
 			SchematicFileName = a_FileName.substr(0, PathEnd) + SchematicFileName;
 		}
 		cBlockArea area;
-		if (!cSchematicFileSerializer::LoadFromSchematicFile(area, SchematicFileName))
+		try
 		{
-			CONDWARNING(a_LogWarnings, "Cannot load schematic file \"%s\" for piece %s in cubeset %s.",
-				SchematicFileName.c_str(), a_PieceName.c_str(), a_FileName.c_str()
+			cSchematicFileSerializer::LoadFromSchematicFile(area, SchematicFileName);
+		}
+		catch (const std::exception & Oops)
+		{
+			CONDWARNING(a_LogWarnings, "Cannot load schematic file \"%s\" for piece %s in cubeset %s. %s",
+				SchematicFileName.c_str(), a_PieceName.c_str(), a_FileName.c_str(), Oops.what()
 			);
 			return nullptr;
 		}
-		return cpp14::make_unique<cPrefab>(area);
+		return std::make_unique<cPrefab>(area);
 	}  // if (SchematicFileName)
 
 	// There's no referenced schematic file, load from BlockDefinitions / BlockData.
@@ -452,7 +438,7 @@ std::unique_ptr<cPrefab> cPrefabPiecePool::LoadPrefabFromCubesetVer1(
 		return nullptr;
 	}
 
-	return cpp14::make_unique<cPrefab>(BlockDefStr, BlockDataStr, SizeX, SizeY, SizeZ);
+	return std::make_unique<cPrefab>(BlockDefStr, BlockDataStr, SizeX, SizeY, SizeZ);
 }
 
 
@@ -613,6 +599,12 @@ bool cPrefabPiecePool::ReadPieceMetadataCubesetVer1(
 	}
 	a_Prefab->SetVerticalStrategyFromString(VerticalStrategy, a_LogWarnings);
 
+	AString ModifiersStr;
+	if (a_LuaState.GetNamedValue("Modifiers", ModifiersStr))
+	{
+		a_Prefab->SetPieceModifiersFromString(ModifiersStr, a_LogWarnings);
+	}
+
 	return true;
 }
 
@@ -722,7 +714,7 @@ AString cPrefabPiecePool::GetMetadata(const AString & a_ParamName) const
 
 
 
-void cPrefabPiecePool::AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrainHeightGenPtr & a_HeightGen, int a_SeaLevel)
+void cPrefabPiecePool::AssignGens(int a_Seed, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen, int a_SeaLevel)
 {
 	// Assign the generator linkage to all starting pieces' VerticalStrategies:
 	for (auto & piece: m_StartingPieces)
@@ -741,6 +733,14 @@ void cPrefabPiecePool::AssignGens(int a_Seed, cBiomeGenPtr & a_BiomeGen, cTerrai
 		if (verticalLimit != nullptr)
 		{
 			verticalLimit->AssignGens(a_Seed, a_BiomeGen, a_HeightGen, a_SeaLevel);
+		}
+		auto modifiers = piece->GetModifiers();
+		if (modifiers.size() > 0)
+		{
+			for (size_t i = 0; i < modifiers.size(); i++)
+			{
+				modifiers[i]->AssignSeed(a_Seed);
+			}
 		}
 	}  // for piece - m_AllPieces[]
 }
@@ -806,7 +806,3 @@ void cPrefabPiecePool::Reset(void)
 {
 	// Do nothing
 }
-
-
-
-

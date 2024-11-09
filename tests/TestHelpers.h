@@ -18,6 +18,7 @@ IMPLEMENT_TEST_MAIN("TestName",
 
 
 
+
 /** The exception that is thrown if a test fails.
 It doesn't inherit from any type so that it is not possible to catch it by a mistake,
 it needs to be caught explicitly (used in the TEST_THROWS).
@@ -45,12 +46,15 @@ public:
 
 /** Checks that the two values are equal; if not, throws a TestException. */
 #define TEST_EQUAL(VAL1, VAL2) \
-	if (VAL1 != VAL2) \
-	{ \
-		throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("Equality test failed: %s != %s", \
-			#VAL1, #VAL2 \
-		)); \
-	}
+	do { \
+		if (VAL1 != VAL2) \
+		{ \
+			throw TestException( \
+				__FILE__, __LINE__, __FUNCTION__, \
+				fmt::format(FMT_STRING("Equality test failed: {} != {}"), #VAL1, #VAL2) \
+			); \
+		} \
+	} while (false)
 
 
 
@@ -58,12 +62,15 @@ public:
 
 /** Checks that the two values are equal; if not, throws a TestException, includes the specified message. */
 #define TEST_EQUAL_MSG(VAL1, VAL2, MSG) \
-	if (VAL1 != VAL2) \
-	{ \
-		throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("Equality test failed: %s != %s (%s)", \
-			#VAL1, #VAL2, MSG \
-		)); \
-	}
+	do { \
+		if (VAL1 != VAL2) \
+		{ \
+			throw TestException( \
+				__FILE__, __LINE__, __FUNCTION__, \
+				fmt::format(FMT_STRING("Equality test failed: {} != {} ({})"), #VAL1, #VAL2, MSG) \
+			); \
+		} \
+	} while (false)
 
 
 
@@ -71,12 +78,15 @@ public:
 
 /** Checks that the two values are not equal; if they are, throws a TestException. */
 #define TEST_NOTEQUAL(VAL1, VAL2) \
-	if (VAL1 == VAL2) \
-	{ \
-		throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("Inequality test failed: %s == %s", \
-			#VAL1, #VAL2 \
-		)); \
-	}
+	do { \
+		if (VAL1 == VAL2) \
+		{ \
+			throw TestException( \
+				__FILE__, __LINE__, __FUNCTION__, \
+				fmt::format(FMT_STRING("Inequality test failed: {} == {}"), #VAL1, #VAL2) \
+			); \
+		} \
+	} while (false)
 
 
 
@@ -101,7 +111,7 @@ public:
 	do { \
 		if (Stmt < Val) \
 		{ \
-			throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("Comparison failed: %s < %s", #Stmt, #Val)); \
+			throw TestException(__FILE__, __LINE__, __FUNCTION__, fmt::format(FMT_STRING("Comparison failed: {} < {}"), #Stmt, #Val)); \
 		} \
 	} while (false)
 
@@ -114,7 +124,7 @@ public:
 	do { \
 		if (Stmt > Val) \
 		{ \
-			throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("Comparison failed: %s > %s", #Stmt, #Val)); \
+			throw TestException(__FILE__, __LINE__, __FUNCTION__, fmt::format(FMT_STRING("Comparison failed: {} > {}"), #Stmt, #Val)); \
 		} \
 	} while (false)
 
@@ -124,29 +134,37 @@ public:
 
 /** Checks that the statement throws an exception of the specified class. */
 #define TEST_THROWS(Stmt, ExcClass) \
-	try \
-	{ \
-		Stmt; \
-		throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("Failed to throw an exception of type %s", \
-			#ExcClass \
-		)); \
-	} \
-	catch (const ExcClass &) \
-	{ \
-		/* This is the expected case. */ \
-	} \
-	catch (const std::exception & exc) \
-	{ \
-		throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("An unexpected std::exception descendant was thrown, was expecting type %s. Message is: %s", \
-			#ExcClass, exc.what() \
-		)); \
-	} \
-	catch (...) \
-	{ \
-		throw TestException(__FILE__, __LINE__, __FUNCTION__, Printf("An unexpected unknown exception object was thrown, was expecting type %s", \
-			#ExcClass \
-		)); \
-	}
+	do { \
+		try \
+		{ \
+			Stmt; \
+			throw TestException( \
+				__FILE__, __LINE__, __FUNCTION__, \
+				fmt::format(FMT_STRING("Failed to throw an exception of type {}"), #ExcClass) \
+			); \
+		} \
+		catch (const ExcClass &) \
+		{ \
+			/* This is the expected case. */ \
+		} \
+		catch (const std::exception & exc) \
+		{ \
+			throw TestException( \
+				__FILE__, __LINE__, __FUNCTION__, \
+				fmt::format( \
+					FMT_STRING("An unexpected std::exception descendant was thrown, was expecting type {}. Message is: {}"), \
+					#ExcClass, exc.what() \
+				) \
+			); \
+		} \
+		catch (...)\
+		{ \
+			throw TestException( \
+				__FILE__, __LINE__, __FUNCTION__, \
+				fmt::format(FMT_STRING("An unexpected unknown exception object was thrown, was expecting type {}"), #ExcClass) \
+			); \
+		} \
+	} while (false)
 
 
 
@@ -154,19 +172,24 @@ public:
 
 /** Checks that the statement throws an exception of any type. */
 #define TEST_THROWS_ANY(Stmt) \
-	try \
-	{ \
-		Stmt; \
-		throw TestException(__FILE__, __LINE__, __FUNCTION__, "Failed to throw an exception of any type"); \
-	} \
-	catch (const TestException & exc) \
-	{ \
-		throw exc; \
-	} \
-	catch (...) \
-	{ \
-		/* This is the expected case */ \
-	}
+	do { \
+		try \
+		{ \
+			Stmt; \
+			throw TestException( \
+				__FILE__, __LINE__, __FUNCTION__, \
+				"Failed to throw an exception of any type" \
+			); \
+		} \
+		catch (const TestException & exc) \
+		{ \
+			throw exc; \
+		} \
+		catch (...)\
+		{ \
+			/* This is the expected case */ \
+		} \
+	} while (false)
 
 
 
@@ -174,18 +197,18 @@ public:
 
 /** Fails the test unconditionally, with the specified message. */
 #define TEST_FAIL(MSG) \
-	throw TestException(__FILE__, __LINE__, __FUNCTION__, MSG);
+	throw TestException(__FILE__, __LINE__, __FUNCTION__, MSG)
 
 
 
 
 
 /** Checks that the statement causes an ASSERT trigger. */
-#ifdef _DEBUG
-	#define TEST_ASSERTS(Stmt) TEST_THROWS(Stmt, cAssertFailure)
+#ifdef NDEBUG
+	#define TEST_ASSERTS(Stmt) LOG("Skipped, cannot test in Release mode: TEST_ASSERT(%s); (%s:%d)", #Stmt, __FILE__, __LINE__)
 #else
-	#define TEST_ASSERTS(Stmt) LOG("Skipped, cannot test in Release mode: TEST_ASSERT(%s); (%s:%d)", #Stmt, __FILE__, __LINE__);
-#endif  // else _DEBUG
+	#define TEST_ASSERTS(Stmt) TEST_THROWS(Stmt, cAssertFailure)
+#endif  // else NDEBUG
 
 
 

@@ -16,12 +16,13 @@
 
 
 
-class cMinecartWithChestWindow :
+class cMinecartWithChestWindow:
 	public cWindow
 {
-	typedef cWindow super;
+	using Super = cWindow;
 
 public:
+
 	cMinecartWithChestWindow(cMinecartWithChest * a_ChestCart) :
 		cWindow(wtChest, "Minecart with Chest"),
 		m_ChestCart(a_ChestCart)
@@ -42,13 +43,13 @@ public:
 			// Chest Area
 			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar    */
 			AreasInOrder.push_back(m_SlotAreas[1]);  /* Inventory */
-			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
+			Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, true);
 		}
 		else
 		{
 			// Hotbar or Inventory
 			AreasInOrder.push_back(m_SlotAreas[0]);  /* Chest */
-			super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
+			Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 		}
 	}
 

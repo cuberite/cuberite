@@ -7,12 +7,13 @@
 
 
 
-class cSquid :
+class cSquid:
 	public cPassiveMonster
 {
-	typedef cPassiveMonster super;
+	using Super = cPassiveMonster;
 
 public:
+
 	cSquid();
 
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;

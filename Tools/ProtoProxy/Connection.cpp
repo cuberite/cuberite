@@ -10,10 +10,10 @@
 #include "mbedTLS++/CryptoKey.h"
 #include "../../src/Logger.h"
 
-#include "fmt/printf.h"
-
 #ifdef _WIN32
 	#include <direct.h>  // For _mkdir()
+#else
+	#include <sys/stat.h>   // for mkdir
 #endif
 
 
@@ -38,21 +38,21 @@
 
 #define HANDLE_CLIENT_PACKET_READ(Proc, Type, Var) \
 	Type Var; \
-	{ \
+	do { \
 		if (!m_ClientBuffer.Proc(Var)) \
 		{ \
 			return false; \
 		} \
-	}
+	} while (false)
 
 #define HANDLE_SERVER_PACKET_READ(Proc, Type, Var) \
 	Type Var; \
-	{ \
+	do { \
 		if (!m_ServerBuffer.Proc(Var)) \
 		{ \
 			return false; \
 		} \
-	}
+	} while (false)
 
 #define CLIENTSEND(...) SendData(m_ClientSocket, __VA_ARGS__, "Client")
 #define SERVERSEND(...) SendData(m_ServerSocket, __VA_ARGS__, "Server")
@@ -60,47 +60,47 @@
 #define SERVERENCRYPTSEND(...) SendEncryptedData(m_ServerSocket, m_ServerEncryptor, __VA_ARGS__, "Server")
 
 #define COPY_TO_SERVER() \
-	{ \
-		AString ToServer; \
+	do { \
+		ContiguousByteBuffer ToServer; \
 		m_ClientBuffer.ReadAgain(ToServer); \
 		switch (m_ServerState) \
 		{ \
 			case csUnencrypted: \
 			{ \
-				SERVERSEND(ToServer.data(), ToServer.size()); \
+				SERVERSEND(ToServer); \
 				break; \
 			} \
 			case csEncryptedUnderstood: \
 			case csEncryptedUnknown: \
 			{ \
-				SERVERENCRYPTSEND(ToServer.data(), ToServer.size()); \
+				SERVERENCRYPTSEND(ToServer); \
 				break; \
 			} \
 			case csWaitingForEncryption: \
 			{ \
 				Log("Waiting for server encryption, queued %u bytes", ToServer.size()); \
-				m_ServerEncryptionBuffer.append(ToServer.data(), ToServer.size()); \
+				m_ServerEncryptionBuffer += ToServer; \
 				break; \
 			} \
 		} \
 		DebugSleep(50); \
-	}
+	} while (false)
 
 #define COPY_TO_CLIENT() \
-	{ \
-		AString ToClient; \
+	do { \
+		ContiguousByteBuffer ToClient; \
 		m_ServerBuffer.ReadAgain(ToClient); \
 		switch (m_ClientState) \
 		{ \
 			case csUnencrypted: \
 			{ \
-				CLIENTSEND(ToClient.data(), ToClient.size()); \
+				CLIENTSEND(ToClient); \
 				break; \
 			} \
 			case csEncryptedUnderstood: \
 			case csEncryptedUnknown: \
 			{ \
-				CLIENTENCRYPTSEND(ToClient.data(), ToClient.size()); \
+				CLIENTENCRYPTSEND(ToClient); \
 				break; \
 			} \
 			case csWaitingForEncryption: \
@@ -110,28 +110,28 @@
 			\
 		} \
 		DebugSleep(50); \
-	}
+	} while (false)
 
 #define HANDLE_CLIENT_READ(Proc) \
-	{ \
+	do { \
 		if (!Proc) \
 		{ \
-			AString Leftover; \
+			ContiguousByteBuffer Leftover; \
 			m_ClientBuffer.ReadAgain(Leftover); \
 			DataLog(Leftover.data(), Leftover.size(), "Leftover data after client packet parsing, %d bytes:", Leftover.size()); \
 			m_ClientBuffer.ResetRead(); \
 			return true; \
 		} \
-	}
+	} while (false)
 
 #define HANDLE_SERVER_READ(Proc) \
-	{ \
+	do { \
 		if (!Proc) \
 		{ \
 			m_ServerBuffer.ResetRead(); \
 			return true; \
 		} \
-	}
+	} while (false)
 
 
 
@@ -151,7 +151,8 @@ AString PrintableAbsIntTriplet(int a_X, int a_Y, int a_Z, double a_Divisor = 32)
 
 AString PrintableAbsIntTriplet(int a_X, int a_Y, int a_Z, double a_Divisor)
 {
-	return Printf("<%d, %d, %d> ~ {%.02f, %.02f, %.02f}",
+	return fmt::format(
+		FMT_STRING("<{}, {}, {}> ~ {{{}, {}, {}}}"),
 		a_X, a_Y, a_Z,
 		static_cast<double>(a_X) / a_Divisor, static_cast<double>(a_Y) / a_Divisor, static_cast<double>(a_Z) / a_Divisor
 	);
@@ -214,7 +215,7 @@ cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 		mkdir("Logs", 0777);
 	#endif
 
-	Printf(m_LogNameBase, "Logs/Log_%d_%d", static_cast<int>(time(nullptr)), static_cast<int>(a_ClientSocket));
+	m_LogNameBase = fmt::format(FMT_STRING("Logs/Log_{}_{}"), time(nullptr), a_ClientSocket);
 	AString fnam(m_LogNameBase);
 	fnam.append(".log");
 	#ifdef _WIN32
@@ -223,7 +224,7 @@ cConnection::cConnection(SOCKET a_ClientSocket, cServer & a_Server) :
 		m_LogFile = fopen(fnam.c_str(), "w");
 	#endif
 	Log("Log file created");
-	printf("Connection is logged to file \"%s\"\n", fnam.c_str());
+	fmt::print(FMT_STRING("Connection is logged to file \"{}\"\n"), fnam);
 }
 
 
@@ -284,16 +285,13 @@ void cConnection::Run(void)
 
 
 
-void cConnection::Log(const char * a_Format, fmt::ArgList a_Args)
+void cConnection::vLog(const char * a_Format, fmt::printf_args a_ArgList)
 {
-	fmt::MemoryWriter FullMsg;
-	fmt::printf(FullMsg, "[%5.3f] ", GetRelativeTime());
-	fmt::printf(FullMsg, a_Format, a_Args);
-	fmt::printf(FullMsg, "\n");
-
 	// Log to file:
 	cCSLock Lock(m_CSLog);
-	fputs(FullMsg.c_str(), m_LogFile);
+	fmt::fprintf(m_LogFile, "[%5.3f] ", GetRelativeTime());
+	fmt::vfprintf(m_LogFile, a_Format, a_ArgList);
+	fmt::fprintf(m_LogFile, "\n");
 	#ifdef _DEBUG
 		fflush(m_LogFile);
 	#endif  // _DEBUG
@@ -306,22 +304,19 @@ void cConnection::Log(const char * a_Format, fmt::ArgList a_Args)
 
 
 
-void cConnection::DataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::ArgList a_Args)
+void cConnection::vDataLog(const void * a_Data, size_t a_Size, const char * a_Format, fmt::printf_args a_ArgList)
 {
-	fmt::MemoryWriter FullMsg;
-	fmt::printf(FullMsg, "[%5.3f] ", GetRelativeTime());
-	fmt::printf(FullMsg, a_Format, a_Args);
 	AString Hex;
-	fmt::printf(FullMsg, "\n%s\n", CreateHexDump(Hex, a_Data, a_Size, 16));
+	CreateHexDump(Hex, a_Data, a_Size, 16);
 
 	// Log to file:
 	cCSLock Lock(m_CSLog);
-	fputs(FullMsg.c_str(), m_LogFile);
+	fmt::fprintf(m_LogFile, "[%5.3f] ", GetRelativeTime());
+	fmt::vfprintf(m_LogFile, a_Format, a_ArgList);
+	fmt::fprintf(m_LogFile, "\n%s\n", Hex);
 
-	/*
 	// Log to screen:
-	std::cout << FullMsg;
-	//*/
+	// std::cout << FullMsg;
 }
 
 
@@ -382,15 +377,15 @@ bool cConnection::RelayFromServer(void)
 		}
 		case csEncryptedUnderstood:
 		{
-			m_ServerDecryptor.ProcessData(reinterpret_cast<Byte *>(Buffer), reinterpret_cast<Byte *>(Buffer), static_cast<size_t>(res));
+			m_ServerDecryptor.ProcessData(reinterpret_cast<std::byte *>(Buffer), static_cast<size_t>(res));
 			DataLog(Buffer, static_cast<size_t>(res), "Decrypted %d bytes from the SERVER", res);
 			return DecodeServersPackets(Buffer, res);
 		}
 		case csEncryptedUnknown:
 		{
-			m_ServerDecryptor.ProcessData(reinterpret_cast<Byte *>(Buffer), reinterpret_cast<Byte *>(Buffer), static_cast<size_t>(res));
+			m_ServerDecryptor.ProcessData(reinterpret_cast<std::byte *>(Buffer), static_cast<size_t>(res));
 			DataLog(Buffer, static_cast<size_t>(res), "Decrypted %d bytes from the SERVER", res);
-			return CLIENTSEND(Buffer, static_cast<size_t>(res));
+			return CLIENTSEND({ reinterpret_cast<const std::byte *>(Buffer), static_cast<size_t>(res) });
 		}
 	}
 	ASSERT(!"Unhandled server state while relaying from server");
@@ -427,8 +422,8 @@ bool cConnection::RelayFromClient(void)
 		case csEncryptedUnknown:
 		{
 			DataLog(Buffer, static_cast<size_t>(res), "Decrypted %d bytes from the CLIENT", res);
-			m_ServerEncryptor.ProcessData(reinterpret_cast<Byte *>(Buffer), reinterpret_cast<Byte *>(Buffer), static_cast<size_t>(res));
-			return SERVERSEND(Buffer, static_cast<size_t>(res));
+			m_ServerEncryptor.ProcessData(reinterpret_cast<std::byte *>(Buffer), static_cast<size_t>(res));
+			return SERVERSEND({ reinterpret_cast<const std::byte *>(Buffer), static_cast<size_t>(res) });
 		}
 	}
 	ASSERT(!"Unhandled server state while relaying from client");
@@ -449,11 +444,11 @@ double cConnection::GetRelativeTime(void)
 
 
 
-bool cConnection::SendData(SOCKET a_Socket, const char * a_Data, size_t a_Size, const char * a_Peer)
+bool cConnection::SendData(SOCKET a_Socket, const ContiguousByteBufferView a_Data, const char * a_Peer)
 {
-	DataLog(a_Data, a_Size, "Sending data to %s, %u bytes", a_Peer, static_cast<unsigned>(a_Size));
+	DataLog(a_Data.data(), a_Data.size(), "Sending data to %s, %zu bytes", a_Peer, a_Data.size());
 
-	int res = static_cast<int>(send(a_Socket, a_Data, a_Size, 0));  // Windows uses int for a_Size, Linux uses size_t; but Windows doesn't complain. Return type is int on Windows and ssize_t on Linux
+	int res = static_cast<int>(send(a_Socket, reinterpret_cast<const char *>(a_Data.data()), a_Data.size(), 0));  // Windows uses int for a_Size, Linux uses size_t; but Windows doesn't complain. Return type is int on Windows and ssize_t on Linux
 	if (res <= 0)
 	{
 		Log("%s closed the socket: %d, %d; aborting connection", a_Peer, res, SocketError);
@@ -468,34 +463,22 @@ bool cConnection::SendData(SOCKET a_Socket, const char * a_Data, size_t a_Size, 
 
 bool cConnection::SendData(SOCKET a_Socket, cByteBuffer & a_Data, const char * a_Peer)
 {
-	AString All;
+	ContiguousByteBuffer All;
 	a_Data.ReadAll(All);
 	a_Data.CommitRead();
-	return SendData(a_Socket, All.data(), All.size(), a_Peer);
+	return SendData(a_Socket, All, a_Peer);
 }
 
 
 
 
 
-bool cConnection::SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, const char * a_Data, size_t a_Size, const char * a_Peer)
+bool cConnection::SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, ContiguousByteBuffer & a_Data, const char * a_Peer)
 {
-	DataLog(a_Data, a_Size, "Encrypting %d bytes to %s", a_Size, a_Peer);
-	const Byte * Data = reinterpret_cast<const Byte *>(a_Data);
-	while (a_Size > 0)
-	{
-		Byte Buffer[64 KiB];
-		size_t NumBytes = (a_Size > sizeof(Buffer)) ? sizeof(Buffer) : a_Size;
-		a_Encryptor.ProcessData(Buffer, Data, NumBytes);
-		bool res = SendData(a_Socket, reinterpret_cast<const char *>(Buffer), NumBytes, a_Peer);
-		if (!res)
-		{
-			return false;
-		}
-		Data += NumBytes;
-		a_Size -= NumBytes;
-	}
-	return true;
+	DataLog(a_Data.data(), a_Data.size(), "Encrypting %zu bytes to %s", a_Data.size(), a_Peer);
+
+	a_Encryptor.ProcessData(a_Data.data(), a_Data.size());
+	return SendData(a_Socket, a_Data, a_Peer);
 }
 
 
@@ -504,10 +487,10 @@ bool cConnection::SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Enc
 
 bool cConnection::SendEncryptedData(SOCKET a_Socket, cAesCfb128Encryptor & a_Encryptor, cByteBuffer & a_Data, const char * a_Peer)
 {
-	AString All;
+	ContiguousByteBuffer All;
 	a_Data.ReadAll(All);
 	a_Data.CommitRead();
-	return SendEncryptedData(a_Socket, a_Encryptor, All.data(), All.size(), a_Peer);
+	return SendEncryptedData(a_Socket, a_Encryptor, All, a_Peer);
 }
 
 
@@ -655,7 +638,7 @@ bool cConnection::DecodeServersPackets(const char * a_Data, int a_Size)
 		if (PacketLen == 0)
 		{
 			m_ServerBuffer.ResetRead();
-			AString All;
+			ContiguousByteBuffer All;
 			m_ServerBuffer.ReadAll(All);
 			DataLog(All.data(), All.size(), "====== Received a bad packet length? Inspect the contents below ======");
 			m_ServerBuffer.CommitRead();  // Try to recover by marking everything as read
@@ -806,10 +789,11 @@ bool cConnection::HandleClientHandshake(void)
 	Packet.WriteVarUTF8String(ServerHost);
 	Packet.WriteBEUInt16(m_Server.GetConnectPort());
 	Packet.WriteVarInt32(NextState);
-	AString Pkt;
+	ContiguousByteBuffer Pkt;
 	Packet.ReadAll(Pkt);
 	cByteBuffer ToServer(512);
-	ToServer.WriteVarUTF8String(Pkt);
+	ToServer.WriteVarInt32(static_cast<UInt32>(Pkt.size()));
+	ToServer.Write(Pkt.data(), Pkt.size());
 	SERVERSEND(ToServer);
 
 	m_ClientProtocolState = static_cast<int>(NextState);
@@ -1119,8 +1103,8 @@ bool cConnection::HandleClientPluginMessage(void)
 {
 	HANDLE_CLIENT_PACKET_READ(ReadVarUTF8String, AString, ChannelName);
 	HANDLE_CLIENT_PACKET_READ(ReadBEUInt16,      UInt16,  Length);
-	AString Data;
-	if (!m_ClientBuffer.ReadString(Data, Length))
+	ContiguousByteBuffer Data;
+	if (!m_ClientBuffer.ReadSome(Data, Length))
 	{
 		return false;
 	}
@@ -1261,8 +1245,8 @@ bool cConnection::HandleClientWindowClose(void)
 
 bool cConnection::HandleClientUnknownPacket(UInt32 a_PacketType, UInt32 a_PacketLen, UInt32 a_PacketReadSoFar)
 {
-	AString Data;
-	if (!m_ClientBuffer.ReadString(Data, a_PacketLen - a_PacketReadSoFar))
+	ContiguousByteBuffer Data;
+	if (!m_ClientBuffer.ReadSome(Data, a_PacketLen - a_PacketReadSoFar))
 	{
 		return false;
 	}
@@ -1296,14 +1280,14 @@ bool cConnection::HandleServerLoginEncryptionKeyRequest(void)
 	// Read the packet from the server:
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, ServerID);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16,      UInt16,  PublicKeyLength);
-	AString PublicKey;
-	if (!m_ServerBuffer.ReadString(PublicKey, PublicKeyLength))
+	ContiguousByteBuffer PublicKey;
+	if (!m_ServerBuffer.ReadSome(PublicKey, PublicKeyLength))
 	{
 		return false;
 	}
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, NonceLength);
-	AString Nonce;
-	if (!m_ServerBuffer.ReadString(Nonce, NonceLength))
+	ContiguousByteBuffer Nonce;
+	if (!m_ServerBuffer.ReadSome(Nonce, NonceLength))
 	{
 		return false;
 	}
@@ -1312,7 +1296,7 @@ bool cConnection::HandleServerLoginEncryptionKeyRequest(void)
 	DataLog(PublicKey.data(), PublicKey.size(), "  Public key (%u bytes)", static_cast<unsigned>(PublicKey.size()));
 
 	// Reply to the server:
-	SendEncryptionKeyResponse(PublicKey, Nonce);
+	SendEncryptionKeyResponse({ reinterpret_cast<const char *>(PublicKey.data()), PublicKey.size() }, { reinterpret_cast<const char *>(Nonce.data()), Nonce.size() });
 
 	// Do not send to client - we want the client connection open
 	return true;
@@ -1338,7 +1322,7 @@ bool cConnection::HandleServerLoginSuccess(void)
 		Log("Server communication is now encrypted");
 		m_ServerState = csEncryptedUnderstood;
 		DataLog(m_ServerEncryptionBuffer.data(), m_ServerEncryptionBuffer.size(), "Sending the queued data to server (%u bytes):", m_ServerEncryptionBuffer.size());
-		SERVERENCRYPTSEND(m_ServerEncryptionBuffer.data(), m_ServerEncryptionBuffer.size());
+		SERVERENCRYPTSEND(m_ServerEncryptionBuffer);
 		m_ServerEncryptionBuffer.clear();
 	}
 	COPY_TO_CLIENT();
@@ -1777,7 +1761,7 @@ bool cConnection::HandleServerKeepAlive(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, PingID);
 	Log("Received a PACKET_KEEP_ALIVE from the server:");
 	Log("  ID = %u", PingID);
-	COPY_TO_CLIENT()
+	COPY_TO_CLIENT();
 	return true;
 }
 
@@ -1812,12 +1796,12 @@ bool cConnection::HandleServerKick(void)
 
 		if (Split.size() == 6)
 		{
-			Log("  Preamble: \"%s\"", Split[0].c_str());
-			Log("  Protocol version: \"%s\"", Split[1].c_str());
-			Log("  Server version: \"%s\"", Split[2].c_str());
-			Log("  MOTD: \"%s\"", Split[3].c_str());
-			Log("  Cur players: \"%s\"", Split[4].c_str());
-			Log("  Max players: \"%s\"", Split[5].c_str());
+			Log("  Preamble: \"%s\"", Split[0]);
+			Log("  Protocol version: \"%s\"", Split[1]);
+			Log("  Server version: \"%s\"", Split[2]);
+			Log("  MOTD: \"%s\"", Split[3]);
+			Log("  Cur players: \"%s\"", Split[4]);
+			Log("  Max players: \"%s\"", Split[5]);
 
 			// Modify the MOTD to show that it's being ProtoProxied:
 			Reason.assign(Split[0]);
@@ -1826,7 +1810,7 @@ bool cConnection::HandleServerKick(void)
 			Reason.push_back(0);
 			Reason.append(Split[2]);
 			Reason.push_back(0);
-			Reason.append(Printf("ProtoProxy: %s", Split[3].c_str()));
+			Reason.append(fmt::format(FMT_STRING("ProtoProxy: {}"), Split[3]));
 			Reason.push_back(0);
 			Reason.append(Split[4]);
 			Reason.push_back(0);
@@ -1835,8 +1819,8 @@ bool cConnection::HandleServerKick(void)
 			AString PacketStart("\xff");
 			PacketStart.push_back(static_cast<char>(ReasonBE16.size() / 256));
 			PacketStart.push_back(static_cast<char>(ReasonBE16.size() % 256));
-			CLIENTSEND(PacketStart.data(), PacketStart.size());
-			CLIENTSEND(reinterpret_cast<const char *>(ReasonBE16.data()), ReasonBE16.size() * sizeof(char16_t));
+			CLIENTSEND({ reinterpret_cast<const std::byte *>(PacketStart.data()), PacketStart.size() });
+			CLIENTSEND({ reinterpret_cast<const std::byte *>(ReasonBE16.data()), ReasonBE16.size() * sizeof(char16_t) });
 			return true;
 		}
 		else
@@ -1846,7 +1830,7 @@ bool cConnection::HandleServerKick(void)
 	}
 	else
 	{
-		Log("  Reason = \"%s\"", Reason.c_str());
+		Log("  Reason = \"%s\"", Reason);
 	}
 	COPY_TO_CLIENT();
 	return true;
@@ -1864,8 +1848,8 @@ bool cConnection::HandleServerMapChunk(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, PrimaryBitmap);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, AdditionalBitmap);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, CompressedSize);
-	AString CompressedData;
-	if (!m_ServerBuffer.ReadString(CompressedData, CompressedSize))
+	ContiguousByteBuffer CompressedData;
+	if (!m_ServerBuffer.ReadSome(CompressedData, CompressedSize))
 	{
 		return false;
 	}
@@ -1875,7 +1859,7 @@ bool cConnection::HandleServerMapChunk(void)
 
 	// TODO: Save the compressed data into a file for later analysis
 
-	COPY_TO_CLIENT()
+	COPY_TO_CLIENT();
 	return true;
 }
 
@@ -1888,8 +1872,8 @@ bool cConnection::HandleServerMapChunkBulk(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, ChunkCount);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, CompressedSize);
 	HANDLE_SERVER_PACKET_READ(ReadBool,     bool,   IsSkyLightSent);
-	AString CompressedData;
-	if (!m_ServerBuffer.ReadString(CompressedData, CompressedSize))
+	ContiguousByteBuffer CompressedData;
+	if (!m_ServerBuffer.ReadSome(CompressedData, CompressedSize))
 	{
 		return false;
 	}
@@ -1938,8 +1922,8 @@ bool cConnection::HandleServerMultiBlockChange(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  ChunkZ);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, NumBlocks);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt32, UInt32, DataSize);
-	AString BlockChangeData;
-	if (!m_ServerBuffer.ReadString(BlockChangeData, DataSize))
+	ContiguousByteBuffer BlockChangeData;
+	if (!m_ServerBuffer.ReadSome(BlockChangeData, DataSize))
 	{
 		return false;
 	}
@@ -2047,8 +2031,8 @@ bool cConnection::HandleServerPluginMessage(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, ChannelName);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16,      UInt16,  Length);
-	AString Data;
-	if (!m_ServerBuffer.ReadString(Data, Length))
+	ContiguousByteBuffer Data;
+	if (!m_ServerBuffer.ReadSome(Data, Length))
 	{
 		return false;
 	}
@@ -2238,9 +2222,9 @@ bool cConnection::HandleServerSpawnNamedEntity(void)
 	sSpawnDatas Data;
 	for (UInt32 i = 0; i < DataCount; i++)
 	{
-		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Name)
-		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Value)
-		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Signature)
+		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Name);
+		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Value);
+		HANDLE_SERVER_PACKET_READ(ReadVarUTF8String, AString, Signature);
 		Data.push_back(sSpawnData(Name, Value, Signature));
 	}
 	HANDLE_SERVER_PACKET_READ(ReadBEInt32,  Int32,  PosX);
@@ -2286,7 +2270,7 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 	#ifdef _DEBUG
 	// DEBUG:
 	// This packet is still troublesome when DataIndicator != 0
-	AString Buffer;
+	ContiguousByteBuffer Buffer;
 	m_ServerBuffer.ResetRead();
 	m_ServerBuffer.ReadAll(Buffer);
 	m_ServerBuffer.ResetRead();
@@ -2336,7 +2320,7 @@ bool cConnection::HandleServerSpawnObjectVehicle(void)
 			}
 			// TODO: Splash potions
 		}
-		if ((ExtraLen > 0) && !m_ServerBuffer.ReadString(ExtraData, ExtraLen))
+		if ((ExtraLen > 0) && !m_ServerBuffer.ReadSome(ExtraData, ExtraLen))
 		{
 			return false;
 		}
@@ -2424,6 +2408,7 @@ bool cConnection::HandleServerStatistics(void)
 
 
 
+
 bool cConnection::HandleServerStatusPing(void)
 {
 	HANDLE_SERVER_PACKET_READ(ReadBEInt64, Int64, Time);
@@ -2457,10 +2442,11 @@ bool cConnection::HandleServerStatusResponse(void)
 	cByteBuffer Packet(Response.size() + 50);
 	Packet.WriteVarInt32(0);  // Packet type - status response
 	Packet.WriteVarUTF8String(Response);
-	AString Pkt;
+	ContiguousByteBuffer Pkt;
 	Packet.ReadAll(Pkt);
 	cByteBuffer ToClient(Response.size() + 50);
-	ToClient.WriteVarUTF8String(Pkt);
+	ToClient.WriteVarInt32(static_cast<UInt32>(Pkt.size()));
+	ToClient.Write(Pkt.data(), Pkt.size());
 	CLIENTSEND(ToClient);
 	return true;
 }
@@ -2553,8 +2539,8 @@ bool cConnection::HandleServerUpdateTileEntity(void)
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt8,  UInt8,  Action);
 	HANDLE_SERVER_PACKET_READ(ReadBEUInt16, UInt16, DataLength);
 
-	AString Data;
-	if ((DataLength > 0) && !m_ServerBuffer.ReadString(Data, DataLength))
+	ContiguousByteBuffer Data;
+	if ((DataLength > 0) && !m_ServerBuffer.ReadSome(Data, DataLength))
 	{
 		return false;
 	}
@@ -2564,8 +2550,7 @@ bool cConnection::HandleServerUpdateTileEntity(void)
 	DataLog(Data.data(), Data.size(), "  Data (%u bytes)", DataLength);
 
 	// Save metadata to a file:
-	AString fnam;
-	Printf(fnam, "%s_tile_%08x.nbt", m_LogNameBase.c_str(), m_ItemIdx++);
+	auto fnam = fmt::format(FMT_STRING("{}_tile_{:08x}.nbt"), m_LogNameBase, m_ItemIdx++);
 	FILE * f = fopen(fnam.c_str(), "wb");
 	if (f != nullptr)
 	{
@@ -2670,9 +2655,9 @@ bool cConnection::HandleServerWindowOpen(void)
 
 bool cConnection::HandleServerUnknownPacket(UInt32 a_PacketType, UInt32 a_PacketLen, UInt32 a_PacketReadSoFar)
 {
-	AString Data;
+	ContiguousByteBuffer Data;
 	ASSERT(a_PacketLen >= a_PacketReadSoFar);
-	if (!m_ServerBuffer.ReadString(Data, a_PacketLen - a_PacketReadSoFar))
+	if (!m_ServerBuffer.ReadSome(Data, a_PacketLen - a_PacketReadSoFar))
 	{
 		return false;
 	}
@@ -2707,7 +2692,7 @@ bool cConnection::ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc)
 	a_Buffer.ReadBEInt8(ItemCount);  // We already know we can read these bytes - we checked before.
 	a_Buffer.ReadBEInt16(ItemDamage);
 	a_Buffer.ReadBEUInt16(MetadataLength);
-	Printf(a_ItemDesc, "%d:%d * %d", ItemType, ItemDamage, ItemCount);
+	a_ItemDesc = fmt::format(FMT_STRING("{}:{} * {}"), ItemType, ItemDamage, ItemCount);
 	if (MetadataLength <= 0)
 	{
 		return true;
@@ -2720,17 +2705,16 @@ bool cConnection::ParseSlot(cByteBuffer & a_Buffer, AString & a_ItemDesc)
 	}
 	AString MetaHex;
 	CreateHexDump(MetaHex, Metadata.data(), Metadata.size(), 16);
-	AppendPrintf(a_ItemDesc, "; %u bytes of meta:\n%s", MetadataLength, MetaHex.c_str());
+	a_ItemDesc.append(fmt::format(FMT_STRING("; {} bytes of meta:\n{}"), MetadataLength, MetaHex));
 
 	// Save metadata to a file:
-	AString fnam;
-	Printf(fnam, "%s_item_%08x.nbt", m_LogNameBase.c_str(), m_ItemIdx++);
+	auto fnam = fmt::format(FMT_STRING("{}_item_{:08x}.nbt"), m_LogNameBase, m_ItemIdx++);
 	FILE * f = fopen(fnam.c_str(), "wb");
 	if (f != nullptr)
 	{
 		fwrite(Metadata.data(), 1, Metadata.size(), f);
 		fclose(f);
-		AppendPrintf(a_ItemDesc, "\n    (saved to file \"%s\")", fnam.c_str());
+		a_ItemDesc.append(fmt::format(FMT_STRING("\n    (saved to file \"{}\")"), fnam));
 	}
 
 	return true;
@@ -2772,9 +2756,9 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 				rs = rs - static_cast<int>(a_Buffer.GetReadableSpace());
 				cByteBuffer LenBuf(8);
 				LenBuf.WriteVarInt32(Len);
-				AString VarLen;
+				ContiguousByteBuffer VarLen;
 				LenBuf.ReadAll(VarLen);
-				a_Metadata.append(VarLen);
+				a_Metadata += { reinterpret_cast<const char *>(VarLen.data()), VarLen.size() };
 				Length = Len;
 				break;
 			}
@@ -2802,12 +2786,12 @@ bool cConnection::ParseMetadata(cByteBuffer & a_Buffer, AString & a_Metadata)
 		}  // switch (Type)
 
 		// Read the data in this item:
-		AString data;
-		if (!a_Buffer.ReadString(data, Length))
+		ContiguousByteBuffer data;
+		if (!a_Buffer.ReadSome(data, Length))
 		{
 			return false;
 		}
-		a_Metadata.append(data);
+		a_Metadata += { reinterpret_cast<const char *>(data.data()), data.size() };
 		if (!a_Buffer.ReadBEUInt8(x))
 		{
 			return false;

@@ -4,8 +4,7 @@
 
 #include "Globals.h"
 #include "ScoreboardSerializer.h"
-#include "../StringCompression.h"
-#include "zlib/zlib.h"
+#include "OSSupport/GZipFile.h"
 #include "FastNBT.h"
 
 #include "../Scoreboard.h"
@@ -17,43 +16,35 @@
 cScoreboardSerializer::cScoreboardSerializer(const AString & a_WorldName, cScoreboard * a_ScoreBoard):
 	m_ScoreBoard(a_ScoreBoard)
 {
-	AString DataPath;
-	Printf(DataPath, "%s%cdata", a_WorldName.c_str(), cFile::PathSeparator());
-
+	auto DataPath = fmt::format(FMT_STRING("{}{}data"), a_WorldName, cFile::PathSeparator());
 	m_Path = DataPath + cFile::PathSeparator() + "scoreboard.dat";
-
-	cFile::CreateFolder(FILE_IO_PREFIX + DataPath);
+	cFile::CreateFolder(DataPath);
 }
 
 
 
 
 
-bool cScoreboardSerializer::Load(void)
+bool cScoreboardSerializer::Load()
 {
-	AString Data = cFile::ReadWholeFile(FILE_IO_PREFIX + m_Path);
-	if (Data.empty())
+	try
 	{
+		const auto Data = GZipFile::ReadRestOfFile(m_Path);
+		const cParsedNBT NBT(Data.GetView());
+
+		if (!NBT.IsValid())
+		{
+			// NBT Parsing failed
+			return false;
+		}
+
+		return LoadScoreboardFromNBT(NBT);
+	}
+	catch (const std::exception & Oops)
+	{
+		LOGWARNING("Failed to load scoreboard from \"%s\": %s", m_Path.c_str(), Oops.what());
 		return false;
 	}
-
-	AString Uncompressed;
-	int res = UncompressStringGZIP(Data.data(), Data.size(), Uncompressed);
-
-	if (res != Z_OK)
-	{
-		return false;
-	}
-
-	// Parse the NBT data:
-	cParsedNBT NBT(Uncompressed.data(), Uncompressed.size());
-	if (!NBT.IsValid())
-	{
-		// NBT Parsing failed
-		return false;
-	}
-
-	return LoadScoreboardFromNBT(NBT);
 }
 
 
@@ -63,32 +54,15 @@ bool cScoreboardSerializer::Load(void)
 bool cScoreboardSerializer::Save(void)
 {
 	cFastNBTWriter Writer;
-
 	SaveScoreboardToNBT(Writer);
-
 	Writer.Finish();
 
-	#ifdef _DEBUG
-	cParsedNBT TestParse(Writer.GetResult().data(), Writer.GetResult().size());
+#ifndef NDEBUG
+	cParsedNBT TestParse(Writer.GetResult());
 	ASSERT(TestParse.IsValid());
-	#endif  // _DEBUG
+#endif  // !NDEBUG
 
-	cFile File;
-	if (!File.Open(FILE_IO_PREFIX + m_Path, cFile::fmWrite))
-	{
-		return false;
-	}
-
-	AString Compressed;
-	int res = CompressStringGZIP(Writer.GetResult().data(), Writer.GetResult().size(), Compressed);
-
-	if (res != Z_OK)
-	{
-		return false;
-	}
-
-	File.Write(Compressed.data(), Compressed.size());
-	File.Close();
+	GZipFile::Write(m_Path, Writer.GetResult());
 
 	return true;
 }

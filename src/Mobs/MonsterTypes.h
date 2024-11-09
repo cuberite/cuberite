@@ -6,47 +6,83 @@
 
 
 // tolua_begin
-/** Identifies individual monster type, as well as their network type-ID. */
+/** Identifies individual monster type. */
 enum eMonsterType
 {
 	mtInvalidType = -1,
 
-	mtBat          = E_META_SPAWN_EGG_BAT,
-	mtBlaze        = E_META_SPAWN_EGG_BLAZE,
-	mtCaveSpider   = E_META_SPAWN_EGG_CAVE_SPIDER,
-	mtChicken      = E_META_SPAWN_EGG_CHICKEN,
-	mtCow          = E_META_SPAWN_EGG_COW,
-	mtCreeper      = E_META_SPAWN_EGG_CREEPER,
-	mtEnderDragon  = E_META_SPAWN_EGG_ENDER_DRAGON,
-	mtEnderman     = E_META_SPAWN_EGG_ENDERMAN,
-	mtGhast        = E_META_SPAWN_EGG_GHAST,
-	mtGiant        = E_META_SPAWN_EGG_GIANT,
-	mtGuardian     = E_META_SPAWN_EGG_GUARDIAN,
-	mtHorse        = E_META_SPAWN_EGG_HORSE,
-	mtIronGolem    = E_META_SPAWN_EGG_IRON_GOLEM,
-	mtMagmaCube    = E_META_SPAWN_EGG_MAGMA_CUBE,
-	mtMooshroom    = E_META_SPAWN_EGG_MOOSHROOM,
-	mtOcelot       = E_META_SPAWN_EGG_OCELOT,
-	mtPig          = E_META_SPAWN_EGG_PIG,
-	mtRabbit       = E_META_SPAWN_EGG_RABBIT,
-	mtSheep        = E_META_SPAWN_EGG_SHEEP,
-	mtSilverfish   = E_META_SPAWN_EGG_SILVERFISH,
-	mtSkeleton     = E_META_SPAWN_EGG_SKELETON,
-	mtSlime        = E_META_SPAWN_EGG_SLIME,
-	mtSnowGolem    = E_META_SPAWN_EGG_SNOW_GOLEM,
-	mtSpider       = E_META_SPAWN_EGG_SPIDER,
-	mtSquid        = E_META_SPAWN_EGG_SQUID,
-	mtVillager     = E_META_SPAWN_EGG_VILLAGER,
-	mtWitch        = E_META_SPAWN_EGG_WITCH,
-	mtWither       = E_META_SPAWN_EGG_WITHER,
-	mtWolf         = E_META_SPAWN_EGG_WOLF,
-	mtZombie       = E_META_SPAWN_EGG_ZOMBIE,
-	mtZombiePigman = E_META_SPAWN_EGG_ZOMBIE_PIGMAN,
-	mtMax          = 120,  // This is just a hotfix for https://forum.cuberite.org/thread-1616.html. Tolua is too bad to find the highest value, so this is needed.
+	mtBat,
+	mtBlaze,
+	mtCat,                          // Added in 1.14
+	mtCaveSpider,
+	mtChicken,
+	mtCod,                          // Added in 1.13
+	mtCow,
+	mtCreeper,
+	mtDolphin,                      // Added in 1.13
+	mtDonkey,                       // Added in 1.6
+	mtDrowned,                      // Added in 1.13
+	mtElderGuardian,                // Added in 1.13
+	mtEnderDragon,
+	mtEnderman,
+	mtEndermite,                    // Added in 1.8
+	mtEvoker,                       // Added in 1.11
+	mtFox,                          // Added in 1.14
+	mtGhast,
+	mtGiant,
+	mtGuardian,
+	mtHorse,
+	mtHoglin,                       // Added in 1.16
+	mtHusk,                         // Added in 1.10
+	mtIllusioner,                   // Added in 1.12
+	mtIronGolem,
+	mtLlama,                        // Added in 1.11
+	mtMagmaCube,
+	mtMooshroom,
+	mtMule,                         // Added in 1.6
+	mtOcelot,
+	mtPanda,                        // Added in 1.14
+	mtParrot,                       // Added in 1.12
+	mtPhantom,                      // Added in 1.13
+	mtPig,
+	mtPiglin,                       // Added in 1.16
+	mtPiglinBrute,                  // Added in 1.16
+	mtPillager,                     // Added in 1.14
+	mtPolarBear,                    // Added in 1.10
+	mtPufferfish,                   // Added in 1.13
+	mtRabbit,
+	mtRavager,                      // Added in 1.14
+	mtSalmon,                       // Added in 1.13
+	mtSheep,
+	mtShulker,                      // Added in 1.9
+	mtSilverfish,
+	mtSkeleton,
+	mtSkeletonHorse,
+	mtSlime,
+	mtSnowGolem,
+	mtSpider,
+	mtSquid,
+	mtStray,                        // Added in 1.10
+	mtStrider,                      // Added in 1.16
+	mtTraderLlama,                  // Added in 1.11
+	mtTropicalFish,                 // Added in 1.13
+	mtTurtle,                       // Added in 1.13
+	mtVex,                          // Added in 1.11
+	mtVillager,
+	mtVindicator,                   // Added in 1.11
+	mtWanderingTrader,              // Added in 1.14
+	mtWitch,
+	mtWither,
+	mtWitherSkeleton,
+	mtWolf,
+	mtZoglin,                       // Added in 1.16
+	mtZombie,
+	mtZombieHorse,                  // Added in 1.6
+	mtZombifiedPiglin,
+	mtZombieVillager,
+
+	// Synonyms:
+	mtZombiePigman = mtZombifiedPiglin,
 } ;
 
 // tolua_end
-
-
-
-

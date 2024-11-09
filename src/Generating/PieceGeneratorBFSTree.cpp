@@ -149,7 +149,7 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 				continue;
 			}
 			// Fits, add it to list of possibile connections:
-			Connections.push_back(cConnection(**itrP, *itrC, NumCCWRotations, Weight));
+			Connections.emplace_back(**itrP, *itrC, NumCCWRotations, Weight);
 			WeightTotal += Weight;
 		}  // for itrC - Connectors[]
 	}  // for itrP - AvailablePieces[]
@@ -177,7 +177,7 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 	// Place the piece:
 	Vector3i NewPos = Conn.m_Piece->RotatePos(Conn.m_Connector.m_Pos, Conn.m_NumCCWRotations);
 	ConnPos -= NewPos;
-	auto PlacedPiece = cpp14::make_unique<cPlacedPiece>(&a_ParentPiece, *(Conn.m_Piece), ConnPos, Conn.m_NumCCWRotations);
+	auto PlacedPiece = std::make_unique<cPlacedPiece>(&a_ParentPiece, *(Conn.m_Piece), ConnPos, Conn.m_NumCCWRotations);
 
 	// Add the new piece's connectors to the list of free connectors:
 	cPiece::cConnectors Connectors = Conn.m_Piece->GetConnectors();
@@ -188,7 +188,7 @@ bool cPieceGeneratorBFSTree::TryPlacePieceAtConnector(
 			// This is the connector through which we have been connected to the parent, don't add
 			continue;
 		}
-		a_OutConnectors.push_back(cFreeConnector(PlacedPiece.get(), Conn.m_Piece->RotateMoveConnector(*itr, Conn.m_NumCCWRotations, ConnPos.x, ConnPos.y, ConnPos.z)));
+		a_OutConnectors.emplace_back(PlacedPiece.get(), Conn.m_Piece->RotateMoveConnector(*itr, Conn.m_NumCCWRotations, ConnPos.x, ConnPos.y, ConnPos.z));
 	}
 	a_OutPieces.push_back(std::move(PlacedPiece));
 

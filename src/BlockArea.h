@@ -14,16 +14,19 @@
 
 #pragma once
 
+#include "BlockType.h"
 #include "ForEachChunkProvider.h"
 #include "ChunkDataCallback.h"
 #include "Cuboid.h"
 #include "FunctionRef.h"
+#include "BlockEntities/BlockEntity.h"
 
 
 
 
 // fwd:
 class cCuboid;
+class cItem;
 class cItems;
 using cBlockEntityCallback = cFunctionRef<bool(cBlockEntity &)>;
 
@@ -422,8 +425,6 @@ public:
 	/** Direct read-only access to block entities. */
 	const cBlockEntities & GetBlockEntities(void) const { ASSERT(HasBlockEntities()); return *m_BlockEntities; }
 
-	/** Returns the pickups that would result if the block at the specified position was mined by a_Digger, using a_Tool. */
-	cItems PickupsFromBlock(Vector3i a_AbsPos, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr);
 
 
 protected:
@@ -448,12 +449,13 @@ protected:
 
 		// cChunkDataCallback overrides:
 		virtual bool Coords(int a_ChunkX, int a_ChunkZ) override;
-		virtual void ChunkData(const cChunkData &  a_BlockTypes) override;
+		virtual void ChunkData(const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData) override;
 		virtual void BlockEntity(cBlockEntity * a_BlockEntity) override;
 	} ;
 
 	using NIBBLEARRAY = std::unique_ptr<NIBBLETYPE[]>;
 	using BLOCKARRAY = std::unique_ptr<BLOCKTYPE[]>;
+	using cBlockEntitiesPtr = std::unique_ptr<cBlockEntities>;
 
 	Vector3i m_Origin;
 	Vector3i m_Size;
@@ -466,14 +468,6 @@ protected:
 	NIBBLEARRAY m_BlockMetas;     // Each meta is stored as a separate byte for faster access
 	NIBBLEARRAY m_BlockLight;     // Each light value is stored as a separate byte for faster access
 	NIBBLEARRAY m_BlockSkyLight;  // Each light value is stored as a separate byte for faster access
-
-	/** Deleter to clear the block entities before deleting the container. */
-	struct sBlockEntitiesDeleter
-	{
-		void operator () (cBlockEntities * a_BlockEntities);
-	};
-
-	using cBlockEntitiesPtr = std::unique_ptr<cBlockEntities, sBlockEntitiesDeleter>;
 
 	/** The block entities contained within the area.
 	Only valid if the area was created / read with the baBlockEntities flag.
@@ -509,9 +503,6 @@ protected:
 
 	template <bool MetasValid>
 	void MergeByStrategy(const cBlockArea & a_Src, int a_RelX, int a_RelY, int a_RelZ, eMergeStrategy a_Strategy, const NIBBLETYPE * SrcMetas, NIBBLETYPE * DstMetas);
-
-	/** Clears the block entities from the specified container, freeing each blockentity. */
-	static void ClearBlockEntities(cBlockEntities & a_BlockEntities);
 
 	/** Updates m_BlockEntities to remove BEs that no longer match the blocktype at their coords, and clones from a_Src the BEs that are missing.
 	a_RelX, a_RelY and a_RelZ are relative coords that should be added to all BEs from a_Src before checking them.

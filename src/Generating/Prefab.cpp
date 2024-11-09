@@ -10,6 +10,7 @@ uses a prefabricate in a cBlockArea for drawing itself.
 #include "Prefab.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 #include "ChunkDesc.h"
+#include "../BlockInfo.h"
 
 
 
@@ -156,8 +157,24 @@ void cPrefab::Draw(cChunkDesc & a_Dest, const Vector3i & a_Placement, int a_NumR
 		return;
 	}
 
-	// Write the image:
-	a_Dest.WriteBlockArea(Image, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
+	if (m_Modifiers.size() == 0)
+	{
+		// Write the image:
+		a_Dest.WriteBlockArea(Image, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
+	}
+	else
+	{
+		cBlockArea RandomizedImage;
+		Image.CopyTo(RandomizedImage);
+
+		for (size_t i = 0; i < m_Modifiers.size(); i++)
+		{
+			m_Modifiers[i]->Modify(RandomizedImage, a_Placement, a_NumRotations);
+		}
+
+		// Write the modified image:
+		a_Dest.WriteBlockArea(RandomizedImage, Placement.x, Placement.y, Placement.z, m_MergeStrategy);
+	}
 
 	// If requested, draw the floor (from the bottom of the prefab down to the nearest non-air)
 	switch (m_ExtendFloorStrategy)
@@ -302,7 +319,7 @@ void cPrefab::SetDefaultWeight(int a_DefaultWeight)
 
 void cPrefab::AddConnector(int a_RelX, int a_RelY, int a_RelZ, cPiece::cConnector::eDirection a_Direction, int a_Type)
 {
-	m_Connectors.push_back(cConnector(a_RelX, a_RelY, a_RelZ, a_Type, a_Direction));
+	m_Connectors.emplace_back(a_RelX, a_RelY, a_RelZ, a_Type, a_Direction);
 }
 
 

@@ -1,5 +1,6 @@
+target_sources(
+	${CMAKE_PROJECT_NAME} PRIVATE
 
-SET (SRCS
 	BioGen.cpp
 	Caves.cpp
 	ChunkDesc.cpp
@@ -10,12 +11,14 @@ SET (SRCS
 	DistortedHeightmap.cpp
 	DungeonRoomsFinisher.cpp
 	EndGen.cpp
+	EnderDragonFightStructuresGen.cpp
 	FinishGen.cpp
 	GridStructGen.cpp
 	HeiGen.cpp
 	MineShafts.cpp
 	Noise3DGenerator.cpp
 	PieceGeneratorBFSTree.cpp
+	PieceModifier.cpp
 	PiecePool.cpp
 	PieceStructuresGen.cpp
 	Prefab.cpp
@@ -23,15 +26,14 @@ SET (SRCS
 	PrefabStructure.cpp
 	Ravines.cpp
 	RoughRavines.cpp
+	SinglePieceStructuresGen.cpp
 	StructGen.cpp
 	Trees.cpp
 	TwoHeights.cpp
 	VerticalLimit.cpp
 	VerticalStrategy.cpp
 	VillageGen.cpp
-)
 
-SET (HDRS
 	BioGen.h
 	Caves.h
 	ChunkDesc.h
@@ -43,6 +45,7 @@ SET (HDRS
 	DistortedHeightmap.h
 	DungeonRoomsFinisher.h
 	EndGen.h
+	EnderDragonFightStructuresGen.h
 	FinishGen.h
 	GridStructGen.h
 	HeiGen.h
@@ -50,6 +53,7 @@ SET (HDRS
 	MineShafts.h
 	Noise3DGenerator.h
 	PieceGeneratorBFSTree.h
+	PieceModifier.h
 	PiecePool.h
 	PieceStructuresGen.h
 	Prefab.h
@@ -59,6 +63,7 @@ SET (HDRS
 	Ravines.h
 	RoughRavines.h
 	ShapeGen.cpp
+	SinglePieceStructuresGen.h
 	StructGen.h
 	Trees.h
 	TwoHeights.h
@@ -66,12 +71,3 @@ SET (HDRS
 	VerticalStrategy.h
 	VillageGen.h
 )
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set_source_files_properties(CompoGenBiomal.cpp PROPERTIES COMPILE_FLAGS "-Wno-error=global-constructors")
-endif()
-
-if(NOT MSVC)
-	add_library(Generating ${SRCS} ${HDRS})
-	target_link_libraries(Generating fmt::fmt OSSupport Blocks Bindings)
-endif()

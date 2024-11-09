@@ -13,11 +13,9 @@ class cDispenserEntity :
 {
 	// tolua_end
 
-	using super = cDropSpenserEntity;
+	using Super = cDropSpenserEntity;
 
 public:  // tolua_export
-
-	BLOCKENTITY_PROTODEF(cDispenserEntity)
 
 	/** Constructor used for normal operation */
 	cDispenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
@@ -54,6 +52,7 @@ public:  // tolua_export
 	// tolua_end
 
 private:
+
 	// cDropSpenser overrides:
 	virtual void DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum) override;
 
@@ -64,6 +63,3 @@ private:
 	does the m_Contents processing and returns true. Returns false otherwise. */
 	bool EmptyLiquidBucket(BLOCKTYPE a_BlockInFront, int a_SlotNum);
 } ;  // tolua_export
-
-
-

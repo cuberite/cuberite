@@ -143,7 +143,7 @@ void cWebAdmin::Stop(void)
 
 bool cWebAdmin::LoadLoginPage(void)
 {
-	cFile File(FILE_IO_PREFIX "webadmin/login_template.html", cFile::fmRead);
+	cFile File("webadmin/login_template.html", cFile::fmRead);
 	if (!File.IsOpen())
 	{
 		return false;
@@ -167,7 +167,7 @@ bool cWebAdmin::LoadLoginPage(void)
 void cWebAdmin::RemoveAllPluginWebTabs(const AString & a_PluginName)
 {
 	cCSLock lock(m_CS);
-	m_WebTabs.erase(std::remove_if(m_WebTabs.begin(), m_WebTabs.end(), [=](cWebTabPtr a_CBWebTab)
+	m_WebTabs.erase(std::remove_if(m_WebTabs.begin(), m_WebTabs.end(), [=](const cWebTabPtr & a_CBWebTab)
 		{
 			return (a_CBWebTab->m_PluginName == a_PluginName);
 		}),
@@ -190,6 +190,13 @@ void cWebAdmin::Reload(void)
 			" This will not take effect until you restart the server."
 		);
 	}
+	else if (!HasUsers())
+	{
+		LOGWARNING(
+			"The webadmin is enabled but has no users configured."
+			" To add new users, edit webadmin.ini"
+		);
+	}
 
 	// Initialize the WebAdmin template script and reload the file:
 	if (m_TemplateScript.IsValid())
@@ -198,16 +205,16 @@ void cWebAdmin::Reload(void)
 	}
 	m_TemplateScript.Create();
 	m_TemplateScript.RegisterAPILibs();
-	if (!m_TemplateScript.LoadFile(FILE_IO_PREFIX "webadmin/template.lua"))
+	if (!m_TemplateScript.LoadFile("webadmin/template.lua"))
 	{
-		LOGWARN("Could not load WebAdmin template \"%s\". WebAdmin will not work properly!", FILE_IO_PREFIX "webadmin/template.lua");
+		LOGWARN("Could not load WebAdmin template \"%s\". WebAdmin will not work properly!", "webadmin/template.lua");
 		m_TemplateScript.Close();
 	}
 
 	// Load the login template, provide a fallback default if not found:
 	if (!LoadLoginPage())
 	{
-		LOGWARN("Could not load WebAdmin login page \"%s\", using fallback template.", FILE_IO_PREFIX "webadmin/login_template.html");
+		LOGWARN("Could not load WebAdmin login page \"%s\", using fallback template.", "webadmin/login_template.html");
 
 		// Set the fallback:
 		m_LoginPage = \
@@ -242,6 +249,23 @@ bool cWebAdmin::LoadIniFile(void)
 	}
 
 	return m_IniFile.GetValueSetB("WebAdmin", "Enabled", true);
+}
+
+
+
+
+
+bool cWebAdmin::HasUsers()
+{
+	for (int i = 0; i < m_IniFile.GetNumKeys(); i++)
+	{
+		AString key = m_IniFile.GetKeyName(i);
+		if (key.rfind("User:", 0) == 0)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -378,7 +402,7 @@ void cWebAdmin::HandleFileRequest(cHTTPServerConnection & a_Connection, cHTTPInc
 	// Read the file contents and guess its mime-type, based on the extension:
 	AString Content = "<h2>404 Not Found</h2>";
 	AString ContentType = "text/html";
-	AString Path = Printf(FILE_IO_PREFIX "webadmin/files/%s", FileURL.c_str());
+	AString Path = "webadmin/files/" + FileURL;
 
 	// Return 404 if the file is not found, or the URL contains '../' (for security reasons)
 	if ((FileURL.find("../") == AString::npos) && cFile::IsFile(Path))
@@ -485,9 +509,9 @@ sWebAdminPage cWebAdmin::GetPage(const HTTPRequest & a_Request)
 		page.ContentType = "text/html";  // Default to HTML content type, unless overridden by a plugin
 		if (!tab->m_Callback->Call(a_Request, split[1], page.Content, page.ContentType))
 		{
-			page.Content = GetHTMLEscapedString(Printf(
-				"WebTab callback for plugin %s, page %s has failed.",
-				tab->m_PluginName.c_str(), tab->m_Title.c_str()
+			page.Content = GetHTMLEscapedString(fmt::format(
+				FMT_STRING("WebTab callback for plugin {}, page {} has failed."),
+				tab->m_PluginName, tab->m_Title
 			));
 		}
 		page.PluginName = tab->m_PluginName;
@@ -519,7 +543,7 @@ void cWebAdmin::AddWebTab(
 )
 {
 	cCSLock lock(m_CS);
-	m_WebTabs.emplace_back(std::make_shared<cWebTab>(a_Title, a_UrlPath, a_PluginName, a_Callback));
+	m_WebTabs.emplace_back(std::make_shared<cWebTab>(a_Title, a_UrlPath, a_PluginName, std::move(a_Callback)));
 }
 
 

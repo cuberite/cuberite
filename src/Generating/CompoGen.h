@@ -115,7 +115,7 @@ class cCompoGenCache :
 	public cTerrainCompositionGen
 {
 public:
-	cCompoGenCache(cTerrainCompositionGenPtr a_Underlying, int a_CacheSize);  // Doesn't take ownership of a_Underlying
+	cCompoGenCache(std::unique_ptr<cTerrainCompositionGen> a_Underlying, int a_CacheSize);
 	virtual ~cCompoGenCache() override;
 
 	// cTerrainCompositionGen override:
@@ -124,7 +124,7 @@ public:
 
 protected:
 
-	cTerrainCompositionGenPtr m_Underlying;
+	std::unique_ptr<cTerrainCompositionGen> m_Underlying;
 
 	struct sCacheData
 	{
@@ -145,7 +145,3 @@ protected:
 	int m_NumMisses;
 	int m_TotalChain;  // Number of cache items walked to get to a hit (only added for hits)
 } ;
-
-
-
-

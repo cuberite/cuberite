@@ -22,7 +22,7 @@ static void verifyChunkDescHeightmap(const cChunkDesc & a_ChunkDesc)
 				if (BlockType != E_BLOCK_AIR)
 				{
 					int Height = a_ChunkDesc.GetHeight(x, z);
-					TEST_EQUAL_MSG(Height, y, Printf("Chunk height at <%d, %d>: exp %d, got %d", x, z, y, Height));
+					TEST_EQUAL_MSG(Height, y, fmt::format(FMT_STRING("Chunk height at <{}, {}>: exp {}, got {}"), x, z, y, Height));
 					break;
 				}
 			}  // for y
@@ -99,7 +99,7 @@ static void testGenerateOverworld(cChunkGenerator & aDefaultOverworldGen)
 		{
 			for (int z = 0; z < cChunkDef::Width; ++z)
 			{
-				TEST_EQUAL_MSG(chd.GetBlockType(x, 0, z), E_BLOCK_BEDROCK, Printf("Bedrock floor at {%d, 0, %d}", x, z));
+				TEST_EQUAL_MSG(chd.GetBlockType(x, 0, z), E_BLOCK_BEDROCK, fmt::format(FMT_STRING("Bedrock floor at {{{}, {}, {}}}"), x, 0, z));
 			}
 		}
 
@@ -124,12 +124,12 @@ static void testGenerateOverworld(cChunkGenerator & aDefaultOverworldGen)
 				auto y = chd.GetHeight(x, z);
 				auto blockType = chd.GetBlockType(x, y, z);
 				TEST_EQUAL_MSG(validOverworldBlockTypes.count(blockType), 1,
-					Printf("Block at {%d, %d, %d}: %d", x, y, z, blockType)
+					fmt::format(FMT_STRING("Block at {{{}, {}, {}}}: {}"), x, y, z, blockType)
 				);
 				if (y < cChunkDef::Height - 1)
 				{
 					TEST_EQUAL_MSG(chd.GetBlockType(x, cChunkDef::Height - 1, z), E_BLOCK_AIR,
-						Printf("Air at {%d, %d, %d}", x, cChunkDef::Height - 1, z)
+						fmt::format(FMT_STRING("Air at {{{}, {}, {}}}"), x, cChunkDef::Height - 1, z)
 					);
 				}
 			}
@@ -163,7 +163,7 @@ static void testGenerateNether(cChunkGenerator & aDefaultNetherGen)
 		{
 			for (int z = 0; z < cChunkDef::Width; ++z)
 			{
-				TEST_EQUAL_MSG(chd.GetBiome(x, z), biNether, Printf("Nether biome at {%d, %d}", x, z));
+				TEST_EQUAL_MSG(chd.GetBiome(x, z), biNether, fmt::format(FMT_STRING("Nether biome at <{}, {}>"), x, z));
 			}
 		}
 
@@ -173,12 +173,24 @@ static void testGenerateNether(cChunkGenerator & aDefaultNetherGen)
 		{
 			for (int z = 0; z < cChunkDef::Width; ++z)
 			{
-				TEST_EQUAL_MSG(chd.GetBlockType(x, 0, z), E_BLOCK_BEDROCK, Printf("Bedrock floor at {%d, 0, %d}", x, z));
+				TEST_EQUAL_MSG(chd.GetBlockType(x, 0, z), E_BLOCK_BEDROCK, fmt::format(FMT_STRING("Bedrock floor at {{{}, {}, {}}}"), x, 0, z));
 				auto y = chd.GetHeight(x, z);
-				TEST_EQUAL(y, prevHeight);  // Same height across the entire chunk
+				auto topBlockType = chd.GetBlockType(x, y, z);
+				// Skip the mushrooms generated on the top bedrock layer:
+				if (
+					(topBlockType == E_BLOCK_BROWN_MUSHROOM) ||
+					(topBlockType == E_BLOCK_RED_MUSHROOM)
+				)
+				{
+					y -= 1;
+				}
+				TEST_EQUAL_MSG(y, prevHeight, fmt::format(
+					FMT_STRING("Failed: Same height across the entire chunk, at <{}, {}>: exp {}, got {}; top block: {}"),
+					x, z, prevHeight, y, chd.GetBlockType(x, y, z)
+				));
 				auto blockType = chd.GetBlockType(x, y, z);
 				TEST_EQUAL_MSG(blockType, E_BLOCK_BEDROCK,
-					Printf("Bedrock ceiling at {%d, %d, %d}: %d", x, y, z, blockType)
+					fmt::format(FMT_STRING("Bedrock ceiling at {{{}, {}, {}}}: {}"), x, y, z, blockType)
 				);
 			}
 		}
@@ -207,7 +219,7 @@ static void testGenerateNether(cChunkGenerator & aDefaultNetherGen)
 				if (!hasSuitableBlockType)
 				{
 					printChunkColumn(chd, x, z);
-					TEST_FAIL(Printf("!hasSuitableBlockType at column {%d, %d} of chunk [%d, 0]", x, z, chunkX));
+					TEST_FAIL(fmt::format(FMT_STRING("!hasSuitableBlockType at column <{}, {}> of chunk [{}, 0]"), x, z, chunkX));
 				}
 			}
 		}
@@ -245,9 +257,14 @@ static void checkChunkChecksums(
 	{
 		cChunkDesc chd(coords.mCoords);
 		aGenerator.Generate(chd);
+		/*
+		cFile f(Printf("Repeatability_%s-%02d-%02d.raw", aDimension, coords.mCoords.m_ChunkX, coords.mCoords.m_ChunkZ), cFile::fmWrite);
+		f.Write(chd.GetBlockTypes(), sizeof(chd.GetBlockTypes()));
+		f.Close();
+		*/
 		auto checksum = chunkSHA1(chd);
 		TEST_EQUAL_MSG(checksum, coords.mChecksum,
-			Printf("%s chunk %s SHA1: expected %s, got %s", aDimension, coords.mCoords.ToString(), coords.mChecksum, checksum)
+			fmt::format(FMT_STRING("{} chunk {} SHA1: expected {}, got {}"), aDimension, coords.mCoords.ToString(), coords.mChecksum, checksum)
 		);
 	}
 }
@@ -275,11 +292,11 @@ static void testRepeatability(cChunkGenerator & aDefaultOverworldGenerator, cChu
 	// Test the default Nether generator:
 	std::vector<CoordsWithChecksum> netherChecksums =
 	{
-		{ 0,    0, "-25231a9ce4bc57eaeaf1f4ad01c32ddd5b2293e5"},
-		{ 1,    0, "-61ef8824b6b241b4f0e28c09505bad5d7898a8a4"},
-		{ 1,    1, "6b3ba6dcb18568e21b3a5aae9ea58368079fbaf8"},
-		{17,    0, "1acc3a28eb1be66b3e4a256f0712a48f96085a39"},
-		{ 8, 1024, "6f9b96e0613ca2fd879dbb53634b511e5649627a"},
+		{ 0,    0, "-487001a1ada9cdd7c8b557d3ff7081881f57c660"},
+		{ 1,    0, "a074ac7a1f2fbf4173324e5edd792197d6a29c2"},
+		{ 1,    1, "5867c5121f2a259ebc2aa53ecafed93dd3d6de95"},
+		{17,    0, "-300191cee5b30592f7b61cd22ea08669eba3f569"},
+		{ 8, 1024, "69bbda09be981f5e3adc53d0a49995aff43f1290"},
 	};
 	checkChunkChecksums(aDefaultNetherGenerator, netherChecksums, "Nether");
 }

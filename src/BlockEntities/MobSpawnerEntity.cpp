@@ -14,7 +14,7 @@
 
 
 cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
 	m_Entity(mtPig),
 	m_SpawnDelay(100),
 	m_IsActive(false)
@@ -28,11 +28,17 @@ cMobSpawnerEntity::cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMe
 
 void cMobSpawnerEntity::CopyFrom(const cBlockEntity & a_Src)
 {
-	super::CopyFrom(a_Src);
+	Super::CopyFrom(a_Src);
 	auto & src = static_cast<const cMobSpawnerEntity &>(a_Src);
 	m_Entity = src.m_Entity;
 	m_IsActive = src.m_IsActive;
 	m_SpawnDelay = src.m_SpawnDelay;
+	m_SpawnCount = src.m_SpawnCount;
+	m_SpawnRange = src.m_SpawnRange;
+	m_MinSpawnDelay = src.m_MinSpawnDelay;
+	m_MaxSpawnDelay = src.m_MaxSpawnDelay;
+	m_MaxNearbyEntities = src.m_MaxNearbyEntities;
+	m_RequiredPlayerRange = src.m_RequiredPlayerRange;
 }
 
 
@@ -64,6 +70,7 @@ bool cMobSpawnerEntity::UsedBy(cPlayer * a_Player)
 		{
 			a_Player->GetInventory().RemoveOneEquippedItem();
 		}
+		m_World->BroadcastBlockEntity(GetPos());
 		FLOGD("Changed monster spawner at {0} to type {1}.", GetPos(), cMonster::MobTypeToString(MonsterType));
 		return true;
 	}
@@ -76,14 +83,7 @@ bool cMobSpawnerEntity::UsedBy(cPlayer * a_Player)
 
 void cMobSpawnerEntity::UpdateActiveState(void)
 {
-	if (GetNearbyPlayersNum() > 0)
-	{
-		m_IsActive = true;
-	}
-	else
-	{
-		m_IsActive = false;
-	}
+	m_IsActive = (GetNearbyPlayersNum() > 0);
 }
 
 
@@ -92,8 +92,10 @@ void cMobSpawnerEntity::UpdateActiveState(void)
 
 bool cMobSpawnerEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
-	// Update the active flag every 5 seconds
-	if ((m_World->GetWorldAge() % 100) == 0)
+	using namespace std::chrono_literals;
+
+	// Update the active flag every 5 seconds:
+	if ((m_World->GetWorldTickAge() % 5s) == 0s)
 	{
 		UpdateActiveState();
 	}
@@ -106,6 +108,7 @@ bool cMobSpawnerEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (m_SpawnDelay <= 0)
 	{
 		SpawnEntity();
+		m_World->BroadcastBlockEntity(GetPos());
 		return true;
 	}
 	else
@@ -121,8 +124,7 @@ bool cMobSpawnerEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 void cMobSpawnerEntity::ResetTimer(void)
 {
-	m_SpawnDelay = GetRandomProvider().RandInt<short>(200, 800);
-	m_World->BroadcastBlockEntity(GetPos());
+	m_SpawnDelay = GetRandomProvider().RandInt<short>(m_MinSpawnDelay, m_MaxSpawnDelay);
 }
 
 
@@ -131,59 +133,55 @@ void cMobSpawnerEntity::ResetTimer(void)
 
 void cMobSpawnerEntity::SpawnEntity(void)
 {
-	int NearbyEntities = GetNearbyMonsterNum(m_Entity);
-	if (NearbyEntities >= 6)
+	auto NearbyEntities = GetNearbyMonsterNum(m_Entity);
+	if (NearbyEntities >= m_MaxNearbyEntities)
 	{
 		ResetTimer();
 		return;
 	}
 
-	auto MobType = m_Entity;
-	bool EntitiesSpawned = m_World->DoWithChunk(GetChunkX(), GetChunkZ(), [&](cChunk & a_Chunk)
+	bool EntitiesSpawned = m_World->DoWithChunk(GetChunkX(), GetChunkZ(), [this, NearbyEntities](cChunk & a_Chunk)
 		{
 			auto & Random = GetRandomProvider();
+			auto EntitySpawnTally = NearbyEntities;
 
 			bool HaveSpawnedEntity = false;
-			for (size_t i = 0; i < 4; i++)
+			for (short I = 0; I < m_SpawnCount; I++)
 			{
-				if (NearbyEntities >= 6)
+				if (EntitySpawnTally >= m_MaxNearbyEntities)
 				{
 					break;
 				}
 
-				Vector3i spawnRelPos(GetRelPos());
-				spawnRelPos += Vector3i(
-					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * 4.0),
+				auto SpawnRelPos(GetRelPos());
+				SpawnRelPos += Vector3i(
+					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * static_cast<double>(m_SpawnRange)),
 					Random.RandInt(-1, 1),
-					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * 4.0)
+					static_cast<int>((Random.RandReal<double>() - Random.RandReal<double>()) * static_cast<double>(m_SpawnRange))
 				);
 
-				auto chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(spawnRelPos);
-				if ((chunk == nullptr) || !chunk->IsValid())
+				auto Chunk = a_Chunk.GetRelNeighborChunkAdjustCoords(SpawnRelPos);
+				if ((Chunk == nullptr) || !Chunk->IsValid())
 				{
 					continue;
 				}
-				EMCSBiome Biome = chunk->GetBiomeAt(spawnRelPos.x, spawnRelPos.z);
+				EMCSBiome Biome = Chunk->GetBiomeAt(SpawnRelPos.x, SpawnRelPos.z);
 
-				if (cMobSpawner::CanSpawnHere(chunk, spawnRelPos, MobType, Biome))
+				if (cMobSpawner::CanSpawnHere(Chunk, SpawnRelPos, m_Entity, Biome, true))
 				{
-					auto absPos = chunk->RelativeToAbsolute(spawnRelPos);
-					auto monster = cMonster::NewMonsterFromType(MobType);
-					if (monster == nullptr)
+					auto AbsPos = Chunk->RelativeToAbsolute(SpawnRelPos);
+					auto Monster = cMonster::NewMonsterFromType(m_Entity);
+					if (Monster == nullptr)
 					{
 						continue;
 					}
-					monster->SetPosition(absPos);
-					monster->SetYaw(Random.RandReal(360.0f));
-					if (chunk->GetWorld()->SpawnMobFinalize(std::move(monster)) != cEntity::INVALID_ID)
+					Monster->SetPosition(AbsPos);
+					Monster->SetYaw(Random.RandReal(360.0f));
+					if (Chunk->GetWorld()->SpawnMobFinalize(std::move(Monster)) != cEntity::INVALID_ID)
 					{
 						HaveSpawnedEntity = true;
-						m_World->BroadcastSoundParticleEffect(
-							EffectID::PARTICLE_MOBSPAWN,
-							absPos,
-							0
-						);
-						NearbyEntities++;
+						m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_MOBSPAWN, AbsPos, 0);
+						EntitySpawnTally++;
 					}
 				}
 			}
@@ -203,39 +201,23 @@ void cMobSpawnerEntity::SpawnEntity(void)
 
 int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 {
-	auto SpawnerPos = Vector3d(0.5, 0.5, 0.5) + m_Pos;
 	int NumPlayers = 0;
 
-	class cCallback : public cChunkDataCallback
+	auto Callback = [this, &NumPlayers](cEntity & a_Entity)
 	{
-	public:
-		cCallback(Vector3d a_SpawnerPos, int & a_NumPlayers) :
-			m_SpawnerPos(a_SpawnerPos),
-			m_NumPlayers(a_NumPlayers)
+		if (!a_Entity.IsPlayer())
 		{
+			return false;
 		}
-
-		virtual void Entity(cEntity * a_Entity) override
+		if ((m_Pos - a_Entity.GetPosition()).Length() <= m_RequiredPlayerRange)
 		{
-			if (!a_Entity->IsPlayer())
-			{
-				return;
-			}
-
-			if ((m_SpawnerPos - a_Entity->GetPosition()).Length() <= 16)
-			{
-				m_NumPlayers++;
-			}
+			NumPlayers++;
 		}
+		return false;
+	};
 
-	protected:
-		Vector3d m_SpawnerPos;
-		int & m_NumPlayers;
-	} Callback(SpawnerPos, NumPlayers);
-
-	int ChunkX = GetChunkX();
-	int ChunkZ = GetChunkZ();
-	m_World->ForEachChunkInRect(ChunkX - 1, ChunkX + 1, ChunkZ - 1, ChunkZ + 1, Callback);
+	const cBoundingBox PlayerBoundingBox(Vector3d(m_Pos.x, m_Pos.y - m_RequiredPlayerRange, m_Pos.z), m_RequiredPlayerRange, m_RequiredPlayerRange * 2);
+	m_World->ForEachEntityInBox(PlayerBoundingBox, Callback);
 
 	return NumPlayers;
 }
@@ -246,51 +228,25 @@ int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 
 int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 {
-	auto SpawnerPos = Vector3d(0.5, 0.5, 0.5) + m_Pos;
 	int NumEntities = 0;
 
-	class cCallback : public cChunkDataCallback
+	auto Callback = [this, &NumEntities](cEntity & a_Entity)
 	{
-	public:
-		cCallback(Vector3d a_SpawnerPos, eMonsterType a_CallbackEntityType, int & a_NumEntities) :
-			m_SpawnerPos(a_SpawnerPos),
-			m_EntityType(a_CallbackEntityType),
-			m_NumEntities(a_NumEntities)
+		if (!a_Entity.IsMob())
 		{
+			return false;
 		}
 
-		virtual void Entity(cEntity * a_Entity) override
+		auto & Mob = static_cast<cMonster &>(a_Entity);
+		if (Mob.GetMobType() == m_Entity)
 		{
-			if (!a_Entity->IsMob())
-			{
-				return;
-			}
-
-			cMonster * Mob = static_cast<cMonster *>(a_Entity);
-			if (Mob->GetMobType() != m_EntityType)
-			{
-				return;
-			}
-
-			if ((Diff(m_SpawnerPos.x, a_Entity->GetPosX()) <= 8.0) && (Diff(m_SpawnerPos.y, a_Entity->GetPosY()) <= 4.0) && (Diff(m_SpawnerPos.z, a_Entity->GetPosZ()) <= 8.0))
-			{
-				m_NumEntities++;
-			}
+			NumEntities++;
 		}
+		return false;
+	};
 
-	protected:
-		Vector3d m_SpawnerPos;
-		eMonsterType m_EntityType;
-		int & m_NumEntities;
-	} Callback(SpawnerPos, a_EntityType, NumEntities);
-
-	int ChunkX = GetChunkX();
-	int ChunkZ = GetChunkZ();
-	m_World->ForEachChunkInRect(ChunkX - 1, ChunkX + 1, ChunkZ - 1, ChunkZ + 1, Callback);
+	const cBoundingBox EntityBoundingBox(Vector3d(m_Pos.x, m_Pos.y - 4, m_Pos.z), m_SpawnRange, 8);
+	m_World->ForEachEntityInBox(EntityBoundingBox, Callback);
 
 	return NumEntities;
 }
-
-
-
-

@@ -22,12 +22,13 @@ class cChunk;
 
 
 
-class cLineBlockTracer :
+class cLineBlockTracer:
 	public cBlockTracer
 {
-	typedef cBlockTracer super;
+	using Super = cBlockTracer;
 
 public:
+
 	enum eLineOfSight
 	{
 		// Bit flags used for LineOfSightTrace's Sight parameter:
@@ -44,15 +45,13 @@ public:
 	cLineBlockTracer(cWorld & a_World, cCallbacks & a_Callbacks);
 
 	/** Traces one line between Start and End; returns true if the entire line was traced (until OnNoMoreHits()) */
-	bool Trace(double a_StartX, double a_StartY, double a_StartZ, double a_EndX, double a_EndY, double a_EndZ);
+	bool Trace(Vector3d a_Start, Vector3d a_End);
+
 
 	// Utility functions for simple one-line usage:
 
 	/** Traces one line between Start and End; returns true if the entire line was traced (until OnNoMoreHits()) */
-	static bool Trace(cWorld & a_World, cCallbacks & a_Callbacks, double a_StartX, double a_StartY, double a_StartZ, double a_EndX, double a_EndY, double a_EndZ);
-
-	/** Traces one line between Start and End; returns true if the entire line was traced (until OnNoMoreHits()) */
-	static bool Trace(cWorld & a_World, cCallbacks & a_Callbacks, const Vector3d & a_Start, const Vector3d & a_End);
+	static bool Trace(cWorld & a_World, cCallbacks & a_Callbacks, const Vector3d a_Start, const Vector3d a_End);
 
 	/** Returns true if the two positions are within line of sight (not obscured by blocks).
 	a_Sight specifies which blocks are considered transparent for the trace, is an OR-combination of eLineOfSight constants. */
@@ -74,19 +73,19 @@ public:
 
 protected:
 	/** The start point of the trace */
-	double m_StartX, m_StartY, m_StartZ;
+	Vector3d m_Start;
 
 	/** The end point of the trace */
-	double m_EndX, m_EndY, m_EndZ;
+	Vector3d m_End;
 
 	/** The difference in coords, End - Start */
-	double m_DiffX, m_DiffY, m_DiffZ;
+	Vector3d m_Diff;
 
 	/** The increment at which the block coords are going from Start to End; either +1 or -1 */
-	int m_DirX, m_DirY, m_DirZ;
+	Vector3i m_Dir;
 
 	/** The current block */
-	int m_CurrentX, m_CurrentY, m_CurrentZ;
+	Vector3i m_Current;
 
 	/** The face through which the current block has been entered */
 	eBlockFace m_CurrentFace;
@@ -106,8 +105,6 @@ protected:
 
 	bool ChunkCallback(cChunk * a_Chunk);
 } ;
-
-
 
 
 
