@@ -231,12 +231,12 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 		if ((m_EMState == CHASING) || (m_EMState == ESCAPING))
 		{
 			// Apply run speed:
-			Distance *= m_DefaultRunSpeed * m_RelativeWalkSpeed;
+			Distance *= m_BaseRunSpeed * m_RelativeWalkSpeed;
 		}
 		else
 		{
 			// Apply walk speed:
-			Distance *= m_DefaultWalkSpeed * m_RelativeWalkSpeed;
+			Distance *= m_BaseWalkSpeed * m_RelativeWalkSpeed;
 		}
 
 		/* Reduced default speed.
