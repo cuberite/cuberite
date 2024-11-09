@@ -26,7 +26,7 @@ in a depth-first processing. Each of the descendants will branch randomly, if no
 
 
 
-class cMineShaft abstract
+class cMineShaft
 {
 public:
 	enum eKind
