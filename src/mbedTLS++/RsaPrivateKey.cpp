@@ -11,7 +11,7 @@
 
 cRsaPrivateKey::cRsaPrivateKey(void)
 {
-	mbedtls_rsa_init(&m_Rsa, MBEDTLS_RSA_PKCS_V15, 0);
+	mbedtls_rsa_init(&m_Rsa);
 	m_CtrDrbg.Initialize("RSA", 3);
 }
 
@@ -21,7 +21,7 @@ cRsaPrivateKey::cRsaPrivateKey(void)
 
 cRsaPrivateKey::cRsaPrivateKey(const cRsaPrivateKey & a_Other)
 {
-	mbedtls_rsa_init(&m_Rsa, MBEDTLS_RSA_PKCS_V15, 0);
+	mbedtls_rsa_init(&m_Rsa);
 	mbedtls_rsa_copy(&m_Rsa, &a_Other.m_Rsa);
 	m_CtrDrbg.Initialize("RSA", 3);
 }
@@ -122,7 +122,7 @@ int cRsaPrivateKey::Decrypt(const ContiguousByteBufferView a_EncryptedData, Byte
 	}
 	size_t DecryptedLength;
 	int res = mbedtls_rsa_pkcs1_decrypt(
-		&m_Rsa, mbedtls_ctr_drbg_random, m_CtrDrbg.GetInternal(), MBEDTLS_RSA_PRIVATE, &DecryptedLength,
+		&m_Rsa, mbedtls_ctr_drbg_random, m_CtrDrbg.GetInternal(), &DecryptedLength,
 		reinterpret_cast<const unsigned char *>(a_EncryptedData.data()), a_DecryptedData, a_DecryptedMaxLength
 	);
 	if (res != 0)

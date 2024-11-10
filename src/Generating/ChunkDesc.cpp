@@ -525,7 +525,7 @@ cBlockEntity * cChunkDesc::GetBlockEntity(Vector3i a_RelPos)
 	if (Iterator != m_BlockArea.GetBlockEntities().end())
 	{
 		// Already in the list:
-		cBlockEntity * BlockEntity = itr->second.get();
+		cBlockEntity * BlockEntity = Iterator->second.get();
 		if (BlockEntity->GetBlockType() == GetBlock(a_RelPos).Type())
 		{
 			// Correct type, already present. Return it:
@@ -547,7 +547,7 @@ cBlockEntity * cChunkDesc::GetBlockEntity(Vector3i a_RelPos)
 		// No block entity for this block type
 		return nullptr;
 	}
-	auto res = m_BlockArea.GetBlockEntities().emplace(Idx, std::move(BlockEntity));
+	auto res = m_BlockArea.GetBlockEntities().emplace(Idx, std::move(be));
 	return res.first->second.get();
 }
 
