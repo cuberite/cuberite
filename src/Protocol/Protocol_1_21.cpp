@@ -6,6 +6,7 @@
 #include "Entities/Player.h"
 #include <ClientHandle.h>
 #include "../AllTags/BlockTags.h"
+#include "BlockEntities/BlockEntity.h"
 #include "WorldStorage/FastNBT.h"
 #include "Palettes/Palette_1_21.h"
 #include "Palettes/Palette_1_21_2.h"
