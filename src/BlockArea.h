@@ -166,7 +166,7 @@ public:
 	/** Expands the internal contents by the specified amount of blocks from each border */
 	void Expand(int a_SubMinX, int a_AddMaxX, int a_SubMinY, int a_AddMaxY, int a_SubMinZ, int a_AddMaxZ);
 
-	/** Merges another block area into this one, using the specified block combinating strategy
+	/** Merges another block area into this one, using the specified block combining strategy
 	This function combines another BlockArea into the current object.
 	The a_RelX, a_RelY and a_RelZ parameters specify the coords of this BA where a_Src should be copied.
 	If both areas contain baBlockEntities, the BEs are merged (with preference of keeping this' ones) (MergeBlockEntities()).
@@ -238,7 +238,7 @@ public:
 
 	*/
 
-	/** Merges another block area into this one, using the specified block combinating strategy.
+	/** Merges another block area into this one, using the specified block combining strategy.
 	See Merge() above for details. */
 	void Merge(const cBlockArea & a_Src, const Vector3i & a_RelMinCoords, eMergeStrategy a_Strategy);
 
@@ -356,7 +356,7 @@ public:
 	bool HasBlocks        (void) const { return (m_Blocks        != nullptr); }
 	bool HasBlockLights   (void) const { return (m_BlockLight    != nullptr); }
 	bool HasBlockSkyLights(void) const { return (m_BlockSkyLight != nullptr); }
-	bool HasBlockEntities (void) const { return (m_BlockEntities != nullptr); }
+	bool HasBlockEntities (void) const { return m_BlockEntities.operator bool(); }
 
 	/** Returns the count of blocks that are not air.
 	Returns 0 if blocktypes not available. Block metas are ignored (if present, air with any meta is still considered air). */
@@ -412,7 +412,8 @@ public:
 	bool ForEachBlockEntity(cBlockEntityCallback a_Callback);
 
 	/** Direct read-only access to block entities. */
-	const cBlockEntities & GetBlockEntities(void) const { ASSERT(HasBlockEntities()); return *m_BlockEntities; }
+	const cBlockEntities & GetBlockEntities(void) const { ASSERT(HasBlockEntities()); return *m_BlockEntities.get(); }
+	cBlockEntities &       GetBlockEntities(void)       { ASSERT(HasBlockEntities()); return *m_BlockEntities.get(); }
 
 
 
