@@ -61,7 +61,7 @@ UInt32 cProtocol_1_16::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktParticleEffect:       return 0x23;
 		case cProtocol::pktLightUpdate:          return 0x24;
 		case cProtocol::pktJoinGame:             return 0x25;
-			//  map update 0x26
+		case cProtocol::pktMapData:              return 0x26;
 			//  set trade offers 0x27 
 		case cProtocol::pktEntityRelMove:        return 0x28;
 		case cProtocol::pktEntityRelMoveLook:    return 0x29;
@@ -738,7 +738,7 @@ UInt32 cProtocol_1_16_2::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktParticleEffect:       return 0x22;
 		case cProtocol::pktLightUpdate:          return 0x23;
 		case cProtocol::pktJoinGame:             return 0x24;
-			//  map update 0x25
+		case cProtocol::pktMapData:              return 0x25;
 			//  set trade offers 0x26 
 		case cProtocol::pktEntityRelMove:        return 0x27;
 		case cProtocol::pktEntityRelMoveLook:    return 0x28;

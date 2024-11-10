@@ -2160,7 +2160,7 @@ UInt32 cProtocol_1_20_5::GetPacketID(ePacketType a_PacketType) const
         case cProtocol::pktParticleEffect:       return 0x29;
         case cProtocol::pktLightUpdate:          return 0x2A;
         case cProtocol::pktJoinGame:             return 0x2B;
-                        //  map update 0x2C
+		case cProtocol::pktMapData:              return 0x2C;
                         //  set trade offers 0x2D
         case cProtocol::pktEntityRelMove:        return 0x2E;
         case cProtocol::pktEntityRelMoveLook:    return 0x2F;
