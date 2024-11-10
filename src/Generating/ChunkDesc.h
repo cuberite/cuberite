@@ -238,7 +238,8 @@ public:
 	inline BlockNibbleBytes &        GetBlockMetasUncompressed(void) { return *(reinterpret_cast<BlockNibbleBytes *>(m_BlockArea.GetBlockMetas())); }
 	inline cChunkDef::HeightMap &    GetHeightMap             (void) { return m_HeightMap; }
 	inline cEntityList &             GetEntities              (void) { return m_Entities; }
-	inline cBlockEntities &          GetBlockEntities         (void) { return m_BlockEntities; }
+	inline const cBlockEntities &    GetBlockEntities         (void) const { return m_BlockArea.GetBlockEntities(); }
+	inline cBlockEntities &          GetBlockEntities         (void) { return m_BlockArea.GetBlockEntities(); }
 
 	inline const cChunkDef::BiomeMap &     GetBiomeMap()   const { return m_BiomeMap; }
 	inline const cChunkDef::BlockTypes &   GetBlockTypes() const { return *(reinterpret_cast<cChunkDef::BlockTypes *>(m_BlockArea.GetBlockTypes())); }
@@ -259,7 +260,6 @@ private:
 	cBlockArea              m_BlockArea;
 	cChunkDef::HeightMap    m_HeightMap;
 	cEntityList             m_Entities;
-	cBlockEntities          m_BlockEntities;  // Individual block entities are NOT owned by this object!
 
 	bool m_bUseDefaultBiomes;
 	bool m_bUseDefaultHeight;
