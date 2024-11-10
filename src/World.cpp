@@ -2123,7 +2123,7 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 bool cWorld::DigBlock(Vector3i a_BlockPos, const cEntity * a_Digger)
 {
 	BlockState Block;
-	if(GetBlock(a_BlockPos, Block))
+	if(!GetBlock(a_BlockPos, Block))
 	{
 		return false;
 	}
