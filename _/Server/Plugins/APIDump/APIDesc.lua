@@ -9263,7 +9263,7 @@ a_Player:OpenWindow(Window);
 							Type = "number",
 						},
 					},
-					Notes = "Returns the relative walk speed of this mob. Standard is 1.0",
+					Notes = "Returns the walk speed multiplier of this mob. Base is set in monsters.ini (will default to 1 if not set).",
 				},
 				HasCustomName =
 				{
@@ -9427,7 +9427,7 @@ a_Player:OpenWindow(Window);
 							Type = "number",
 						},
 					},
-					Notes = "Sets the relative walk speed of this mob. The default relative speed is 1.0.",
+					Notes = "Sets the walk speed multiplier of this mob. Base is set in monsters.ini (will default to 1 if not set).",
 				},
 				StringToMobType =
 				{
