@@ -21,6 +21,10 @@ protected:
 
 	virtual void    HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer) override;
 
+	virtual UInt32  GetProtocolBlockType(BlockState a_Block) const override;
+	virtual UInt32  GetProtocolItemType(Item a_ItemID) const override;
+	virtual Item    GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
+
 	virtual int     GetProtocolParticleID(const AString & a_ParticleName) const override;
 	virtual Version GetProtocolVersion() const override;
 };

@@ -13,6 +13,7 @@
 #include "Entities/ArrowEntity.h"
 #include "Entities/Minecart.h"
 #include "Palettes/Palette_1_16.h"
+#include "Palettes/Palette_1_20.h"
 #include "UI/HorseWindow.h"
 
 
@@ -308,6 +309,33 @@ void cProtocol_1_20::SendRespawn(eDimension a_Dimension)
 	Pkt.WriteBEInt8(0x3);   // keep player attributes
 	Pkt.WriteBool(false);  // optional last death pos
 	Pkt.WriteVarInt32(0);
+}
+
+
+
+
+
+UInt32 cProtocol_1_20::GetProtocolBlockType(BlockState a_Block) const
+{
+	return Palette_1_20::From(a_Block);
+}
+
+
+
+
+
+UInt32 cProtocol_1_20::GetProtocolItemType(Item a_ItemID) const
+{
+	return Palette_1_20::From(a_ItemID);
+}
+
+
+
+
+
+Item cProtocol_1_20::GetItemFromProtocolID(UInt32 a_ProtocolID) const
+{
+	return Palette_1_20::ToItem(a_ProtocolID);
 }
 
 
