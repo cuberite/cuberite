@@ -1587,7 +1587,12 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, BlockState a_Block)
 	{
 		for (int z = 0; z < 2; ++z)
 		{
-			auto OtherSapling = GetBlock(a_BlockPos.addedXZ(x, z));
+			BlockState OtherSapling;
+			if (GetBlock(a_BlockPos.addedXZ(x, z), OtherSapling))
+			{
+				return false;
+			}
+			
 			IsLarge = IsLarge && (OtherSapling.Type() == a_Block.Type());
 		}
 	}
@@ -1603,7 +1608,11 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, BlockState a_Block)
 	{
 		for (int z = 0; z > -2; --z)
 		{
-			auto OtherSapling = GetBlock(a_BlockPos.addedXZ(x, z));
+			BlockState OtherSapling;
+			if (GetBlock(a_BlockPos.addedXZ(x, z), OtherSapling))
+			{
+				return false;
+			}
 			IsLarge = IsLarge && (OtherSapling.Type() == a_Block.Type());
 		}
 	}
@@ -1620,7 +1629,11 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, BlockState a_Block)
 	{
 		for (int z = 0; z > -2; --z)
 		{
-			auto OtherSapling = GetBlock(a_BlockPos.addedXZ(x, z));
+			BlockState OtherSapling;
+			if (GetBlock(a_BlockPos.addedXZ(x, z), OtherSapling))
+			{
+				return false;
+			}
 			IsLarge = IsLarge && (OtherSapling.Type() == a_Block.Type());
 		}
 	}
@@ -1638,7 +1651,11 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, BlockState a_Block)
 	{
 		for (int z = 0; z < 2; ++z)
 		{
-			auto OtherSapling = GetBlock(a_BlockPos.addedXZ(x, z));
+			BlockState OtherSapling;
+			if (GetBlock(a_BlockPos.addedXZ(x, z), OtherSapling))
+			{
+				return false;
+			}
 			IsLarge = IsLarge && (OtherSapling.Type() == a_Block.Type());
 		}
 	}
@@ -2075,7 +2092,14 @@ UInt32 cWorld::SpawnEnderCrystal(Vector3d a_Pos, bool a_ShowBottom)
 
 void cWorld::PlaceBlock(const Vector3i a_Position, BlockState a_Block)
 {
-	auto OldBlock = GetBlock(a_Position);
+	BlockState OldBlock;
+
+	if (!GetBlock(a_Position, OldBlock))
+	{
+		return;
+	}
+
+
 	SetBlock(a_Position, a_Block);
 
 	cChunkInterface ChunkInterface(GetChunkMap());
@@ -2098,7 +2122,11 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 
 bool cWorld::DigBlock(Vector3i a_BlockPos, const cEntity * a_Digger)
 {
-	auto Block = GetBlock(a_BlockPos);
+	BlockState Block;
+	if(!GetBlock(a_BlockPos, Block))
+	{
+		return false;
+	}
 
 	if (!m_ChunkMap.DigBlock(a_BlockPos))
 	{
@@ -2643,6 +2671,12 @@ bool cWorld::SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, co
 
 bool cWorld::IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ)
 {
+	BlockState Block;
+	if (GetBlock({ a_BlockX, a_BlockY, a_BlockZ }, Block))
+	{
+		return false;
+	}
+
 	return cBlockTrapdoorHandler::IsTrapdoorOpen(GetBlock({ a_BlockX, a_BlockY, a_BlockZ }));
 }
 
@@ -2652,7 +2686,12 @@ bool cWorld::IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
 {
-	auto Trapdoor = GetBlock({ a_BlockX, a_BlockY, a_BlockZ });
+	BlockState Trapdoor;
+	if(GetBlock({ a_BlockX, a_BlockY, a_BlockZ }, Trapdoor))
+	{
+		return false;
+	}
+	
 	if (cBlockTrapdoorHandler::IsBlockTrapdoor(Trapdoor))
 	{
 		return false;
