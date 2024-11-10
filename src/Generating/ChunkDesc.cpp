@@ -519,13 +519,13 @@ void cChunkDesc::RandomFillRelCuboid(
 
 cBlockEntity * cChunkDesc::GetBlockEntity(Vector3i a_RelPos)
 {
-	auto Idx = static_cast<size_t>(cChunkDef::MakeIndex(a_RelPos));
-	auto itr = m_BlockEntities.find(Idx);
+	const auto Idx = cChunkDef::MakeIndex(a_RelPos);
+	const auto Iterator = m_BlockArea.GetBlockEntities().find(Idx);
 
-	if (itr != m_BlockEntities.end())
+	if (Iterator != m_BlockArea.GetBlockEntities().end())
 	{
 		// Already in the list:
-		cBlockEntity * BlockEntity = itr->second.get();
+		cBlockEntity * BlockEntity = Iterator->second.get();
 		if (BlockEntity->GetBlockType() == GetBlock(a_RelPos).Type())
 		{
 			// Correct type, already present. Return it:
@@ -534,7 +534,7 @@ cBlockEntity * cChunkDesc::GetBlockEntity(Vector3i a_RelPos)
 		else
 		{
 			// Wrong type, the block type has been overwritten. Erase and create new:
-			m_BlockEntities.erase(itr);
+			m_BlockArea.GetBlockEntities().erase(Iterator);
 		}
 	}
 
@@ -547,7 +547,7 @@ cBlockEntity * cChunkDesc::GetBlockEntity(Vector3i a_RelPos)
 		// No block entity for this block type
 		return nullptr;
 	}
-	auto res = m_BlockEntities.emplace(Idx, std::move(be));
+	auto res = m_BlockArea.GetBlockEntities().emplace(Idx, std::move(be));
 	return res.first->second.get();
 }
 

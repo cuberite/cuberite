@@ -73,7 +73,7 @@ UInt32 cProtocol_1_19::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktParticleEffect:       return 0x21;
 		case cProtocol::pktLightUpdate:          return 0x22;
 		case cProtocol::pktJoinGame:             return 0x23;
-			//  map update 0x24
+		case cProtocol::pktMapData:              return 0x24;
 			//  set trade offers 0x25 
 		case cProtocol::pktEntityRelMove:        return 0x26;
 		case cProtocol::pktEntityRelMoveLook:    return 0x27;
@@ -1452,7 +1452,7 @@ UInt32 cProtocol_1_19_1::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktParticleEffect:       return 0x23;
 		case cProtocol::pktLightUpdate:          return 0x24;
 		case cProtocol::pktJoinGame:             return 0x25;
-			//  map update 0x26
+		case cProtocol::pktMapData:              return 0x26;
 			//  set trade offers 0x27 
 		case cProtocol::pktEntityRelMove:        return 0x28;
 		case cProtocol::pktEntityRelMoveLook:    return 0x29;
@@ -1897,7 +1897,7 @@ UInt32 cProtocol_1_19_3::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktParticleEffect:       return 0x22;
 		case cProtocol::pktLightUpdate:          return 0x23;
 		case cProtocol::pktJoinGame:             return 0x24;
-			//  map update 0x25
+		case cProtocol::pktMapData:              return 0x25;
 			//  set trade offers 0x26 
 		case cProtocol::pktEntityRelMove:        return 0x27;
 		case cProtocol::pktEntityRelMoveLook:    return 0x28;
@@ -2659,7 +2659,7 @@ UInt32 cProtocol_1_19_4::GetPacketID(ePacketType a_PacketType) const
         case cProtocol::pktParticleEffect:       return 0x26;
         case cProtocol::pktLightUpdate:          return 0x27;
         case cProtocol::pktJoinGame:             return 0x28;
-                //  map update 0x29
+		case cProtocol::pktMapData:              return 0x29;
                 //  set trade offers 0x2A
         case cProtocol::pktEntityRelMove:        return 0x2B;
         case cProtocol::pktEntityRelMoveLook:    return 0x2C;
