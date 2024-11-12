@@ -2,7 +2,7 @@
 #pragma once
 
 #include "../../Chunk.h"
-#include "../AllTags/BlockTags.h"
+#include "AllTags/BlockTags.h"
 
 /** Mixin to ensure the block has a dirt-like block underneath. */
 template <class Base>
