@@ -3198,7 +3198,7 @@ void cProtocol_1_19_4::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 				if (!MinecartContent.IsEmpty())
 				{
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockIDMeta, EntityMetadataType::VarInt);
-					a_Pkt.WriteVarInt32(GetProtocolItemType(MinecartContent.m_ItemType))); // todo use proper palette
+					a_Pkt.WriteVarInt32(GetProtocolItemType(MinecartContent.m_ItemType));
 
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockY, EntityMetadataType::VarInt);
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
