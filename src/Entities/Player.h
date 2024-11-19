@@ -147,6 +147,9 @@ public:
 	/** Cancels the current bow charging */
 	void CancelChargingBow(void);
 
+	/** Gets If The Player Is Teleporting To Fix https://github.com/cuberite/cuberite/issues/5542 */
+	bool GetIsTeleporting() { return m_IsTeleporting; };
+
 	/** Returns true if the player is currently charging the bow */
 	bool IsChargingBow(void) const { return m_IsChargingBow; }
 
