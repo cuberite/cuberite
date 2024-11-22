@@ -51,7 +51,7 @@ static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & a
 	cmd.parse(argc, argv);
 
 	// Copy the parsed args' values into a settings repository:
-	if(runDetached.getValue())
+	if (runDetached.getValue())
 	{
 		g_DetachedStdin = true;
 	}
