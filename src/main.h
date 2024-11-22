@@ -8,3 +8,6 @@ extern bool g_ShouldLogCommOut;
 
 /** If set to true, binary will attempt to run as a service. */
 extern bool g_RunAsService;
+
+/** If set to true, binary runs in foreground without cstding handles */
+extern bool g_DetachedStdin;

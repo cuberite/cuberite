@@ -211,7 +211,10 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 		// Save the current time
 		m_StartTime = std::chrono::steady_clock::now();
 
-		HandleInput();
+		if(!g_DetachedStdin) {
+			HandleInput();
+		}
+		
 		s_StopEvent.Wait();
 
 		// Stop the server:
