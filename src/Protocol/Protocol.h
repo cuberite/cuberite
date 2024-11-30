@@ -118,6 +118,7 @@ public:
 		pktScoreboardObjective,
 		pktSpawnObject,
 		pktSoundEffect,
+		pktSetCursorItem,
 		pktSelectKnownPacks,
 		pktSoundParticleEffect,
 		pktSpawnExperienceOrb,
