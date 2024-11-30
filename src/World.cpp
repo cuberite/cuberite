@@ -853,8 +853,6 @@ bool cWorld::CanSpawnAt(int a_X, int & a_Y, int a_Z)
 	ChunkStay.Enable(m_ChunkMap);
 	ChunkStay.Wait();
 
-	static const int ValidSpawnBlocksCount = ARRAYCOUNT(ValidSpawnBlocks);
-
 	// Increase this by two, because we need two more blocks for body and head
 	auto Height = GetHeight(static_cast<int>(a_X), static_cast<int>(a_Z));
 	ASSERT(Height.has_value());
