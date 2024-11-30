@@ -707,7 +707,7 @@ UInt32 cProtocol_1_21_2::GetPacketID(ePacketType a_PacketType) const
         case cProtocol::pktCameraSetTo:          return 0x57;
         case cProtocol::pktRenderDistanceCenter: return 0x58;
                         //  chunk load distance 0x59
-						// SetCursorItem 0x5A;
+		case cProtocol::pktSetCursorItem:        return 0x5A;
         case cProtocol::pktSpawnPosition:        return 0x5B;
                         //  scoreboard display 0x5C
         case cProtocol::pktEntityMeta:           return 0x5D;
@@ -1304,6 +1304,13 @@ void cProtocol_1_21_2::SendEntityPosition(const cEntity & a_Entity)
 void cProtocol_1_21_2::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
 {
 	ASSERT(m_State == 3);  // In game mode?
+
+	if (a_SlotNum == -1)
+	{
+		cPacketizer Pkt(*this, pktSetCursorItem);
+		WriteItem(Pkt, a_Item);
+		return;
+	}
 
 	cPacketizer Pkt(*this, pktInventorySlot);
 	Pkt.WriteVarInt32(0); // sync id
