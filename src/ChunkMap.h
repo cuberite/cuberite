@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include "ChunkDataCallback.h"
 #include "EffectID.h"
 #include "FunctionRef.h"
@@ -93,10 +95,10 @@ public:
 	bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) const;
 	bool IsWeatherWetAt(Vector3i a_Position) const;
 
-	bool      IsChunkValid       (int a_ChunkX, int a_ChunkZ) const;
-	bool      HasChunkAnyClients (int a_ChunkX, int a_ChunkZ) const;
-	int       GetHeight          (int a_BlockX, int a_BlockZ);  // Waits for the chunk to get loaded / generated
-	bool      TryGetHeight       (int a_BlockX, int a_BlockZ, int & a_Height);  // Returns false if chunk not loaded / generated
+	bool IsChunkValid       (int a_ChunkX, int a_ChunkZ) const;
+	bool HasChunkAnyClients (int a_ChunkX, int a_ChunkZ) const;
+
+	std::optional<int> GetHeight(int a_BlockX, int a_BlockZ);  // Returns nullopt if chunk not loaded / generated
 
 	/** Sets the block at the specified coords to the specified value.
 	The replacement doesn't trigger block updates, nor wake up simulators.

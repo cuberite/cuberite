@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include "Simulator/SimulatorManager.h"
 #include "ChunkMap.h"
 #include "WorldStorage/WorldStorage.h"
@@ -134,9 +136,6 @@ public:
 
 	virtual eDimension GetDimension(void) const override { return m_Dimension; }
 
-	/** Returns the world height at the specified coords; waits for the chunk to get loaded / generated */
-	virtual int GetHeight(int a_BlockX, int a_BlockZ) override;
-
 	// tolua_end
 
 	virtual cTickTime GetTimeOfDay(void) const override;
@@ -146,8 +145,8 @@ public:
 
 	virtual void SetTimeOfDay(cTickTime a_TimeOfDay) override;
 
-	/** Retrieves the world height at the specified coords; returns false if chunk not loaded / generated */
-	bool TryGetHeight(int a_BlockX, int a_BlockZ, int & a_Height);  // Exported in ManualBindings.cpp
+	/** Retrieves the world height at the specified coords; returns nullopt if chunk not loaded / generated */
+	virtual std::optional<int> GetHeight(int a_BlockX, int a_BlockZ) override;  // Exported in ManualBindings.cpp
 
 	// Broadcast respective packets to all clients of the chunk where the event is taking place
 	// Implemented in Broadcaster.cpp
@@ -572,6 +571,10 @@ public:
 	int GetSpawnX(void) const { return m_SpawnX; }
 	int GetSpawnY(void) const { return m_SpawnY; }
 	int GetSpawnZ(void) const { return m_SpawnZ; }
+	Vector3i GetSpawnPos() const
+	{
+		return {m_SpawnX, m_SpawnY, m_SpawnZ};
+	}
 
 	/** Wakes up the simulators for the specified block */
 	virtual void WakeUpSimulators(Vector3i a_Block) override;
