@@ -1689,7 +1689,7 @@ static int tolua_cWorld_SpawnSplitExperienceOrbs(lua_State* tolua_S)
 
 static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
 {
-	/* Exported manually, because tolua would require the out-only param a_Height to be used when calling
+	/* Exported manually because we don't export optional<T>
 	Function signature: world:TryGetHeight(a_World, a_BlockX, a_BlockZ) -> IsValid, Height
 	*/
 
@@ -1716,14 +1716,46 @@ static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
 	}
 
 	// Call the implementation:
-	int Height = 0;
-	bool res = self->TryGetHeight(BlockX, BlockZ, Height);
-	L.Push(res);
-	if (res)
+	auto Height = self->GetHeight(BlockX, BlockZ);
+	L.Push(Height.has_value());
+	if (Height.has_value())
 	{
-		L.Push(Height);
+		L.Push(Height.value());
 		return 2;
 	}
+	return 1;
+}
+
+
+
+
+
+static int tolua_cWorld_GetHeight(lua_State * tolua_S)
+{
+	// Signature: world:GetHeight(a_World, a_BlockX, a_BlockZ) -> Height
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamNumber(2, 3) ||
+		!L.CheckParamEnd(4)
+		)
+	{
+		return 0;
+	}
+
+	// Get params:
+	cWorld * self = nullptr;
+	int BlockX = 0;
+	int BlockZ = 0;
+	L.GetStackValues(1, self, BlockX, BlockZ);
+
+	// Call the implementation:
+	L.LogStackTrace();
+	FLOGWARN("cWorld:GetHeight is DEPRECATED, use TryGetHeight instead");
+	auto Height = self->GetHeight(BlockX, BlockZ);
+	L.Push(Height.value_or(0));
 	return 1;
 }
 
@@ -1776,6 +1808,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetBlockMeta",                 tolua_cWorld_GetBlockMeta);
 			tolua_function(tolua_S, "GetBlockSkyLight",             tolua_cWorld_GetBlockSkyLight);
 			tolua_function(tolua_S, "GetBlockTypeMeta",             tolua_cWorld_GetBlockTypeMeta);
+			tolua_function(tolua_S, "GetHeight",                    tolua_cWorld_GetHeight);
 			tolua_function(tolua_S, "GetSignLines",                 tolua_cWorld_GetSignLines);
 			tolua_function(tolua_S, "GetTimeOfDay",                 tolua_cWorld_GetTimeOfDay);
 			tolua_function(tolua_S, "GetWorldAge",                  tolua_cWorld_GetWorldAge);

@@ -4,6 +4,8 @@
 #include "../FunctionRef.h"
 #include "../Mobs/MonsterTypes.h"
 
+#include <optional>
+
 class cBlockEntity;
 class cBroadcastInterface;
 class cItems;
@@ -76,7 +78,9 @@ public:
 	virtual bool IsWeatherWetAt(int a_BlockX, int a_BlockZ) = 0;
 
 	/** Returns true if it is raining or storming at the specified location,
-	and the rain reaches the specified block position. */
+	and the rain reaches the specified block position.
+	Returns the global weather state for unloaded chunks.
+	*/
 	virtual bool IsWeatherWetAtXYZ(Vector3i a_Pos) = 0;
 
 	/** Returns or sets the minumim or maximum netherportal width */
@@ -91,8 +95,8 @@ public:
 	virtual void SetMinNetherPortalHeight(int a_NewMinHeight) = 0;
 	virtual void SetMaxNetherPortalHeight(int a_NewMaxHeight) = 0;
 
-	/** Returns the world height at the specified coords; waits for the chunk to get loaded / generated */
-	virtual int GetHeight(int a_BlockX, int a_BlockZ) = 0;
+	/** Returns the world height at the specified coords; returns nullopt for unloaded / generated chunks */
+	virtual std::optional<int> GetHeight(int a_BlockX, int a_BlockZ) = 0;
 
 	/** Wakes up the simulators for the specified block */
 	virtual void WakeUpSimulators(Vector3i a_Block) = 0;
