@@ -51,7 +51,7 @@ class cCommandManager
 		void WriteCommandTree(cPacketizer& a_Packet, const cProtocol & a_Protocol);
 
 	 protected:
-		cCommandNode(eNodeType a_Type, CommandNodeList a_ChildrenNodes, cCommandNode * a_RedirectNode, CmdArgPtr a_ParserArgument, AString a_Name, eCommandSuggestionType a_SuggestionType, bool a_IsExecutable, CommandExecutor a_Executioner);
+		cCommandNode(eNodeType a_Type, const CommandNodeList& a_ChildrenNodes, cCommandNode * a_RedirectNode, CmdArgPtr a_ParserArgument, const AString& a_Name, eCommandSuggestionType a_SuggestionType, bool a_IsExecutable, CommandExecutor a_Executioner);
 
 		cCommandNode * GetLiteralCommandNode(const AString& a_NodeName);
 

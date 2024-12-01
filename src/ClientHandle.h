@@ -275,8 +275,8 @@ public:  // tolua_export
 	void SetAllowListing(bool a_AllowsListing) { m_Allowslisting = a_AllowsListing; }
 	bool GetAllowListing(void) const { return m_Allowslisting; }
 
-	void SetParticleMode(ParticleMode a_ParticelMode) { m_ParticleMode = a_ParticelMode; }
-	ParticleMode GetParticleMode(void) const { return m_ParticleMode; }
+	void SetParticleMode(eParticleModeSetting a_ParticelMode) { m_ParticleMode = a_ParticelMode; }
+	eParticleModeSetting GetParticleMode(void) const { return m_ParticleMode; }
 
 	int GetUniqueID(void) const { return m_UniqueID; }
 
@@ -408,7 +408,7 @@ public:  // tolua_export
 	void HandleUseItem          (bool a_UsedMainHand);
 	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
 	void HandleWindowClose      (UInt8 a_WindowID);
-	void HandlePlayerSession    (cUUID a_SessionID, Int64 ExpiresAt, ContiguousByteBuffer a_PublicKey, ContiguousByteBuffer a_KeySignature);
+	void HandlePlayerSession    (cUUID a_SessionID, Int64 ExpiresAt, const ContiguousByteBuffer& a_PublicKey, const ContiguousByteBuffer& a_KeySignature);
 
 	/** Called when a recipe from the recipe book is selected */
 	void HandleCraftRecipe      (UInt32 a_RecipeId);
@@ -462,8 +462,8 @@ public:  // tolua_export
 			m_IsPopulated(true),
 			m_SessionId(a_SessionID),
 			m_ExpiresAt(a_ExpiresAt),
-			m_PublicKey(a_PublicKey),
-			m_KeySignature(a_KeySignature)
+			m_PublicKey(std::move(a_PublicKey)),
+			m_KeySignature(std::move(a_KeySignature))
 		{
 
 		}
@@ -603,7 +603,7 @@ private:
 	/* Should the player be displayed in player tab list or sent in server status packets. Set by ClientSettings packet */
 	bool m_Allowslisting;
 
-	ParticleMode m_ParticleMode;
+	eParticleModeSetting m_ParticleMode;
 
 	static int s_ClientCount;
 

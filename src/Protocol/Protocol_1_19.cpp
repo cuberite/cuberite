@@ -5,7 +5,11 @@
 #include "Server.h"
 #include "Entities/Player.h"
 #include "Entities/Entity.h"
+#include "Entities/Pickup.h"
+#include "Entities/Minecart.h"
 #include "../WorldStorage/FastNBT.h"
+#include "../Root.h"
+#include "../JsonUtils.h"
 
 
 

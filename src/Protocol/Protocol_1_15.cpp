@@ -1383,7 +1383,7 @@ void cProtocol_1_15::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 				if (!MinecartContent.IsEmpty())
 				{
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockIDMeta, EntityMetadataType::VarInt);
-					a_Pkt.WriteVarInt32(Palette_1_14::From(MinecartContent.m_ItemType));
+					a_Pkt.WriteVarInt32(GetProtocolItemType(MinecartContent.m_ItemType));
 
 					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockY, EntityMetadataType::VarInt);
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
@@ -1566,7 +1566,7 @@ void cProtocol_1_15::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			a_Pkt.WriteBool(Carried != BlockType::Air);
 			if (Carried != BlockType::Air)
 			{
-				a_Pkt.WriteVarInt32(Palette_1_14::From(Carried));
+				a_Pkt.WriteVarInt32(GetProtocolBlockType(Carried));
 			}
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::EndermanScreaming, EntityMetadataType::Boolean);

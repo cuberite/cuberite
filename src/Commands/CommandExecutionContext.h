@@ -9,7 +9,7 @@ class cCommandExecutionContext
 
   public:
 	cCommandExecutionContext(cPlayer* const a_PlayerExecutor) :
-		a_PlayerExecutor(a_PlayerExecutor)
+		m_PlayerExecutor(a_PlayerExecutor)
 	{
 	}
 
@@ -26,9 +26,9 @@ class cCommandExecutionContext
 	//TODO: add support for command block and all entities
 	void SendFeedback(const AString& a_ToSend) const
 	{
-		if (a_PlayerExecutor != nullptr)
+		if (m_PlayerExecutor != nullptr)
 		{
-			a_PlayerExecutor->SendMessageInfo(a_ToSend);
+			m_PlayerExecutor->SendMessageInfo(a_ToSend);
 		}
 		else
 		{
@@ -38,14 +38,14 @@ class cCommandExecutionContext
 
 	cPlayer* GetPlayer() const
 	{
-		if (a_PlayerExecutor == nullptr)
+		if (m_PlayerExecutor == nullptr)
 		{
 			throw cCommandExecutionException("Player Entity required");
 		}
-		return a_PlayerExecutor;		
+		return m_PlayerExecutor;		
 	}
 
   private:
 	std::map<AString, std::any> m_ArgumentMap;
-	cPlayer* a_PlayerExecutor;
+	cPlayer* m_PlayerExecutor;
 };

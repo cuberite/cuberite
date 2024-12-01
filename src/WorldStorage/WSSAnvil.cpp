@@ -451,8 +451,10 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				}
 				const int BlockStatesId = a_NBT.FindChildByName(Child1, "Properties");
 
-				AString bls = "";
+				AString bls;
 				std::vector<AString> strs;
+				#define READ_BLOCK_STATES 0
+				#if READ_BLOCK_STATES  // Temporarily disabled 
 				if (BlockStatesId > 0 && false)
 				{
 					if (a_NBT.GetType(BlockStatesId) != TAG_Compound)
@@ -468,6 +470,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 						strs.push_back(bls);
 					}
 				}
+				#endif
 				std::sort(strs.begin(),strs.end());
 
 				AString tosearch = blockid.substr(10,std::string::npos);  // substr to remove the "minecraft:"
@@ -475,7 +478,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				{
 					tosearch += " ";
 				}
-				for (auto itm : strs)
+				for (const auto& itm : strs)
 				{
 					tosearch += itm;
 				}

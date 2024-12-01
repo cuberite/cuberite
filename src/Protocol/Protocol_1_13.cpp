@@ -155,14 +155,13 @@ void cProtocol_1_13::SendCommandTree()
 	// TODO: rework the whole command system to support new format
 	// https://wiki.vg/Command_Data
 
-	if (true)
+#define NEW_COMMAND_TREE 1
+#if NEW_COMMAND_TREE
 	{
-		{
-			cPacketizer Pkt(*this, pktCommnadTree);
-			cRoot::Get()->GetPluginManager()->GetRootCommandNode()->WriteCommandTree(Pkt,*this);
-		}
+		cPacketizer Pkt(*this, pktCommnadTree);
+		cRoot::Get()->GetPluginManager()->GetRootCommandNode()->WriteCommandTree(Pkt,*this);
 	}
-	else
+#else
 	{
 		AStringVector commands;
 		class cCallback :
@@ -186,7 +185,7 @@ void cProtocol_1_13::SendCommandTree()
 		{
 			cPacketizer Pkt(*this, pktCommnadTree);
 			Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size()) + 1);  // + 1 for the root node
-			for (AString var : Callback.m_Commands)
+			for (const AString& var : Callback.m_Commands)
 			{
 				Pkt.WriteVarInt32(1);  // Flags
 				Pkt.WriteVarInt32(0);  // Size of Array of child nodes
@@ -203,6 +202,7 @@ void cProtocol_1_13::SendCommandTree()
 			Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size())); // root index
 		}
 	}
+#endif
 }
 
 
@@ -1811,7 +1811,7 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 	{
 		bool strong_potion = false;
 		bool long_potion = false;
-		AString potionname = "";
+		AString potionname;
 		AString finalname = "minecraft:";
 		
 		int potion_dmg = a_Item.m_ItemDamage & 0x1F;

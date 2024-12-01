@@ -6,6 +6,8 @@
 #include "../Entities/Player.h"
 #include "../Entities/Entity.h"
 #include "../WorldStorage/FastNBT.h"
+#include "../Root.h"
+#include "../UI/Window.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
