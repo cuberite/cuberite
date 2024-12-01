@@ -20,7 +20,7 @@ public:
   private:
 	int m_angertime;
 	int m_CannotEnterHiveTicks;
-	int CropsGrownSincePollination;
+	int m_CropsGrownSincePollination;
 
 
 } ;

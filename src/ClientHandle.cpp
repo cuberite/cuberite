@@ -1716,7 +1716,7 @@ void cClientHandle::HandleWindowClose(UInt8 a_WindowID)
 
 
 
-void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 a_ExpiresAt, ContiguousByteBuffer a_PublicKey, ContiguousByteBuffer a_KeySignature)
+void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 a_ExpiresAt, const ContiguousByteBuffer& a_PublicKey, const ContiguousByteBuffer& a_KeySignature)
 {
 	// hash algorith mchnages somehre between 1.19.4 and 1.21 - maybe???
 
