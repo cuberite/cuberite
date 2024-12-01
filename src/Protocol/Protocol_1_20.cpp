@@ -12,9 +12,9 @@
 #include "../WorldStorage/FastNBT.h"
 #include "Entities/ArrowEntity.h"
 #include "Entities/Minecart.h"
-#include "Palettes/Palette_1_16.h"
 #include "Palettes/Palette_1_20.h"
 #include "UI/HorseWindow.h"
+#include "../Entities/Entity.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////

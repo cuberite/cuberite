@@ -1,6 +1,11 @@
 #include "Globals.h"
 #include "Protocol_1_17.h"
 #include "Packetizer.h"
+#include "../ClientHandle.h"
+#include "../Server.h"
+#include "../Entities/Player.h"
+#include "../Entities/Entity.h"
+#include "../WorldStorage/FastNBT.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////

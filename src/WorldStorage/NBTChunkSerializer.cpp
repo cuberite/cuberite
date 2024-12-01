@@ -1381,9 +1381,9 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 
 
-				INT64* arr = new INT64[longarrsize];
+				Int64* arr = new Int64[longarrsize];
 
-				UINT64 tbuf = 0;
+				UInt64 tbuf = 0;
 				int BitIndex = 0;
 				int longindex = 0;
 				int toloop = static_cast<int>(Blocks->size());
@@ -1393,7 +1393,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				{
 					auto & v = Blocks->at(i);
 					auto ind = std::find(temparr.begin(), newlistend, v);
-					INT64 towrite = ind - temparr.begin();
+					Int64 towrite = ind - temparr.begin();
 					tbuf |= towrite << BitIndex;
 					BitIndex += bitused;
 					//bitswritten += bitused;
@@ -1414,11 +1414,11 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 						else
 						{
 							ASSERT(longindex < longarrsize);
-							INT64 upperpart = 0;
+							Int64 upperpart = 0;
 							if (BitIndex != 64)
 							{
 								upperpart = towrite >> (64 - BitIndex);
-								INT64 lowerpart = towrite & ((static_cast<INT64>(1) << (64 - BitIndex)) - 1);
+								Int64 lowerpart = towrite & ((static_cast<Int64>(1) << (64 - BitIndex)) - 1);
 								tbuf |= lowerpart;
 								//bitswritten += 64 - BitIndex;
 								BitIndex = bitused - (64 - BitIndex);

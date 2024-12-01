@@ -2,6 +2,7 @@
 #include "CommandManager.h"
 #include "CommandException.h"
 #include "CompositeChat.h"
+#include "Root.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
