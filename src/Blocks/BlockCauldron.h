@@ -308,132 +308,132 @@ private:
 				a_Player.GetStatistics().Custom[CustomStatistic::FillCauldron]++;
 			}
 		}
-		//TODO: either create a seperate header file fore water and lava or handle them here
-		//switch (EquippedItem.m_ItemType)
-		//{
-		//	case Item::Bucket:
-		//	{
-		//		if (FillState == 3)
-		//		{
-		//			a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(0));
-		//			// Give new bucket, filled with fluid when the gamemode is not creative:
-		//			if (!a_Player.IsGameModeCreative())
-		//			{
-		//				a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::WaterBucket));
-		//			}
-		//		}
-		//		break;
-		//	}
-		//	case Item::WaterBucket:
-		//	{
-		//		a_ChunkInterface.FastSetBlock(a_BlockPos, Block::WaterCauldron::WaterCauldron(3));
-		//		// Give empty bucket back when the gamemode is not creative:
-		//		if (!a_Player.IsGameModeCreative())
-		//		{
-		//			a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Bucket));
-		//		}
-		//		a_Player.GetStatistics().Custom[CustomStatistic::FillCauldron]++;
-		//
-		//		break;
-		//	}
-		//	case Item::LavaBucket:
-		//	{
-		//		a_ChunkInterface.FastSetBlock(a_BlockPos, Block::LavaCauldron::LavaCauldron());
-		//		// Give empty bucket back when the gamemode is not creative:
-		//		if (!a_Player.IsGameModeCreative())
-		//		{
-		//			a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Bucket));
-		//		}
-		//		a_Player.GetStatistics().Custom[CustomStatistic::FillCauldron]++;
-		//
-		//		break;
-		//	}
-		//	case Item::PowderSnowBucket:
-		//	{
-		//		a_ChunkInterface.FastSetBlock(a_BlockPos, Block::PowderSnowCauldron::PowderSnowCauldron(3));
-		//		// Give empty bucket back when the gamemode is not creative:
-		//		if (!a_Player.IsGameModeCreative())
-		//		{
-		//			a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Bucket));
-		//		}
-		//		a_Player.GetStatistics().Custom[CustomStatistic::FillCauldron]++;
-		//
-		//		break;
-		//	}
-		//	case Item::GlassBottle:
-		//	{
-		//		if (FillState > 0)
-		//		{
-		//			a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(--FillState));
-		//			// Give new potion when the gamemode is not creative:
-		//			if (!a_Player.IsGameModeCreative())
-		//			{
-		//				a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Potion));
-		//			}
-		//			a_Player.GetStatistics().Custom[CustomStatistic::UseCauldron]++;
-		//		}
-		//		break;
-		//	}
-		//	case Item::Potion:
-		//	{
-		//		// Refill cauldron with water bottles.
-		//		if ((FillState < 3) && (EquippedItem.m_ItemDamage == 0))
-		//		{
-		//			a_ChunkInterface.FastSetBlock(Vector3i(a_BlockPos), Block::Cauldron::Cauldron(++FillState));
-		//			// Give back an empty bottle when the gamemode is not creative:
-		//			if (!a_Player.IsGameModeCreative())
-		//			{
-		//				a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::GlassBottle));
-		//			}
-		//		}
-		//		break;
-		//	}
-		//	case Item::LeatherBoots:
-		//	case Item::LeatherHelmet:
-		//	case Item::LeatherLeggings:
-		//	case Item::LeatherChestplate:
-		//	{
-		//		// Resets any color to default:
-		//		if ((FillState > 0) && ((EquippedItem.m_ItemColor.GetRed() != 255) || (EquippedItem.m_ItemColor.GetBlue() != 255) || (EquippedItem.m_ItemColor.GetGreen() != 255)))
-		//		{
-		//			a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(--FillState));
-		//			auto NewItem = cItem(EquippedItem);
-		//			NewItem.m_ItemColor.Clear();
-		//			a_Player.ReplaceOneEquippedItemTossRest(NewItem);
-		//		}
-		//		break;
-		//	}
-		//	case Item::BlackShulkerBox:
-		//	case Item::BlueShulkerBox:
-		//	case Item::BrownShulkerBox:
-		//	case Item::CyanShulkerBox:
-		//	case Item::GrayShulkerBox:
-		//	case Item::GreenShulkerBox:
-		//	case Item::LightBlueShulkerBox:
-		//	case Item::LightGrayShulkerBox:
-		//	case Item::LimeShulkerBox:
-		//	case Item::MagentaShulkerBox:
-		//	case Item::OrangeShulkerBox:
-		//	case Item::PinkShulkerBox:
-		//	case Item::RedShulkerBox:
-		//	case Item::YellowShulkerBox:
-		//	{
-		//		// Resets shulker box color.
-		//		if (FillState == 0)
-		//		{
-		//			// The cauldron is empty:
-		//			break;
-		//		}
-		//
-		//		// Proceed with normal cleaning:
-		//		a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(--FillState));
-		//		auto NewShulker = cItem(EquippedItem);
-		//		NewShulker.m_ItemType = Item::ShulkerBox;
-		//		a_Player.ReplaceOneEquippedItemTossRest(NewShulker);
-		//		break;
-		//	}
-		//	default: break;
-		//}
+		/*TODO: either create a seperate header file fore water and lava or handle them here
+		switch (EquippedItem.m_ItemType)
+		{
+			case Item::Bucket:
+			{
+				if (FillState == 3)
+				{
+					a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(0));
+					// Give new bucket, filled with fluid when the gamemode is not creative:
+					if (!a_Player.IsGameModeCreative())
+					{
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::WaterBucket));
+					}
+				}
+				break;
+			}
+			case Item::WaterBucket:
+			{
+				a_ChunkInterface.FastSetBlock(a_BlockPos, Block::WaterCauldron::WaterCauldron(3));
+				// Give empty bucket back when the gamemode is not creative:
+				if (!a_Player.IsGameModeCreative())
+				{
+					a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Bucket));
+				}
+				a_Player.GetStatistics().Custom[CustomStatistic::FillCauldron]++;
+		
+				break;
+			}
+			case Item::LavaBucket:
+			{
+				a_ChunkInterface.FastSetBlock(a_BlockPos, Block::LavaCauldron::LavaCauldron());
+				// Give empty bucket back when the gamemode is not creative:
+				if (!a_Player.IsGameModeCreative())
+				{
+					a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Bucket));
+				}
+				a_Player.GetStatistics().Custom[CustomStatistic::FillCauldron]++;
+		
+				break;
+			}
+			case Item::PowderSnowBucket:
+			{
+				a_ChunkInterface.FastSetBlock(a_BlockPos, Block::PowderSnowCauldron::PowderSnowCauldron(3));
+				// Give empty bucket back when the gamemode is not creative:
+				if (!a_Player.IsGameModeCreative())
+				{
+					a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Bucket));
+				}
+				a_Player.GetStatistics().Custom[CustomStatistic::FillCauldron]++;
+		
+				break;
+			}
+			case Item::GlassBottle:
+			{
+				if (FillState > 0)
+				{
+					a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(--FillState));
+					// Give new potion when the gamemode is not creative:
+					if (!a_Player.IsGameModeCreative())
+					{
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Potion));
+					}
+					a_Player.GetStatistics().Custom[CustomStatistic::UseCauldron]++;
+				}
+				break;
+			}
+			case Item::Potion:
+			{
+				// Refill cauldron with water bottles.
+				if ((FillState < 3) && (EquippedItem.m_ItemDamage == 0))
+				{
+					a_ChunkInterface.FastSetBlock(Vector3i(a_BlockPos), Block::Cauldron::Cauldron(++FillState));
+					// Give back an empty bottle when the gamemode is not creative:
+					if (!a_Player.IsGameModeCreative())
+					{
+						a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::GlassBottle));
+					}
+				}
+				break;
+			}
+			case Item::LeatherBoots:
+			case Item::LeatherHelmet:
+			case Item::LeatherLeggings:
+			case Item::LeatherChestplate:
+			{
+				// Resets any color to default:
+				if ((FillState > 0) && ((EquippedItem.m_ItemColor.GetRed() != 255) || (EquippedItem.m_ItemColor.GetBlue() != 255) || (EquippedItem.m_ItemColor.GetGreen() != 255)))
+				{
+					a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(--FillState));
+					auto NewItem = cItem(EquippedItem);
+					NewItem.m_ItemColor.Clear();
+					a_Player.ReplaceOneEquippedItemTossRest(NewItem);
+				}
+				break;
+			}
+			case Item::BlackShulkerBox:
+			case Item::BlueShulkerBox:
+			case Item::BrownShulkerBox:
+			case Item::CyanShulkerBox:
+			case Item::GrayShulkerBox:
+			case Item::GreenShulkerBox:
+			case Item::LightBlueShulkerBox:
+			case Item::LightGrayShulkerBox:
+			case Item::LimeShulkerBox:
+			case Item::MagentaShulkerBox:
+			case Item::OrangeShulkerBox:
+			case Item::PinkShulkerBox:
+			case Item::RedShulkerBox:
+			case Item::YellowShulkerBox:
+			{
+				// Resets shulker box color.
+				if (FillState == 0)
+				{
+					// The cauldron is empty:
+					break;
+				}
+		
+				// Proceed with normal cleaning:
+				a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(--FillState));
+				auto NewShulker = cItem(EquippedItem);
+				NewShulker.m_ItemType = Item::ShulkerBox;
+				a_Player.ReplaceOneEquippedItemTossRest(NewShulker);
+				break;
+			}
+			default: break;
+		}*/
 
 		if (!EquippedItem.GetHandler().IsPlaceable())
 		{
