@@ -2385,7 +2385,7 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	});
 	Json::Value sample;
 	int i = 0;
-	for (std::pair<cUUID, AString> PlayerId : playeruuids)
+	for (const std::pair<cUUID, AString>& PlayerId : playeruuids)
 	{
 		Json::Value entry;
 		entry["name"] = PlayerId.second;
@@ -3324,7 +3324,7 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 	}
 
 	// Log the comm into logfile:
-	if (false/*g_ShouldLogCommOut && m_CommLogFile.IsOpen()*/)
+	if (g_ShouldLogCommOut && m_CommLogFile.IsOpen())
 	{
 		AString Hex;
 		ASSERT(PacketData.size() > 0);

@@ -317,7 +317,7 @@ void cProtocol_1_13::SendTabCompletionResults(const AStringVector & a_Results, U
 		Pkt.WriteVarInt32(0);  //  Start
 		Pkt.WriteVarInt32(0);  //  Length
 		Pkt.WriteVarInt32(static_cast<UInt32>(a_Results.size()));
-		for (AString Match : a_Results)
+		for (const AString& Match : a_Results)
 		{
 			Pkt.WriteString(Match);
 			Pkt.WriteBool(false); // Has Tooltip

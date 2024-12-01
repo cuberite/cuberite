@@ -10,6 +10,9 @@
 #include "../WorldStorage/FastNBT.h"
 #include "../Root.h"
 #include "../JsonUtils.h"
+#include "../Entities/ArrowEntity.h"
+#include "../Entities/Boat.h"
+#include "../Entities/EnderCrystal.h"
 
 
 
@@ -597,7 +600,7 @@ void cProtocol_1_19::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuf
 	}
 	else
 	{
-		HANDLE_READ(a_ByteBuffer,ReadBEInt64,INT64,salt);
+		HANDLE_READ(a_ByteBuffer,ReadBEInt64,Int64,salt);
 		HANDLE_READ(a_ByteBuffer,ReadVarInt32,UInt32,SignatureLength);
 		if (!a_ByteBuffer.ReadSome(SignatureData, SignatureLength))
 		{
@@ -2888,7 +2891,7 @@ void cProtocol_1_19_4::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 				Writer.AddString("type", "minecraft:damage_type");
 				Writer.BeginList("value", eTagType::TAG_Compound);
 				int id = 0;
-					for (auto ds : dmgsrc)
+					for (const auto& ds : dmgsrc)
 					{
 						Writer.BeginCompound("");
 							Writer.BeginCompound("element");

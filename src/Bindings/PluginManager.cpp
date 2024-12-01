@@ -1255,24 +1255,24 @@ bool cPluginManager::CallHookWorldTick(cWorld & a_World, std::chrono::millisecon
 cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
 {
 	//to true here and in send command tree
-	if (true)
+#define NEW_COMMANDS 1
+#if NEW_COMMANDS
+	if (a_Command.empty())
 	{
-		if (a_Command.empty())
-		{
-			return crUnknownCommand;
-		}
-		if (!a_Command.empty() && (a_Command[0] != '/'))
-		{
-			return crUnknownCommand;
-		}
-		auto r = BasicStringReader(a_Command.substr(1));
-		auto ctx = cCommandExecutionContext(&a_Player);
-		if (!GetRootCommandNode()->Parse(r,ctx))
-		{
-			return crError;
-		}
-		return crExecuted;
+		return crUnknownCommand;
 	}
+	if (!a_Command.empty() && (a_Command[0] != '/'))
+	{
+		return crUnknownCommand;
+	}
+	auto r = BasicStringReader(a_Command.substr(1));
+	auto ctx = cCommandExecutionContext(&a_Player);
+	if (!GetRootCommandNode()->Parse(r,ctx))
+	{
+		return crError;
+	}
+	return crExecuted;
+#else
 	AStringVector Split(StringSplit(a_Command, " "));
 	if (Split.empty())
 	{
@@ -1324,6 +1324,7 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 	}
 
 	return crExecuted;
+#endif
 }
 
 
