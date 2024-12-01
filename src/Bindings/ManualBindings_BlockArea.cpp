@@ -10,8 +10,6 @@
 #include "LuaState.h"
 #include "PluginLua.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
-#include <format>
-#include <fmt/test/format>
 
 
 
@@ -241,7 +239,7 @@ static int tolua_cBlockArea_FillRelCuboid(lua_State * a_LuaState)
 	L.GetStackValues(nextIdx + 2, BlockMeta, BlockLight, BlockSkyLight);  // These values are optional
 	if (!cBlockArea::IsValidDataTypeCombination(DataTypes))
 	{
-		return L.ApiParamError(std::format("Invalid baDataTypes combination (%d)", DataTypes));
+		return L.ApiParamError(fmt::format("Invalid baDataTypes combination (%d)", DataTypes));
 	}
 
 	// Do the actual Fill:
@@ -1090,7 +1088,7 @@ static int tolua_cBlockArea_SetRelBlockTypeMeta(lua_State * a_LuaState)
 	// Check if block types and metas are present:
 	if (!self->HasBlocks())
 	{
-		return L.ApiParamError(std::format("The area doesn't contain the baBlocks (0x%02x)", self->GetDataTypes()));
+		return L.ApiParamError(fmt::format("The area doesn't contain the baBlocks (0x%02x)", self->GetDataTypes()));
 	}
 
 	// Read the overloaded params:

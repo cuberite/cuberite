@@ -33,7 +33,7 @@ enum
 
 
 
-enum class eParticleModeSetting : std::uint8_t
+enum class eParticleModeSetting
 {
 	All,
 	Decreased,
