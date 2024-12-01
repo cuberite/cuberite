@@ -10,6 +10,7 @@
 #include "WorldStorage/FastNBT.h"
 #include "Palettes/Palette_1_21.h"
 #include "Palettes/Palette_1_21_2.h"
+#include "../Entities/Entity.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
