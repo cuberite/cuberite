@@ -18,8 +18,8 @@ void EnchantmentSerializer::WriteToNBTCompound(const cEnchantments & a_Enchantme
 		a_Writer.BeginCompound("");
 			if (stringmode)
 			{
-				AString name = "";
-				for (auto var : enchantment_names)
+				AString name;
+				for (const auto& var : enchantment_names)
 				{
 					if (var.second == itr->first)
 					{

@@ -1275,292 +1275,210 @@ public:
 void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, cFastNBTWriter & aWriter)
 {
 	SerializerCollector serializer(aWriter);
-	if (true)  // new format
+	// set to 1.21.1
+	aWriter.AddInt("DataVersion", 3955);  // to which game version does this save correspond to
+
+	aWriter.AddInt("xPos", aCoords.m_ChunkX);
+	aWriter.AddInt("zPos", aCoords.m_ChunkZ);
+	[[maybe_unused]] const bool Result = aWorld.GetChunkData(aCoords, serializer);  // Chunk must be present in order to save
+	ASSERT(Result);
+	serializer.Finish();  // Close NBT tags
+
+	aWriter.BeginList("sections", TAG_Compound);
+
+	const bool use_padding = true;	// used in 1.16+
+	for (size_t Y = 0; Y < cChunkDef::NumSections; Y++)
 	{
-		// set to 1.21.1
-		aWriter.AddInt("DataVersion", 3955);  // to which game version does this save correspond to
+		const auto Blocks = serializer.m_BlockData.GetSection(Y); 
+		const auto BlockLights = serializer.m_LightData.GetBlockLightSection(Y); 
+		const auto SkyLights = serializer.m_LightData.GetSkyLightSection(Y);
+		aWriter.BeginCompound("");
+		aWriter.AddInt("Y", static_cast<Int32>(Y));
+		if (Blocks != nullptr)
+		{ 
+			ChunkBlockData::BlockArray temparr;
+			std::copy(Blocks->begin(),Blocks->end(),temparr.begin());
+			std::sort(temparr.begin(), temparr.end());
+			auto newlistend = std::unique(temparr.begin(),temparr.end());
+			int newsize = static_cast<int>(newlistend - temparr.begin());
+			int bitused = Clamp(CeilC(log2(newsize)), 4, 16);
 
-		aWriter.AddInt("xPos", aCoords.m_ChunkX);
-		aWriter.AddInt("zPos", aCoords.m_ChunkZ);
-		[[maybe_unused]] const bool Result = aWorld.GetChunkData(aCoords, serializer);  // Chunk must be present in order to save
-		ASSERT(Result);
-		serializer.Finish();  // Close NBT tags
+			int longarrsize = -1;
 
-		aWriter.BeginList("sections", TAG_Compound);
+			if (use_padding)
+			{
+				int blocks_per_long = FloorC(64.0 / bitused);
+				int longs_needed = CeilC(4096.0 / blocks_per_long);
+				longarrsize = longs_needed;
+			}
+			else
+			{
+				longarrsize = CeilC((bitused * 4096)/8/8); 
+			}
 
-		const bool use_padding = true;	// used in 1.16+
-		for (size_t Y = 0; Y < cChunkDef::NumSections; Y++)
-		{
-			const auto Blocks = serializer.m_BlockData.GetSection(Y); 
-			const auto BlockLights = serializer.m_LightData.GetBlockLightSection(Y); 
-			const auto SkyLights = serializer.m_LightData.GetSkyLightSection(Y);
-			aWriter.BeginCompound("");
-			aWriter.AddInt("Y", static_cast<Int32>(Y));
-			if (Blocks != nullptr)
-			{ 
-				ChunkBlockData::BlockArray temparr;
-				std::copy(Blocks->begin(),Blocks->end(),temparr.begin());
-				std::sort(temparr.begin(), temparr.end());
-				auto newlistend = std::unique(temparr.begin(),temparr.end());
-				int newsize = static_cast<int>(newlistend - temparr.begin());
-				int bitused = Clamp(CeilC(log2(newsize)), 4, 16);
+			aWriter.BeginCompound("block_states");
+			aWriter.BeginList("palette", eTagType::TAG_Compound);
 
-				int longarrsize = -1;
-
-				if (use_padding)
+			for (size_t i = 0; i < newsize; i++)
+			{
+				bool hasblockstats = false;
+				aWriter.BeginCompound("");
+				auto val = temparr[i];
+				auto strval = AString(NamespaceSerializer::From(val.Type()));
+				auto splitpos = std::find(strval.begin(), strval.end(), ' ');
+				auto id_end_index = static_cast<int>(std::distance(strval.begin(), splitpos));
+				AString stringid = strval.substr(0,id_end_index);
+				AString blockstates;
+				AStringVector blockstatesstrings;
+				if (splitpos != strval.end())
 				{
-					int blocks_per_long = FloorC(64.0 / bitused);
-					int longs_needed = CeilC(4096.0 / blocks_per_long);
-					longarrsize = longs_needed;
+					hasblockstats = true;
+					auto blockstates = strval.substr(id_end_index+1,std::string::npos);
+					blockstatesstrings = StringSplit(blockstates, " ");
 				}
-				else
+
+				aWriter.AddString("Name", "minecraft:"+stringid);
+				if (hasblockstats)
 				{
-					longarrsize = CeilC((bitused * 4096)/8/8); 
-				}
-
-				aWriter.BeginCompound("block_states");
-				aWriter.BeginList("palette", eTagType::TAG_Compound);
-
-				for (size_t i = 0; i < newsize; i++)
-				{
-					bool hasblockstats = false;
-					aWriter.BeginCompound("");
-					auto val = temparr[i];
-					auto strval = AString(NamespaceSerializer::From(val.Type()));
-					auto splitpos = std::find(strval.begin(), strval.end(), ' ');
-					auto id_end_index = static_cast<int>(std::distance(strval.begin(), splitpos));
-					AString stringid = strval.substr(0,id_end_index);
-					AString blockstates;
-					AStringVector blockstatesstrings;
-					if (splitpos != strval.end())
+					aWriter.BeginCompound("Properties");
+					for (size_t j = 0; j < blockstatesstrings.size(); j+=2)
 					{
-						hasblockstats = true;
-						auto blockstates = strval.substr(id_end_index+1,std::string::npos);
-						blockstatesstrings = StringSplit(blockstates, " ");
-					}
-
-					aWriter.AddString("Name", "minecraft:"+stringid);
-					if (hasblockstats)
-					{
-						aWriter.BeginCompound("Properties");
-						for (size_t j = 0; j < blockstatesstrings.size(); j+=2)
+						//AString str = blockstatesstrings[j];
+						//auto nameendindex = static_cast<int>(std::distance(strval.begin(),std::find(strval.begin(), strval.end(), ':')));
+						AString val;
+						if (j+2 >= blockstatesstrings.size())
 						{
-							//AString str = blockstatesstrings[j];
-							//auto nameendindex = static_cast<int>(std::distance(strval.begin(),std::find(strval.begin(), strval.end(), ':')));
-							AString val;
-							if (j+2 >= blockstatesstrings.size())
-							{
-								val = blockstatesstrings[j + 1];
-							}
-							else
-							{
-								val = blockstatesstrings[j + 1].substr(0, blockstatesstrings[j + 1].length() - 1);
-							}
-							aWriter.AddString(blockstatesstrings[j].substr(0,blockstatesstrings[j].length()-1), val);
-						}
-						aWriter.EndCompound();
-					}
-					//auto bls = PaletteUpgrade::GetSaveStrings(val);
-					//aWriter.AddString("Name", "minecraft:"+bls[0].second);
-					//if (bls[1].first != "")
-					//{
-					//	aWriter.BeginCompound("Properties");
-					//	for (size_t j = 1; j < bls.size(); j++)
-					//	{
-					//		if (bls[j].first == "")
-					//		{
-					//			break;
-					//		}
-					//		aWriter.AddString(bls[j].first, bls[j].second);
-					//	}
-					//	aWriter.EndCompound();
-					//}
-					aWriter.EndCompound();
-				}
-				aWriter.EndList();
-
-
-
-				INT64* arr = new INT64[longarrsize];
-
-				UINT64 tbuf = 0;
-				int BitIndex = 0;
-				int longindex = 0;
-				int toloop = static_cast<int>(Blocks->size());
-				//int bitswritten = 0;
-				//std::vector<int> bw = {0};
-				for (size_t i = 0; i < toloop; i++)
-				{
-					auto & v = Blocks->at(i);
-					auto ind = std::find(temparr.begin(), newlistend, v);
-					INT64 towrite = ind - temparr.begin();
-					tbuf |= towrite << BitIndex;
-					BitIndex += bitused;
-					//bitswritten += bitused;
-					//ASSERT(bitswritten >= bw[bw.size()-1]);
-					//bw.push_back(bitswritten);
-					//LOGD(std::to_string(bitswritten) + " - bits written");
-					//ASSERT(bitswritten == (longindex*64+BitIndex));
-					if (BitIndex + bitused > 64 || i == toloop-1)  // not enough bits in current long for the next value?
-					{
-						if (use_padding)
-						{
-							BitIndex = 0;
-							ASSERT(longindex < longarrsize);
-							arr[longindex] = tbuf;
-							tbuf = 0;
-							longindex++;
+							val = blockstatesstrings[j + 1];
 						}
 						else
 						{
-							ASSERT(longindex < longarrsize);
-							INT64 upperpart = 0;
-							if (BitIndex != 64)
-							{
-								upperpart = towrite >> (64 - BitIndex);
-								INT64 lowerpart = towrite & ((static_cast<INT64>(1) << (64 - BitIndex)) - 1);
-								tbuf |= lowerpart;
-								//bitswritten += 64 - BitIndex;
-								BitIndex = bitused - (64 - BitIndex);
-								//bitswritten += BitIndex;
-								//ASSERT(bitswritten >= bw[bw.size()-1]);
-								//bw.push_back(bitswritten);
-								i++;
-							}
-							else
-							{
-								BitIndex = 0;
-								tbuf = 0;
-							}
-							arr[longindex] = tbuf;
-							longindex++;
-							tbuf = 0;
-							tbuf |= upperpart; 
-							//ASSERT(bitswritten == (longindex*64+BitIndex));
+							val = blockstatesstrings[j + 1].substr(0, blockstatesstrings[j + 1].length() - 1);
 						}
+						aWriter.AddString(blockstatesstrings[j].substr(0,blockstatesstrings[j].length()-1), val);
+					}
+					aWriter.EndCompound();
+				}
+				//auto bls = PaletteUpgrade::GetSaveStrings(val);
+				//aWriter.AddString("Name", "minecraft:"+bls[0].second);
+				//if (bls[1].first != "")
+				//{
+				//	aWriter.BeginCompound("Properties");
+				//	for (size_t j = 1; j < bls.size(); j++)
+				//	{
+				//		if (bls[j].first == "")
+				//		{
+				//			break;
+				//		}
+				//		aWriter.AddString(bls[j].first, bls[j].second);
+				//	}
+				//	aWriter.EndCompound();
+				//}
+				aWriter.EndCompound();
+			}
+			aWriter.EndList();
+
+
+
+			Int64* arr = new Int64[longarrsize];
+
+			UInt64 tbuf = 0;
+			int BitIndex = 0;
+			int longindex = 0;
+			int toloop = static_cast<int>(Blocks->size());
+			//int bitswritten = 0;
+			//std::vector<int> bw = {0};
+			for (size_t i = 0; i < toloop; i++)
+			{
+				auto & v = Blocks->at(i);
+				auto ind = std::find(temparr.begin(), newlistend, v);
+				Int64 towrite = ind - temparr.begin();
+				tbuf |= towrite << BitIndex;
+				BitIndex += bitused;
+				//bitswritten += bitused;
+				//ASSERT(bitswritten >= bw[bw.size()-1]);
+				//bw.push_back(bitswritten);
+				//LOGD(std::to_string(bitswritten) + " - bits written");
+				//ASSERT(bitswritten == (longindex*64+BitIndex));
+				if (BitIndex + bitused > 64 || i == toloop-1)  // not enough bits in current long for the next value?
+				{
+					if (use_padding)
+					{
+						BitIndex = 0;
+						ASSERT(longindex < longarrsize);
+						arr[longindex] = tbuf;
+						tbuf = 0;
+						longindex++;
+					}
+					else
+					{
+						ASSERT(longindex < longarrsize);
+						Int64 upperpart = 0;
+						if (BitIndex != 64)
+						{
+							upperpart = towrite >> (64 - BitIndex);
+							Int64 lowerpart = towrite & ((static_cast<Int64>(1) << (64 - BitIndex)) - 1);
+							tbuf |= lowerpart;
+							//bitswritten += 64 - BitIndex;
+							BitIndex = bitused - (64 - BitIndex);
+							//bitswritten += BitIndex;
+							//ASSERT(bitswritten >= bw[bw.size()-1]);
+							//bw.push_back(bitswritten);
+							i++;
+						}
+						else
+						{
+							BitIndex = 0;
+							tbuf = 0;
+						}
+						arr[longindex] = tbuf;
+						longindex++;
+						tbuf = 0;
+						tbuf |= upperpart; 
+						//ASSERT(bitswritten == (longindex*64+BitIndex));
 					}
 				}
-				
-				if (Blocks != nullptr)
-				{
-					aWriter.AddLongArray("data", arr, longindex);
-				}
-				else
-				{
-					// aWriter.AddByteArray("BlockStates", ChunkBlockData::SectionBlockCount, ChunkBlockData::DefaultValue);  // BROKEN
-				}
-				aWriter.EndCompound();
-				delete[] arr;
 			}
-
-			if (BlockLights != nullptr)
+			
+			if (Blocks != nullptr)
 			{
-				aWriter.AddByteArray("BlockLight", reinterpret_cast<const char *>(BlockLights->data()), BlockLights->size());
+				aWriter.AddLongArray("data", arr, longindex);
 			}
 			else
 			{
-				aWriter.AddByteArray("BlockLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultBlockLightValue);
-			}
-
-			if (SkyLights != nullptr)
-			{
-				aWriter.AddByteArray("SkyLight", reinterpret_cast<const char *>(SkyLights->data()), SkyLights->size());
-			}
-			else
-			{
-				aWriter.AddByteArray("SkyLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue);
+				// aWriter.AddByteArray("BlockStates", ChunkBlockData::SectionBlockCount, ChunkBlockData::DefaultValue);  // BROKEN
 			}
 			aWriter.EndCompound();
+			delete[] arr;
 		}
-		aWriter.EndList();  // "Sections"
 
-		aWriter.AddLong("LastUpdate", aWorld.GetWorldAge().count());
+		if (BlockLights != nullptr)
+		{
+			aWriter.AddByteArray("BlockLight", reinterpret_cast<const char *>(BlockLights->data()), BlockLights->size());
+		}
+		else
+		{
+			aWriter.AddByteArray("BlockLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultBlockLightValue);
+		}
 
-		aWriter.AddLong("InhabitedTime", 0);
-
-		aWriter.AddString("Status", "minecraft:full");
-
-		aWriter.AddByte("isLightOn", 1);
-
-		// height maps not implemented yet
-		return;
+		if (SkyLights != nullptr)
+		{
+			aWriter.AddByteArray("SkyLight", reinterpret_cast<const char *>(SkyLights->data()), SkyLights->size());
+		}
+		else
+		{
+			aWriter.AddByteArray("SkyLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue);
+		}
+		aWriter.EndCompound();
 	}
-	//aWriter.BeginCompound("Level");
-	//aWriter.AddInt("xPos", aCoords.m_ChunkX);
-	//aWriter.AddInt("zPos", aCoords.m_ChunkZ);
-	//[[maybe_unused]] const bool Result = aWorld.GetChunkData(aCoords, serializer);  // Chunk must be present in order to save
-	//ASSERT(Result);
-	//serializer.Finish();  // Close NBT tags
+	aWriter.EndList();  // "Sections"
 
-	//// Save biomes:
-	//aWriter.AddByteArray("Biomes", reinterpret_cast<const char *>(serializer.Biomes), ARRAYCOUNT(serializer.Biomes));
+	aWriter.AddLong("LastUpdate", aWorld.GetWorldAge().count());
 
-	//// Save heightmap (Vanilla require this):
-	//aWriter.AddIntArray("HeightMap", reinterpret_cast<const int *>(serializer.Heights), ARRAYCOUNT(serializer.Heights));
+	aWriter.AddLong("InhabitedTime", 0);
 
-	//// Save blockdata:
-	//aWriter.BeginList("Sections", TAG_Compound);
-	//ChunkDef_ForEachSection(serializer.m_BlockData, serializer.m_LightData,
-	//{
-	//	aWriter.BeginCompound("");
+	aWriter.AddString("Status", "minecraft:full");
 
-	//	if (Blocks != nullptr)
-	//	{
-	//		std::string BlockData;
-	//		std::string MetaData;
+	aWriter.AddByte("isLightOn", 1);
 
-	//		for (size_t I = 0; I < Blocks->size(); I++)
-	//		{
-	//			auto NumericBlock = PaletteUpgrade::ToBlock(Blocks->at(I));
-	//			BlockData += static_cast<char>(NumericBlock.first);
-	//			MetaData += static_cast<char>(NumericBlock.second);
-	//		}
-
-	//		aWriter.AddByteArray("Blocks", BlockData);
-	//		aWriter.AddByteArray("Data", MetaData);
-	//	}
-	//	else
-	//	{
-	//		AString Dummy(ChunkBlockData::SectionBlockCount, 0);
-	//		aWriter.AddByteArray("Blocks", Dummy);
-	//		aWriter.AddByteArray("Data", Dummy);
-	//	}
-
-	//	if (BlockLights != nullptr)
-	//	{
-	//		aWriter.AddByteArray("BlockLight", reinterpret_cast<const char *>(BlockLights->data()), BlockLights->size());
-	//	}
-	//	else
-	//	{
-	//		aWriter.AddByteArray("BlockLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultBlockLightValue);
-	//	}
-
-	//	if (SkyLights != nullptr)
-	//	{
-	//		aWriter.AddByteArray("SkyLight", reinterpret_cast<const char *>(SkyLights->data()), SkyLights->size());
-	//	}
-	//	else
-	//	{
-	//		aWriter.AddByteArray("SkyLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue);
-	//	}
-
-	//	aWriter.AddByte("Y", static_cast<unsigned char>(Y));
-	//	aWriter.EndCompound();
-	//});
-	//aWriter.EndList();  // "Sections"
-
-	//// Store the information that the lighting is valid.
-	//// For compatibility reason, the default is "invalid" (missing) - this means older data is re-lighted upon loading.
-	//if (serializer.mIsLightValid)
-	//{
-	//	aWriter.AddByte("MCSIsLightValid", 1);
-	//}
-
-	//// Save the world age to the chunk data. Required by vanilla and mcedit.
-	//aWriter.AddLong("LastUpdate", aWorld.GetWorldAge().count());
-
-	//// Store the flag that the chunk has all the ores, trees, dungeons etc. Cuberite chunks are always complete.
-	//aWriter.AddByte("TerrainPopulated", 1);
-
-	//aWriter.EndCompound();  // "Level"
+	//TODO: height maps not implemented yet 
 }

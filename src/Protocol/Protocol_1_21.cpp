@@ -10,6 +10,7 @@
 #include "WorldStorage/FastNBT.h"
 #include "Palettes/Palette_1_21.h"
 #include "Palettes/Palette_1_21_2.h"
+#include "../Entities/Entity.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -528,7 +529,7 @@ void cProtocol_1_21_2::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 	m_Client->GetPlayer()->SetSkinParts(SkinParts);
 	m_Client->GetPlayer()->SetLeftHanded(MainHand == LEFT_HAND);
 	m_Client->SetAllowListing(AllowsListing);
-	m_Client->SetParticleMode(static_cast<enum ParticleMode>(ParticleMode));
+	m_Client->SetParticleMode(static_cast<enum eParticleModeSetting>(ParticleMode));
 	// TODO: Handle chat flags and chat colors
 }
 

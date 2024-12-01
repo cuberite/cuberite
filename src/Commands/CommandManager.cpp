@@ -2,6 +2,7 @@
 #include "CommandManager.h"
 #include "CommandException.h"
 #include "CompositeChat.h"
+#include "Root.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -14,7 +15,6 @@ cCommandManager::cCommandNode::cCommandNode() :
 	m_ChildrenNodes({}),
 	m_RedirectNode(nullptr),
 	m_Argument(nullptr),
-	m_Name(""),
 	m_SuggestionType(eCommandSuggestionType::None)
 {
 
@@ -52,7 +52,7 @@ cCommandManager::cCommandNode cCommandManager::cCommandNode::Argument(
 	const AString& a_Name, CmdArgPtr a_Argument)
 {
 	return cCommandNode(
-		 eNodeType::Argument, {}, nullptr, a_Argument, a_Name,
+		 eNodeType::Argument, {}, nullptr, std::move(a_Argument), a_Name,
 		eCommandSuggestionType::None, false, [](cCommandExecutionContext& a_Ctx) -> bool { return true; });
 }
 
@@ -146,13 +146,13 @@ void cCommandManager::cCommandNode::WriteCommandTree(cPacketizer& a_Packet, cons
 
 cCommandManager::cCommandNode::cCommandNode(
 	eNodeType a_Type,
-	CommandNodeList a_ChildrenNodes, cCommandNode * a_RedirectNode,
-	CmdArgPtr a_ParserArgument, AString a_Name,
+	const CommandNodeList& a_ChildrenNodes, cCommandNode * a_RedirectNode,
+	CmdArgPtr a_ParserArgument, const AString& a_Name,
 	eCommandSuggestionType a_SuggestionType, bool a_IsExecutable, CommandExecutor a_Executioner) :
 	m_Type(a_Type),
 	m_ChildrenNodes(a_ChildrenNodes),
 	m_RedirectNode(a_RedirectNode),
-	m_Argument(a_ParserArgument),
+	m_Argument(std::move(a_ParserArgument)),
 	m_Name(a_Name),
 	m_SuggestionType(a_SuggestionType),
 	m_Executioner(a_Executioner),

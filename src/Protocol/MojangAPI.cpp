@@ -776,7 +776,7 @@ void cMojangAPI::GetMojangKeys(void)
 
 
 
-bool cMojangAPI::VerifyUsingMojangKeys(ContiguousByteBuffer DataToVerify, ContiguousByteBuffer Signature)
+bool cMojangAPI::VerifyUsingMojangKeys(const ContiguousByteBuffer& DataToVerify, const ContiguousByteBuffer& Signature)
 {
 	const mbedtls_md_type_t hash_type = MBEDTLS_MD_SHA1;
 	const mbedtls_md_info_t *mdinfo = mbedtls_md_info_from_type(hash_type);
