@@ -142,8 +142,8 @@ public:
 		ContentsWidth = 9,
 	};
 
-	const cItem & GetSlot(int a_Idx) const { return m_Contents.GetSlot(a_Idx); }
-	void SetSlot(int a_Idx, const cItem & a_Item) { m_Contents.SetSlot(a_Idx, a_Item); }
+	const cItem & GetSlot(std::size_t a_Idx) const { return m_Contents.GetSlot(a_Idx); }
+	void SetSlot(std::size_t a_Idx, const cItem & a_Item) { m_Contents.SetSlot(a_Idx, a_Item); }
 
 
 protected:
@@ -152,7 +152,7 @@ protected:
 	void OpenNewWindow(void);
 
 	// cItemGrid::cListener overrides:
-	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override
+	virtual void OnSlotChanged(cItemGrid * a_Grid, std::size_t a_SlotNum) override
 	{
 		UNUSED(a_SlotNum);
 		ASSERT(a_Grid == &m_Contents);

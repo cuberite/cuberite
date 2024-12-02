@@ -631,7 +631,7 @@ public:
 	void Push(double a_Value);
 	void Push(int a_Value);
 	void Push(long a_Value);
-	void Push(const UInt32 a_Value);
+	void Push(UInt32 a_Value);
 	void Push(std::chrono::milliseconds a_time);
 
 	/** Pops the specified number of values off the top of the Lua stack. */

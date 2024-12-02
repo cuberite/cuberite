@@ -87,9 +87,9 @@ const AString cWindow::GetWindowTypeName(void) const
 
 
 
-int cWindow::GetNumSlots(void) const
+std::size_t cWindow::GetNumSlots(void) const
 {
-	int res = 0;
+	std::size_t res = 0;
 	for (const auto & itr : m_SlotAreas)
 	{
 		res += itr->GetNumSlots();
@@ -101,10 +101,10 @@ int cWindow::GetNumSlots(void) const
 
 
 
-const cItem * cWindow::GetSlot(cPlayer & a_Player, int a_SlotNum) const
+const cItem * cWindow::GetSlot(cPlayer & a_Player, std::size_t a_SlotNum) const
 {
 	// Return the item at the specified slot for the specified player
-	int LocalSlotNum = 0;
+	std::size_t LocalSlotNum = 0;
 	const cSlotArea * Area = GetSlotArea(a_SlotNum, LocalSlotNum);
 	if (Area == nullptr)
 	{
@@ -118,11 +118,11 @@ const cItem * cWindow::GetSlot(cPlayer & a_Player, int a_SlotNum) const
 
 
 
-void cWindow::SetSlot(cPlayer & a_Player, int a_SlotNum, const cItem & a_Item)
+void cWindow::SetSlot(cPlayer & a_Player, std::size_t a_SlotNum, const cItem & a_Item)
 {
 	// Set the item to the specified slot for the specified player
-	int LocalSlotNum = 0;
-	cSlotArea * Area = GetSlotArea(a_SlotNum, LocalSlotNum);
+	std::size_t LocalSlotNum = 0;
+	auto Area = GetSlotArea(a_SlotNum, LocalSlotNum);
 	if (Area == nullptr)
 	{
 		LOGWARNING("%s: requesting write to an invalid SlotArea (SlotNum %d), ignoring.", __FUNCTION__, a_SlotNum);
@@ -135,7 +135,7 @@ void cWindow::SetSlot(cPlayer & a_Player, int a_SlotNum, const cItem & a_Item)
 
 
 
-bool cWindow::IsSlotInPlayerMainInventory(int a_SlotNum) const
+bool cWindow::IsSlotInPlayerMainInventory(std::size_t a_SlotNum) const
 {
 	// Returns true if the specified slot is in the Player Main Inventory slotarea
 	// The player main inventory is always 27 slots, 9 slots from the end of the inventory
@@ -146,7 +146,7 @@ bool cWindow::IsSlotInPlayerMainInventory(int a_SlotNum) const
 
 
 
-bool cWindow::IsSlotInPlayerHotbar(int a_SlotNum) const
+bool cWindow::IsSlotInPlayerHotbar(std::size_t a_SlotNum) const
 {
 	// Returns true if the specified slot is in the Player Hotbar slotarea
 	// The hotbar is always the last 9 slots
@@ -157,7 +157,7 @@ bool cWindow::IsSlotInPlayerHotbar(int a_SlotNum) const
 
 
 
-bool cWindow::IsSlotInPlayerInventory(int a_SlotNum) const
+bool cWindow::IsSlotInPlayerInventory(std::size_t a_SlotNum) const
 {
 	// Returns true if the specified slot is in the Player Main Inventory or Hotbar slotareas. Note that returns false for Armor.
 	// The player combined inventory is always the last 36 slots
@@ -171,13 +171,13 @@ bool cWindow::IsSlotInPlayerInventory(int a_SlotNum) const
 void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
 {
 	a_Slots.clear();
-	a_Slots.reserve(static_cast<size_t>(GetNumSlots()));
-	for (cSlotAreas::const_iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	a_Slots.reserve(GetNumSlots());
+	for (const auto & Area : m_SlotAreas)
 	{
-		int NumSlots = (*itr)->GetNumSlots();
-		for (int i = 0; i < NumSlots; i++)
+		auto NumSlots = Area->GetNumSlots();
+		for (std::size_t i = 0; i < NumSlots; i++)
 		{
-			const cItem * Item = (*itr)->GetSlot(i, a_Player);
+			const cItem * Item = Area->GetSlot(i, a_Player);
 			if (Item == nullptr)
 			{
 				a_Slots.push_back(cItem());
@@ -196,7 +196,7 @@ void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
 
 void cWindow::Clicked(
 	cPlayer & a_Player,
-	int a_WindowID, short a_SlotNum, eClickAction a_ClickAction,
+	int a_WindowID, std::size_t a_SlotNum, eClickAction a_ClickAction,
 	const cItem & a_ClickedItem
 )
 {
@@ -255,21 +255,21 @@ void cWindow::Clicked(
 		}
 	}
 
-	if (a_SlotNum < 0)
+	if (a_SlotNum == ILLEGAL_SLOT_NUMBER)
 	{
 		// TODO: Other click actions with irrelevant slot number (FS #371)
 		return;
 	}
 
-	int LocalSlotNum = a_SlotNum;
-	for (const auto & itr : m_SlotAreas)
+	auto LocalSlotNum = a_SlotNum;
+	for (const auto & Area : m_SlotAreas)
 	{
-		if (LocalSlotNum < itr->GetNumSlots())
+		if (LocalSlotNum < Area->GetNumSlots())
 		{
-			itr->Clicked(a_Player, LocalSlotNum, a_ClickAction, a_ClickedItem);
+			Area->Clicked(a_Player, LocalSlotNum, a_ClickAction, a_ClickedItem);
 			return;
 		}
-		LocalSlotNum -= itr->GetNumSlots();
+		LocalSlotNum -= Area->GetNumSlots();
 	}
 
 	LOGWARNING("Slot number higher than available window slots: %d, max %d received from \"%s\"; ignoring.",
@@ -347,20 +347,20 @@ bool cWindow::ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse)
 
 
 
-void cWindow::BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum)
+void cWindow::BroadcastSlot(cSlotArea * a_Area, std::size_t a_LocalSlotNum)
 {
 	// Translate local slot num into global slot num:
-	int SlotNum = 0;
+	std::size_t SlotNum = 0;
 	bool HasFound = false;
-	for (cSlotAreas::const_iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	for (const auto & Area : m_SlotAreas)
 	{
-		if (a_Area == *itr)
+		if (a_Area == Area)
 		{
 			SlotNum += a_LocalSlotNum;
 			HasFound = true;
 			break;
 		}
-		SlotNum += (*itr)->GetNumSlots();
+		SlotNum += Area->GetNumSlots();
 	}  // for itr - m_SlotAreas[]
 	if (!HasFound)
 	{
@@ -371,9 +371,9 @@ void cWindow::BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum)
 
 	// Broadcast the update packet:
 	cCSLock Lock(m_CS);
-	for (cPlayerList::iterator itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
+	for (auto itr = m_OpenedBy.begin(); itr != m_OpenedBy.end(); ++itr)
 	{
-		(*itr)->GetClientHandle()->SendInventorySlot(m_WindowID, static_cast<short>(SlotNum), *a_Area->GetSlot(a_LocalSlotNum, **itr));
+		(*itr)->GetClientHandle()->SendInventorySlot(m_WindowID, SlotNum, *a_Area->GetSlot(a_LocalSlotNum, **itr));
 	}  // for itr - m_OpenedBy[]
 }
 
@@ -504,18 +504,18 @@ bool cWindow::CollectItemsToHand(cItem & a_Dragging, cSlotArea & a_Area, cPlayer
 
 
 
-void cWindow::SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_RelativeSlotNum)
+void cWindow::SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, std::size_t a_RelativeSlotNum)
 {
-	int SlotBase = 0;
+	std::size_t SlotBase = 0;
 	bool Found = false;
-	for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	for (const auto & Area : m_SlotAreas)
 	{
-		if (*itr == a_SlotArea)
+		if (Area == a_SlotArea)
 		{
 			Found = true;
 			break;
 		}
-		SlotBase += (*itr)->GetNumSlots();
+		SlotBase += Area->GetNumSlots();
 	}  // for itr - m_SlotAreas[]
 	if (!Found)
 	{
@@ -525,7 +525,7 @@ void cWindow::SendSlot(cPlayer & a_Player, cSlotArea * a_SlotArea, int a_Relativ
 	}
 
 	a_Player.GetClientHandle()->SendInventorySlot(
-		m_WindowID, static_cast<short>(a_RelativeSlotNum + SlotBase), *(a_SlotArea->GetSlot(a_RelativeSlotNum, a_Player))
+		m_WindowID, a_RelativeSlotNum + SlotBase, *(a_SlotArea->GetSlot(a_RelativeSlotNum, a_Player))
 	);
 }
 
@@ -547,9 +547,9 @@ void cWindow::Destroy(void)
 
 
 
-cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum)
+cSlotArea * cWindow::GetSlotArea(std::size_t a_GlobalSlotNum, std::size_t & a_LocalSlotNum)
 {
-	if ((a_GlobalSlotNum < 0) || (a_GlobalSlotNum >= GetNumSlots()))
+	if (a_GlobalSlotNum >= GetNumSlots())
 	{
 		LOGWARNING("%s: requesting an invalid SlotNum: %d out of %d slots", __FUNCTION__, a_GlobalSlotNum, GetNumSlots() - 1);
 		ASSERT(!"Invalid SlotNum");
@@ -557,15 +557,15 @@ cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum)
 	}
 
 	// Iterate through all the SlotAreas, find the correct one
-	int LocalSlotNum = a_GlobalSlotNum;
-	for (cSlotAreas::iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	std::size_t LocalSlotNum = a_GlobalSlotNum;
+	for (const auto & Area : m_SlotAreas)
 	{
-		if (LocalSlotNum < (*itr)->GetNumSlots())
+		if (LocalSlotNum < Area->GetNumSlots())
 		{
 			a_LocalSlotNum = LocalSlotNum;
-			return *itr;
+			return Area;
 		}
-		LocalSlotNum -= (*itr)->GetNumSlots();
+		LocalSlotNum -= Area->GetNumSlots();
 	}  // for itr - m_SlotAreas[]
 
 	// We shouldn't be here - the check at the beginnning should prevent this. Log and assert
@@ -578,9 +578,9 @@ cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum)
 
 
 
-const cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum) const
+const cSlotArea * cWindow::GetSlotArea(std::size_t a_GlobalSlotNum, std::size_t & a_LocalSlotNum) const
 {
-	if ((a_GlobalSlotNum < 0) || (a_GlobalSlotNum >= GetNumSlots()))
+	if (a_GlobalSlotNum >= GetNumSlots())
 	{
 		LOGWARNING("%s: requesting an invalid SlotNum: %d out of %d slots", __FUNCTION__, a_GlobalSlotNum, GetNumSlots() - 1);
 		ASSERT(!"Invalid SlotNum");
@@ -588,15 +588,15 @@ const cSlotArea * cWindow::GetSlotArea(int a_GlobalSlotNum, int & a_LocalSlotNum
 	}
 
 	// Iterate through all the SlotAreas, find the correct one
-	int LocalSlotNum = a_GlobalSlotNum;
-	for (cSlotAreas::const_iterator itr = m_SlotAreas.begin(), end = m_SlotAreas.end(); itr != end; ++itr)
+	auto LocalSlotNum = a_GlobalSlotNum;
+	for (const auto & Slot : m_SlotAreas)
 	{
-		if (LocalSlotNum < (*itr)->GetNumSlots())
+		if (LocalSlotNum < Slot->GetNumSlots())
 		{
 			a_LocalSlotNum = LocalSlotNum;
-			return *itr;
+			return Slot;
 		}
-		LocalSlotNum -= (*itr)->GetNumSlots();
+		LocalSlotNum -= Slot->GetNumSlots();
 	}  // for itr - m_SlotAreas[]
 
 	// We shouldn't be here - the check at the beginnning should prevent this. Log and assert
@@ -619,7 +619,7 @@ void cWindow::OnPaintBegin(cPlayer & a_Player)
 
 
 
-void cWindow::OnPaintProgress(cPlayer & a_Player, int a_SlotNum)
+void cWindow::OnPaintProgress(cPlayer & a_Player, std::size_t a_SlotNum)
 {
 	// Add the slot to the internal structures for inventory painting by the specified player
 	a_Player.AddInventoryPaintSlot(a_SlotNum);
@@ -721,13 +721,13 @@ char cWindow::DistributeItemToSlots(cPlayer & a_Player, const cItem & a_Item, ch
 
 	// Distribute to individual slots, keep track of how many items were actually distributed (full stacks etc.)
 	char NumDistributed = 0;
-	for (cSlotNums::const_iterator itr = a_SlotNums.begin(), end = a_SlotNums.end(); itr != end; ++itr)
+	for (const auto & Slot : a_SlotNums)
 	{
-		int LocalSlotNum = 0;
-		cSlotArea * Area = GetSlotArea(*itr, LocalSlotNum);
+		std::size_t LocalSlotNum = 0;
+		cSlotArea * Area = GetSlotArea(Slot, LocalSlotNum);
 		if (Area == nullptr)
 		{
-			LOGWARNING("%s: Bad SlotArea for slot %d", __FUNCTION__, *itr);
+			LOGWARNING("%s: Bad SlotArea for slot %d", __FUNCTION__, Slot);
 			continue;
 		}
 
