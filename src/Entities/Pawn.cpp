@@ -402,7 +402,7 @@ void cPawn::HandleFalling(void)
 		auto Player = static_cast<cPlayer *>(this);
 
 		/* 3. If the player is flying or climbing, absorb fall damage */
-		FallDamageAbsorbed |= Player->IsFlying() || Player->IsClimbing();
+		FallDamageAbsorbed |= Player->IsFlying() || Player->IsClimbing() || Player->GetIsTeleporting();
 
 		/* 4. If the player is about to bounce on a slime block and is not crouching, absorb all fall damage  */
 		ShouldBounceOnSlime = !Player->IsCrouched();
