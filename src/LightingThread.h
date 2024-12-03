@@ -52,8 +52,8 @@ class cLightingThread:
 
 public:
 
-	cLightingThread(cWorld & a_World);
-	virtual ~cLightingThread() override;
+	explicit cLightingThread(cWorld & a_World);
+	~cLightingThread() override;
 
 	void Stop(void);
 
@@ -80,16 +80,16 @@ protected:
 		cLightingChunkStay(cLightingThread & a_LightingThread, int a_ChunkX, int a_ChunkZ, std::unique_ptr<cChunkCoordCallback> a_CallbackAfter);
 
 	protected:
-		virtual void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override
+		void OnChunkAvailable(int a_ChunkX, int a_ChunkZ) override
 		{
 			UNUSED(a_ChunkX);
 			UNUSED(a_ChunkZ);
 		}
-		virtual bool OnAllChunksAvailable(void) override;
-		virtual void OnDisabled(void) override;
+		bool OnAllChunksAvailable(void) override;
+		void OnDisabled(void) override;
 	} ;
 
-	typedef std::list<cChunkStay *> cChunkStays;
+	using cChunkStays = std::list<cChunkStay *>;
 
 
 	cWorld & m_World;
@@ -109,27 +109,38 @@ protected:
 	/** The highest block in the current 3x3 chunk data */
 	HEIGHTTYPE m_MaxHeight;
 
-
+public:
 	// Buffers for the 3x3 chunk data
 	// These buffers alone are 1.7 MiB in size, therefore they cannot be located on the stack safely - some architectures may have only 1 MiB for stack, or even less
 	// Placing the buffers into the object means that this object can light chunks only in one thread!
 	// The blobs are XZY organized as a whole, instead of 3x3 XZY-organized subarrays ->
-	//  -> This means data has to be scatterred when reading and gathered when writing!
-	static const int BlocksPerYLayer = cChunkDef::Width * cChunkDef::Width * 3 * 3;
-	BLOCKTYPE  m_BlockTypes[BlocksPerYLayer * cChunkDef::Height];
-	NIBBLETYPE m_BlockLight[BlocksPerYLayer * cChunkDef::Height];
-	NIBBLETYPE m_SkyLight  [BlocksPerYLayer * cChunkDef::Height];
-	HEIGHTTYPE m_HeightMap [BlocksPerYLayer];
+	//  -> This means data has to be scattered when reading and gathered when writing!
+	static const size_t BlocksPerYLayer = cChunkDef::Width * cChunkDef::Width * 3 * 3;
 
+	using BlockTypes  = std::array<BLOCKTYPE,  BlocksPerYLayer * cChunkDef::Height>;
+	using NibbleTypes = std::array<NIBBLETYPE, BlocksPerYLayer * cChunkDef::Height>;
+	using HeightMap   = std::array<HEIGHTTYPE, BlocksPerYLayer>;
+
+protected:
+	BlockTypes  m_BlockTypes;
+	NibbleTypes m_BlockLight;
+	NibbleTypes m_SkyLight;
+	HeightMap   m_HeightMap;
+
+public:
 	// Seed management (5.7 MiB)
 	// Two buffers, in each calc step one is set as input and the other as output, then in the next step they're swapped
 	// Each seed is represented twice in this structure - both as a "list" and as a "position".
 	// "list" allows fast traversal from seed to seed
 	// "position" allows fast checking if a coord is already a seed
-	unsigned char m_IsSeed1 [BlocksPerYLayer * cChunkDef::Height];
-	unsigned int  m_SeedIdx1[BlocksPerYLayer * cChunkDef::Height];
-	unsigned char m_IsSeed2 [BlocksPerYLayer * cChunkDef::Height];
-	unsigned int  m_SeedIdx2[BlocksPerYLayer * cChunkDef::Height];
+	using SeedMarkers = std::array<unsigned char, BlocksPerYLayer * cChunkDef::Height>;
+	using SeedIds = std::array<unsigned int,  BlocksPerYLayer * cChunkDef::Height>;
+
+protected:
+	SeedMarkers m_IsSeed1;
+	SeedIds m_SeedIdx1;
+	SeedMarkers m_IsSeed2;
+	SeedIds m_SeedIdx2;
 	size_t m_NumSeeds;
 
 	virtual void Execute(void) override;
@@ -147,22 +158,22 @@ protected:
 	void PrepareBlockLight(void);
 
 	/** Calculates light in the light array specified, using stored seeds */
-	void CalcLight(NIBBLETYPE * a_Light);
+	void CalcLight(NibbleTypes & a_Light);
 
 	/** Does one step in the light calculation - one seed propagation and seed recalculation */
 	void CalcLightStep(
-		NIBBLETYPE * a_Light,
-		size_t a_NumSeedsIn,    unsigned char * a_IsSeedIn,  unsigned int * a_SeedIdxIn,
-		size_t & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
+		NibbleTypes & a_Light,
+		size_t a_NumSeedsIn,    SeedMarkers & a_IsSeedIn,  SeedIds & a_SeedIdxIn,
+		size_t & a_NumSeedsOut, SeedMarkers & a_IsSeedOut, SeedIds & a_SeedIdxOut
 	);
 
 	/** Compresses from 1-block-per-byte (faster calc) into 2-blocks-per-byte (MC storage): */
-	void CompressLight(NIBBLETYPE * a_LightArray, NIBBLETYPE * a_ChunkLight);
+	void CompressLight(const NibbleTypes & a_LightArray, cChunkDef::BlockNibbles & a_ChunkLight);
 
 	void PropagateLight(
-		NIBBLETYPE * a_Light,
+		NibbleTypes & a_Light,
 		unsigned int a_SrcIdx, unsigned int a_DstIdx,
-		size_t & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
+		size_t & a_NumSeedsOut, SeedMarkers & a_IsSeedOut, SeedIds & a_SeedIdxOut
 	);
 
 	/** Queues a chunkstay that has all of its chunks loaded.

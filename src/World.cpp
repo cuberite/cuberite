@@ -3213,8 +3213,8 @@ void cWorld::cChunkGeneratorCallbacks::OnChunkGenerated(cChunkDesc & a_ChunkDesc
 	{
 		Data.BlockData.SetAll(a_ChunkDesc.GetBlockTypes(), BlockMetas);
 
-		std::copy(a_ChunkDesc.GetBiomeMap(), a_ChunkDesc.GetBiomeMap() + std::size(a_ChunkDesc.GetBiomeMap()), Data.BiomeMap);
-		std::copy(a_ChunkDesc.GetHeightMap(), a_ChunkDesc.GetHeightMap() + std::size(a_ChunkDesc.GetHeightMap()), Data.HeightMap);
+		Data.BiomeMap = a_ChunkDesc.GetBiomeMap();
+		Data.HeightMap = a_ChunkDesc.GetHeightMap();
 
 		Data.Entities = std::move(a_ChunkDesc.GetEntities());
 		Data.BlockEntities = std::move(a_ChunkDesc.GetBlockEntities());

@@ -523,7 +523,7 @@ inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_C
 
 
 template <auto Palette>
-inline void cChunkDataSerializer::WriteBlockSectionSeamless(const ChunkBlockData::BlockArray * a_Blocks, const ChunkBlockData::MetaArray * a_Metas, const UInt8 a_BitsPerEntry)
+inline void cChunkDataSerializer::WriteBlockSectionSeamless(const ChunkBlockData::BlockArrayPtr & a_Blocks, const ChunkBlockData::MetaArrayPtr & a_Metas, const UInt8 a_BitsPerEntry)
 {
 	// https://wiki.vg/Chunk_Format#Data_structure
 
@@ -572,7 +572,7 @@ inline void cChunkDataSerializer::WriteBlockSectionSeamless(const ChunkBlockData
 
 
 
-inline void cChunkDataSerializer::WriteLightSectionGrouped(const ChunkLightData::LightArray * const a_BlockLights, const ChunkLightData::LightArray * const a_SkyLights)
+inline void cChunkDataSerializer::WriteLightSectionGrouped(const ChunkLightData::LightArrayPtr & a_BlockLights, const ChunkLightData::LightArrayPtr & a_SkyLights)
 {
 	// Write lighting:
 	if (a_BlockLights == nullptr)
