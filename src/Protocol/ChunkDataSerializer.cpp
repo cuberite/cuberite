@@ -247,6 +247,11 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v768);
 				continue;
 			}
+			case cProtocol::Version::v1_21_4:
+			{
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, CacheVersion::v769);
+				continue;
+			}
 		}
 		UNREACHABLE("Unknown chunk data serialization version");
 	}
@@ -371,6 +376,11 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 			break;
 		}
 		case CacheVersion::v768:
+		{
+			Serialize764<&Palette768>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x28);
+			break;
+		}
+		case CacheVersion::v769: // TODO: fix palette
 		{
 			Serialize764<&Palette768>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x28);
 			break;

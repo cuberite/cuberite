@@ -986,6 +986,101 @@ void cProtocol_1_21_2::SendPlayerMoveLook(const Vector3d a_Pos, const float a_Ya
 
 
 
+UInt32 cProtocol_1_21_2::GetProtocolMobType(eMonsterType a_MobType) const
+{
+	switch (a_MobType)
+	{
+		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
+		case mtAllay: return 2;
+		case mtArmadillo: return 4;
+		case mtAxolotl: return 7;
+		case mtBat: return 10;
+		case mtBee: return 11;
+		case mtBlaze: return 14;
+		case mtBogged: return 16;
+		case mtBreeze: return 17;
+		case mtCamel: return 19;
+		case mtCat: return 20;
+		case mtCaveSpider: return 21;
+		case mtChicken: return 25;
+		case mtCod: return 26;
+		case mtCow: return 28;
+		case mtCreaking: return 29;
+		case mtCreakingTransient: return 30;
+		case mtCreeper: return 31;
+		case mtDolphin: return 34;
+		case mtDonkey: return 35;
+		case mtDrowned: return 37;
+		case mtElderGuardian: return 39;
+		case mtEnderman: return 40;
+		case mtEndermite: return 41;
+		case mtEnderDragon: return 42;
+		case mtEvoker: return 45;
+		case mtFox: return 53;
+		case mtFrog: return 54;
+		case mtGhast: return 56;
+		case mtGiant: return 57;
+		case mtGlowSquid: return 59;
+		case mtGoat: return 60;
+		case mtGuardian: return 61;
+		case mtHoglin: return 62;
+		case mtHorse: return 64;
+		case mtHusk: return 65;
+		case mtIllusioner: return 66;
+		case mtLlama: return 76;
+		case mtMagmaCube: return 78;
+		case mtMooshroom: return 83;
+		case mtMule: return 84;
+		case mtOcelot: return 87;
+		case mtPanda: return 92;
+		case mtParrot: return 93;
+		case mtPhantom: return 94;
+		case mtPig: return 95;
+		case mtPiglin: return 96;
+		case mtPiglinBrute: return 97;
+		case mtPillager: return 98;
+		case mtPolarBear: return 99;
+		case mtPufferfish: return 101;
+		case mtRabbit: return 102;
+		case mtRavager: return 103;
+		case mtSalmon: return 104;
+		case mtSheep: return 105;
+		case mtShulker: return 106;
+		case mtSilverfish: return 108;
+		case mtSkeleton: return 109;
+		case mtSkeletonHorse: return 110;
+		case mtSlime: return 111;
+		case mtSniffer: return 113;
+		case mtSpider: return 118;
+		case mtSquid: return 121;
+		case mtStray: return 122;
+		case mtStrider: return 123;
+		case mtTadpole: return 124;
+		case mtTraderLlama: return 128;
+		case mtTropicalFish: return 130;
+		case mtTurtle: return 131;
+		case mtVex: return 132;
+		case mtVillager: return 133;
+		case mtVindicator: return 134;
+		case mtWanderingTrader: return 135;
+		case mtWarden: return 136;
+		case mtWitch: return 138;
+		case mtWither: return 139;
+		case mtWitherSkeleton: return 140;
+		case mtWolf: return 142;
+		case mtZoglin: return 143;
+		case mtZombie: return 144;
+		case mtZombieHorse: return 145;
+		case mtZombieVillager: return 146;
+		case mtZombifiedPiglin: return 147;
+		default: return 0;
+	}
+}
+
+
+
+
+
 void cProtocol_1_21_2::SendDynamicRegistries()
 {
 	{
@@ -1344,3 +1439,244 @@ void cProtocol_1_21_2::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	m_Client->HandleRightClick({BlockX, BlockY, BlockZ}, FaceIntToBlockFace(Face), {FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16)}, Hand == 0);
 	m_Client->SendAcknowledgeBlockChange(Sequence);
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+//  cProtocol_1_21_4:
+
+cProtocol::Version cProtocol_1_21_4::GetProtocolVersion() const
+{
+	return Version::v1_21_4;
+}
+
+
+
+
+
+void cProtocol_1_21_4::SendSelectKnownPacks()
+{
+	{
+		cPacketizer Pkt(*this, pktSelectKnownPacks);
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteString("minecraft");
+		Pkt.WriteString("core");
+		Pkt.WriteString("1.21.4");
+	}	
+}
+
+
+
+
+
+bool cProtocol_1_21_4::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
+{
+	switch (m_State)
+	{
+		case State::Status:
+		{
+			switch (a_PacketType)
+			{
+				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
+				case 0x01: HandlePacketStatusPing(a_ByteBuffer); return true;
+			}
+			break;
+		}
+
+		case State::Login:
+		{
+			switch (a_PacketType)
+			{
+				case 0x00: HandlePacketLoginStart(a_ByteBuffer); return true;
+				case 0x01: HandlePacketLoginEncryptionResponse(a_ByteBuffer); return true;
+				case 0x02: /* LoginQueryResponseC2SPacket */ return false;
+				case 0x03: HandlePacketEnterConfiguration(a_ByteBuffer); return true;
+				case 0x04: /* CookieResponseC2SPacket */ return false;
+			}
+			break;
+		}
+
+		case State::Configuration:
+		{
+			switch (a_PacketType)
+			{
+				case 0x00: HandlePacketClientSettings(a_ByteBuffer); return true;
+				case 0x01: /* Cookie Response */ return false;
+				case 0x02: HandlePacketPluginMessage(a_ByteBuffer); return true;
+				case 0x03: HandlePacketReady(a_ByteBuffer); return true;
+				case 0x04: HandlePacketKeepAlive(a_ByteBuffer); return true;
+				case 0x05: /* CommonPongC2SPacket */ return false;
+				case 0x06: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
+				case 0x07: /* SelectKnownPacks */ return false;
+			}
+			break;
+		}
+
+		case State::Game:
+		{
+			switch (a_PacketType)
+			{
+                case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
+                case 0x01: /* query nbt packet */ return false;
+				case 0x02: /* BundleItemSelected */ return false;
+                case 0x03: /* update difficulty */ return false;
+                case 0x04: /* MessageAcknowledgmentC2SPacket */ return false;
+                case 0x05: HandlePacketCommandExecution(a_ByteBuffer); return true;
+				case 0x06: /* ChatCommandSignedC2SPacket */ return false;
+                case 0x07: HandlePacketChatMessage(a_ByteBuffer); return true;
+                case 0x08: HandlePacketPlayerSession(a_ByteBuffer); return true;
+                case 0x09: /* AcknowledgeChunksC2SPacket */ return false;
+                case 0x0A: HandlePacketClientStatus(a_ByteBuffer); return true;
+				case 0x0B: /* ClientTickEnd */ return false;
+                case 0x0C: HandlePacketClientSettings(a_ByteBuffer); return true;
+                case 0x0D: HandlePacketTabComplete(a_ByteBuffer); return true;
+                case 0x0E: /* AcknowledgeReconfigurationC2SPacket*/ return false;
+                case 0x0F: /* ButtonClickC2SPacket */ return false;
+                case 0x10: HandlePacketWindowClick(a_ByteBuffer); return true;
+                case 0x11: HandlePacketWindowClose(a_ByteBuffer); return true;
+                case 0x12: /* SlotChangedStateC2SPacket */ return false;
+				case 0x13: /* CookieResponseC2SPacket */ return false;
+                case 0x14: HandlePacketPluginMessage(a_ByteBuffer); return true;
+				case 0x15: /* DebugSampleSubscriptionC2SPacket */ return false;
+                case 0x16: HandlePacketBookUpdate(a_ByteBuffer); return true;  // not fully implemented
+                case 0x17: /* QueryEntityNbtC2SPacket */ return false;
+                case 0x18: HandlePacketUseEntity(a_ByteBuffer); return true;
+                case 0x19: /* Jigsaw generating */ return false;
+                case 0x1A: HandlePacketKeepAlive(a_ByteBuffer); return true;
+                case 0x1B: /* Update difficulty lock */ return false;  // only used in single player
+                case 0x1C: HandlePacketPlayerPos(a_ByteBuffer); return true;  // PositionAndOnGround
+                case 0x1D: HandlePacketPlayerPosLook(a_ByteBuffer); return true; // full
+                case 0x1E: HandlePacketPlayerLook(a_ByteBuffer); return true; // LookAndOnGround
+                case 0x1F: HandlePacketPlayer(a_ByteBuffer); return true;
+                case 0x20: HandlePacketVehicleMove(a_ByteBuffer); return true;
+                case 0x21: HandlePacketBoatSteer(a_ByteBuffer); return true;
+                case 0x22: /* pick item from block */ return false;
+				case 0x23: /* pick item from entity */ return false;
+                case 0x24: /*QueryPingC2SPacket*/ return false;
+                case 0x25: HandleCraftRecipe(a_ByteBuffer); return true;
+                case 0x26: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
+                case 0x27: HandlePacketBlockDig(a_ByteBuffer); return true;
+                case 0x28: /* client command packet */ return false;
+                case 0x29: HandlePacketSteerVehicle(a_ByteBuffer); return true;  // player input packet
+				case 0x2A: /* Player Loaded */ return false;
+                case 0x2B: /* PlayPongC2SPacket */ return false;
+                case 0x2C: /* Recipe Category Options */ return false;
+                case 0x2D: HandlePacketCraftingBookData(a_ByteBuffer); return true;
+                case 0x2E: HandlePacketNameItem(a_ByteBuffer); return true;
+                case 0x2F: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
+                case 0x30: HandlePacketAdvancementTab(a_ByteBuffer); return true;
+                case 0x31: /* select villager trade */ return false;
+                case 0x32: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
+                case 0x33: HandlePacketSlotSelect(a_ByteBuffer); return true;
+                case 0x34: /* update command block */ return false;
+                case 0x35: /* update minecart command block*/ return false;
+                case 0x36: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
+                case 0x37: /* Update jigsaw block */ return false;
+                case 0x38: /* Update structure block */ return false;
+                case 0x39: HandlePacketUpdateSign(a_ByteBuffer); return true;
+                case 0x3A: /* Update hand swing */ return false;
+                case 0x3B: /* Spectator teleport */ return false;
+                case 0x3C: HandlePacketBlockPlace(a_ByteBuffer); return true;
+                case 0x3D: HandlePacketUseItem(a_ByteBuffer); return true;
+				default: break;
+			}
+		}
+	}
+}
+
+
+
+
+
+UInt32 cProtocol_1_21_4::GetProtocolMobType(eMonsterType a_MobType) const
+{
+	switch (a_MobType)
+	{
+		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
+		case mtAllay: return 2;
+		case mtArmadillo: return 4;
+		case mtAxolotl: return 7;
+		case mtBat: return 10;
+		case mtBee: return 11;
+		case mtBlaze: return 14;
+		case mtBogged: return 16;
+		case mtBreeze: return 17;
+		case mtCamel: return 19;
+		case mtCat: return 20;
+		case mtCaveSpider: return 21;
+		case mtChicken: return 25;
+		case mtCod: return 26;
+		case mtCow: return 28;
+		case mtCreaking: return 29;
+		case mtCreeper: return 30;
+		case mtDolphin: return 33;
+		case mtDonkey: return 34;
+		case mtDrowned: return 36;
+		case mtElderGuardian: return 38;
+		case mtEnderman: return 39;
+		case mtEndermite: return 40;
+		case mtEnderDragon: return 41;
+		case mtEvoker: return 44;
+		case mtFox: return 52;
+		case mtFrog: return 53;
+		case mtGhast: return 55;
+		case mtGiant: return 56;
+		case mtGlowSquid: return 58;
+		case mtGoat: return 59;
+		case mtGuardian: return 60;
+		case mtHoglin: return 61;
+		case mtHorse: return 63;
+		case mtHusk: return 64;
+		case mtIllusioner: return 65;
+		case mtLlama: return 75;
+		case mtMagmaCube: return 77;
+		case mtMooshroom: return 82;
+		case mtMule: return 83;
+		case mtOcelot: return 86;
+		case mtPanda: return 91;
+		case mtParrot: return 92;
+		case mtPhantom: return 93;
+		case mtPig: return 94;
+		case mtPiglin: return 95;
+		case mtPiglinBrute: return 96;
+		case mtPillager: return 97;
+		case mtPolarBear: return 98;
+		case mtPufferfish: return 100;
+		case mtRabbit: return 101;
+		case mtRavager: return 102;
+		case mtSalmon: return 103;
+		case mtSheep: return 104;
+		case mtShulker: return 105;
+		case mtSilverfish: return 107;
+		case mtSkeleton: return 108;
+		case mtSkeletonHorse: return 109;
+		case mtSlime: return 110;
+		case mtSniffer: return 112;
+		case mtSpider: return 117;
+		case mtSquid: return 120;
+		case mtStray: return 121;
+		case mtStrider: return 122;
+		case mtTadpole: return 123;
+		case mtTraderLlama: return 127;
+		case mtTropicalFish: return 129;
+		case mtTurtle: return 130;
+		case mtVex: return 131;
+		case mtVillager: return 132;
+		case mtVindicator: return 133;
+		case mtWanderingTrader: return 134;
+		case mtWarden: return 135;
+		case mtWitch: return 137;
+		case mtWither: return 138;
+		case mtWitherSkeleton: return 139;
+		case mtWolf: return 141;
+		case mtZoglin: return 142;
+		case mtZombie: return 143;
+		case mtZombieHorse: return 144;
+		case mtZombieVillager: return 145;
+		case mtZombifiedPiglin: return 146;
+		default: return 0;
+	}
+}
+
+
+
+
