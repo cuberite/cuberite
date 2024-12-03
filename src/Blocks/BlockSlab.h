@@ -71,8 +71,8 @@ public:
 			case BlockType::StoneSlab:
 			case BlockType::WarpedSlab:
 			case BlockType::BambooMosaicSlab:
-			case BlockType::BambooSlab: 
-            case BlockType::CherrySlab:
+			case BlockType::BambooSlab:
+			case BlockType::CherrySlab:
 			case BlockType::CobbledDeepslateSlab:
 			case BlockType::TuffSlab:
 			case BlockType::TuffBrickSlab:
@@ -81,7 +81,7 @@ public:
 			case BlockType::MangroveSlab:
 			case BlockType::DeepslateTileSlab:
 			case BlockType::DeepslateBrickSlab:
-			case BlockType::PolishedDeepslateSlab:    
+			case BlockType::PolishedDeepslateSlab:
 			case BlockType::CutCopperSlab:
 			case BlockType::ExposedCutCopperSlab:
 			case BlockType::WeatheredCutCopperSlab:
@@ -265,7 +265,7 @@ public:
 			}
 			case BlockType::BambooMosaicSlab:            ISSLABTOP(BambooMosaicSlab)
 			case BlockType::BambooSlab:                  ISSLABTOP(BambooSlab)
-            case BlockType::CherrySlab:                  ISSLABTOP(CherrySlab)
+			case BlockType::CherrySlab:                  ISSLABTOP(CherrySlab)
 			case BlockType::CobbledDeepslateSlab:        ISSLABTOP(CobbledDeepslateSlab)
 			case BlockType::TuffSlab:                    ISSLABTOP(TuffSlab)
 			case BlockType::TuffBrickSlab:               ISSLABTOP(TuffBrickSlab)
@@ -457,7 +457,7 @@ public:
 			}
 			case BlockType::BambooMosaicSlab:            ISSLABFULL(BambooMosaicSlab)
 			case BlockType::BambooSlab:                  ISSLABFULL(BambooSlab)
-            case BlockType::CherrySlab:                  ISSLABFULL(CherrySlab)
+			case BlockType::CherrySlab:                  ISSLABFULL(CherrySlab)
 			case BlockType::CobbledDeepslateSlab:        ISSLABFULL(CobbledDeepslateSlab)
 			case BlockType::TuffSlab:                    ISSLABFULL(TuffSlab)
 			case BlockType::TuffBrickSlab:               ISSLABFULL(TuffBrickSlab)
@@ -531,7 +531,7 @@ private:
 			case BlockType::WarpedSlab:                   return cItem(Item::WarpedSlab);
 			case BlockType::BambooMosaicSlab:             return cItem(Item::BambooMosaicSlab);
 			case BlockType::BambooSlab:                   return cItem(Item::BambooSlab);
-            case BlockType::CherrySlab:                   return cItem(Item::CherrySlab);
+			case BlockType::CherrySlab:                   return cItem(Item::CherrySlab);
 			case BlockType::CobbledDeepslateSlab:         return cItem(Item::CobbledDeepslateSlab);
 			case BlockType::TuffSlab:                     return cItem(Item::TuffSlab);
 			case BlockType::TuffBrickSlab:                return cItem(Item::TuffBrickSlab);
@@ -659,7 +659,7 @@ private:
 			case BlockType::WarpedSlab:                  METAMIRRORXZ(WarpedSlab)
 			case BlockType::BambooMosaicSlab:            METAMIRRORXZ(BambooMosaicSlab)
 			case BlockType::BambooSlab:                  METAMIRRORXZ(BambooSlab)
-            case BlockType::CherrySlab:                  METAMIRRORXZ(CherrySlab)
+			case BlockType::CherrySlab:                  METAMIRRORXZ(CherrySlab)
 			case BlockType::CobbledDeepslateSlab:        METAMIRRORXZ(CobbledDeepslateSlab)
 			case BlockType::TuffSlab:                    METAMIRRORXZ(TuffSlab)
 			case BlockType::TuffBrickSlab:               METAMIRRORXZ(TuffBrickSlab)
@@ -730,8 +730,8 @@ private:
 			case BlockType::StoneSlab:                   return 11;
 			case BlockType::WarpedSlab:                  return 0;  // TODO
 			case BlockType::BambooMosaicSlab:
-			case BlockType::BambooSlab: 
-            case BlockType::CherrySlab:
+			case BlockType::BambooSlab:
+			case BlockType::CherrySlab:
 			case BlockType::CobbledDeepslateSlab:
 			case BlockType::TuffSlab:
 			case BlockType::TuffBrickSlab:
@@ -740,7 +740,7 @@ private:
 			case BlockType::MangroveSlab:
 			case BlockType::DeepslateTileSlab:
 			case BlockType::DeepslateBrickSlab:
-			case BlockType::PolishedDeepslateSlab:    
+			case BlockType::PolishedDeepslateSlab:
 			case BlockType::CutCopperSlab:
 			case BlockType::ExposedCutCopperSlab:
 			case BlockType::WeatheredCutCopperSlab:
@@ -748,7 +748,7 @@ private:
 			case BlockType::WaxedCutCopperSlab:
 			case BlockType::WaxedExposedCutCopperSlab:
 			case BlockType::WaxedWeatheredCutCopperSlab:
-			case BlockType::WaxedOxidizedCutCopperSlab: return 0; // TODO
+			case BlockType::WaxedOxidizedCutCopperSlab: return 0;  // TODO
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in slab handler!");

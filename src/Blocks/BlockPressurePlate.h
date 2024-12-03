@@ -85,10 +85,6 @@ private:
 			return cBlockStairsHandler::IsStairsTopHalf(Block);
 		}
 
-		//switch (Block)
-		//{
-		//	return cBlockSlabHandler::IsSlabTop(Block) || cBlockSlabHandler::IsSlabFull(Block);
-		//}
 		switch (Block.Type())
 		{
 			case BlockType::AcaciaFence:

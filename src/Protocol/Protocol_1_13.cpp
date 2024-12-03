@@ -159,7 +159,7 @@ void cProtocol_1_13::SendCommandTree()
 #if NEW_COMMAND_TREE
 	{
 		cPacketizer Pkt(*this, pktCommnadTree);
-		cRoot::Get()->GetPluginManager()->GetRootCommandNode()->WriteCommandTree(Pkt,*this);
+		cRoot::Get()->GetPluginManager()->GetRootCommandNode()->WriteCommandTree(Pkt, *this);
 	}
 #else
 	{
@@ -175,7 +175,7 @@ void cProtocol_1_13::SendCommandTree()
 			UNUSED(a_Plugin);
 			UNUSED(a_Permission);
 			UNUSED(a_HelpString);
-				m_Commands.push_back(a_Command.substr(1, std::string::npos)); // Commands are sent with out slashes
+				m_Commands.push_back(a_Command.substr(1, std::string::npos));  // Commands are sent with out slashes
 				return false;
 			}
 
@@ -185,7 +185,7 @@ void cProtocol_1_13::SendCommandTree()
 		{
 			cPacketizer Pkt(*this, pktCommnadTree);
 			Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size()) + 1);  // + 1 for the root node
-			for (const AString& var : Callback.m_Commands)
+			for (const AString & var : Callback.m_Commands)
 			{
 				Pkt.WriteVarInt32(1);  // Flags
 				Pkt.WriteVarInt32(0);  // Size of Array of child nodes
@@ -199,7 +199,7 @@ void cProtocol_1_13::SendCommandTree()
 				Pkt.WriteVarInt32(static_cast<UInt32>(i));  // Indexes of children in the array
 			}
 
-			Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size())); // root index
+			Pkt.WriteVarInt32(static_cast<UInt32>(Callback.m_Commands.size()));  // root index
 		}
 	}
 #endif
@@ -317,10 +317,10 @@ void cProtocol_1_13::SendTabCompletionResults(const AStringVector & a_Results, U
 		Pkt.WriteVarInt32(0);  //  Start
 		Pkt.WriteVarInt32(0);  //  Length
 		Pkt.WriteVarInt32(static_cast<UInt32>(a_Results.size()));
-		for (const AString& Match : a_Results)
+		for (const AString & Match : a_Results)
 		{
 			Pkt.WriteString(Match);
-			Pkt.WriteBool(false); // Has Tooltip
+			Pkt.WriteBool(false);  // Has Tooltip
 		}
 	}
 }
@@ -917,7 +917,7 @@ void cProtocol_1_13::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, cons
 		AString tempstring = std::string{a_Channel};
 		if (m_Client->HasPluginChannel(tempstring))
 		{
-			m_Client->SendPluginMessage("unregister", tempstring); 
+			m_Client->SendPluginMessage("unregister", tempstring);
 			return;  // Can't register again if already taken - kinda defeats the point of plugin messaging!
 		}
 
@@ -1789,7 +1789,6 @@ bool cProtocol_1_13_2::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size
 
 
 
-
 void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 {
 
@@ -1813,7 +1812,6 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 		bool long_potion = false;
 		AString potionname;
 		AString finalname = "minecraft:";
-		
 		int potion_dmg = a_Item.m_ItemDamage & 0x1F;
 		switch (potion_dmg)
 		{
@@ -1837,26 +1835,26 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 			case 32: potionname = "thick"; break;
 			case 64: potionname = "mundane"; break;
 		}
-		if ((a_Item.m_ItemDamage & 32) == 32 && potionname != "")
+		if (((a_Item.m_ItemDamage & 32) == 32) && (potionname != ""))
 		{
 			potionname = "thick";
 		}
-		if ((a_Item.m_ItemDamage & 64) == 64 && potionname != "")
+		if (((a_Item.m_ItemDamage & 64) == 64) && (potionname != ""))
 		{
 			potionname = "mundane";
 		}
-		if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1 && potionname != "thick")
+		if ((cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1) && (potionname != "thick"))
 		{
 			strong_potion = true;
 			finalname += "strong_";
 		}
-		if ((a_Item.m_ItemDamage & 0x40) == 0x40 && potionname != "mundane")
+		if (((a_Item.m_ItemDamage & 0x40) == 0x40) && (potionname != "mundane"))
 		{
 			long_potion = true;
 			finalname += "long_";
 		}
 		finalname += potionname;
-		Writer.AddString("Potion",finalname);
+		Writer.AddString("Potion", finalname);
 	}
 	if (a_Item.m_RepairCost != 0)
 	{
@@ -1902,5 +1900,4 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 
 	a_Pkt.WriteBuf(Writer.GetResult());
 	// TODO: NBT
-	//a_Pkt.WriteBEInt8(0);
 }

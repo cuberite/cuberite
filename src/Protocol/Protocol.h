@@ -35,7 +35,7 @@ class cPacketizer;
 struct StatisticsManager;
 
 
-static const int CompressionThreshold = 128; // After how large a packet should we compress it.
+static const int CompressionThreshold = 128;  // After how large a packet should we compress it.
 
 
 class cProtocol
@@ -329,12 +329,12 @@ public:
 	enum class PlayerActionResponses
 	{
 		START_DESTROY_BLOCK,
-        ABORT_DESTROY_BLOCK,
-        STOP_DESTROY_BLOCK,
-        DROP_ALL_ITEMS,
-        DROP_ITEM,
-        RELEASE_USE_ITEM,
-        SWAP_HELD_ITEMS
+		ABORT_DESTROY_BLOCK,
+		STOP_DESTROY_BLOCK,
+		DROP_ALL_ITEMS,
+		DROP_ITEM,
+		RELEASE_USE_ITEM,
+		SWAP_HELD_ITEMS
 	};
 	enum class EntityMetadataType
 	{
@@ -391,7 +391,7 @@ public:
 		v1_16_2 = 751,
 		v1_16_3 = 753,
 		v1_16_4 = 754,
-		//  v1_16_5 = 754,
+		// v1_16_5 = 754,
 		v1_17   = 755,
 		v1_17_1 = 756,
 		v1_18   = 757,
@@ -399,19 +399,21 @@ public:
 		v1_18_2 = 758,
 		v1_19   = 759,
 		v1_19_1 = 760,
-		//  v1_19_2 = 760,
+		// v1_19_2 = 760,
 		v1_19_3 = 761,
 		v1_19_4 = 762,
 		v1_20   = 763,
-		//  v1_20_1 = 763,
+		// v1_20_1 = 763,
 		v1_20_2 = 764,
 		v1_20_3 = 765,
-		//  v1_20_4 = 765,
+		// v1_20_4 = 765,
 		v1_20_5 = 766,
 		//  v1_20_6 = 766,
 		v1_21 = 767,
-		//v1_21_1 = 767,
+		// v1_21_1 = 767,
 		v1_21_2 = 768,
+		// v1_21_3 = 768
+		v1_21_4 = 769,
 	};
 
 	enum State

@@ -188,9 +188,6 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_bIsOnDetectorRail = false;
 	}
 
-	//BLOCKTYPE InsideType;
-	//NIBBLETYPE InsideMeta;
-	
 	BlockState InsideBlock = a_Chunk.GetBlock(RelPos);
 
 	auto ContainedBlock = Chunk->GetBlock(RelPos);
@@ -1291,7 +1288,7 @@ void cMinecart::OnRemoveFromWorld(cWorld & a_World)
 {
 	if (m_bIsOnDetectorRail)
 	{
-		m_World->SetBlock(m_DetectorRailPosition, Block::DetectorRail::DetectorRail(false, Block::DetectorRail::Shape(m_World->GetBlock(m_DetectorRailPosition)),Block::DetectorRail::Waterlogged(m_World->GetBlock(m_DetectorRailPosition))));
+		m_World->SetBlock(m_DetectorRailPosition, Block::DetectorRail::DetectorRail(false, Block::DetectorRail::Shape(m_World->GetBlock(m_DetectorRailPosition)), Block::DetectorRail::Waterlogged(m_World->GetBlock(m_DetectorRailPosition))));
 	}
 
 	Super::OnRemoveFromWorld(a_World);

@@ -5,5 +5,5 @@
 
 namespace Palette_1_18
 {
-	
+
 }

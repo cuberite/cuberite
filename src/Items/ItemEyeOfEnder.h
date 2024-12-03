@@ -8,15 +8,15 @@
 
 
 
-class cItemEyeOfEnderHandler:
+class cItemEyeOfEnderHandler final:
 	public cItemThrowableHandler
 {
 	using Super = cItemThrowableHandler;
 
 public:
 
-	cItemEyeOfEnderHandler():
-		Super(Item::EnderEye, cProjectileEntity::pkSnowball, 30)
+	constexpr cItemEyeOfEnderHandler(Item a_ItemType):
+		Super(a_ItemType, cProjectileEntity::pkSnowball, 30)
 	{
 	}
 
@@ -28,14 +28,19 @@ public:
 		cWorld * a_World, cPlayer * a_Player, cBlockPluginInterface & a_PluginInterface, const cItem & a_Item,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		using namespace Block;
 
 		// Try to fill an End Portal Frame block:
 		if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{
-			auto DestBlock = a_World->GetBlock(a_ClickedBlockPos);
+			BlockState DestBlock;
+			if (a_World->GetBlock(a_ClickedBlockPos, DestBlock))
+			{
+				return false;
+			}
+
 			if (DestBlock.Type() == BlockType::EndPortalFrame)
 			{
 				if (EndPortalFrame::Eye(DestBlock))
@@ -90,8 +95,8 @@ public:
 		// Directions to use for the clockwise traversal.
 		static const Vector3i Left[] =
 		{
-			{0,0,0}, // 0
-			{0,0,0},  // 1
+			{ 0, 0,  0},  // 0
+			{ 0, 0,  0},  // 1
 			{-1, 0,  0},  // 2, North, left block is West  / XM  2
 			{ 1, 0,  0},  // 0, South, left block is East  / XP  3
 			{ 0, 0,  1},  // 1, West,  left block is South / ZP  4
@@ -99,11 +104,11 @@ public:
 		};
 		static const Vector3i LeftForward[] =
 		{
-			{0,0,0}, // 0
-			{0,0,0},  // 1
+			{ 0, 0,  0},  // 0
+			{ 0, 0,  0},  // 1
 			{-1, 0, -1},  // 2, North, left block is NorthWest / XM ZM --- 2
-			{ 1, 0,  1},  // 0, South, left block is SouthEast / XP ZP --- 3 
-			{-1, 0,  1},  // 1, West,  left block is SouthWest / XM ZP ----4 
+			{ 1, 0,  1},  // 0, South, left block is SouthEast / XP ZP --- 3
+			{-1, 0,  1},  // 1, West,  left block is SouthWest / XM ZP ----4
 			{ 1, 0, -1},  // 3, East,  left block is NorthEast / XP ZM --- 5
 		};
 

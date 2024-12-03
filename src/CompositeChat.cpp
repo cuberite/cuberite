@@ -376,10 +376,10 @@ AString cCompositeChat::CreateJsonString(bool a_ShouldUseChatPrefixes) const
 
 
 
-void cCompositeChat::WriteAsNBT(cFastNBTWriter& a_Writer, bool a_ShouldUseChatPrefixes) const
+void cCompositeChat::WriteAsNBT(cFastNBTWriter & a_Writer, bool a_ShouldUseChatPrefixes) const
 {
 	Json::Value Message;
-	a_Writer.AddString("text",cClientHandle::FormatMessageType(a_ShouldUseChatPrefixes, GetMessageType(), GetAdditionalMessageTypeData()));
+	a_Writer.AddString("text", cClientHandle::FormatMessageType(a_ShouldUseChatPrefixes, GetMessageType(), GetAdditionalMessageTypeData()));
 	a_Writer.BeginList("extra", eTagType::TAG_Compound);
 	for (const auto & Part : m_Parts)
 	{
@@ -388,12 +388,12 @@ void cCompositeChat::WriteAsNBT(cFastNBTWriter& a_Writer, bool a_ShouldUseChatPr
 		{
 			[this, &a_Writer](const TextPart & a_Part)
 			{
-				a_Writer.AddString("text",a_Part.Text);
+				a_Writer.AddString("text", a_Part.Text);
 				AddChatPartStyle(a_Writer, a_Part.Style);
 			},
 			[this, &a_Writer](const ClientTranslatedPart & a_Part)
 			{
-				a_Writer.AddString("translate",a_Part.Text);
+				a_Writer.AddString("translate", a_Part.Text);
 				a_Writer.BeginList("with", eTagType::TAG_String);
 				Json::Value With;
 				for (const auto & Parameter : a_Part.Parameters)
@@ -404,7 +404,7 @@ void cCompositeChat::WriteAsNBT(cFastNBTWriter& a_Writer, bool a_ShouldUseChatPr
 			},
 			[this, &a_Writer](const UrlPart & a_Part)
 			{
-				a_Writer.AddString("text",a_Part.Text);
+				a_Writer.AddString("text", a_Part.Text);
 				a_Writer.BeginCompound("click_event");
 				a_Writer.AddString("action", "open_url");
 				a_Writer.AddString("value", a_Part.Url);
@@ -413,7 +413,7 @@ void cCompositeChat::WriteAsNBT(cFastNBTWriter& a_Writer, bool a_ShouldUseChatPr
 			},
 			[this, &a_Writer](const RunCommandPart & a_Part)
 			{
-				a_Writer.AddString("text",a_Part.Text);
+				a_Writer.AddString("text", a_Part.Text);
 				a_Writer.BeginCompound("click_event");
 				a_Writer.AddString("action", "run_command");
 				a_Writer.AddString("value", a_Part.Command);
@@ -422,7 +422,7 @@ void cCompositeChat::WriteAsNBT(cFastNBTWriter& a_Writer, bool a_ShouldUseChatPr
 			},
 			[this, &a_Writer](const SuggestCommandPart & a_Part)
 			{
-				a_Writer.AddString("text",a_Part.Text);
+				a_Writer.AddString("text", a_Part.Text);
 				a_Writer.BeginCompound("click_event");
 				a_Writer.AddString("action", "suggest_command");
 				a_Writer.AddString("value", a_Part.Command);
@@ -431,12 +431,14 @@ void cCompositeChat::WriteAsNBT(cFastNBTWriter& a_Writer, bool a_ShouldUseChatPr
 			},
 			[this, &a_Writer](const ShowAchievementPart & a_Part)
 			{
-				//a_Writer.AddString("text",a_Part.Text);
-				//a_Writer.BeginCompound("click_event");
-				//a_Writer.AddString("action", "suggest_command");
-				//a_Writer.AddString("value", a_Part.Command);
-				//a_Writer.EndCompound();
-				//AddChatPartStyle(a_Writer, a_Part.Style);
+				/*
+				a_Writer.AddString("text", a_Part.Text);
+				a_Writer.BeginCompound("click_event");
+				a_Writer.AddString("action", "suggest_command");
+				a_Writer.AddString("value", a_Part.Command);
+				a_Writer.EndCompound();
+				AddChatPartStyle(a_Writer, a_Part.Style);
+				*/
 			},
 		}, Part);
 		a_Writer.EndCompound();
@@ -456,11 +458,11 @@ void cCompositeChat::AddChatPartStyle(cFastNBTWriter & a_Writer, const AString &
 	{
 		switch (a_PartStyle[i])
 		{
-			case 'k': a_Writer.AddByte("obfuscated",true); break;
-			case 'l': a_Writer.AddByte("bold",true); break;
-			case 'm': a_Writer.AddByte("strikethrough",true); break;
-			case 'n': a_Writer.AddByte("underlined",true); break;
-			case 'o': a_Writer.AddByte("italic",true); break;
+			case 'k': a_Writer.AddByte("obfuscated", true); break;
+			case 'l': a_Writer.AddByte("bold", true); break;
+			case 'm': a_Writer.AddByte("strikethrough", true); break;
+			case 'n': a_Writer.AddByte("underlined", true); break;
+			case 'o': a_Writer.AddByte("italic", true); break;
 			case '0': a_Writer.AddString("color", "black"); break;
 			case '1': a_Writer.AddString("color", "dark_blue"); break;
 			case '2': a_Writer.AddString("color", "dark_green"); break;

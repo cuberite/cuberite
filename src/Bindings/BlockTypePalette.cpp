@@ -343,12 +343,12 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 			auto keyEnd = findNextSeparator(aTsvPalette, blockStateEnd + 1);
 			if ((keyEnd == AString::npos) || (aTsvPalette[keyEnd] != '\t'))
 			{
-				throw LoadFailedException(Printf("Incomplete data on line %u (CustomBlockState key)", line));
+				throw LoadFailedException(fmt::format(FMT_STRING("Incomplete data on line {} (blockState key)"), line));
 			}
 			auto valueEnd = findNextSeparator(aTsvPalette, keyEnd + 1);
 			if (valueEnd == AString::npos)
 			{
-				throw LoadFailedException(Printf("Incomplete data on line %u (CustomBlockState value)", line));
+				throw LoadFailedException(fmt::format(FMT_STRING("Incomplete data on line {} (blockState value)"), line));
 			}
 			auto key = aTsvPalette.substr(blockStateEnd + 1, keyEnd - blockStateEnd - 1);
 			auto value = aTsvPalette.substr(keyEnd + 1, valueEnd - keyEnd - 1);

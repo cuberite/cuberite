@@ -118,7 +118,7 @@ public:
 				{
 					case BLOCK_FACE_YP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, CreeperHead::CreeperHead(false,RotationToFineFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, CreeperHead::CreeperHead(false, RotationToFineFace(a_Player.GetYaw())));
 						break;
 					}
 					case BLOCK_FACE_XM:
@@ -139,7 +139,7 @@ public:
 				{
 					case BLOCK_FACE_YP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, CreeperHead::CreeperHead(false,RotationToFineFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, CreeperHead::CreeperHead(false, RotationToFineFace(a_Player.GetYaw())));
 						break;
 					}
 					case BLOCK_FACE_XM:
@@ -160,7 +160,7 @@ public:
 				{
 					case BLOCK_FACE_YP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, PiglinHead::PiglinHead(false,RotationToFineFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, PiglinHead::PiglinHead(false, RotationToFineFace(a_Player.GetYaw())));
 						break;
 					}
 					case BLOCK_FACE_XM:
@@ -191,8 +191,6 @@ public:
 	Adjusts the mob head entity based on the equipped item's data. */
 	void RegularHeadPlaced(const cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace) const
 	{
-		//const auto HeadType = static_cast<eMobHeadType>(a_HeldItem.m_ItemDamage);
-
 		// Use a callback to set the properties of the mob head block entity:
 		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_Player, a_HeldItem, a_ClickedBlockFace](cBlockEntity & a_BlockEntity)
 		{

@@ -421,7 +421,7 @@ struct sSetBlock
 		ASSERT((a_RelZ >= 0) && (a_RelZ < cChunkDef::Width));
 	}
 
-	bool operator<(sSetBlock const& v1) const
+	bool operator<(const sSetBlock & v1) const
 	{
 		return v1.m_RelY > this->m_RelY;
 	}

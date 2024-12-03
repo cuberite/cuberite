@@ -62,13 +62,13 @@ private:
 		bool IsPlacedInWater = a_Player.GetWorld()->GetBlock(a_PlacePosition).Type() == BlockType::Water;
 
 #define PLACE_TRAPDOOR(BlockType) \
-			{\
-				BlockToPlace = BlockType::BlockType(\
-					DestFacing,\
-					IsBottom ? BlockType::Half::Bottom : BlockType::Half::Top,\
-					false, false, IsPlacedInWater);\
-				break;\
-			}\
+	{\
+		BlockToPlace = BlockType::BlockType(\
+			DestFacing, \
+			IsBottom ? BlockType::Half::Bottom : BlockType::Half::Top, \
+			false, false, IsPlacedInWater);\
+		break;\
+	}\
 
 		using namespace Block;
 		switch (BlockItemConverter::FromItem(a_HeldItem.m_ItemType))

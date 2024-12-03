@@ -71,6 +71,7 @@ void cProtocol_1_15::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_B
 
 
 
+
 void cProtocol_1_15::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -187,7 +188,7 @@ void cProtocol_1_15::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteBEInt8(1);
 		Pkt.WriteBool(false);  // Difficulty locked?
 	}
-	// Send world Border // temporarily here
+	// Send world Border  // temporarily here
 	{
 		cPacketizer Pkt(*this, pktWorldBorder);
 		Pkt.WriteVarInt32(3);
@@ -209,7 +210,7 @@ void cProtocol_1_15::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 void cProtocol_1_15::SendPlayerActionResponse(Vector3i a_blockpos, int a_state_id, cProtocol::PlayerActionResponses a_action, bool a_IsApproved)
 {
 	cPacketizer pkt(*this, pktDifficulty);
-	pkt.WriteXYZPosition64(a_blockpos.x,a_blockpos.y,a_blockpos.z);
+	pkt.WriteXYZPosition64(a_blockpos.x, a_blockpos.y, a_blockpos.z);
 	pkt.WriteVarInt32(a_state_id);
 	pkt.WriteVarInt32(static_cast<UInt32>(a_action));
 	pkt.WriteBool(a_IsApproved);
@@ -392,36 +393,37 @@ void cProtocol_1_15::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 
 	return;
 	Byte Action;
-	// switch (a_BlockEntity.GetBlockType())
-	// {
-	// 	case E_BLOCK_CHEST:
-	// 	case E_BLOCK_ENCHANTMENT_TABLE:
-	// 	case E_BLOCK_END_PORTAL:
-	// 	case E_BLOCK_TRAPPED_CHEST:
-	// 	{
-	// 		// The ones with a action of 0 is just a workaround to send the block entities to a client.
-	// 		// Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
-	// 		Action = 0;
-	// 		break;
-	// 	}
-	//
-	// 	case E_BLOCK_MOB_SPAWNER:       Action = 1;  break;  // Update mob spawner spinny mob thing
-	// 	case E_BLOCK_COMMAND_BLOCK:     Action = 2;  break;  // Update command block text
-	// 	case E_BLOCK_BEACON:            Action = 3;  break;  // Update beacon entity
-	// 	case E_BLOCK_HEAD:              Action = 4;  break;  // Update Mobhead entity
-	// 	// case E_BLOCK_CONDUIT:        Action = 5;  break;  // Update Conduit entity
-	// 	case E_BLOCK_STANDING_BANNER:
-	// 	case E_BLOCK_WALL_BANNER:       Action = 6;  break;  // Update banner entity
-	// 	// case Structure Block:        Action = 7;  break;  // Update Structure tile entity
-	// 	case E_BLOCK_END_GATEWAY:       Action = 8;  break;  // Update destination for a end gateway entity
-	// 	case E_BLOCK_SIGN_POST:         Action = 9;  break;  // Update sign entity
-	// 	// case E_BLOCK_SHULKER_BOX:    Action = 10; break;  // sets shulker box - not used just here if anyone is confused from reading the protocol wiki
-	// 	case E_BLOCK_BED:               Action = 11; break;  // Update bed color
-	// 	// case E_BLOCK_JIGSAW:         Action = 12; break;
-	// 	// case E_BLOCK_CAMPFIRE:       Action = 13; break;
-	//
-	// 	default: return;  // Block entities change between versions
-	// }
+	/*
+	switch (a_BlockEntity.GetBlockType())
+	{
+		case E_BLOCK_CHEST:
+		case E_BLOCK_ENCHANTMENT_TABLE:
+		case E_BLOCK_END_PORTAL:
+		case E_BLOCK_TRAPPED_CHEST:
+		{
+			// The ones with a action of 0 is just a workaround to send the block entities to a client.
+			// Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
+			Action = 0;
+			break;
+		}
+
+		case E_BLOCK_MOB_SPAWNER:       Action = 1;  break;  // Update mob spawner spinny mob thing
+		case E_BLOCK_COMMAND_BLOCK:     Action = 2;  break;  // Update command block text
+		case E_BLOCK_BEACON:            Action = 3;  break;  // Update beacon entity
+		case E_BLOCK_HEAD:              Action = 4;  break;  // Update Mobhead entity
+		// case E_BLOCK_CONDUIT:        Action = 5;  break;  // Update Conduit entity
+		case E_BLOCK_STANDING_BANNER:
+		case E_BLOCK_WALL_BANNER:       Action = 6;  break;  // Update banner entity
+		// case Structure Block:        Action = 7;  break;  // Update Structure tile entity
+		case E_BLOCK_END_GATEWAY:       Action = 8;  break;  // Update destination for a end gateway entity
+		case E_BLOCK_SIGN_POST:         Action = 9;  break;  // Update sign entity
+		// case E_BLOCK_SHULKER_BOX:    Action = 10; break;  // sets shulker box - not used just here if anyone is confused from reading the protocol wiki
+		case E_BLOCK_BED:               Action = 11; break;  // Update bed color
+		// case E_BLOCK_JIGSAW:         Action = 12; break;
+		// case E_BLOCK_CAMPFIRE:       Action = 13; break;
+
+		default: return;  // Block entities change between versions
+	} */
 
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
 	Pkt.WriteXZYPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
@@ -882,19 +884,19 @@ UInt8 cProtocol_1_15::GetEntityMetadataID(EntityMetadata a_Metadata) const
 
 
 
-//std::pair<short, short> cProtocol_1_15::GetItemFromProtocolID(UInt32 a_ProtocolID) const
-//{
-//	return PaletteUpgrade::ToItem(Palette_1_15::ToItem(a_ProtocolID));
-//}
-//
-//
-//
-//
-//
-//UInt32 cProtocol_1_15::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const
-//{
-//	return Palette_1_15::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
-//}
+/* std::pair<short, short> cProtocol_1_15::GetItemFromProtocolID(UInt32 a_ProtocolID) const
+{
+	return PaletteUpgrade::ToItem(Palette_1_15::ToItem(a_ProtocolID));
+}
+
+
+
+
+
+UInt32 cProtocol_1_15::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const
+{
+	return Palette_1_15::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
+} */
 
 
 
@@ -977,10 +979,10 @@ UInt8 cProtocol_1_15::GetProtocolEntityType(const cEntity & a_Entity) const
 
 
 
-//UInt32 cProtocol_1_15::GetProtocolItemType(short a_ItemID, short a_ItemDamage) const
-//{
-//	return Palette_1_15::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
-//}
+/* UInt32 cProtocol_1_15::GetProtocolItemType(short a_ItemID, short a_ItemDamage) const
+{
+	return Palette_1_15::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
+} */
 
 
 
@@ -1215,7 +1217,7 @@ bool cProtocol_1_15::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x22: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 		case 0x23: HandlePacketSlotSelect(a_ByteBuffer); return true;
 		case 0x24: /* update command block */ return false;
-		case 0x25: /* update minecart command block*/ return false;
+		case 0x25: /* update minecart command block */ return false;
 		case 0x26: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 		case 0x27: /* Update jigsaw block */ return false;
 		case 0x28: /* Update structure block */ return false;
@@ -1226,7 +1228,6 @@ bool cProtocol_1_15::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x2D: HandlePacketUseItem(a_ByteBuffer); return true;
 		default: break;
 	}
-	
 	return Super::HandlePacket(a_ByteBuffer, a_PacketType);
 }
 

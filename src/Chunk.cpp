@@ -315,7 +315,6 @@ void cChunk::GetAllData(cChunkDataCallback & a_Callback) const
 
 	a_Callback.LightIsValid(m_IsLightValid);
 	a_Callback.ChunkData(m_BlockData, m_LightData);
-	//a_Callback.ChunkData2(m_BlockData2, m_LightData);
 	a_Callback.HeightMap(m_HeightMap);
 	a_Callback.BiomeMap(m_BiomeMap);
 
@@ -340,7 +339,6 @@ void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 	std::copy_n(a_SetChunkData.BiomeMap.data(), a_SetChunkData.BiomeMap.size(), m_BiomeMap.data());
 
 	m_BlockData = std::move(a_SetChunkData.BlockData);
-	//m_BlockData2 = std::move(a_SetChunkData.BlockData2);
 	m_LightData = std::move(a_SetChunkData.LightData);
 	m_IsLightValid = a_SetChunkData.IsLightValid;
 
@@ -399,7 +397,7 @@ void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 	}
 
 	// Wake up all simulators for their respective blocks:
-	//WakeUpSimulators();
+	// WakeUpSimulators();
 }
 
 

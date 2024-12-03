@@ -8,7 +8,7 @@
 
 
 
-class cItemBigFlowerHandler:
+class cItemBigFlowerHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
@@ -17,16 +17,7 @@ public:
 
 	using Super::Super;
 
-	cItemBigFlowerHandler(Item a_ItemType):
-		Super(a_ItemType)
-	{
-	}
-
-
-
-
-
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
 		// Needs at least two free blocks to build in:
 		if (a_PlacePosition.y >= (cChunkDef::Height - 1))
@@ -36,7 +27,11 @@ public:
 
 		const auto & World = *a_Player.GetWorld();
 		const auto TopPos = a_PlacePosition.addedY(1);
-		auto BlockToReplace = World.GetBlock(TopPos);
+		BlockState BlockToReplace;
+		if (World.GetBlock(TopPos, BlockToReplace))
+		{
+			return false;
+		}
 
 		if (!cBlockHandler::For(BlockToReplace.Type()).DoesIgnoreBuildCollision(World, a_HeldItem, TopPos, BlockToReplace, a_ClickedBlockFace, false))
 		{

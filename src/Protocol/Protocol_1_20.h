@@ -15,8 +15,8 @@ public:
 
 protected:
 	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
-    virtual void    SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
-    virtual void    SendRespawn(eDimension a_Dimension) override;
+	virtual void    SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
+	virtual void    SendRespawn(eDimension a_Dimension) override;
 	virtual void    SendEditSign(Vector3i a_BlockPos) override;
 
 	virtual void    HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer) override;
@@ -42,7 +42,7 @@ public:
 	using Super::Super;
 
 protected:
-	virtual UInt32	GetPacketID(ePacketType a_PacketType) const override;
+	virtual UInt32  GetPacketID(ePacketType a_PacketType) const override;
 
 	virtual void    SendLoginSuccess(void) override;
 	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
@@ -74,7 +74,7 @@ public:
 	using Super::Super;
 
 protected:
-	virtual UInt32	GetPacketID(ePacketType a_PacketType) const override;
+	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
 
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 

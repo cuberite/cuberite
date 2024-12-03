@@ -1704,7 +1704,8 @@ namespace PaletteUpgrade
 			case (255 << 4) | 0: return StructureBlock::StructureBlock(StructureBlock::Mode::Save);
 			case (255 << 4) | 1: return StructureBlock::StructureBlock(StructureBlock::Mode::Load);
 			case (255 << 4) | 2: return StructureBlock::StructureBlock(StructureBlock::Mode::Corner);
-			case (255 << 4) | 3: return StructureBlock::StructureBlock(StructureBlock::Mode::Data);*/
+			case (255 << 4) | 3: return StructureBlock::StructureBlock(StructureBlock::Mode::Data);
+			*/
 			default:
 			{
 				// LOGWARNING("%d, %d, %s", Block, Meta, std::bitset<8>(Meta));
@@ -2310,7 +2311,7 @@ namespace PaletteUpgrade
 			case (373 << 16) | 8273:
 			case (373 << 16) | 8289:
 			case (373 << 16) | 8290:
-			case (373 << 16) | 8292: 
+			case (373 << 16) | 8292:
 			case (373 << 16) | 8297: return Item::Potion;
 
 			// Potion type encoded in Item NBT:
@@ -4307,7 +4308,8 @@ namespace PaletteUpgrade
 
 			// renamed or added blocks that have an old replacement
 			case CaveAir::CaveAir().ID: return { 0, 0 };
-			case Pumpkin::Pumpkin().ID: return { 86, 0 };*/
+			case Pumpkin::Pumpkin().ID: return { 86, 0 };
+			*/
 
 			default:
 			{
@@ -5297,9 +5299,9 @@ namespace PaletteUpgrade
 			case Item::CartographyTable:                return BlockType::CartographyTable;
 			case Item::CarvedPumpkin:                   return BlockType::CarvedPumpkin;
 			case Item::Cauldron:                        return BlockType::Cauldron;
-			//case Item::CaveAir:                         return BlockType::CaveAir;
+			// case Item::CaveAir:                         return BlockType::CaveAir;
 			case Item::GlowBerries:                       return BlockType::CaveVines;
-			//case Item::CaveVinesPlant:                  return BlockType::CaveVinesPlant;
+			// case Item::CaveVinesPlant:                  return BlockType::CaveVinesPlant;
 			case Item::Chain:                           return BlockType::Chain;
 			case Item::ChainCommandBlock:               return BlockType::ChainCommandBlock;
 			case Item::CherryButton:                    return BlockType::CherryButton;
@@ -5767,8 +5769,8 @@ namespace PaletteUpgrade
 			case Item::PinkTulip:                       return BlockType::PinkTulip;
 			case Item::PinkWool:                        return BlockType::PinkWool;
 			case Item::Piston:                          return BlockType::Piston;
-			//case Item::PistonHead:                      return BlockType::PistonHead;
-			//case Item::PitcherCrop:                     return BlockType::PitcherCrop;
+			// case Item::PistonHead:                      return BlockType::PistonHead;
+			// case Item::PitcherCrop:                     return BlockType::PitcherCrop;
 			case Item::PitcherPlant:                    return BlockType::PitcherPlant;
 			case Item::PlayerHead:                      return BlockType::PlayerHead;
 			case Item::Podzol:                          return BlockType::Podzol;
@@ -5803,8 +5805,8 @@ namespace PaletteUpgrade
 			case Item::PolishedTuffWall:                return BlockType::PolishedTuffWall;
 			case Item::Poppy:                           return BlockType::Poppy;
 			case Item::Potion:                          return BlockType::Potatoes;
-			//case Item::PowderSnow:                      return BlockType::PowderSnow;
-			//case Item::PowderSnowCauldron:              return BlockType::PowderSnowCauldron;
+			// case Item::PowderSnow:                      return BlockType::PowderSnow;
+			// case Item::PowderSnowCauldron:              return BlockType::PowderSnowCauldron;
 			case Item::PoweredRail:                     return BlockType::PoweredRail;
 			case Item::Prismarine:                      return BlockType::Prismarine;
 			case Item::PrismarineBrickSlab:             return BlockType::PrismarineBrickSlab;
@@ -5868,7 +5870,7 @@ namespace PaletteUpgrade
 			case Item::RedstoneLamp:                    return BlockType::RedstoneLamp;
 			case Item::RedstoneOre:                     return BlockType::RedstoneOre;
 			case Item::RedstoneTorch:                   return BlockType::RedstoneTorch;
-			//case Item::RedstoneWallTorch:               return BlockType::RedstoneWallTorch;
+			// case Item::RedstoneWallTorch:               return BlockType::RedstoneWallTorch;
 			case Item::Redstone:                    return BlockType::RedstoneWire;
 			case Item::ReinforcedDeepslate:             return BlockType::ReinforcedDeepslate;
 			case Item::Repeater:                        return BlockType::Repeater;
@@ -6004,11 +6006,11 @@ namespace PaletteUpgrade
 			case Item::TuffWall:                        return BlockType::TuffWall;
 			case Item::TurtleEgg:                       return BlockType::TurtleEgg;
 			case Item::TwistingVines:                   return BlockType::TwistingVines;  // not implemnted properly
-			//case Item::TwistingVinesPlant:              return BlockType::TwistingVinesPlant;
+			// case Item::TwistingVinesPlant:              return BlockType::TwistingVinesPlant;
 			case Item::VerdantFroglight:                return BlockType::VerdantFroglight;
 			case Item::Vine:                            return BlockType::Vine;
-			//case Item::VoidAir:                         return BlockType::VoidAir;
-			//case Item::WallTorch:                       return BlockType::WallTorch;
+			// case Item::VoidAir:                         return BlockType::VoidAir;
+			// case Item::WallTorch:                       return BlockType::WallTorch;
 			case Item::WarpedButton:                    return BlockType::WarpedButton;
 			case Item::WarpedDoor:                      return BlockType::WarpedDoor;
 			case Item::WarpedFence:                     return BlockType::WarpedFence;
@@ -6026,8 +6028,8 @@ namespace PaletteUpgrade
 			case Item::WarpedStem:                      return BlockType::WarpedStem;
 			case Item::WarpedTrapdoor:                  return BlockType::WarpedTrapdoor;
 			case Item::WarpedWartBlock:                 return BlockType::WarpedWartBlock;
-			//case Item::Water:                           return BlockType::Water;
-			//case Item::WaterCauldron:                   return BlockType::WaterCauldron;
+			// case Item::Water:                           return BlockType::Water;
+			// case Item::WaterCauldron:                   return BlockType::WaterCauldron;
 			case Item::WaxedChiseledCopper:             return BlockType::WaxedChiseledCopper;
 			case Item::WaxedCopperBlock:                return BlockType::WaxedCopperBlock;
 			case Item::WaxedCopperBulb:                 return BlockType::WaxedCopperBulb;
@@ -6074,7 +6076,7 @@ namespace PaletteUpgrade
 			case Item::WeatheredCutCopperSlab:          return BlockType::WeatheredCutCopperSlab;
 			case Item::WeatheredCutCopperStairs:        return BlockType::WeatheredCutCopperStairs;
 			case Item::WeepingVines:                    return BlockType::WeepingVines;  // not implemnetd properly
-			//case Item::WeepingVinesPlant:               return BlockType::WeepingVinesPlant;
+			// case Item::WeepingVinesPlant:               return BlockType::WeepingVinesPlant;
 			case Item::WetSponge:                       return BlockType::WetSponge;
 			case Item::Wheat:                           return BlockType::Wheat;
 			case Item::WhiteBanner:                     return BlockType::WhiteBanner;

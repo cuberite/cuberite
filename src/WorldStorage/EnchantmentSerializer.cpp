@@ -19,7 +19,7 @@ void EnchantmentSerializer::WriteToNBTCompound(const cEnchantments & a_Enchantme
 			if (stringmode)
 			{
 				AString name;
-				for (const auto& var : enchantment_names)
+				for (const auto & var : enchantment_names)
 				{
 					if (var.second == itr->first)
 					{
@@ -27,7 +27,7 @@ void EnchantmentSerializer::WriteToNBTCompound(const cEnchantments & a_Enchantme
 						break;
 					}
 				}
-				a_Writer.AddString("id",name);
+				a_Writer.AddString("id", name);
 			}
 			else
 			{
@@ -79,7 +79,7 @@ void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const c
 		int id = -1, lvl = -1;
 		for (int ch = a_NBT.GetFirstChild(tag); ch >= 0; ch = a_NBT.GetNextSibling(ch))
 		{
-			if (a_NBT.GetType(ch) != TAG_Short && a_NBT.GetType(ch) != TAG_String)
+			if ((a_NBT.GetType(ch) != TAG_Short) && (a_NBT.GetType(ch) != TAG_String))
 			{
 				continue;
 			}
@@ -92,7 +92,7 @@ void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const c
 				else
 				{
 					AString name = a_NBT.GetString(ch);
-					name.erase(0,strlen("minecraft:"));
+					name.erase(0, strlen("minecraft:"));
 					VERIFY(enchantment_names.count(name) > 0);  // Will fail for unimplemented enchants
 					id = enchantment_names.at(name);
 				}

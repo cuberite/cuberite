@@ -7,10 +7,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 // eCommandNode:
-
 cCommandManager::cCommandNode::cCommandNode() :
 	m_IsExecutable(false),
-	m_Executioner([](cCommandExecutionContext& a_Ctx) -> bool { return true; }),
+	m_Executioner([](cCommandExecutionContext & a_Ctx) -> bool { return true; }),
 	m_Type(eNodeType::Root),
 	m_ChildrenNodes({}),
 	m_RedirectNode(nullptr),
@@ -36,24 +35,23 @@ cCommandManager::cCommandNode::Then(const cCommandNode * a_ChildNode)
 
 
 cCommandManager::cCommandNode
-cCommandManager::cCommandNode::Literal(const AString& a_Name)
+cCommandManager::cCommandNode::Literal(const AString & a_Name)
 {
 	return cCommandNode(
 		eNodeType::Literal, {}, nullptr,
 		nullptr, a_Name,
-		eCommandSuggestionType::None, false, [](cCommandExecutionContext& a_Ctx) -> bool { return true; });
+		eCommandSuggestionType::None, false, [](cCommandExecutionContext & a_Ctx) -> bool { return true; });
 }
 
 
 
 
 
-cCommandManager::cCommandNode cCommandManager::cCommandNode::Argument(
-	const AString& a_Name, CmdArgPtr a_Argument)
+cCommandManager::cCommandNode cCommandManager::cCommandNode::Argument(const AString & a_Name, CmdArgPtr a_Argument)
 {
 	return cCommandNode(
-		 eNodeType::Argument, {}, nullptr, std::move(a_Argument), a_Name,
-		eCommandSuggestionType::None, false, [](cCommandExecutionContext& a_Ctx) -> bool { return true; });
+		eNodeType::Argument, {}, nullptr, std::move(a_Argument), a_Name,
+		eCommandSuggestionType::None, false, [](cCommandExecutionContext & a_Ctx) -> bool { return true; });
 }
 
 
@@ -71,7 +69,7 @@ cCommandManager::cCommandNode * cCommandManager::cCommandNode::Executable(const 
 
 
 
-bool cCommandManager::cCommandNode::Parse(BasicStringReader& a_Command, cCommandExecutionContext& a_Ctx)
+bool cCommandManager::cCommandNode::Parse(BasicStringReader & a_Command, cCommandExecutionContext & a_Ctx)
 {
 	if (this->m_Type == eNodeType::Root)
 	{
@@ -85,7 +83,7 @@ bool cCommandManager::cCommandNode::Parse(BasicStringReader& a_Command, cCommand
 		{
 			try
 			{
-				return cmd->Parse(a_Command,a_Ctx);
+				return cmd->Parse(a_Command, a_Ctx);
 			}
 			catch (cCommandParseException ex)
 			{
@@ -114,7 +112,7 @@ bool cCommandManager::cCommandNode::Parse(BasicStringReader& a_Command, cCommand
 		}
 		else
 		{
-			//TODO: handle errors properly
+			// TODO: handle errors properly
 		}
 
 	}
@@ -126,7 +124,7 @@ bool cCommandManager::cCommandNode::Parse(BasicStringReader& a_Command, cCommand
 
 
 
-void cCommandManager::cCommandNode::WriteCommandTree(cPacketizer& a_Packet, const cProtocol & a_Protocol)
+void cCommandManager::cCommandNode::WriteCommandTree(cPacketizer & a_Packet, const cProtocol & a_Protocol)
 {
 	if (this->m_Type != eNodeType::Root)
 	{
@@ -137,7 +135,7 @@ void cCommandManager::cCommandNode::WriteCommandTree(cPacketizer& a_Packet, cons
 	auto map = ComputeChildrenIds(*this);
 	a_Packet.WriteVarInt32(static_cast<UInt32>(map.size()));
 	this->WriteCommandTreeInternal(a_Packet, map, a_Protocol);
-	a_Packet.WriteVarInt32(0); // root node
+	a_Packet.WriteVarInt32(0);  // root node
 }
 
 
@@ -146,8 +144,8 @@ void cCommandManager::cCommandNode::WriteCommandTree(cPacketizer& a_Packet, cons
 
 cCommandManager::cCommandNode::cCommandNode(
 	eNodeType a_Type,
-	const CommandNodeList& a_ChildrenNodes, cCommandNode * a_RedirectNode,
-	CmdArgPtr a_ParserArgument, const AString& a_Name,
+	const CommandNodeList & a_ChildrenNodes, cCommandNode * a_RedirectNode,
+	CmdArgPtr a_ParserArgument, const AString & a_Name,
 	eCommandSuggestionType a_SuggestionType, bool a_IsExecutable, CommandExecutor a_Executioner) :
 	m_Type(a_Type),
 	m_ChildrenNodes(a_ChildrenNodes),
@@ -161,13 +159,15 @@ cCommandManager::cCommandNode::cCommandNode(
 }
 
 
-  // TODO: implement binary search instead of linear
+
+
+
 cCommandManager::cCommandNode *
-cCommandManager::cCommandNode::GetLiteralCommandNode(const AString& a_NodeName)
+cCommandManager::cCommandNode::GetLiteralCommandNode(const AString & a_NodeName)   // TODO: implement binary search instead of linear
 {
-	for (auto& var : this->m_ChildrenNodes)
+	for (auto & var : this->m_ChildrenNodes)
 	{
-		if (var.m_Name.compare(a_NodeName) == 0 && var.m_Type == eNodeType::Literal)
+		if ((var.m_Name.compare(a_NodeName) == 0) && (var.m_Type == eNodeType::Literal))
 		{
 			return &var;
 		}
@@ -175,21 +175,26 @@ cCommandManager::cCommandNode::GetLiteralCommandNode(const AString& a_NodeName)
 	return nullptr;
 }
 
+
+
+
+
 void cCommandManager::cCommandNode::WriteCommandTreeInternal(cPacketizer & a_Packet, std::map<cCommandNode *, UInt32> & a_Map, const cProtocol & a_Protocol)
 {
 	Byte flags = static_cast<Byte>(this->m_Type) | (this->m_IsExecutable << 2) | ((this->m_RedirectNode != nullptr) << 3) | ((this->m_SuggestionType != eCommandSuggestionType::None) << 4);
 	a_Packet.WriteBEInt8(flags);
 	a_Packet.WriteVarInt32(static_cast<UInt32>(this->m_ChildrenNodes.size()));
 
-	for (auto& var : this->m_ChildrenNodes)
-	{ 
+	for (auto & var : this->m_ChildrenNodes)
+	{
 		a_Packet.WriteVarInt32(a_Map[&var]);
 	}
-	
+
 	if (this->m_RedirectNode != nullptr)
 	{
 		// TODO: write redirect node
 	}
+
 	if (this->m_Type != eNodeType::Root)
 	{
 		a_Packet.WriteString(this->m_Name);
@@ -199,7 +204,7 @@ void cCommandManager::cCommandNode::WriteCommandTreeInternal(cPacketizer & a_Pac
 			if (id == -1)
 			{
 				a_Packet.WriteVarInt32(static_cast<UInt32>(a_Protocol.GetProtocolCommandArgumentID(eCommandParserType::String)));
-				a_Packet.WriteVarInt32(2); // Greedy phrase
+				a_Packet.WriteVarInt32(2);  // Greedy phrase
 			}
 			else
 			{
@@ -219,9 +224,13 @@ void cCommandManager::cCommandNode::WriteCommandTreeInternal(cPacketizer & a_Pac
 	}
 	for (auto & command_node : this->m_ChildrenNodes)
 	{
-		command_node.WriteCommandTreeInternal(a_Packet,a_Map,a_Protocol);
+		command_node.WriteCommandTreeInternal(a_Packet, a_Map, a_Protocol);
 	}
 }
+
+
+
+
 
 std::map<cCommandManager::cCommandNode *, UInt32>
 cCommandManager::cCommandNode::ComputeChildrenIds(cCommandNode & a_node)
@@ -231,7 +240,7 @@ cCommandManager::cCommandNode::ComputeChildrenIds(cCommandNode & a_node)
 	CollectChildren(list, a_node);
 	childmap[&a_node] = 0;
 	int i = 1;
-	for (cCommandNode* var : list)
+	for (cCommandNode * var : list)
 	{
 		childmap[var] = i;
 		i++;
@@ -239,10 +248,14 @@ cCommandManager::cCommandNode::ComputeChildrenIds(cCommandNode & a_node)
 	return childmap;
 }
 
-std::vector<cCommandManager::cCommandNode*>
-cCommandManager::cCommandNode::CollectChildren(std::vector<cCommandNode*>& a_list, cCommandNode& a_node)
+
+
+
+
+std::vector<cCommandManager::cCommandNode *>
+cCommandManager::cCommandNode::CollectChildren(std::vector<cCommandNode *> & a_list, cCommandNode & a_node)
 {
-	for (auto& var : a_node.m_ChildrenNodes)
+	for (auto & var : a_node.m_ChildrenNodes)
 	{
 		a_list.push_back(&var);
 		CollectChildren(a_list, var);
@@ -250,8 +263,12 @@ cCommandManager::cCommandNode::CollectChildren(std::vector<cCommandNode*>& a_lis
 	return a_list;
 }
 
+
+
+
+
 cCommandManager::cCommandNode *
-cCommandManager::cCommandNode::GetNextPotentialNode(BasicStringReader& a_Reader, cCommandExecutionContext& a_Ctx)
+cCommandManager::cCommandNode::GetNextPotentialNode(BasicStringReader & a_Reader, cCommandExecutionContext & a_Ctx)
 {
 	const int oldc = a_Reader.GetCursor();
 	const auto lit = this->GetLiteralCommandNode(a_Reader.ReadStringUntilWhiteSpace());
@@ -260,13 +277,13 @@ cCommandManager::cCommandNode::GetNextPotentialNode(BasicStringReader& a_Reader,
 		return lit;
 	}
 	a_Reader.SetCursor(oldc);
-	for (auto& var : this->m_ChildrenNodes)
+	for (auto & var : this->m_ChildrenNodes)
 	{
 		if (var.m_Type == eNodeType::Argument)
 		{
 			try
 			{
-				var.m_Argument->Parse(a_Reader,a_Ctx,var.m_Name);
+				var.m_Argument->Parse(a_Reader, a_Ctx, var.m_Name);
 				return &var;
 			}
 			catch (const cCommandParseException & ex)

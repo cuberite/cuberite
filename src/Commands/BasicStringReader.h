@@ -3,8 +3,8 @@
 
 class BasicStringReader
 {
-  public:
-	BasicStringReader(const AString& a_String) :
+public:
+	BasicStringReader(const AString & a_String) :
 		m_Cursor(0),
 		m_String(a_String)
 	{
@@ -13,10 +13,10 @@ class BasicStringReader
 
 	AString ReadStringUntilWhiteSpace()
 	{
-		//TODO: check range before calling
+		// TODO: check range before calling
 		try
 		{
-			auto ret = m_String.substr(m_Cursor, m_String.find(' ',m_Cursor) - m_Cursor);
+			auto ret = m_String.substr(m_Cursor, m_String.find(' ', m_Cursor) - m_Cursor);
 			m_Cursor += static_cast<int>(ret.size())+1;
 			return ret;
 		}
@@ -29,9 +29,9 @@ class BasicStringReader
 
 	void SetCursor(const int a_Cursor) { m_Cursor = a_Cursor; }
 
-	bool IsDone() const { return static_cast<int>(m_String.size()) == m_Cursor-1; }
+	bool IsDone() const { return static_cast<int>(m_String.size()) == m_Cursor - 1; }
 	AString GetString() const { return m_String; }
-  private:
+private:
 	int m_Cursor;
 	AString m_String;
 };

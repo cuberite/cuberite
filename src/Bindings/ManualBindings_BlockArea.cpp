@@ -275,9 +275,9 @@ static int tolua_cBlockArea_GetBlockTypeMeta(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, Coords, "Coords");
 	if (!self->IsValidCoords(Coords))
 	{
-	//	return L.FApiParamError("Coords ({0}) out of range ({1} - {2})",
-	//		Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
-	//	);
+		return L.ApiParamError(fmt::format(FMT_STRING("Coords ({0}) out of range ({1} - {2})"),
+			Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
+		));
 	}
 
 	auto Block = self->GetBlock({Coords.x, Coords.y, Coords.z});
@@ -423,9 +423,9 @@ static int tolua_cBlockArea_GetRelBlockTypeMeta(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, Coords, "Coords");
 	if (!self->IsValidRelCoords(Coords))
 	{
-		//return L.FApiParamError("The coords ({0}) are out of range (max {1})",
-		//	Coords, (self->GetSize() - Vector3i{1, 1, 1})
-		//);
+		return L.ApiParamError(fmt::format(FMT_STRING("The coords ({0}) are out of range (max {1})"),
+			Coords, (self->GetSize() - Vector3i{1, 1, 1})
+		));
 	}
 
 	auto Block = self->GetRelBlock(Coords);
@@ -879,9 +879,9 @@ static int GetBlock(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, Coords, "Coords");
 	if (!self->IsValidCoords(Coords))
 	{
-		//return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
-		//	Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
-		//);
+		return L.ApiParamError(fmt::format(FMT_STRING("The coords ({0}) are out of range ({1} - {2})"),
+			Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
+		));
 	}
 
 	// Get the block info:
@@ -930,9 +930,9 @@ static int GetRelBlock(lua_State * a_LuaState)
 	readVector3iOverloadParams(L, 2, Coords, "Coords");
 	if (!self->IsValidRelCoords(Coords))
 	{
-		//return L.FApiParamError("The coords ({0}) are out of range ({1})",
-		//	Coords, (self->GetSize() - Vector3i(1, 1, 1))
-		//);
+		return L.ApiParamError(fmt::format(FMT_STRING("The coords ({0}) are out of range ({1})"),
+			Coords, (self->GetSize() - Vector3i(1, 1, 1))
+		));
 	}
 
 	// Get the block info:
@@ -978,9 +978,9 @@ static int SetBlock(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, Coords, "Coords");
 	if (!self->IsValidCoords(Coords))
 	{
-		//return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
-		//	Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
-		//);
+		return L.ApiParamError(fmt::format(FMT_STRING("The coords ({0}) are out of range ({1} - {2})"),
+			Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
+		));
 	}
 	unsigned char Data;
 	L.GetStackValues(idx, Data);
@@ -1030,9 +1030,10 @@ static int SetRelBlock(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, Coords, "Coords");
 	if (!self->IsValidRelCoords(Coords))
 	{
-		//return L.FApiParamError("The coords ({0}) are out of range ({1})",
-		//	Coords, (self->GetSize() - Vector3i(1, 1, 1))
-		//);
+		return L.ApiParamError(fmt::format(
+			FMT_STRING("The coords ({0}) are out of range ({1})"),
+			Coords, (self->GetSize() - Vector3i(1, 1, 1))
+		));
 	}
 	unsigned char Data;
 	L.GetStackValues(idx, Data);
@@ -1073,9 +1074,9 @@ static int tolua_cBlockArea_SetBlockTypeMeta(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, Coords, "Coords");
 	if (!self->IsValidCoords(Coords))
 	{
-		//return L.FApiParamError("The coords ({0}) are out of range ({1} - {2})",
-		//	Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
-		//);
+		return L.ApiParamError(fmt::format(FMT_STRING("The coords ({0}) are out of range ({1} - {2})"),
+			Coords, self->GetOrigin(), self->GetOrigin() + self->GetSize() - Vector3i{1, 1, 1}
+		));
 	}
 
 	unsigned char Block;
@@ -1121,9 +1122,10 @@ static int tolua_cBlockArea_SetRelBlockTypeMeta(lua_State * a_LuaState)
 	auto idx = readVector3iOverloadParams(L, 2, Coords, "Coords");
 	if (!self->IsValidRelCoords(Coords))
 	{
-		//return L.FApiParamError("The coords ({0}) are out of range ({1})",
-		//	Coords, (self->GetSize() - Vector3i(1, 1, 1))
-		//);
+		return L.ApiParamError(fmt::format(
+			FMT_STRING("The coords ({0}) are out of range ({1})"),
+			Coords, (self->GetSize() - Vector3i(1, 1, 1))
+		));
 	}
 
 	unsigned char Block;

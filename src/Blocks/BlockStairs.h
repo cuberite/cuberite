@@ -57,8 +57,8 @@ public:
 			case BlockType::StoneStairs:
 			case BlockType::WarpedStairs:
 			case BlockType::BambooMosaicStairs:
-			case BlockType::BambooStairs: 
-            case BlockType::CherryStairs:
+			case BlockType::BambooStairs:
+			case BlockType::CherryStairs:
 			case BlockType::CobbledDeepslateStairs:
 			case BlockType::TuffStairs:
 			case BlockType::TuffBrickStairs:
@@ -67,7 +67,7 @@ public:
 			case BlockType::MangroveStairs:
 			case BlockType::DeepslateTileStairs:
 			case BlockType::DeepslateBrickStairs:
-			case BlockType::PolishedDeepslateStairs:    
+			case BlockType::PolishedDeepslateStairs:
 			case BlockType::CutCopperStairs:
 			case BlockType::ExposedCutCopperStairs:
 			case BlockType::WeatheredCutCopperStairs:
@@ -128,8 +128,8 @@ public:
 			case BlockType::StoneStairs:                   return StoneStairs::Half(a_Block) == StoneStairs::Half::Top;
 			case BlockType::WarpedStairs:                  return WarpedStairs::Half(a_Block) == WarpedStairs::Half::Top;
 			case BlockType::BambooMosaicStairs:            IS_STAIR_TOP_HALF(BambooMosaicStairs)
-			case BlockType::BambooStairs:                  IS_STAIR_TOP_HALF(BambooStairs) 
-            case BlockType::CherryStairs:                  IS_STAIR_TOP_HALF(BambooMosaicStairs)
+			case BlockType::BambooStairs:                  IS_STAIR_TOP_HALF(BambooStairs)
+			case BlockType::CherryStairs:                  IS_STAIR_TOP_HALF(BambooMosaicStairs)
 			case BlockType::CobbledDeepslateStairs:        IS_STAIR_TOP_HALF(CobbledDeepslateStairs)
 			case BlockType::TuffStairs:                    IS_STAIR_TOP_HALF(TuffStairs)
 			case BlockType::TuffBrickStairs:               IS_STAIR_TOP_HALF(TuffBrickStairs)
@@ -138,7 +138,7 @@ public:
 			case BlockType::MangroveStairs:                IS_STAIR_TOP_HALF(MangroveStairs)
 			case BlockType::DeepslateTileStairs:           IS_STAIR_TOP_HALF(DeepslateTileStairs)
 			case BlockType::DeepslateBrickStairs:          IS_STAIR_TOP_HALF(DeepslateBrickStairs)
-			case BlockType::PolishedDeepslateStairs:       IS_STAIR_TOP_HALF(PolishedDeepslateStairs)    
+			case BlockType::PolishedDeepslateStairs:       IS_STAIR_TOP_HALF(PolishedDeepslateStairs)
 			case BlockType::CutCopperStairs:               IS_STAIR_TOP_HALF(CutCopperStairs)
 			case BlockType::ExposedCutCopperStairs:        IS_STAIR_TOP_HALF(ExposedCutCopperStairs)
 			case BlockType::WeatheredCutCopperStairs:      IS_STAIR_TOP_HALF(WeatheredCutCopperStairs)
@@ -221,8 +221,8 @@ private:
 			case BlockType::StoneStairs:                   return 11;
 			case BlockType::WarpedStairs:                  return 23;
 			case BlockType::BambooMosaicStairs:
-			case BlockType::BambooStairs: 
-            case BlockType::CherryStairs:
+			case BlockType::BambooStairs:
+			case BlockType::CherryStairs:
 			case BlockType::CobbledDeepslateStairs:
 			case BlockType::TuffStairs:
 			case BlockType::TuffBrickStairs:
@@ -231,7 +231,7 @@ private:
 			case BlockType::MangroveStairs:
 			case BlockType::DeepslateTileStairs:
 			case BlockType::DeepslateBrickStairs:
-			case BlockType::PolishedDeepslateStairs:    
+			case BlockType::PolishedDeepslateStairs:
 			case BlockType::CutCopperStairs:
 			case BlockType::ExposedCutCopperStairs:
 			case BlockType::WeatheredCutCopperStairs:

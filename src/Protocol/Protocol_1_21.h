@@ -18,7 +18,7 @@ protected:
 	virtual void SendSelectKnownPacks() override;
 	virtual void SendUpdateBlockEntity(cBlockEntity & a_BlockEntity) override;
 
-	virtual UInt32	GetPacketID(ePacketType a_PacketType) const override;
+	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
 
 	virtual Version GetProtocolVersion() const override;
 	virtual UInt32 GetProtocolBlockType(BlockState a_Block) const override;
@@ -59,7 +59,35 @@ protected:
 	virtual UInt32 GetProtocolBlockType(BlockState a_Block) const override;
 	virtual UInt32 GetProtocolItemType(Item a_ItemID) const override;
 	virtual Item GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
 
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
+	virtual Version GetProtocolVersion() const override;
+};
+
+
+
+
+
+class cProtocol_1_21_4
+	: public cProtocol_1_21_2
+{
+	using Super = cProtocol_1_21_2;
+public:
+
+	using Super::Super;
+
+protected:
+
+	virtual void SendSelectKnownPacks() override;
+	// virtual void SendDynamicRegistries() override;
+
+	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
+
+	// virtual UInt32 GetProtocolBlockType(BlockState a_Block) const override;
+	// virtual UInt32 GetProtocolItemType(Item a_ItemID) const override;
+	// virtual Item GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
+	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
+
 	virtual Version GetProtocolVersion() const override;
 };

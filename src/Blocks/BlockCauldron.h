@@ -308,7 +308,7 @@ private:
 				a_Player.GetStatistics().Custom[CustomStatistic::FillCauldron]++;
 			}
 		}
-		/*TODO: either create a seperate header file fore water and lava or handle them here
+		/* TODO: either create a seperate header file fore water and lava or handle them here
 		switch (EquippedItem.m_ItemType)
 		{
 			case Item::Bucket:
@@ -333,7 +333,6 @@ private:
 					a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Bucket));
 				}
 				a_Player.GetStatistics().Custom[CustomStatistic::FillCauldron]++;
-		
 				break;
 			}
 			case Item::LavaBucket:
@@ -345,7 +344,6 @@ private:
 					a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Bucket));
 				}
 				a_Player.GetStatistics().Custom[CustomStatistic::FillCauldron]++;
-		
 				break;
 			}
 			case Item::PowderSnowBucket:
@@ -357,7 +355,6 @@ private:
 					a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Bucket));
 				}
 				a_Player.GetStatistics().Custom[CustomStatistic::FillCauldron]++;
-		
 				break;
 			}
 			case Item::GlassBottle:
@@ -424,7 +421,6 @@ private:
 					// The cauldron is empty:
 					break;
 				}
-		
 				// Proceed with normal cleaning:
 				a_ChunkInterface.FastSetBlock(a_BlockPos, Block::Cauldron::Cauldron(--FillState));
 				auto NewShulker = cItem(EquippedItem);
@@ -433,7 +429,8 @@ private:
 				break;
 			}
 			default: break;
-		}*/
+		}
+		*/
 
 		if (!EquippedItem.GetHandler().IsPlaceable())
 		{
@@ -474,14 +471,16 @@ private:
 	) const override
 	{
 		auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-		//if (!a_WorldInterface.IsWeatherWetAtXYZ(WorldPos.addedY(1)))
-		//{
-		//	// It's not raining at our current location or we do not have a direct view of the sky
-		//	return;
-		//}
+		/*
+		if (!a_WorldInterface.IsWeatherWetAtXYZ(WorldPos.addedY(1)))
+		{
+			// It's not raining at our current location or we do not have a direct view of the sky
+			return;
+		}
+		*/
 
 		BlockState Block = a_Chunk.GetBlock(a_RelPos);
-		if ((Block.Type() == BlockType::WaterCauldron || Block.Type() == BlockType::Cauldron) && a_WorldInterface.IsWeatherWetAtXYZ(WorldPos.addedY(1)))
+		if (((Block.Type() == BlockType::WaterCauldron) || (Block.Type() == BlockType::Cauldron)) && a_WorldInterface.IsWeatherWetAtXYZ(WorldPos.addedY(1)))
 		{
 			auto FillState = Block::WaterCauldron::Level(a_Chunk.GetBlock(a_RelPos));
 			if (FillState < 3)
@@ -489,15 +488,17 @@ private:
 				a_Chunk.FastSetBlock(a_RelPos, Block::WaterCauldron::WaterCauldron(FillState + 1));
 			}
 		}
-		//TODO: check if its snowing
-		//else if ((Block.Type() == BlockType::PowderSnowCauldron || Block.Type() == BlockType::Cauldron) && a_WorldInterface.i)
-		//{
-		//	auto FillState = Block::PowderSnowCauldron::Level(a_Chunk.GetBlock(a_RelPos));
-		//	if (FillState < 3)
-		//	{
-		//		a_Chunk.FastSetBlock(a_RelPos, Block::PowderSnowCauldron::PowderSnowCauldron(FillState + 1));
-		//	}
-		//}
+		/*
+		TODO: check if its snowing
+		else if (((Block.Type() == BlockType::PowderSnowCauldron) || (Block.Type() == BlockType::Cauldron)) && a_WorldInterface.i)
+		{
+			auto FillState = Block::PowderSnowCauldron::Level(a_Chunk.GetBlock(a_RelPos));
+			if (FillState < 3)
+			{
+				a_Chunk.FastSetBlock(a_RelPos, Block::PowderSnowCauldron::PowderSnowCauldron(FillState + 1));
+			}
+		}
+		*/
 	}
 
 

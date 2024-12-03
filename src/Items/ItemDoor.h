@@ -64,7 +64,11 @@ public:
 
 		// Check the block that will get replaced by the door:
 		{
-			auto UpperReplacedBlock = World.GetBlock(UpperBlockPosition);
+			BlockState UpperReplacedBlock;
+			if (World.GetBlock(UpperBlockPosition, UpperReplacedBlock))
+			{
+				return false;
+			}
 
 			if (!cBlockHandler::For(UpperReplacedBlock.Type()).DoesIgnoreBuildCollision(World, a_HeldItem, UpperBlockPosition, UpperReplacedBlock, a_ClickedBlockFace, false))
 			{
@@ -112,10 +116,10 @@ public:
 		using namespace Block;
 
 #define PLACE_DOOR(DoorType) \
-			{\
-				return a_Player.PlaceBlock(a_PlacePosition,DoorType::DoorType(Facing, DoorType::Half::Lower, HingeRight ? DoorType::Hinge::Right : DoorType::Hinge::Left, false, false))&&\
-				a_Player.PlaceBlock(UpperBlockPosition, DoorType::DoorType(Facing, DoorType::Half::Upper, HingeRight ? DoorType::Hinge::Right : DoorType::Hinge::Left, false, false));\
-			}\
+	{\
+		return a_Player.PlaceBlock(a_PlacePosition, DoorType::DoorType(Facing, DoorType::Half::Lower, HingeRight ? DoorType::Hinge::Right : DoorType::Hinge::Left, false, false)) && \
+		a_Player.PlaceBlock(UpperBlockPosition, DoorType::DoorType(Facing, DoorType::Half::Upper, HingeRight ? DoorType::Hinge::Right : DoorType::Hinge::Left, false, false));\
+	}\
 
 		switch (BlockType)
 		{

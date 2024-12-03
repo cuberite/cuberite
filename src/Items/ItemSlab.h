@@ -86,10 +86,10 @@ protected:
 		using namespace Block;
 
 #define PLACE_SLAB(SlabType) \
-			{\
-				BlockToPlace = SlabType::SlabType(IsTop ? SlabType::Type::Top : SlabType::Type::Bottom, IsPlacedInWater);\
-				break;\
-			}\
+	{\
+		BlockToPlace = SlabType::SlabType(IsTop ? SlabType::Type::Top : SlabType::Type::Bottom, IsPlacedInWater);\
+		break;\
+	}\
 
 		switch (m_ItemType)
 		{
@@ -295,7 +295,7 @@ protected:
 			}
 			case Item::BambooMosaicSlab:            PLACE_SLAB(BambooMosaicSlab)
 			case Item::BambooSlab:                  PLACE_SLAB(BambooSlab)
-            case Item::CherrySlab:                  PLACE_SLAB(CherrySlab)
+			case Item::CherrySlab:                  PLACE_SLAB(CherrySlab)
 			case Item::CobbledDeepslateSlab:        PLACE_SLAB(CobbledDeepslateSlab)
 			case Item::TuffSlab:                    PLACE_SLAB(TuffSlab)
 			case Item::TuffBrickSlab:               PLACE_SLAB(TuffBrickSlab)
@@ -386,7 +386,7 @@ protected:
 			case BlockType::WarpedSlab:                  return WarpedSlab::WarpedSlab(WarpedSlab::Type::Double, WarpedSlab::Waterlogged(BlockToPlace));
 			case BlockType::BambooMosaicSlab:            GET_DOUBLE_SLAB(BambooMosaicSlab)
 			case BlockType::BambooSlab:                  GET_DOUBLE_SLAB(BambooSlab)
-            case BlockType::CherrySlab:                  GET_DOUBLE_SLAB(CherrySlab)
+			case BlockType::CherrySlab:                  GET_DOUBLE_SLAB(CherrySlab)
 			case BlockType::CobbledDeepslateSlab:        GET_DOUBLE_SLAB(CobbledDeepslateSlab)
 			case BlockType::TuffSlab:                    GET_DOUBLE_SLAB(TuffSlab)
 			case BlockType::TuffBrickSlab:               GET_DOUBLE_SLAB(TuffBrickSlab)
