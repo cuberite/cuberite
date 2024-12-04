@@ -13,6 +13,7 @@
 #include "OSSupport/MiniDumpWriter.h"
 #include "OSSupport/SleepResolutionBooster.h"
 #include "OSSupport/StartAsService.h"
+#include <tclap/SwitchArg.h>
 
 
 
@@ -21,6 +22,8 @@
 bool g_ShouldLogCommIn;
 bool g_ShouldLogCommOut;
 bool g_RunAsService;
+
+bool g_DetachedStdin;
 
 
 
@@ -44,9 +47,14 @@ static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & a
 	TCLAP::SwitchArg noBufArg        ("",  "no-output-buffering", "Disable output buffering", cmd);
 	TCLAP::SwitchArg noFileLogArg    ("",  "no-log-file",         "Disable logging to file", cmd);
 	TCLAP::SwitchArg runAsServiceArg ("d", "service",             "Run as a service on Windows, or daemon on UNIX like systems", cmd);
+	TCLAP::SwitchArg runDetached ("", "detached", "Run with detached stdin (useful for container/docker)", cmd);
 	cmd.parse(argc, argv);
 
 	// Copy the parsed args' values into a settings repository:
+	if (runDetached.getValue())
+	{
+		g_DetachedStdin = true;
+	}
 	if (confArg.isSet())
 	{
 		AString conf_file = confArg.getValue();
