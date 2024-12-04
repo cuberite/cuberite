@@ -4,6 +4,7 @@
 
 #include "Server.h"
 #include "ClientHandle.h"
+#include "LoggerSimple.h"
 #include "Mobs/Monster.h"
 #include "Root.h"
 #include "World.h"
@@ -173,6 +174,8 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 	LOGD("Compatible protocol versions %s", MCS_PROTOCOL_VERSIONS);
 
 	m_Ports = ReadUpgradeIniPorts(a_Settings, "Server", "Ports", "Port", "PortsIPv6", "25565");
+
+	LOGINFO("Server Running On Port: %s", m_Ports[0]);
 
 	m_RCONServer.Initialize(a_Settings);
 
