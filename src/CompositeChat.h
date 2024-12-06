@@ -176,8 +176,7 @@ public:
 
 	void AddChatPartStyle(cFastNBTWriter & a_Writer, const AString & a_PartStyle) const;
 
-	/** Adds the chat part's style (represented by the part's stylestring) into
-	 * the Json object. */
+	/** Adds the chat part's style (represented by the part's stylestring) into the Json object. */
 	void AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle) const;
 
 protected:

@@ -6,25 +6,24 @@
 
 class cCommandExecutionContext
 {
-
-  public:
-	cCommandExecutionContext(cPlayer* const a_PlayerExecutor) :
+public:
+	cCommandExecutionContext(cPlayer * const a_PlayerExecutor) :
 		m_PlayerExecutor(a_PlayerExecutor)
 	{
 	}
 
-	void AddValue(const AString& a_Name, const std::any& a_Value)
+	void AddValue(const AString & a_Name, const std::any & a_Value)
 	{
 		m_ArgumentMap[a_Name] = a_Value;
 	}
 
-	std::any GetValue(const AString& a_Name)
+	std::any GetValue(const AString & a_Name)
 	{
-		return m_ArgumentMap[a_Name];		
+		return m_ArgumentMap[a_Name];
 	}
 
-	//TODO: add support for command block and all entities
-	void SendFeedback(const AString& a_ToSend) const
+	// TODO: add support for command block and all entities
+	void SendFeedback(const AString & a_ToSend) const
 	{
 		if (m_PlayerExecutor != nullptr)
 		{
@@ -36,16 +35,16 @@ class cCommandExecutionContext
 		}
 	}
 
-	cPlayer* GetPlayer() const
+	cPlayer * GetPlayer() const
 	{
 		if (m_PlayerExecutor == nullptr)
 		{
 			throw cCommandExecutionException("Player Entity required");
 		}
-		return m_PlayerExecutor;		
+		return m_PlayerExecutor;
 	}
 
-  private:
+private:
 	std::map<AString, std::any> m_ArgumentMap;
-	cPlayer* m_PlayerExecutor;
+	cPlayer * m_PlayerExecutor;
 };

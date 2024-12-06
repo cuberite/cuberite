@@ -348,16 +348,15 @@ Compression::Result cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk)
 bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, const ContiguousByteBufferView a_RawChunkData)
 {
 	struct SetChunkData Data(a_Chunk);
-	
 	if (newFormat)
 	{
 		// LOGD("LOADING chunk X %d Z %d", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 		int Level = a_NBT.FindChildByName(0, "Level");
 		if (Level < 0)
 		{
-			Level = 0;	// in 1.18+? tag level does not exist
-			//ChunkLoadFailed(a_Chunk, "Missing NBT tag: Level", a_RawChunkData);
-			//return false;
+			Level = 0;  // in 1.18+? tag level does not exist
+			// ChunkLoadFailed(a_Chunk, "Missing NBT tag: Level", a_RawChunkData);
+			// return false;
 		}
 		int DataVersionTag = a_NBT.FindChildByName(0, "DataVersion");
 		if (DataVersionTag < 0)
@@ -454,7 +453,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				AString bls;
 				std::vector<AString> strs;
 				#define READ_BLOCK_STATES 0
-				#if READ_BLOCK_STATES  // Temporarily disabled 
+				#if READ_BLOCK_STATES  // Temporarily disabled
 				if (BlockStatesId > 0 && false)
 				{
 					if (a_NBT.GetType(BlockStatesId) != TAG_Compound)
@@ -471,14 +470,14 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 					}
 				}
 				#endif
-				std::sort(strs.begin(),strs.end());
+				std::sort(strs.begin(), strs.end());
 
-				AString tosearch = blockid.substr(10,std::string::npos);  // substr to remove the "minecraft:"
+				AString tosearch = blockid.substr(10, std::string::npos);  // substr to remove the "minecraft:"
 				if (strs.size() != 0)
 				{
 					tosearch += " ";
 				}
-				for (const auto& itm : strs)
+				for (const auto & itm : strs)
 				{
 					tosearch += itm;
 				}
@@ -487,14 +486,12 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 					tosearch = tosearch.substr(0, tosearch.size() - 2);
 				}
 				// LOGD("%d hash tbl size", (*BlockMap::BlMap::GetMap()).size());
-				//Check if 
-				BlockState cnt = NamespaceSerializer::ToBlockType(tosearch);	 //(*BlockMap::BlMap::GetMap()).count(tosearch);
+				BlockState cnt = NamespaceSerializer::ToBlockType(tosearch);  // ( *BlockMap::BlMap::GetMap()).count(tosearch);
 
 				if (cnt == BlockType::Air)
 				{
-					//UNREACHABLE("could find given block while loading chunk X: " + a_Chunk.m_ChunkX + " Z: " a_Chunk.m_ChunkZ + " Y Section: " + Y);
+					UNREACHABLE("Could find given block while loading chunk X: " + a_Chunk.m_ChunkX + " Z: " a_Chunk.m_ChunkZ + " Y Section: " + Y);
 				}
-				//NEWBLOCKTYPE protocolblockid = (*BlockMap::BlMap::GetMap()).at(tosearch);
 				Paletteids.push_back(cnt);
 
 				Palette.emplace_back(blockid.substr(strlen("minecraft:"), std::string::npos));
@@ -511,13 +508,8 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			}
 			else
 			{
-				SectionBlockLongCount = IndexBitSize*4096/8/8;
+				SectionBlockLongCount = IndexBitSize * 4096 / 8 / 8;
 			}
-
-			//if (a_Chunk.m_ChunkX == -1 && a_Chunk.m_ChunkZ == 0 && Y == 3)
-			//{
-			//	DebugBreak();
-			//}
 
 			const std::byte* BlockStateData = nullptr;
 
@@ -526,7 +518,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				BlockStateData = GetSectionDataLong(a_NBT, block_states_compound, "data", SectionBlockLongCount);
 				if (BlockStateData != nullptr)
 				{
-					VERIFY(static_cast<size_t>(SectionBlockLongCount) * 8 == a_NBT.GetDataLength(a_NBT.FindChildByName(block_states_compound,"data")));
+					VERIFY(static_cast<size_t>(SectionBlockLongCount) * 8 == a_NBT.GetDataLength(a_NBT.FindChildByName(block_states_compound, "data")));
 				}
 			}
 			else
@@ -534,11 +526,11 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				BlockStateData = GetSectionDataLong(a_NBT, Child, "BlockStates", SectionBlockLongCount);
 				if (BlockStateData != nullptr)
 				{
-					VERIFY(static_cast<size_t>(SectionBlockLongCount) * 8 == a_NBT.GetDataLength(a_NBT.FindChildByName(Child,"BlockStates")));
+					VERIFY(static_cast<size_t>(SectionBlockLongCount) * 8 == a_NBT.GetDataLength(a_NBT.FindChildByName(Child, "BlockStates")));
 				}
 			}
 
-			const auto BlockLightData = GetSectionData(a_NBT, Child, "BlockLight",ChunkLightData::SectionLightCount);  // Still exists but does not have to be present for a valid section
+			const auto BlockLightData = GetSectionData(a_NBT, Child, "BlockLight", ChunkLightData::SectionLightCount);  // Still exists but does not have to be present for a valid section
 			const auto SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount);  // Still exists but does not have to be present for a valid section
 
 			if (BlockStateData != nullptr)
@@ -594,10 +586,10 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			else if (Paletteids.size() == 1)  // if there is only one block in the palette, we can just fill the section with it
 			{
 				std::array<BlockState, 4096> Oneblock;
-			    std::fill(Oneblock.begin(), Oneblock.end(), Paletteids[0]);
+				std::fill(Oneblock.begin(), Oneblock.end(), Paletteids[0]);
 				Data.BlockData.SetSection(reinterpret_cast<ChunkBlockData::SectionType &>(Oneblock), Y);
 			}
-			if (BlockLightData != nullptr && SkyLightData != nullptr)
+			if ((BlockLightData != nullptr) && (SkyLightData != nullptr))
 			{
 				Data.LightData.SetSection(*reinterpret_cast<const ChunkLightData::SectionType *>(BlockLightData), *reinterpret_cast<const ChunkLightData::SectionType *>(SkyLightData), static_cast<size_t>(Y));
 				Data.IsLightValid = true;
@@ -606,8 +598,8 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			{
 				Data.IsLightValid = false;
 			}
-			memset(&Data.HeightMap,0,256); // temp
-			memset(&Data.BiomeMap,0,1024); // temp
+			memset(&Data.HeightMap, 0, 256);  // temp
+			memset(&Data.BiomeMap, 0, 1024);  // temp
 		}  // for itr - LevelSections[]
 
 		// Load the entities from NBT:
@@ -617,7 +609,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			entities = a_NBT.FindChildByName(Level, "entities");
 		}
 		LoadEntitiesFromNBT(Data.Entities, a_NBT, entities);
-		//TODO: block entites
+		// TODO: block entites
 	}
 
 	m_World->QueueSetChunkData(std::move(Data));
@@ -1824,13 +1816,12 @@ OwnedBlockEntity cWSSAnvil::LoadMobHeadFromNBT(const cParsedNBT & a_NBT, int a_T
 	{
 		return nullptr;
 	}
-	//TODO: update for new versions
+	// TODO: update for new versions
 	auto MobHead = std::make_unique<cMobHeadEntity>(a_Block, a_Pos, m_World);
-	
 	int currentLine = a_NBT.FindChildByName(a_TagIdx, "SkullType");
 	if (currentLine >= 0)
 	{
-		//MobHead->SetType(static_cast<eMobHeadType>(a_NBT.GetByte(currentLine)));
+		// MobHead->SetType(static_cast<eMobHeadType>(a_NBT.GetByte(currentLine)));
 	}
 
 	currentLine = a_NBT.FindChildByName(a_TagIdx, "Rot");
@@ -4419,7 +4410,6 @@ const std::byte * cWSSAnvil::GetSectionData(const cParsedNBT & a_NBT, int a_Tag,
 
 
 
-
 const std::byte * cWSSAnvil::GetSectionDataLong(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, size_t a_Length)
 {
 	int Child = a_NBT.FindChildByName(a_Tag, a_ChildName);
@@ -4429,7 +4419,6 @@ const std::byte * cWSSAnvil::GetSectionDataLong(const cParsedNBT & a_NBT, int a_
 	}
 	return nullptr;
 }
-
 
 
 

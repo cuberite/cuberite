@@ -528,8 +528,6 @@ void cEntityEffectSlowFalling::OnTick(cPawn & a_Target)
 	if (a_Target.IsPlayer())
 	{
 		LOGD("Slow falling isnt implemnted");
-		//cPlayer & Target = static_cast<cPlayer &>(a_Target);
-		//Target.SetFoodSaturationLevel(Target.GetFoodSaturationLevel() + (1 + m_Intensity));  // Increase saturation 1 per tick, adds 1 for every increase in level
 	}
 }
 
@@ -545,8 +543,6 @@ void cEntityEffectConduitPower::OnTick(cPawn & a_Target)
 	if (a_Target.IsPlayer())
 	{
 		LOGD("Conduit Power isnt implemnted");
-		//cPlayer & Target = static_cast<cPlayer &>(a_Target);
-		//Target.SetFoodSaturationLevel(Target.GetFoodSaturationLevel() + (1 + m_Intensity));  // Increase saturation 1 per tick, adds 1 for every increase in level
 	}
 }
 
@@ -562,8 +558,6 @@ void cEntityEffectDolphinsGrace::OnTick(cPawn & a_Target)
 	if (a_Target.IsPlayer())
 	{
 		LOGD("Dolphins Grace isnt implemnted");
-		//cPlayer & Target = static_cast<cPlayer &>(a_Target);
-		//Target.SetFoodSaturationLevel(Target.GetFoodSaturationLevel() + (1 + m_Intensity));  // Increase saturation 1 per tick, adds 1 for every increase in level
 	}
 }
 
@@ -579,8 +573,6 @@ void cEntityEffectBadOmen::OnTick(cPawn & a_Target)
 	if (a_Target.IsPlayer())
 	{
 		LOGD("Bad omen isnt implemnted");
-		//cPlayer & Target = static_cast<cPlayer &>(a_Target);
-		//Target.SetFoodSaturationLevel(Target.GetFoodSaturationLevel() + (1 + m_Intensity));  // Increase saturation 1 per tick, adds 1 for every increase in level
 	}
 }
 
@@ -596,7 +588,5 @@ void cEntityEffectHeroOfTheVillage::OnTick(cPawn & a_Target)
 	if (a_Target.IsPlayer())
 	{
 		LOGD("Hero of the village isnt implemnted");
-		//cPlayer & Target = static_cast<cPlayer &>(a_Target);
-		//Target.SetFoodSaturationLevel(Target.GetFoodSaturationLevel() + (1 + m_Intensity));  // Increase saturation 1 per tick, adds 1 for every increase in level
 	}
 }

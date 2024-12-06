@@ -9,17 +9,14 @@
 
 
 
-class cItemHoeHandler:
+class cItemHoeHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemHoeHandler(Item a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 
@@ -32,7 +29,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		if ((a_ClickedBlockFace == BLOCK_FACE_NONE) || (a_ClickedBlockPos.y >= cChunkDef::Height))
 		{
@@ -47,7 +44,11 @@ public:
 		}
 
 		// Can only transform dirt or grass blocks:
-		auto BlockBelow = a_World->GetBlock(a_ClickedBlockPos);
+		BlockState BlockBelow;
+		if (a_World->GetBlock(a_ClickedBlockPos, BlockBelow));
+		{
+			return false;
+		}
 		switch (BlockBelow.Type())
 		{
 			case BlockType::GrassBlock:
@@ -82,7 +83,7 @@ public:
 
 
 
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) const override
 	{
 		switch (a_Action)
 		{

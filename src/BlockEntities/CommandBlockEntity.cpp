@@ -38,7 +38,7 @@ bool cCommandBlockEntity::UsedBy(cPlayer * a_Player)
 	{
 		return false;
 	};
-	m_World->DoWithBlockEntityAt(m_Pos, empty); // necessary to make sure an update block entity packet is sent
+	m_World->DoWithBlockEntityAt(m_Pos, empty);  // Necessary to make sure an update block entity packet is sent
 	return true;
 }
 

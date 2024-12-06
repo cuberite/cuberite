@@ -112,8 +112,8 @@ private:
 		{
 			switch (NeighbourFace)
 			{
-				UNREACHABLE("unimplemented");
 				/*
+				UNREACHABLE("unimplemented");
 				case eBlockFace::BLOCK_FACE_YM:
 					return !(NeighborMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
 				case eBlockFace::BLOCK_FACE_YP:
@@ -129,7 +129,8 @@ private:
 				default:
 				{
 					return false;
-				}*/
+				}
+				*/
 			}
 		}
 		return false;

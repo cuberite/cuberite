@@ -68,7 +68,7 @@ public:
 		switch (Self.Type())
 		{
 			case BlockType::Rail: break;   // Nothing to do
-			case BlockType::ActivatorRail: a_ChunkInterface.FastSetBlock(a_Position, ActivatorRail::ActivatorRail(a_Powered, ActivatorRail::Shape(Self),ActivatorRail::Waterlogged(Self))); break;
+			case BlockType::ActivatorRail: a_ChunkInterface.FastSetBlock(a_Position, ActivatorRail::ActivatorRail(a_Powered, ActivatorRail::Shape(Self), ActivatorRail::Waterlogged(Self))); break;
 			case BlockType::DetectorRail:  a_ChunkInterface.FastSetBlock(a_Position, DetectorRail::DetectorRail(a_Powered, DetectorRail::Shape(Self), DetectorRail::Waterlogged(Self))); break;
 			case BlockType::PoweredRail:   a_ChunkInterface.FastSetBlock(a_Position, PoweredRail::PoweredRail(a_Powered, PoweredRail::Shape(Self), PoweredRail::Waterlogged(Self))); break;
 			default: break;
@@ -679,7 +679,6 @@ private:
 	{
 		using namespace Block;
 		auto Self = a_ChunkInterface.GetBlock(a_Pos);
-		//AddFaceDirection(a_Pos.x, a_Pos.y, a_Pos.z, a_BlockFace, false);
 		a_Pos = AddFaceDirection(a_Pos, a_BlockFace, false);
 		BlockState Other = 0;
 		if (!IsBlockRail(a_ChunkInterface.GetBlock(a_Pos)))

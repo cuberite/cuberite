@@ -687,7 +687,7 @@ void cWorld::InitializeSpawn(void)
 
 	int ChunkX = 0, ChunkZ = 0;
 	cChunkDef::BlockToChunk(m_SpawnX, m_SpawnZ, ChunkX, ChunkZ);
-	//cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, ViewDist);
+	cSpawnPrepare::PrepareChunks(*this, ChunkX, ChunkZ, ViewDist);
 }
 
 
@@ -1191,7 +1191,7 @@ void cWorld::TickWeather(float a_Dt)
 	{
 		BroadcastGameStateChange(eGameStateReason::RainGradientChanged, m_RainGradient);
 	}
-	if(oldthunder != m_ThunderGradient)
+	if (oldthunder != m_ThunderGradient)
 	{
 		BroadcastGameStateChange(eGameStateReason::ThunderGradientChanged, m_ThunderGradient);
 	}
@@ -1201,7 +1201,7 @@ void cWorld::TickWeather(float a_Dt)
 		// 0.5% chance per tick of thunderbolt
 		if (GetRandomProvider().RandBool(0.005))
 		{
-			//CastThunderbolt({0, 0, 0});  // TODO: find random positions near players to cast thunderbolts.
+			// CastThunderbolt({0, 0, 0});  // TODO: find random positions near players to cast thunderbolts. Disabled because it crashes 1.13+ clients
 		}
 	}
 }
@@ -1637,7 +1637,6 @@ bool cWorld::GetLargeTreeAdjustment(Vector3i & a_BlockPos, BlockState a_Block)
 			{
 				return false;
 			}
-			
 			IsLarge = IsLarge && (OtherSapling.Type() == a_Block.Type());
 		}
 	}
@@ -2168,7 +2167,7 @@ bool cWorld::GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure)
 bool cWorld::DigBlock(Vector3i a_BlockPos, const cEntity * a_Digger)
 {
 	BlockState Block;
-	if(!GetBlock(a_BlockPos, Block))
+	if (!GetBlock(a_BlockPos, Block))
 	{
 		return false;
 	}
@@ -2723,11 +2722,11 @@ bool cWorld::IsTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ)
 bool cWorld::SetTrapdoorOpen(int a_BlockX, int a_BlockY, int a_BlockZ, bool a_Open)
 {
 	BlockState Trapdoor;
-	if(GetBlock({ a_BlockX, a_BlockY, a_BlockZ }, Trapdoor))
+	if (GetBlock({ a_BlockX, a_BlockY, a_BlockZ }, Trapdoor))
 	{
 		return false;
 	}
-	
+
 	if (cBlockTrapdoorHandler::IsBlockTrapdoor(Trapdoor))
 	{
 		return false;

@@ -81,9 +81,9 @@ private:
 
 	inline void Serialize573(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkBlockData & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);
 
-	inline void Serialize735(const int a_ChunkX, const int a_ChunkZ,const ChunkBlockData & a_BlockData2,const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);
-	inline void Serialize751(const int a_ChunkX, const int a_ChunkZ,const ChunkBlockData & a_BlockData2,const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);
-	inline void Serialize755(const int a_ChunkX, const int a_ChunkZ,const ChunkBlockData & a_BlockData2,const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);
+	inline void Serialize735(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);
+	inline void Serialize751(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);
+	inline void Serialize755(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);
 	template <auto Palette>
 	inline void Serialize757(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, UInt32 a_packet_id);
 	template <auto Palette>

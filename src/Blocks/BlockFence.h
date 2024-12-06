@@ -195,34 +195,34 @@ private:
 	}
 
 
-#define GET_FENCE_XM(FenceType,State) \
+#define GET_FENCE_XM(FenceType, State) \
 	ToPlace = Block::FenceType::FenceType( \
-					Block::FenceType::East(current),\
-					Block::FenceType::North(current),\
-					Block::FenceType::South(current),\
-					Block::FenceType::Waterlogged(current),\
-					State); break; 
-#define GET_FENCE_XP(FenceType,State) \
+	Block::FenceType::East(current), \
+	Block::FenceType::North(current), \
+	Block::FenceType::South(current), \
+	Block::FenceType::Waterlogged(current), \
+	State); break; 
+#define GET_FENCE_XP(FenceType, State) \
 	ToPlace = Block::FenceType::FenceType( \
-					State,\
-					Block::FenceType::North(current),\
-					Block::FenceType::South(current),\
-					Block::FenceType::Waterlogged(current),\
-					Block::FenceType::West(current)); break; 
-#define GET_FENCE_ZM(FenceType,State) \
+	State, \
+	Block::FenceType::North(current), \
+	Block::FenceType::South(current), \
+	Block::FenceType::Waterlogged(current), \
+	Block::FenceType::West(current)); break; 
+#define GET_FENCE_ZM(FenceType, State) \
 	ToPlace = Block::FenceType::FenceType( \
-					Block::FenceType::East(current),\
-					State,\
-					Block::FenceType::South(current),\
-					Block::FenceType::Waterlogged(current),\
-					Block::FenceType::West(current)); break; 
-#define GET_FENCE_ZP(FenceType,State) \
+	Block::FenceType::East(current), \
+	State, \
+	Block::FenceType::South(current), \
+	Block::FenceType::Waterlogged(current), \
+	Block::FenceType::West(current)); break; 
+#define GET_FENCE_ZP(FenceType, State) \
 	ToPlace = Block::FenceType::FenceType( \
-					Block::FenceType::East(current),\
-					Block::FenceType::North(current),\
-					State,\
-					Block::FenceType::Waterlogged(current),\
-					Block::FenceType::West(current)); break; \
+	Block::FenceType::East(current), \
+	Block::FenceType::North(current), \
+	State, \
+	Block::FenceType::Waterlogged(current), \
+	Block::FenceType::West(current)); break; \
 
 
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override

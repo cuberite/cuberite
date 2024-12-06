@@ -419,9 +419,9 @@ void cClientHandle::Authenticate(AString && a_Name, const cUUID & a_UUID, Json::
 
 	if (m_ProtocolVersion > static_cast<UInt32>(cProtocol::Version::v1_20))
 	{
-		//  do nothing I guess
+		// do nothing I guess
 	}
-	else // <= 1.20
+	else  // <= 1.20
 	{
 		if (m_ForgeHandshake.IsForgeClient)
 		{
@@ -440,8 +440,6 @@ void cClientHandle::Authenticate(AString && a_Name, const cUUID & a_UUID, Json::
 
 void cClientHandle::FinishAuthenticate()
 {
-
-
 	/*
 	LOGD("Created a new cPlayer object at %p for client %s @ %s (%p)",
 		static_cast<void *>(m_Player),
@@ -1712,7 +1710,7 @@ void cClientHandle::HandleWindowClose(UInt8 a_WindowID)
 
 
 
-void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 a_ExpiresAt, const ContiguousByteBuffer& a_PublicKey, const ContiguousByteBuffer& a_KeySignature)
+void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 a_ExpiresAt, const ContiguousByteBuffer & a_PublicKey, const ContiguousByteBuffer & a_KeySignature)
 {
 	// hash algorith mchnages somehre between 1.19.4 and 1.21 - maybe???
 
@@ -1724,7 +1722,7 @@ void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 a_ExpiresAt, co
 	Int64 toadd = (static_cast<UInt64>(htonl(static_cast<UInt32>(a_ExpiresAt))) << 32) | (static_cast<UInt64>(htonl(static_cast<UInt32>(a_ExpiresAt >> 32))));
 	*(reinterpret_cast<Int64*>(tempbfr + 16)) = toadd;
 	ContiguousByteBuffer toverify;
-	toverify.append(reinterpret_cast<std::byte*>(tempbfr),24);
+	toverify.append(reinterpret_cast<std::byte*>(tempbfr), 24);
 	toverify.append(a_PublicKey);
 	delete[] tempbfr;
 	if (!cRoot::Get()->GetMojangAPI().VerifyUsingMojangKeys(toverify, a_KeySignature))
@@ -1733,7 +1731,7 @@ void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 a_ExpiresAt, co
 		// TODO: add enforce secure profile somewhere in settings and kick player if the key is invalid
 		return;
 	}
-    Int64 milliseconds_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	Int64 milliseconds_since_epoch = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 	if (milliseconds_since_epoch > a_ExpiresAt)
 	{
 		LOGWARN("Expired public key sent by %s", GetUsername());
@@ -1742,10 +1740,10 @@ void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 a_ExpiresAt, co
 	}
 	m_PlayerSession = cClientHandle::cPlayerSessionData(a_SessionID, a_ExpiresAt, a_PublicKey, a_KeySignature);
 	cRoot::Get()->ForEachPlayer([this](const cPlayer & a_Player)
-    {
+	{
 		a_Player.GetClientHandle()->SendPlayerListInitChat(*this->GetPlayer());
 		return false;
-    });
+	});
 }
 
 
@@ -3315,6 +3313,7 @@ void cClientHandle::SendWeather(eWeather a_Weather)
 {
 	m_Protocol->SendWeather(a_Weather);
 }
+
 
 
 

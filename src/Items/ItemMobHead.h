@@ -118,7 +118,7 @@ public:
 				{
 					case BLOCK_FACE_YP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, CreeperHead::CreeperHead(false,RotationToFineFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, CreeperHead::CreeperHead(false, RotationToFineFace(a_Player.GetYaw())));
 						break;
 					}
 					case BLOCK_FACE_XM:
@@ -139,7 +139,7 @@ public:
 				{
 					case BLOCK_FACE_YP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, CreeperHead::CreeperHead(false,RotationToFineFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, CreeperHead::CreeperHead(false, RotationToFineFace(a_Player.GetYaw())));
 						break;
 					}
 					case BLOCK_FACE_XM:
@@ -160,7 +160,7 @@ public:
 				{
 					case BLOCK_FACE_YP:
 					{
-						a_Player.PlaceBlock(a_PlacePosition, PiglinHead::PiglinHead(false,RotationToFineFace(a_Player.GetYaw())));
+						a_Player.PlaceBlock(a_PlacePosition, PiglinHead::PiglinHead(false, RotationToFineFace(a_Player.GetYaw())));
 						break;
 					}
 					case BLOCK_FACE_XM:

@@ -34,7 +34,7 @@ UInt32 cProtocol_1_21::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::Game:
 			switch (a_PacketType)
 			{
-				default: return Super::GetPacketID(a_PacketType); 
+				default: return Super::GetPacketID(a_PacketType);
 				// CustomReportDetailsS2CPacket 0x0F
 				// ServerLinksS2CPacket 0x10
 			}
@@ -42,12 +42,12 @@ UInt32 cProtocol_1_21::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::Configuration:
 			switch (a_PacketType)
 			{
-				default: return Super::GetPacketID(a_PacketType); 
+				default: return Super::GetPacketID(a_PacketType);
 				// CustomReportDetailsS2CPacket 0x7A
 				// ServerLinksS2CPacket 0x7B
 			}
 			break;
-		//default: ASSERT(false,"Invalid m_State: %d", m_State); break;
+		// default: ASSERT(false,"Invalid m_State: %d", m_State); break;
 	}
 }
 
@@ -86,10 +86,10 @@ void cProtocol_1_21::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	{
 		switch (a_BlockEntity.GetBlockType())
 		{
-			//case BlockType::Banner:                Action = 19; break;
+			// case BlockType::Banner:                Action = 19; break;
 			case BlockType::Barrel:                Action = 26; break;
 			case BlockType::Beacon:                Action = 14; break;
-			//case BlockType::Bed:                   Action = 24; break;
+			// case BlockType::Bed:                   Action = 24; break;
 			case BlockType::Beehive:               Action = 33; break;
 			case BlockType::Bell:                  Action = 30; break;
 			case BlockType::BlastFurnace:          Action = 28; break;
@@ -112,7 +112,7 @@ void cProtocol_1_21::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 			case BlockType::EndPortal:             Action = 13; break;
 			case BlockType::EnderChest:            Action = 3; break;
 			case BlockType::Furnace:               Action = 0; break;
-			//case BlockType::HangingSign:           Action = 8; break;
+			// case BlockType::HangingSign:           Action = 8; break;
 			case BlockType::Hopper:                Action = 17; break;
 			case BlockType::Jigsaw:                Action = 31; break;
 			case BlockType::Jukebox:               Action = 4; break;
@@ -123,8 +123,8 @@ void cProtocol_1_21::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 			case BlockType::SculkSensor:           Action = 34; break;
 			case BlockType::SculkShrieker:         Action = 37; break;
 			case BlockType::ShulkerBox:            Action = 23; break;
-			//case BlockType::Sign:                  Action = 7; break;
-			//case BlockType::Skull:                 Action = 15; break;
+			// case BlockType::Sign:                  Action = 7; break;
+			// case BlockType::Skull:                 Action = 15; break;
 			case BlockType::Smoker:                Action = 27; break;
 			case BlockType::StructureBlock:        Action = 20; break;
 			case BlockType::TrappedChest:          Action = 2; break;
@@ -177,8 +177,8 @@ void cProtocol_1_21::SendDynamicRegistries()
 			Writer.AddByte("has_ceiling", 0);
 			Writer.AddInt("min_y", 0);
 			Writer.AddInt("height", 256);
-			Writer.AddInt("monster_spawn_light_level",0);
-			Writer.AddInt("monster_spawn_block_light_limit",0);
+			Writer.AddInt("monster_spawn_light_level", 0);
+			Writer.AddInt("monster_spawn_block_light_limit", 0);
 			Writer.Finish();
 			Pkt.WriteBuf(Writer.GetResult());
 		}
@@ -186,7 +186,7 @@ void cProtocol_1_21::SendDynamicRegistries()
 			cPacketizer Pkt(*this, pktConfigurationDynamicRegistries);
 			Pkt.WriteString("minecraft:worldgen/biome");
 			Pkt.WriteVarInt32(64);
-			Pkt.WriteString("plains"); Pkt.WriteBool(false); // temporarily here
+			Pkt.WriteString("plains"); Pkt.WriteBool(false);  // temporarily here
 			Pkt.WriteString("badlands"); Pkt.WriteBool(false);
 			Pkt.WriteString("bamboo_jungle"); Pkt.WriteBool(false);
 			Pkt.WriteString("basalt_deltas"); Pkt.WriteBool(false);
@@ -226,7 +226,7 @@ void cProtocol_1_21::SendDynamicRegistries()
 			Pkt.WriteString("old_growth_birch_forest"); Pkt.WriteBool(false);
 			Pkt.WriteString("old_growth_pine_taiga"); Pkt.WriteBool(false);
 			Pkt.WriteString("old_growth_spruce_taiga"); Pkt.WriteBool(false);
-			//Pkt.WriteString("plains"); Pkt.WriteBool(false);
+			// Pkt.WriteString("plains"); Pkt.WriteBool(false);
 			Pkt.WriteString("river"); Pkt.WriteBool(false);
 			Pkt.WriteString("savanna"); Pkt.WriteBool(false);
 			Pkt.WriteString("savanna_plateau"); Pkt.WriteBool(false);
@@ -396,7 +396,7 @@ void cProtocol_1_21::SendDynamicRegistries()
 			Pkt.WriteString("precipice"); Pkt.WriteBool(false);
 			Pkt.WriteString("creator"); Pkt.WriteBool(false);
 			Pkt.WriteString("creator_music_box"); Pkt.WriteBool(false);
-		}	
+		}
 	}
 }
 
@@ -415,7 +415,7 @@ void cProtocol_1_21::SendSelectKnownPacks()
 		Pkt.WriteString("minecraft");
 		Pkt.WriteString("core");
 		Pkt.WriteString("1.21.1");
-	}	
+	}
 }
 
 
@@ -504,7 +504,7 @@ void cProtocol_1_21_2::SendSelectKnownPacks()
 		Pkt.WriteString("minecraft");
 		Pkt.WriteString("core");
 		Pkt.WriteString("1.21.3");
-	}	
+	}
 }
 
 
@@ -613,142 +613,142 @@ UInt32 cProtocol_1_21_2::GetPacketID(ePacketType a_PacketType) const
 			// ServerLinksS2CPacket 0x10
 
 		//  Game packets
-        case cProtocol::pktSpawnObject:          return 0x01;
-        case cProtocol::pktSpawnMob:             return 0x01;
-        case cProtocol::pktSpawnPainting:        return 0x01;
-        case cProtocol::pktSpawnOtherPlayer:     return 0x01;
-        case cProtocol::pktSpawnExperienceOrb:   return 0x02;
-        case cProtocol::pktEntityAnimation:      return 0x03;
-        case cProtocol::pktStatistics:           return 0x04;
-        case cProtocol::pktPlayerActionResponse: return 0x05;
+		case cProtocol::pktSpawnObject:          return 0x01;
+		case cProtocol::pktSpawnMob:             return 0x01;
+		case cProtocol::pktSpawnPainting:        return 0x01;
+		case cProtocol::pktSpawnOtherPlayer:     return 0x01;
+		case cProtocol::pktSpawnExperienceOrb:   return 0x02;
+		case cProtocol::pktEntityAnimation:      return 0x03;
+		case cProtocol::pktStatistics:           return 0x04;
+		case cProtocol::pktPlayerActionResponse: return 0x05;
         //  case cProtocol::pktBlockbreakingprogress:   return 0x06;
-        case cProtocol::pktUpdateBlockEntity:    return 0x07;
-        case cProtocol::pktBlockAction:          return 0x08;
-        case cProtocol::pktBlockChange:          return 0x09;
-        case cProtocol::pktBossBar:              return 0x0A;
-        case cProtocol::pktDifficulty:           return 0x0B;
-                        //  ChunkSentS2CPacket 0x0C
-                        //  StartChunkSendS2CPacket 0xD
-                        //  ChunkBiomeDataS2CPacket 0x0E
-                        //  clear title 0x0F
-                        //  command suggestions here 0x10
+		case cProtocol::pktUpdateBlockEntity:    return 0x07;
+		case cProtocol::pktBlockAction:          return 0x08;
+		case cProtocol::pktBlockChange:          return 0x09;
+		case cProtocol::pktBossBar:              return 0x0A;
+		case cProtocol::pktDifficulty:           return 0x0B;
+			//  ChunkSentS2CPacket 0x0C
+			//  StartChunkSendS2CPacket 0xD
+			//  ChunkBiomeDataS2CPacket 0x0E
+			//  clear title 0x0F
+			//  command suggestions here 0x10
 		case cProtocol::pktCommnadTree:          return 0x11;
-        case cProtocol::pktWindowClose:          return 0x12;
-        case cProtocol::pktWindowItems:          return 0x13;  //  Inventory packet
-        case cProtocol::pktWindowProperty:       return 0x14;  //  ScreenHandlerPropertyUpdateS2CPacket
-        case cProtocol::pktInventorySlot:        return 0x15;  //  ScreenHandlerSlotUpdateS2CPacket
+		case cProtocol::pktWindowClose:          return 0x12;
+		case cProtocol::pktWindowItems:          return 0x13;  //  Inventory packet
+		case cProtocol::pktWindowProperty:       return 0x14;  //  ScreenHandlerPropertyUpdateS2CPacket
+		case cProtocol::pktInventorySlot:        return 0x15;  //  ScreenHandlerSlotUpdateS2CPacket
 						//  CookieRequest 0x16
-                        //  cooldown update 0x17
-                        //  chat suggestions 0x18
-        case cProtocol::pktCustomPayload:        return 0x19;
-        case cProtocol::pktPluginMessage:        return 0x19;
-                        // EntityDamageS2CPacket 0x1A
-						// DebugSample 0x1B
-                        // RemoveMessageS2CPacket 0x1C
-        case cProtocol::pktDisconnectDuringGame: return 0x1D;
-                        //  ProfilelessChatMessageS2CPacket 0x1E
-        case cProtocol::pktEntityStatus:         return 0x1F;
-						// case EntityPositionSync 0x20
-        case cProtocol::pktExplosion:            return 0x21;
-        case cProtocol::pktUnloadChunk:          return 0x22;
-        case cProtocol::pktGameMode:             return 0x23;
-        case cProtocol::pktWeather:              return 0x23;
-        case cProtocol::pktHorseWindowOpen:      return 0x24;
-                        // DamageTiltS2CPacket 0x25
-                        // wolrld border initalize 0x26
-        case cProtocol::pktKeepAlive:            return 0x27;
-                        // chunk data packet 0x28
-        case cProtocol::pktSoundParticleEffect:  return 0x29;  // world event
-        case cProtocol::pktParticleEffect:       return 0x2A;
-        case cProtocol::pktLightUpdate:          return 0x2B;
-        case cProtocol::pktJoinGame:             return 0x2C;
-                        //  map update 0x2D
-                        //  set trade offers 0x2E
-        case cProtocol::pktEntityRelMove:        return 0x2F;
-        case cProtocol::pktEntityRelMoveLook:    return 0x30;
+			//  cooldown update 0x17
+			//  chat suggestions 0x18
+		case cProtocol::pktCustomPayload:        return 0x19;
+		case cProtocol::pktPluginMessage:        return 0x19;
+			// EntityDamageS2CPacket 0x1A
+			// DebugSample 0x1B
+			// RemoveMessageS2CPacket 0x1C
+		case cProtocol::pktDisconnectDuringGame: return 0x1D;
+			//  ProfilelessChatMessageS2CPacket 0x1E
+		case cProtocol::pktEntityStatus:         return 0x1F;
+			// case EntityPositionSync 0x20
+		case cProtocol::pktExplosion:            return 0x21;
+		case cProtocol::pktUnloadChunk:          return 0x22;
+		case cProtocol::pktGameMode:             return 0x23;
+		case cProtocol::pktWeather:              return 0x23;
+		case cProtocol::pktHorseWindowOpen:      return 0x24;
+			// DamageTiltS2CPacket 0x25
+			// wolrld border initalize 0x26
+		case cProtocol::pktKeepAlive:            return 0x27;
+			// chunk data packet 0x28
+		case cProtocol::pktSoundParticleEffect:  return 0x29;  // world event
+		case cProtocol::pktParticleEffect:       return 0x2A;
+		case cProtocol::pktLightUpdate:          return 0x2B;
+		case cProtocol::pktJoinGame:             return 0x2C;
+			//  map update 0x2D
+			//  set trade offers 0x2E
+		case cProtocol::pktEntityRelMove:        return 0x2F;
+		case cProtocol::pktEntityRelMoveLook:    return 0x30;
 						// MoveMinecartAlongTrack 0x31
-        case cProtocol::pktEntityLook:           return 0x32;
-                        //  vehicle move 0x33
-                        //  open written book 0x34
-        case cProtocol::pktWindowOpen:           return 0x35;
-        case cProtocol::pktUpdateSign:           return 0x36;
-                        //  CommonPingS2CPacket 0x37
-                        //  PingResultS2CPacket 0x38
-                        //  craft failed response 0x39
-        case cProtocol::pktPlayerAbilities:      return 0x3A;
-                        //  ChatMessageS2CPacket 0x3B
-                        //  combat exit 0x3C
-                        //  comabt enter 0x3D
-                        //  death msg 0x3E
-        case cProtocol::pktPlayerLstRemove:      return 0x3F;
-        case cProtocol::pktPlayerList:           return 0x40;
-                        //  look at 0x41
-        case cProtocol::pktPlayerMoveLook:       return 0x42;
+		case cProtocol::pktEntityLook:           return 0x32;
+			//  vehicle move 0x33
+			//  open written book 0x34
+		case cProtocol::pktWindowOpen:           return 0x35;
+		case cProtocol::pktUpdateSign:           return 0x36;
+			//  CommonPingS2CPacket 0x37
+			//  PingResultS2CPacket 0x38
+			//  craft failed response 0x39
+		case cProtocol::pktPlayerAbilities:      return 0x3A;
+			//  ChatMessageS2CPacket 0x3B
+			//  combat exit 0x3C
+			//  comabt enter 0x3D
+			//  death msg 0x3E
+		case cProtocol::pktPlayerLstRemove:      return 0x3F;
+		case cProtocol::pktPlayerList:           return 0x40;
+			//  look at 0x41
+		case cProtocol::pktPlayerMoveLook:       return 0x42;
 						// player rotation 0x43
-        case cProtocol::pktUnlockRecipe:         return 0x44;
+		case cProtocol::pktUnlockRecipe:         return 0x44;
 						// recipe add 0x43
 						// recipe remove 0x45
 						// recipe settings 0x46
-        case cProtocol::pktDestroyEntity:        return 0x47;
-        case cProtocol::pktRemoveEntityEffect:   return 0x48;
-                        // ScoreboardScoreResetS2CPacket 0x49
-                        // ResourcePackRemoveS2CPacket 0x4A
-        case cProtocol::pktResourcePack:         return 0x4B;
-        case cProtocol::pktRespawn:              return 0x4C;
-        case cProtocol::pktEntityHeadLook:       return 0x4D;
-        case cProtocol::pktBlockChanges:         return 0x4E;
-                        // select advancment tab 0x4F
-                        // ServerMetadataS2CPacket 0x50
-                        // overlay msg 0x51
-                        // wb -- worldborder wb center changed 0x52
-                        // wb interpolate size 0x53
-                        // wb size changed 0x54
-                        // wb warning time changed 0x55
-                        // wb warning blocks changed 0x56
-        case cProtocol::pktCameraSetTo:          return 0x57;
-        case cProtocol::pktRenderDistanceCenter: return 0x58;
-                        //  chunk load distance 0x59
+		case cProtocol::pktDestroyEntity:        return 0x47;
+		case cProtocol::pktRemoveEntityEffect:   return 0x48;
+			// ScoreboardScoreResetS2CPacket 0x49
+			// ResourcePackRemoveS2CPacket 0x4A
+		case cProtocol::pktResourcePack:         return 0x4B;
+		case cProtocol::pktRespawn:              return 0x4C;
+		case cProtocol::pktEntityHeadLook:       return 0x4D;
+		case cProtocol::pktBlockChanges:         return 0x4E;
+			// select advancment tab 0x4F
+			// ServerMetadataS2CPacket 0x50
+			// overlay msg 0x51
+			// wb -- worldborder wb center changed 0x52
+			// wb interpolate size 0x53
+			// wb size changed 0x54
+			// wb warning time changed 0x55
+			// wb warning blocks changed 0x56
+		case cProtocol::pktCameraSetTo:          return 0x57;
+		case cProtocol::pktRenderDistanceCenter: return 0x58;
+			//  chunk load distance 0x59
 		case cProtocol::pktSetCursorItem:        return 0x5A;
-        case cProtocol::pktSpawnPosition:        return 0x5B;
-                        //  scoreboard display 0x5C
-        case cProtocol::pktEntityMeta:           return 0x5D;
-                        // entity attach 0x5E
-        case cProtocol::pktEntityVelocity:       return 0x5F;
-        case cProtocol::pktEntityEquipment:      return 0x60;
-        case cProtocol::pktExperience:           return 0x61;
-        case cProtocol::pktUpdateHealth:         return 0x62;
+		case cProtocol::pktSpawnPosition:        return 0x5B;
+			//  scoreboard display 0x5C
+		case cProtocol::pktEntityMeta:           return 0x5D;
+			// entity attach 0x5E
+		case cProtocol::pktEntityVelocity:       return 0x5F;
+		case cProtocol::pktEntityEquipment:      return 0x60;
+		case cProtocol::pktExperience:           return 0x61;
+		case cProtocol::pktUpdateHealth:         return 0x62;
 		case cProtocol::pktHeldItemChange:       return 0x63;
-        case cProtocol::pktScoreboardObjective:  return 0x64;
-        case cProtocol::pktAttachEntity:         return 0x65;
-						// set player inventory 0x66
-                        // Teams 0x67
-        case cProtocol::pktUpdateScore:          return 0x68;
-                        // simulation distance 0x69
-                        // subtitle 0x6A
-        case cProtocol::pktTimeUpdate:           return 0x6B;
-        case cProtocol::pktTitle:                return 0x6C;
-                        //  title fade 0x6D
-                        //  play sound from entity 0x6E
+		case cProtocol::pktScoreboardObjective:  return 0x64;
+		case cProtocol::pktAttachEntity:         return 0x65;
+			// set player inventory 0x66
+			// Teams 0x67
+		case cProtocol::pktUpdateScore:          return 0x68;
+			// simulation distance 0x69
+			// subtitle 0x6A
+		case cProtocol::pktTimeUpdate:           return 0x6B;
+		case cProtocol::pktTitle:                return 0x6C;
+			//  title fade 0x6D
+			//  play sound from entity 0x6E
 		case cProtocol::pktSoundEffect:          return 0x6F;
-                        //  EnterReconfigurationS2CPacket 0x70
-                        //  stop sound 0x71
+			//  EnterReconfigurationS2CPacket 0x70
+			//  stop sound 0x71
 						//  StoreCookies 0x72
-        case cProtocol::pktChatRaw:              return 0x73; //  Gamemessage
-                        //  player list header 0x74
-                        //  NbtQueryResponseS2CPacket 0x75
-        case cProtocol::pktCollectEntity:        return 0x76;
-        case cProtocol::pktTeleportEntity:       return 0x77;
-                        //  UpdateTickRateS2CPacket 0x78
-                        //  TickStepS2CPacket 0x79
-						//  ServerTransfer 0x7A
-                        //  advancment update 0x7B
-        case cProtocol::pktEntityProperties:     return 0x7C;
-        case cProtocol::pktEntityEffect:         return 0x7D;
-                        //  sync recepies 0x7E
-                        //  sync tags 0x7F
-						//  ProjectilePower 0x80
-						// CustomReportDetailsS2CPacket 0x81
-						// ServerLinksS2CPacket 0x82
+		case cProtocol::pktChatRaw:              return 0x73; //  Gamemessage
+			//  player list header 0x74
+			//  NbtQueryResponseS2CPacket 0x75
+		case cProtocol::pktCollectEntity:        return 0x76;
+		case cProtocol::pktTeleportEntity:       return 0x77;
+			//  UpdateTickRateS2CPacket 0x78
+			//  TickStepS2CPacket 0x79
+			//  ServerTransfer 0x7A
+			//  advancment update 0x7B
+		case cProtocol::pktEntityProperties:     return 0x7C;
+		case cProtocol::pktEntityEffect:         return 0x7D;
+			//  sync recepies 0x7E
+			//  sync tags 0x7F
+			//  ProjectilePower 0x80
+			// CustomReportDetailsS2CPacket 0x81
+			// ServerLinksS2CPacket 0x82
 		default: UNREACHABLE("unhandeled packet");
 	}
 }
@@ -827,66 +827,66 @@ bool cProtocol_1_21_2::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		{
 			switch (a_PacketType)
 			{
-                case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
-                case 0x01: /* query nbt packet */ return false;
+				case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
+				case 0x01: /* query nbt packet */ return false;
 				case 0x02: /* BundleItemSelected */ return false;
-                case 0x03: /* update difficulty */ return false;
-                case 0x04: /* MessageAcknowledgmentC2SPacket */ return false;
-                case 0x05: HandlePacketCommandExecution(a_ByteBuffer); return true;
+				case 0x03: /* update difficulty */ return false;
+				case 0x04: /* MessageAcknowledgmentC2SPacket */ return false;
+				case 0x05: HandlePacketCommandExecution(a_ByteBuffer); return true;
 				case 0x06: /* ChatCommandSignedC2SPacket */ return false;
-                case 0x07: HandlePacketChatMessage(a_ByteBuffer); return true;
-                case 0x08: HandlePacketPlayerSession(a_ByteBuffer); return true;
-                case 0x09: /* AcknowledgeChunksC2SPacket */ return false;
-                case 0x0A: HandlePacketClientStatus(a_ByteBuffer); return true;
+				case 0x07: HandlePacketChatMessage(a_ByteBuffer); return true;
+				case 0x08: HandlePacketPlayerSession(a_ByteBuffer); return true;
+				case 0x09: /* AcknowledgeChunksC2SPacket */ return false;
+				case 0x0A: HandlePacketClientStatus(a_ByteBuffer); return true;
 				case 0x0B: /* ClientTickEnd */ return false;
-                case 0x0C: HandlePacketClientSettings(a_ByteBuffer); return true;
-                case 0x0D: HandlePacketTabComplete(a_ByteBuffer); return true;
-                case 0x0E: /* AcknowledgeReconfigurationC2SPacket*/ return false;
-                case 0x0F: /* ButtonClickC2SPacket */ return false;
-                case 0x10: HandlePacketWindowClick(a_ByteBuffer); return true;
-                case 0x11: HandlePacketWindowClose(a_ByteBuffer); return true;
-                case 0x12: /* SlotChangedStateC2SPacket */ return false;
+				case 0x0C: HandlePacketClientSettings(a_ByteBuffer); return true;
+				case 0x0D: HandlePacketTabComplete(a_ByteBuffer); return true;
+				case 0x0E: /* AcknowledgeReconfigurationC2SPacket*/ return false;
+				case 0x0F: /* ButtonClickC2SPacket */ return false;
+				case 0x10: HandlePacketWindowClick(a_ByteBuffer); return true;
+				case 0x11: HandlePacketWindowClose(a_ByteBuffer); return true;
+				case 0x12: /* SlotChangedStateC2SPacket */ return false;
 				case 0x13: /* CookieResponseC2SPacket */ return false;
-                case 0x14: HandlePacketPluginMessage(a_ByteBuffer); return true;
+				case 0x14: HandlePacketPluginMessage(a_ByteBuffer); return true;
 				case 0x15: /* DebugSampleSubscriptionC2SPacket */ return false;
-                case 0x16: HandlePacketBookUpdate(a_ByteBuffer); return true;  // not fully implemented
-                case 0x17: /* QueryEntityNbtC2SPacket */ return false;
-                case 0x18: HandlePacketUseEntity(a_ByteBuffer); return true;
-                case 0x19: /* Jigsaw generating */ return false;
-                case 0x1A: HandlePacketKeepAlive(a_ByteBuffer); return true;
-                case 0x1B: /* Update difficulty lock */ return false;  // only used in single player
-                case 0x1C: HandlePacketPlayerPos(a_ByteBuffer); return true;  // PositionAndOnGround
-                case 0x1D: HandlePacketPlayerPosLook(a_ByteBuffer); return true; // full
-                case 0x1E: HandlePacketPlayerLook(a_ByteBuffer); return true; // LookAndOnGround
-                case 0x1F: HandlePacketPlayer(a_ByteBuffer); return true;
-                case 0x20: HandlePacketVehicleMove(a_ByteBuffer); return true;
-                case 0x21: HandlePacketBoatSteer(a_ByteBuffer); return true;
-                case 0x22: /* pick from inventory */ return false;
-                case 0x23: /*QueryPingC2SPacket*/ return false;
-                case 0x24: HandleCraftRecipe(a_ByteBuffer); return true;
-                case 0x25: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
-                case 0x26: HandlePacketBlockDig(a_ByteBuffer); return true;
-                case 0x27: /* client command packet */ return false;
-                case 0x28: HandlePacketSteerVehicle(a_ByteBuffer); return true;  // player input packet
-                case 0x29: /* PlayPongC2SPacket */ return false;
-                case 0x2A: /* Recipe Category Options */ return false;
-                case 0x2B: HandlePacketCraftingBookData(a_ByteBuffer); return true;
-                case 0x2C: HandlePacketNameItem(a_ByteBuffer); return true;
-                case 0x2D: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
-                case 0x2E: HandlePacketAdvancementTab(a_ByteBuffer); return true;
-                case 0x2F: /* select villager trade */ return false;
-                case 0x30: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
-                case 0x31: HandlePacketSlotSelect(a_ByteBuffer); return true;
-                case 0x32: /* update command block */ return false;
-                case 0x33: /* update minecart command block*/ return false;
-                case 0x34: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
-                case 0x35: /* Update jigsaw block */ return false;
-                case 0x36: /* Update structure block */ return false;
-                case 0x37: HandlePacketUpdateSign(a_ByteBuffer); return true;
-                case 0x38: /* Update hand swing */ return false;
-                case 0x39: /* Spectator teleport */ return false;
-                case 0x3A: HandlePacketBlockPlace(a_ByteBuffer); return true;
-                case 0x3B: HandlePacketUseItem(a_ByteBuffer); return true;
+				case 0x16: HandlePacketBookUpdate(a_ByteBuffer); return true;  // not fully implemented
+				case 0x17: /* QueryEntityNbtC2SPacket */ return false;
+				case 0x18: HandlePacketUseEntity(a_ByteBuffer); return true;
+				case 0x19: /* Jigsaw generating */ return false;
+				case 0x1A: HandlePacketKeepAlive(a_ByteBuffer); return true;
+				case 0x1B: /* Update difficulty lock */ return false;  // only used in single player
+				case 0x1C: HandlePacketPlayerPos(a_ByteBuffer); return true;  // PositionAndOnGround
+				case 0x1D: HandlePacketPlayerPosLook(a_ByteBuffer); return true;  // full
+				case 0x1E: HandlePacketPlayerLook(a_ByteBuffer); return true;  // LookAndOnGround
+				case 0x1F: HandlePacketPlayer(a_ByteBuffer); return true;
+				case 0x20: HandlePacketVehicleMove(a_ByteBuffer); return true;
+				case 0x21: HandlePacketBoatSteer(a_ByteBuffer); return true;
+				case 0x22: /* pick from inventory */ return false;
+				case 0x23: /* QueryPingC2SPacket */ return false;
+				case 0x24: HandleCraftRecipe(a_ByteBuffer); return true;
+				case 0x25: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
+				case 0x26: HandlePacketBlockDig(a_ByteBuffer); return true;
+				case 0x27: /* client command packet */ return false;
+				case 0x28: HandlePacketSteerVehicle(a_ByteBuffer); return true;  // player input packet
+				case 0x29: /* PlayPongC2SPacket */ return false;
+				case 0x2A: /* Recipe Category Options */ return false;
+				case 0x2B: HandlePacketCraftingBookData(a_ByteBuffer); return true;
+				case 0x2C: HandlePacketNameItem(a_ByteBuffer); return true;
+				case 0x2D: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
+				case 0x2E: HandlePacketAdvancementTab(a_ByteBuffer); return true;
+				case 0x2F: /* select villager trade */ return false;
+				case 0x30: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
+				case 0x31: HandlePacketSlotSelect(a_ByteBuffer); return true;
+				case 0x32: /* update command block */ return false;
+				case 0x33: /* update minecart command block*/ return false;
+				case 0x34: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
+				case 0x35: /* Update jigsaw block */ return false;
+				case 0x36: /* Update structure block */ return false;
+				case 0x37: HandlePacketUpdateSign(a_ByteBuffer); return true;
+				case 0x38: /* Update hand swing */ return false;
+				case 0x39: /* Spectator teleport */ return false;
+				case 0x3A: HandlePacketBlockPlace(a_ByteBuffer); return true;
+				case 0x3B: HandlePacketUseItem(a_ByteBuffer); return true;
 				default: break;
 			}
 		}
@@ -914,8 +914,8 @@ void cProtocol_1_21_2::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 		Pkt.WriteBool(true);   // Show deaths screen
 		Pkt.WriteBool(false);  // Do Limited Crafting
 
-		Pkt.WriteVarInt32(0); // Dimension id
-		Pkt.WriteString("minecraft:overworld"); // dimension name
+		Pkt.WriteVarInt32(0);  // Dimension id
+		Pkt.WriteString("minecraft:overworld");  // dimension name
 		Pkt.WriteBEInt64(0);  // Seed
 
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()));  // current game mode
@@ -1107,8 +1107,8 @@ void cProtocol_1_21_2::SendDynamicRegistries()
 			Writer.AddByte("has_ceiling", 0);
 			Writer.AddInt("min_y", 0);
 			Writer.AddInt("height", 256);
-			Writer.AddInt("monster_spawn_light_level",0);
-			Writer.AddInt("monster_spawn_block_light_limit",0);
+			Writer.AddInt("monster_spawn_light_level", 0);
+			Writer.AddInt("monster_spawn_block_light_limit", 0);
 			Writer.Finish();
 			Pkt.WriteBuf(Writer.GetResult());
 		}
@@ -1116,7 +1116,7 @@ void cProtocol_1_21_2::SendDynamicRegistries()
 			cPacketizer Pkt(*this, pktConfigurationDynamicRegistries);
 			Pkt.WriteString("minecraft:worldgen/biome");
 			Pkt.WriteVarInt32(64);
-			Pkt.WriteString("plains"); Pkt.WriteBool(false); // temporarily here
+			Pkt.WriteString("plains"); Pkt.WriteBool(false);  // temporarily here
 			Pkt.WriteString("badlands"); Pkt.WriteBool(false);
 			Pkt.WriteString("bamboo_jungle"); Pkt.WriteBool(false);
 			Pkt.WriteString("basalt_deltas"); Pkt.WriteBool(false);
@@ -1156,7 +1156,7 @@ void cProtocol_1_21_2::SendDynamicRegistries()
 			Pkt.WriteString("old_growth_birch_forest"); Pkt.WriteBool(false);
 			Pkt.WriteString("old_growth_pine_taiga"); Pkt.WriteBool(false);
 			Pkt.WriteString("old_growth_spruce_taiga"); Pkt.WriteBool(false);
-			//Pkt.WriteString("plains"); Pkt.WriteBool(false);
+			// Pkt.WriteString("plains"); Pkt.WriteBool(false);
 			Pkt.WriteString("river"); Pkt.WriteBool(false);
 			Pkt.WriteString("savanna"); Pkt.WriteBool(false);
 			Pkt.WriteString("savanna_plateau"); Pkt.WriteBool(false);
@@ -1329,7 +1329,7 @@ void cProtocol_1_21_2::SendTimeUpdate(const cTickTimeLong a_WorldAge, const cTic
 void cProtocol_1_21_2::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, BitField);
-	//TODO: parse data
+	// TODO: parse data
 }
 
 
@@ -1461,7 +1461,7 @@ void cProtocol_1_21_4::SendSelectKnownPacks()
 		Pkt.WriteString("minecraft");
 		Pkt.WriteString("core");
 		Pkt.WriteString("1.21.4");
-	}	
+	}
 }
 
 
@@ -1515,68 +1515,68 @@ bool cProtocol_1_21_4::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		{
 			switch (a_PacketType)
 			{
-                case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
-                case 0x01: /* query nbt packet */ return false;
+				case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
+				case 0x01: /* query nbt packet */ return false;
 				case 0x02: /* BundleItemSelected */ return false;
-                case 0x03: /* update difficulty */ return false;
-                case 0x04: /* MessageAcknowledgmentC2SPacket */ return false;
-                case 0x05: HandlePacketCommandExecution(a_ByteBuffer); return true;
+				case 0x03: /* update difficulty */ return false;
+				case 0x04: /* MessageAcknowledgmentC2SPacket */ return false;
+				case 0x05: HandlePacketCommandExecution(a_ByteBuffer); return true;
 				case 0x06: /* ChatCommandSignedC2SPacket */ return false;
-                case 0x07: HandlePacketChatMessage(a_ByteBuffer); return true;
-                case 0x08: HandlePacketPlayerSession(a_ByteBuffer); return true;
-                case 0x09: /* AcknowledgeChunksC2SPacket */ return false;
-                case 0x0A: HandlePacketClientStatus(a_ByteBuffer); return true;
+				case 0x07: HandlePacketChatMessage(a_ByteBuffer); return true;
+				case 0x08: HandlePacketPlayerSession(a_ByteBuffer); return true;
+				case 0x09: /* AcknowledgeChunksC2SPacket */ return false;
+				case 0x0A: HandlePacketClientStatus(a_ByteBuffer); return true;
 				case 0x0B: /* ClientTickEnd */ return false;
-                case 0x0C: HandlePacketClientSettings(a_ByteBuffer); return true;
-                case 0x0D: HandlePacketTabComplete(a_ByteBuffer); return true;
-                case 0x0E: /* AcknowledgeReconfigurationC2SPacket*/ return false;
-                case 0x0F: /* ButtonClickC2SPacket */ return false;
-                case 0x10: HandlePacketWindowClick(a_ByteBuffer); return true;
-                case 0x11: HandlePacketWindowClose(a_ByteBuffer); return true;
-                case 0x12: /* SlotChangedStateC2SPacket */ return false;
+				case 0x0C: HandlePacketClientSettings(a_ByteBuffer); return true;
+				case 0x0D: HandlePacketTabComplete(a_ByteBuffer); return true;
+				case 0x0E: /* AcknowledgeReconfigurationC2SPacket*/ return false;
+				case 0x0F: /* ButtonClickC2SPacket */ return false;
+				case 0x10: HandlePacketWindowClick(a_ByteBuffer); return true;
+				case 0x11: HandlePacketWindowClose(a_ByteBuffer); return true;
+				case 0x12: /* SlotChangedStateC2SPacket */ return false;
 				case 0x13: /* CookieResponseC2SPacket */ return false;
-                case 0x14: HandlePacketPluginMessage(a_ByteBuffer); return true;
+				case 0x14: HandlePacketPluginMessage(a_ByteBuffer); return true;
 				case 0x15: /* DebugSampleSubscriptionC2SPacket */ return false;
-                case 0x16: HandlePacketBookUpdate(a_ByteBuffer); return true;  // not fully implemented
-                case 0x17: /* QueryEntityNbtC2SPacket */ return false;
-                case 0x18: HandlePacketUseEntity(a_ByteBuffer); return true;
-                case 0x19: /* Jigsaw generating */ return false;
-                case 0x1A: HandlePacketKeepAlive(a_ByteBuffer); return true;
-                case 0x1B: /* Update difficulty lock */ return false;  // only used in single player
-                case 0x1C: HandlePacketPlayerPos(a_ByteBuffer); return true;  // PositionAndOnGround
-                case 0x1D: HandlePacketPlayerPosLook(a_ByteBuffer); return true; // full
-                case 0x1E: HandlePacketPlayerLook(a_ByteBuffer); return true; // LookAndOnGround
-                case 0x1F: HandlePacketPlayer(a_ByteBuffer); return true;
-                case 0x20: HandlePacketVehicleMove(a_ByteBuffer); return true;
-                case 0x21: HandlePacketBoatSteer(a_ByteBuffer); return true;
-                case 0x22: /* pick item from block */ return false;
+				case 0x16: HandlePacketBookUpdate(a_ByteBuffer); return true;  // not fully implemented
+				case 0x17: /* QueryEntityNbtC2SPacket */ return false;
+				case 0x18: HandlePacketUseEntity(a_ByteBuffer); return true;
+				case 0x19: /* Jigsaw generating */ return false;
+				case 0x1A: HandlePacketKeepAlive(a_ByteBuffer); return true;
+				case 0x1B: /* Update difficulty lock */ return false;  // only used in single player
+				case 0x1C: HandlePacketPlayerPos(a_ByteBuffer); return true;  // PositionAndOnGround
+				case 0x1D: HandlePacketPlayerPosLook(a_ByteBuffer); return true; // full
+				case 0x1E: HandlePacketPlayerLook(a_ByteBuffer); return true; // LookAndOnGround
+				case 0x1F: HandlePacketPlayer(a_ByteBuffer); return true;
+				case 0x20: HandlePacketVehicleMove(a_ByteBuffer); return true;
+				case 0x21: HandlePacketBoatSteer(a_ByteBuffer); return true;
+				case 0x22: /* pick item from block */ return false;
 				case 0x23: /* pick item from entity */ return false;
-                case 0x24: /*QueryPingC2SPacket*/ return false;
-                case 0x25: HandleCraftRecipe(a_ByteBuffer); return true;
-                case 0x26: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
-                case 0x27: HandlePacketBlockDig(a_ByteBuffer); return true;
-                case 0x28: /* client command packet */ return false;
-                case 0x29: HandlePacketSteerVehicle(a_ByteBuffer); return true;  // player input packet
+				case 0x24: /*QueryPingC2SPacket*/ return false;
+				case 0x25: HandleCraftRecipe(a_ByteBuffer); return true;
+				case 0x26: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
+				case 0x27: HandlePacketBlockDig(a_ByteBuffer); return true;
+				case 0x28: /* client command packet */ return false;
+				case 0x29: HandlePacketSteerVehicle(a_ByteBuffer); return true;  // player input packet
 				case 0x2A: /* Player Loaded */ return false;
-                case 0x2B: /* PlayPongC2SPacket */ return false;
-                case 0x2C: /* Recipe Category Options */ return false;
-                case 0x2D: HandlePacketCraftingBookData(a_ByteBuffer); return true;
-                case 0x2E: HandlePacketNameItem(a_ByteBuffer); return true;
-                case 0x2F: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
-                case 0x30: HandlePacketAdvancementTab(a_ByteBuffer); return true;
-                case 0x31: /* select villager trade */ return false;
-                case 0x32: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
-                case 0x33: HandlePacketSlotSelect(a_ByteBuffer); return true;
-                case 0x34: /* update command block */ return false;
-                case 0x35: /* update minecart command block*/ return false;
-                case 0x36: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
-                case 0x37: /* Update jigsaw block */ return false;
-                case 0x38: /* Update structure block */ return false;
-                case 0x39: HandlePacketUpdateSign(a_ByteBuffer); return true;
-                case 0x3A: /* Update hand swing */ return false;
-                case 0x3B: /* Spectator teleport */ return false;
-                case 0x3C: HandlePacketBlockPlace(a_ByteBuffer); return true;
-                case 0x3D: HandlePacketUseItem(a_ByteBuffer); return true;
+				case 0x2B: /* PlayPongC2SPacket */ return false;
+				case 0x2C: /* Recipe Category Options */ return false;
+				case 0x2D: HandlePacketCraftingBookData(a_ByteBuffer); return true;
+				case 0x2E: HandlePacketNameItem(a_ByteBuffer); return true;
+				case 0x2F: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
+				case 0x30: HandlePacketAdvancementTab(a_ByteBuffer); return true;
+				case 0x31: /* select villager trade */ return false;
+				case 0x32: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
+				case 0x33: HandlePacketSlotSelect(a_ByteBuffer); return true;
+				case 0x34: /* update command block */ return false;
+				case 0x35: /* update minecart command block*/ return false;
+				case 0x36: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
+				case 0x37: /* Update jigsaw block */ return false;
+				case 0x38: /* Update structure block */ return false;
+				case 0x39: HandlePacketUpdateSign(a_ByteBuffer); return true;
+				case 0x3A: /* Update hand swing */ return false;
+				case 0x3B: /* Spectator teleport */ return false;
+				case 0x3C: HandlePacketBlockPlace(a_ByteBuffer); return true;
+				case 0x3D: HandlePacketUseItem(a_ByteBuffer); return true;
 				default: break;
 			}
 		}

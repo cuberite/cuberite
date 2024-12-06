@@ -106,7 +106,7 @@ private:
 				Res.Add(Item::Potato, PotatoCount);
 				if (Rand.RandBool(0.02))
 				{
-					// https://minecraft.gamepedia.com/Poisonous_Potato#Obtaining
+					// https://minecraft.wiki/w/Poisonous_Potato#Obtaining
 					// With a 2% chance, drop a poisonous potato as well:
 					Res.Add(Item::PoisonousPotato);
 				}
@@ -183,7 +183,14 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		return ((a_Position.y > 0) && (a_Chunk.GetBlock(a_Position.addedY(-1)).Type() == BlockType::Farmland));
+		const auto BlockBelow = a_Position.addedY(-1);
+
+		if (!cChunkDef::IsValidHeight(BlockBelow))
+		{
+			return false;
+		}
+
+		return a_Chunk.GetBlock(BlockBelow) == BlockType::Farmland;
 	}
 
 

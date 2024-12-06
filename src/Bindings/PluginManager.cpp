@@ -1254,7 +1254,7 @@ bool cPluginManager::CallHookWorldTick(cWorld & a_World, std::chrono::millisecon
 
 cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
 {
-	//to true here and in send command tree
+	// To true here and in send command tree
 #define NEW_COMMANDS 1
 #if NEW_COMMANDS
 	if (a_Command.empty())
@@ -1267,7 +1267,7 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 	}
 	auto r = BasicStringReader(a_Command.substr(1));
 	auto ctx = cCommandExecutionContext(&a_Player);
-	if (!GetRootCommandNode()->Parse(r,ctx))
+	if (!GetRootCommandNode()->Parse(r, ctx))
 	{
 		return crError;
 	}
@@ -1750,7 +1750,7 @@ void cPluginManager::SetupNewCommands(void)
 #define LITERAL(name) cCommandManager::cCommandNode::Literal(name)
 #define ARGUMENT(name, arg) cCommandManager::cCommandNode::Argument(name, std::make_shared<arg>())
 #define ARGUMENT_ARGS(name, arg, args) cCommandManager::cCommandNode::Argument(name, std::make_shared<arg>(args))
-#define EXECUTE(exe) [](const cCommandExecutionContext& a_Ctx) -> bool {exe return true;}
+#define EXECUTE(exe) [](const cCommandExecutionContext & a_Ctx) -> bool {exe return true;}
 	auto node = cCommandManager::cCommandNode();
 	node.Then(
 		cCommandManager::cCommandNode::Literal("testcmd")
@@ -1758,7 +1758,7 @@ void cPluginManager::SetupNewCommands(void)
 				a_Ctx.SendFeedback("test cmd success");
 				return true;
 			})
-			->Then(cCommandManager::cCommandNode::Argument("test float", std::make_shared<cCommandFloatArgument>()).Executable([](const cCommandExecutionContext& a_Ctx) -> bool {
+			->Then(cCommandManager::cCommandNode::Argument("test float", std::make_shared<cCommandFloatArgument>()).Executable([](const cCommandExecutionContext & a_Ctx) -> bool {
 				 a_Ctx.SendFeedback(
 					 "test cmd success2 " + std::to_string(cCommandFloatArgument::GetFloatFromCtx(a_Ctx, "test float")));
 				  	 return true; })));

@@ -75,10 +75,10 @@ public:
 			case BlockType::JungleLeaves:  return JungleLeaves::JungleLeaves   (a_Distance, JungleLeaves::Persistent(a_Block), JungleLeaves::Waterlogged(a_Block));
 			case BlockType::OakLeaves:     return OakLeaves::OakLeaves         (a_Distance, OakLeaves::Persistent(a_Block), OakLeaves::Waterlogged(a_Block));
 			case BlockType::SpruceLeaves:  return SpruceLeaves::SpruceLeaves   (a_Distance, SpruceLeaves::Persistent(a_Block), SpruceLeaves::Waterlogged(a_Block));
-			case BlockType::AzaleaLeaves:  return AzaleaLeaves::AzaleaLeaves   (a_Distance, AzaleaLeaves::Persistent(a_Block),AzaleaLeaves::Waterlogged(a_Block));
-			case BlockType::CherryLeaves:  return CherryLeaves::CherryLeaves   (a_Distance, CherryLeaves::Persistent(a_Block),CherryLeaves::Waterlogged(a_Block));
-			case BlockType::MangroveLeaves:return MangroveLeaves::MangroveLeaves(a_Distance, MangroveLeaves::Persistent(a_Block),MangroveLeaves::Waterlogged(a_Block));
-			case BlockType::FloweringAzaleaLeaves:return FloweringAzaleaLeaves::FloweringAzaleaLeaves(a_Distance, FloweringAzaleaLeaves::Persistent(a_Block),FloweringAzaleaLeaves::Waterlogged(a_Block));
+			case BlockType::AzaleaLeaves:  return AzaleaLeaves::AzaleaLeaves   (a_Distance, AzaleaLeaves::Persistent(a_Block), AzaleaLeaves::Waterlogged(a_Block));
+			case BlockType::CherryLeaves:  return CherryLeaves::CherryLeaves   (a_Distance, CherryLeaves::Persistent(a_Block), CherryLeaves::Waterlogged(a_Block));
+			case BlockType::MangroveLeaves:return MangroveLeaves::MangroveLeaves(a_Distance, MangroveLeaves::Persistent(a_Block), MangroveLeaves::Waterlogged(a_Block));
+			case BlockType::FloweringAzaleaLeaves:return FloweringAzaleaLeaves::FloweringAzaleaLeaves(a_Distance, FloweringAzaleaLeaves::Persistent(a_Block), FloweringAzaleaLeaves::Waterlogged(a_Block));
 			default: return a_Block;
 		}
 	}
@@ -115,7 +115,7 @@ public:
 			case BlockType::SpruceLeaves:  return SpruceLeaves::SpruceLeaves   (SpruceLeaves::Distance(a_Block),  a_IsPersistant, SpruceLeaves::Waterlogged(a_Block));
 			case BlockType::AzaleaLeaves:  return AzaleaLeaves::AzaleaLeaves   (AzaleaLeaves::Distance(a_Block),  a_IsPersistant, AzaleaLeaves::Waterlogged(a_Block));
 			case BlockType::CherryLeaves:  return CherryLeaves::CherryLeaves   (CherryLeaves::Distance(a_Block),  a_IsPersistant, CherryLeaves::Waterlogged(a_Block));
-			case BlockType::MangroveLeaves:return MangroveLeaves::MangroveLeaves(MangroveLeaves::Distance(a_Block), a_IsPersistant,MangroveLeaves::Waterlogged(a_Block));
+			case BlockType::MangroveLeaves:return MangroveLeaves::MangroveLeaves(MangroveLeaves::Distance(a_Block), a_IsPersistant, MangroveLeaves::Waterlogged(a_Block));
 			case BlockType::FloweringAzaleaLeaves:return FloweringAzaleaLeaves::FloweringAzaleaLeaves(FloweringAzaleaLeaves::Distance(a_Block), a_IsPersistant, FloweringAzaleaLeaves::Waterlogged(a_Block));
 			default: return a_Block;
 		}
@@ -226,7 +226,7 @@ private:
 				}
 				break;
 			}
-			//todo azlea trees
+			// todo azlea trees
 			default: return {};
 		}
 

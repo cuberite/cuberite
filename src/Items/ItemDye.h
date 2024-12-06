@@ -78,7 +78,7 @@ public:
 			// Cocoa (brown dye) can be planted on jungle logs:
 
 			BlockState ClickedBlock;
-			if(a_World->GetBlock(a_ClickedBlockPos, ClickedBlock))
+			if (a_World->GetBlock(a_ClickedBlockPos, ClickedBlock))
 			{
 				return false;
 			}

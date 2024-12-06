@@ -1004,6 +1004,13 @@ void cPlayer::Respawn(void)
 		TeleportToCoords(m_RespawnPosition.x, m_RespawnPosition.y, m_RespawnPosition.z);
 	}
 
+	// The Notchian client enters a weird glitched state when trying to "resurrect" dead players
+	// To prevent that, destroy the existing client-side entity, and create a new one with the same ID
+	// This does not make any difference to more modern clients
+	m_World->BroadcastDestroyEntity(*this, &*m_ClientHandle);
+	m_World->BroadcastSpawnEntity(*this, &*m_ClientHandle);
+
+
 	SetVisible(true);
 }
 
@@ -2509,8 +2516,6 @@ bool cPlayer::PlaceBlocks(const std::initializer_list<sSetBlock> a_Blocks)
 	cChunkInterface ChunkInterface(m_World->GetChunkMap());
 	for (const auto & Block : a_Blocks)
 	{
-		//m_World->NewPlaceBlock(Block.GetAbsolutePos(), Block.m_BlockIdNew);
-
 		// Set the blocks:
 		m_World->PlaceBlock(Block.GetAbsolutePos(), Block.m_Block);
 
@@ -2610,7 +2615,11 @@ bool cPlayer::IsInsideWater()
 		return false;
 	}
 
-	auto Block = m_World->GetBlock(EyePos);
+	BlockState Block;
+	if (m_World->GetBlock(EyePos, Block))
+	{
+		return false;
+	}
 
 	if (Block.Type() != BlockType::Water)
 	{

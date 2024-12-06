@@ -16,7 +16,6 @@ namespace PaletteUpgrade
 	std::pair<unsigned char, unsigned char> ToBlock(BlockState a_Block);
 	std::pair<short, short> ToItem(Item ID);
 	BlockType ToBlockType(NEWBLOCKTYPE block);
-	//NEWBLOCKTYPE ToInternalId(BlockType block, AllBlockStates blockstate);
 	BlockType BlockToItemType(Item blocktype);
 	std::array<std::pair<std::string, std::string>, 8> GetSaveStrings(NEWBLOCKTYPE a_block);
 };

@@ -11,26 +11,14 @@
 
 
 
-class cItemShearsHandler:
+class cItemShearsHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemShearsHandler(Item a_ItemType):
-		Super(a_ItemType)
-	{
-	}
-
-
-
-
-
-	virtual bool IsTool(void) override
-	{
-		return true;
-	}
+	using Super::Super;
 
 
 
@@ -42,10 +30,13 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
-		auto BrokenBlock = a_World->GetBlock(a_ClickedBlockPos);
-
+		BlockState BrokenBlock;
+		if (a_World->GetBlock(a_ClickedBlockPos, BrokenBlock))
+		{
+			return false;
+		}
 		if (cBlockLeavesHandler::IsBlockLeaves(BrokenBlock))
 		{
 			a_World->DropBlockAsPickups(a_ClickedBlockPos, a_Player, &a_HeldItem);
@@ -59,7 +50,7 @@ public:
 
 
 
-	virtual bool CanHarvestBlock(BlockState a_Block) override
+	virtual bool CanHarvestBlock(BlockState a_Block) const override
 	{
 		switch (a_Block.Type())
 		{
@@ -75,7 +66,7 @@ public:
 
 
 
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) const override
 	{
 		switch (a_Action)
 		{
@@ -91,7 +82,7 @@ public:
 
 
 
-	virtual float GetBlockBreakingStrength(BlockState a_Block) override
+	virtual float GetBlockBreakingStrength(BlockState a_Block) const override
 	{
 		if ((a_Block == BlockType::Cobweb) || cBlockLeavesHandler::IsBlockLeaves(a_Block))
 		{

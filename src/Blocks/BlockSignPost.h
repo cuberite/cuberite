@@ -109,7 +109,7 @@ private:
 		}
 	}
 
-	//TODO: check is mirrorXY and mirrorYZ are identical
+	// TODO: check is mirrorXY and mirrorYZ are identical
 
 #define MIRROR_XY(SignType) \
 	return SignType::SignType(  (SignType::Rotation(a_Block)  + 8) % 16, SignType::Waterlogged(a_Block)); \

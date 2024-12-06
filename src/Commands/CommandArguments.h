@@ -7,11 +7,11 @@
 
 class cCommandArgument
 {
-  public:
+public:
 	cCommandArgument() = default;
 	virtual eCommandParserType GetParserType() const { return eCommandParserType::None; }
-	virtual void WriteProperties(cPacketizer& a_Packet) const { return; }
-	virtual void Parse(BasicStringReader& a_ToParse, cCommandExecutionContext& ctx, const AString& a_Name) { return; }
+	virtual void WriteProperties(cPacketizer & a_Packet) const { return; }
+	virtual void Parse(BasicStringReader & a_ToParse, cCommandExecutionContext & ctx, const AString & a_Name) { return; }
 };
 
 
@@ -20,12 +20,11 @@ class cCommandArgument
 
 class cCommandFloatArgument final : public cCommandArgument
 {
-
-  public:
-	cCommandFloatArgument(float a_Min, float a_Max) : m_Min(a_Min), m_Max(a_Max){}
+public:
+	cCommandFloatArgument(float a_Min, float a_Max) : m_Min(a_Min), m_Max(a_Max) {}
 	cCommandFloatArgument() = default;
 
-	void WriteProperties(cPacketizer& a_Packet) const override
+	void WriteProperties(cPacketizer & a_Packet) const override
 	{
 		const Byte flags = static_cast<Byte>(m_Min.has_value()) | static_cast<Byte>(m_Max.has_value() << 1);
 		a_Packet.WriteBEInt8(static_cast<Int8>(flags));
@@ -38,19 +37,19 @@ class cCommandFloatArgument final : public cCommandArgument
 			a_Packet.WriteBEFloat(m_Max.value());
 		}
 	}
-	void Parse(BasicStringReader& a_ToParse, cCommandExecutionContext& ctx, const AString& a_Name) override
+	void Parse(BasicStringReader & a_ToParse, cCommandExecutionContext & ctx, const AString & a_Name) override
 	{
 		float value = 0;
 		const auto str = a_ToParse.ReadStringUntilWhiteSpace();
 		try
 		{
-			 value = std::stof(str);
+			value = std::stof(str);
 		}
-		catch (std::invalid_argument& ex)
+		catch (std::invalid_argument & ex)
 		{
 			throw cCommandParseException("Failed to parse " + str + " as float. Error: "+ ex.what());
 		}
-		catch (std::out_of_range& ex)
+		catch (std::out_of_range & ex)
 		{
 			throw cCommandParseException("Failed to parse " + str + " as float because its too large/small. Error: "+ ex.what());
 		}
@@ -65,7 +64,7 @@ class cCommandFloatArgument final : public cCommandArgument
 		ctx.AddValue(a_Name, value);
 	}
 	virtual eCommandParserType GetParserType() const override { return eCommandParserType::Float; }
-	static float GetFloatFromCtx(cCommandExecutionContext a_Ctx, const AString& a_Name)
+	static float GetFloatFromCtx(cCommandExecutionContext a_Ctx, const AString & a_Name)
 	{
 		return std::any_cast<float>(a_Ctx.GetValue(a_Name));
 	}
@@ -81,15 +80,15 @@ private:
 
 class cCommandTimeArgument final : public cCommandArgument
 {
-  public:
+public:
 	cCommandTimeArgument(int a_Min) : m_Min(a_Min){}
 	cCommandTimeArgument() = default;
 
-	void WriteProperties(cPacketizer& a_Packet) const override
+	void WriteProperties(cPacketizer & a_Packet) const override
 	{
 		a_Packet.WriteBEInt32(m_Min.value_or(0));
 	}
-	void Parse(BasicStringReader& a_ToParse, cCommandExecutionContext& ctx, const AString& a_Name) override
+	void Parse(BasicStringReader & a_ToParse, cCommandExecutionContext & ctx, const AString & a_Name) override
 	{
 		float value = 0;
 		auto str = a_ToParse.ReadStringUntilWhiteSpace();
@@ -100,26 +99,26 @@ class cCommandTimeArgument final : public cCommandArgument
 			if (unit == 'd')
 			{
 				multiplier = 24000;
-				str = str.substr(0,str.size() - 1);
+				str = str.substr(0, str.size() - 1);
 			}
 			if (unit == 's')
 			{
 				multiplier = 20;
-				str = str.substr(0,str.size() - 1);
+				str = str.substr(0, str.size() - 1);
 			}
 			if (unit == 't')
 			{
-				str = str.substr(0,str.size() - 1);
+				str = str.substr(0, str.size() - 1);
 			}
-			 value = std::stof(str);
+			value = std::stof(str);
 		}
 		catch (std::invalid_argument& ex)
 		{
-			throw cCommandParseException("Failed to parse " + str + " as float. Error: "+ ex.what());
+			throw cCommandParseException("Failed to parse " + str + " as float. Error: " + ex.what());
 		}
 		catch (std::out_of_range& ex)
 		{
-			throw cCommandParseException("Failed to parse " + str + " as float because its too large/small. Error: "+ ex.what());
+			throw cCommandParseException("Failed to parse " + str + " as float because its too large/small. Error: " + ex.what());
 		}
 		value *= multiplier;
 		if (m_Min.has_value() && value < m_Min.value())
@@ -129,7 +128,7 @@ class cCommandTimeArgument final : public cCommandArgument
 		ctx.AddValue(a_Name, static_cast<int>(value));
 	}
 	virtual eCommandParserType GetParserType() const override { return eCommandParserType::Time; }
-	static int GetTimeTicksFromCtx(cCommandExecutionContext a_Ctx, const AString& a_Name)
+	static int GetTimeTicksFromCtx(cCommandExecutionContext a_Ctx, const AString & a_Name)
 	{
 		return std::any_cast<int>(a_Ctx.GetValue(a_Name));
 	}
@@ -147,7 +146,7 @@ class cCommandGameModeArgument final : public cCommandArgument
 public:
 	cCommandGameModeArgument() = default;
 
-	void Parse(BasicStringReader& a_ToParse, cCommandExecutionContext& ctx, const AString& a_Name) override
+	void Parse(BasicStringReader & a_ToParse, cCommandExecutionContext & ctx, const AString & a_Name) override
 	{
 		eGameMode value = eGameMode_NotSet;
 		auto str = a_ToParse.ReadStringUntilWhiteSpace();
@@ -174,7 +173,7 @@ public:
 		ctx.AddValue(a_Name, value);
 	}
 	virtual eCommandParserType GetParserType() const override { return eCommandParserType::Gamemode; }
-	static eGameMode GetGameModeFromCtx(cCommandExecutionContext a_Ctx, const AString& a_Name)
+	static eGameMode GetGameModeFromCtx(cCommandExecutionContext a_Ctx, const AString & a_Name)
 	{
 		return std::any_cast<eGameMode>(a_Ctx.GetValue(a_Name));
 	}
