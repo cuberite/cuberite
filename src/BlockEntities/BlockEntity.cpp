@@ -23,6 +23,7 @@
 #include "MobSpawnerEntity.h"
 #include "JukeboxEntity.h"
 #include "NoteEntity.h"
+#include "ShulkerBoxEntity.h"
 #include "SignEntity.h"
 
 
@@ -101,6 +102,24 @@ OwnedBlockEntity cBlockEntity::CreateByBlockType(const BLOCKTYPE a_BlockType, co
 		case E_BLOCK_LIT_FURNACE:       return std::make_unique<cFurnaceEntity        >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_MOB_SPAWNER:       return std::make_unique<cMobSpawnerEntity     >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_NOTE_BLOCK:        return std::make_unique<cNoteEntity           >(a_BlockType, a_BlockMeta, a_Pos, a_World);
+
+		case E_BLOCK_WHITE_SHULKER_BOX:
+		case E_BLOCK_ORANGE_SHULKER_BOX:
+		case E_BLOCK_MAGENTA_SHULKER_BOX:
+		case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:
+		case E_BLOCK_YELLOW_SHULKER_BOX:
+		case E_BLOCK_LIME_SHULKER_BOX:
+		case E_BLOCK_PINK_SHULKER_BOX:
+		case E_BLOCK_GRAY_SHULKER_BOX:
+		case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:
+		case E_BLOCK_CYAN_SHULKER_BOX:
+		case E_BLOCK_PURPLE_SHULKER_BOX:
+		case E_BLOCK_BLUE_SHULKER_BOX:
+		case E_BLOCK_BROWN_SHULKER_BOX:
+		case E_BLOCK_GREEN_SHULKER_BOX:
+		case E_BLOCK_RED_SHULKER_BOX:
+		case E_BLOCK_BLACK_SHULKER_BOX: return std::make_unique<cShulkerBoxEntity     >(a_BlockType, a_BlockMeta, a_Pos, a_World);
+
 		case E_BLOCK_SIGN_POST:         return std::make_unique<cSignEntity           >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_TRAPPED_CHEST:     return std::make_unique<cChestEntity          >(a_BlockType, a_BlockMeta, a_Pos, a_World);
 		case E_BLOCK_WALLSIGN:          return std::make_unique<cSignEntity           >(a_BlockType, a_BlockMeta, a_Pos, a_World);
@@ -149,6 +168,24 @@ bool cBlockEntity::IsBlockEntityBlockType(const BLOCKTYPE a_BlockType)
 		case E_BLOCK_LIT_FURNACE:
 		case E_BLOCK_MOB_SPAWNER:
 		case E_BLOCK_NOTE_BLOCK:
+
+		case E_BLOCK_WHITE_SHULKER_BOX:
+		case E_BLOCK_ORANGE_SHULKER_BOX:
+		case E_BLOCK_MAGENTA_SHULKER_BOX:
+		case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:
+		case E_BLOCK_YELLOW_SHULKER_BOX:
+		case E_BLOCK_LIME_SHULKER_BOX:
+		case E_BLOCK_PINK_SHULKER_BOX:
+		case E_BLOCK_GRAY_SHULKER_BOX:
+		case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:
+		case E_BLOCK_CYAN_SHULKER_BOX:
+		case E_BLOCK_PURPLE_SHULKER_BOX:
+		case E_BLOCK_BLUE_SHULKER_BOX:
+		case E_BLOCK_BROWN_SHULKER_BOX:
+		case E_BLOCK_GREEN_SHULKER_BOX:
+		case E_BLOCK_RED_SHULKER_BOX:
+		case E_BLOCK_BLACK_SHULKER_BOX:
+
 		case E_BLOCK_SIGN_POST:
 		case E_BLOCK_STANDING_BANNER:
 		case E_BLOCK_TRAPPED_CHEST:
