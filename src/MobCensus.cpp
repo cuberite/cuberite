@@ -38,10 +38,8 @@ int cMobCensus::GetCapMultiplier(cMonster::eFamily a_MobFamily)
 		case cMonster::mfPassive: return 11;
 		case cMonster::mfAmbient: return 16;
 		case cMonster::mfWater:   return 5;
-		case cMonster::mfNoSpawn:
-		{
-			break;
-		}
+		case cMonster::mfNoSpawn: break;
+		case cMonster::mfUnknown: break;
 	}
 	UNREACHABLE("Unsupported mob family");
 }
