@@ -467,7 +467,6 @@ private:
 	cChunkMap * m_ChunkMap;
 
 	ChunkBlockData m_BlockData;
-	//ChunkBlockDataNew m_BlockData2;
 	ChunkLightData m_LightData;
 
 	cChunkDef::HeightMap m_HeightMap;

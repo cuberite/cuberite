@@ -28,7 +28,7 @@ public:
 		const auto & World = *a_Player.GetWorld();
 		const auto TopPos = a_PlacePosition.addedY(1);
 		BlockState BlockToReplace;
-		if(World.GetBlock(TopPos, BlockToReplace))
+		if (World.GetBlock(TopPos, BlockToReplace))
 		{
 			return false;
 		}

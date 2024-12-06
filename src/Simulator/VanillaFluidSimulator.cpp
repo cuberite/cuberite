@@ -82,8 +82,7 @@ void cVanillaFluidSimulator::SpreadXZ(cChunk * a_Chunk, Vector3i a_RelPos, unsig
 
 int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, Vector3i a_RelPos, FluidDirection a_Dir, unsigned a_Iteration)
 {
-	return 0;
-	/*
+	
 	int Cost = InfiniteCost;
 
 	BlockState Self = 0;
@@ -120,40 +119,40 @@ int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, Vector3i a_RelPo
 	}
 
 	// Recurse
-	if (a_Dir != X_MINUS)
+	if (a_Dir != FluidDirection::X_MINUS)
 	{
-		int NextCost = CalculateFlowCost(a_Chunk, a_RelPos.addedX(1), X_PLUS, a_Iteration + 1);
+		int NextCost = CalculateFlowCost(a_Chunk, a_RelPos.addedX(1), FluidDirection::X_PLUS, a_Iteration + 1);
 		if (NextCost < Cost)
 		{
 			Cost = NextCost;
 		}
 	}
-	if (a_Dir != X_PLUS)
+	if (a_Dir != FluidDirection::X_PLUS)
 	{
-		int NextCost = CalculateFlowCost(a_Chunk, a_RelPos.addedX(-1), X_MINUS, a_Iteration + 1);
+		int NextCost = CalculateFlowCost(a_Chunk, a_RelPos.addedX(-1), FluidDirection::X_MINUS, a_Iteration + 1);
 		if (NextCost < Cost)
 		{
 			Cost = NextCost;
 		}
 	}
-	if (a_Dir != Z_MINUS)
+	if (a_Dir != FluidDirection::Z_MINUS)
 	{
-		int NextCost = CalculateFlowCost(a_Chunk, a_RelPos.addedZ(1), Z_PLUS, a_Iteration + 1);
+		int NextCost = CalculateFlowCost(a_Chunk, a_RelPos.addedZ(1), FluidDirection::Z_PLUS, a_Iteration + 1);
 		if (NextCost < Cost)
 		{
 			Cost = NextCost;
 		}
 	}
-	if (a_Dir != Z_PLUS)
+	if (a_Dir != FluidDirection::Z_PLUS)
 	{
-		int NextCost = CalculateFlowCost(a_Chunk, a_RelPos.addedZ(-1), Z_MINUS, a_Iteration + 1);
+		int NextCost = CalculateFlowCost(a_Chunk, a_RelPos.addedZ(-1), FluidDirection::Z_MINUS, a_Iteration + 1);
 		if (NextCost < Cost)
 		{
 			Cost = NextCost;
 		}
 	}
 
-	return Cost;*/
+	return Cost;
 }
 
 

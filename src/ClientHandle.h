@@ -201,7 +201,7 @@ public:  // tolua_export
 	void SendParticleEffect             (const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data);
 	void SendPlayerAbilities            (void);
 	void SendPlayerListAddPlayer        (const cPlayer & a_Player);
-    void SendPlayerListInitChat         (const cPlayer & a_Player) ;
+	void SendPlayerListInitChat         (const cPlayer & a_Player);
 	void SendPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer);  // tolua_export
 	void SendPlayerListRemovePlayer     (const cPlayer & a_Player);
 	void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName);
@@ -402,13 +402,13 @@ public:  // tolua_export
 
 	void HandleSteerVehicle     (float Forward, float Sideways);
 	void HandleTabCompletion    (const AString & a_Text, UInt32 CompletionId);
-	void HandleUpdateSign       (Vector3i a_BlockPos,const AString & a_Line1, const AString & a_Line2,const AString & a_Line3, const AString & a_Line4);
+	void HandleUpdateSign       (Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	void HandleUnmount          (void);
 	void HandleUseEntity        (UInt32 a_TargetEntityID, bool a_IsLeftClick);
 	void HandleUseItem          (bool a_UsedMainHand);
 	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
 	void HandleWindowClose      (UInt8 a_WindowID);
-	void HandlePlayerSession    (cUUID a_SessionID, Int64 ExpiresAt, const ContiguousByteBuffer& a_PublicKey, const ContiguousByteBuffer& a_KeySignature);
+	void HandlePlayerSession    (cUUID a_SessionID, Int64 ExpiresAt, const ContiguousByteBuffer & a_PublicKey, const ContiguousByteBuffer & a_KeySignature);
 
 	/** Called when a recipe from the recipe book is selected */
 	void HandleCraftRecipe      (UInt32 a_RecipeId);
@@ -448,7 +448,7 @@ public:  // tolua_export
 	/* Contains information for verifying chat messages form players only used in 1.19+ */
 	class cPlayerSessionData
 	{
-	  public:
+	public:
 		cPlayerSessionData() :
 			m_IsPopulated(false),
 			m_SessionId(cUUID()),
@@ -472,7 +472,7 @@ public:  // tolua_export
 		Int64 GetExpiresAtEpochMiliscond() const { return m_ExpiresAt; };
 		ContiguousByteBuffer GetPublicKey() const { return m_PublicKey; };
 		ContiguousByteBuffer GetKeySignature() const { return m_KeySignature; };
-	  private:
+	private:
 		bool m_IsPopulated;
 		cUUID m_SessionId;
 		Int64 m_ExpiresAt;

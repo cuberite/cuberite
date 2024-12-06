@@ -57,7 +57,7 @@ public:
 			case BlockType::StoneStairs:
 			case BlockType::WarpedStairs:
 			case BlockType::BambooMosaicStairs:
-			case BlockType::BambooStairs: 
+			case BlockType::BambooStairs:
             case BlockType::CherryStairs:
 			case BlockType::CobbledDeepslateStairs:
 			case BlockType::TuffStairs:
@@ -67,7 +67,7 @@ public:
 			case BlockType::MangroveStairs:
 			case BlockType::DeepslateTileStairs:
 			case BlockType::DeepslateBrickStairs:
-			case BlockType::PolishedDeepslateStairs:    
+			case BlockType::PolishedDeepslateStairs: 
 			case BlockType::CutCopperStairs:
 			case BlockType::ExposedCutCopperStairs:
 			case BlockType::WeatheredCutCopperStairs:
@@ -218,7 +218,7 @@ private:
 			case BlockType::StoneStairs:                   return 11;
 			case BlockType::WarpedStairs:                  return 23;
 			case BlockType::BambooMosaicStairs:
-			case BlockType::BambooStairs: 
+			case BlockType::BambooStairs:
             case BlockType::CherryStairs:
 			case BlockType::CobbledDeepslateStairs:
 			case BlockType::TuffStairs:
@@ -228,7 +228,7 @@ private:
 			case BlockType::MangroveStairs:
 			case BlockType::DeepslateTileStairs:
 			case BlockType::DeepslateBrickStairs:
-			case BlockType::PolishedDeepslateStairs:    
+			case BlockType::PolishedDeepslateStairs:
 			case BlockType::CutCopperStairs:
 			case BlockType::ExposedCutCopperStairs:
 			case BlockType::WeatheredCutCopperStairs:

@@ -7,7 +7,7 @@ class cEntityEffect
 {
 public:
 
-	//Missing luck, unluck, levitaion anmd glowing
+	// Missing luck, unluck, levitation and glowing
 	/** All types of entity effects (numbers correspond to protocol / storage types) */
 	enum eType : short
 	{
@@ -630,7 +630,6 @@ public:
 
 	virtual void OnTick(cPawn & a_Target) override;
 };
-
 
 
 

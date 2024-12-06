@@ -409,7 +409,7 @@ public:
 
 	cCommandManager::cCommandNode * GetRootCommandNode() { return &m_RootCommandNode; };
 
-  private:
+private:
 	friend class cRoot;
 
 	class cCommandReg

@@ -33,7 +33,7 @@ public:
 	) const override
 	{
 		BlockState BrokenBlock;
-		if(a_World->GetBlock(a_ClickedBlockPos, BrokenBlock))
+		if (a_World->GetBlock(a_ClickedBlockPos, BrokenBlock))
 		{
 			return false;
 		}

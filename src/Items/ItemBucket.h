@@ -36,7 +36,7 @@ public:
 			case Item::Bucket:      return ScoopUpFluid(a_World, a_Player, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace);
 			case Item::LavaBucket:  return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace, Block::Lava::Lava());
 			case Item::WaterBucket: return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace, Block::Water::Water());
-			case Item::PowderSnowBucket: return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace, Block::PowderSnow::PowderSnow()); // not really a fluid but it works
+			case Item::PowderSnowBucket: return PlaceFluid  (a_World, a_Player, a_PluginInterface, a_HeldItem, a_ClickedBlockPos, a_ClickedBlockFace, Block::PowderSnow::PowderSnow());  // not really a fluid but it works
 			default:
 			{
 				FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, m_ItemType);
@@ -134,7 +134,7 @@ public:
 
 		if (a_BlockFace != BLOCK_FACE_NONE)
 		{
-			//return false;
+			// return false;
 		}
 
 		BlockState Dest;

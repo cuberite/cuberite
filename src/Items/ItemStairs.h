@@ -91,8 +91,8 @@ private:
 			case BlockType::StoneStairs:                   BlockToPlace = StoneStairs::StoneStairs(                                     BlockFace, Inverse ? StoneStairs::Half::Top                   : StoneStairs::Half::Bottom,                   StoneStairs::Shape::Straight, IsPlacedInWater); break;
 			case BlockType::WarpedStairs:                  BlockToPlace = WarpedStairs::WarpedStairs(                                   BlockFace, Inverse ? WarpedStairs::Half::Top                  : WarpedStairs::Half::Bottom,                  WarpedStairs::Shape::Straight, IsPlacedInWater); break;
 			case BlockType::BambooMosaicStairs:            SET_BLOCK_TO_PLACE(BambooMosaicStairs)
-			case BlockType::BambooStairs:                  SET_BLOCK_TO_PLACE(BambooStairs) 
-            case BlockType::CherryStairs:                  SET_BLOCK_TO_PLACE(BambooMosaicStairs)
+			case BlockType::BambooStairs:                  SET_BLOCK_TO_PLACE(BambooStairs)
+			case BlockType::CherryStairs:                  SET_BLOCK_TO_PLACE(BambooMosaicStairs)
 			case BlockType::CobbledDeepslateStairs:        SET_BLOCK_TO_PLACE(CobbledDeepslateStairs)
 			case BlockType::TuffStairs:                    SET_BLOCK_TO_PLACE(TuffStairs)
 			case BlockType::TuffBrickStairs:               SET_BLOCK_TO_PLACE(TuffBrickStairs)
@@ -101,7 +101,7 @@ private:
 			case BlockType::MangroveStairs:                SET_BLOCK_TO_PLACE(MangroveStairs)
 			case BlockType::DeepslateTileStairs:           SET_BLOCK_TO_PLACE(DeepslateTileStairs)
 			case BlockType::DeepslateBrickStairs:          SET_BLOCK_TO_PLACE(DeepslateBrickStairs)
-			case BlockType::PolishedDeepslateStairs:       SET_BLOCK_TO_PLACE(PolishedDeepslateStairs)    
+			case BlockType::PolishedDeepslateStairs:       SET_BLOCK_TO_PLACE(PolishedDeepslateStairs)
 			case BlockType::CutCopperStairs:               SET_BLOCK_TO_PLACE(CutCopperStairs)
 			case BlockType::ExposedCutCopperStairs:        SET_BLOCK_TO_PLACE(ExposedCutCopperStairs)
 			case BlockType::WeatheredCutCopperStairs:      SET_BLOCK_TO_PLACE(WeatheredCutCopperStairs)

@@ -742,7 +742,7 @@ void cMojangAPI::GetMojangKeys(void)
 #endif
 		return;
 	}
-	//  TODO: parse profilePropertyKeys 
+	//  TODO: parse profilePropertyKeys
 	const Json::Value & ProfCertKeys = root.get("playerCertificateKeys", "");
 	if (ProfCertKeys.empty() || !ProfCertKeys.isArray())
 	{
@@ -753,9 +753,9 @@ void cMojangAPI::GetMojangKeys(void)
 	{
 		const Json::Value & Key = ProfCertKeys[i];
 		AString pubkey = Key.get("publicKey", "").asString();
-		unsigned char* tempbfr = new unsigned char[pubkey.size()];
+		unsigned char * tempbfr = new unsigned char[pubkey.size()];
 		size_t BytesWiritten = -1;
-		if (mbedtls_base64_decode(tempbfr, pubkey.size(), &BytesWiritten, reinterpret_cast<const unsigned char*>(pubkey.c_str()), pubkey.size()) != 0)
+		if (mbedtls_base64_decode(tempbfr, pubkey.size(), &BytesWiritten, reinterpret_cast<const unsigned char *>(pubkey.c_str()), pubkey.size()) != 0)
 		{
 			LOGWARNING("Failed to base64 decode mojang key");
 			continue;
@@ -776,12 +776,12 @@ void cMojangAPI::GetMojangKeys(void)
 
 
 
-bool cMojangAPI::VerifyUsingMojangKeys(const ContiguousByteBuffer& DataToVerify, const ContiguousByteBuffer& Signature)
+bool cMojangAPI::VerifyUsingMojangKeys(const ContiguousByteBuffer & DataToVerify, const ContiguousByteBuffer & Signature)
 {
 	const mbedtls_md_type_t hash_type = MBEDTLS_MD_SHA1;
 	const mbedtls_md_info_t *mdinfo = mbedtls_md_info_from_type(hash_type);
-	unsigned char* Digest = new unsigned char[mdinfo->size];
-	int hash_err = mbedtls_md(mdinfo, reinterpret_cast<const unsigned char*>(DataToVerify.c_str()), DataToVerify.size(), Digest);
+	unsigned char * Digest = new unsigned char[mdinfo->size];
+	int hash_err = mbedtls_md(mdinfo, reinterpret_cast<const unsigned char *>(DataToVerify.c_str()), DataToVerify.size(), Digest);
 	if (hash_err != 0)
 	{
 		LOGWARN("Failed to calculate hash");
@@ -789,7 +789,7 @@ bool cMojangAPI::VerifyUsingMojangKeys(const ContiguousByteBuffer& DataToVerify,
 	}
 	for (auto ctx : MojangPublicKeys)
 	{
-		int verify_error = mbedtls_pk_verify(&ctx, hash_type, Digest, mdinfo->size, reinterpret_cast<const unsigned char*>(Signature.c_str()), Signature.size());
+		int verify_error = mbedtls_pk_verify(&ctx, hash_type, Digest, mdinfo->size, reinterpret_cast<const unsigned char *>(Signature.c_str()), Signature.size());
 		if (verify_error == 0)
 		{
 			return true;

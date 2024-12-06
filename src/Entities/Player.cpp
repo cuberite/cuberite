@@ -2516,8 +2516,6 @@ bool cPlayer::PlaceBlocks(const std::initializer_list<sSetBlock> a_Blocks)
 	cChunkInterface ChunkInterface(m_World->GetChunkMap());
 	for (const auto & Block : a_Blocks)
 	{
-		//m_World->NewPlaceBlock(Block.GetAbsolutePos(), Block.m_BlockIdNew);
-
 		// Set the blocks:
 		m_World->PlaceBlock(Block.GetAbsolutePos(), Block.m_Block);
 
@@ -2618,7 +2616,7 @@ bool cPlayer::IsInsideWater()
 	}
 
 	BlockState Block;
-	if (m_World->GetBlock(EyePos,Block))
+	if (m_World->GetBlock(EyePos, Block))
 	{
 		return false;
 	}

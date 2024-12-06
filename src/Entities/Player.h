@@ -104,7 +104,7 @@ public:
 	*/
 	bool SetCurrentExperience(int a_XpTotal);
 
-	/** Resend the RenderDistanceCenter packet to the player **/
+	/** Resend the RenderDistanceCenter packet to the player */
 	void ResendRenderDistanceCenter();
 
 		void SendPlayerInventoryJoin();

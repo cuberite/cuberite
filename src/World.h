@@ -79,7 +79,7 @@ public:
 
 	// tolua_begin
 
-    virtual	void FlushPendingBlockChanges() override;
+	virtual void FlushPendingBlockChanges() override;
 
 	/** Get whether saving chunks is enabled */
 	bool IsSavingEnabled(void) const { return m_IsSavingEnabled; }

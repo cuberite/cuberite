@@ -38,11 +38,11 @@ public:
 			return false;
 		}
 #define PLACE_BED(BedType)\
-				Success = a_Player.PlaceBlocks({\
-					{ a_PlacePosition, BedType::BedType(Rotation, false, BedType::Part::Foot) },\
-					{ HeadPosition,    BedType::BedType(Rotation, false, BedType::Part::Head) }\
-				});\
-				break;\
+	Success = a_Player.PlaceBlocks({\
+		{ a_PlacePosition, BedType::BedType(Rotation, false, BedType::Part::Foot) }, \
+		{ HeadPosition,    BedType::BedType(Rotation, false, BedType::Part::Head) }\
+	});\
+	break;\
 
 		using namespace Block;
 		bool Success = false;
@@ -77,7 +77,7 @@ public:
 		{
 			ASSERT(cBlockBedHandler::IsBlockBed(a_BlockEntity.GetBlock()));
 
-			static_cast<cBedEntity &>(a_BlockEntity).SetColor(a_HeldItem.m_ItemDamage); // broken
+			static_cast<cBedEntity &>(a_BlockEntity).SetColor(a_HeldItem.m_ItemDamage);  // Broken
 			return false;
 		};
 		World.DoWithBlockEntityAt(a_PlacePosition, SetColor);
