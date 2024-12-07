@@ -100,7 +100,7 @@ static void testGenerateOverworld(cChunkGenerator & aDefaultOverworldGen)
 		{
 			for (int z = 0; z < cChunkDef::Width; ++z)
 			{
-				TEST_EQUAL_MSG(chd.GetBlock({x, 0, z}).Type(), BlockType::Bedrock, Printf("Bedrock floor at {%d, 0, %d}", x, z));
+				TEST_EQUAL_MSG(chd.GetBlock({x, 0, z}).Type(), BlockType::Bedrock, fmt::format(FMT_STRING("Bedrock floor at {{{}, {}, {}}}"), x, 0, z));
 			}
 		}
 
@@ -129,12 +129,12 @@ static void testGenerateOverworld(cChunkGenerator & aDefaultOverworldGen)
 				auto y = chd.GetHeight(x, z);
 				auto Block = chd.GetBlock({x, y, z});
 				TEST_EQUAL_MSG(validOverworldBlockTypes.count(Block.Type()), 1,
-					Printf("Block at {{}, {}, {}}: {}", x, y, z, Block.Type())
+					fmt::format(FMT_STRING("Block at {{}, {}, {}}: {}", x, y, z, Block.Type())
 				);
 				if (y < cChunkDef::Height - 1)
 				{
 					TEST_EQUAL_MSG(chd.GetBlock({x, cChunkDef::Height - 1, z}), BlockType::Air,
-						Printf("Air at {%d, %d, %d}", x, cChunkDef::Height - 1, z)
+						fmt::format(FMT_STRING("Air at {%d, %d, %d}", x, cChunkDef::Height - 1, z)
 					);
 				}
 			}
@@ -178,7 +178,7 @@ static void testGenerateNether(cChunkGenerator & aDefaultNetherGen)
 		{
 			for (int z = 0; z < cChunkDef::Width; ++z)
 			{
-				TEST_EQUAL_MSG(chd.GetBlock({x, 0, z}), BlockType::Bedrock, Printf("Bedrock floor at {%d, 0, %d}", x, z));
+				TEST_EQUAL_MSG(chd.GetBlock({x, 0, z}), BlockType::Bedrock, fmt::format(FMT_STRING("Bedrock floor at {%d, 0, %d}", x, z));
 				auto y = chd.GetHeight(x, z);
 				auto TopBlock = chd.GetBlock({x, y, z});
 				// Skip the mushrooms generated on the top bedrock layer:
@@ -189,12 +189,12 @@ static void testGenerateNether(cChunkGenerator & aDefaultNetherGen)
 				{
 					y -= 1;
 				}
-				TEST_EQUAL_MSG(y, prevHeight, Printf("Failed: Same height across the entire chunk, at {{}, {}}: exp {}, got {}; top block: {}",
+				TEST_EQUAL_MSG(y, prevHeight, fmt::format(FMT_STRING("Failed: Same height across the entire chunk, at {{}, {}}: exp {}, got {}; top block: {}",
 					x, z, prevHeight, y, chd.GetBlock({x, y, z}).Type()
 				));
 				auto Block = chd.GetBlock({x, y, z});
 				TEST_EQUAL_MSG(Block.Type(), BlockType::Bedrock,
-					Printf("Bedrock ceiling at {{}, {}, {}}: {}", x, y, z, Block.Type())
+					fmt::format(FMT_STRING("Bedrock ceiling at {{}, {}, {}}: {}", x, y, z, Block.Type())
 				);
 			}
 		}
