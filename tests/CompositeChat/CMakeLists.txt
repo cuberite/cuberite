@@ -6,6 +6,7 @@ set (SHARED_SRCS
 	${PROJECT_SOURCE_DIR}/src/CompositeChat.cpp
 	${PROJECT_SOURCE_DIR}/src/JsonUtils.cpp
 	${PROJECT_SOURCE_DIR}/src/StringUtils.cpp
+	${PROJECT_SOURCE_DIR}/src/WorldStorage/FastNBT.cpp
 )
 
 set (SHARED_HDRS
@@ -13,6 +14,7 @@ set (SHARED_HDRS
 	${PROJECT_SOURCE_DIR}/src/CompositeChat.h
 	${PROJECT_SOURCE_DIR}/src/JsonUtils.h
 	${PROJECT_SOURCE_DIR}/src/StringUtils.h
+	${PROJECT_SOURCE_DIR}/src/WorldStorage/FastNBT.h
 )
 
 set (SRCS
