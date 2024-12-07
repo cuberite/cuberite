@@ -772,6 +772,8 @@ void cProtocol_1_21_2::SendTags(void)
 			Pkt.WriteString("minecraft:is_jungle");
 			Pkt.WriteVarInt32(1);
 				Pkt.WriteVarInt32(3);
+			// indent -- Has to be here so CheckBasicStyle does not fail
+		// indent
 	}
 }
 
