@@ -94,7 +94,7 @@ Used to be a function, but clang-3.5 didn't like it ("error: debug information f
 		{ \
 			for (int z = 0; z < 5; ++z) \
 			{ \
-				pbaA.setBlock({x, y, z}, Printf("A-%d-%d-%d", x, y, z), CustomBlockState()); \
+				pbaA.setBlock({x, y, z}, fmt::format(FMT_STRING("A-{}-{}-{}"), x, y, z), CustomBlockState()); \
 			} \
 		} \
 	} \
@@ -105,7 +105,7 @@ Used to be a function, but clang-3.5 didn't like it ("error: debug information f
 		{ \
 			for (int z = 0; z < 6; ++z) \
 			{ \
-				pbaB.setBlock({x, y, z}, Printf("B-%d-%d-%d", x, y, z), CustomBlockState()); \
+				pbaB.setBlock({x, y, z}, fmt::format(FMT_STRING("B-{}-{}-{}"), x, y, z), CustomBlockState()); \
 			} \
 		} \
 	} \
