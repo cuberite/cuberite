@@ -1321,7 +1321,7 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 		{
 			case TAG_List:
 			{
-				if ((TagName == "ench") || (TagName == "StoredEnchantments") || TagName == "Enchantments")  // Enchantments tags
+				if ((TagName == "ench") || (TagName == "StoredEnchantments") || (TagName == "Enchantments"))  // Enchantments tags
 				{
 					EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
 				}
@@ -1384,7 +1384,7 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 				if (TagName == "Potion")
 				{
 					AString PotionEffect = NBT.GetString(tag);
-					LOGD("%s",PotionEffect);
+					LOGD("%s", PotionEffect);
 					if (PotionEffect.find("minecraft:") == AString::npos)
 					{
 						LOGD("Unknown or missing domain on potion effect name %s!", PotionEffect.c_str());
@@ -1845,7 +1845,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
 		const char * TagName = (a_Item.m_ItemType == Item::EnchantedBook) ? "StoredEnchantments" : "ench";
-		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName,false);
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName, false);
 	}
 	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
 	{

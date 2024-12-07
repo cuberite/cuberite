@@ -49,7 +49,7 @@ public:
 protected:
 
 	virtual Version GetProtocolVersion() const override;
-    virtual void HandlePacketUseEntity(cByteBuffer & a_ByteBuffer) override;
+	virtual void HandlePacketUseEntity(cByteBuffer & a_ByteBuffer) override;
 };
 
 

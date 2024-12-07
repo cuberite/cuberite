@@ -8616,7 +8616,7 @@ namespace Palette_1_14
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_ZM).ID: return 6010;
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_ZP).ID: return 6011;
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XM).ID: return 6012;
-			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XP).ID: return 6013;*/
+			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XP).ID: return 6013; */
 			default: return 0;
 		}
 	}

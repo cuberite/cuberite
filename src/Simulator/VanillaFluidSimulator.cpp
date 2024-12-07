@@ -82,7 +82,6 @@ void cVanillaFluidSimulator::SpreadXZ(cChunk * a_Chunk, Vector3i a_RelPos, unsig
 
 int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, Vector3i a_RelPos, FluidDirection a_Dir, unsigned a_Iteration)
 {
-	
 	int Cost = InfiniteCost;
 
 	BlockState Self = 0;

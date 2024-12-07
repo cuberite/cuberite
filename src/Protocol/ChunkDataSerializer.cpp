@@ -1046,6 +1046,7 @@ inline void cChunkDataSerializer::Serialize755(const int a_ChunkX, const int a_C
 
 
 
+
 template <auto Palette>
 inline void cChunkDataSerializer::Serialize757(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData2, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, UInt32 a_packet_id)
 {
@@ -1096,7 +1097,7 @@ inline void cChunkDataSerializer::Serialize757(const int a_ChunkX, const int a_C
 		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
 		WriteBlockSectionSeamless2<Palette>(Blocks, BitsPerEntry, true);
 
-		//Biomes
+		// Biomes
 		m_Packet.WriteBEUInt8(0);
 		m_Packet.WriteVarInt32(0);
 		m_Packet.WriteVarInt32(0);
@@ -1117,6 +1118,7 @@ inline void cChunkDataSerializer::Serialize757(const int a_ChunkX, const int a_C
 	m_Packet.WriteVarInt32(0);
 	m_Packet.WriteVarInt32(0);
 }
+
 
 
 
@@ -1171,8 +1173,8 @@ inline void cChunkDataSerializer::Serialize763(const int a_ChunkX, const int a_C
 		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
 		WriteBlockSectionSeamless2<Palette>(Blocks, BitsPerEntry, true);
 
-		//Biomes
-		m_Packet.WriteBEUInt8(0); 
+		// Biomes
+		m_Packet.WriteBEUInt8(0);
 		m_Packet.WriteVarInt32(0);
 		m_Packet.WriteVarInt32(0);
 	}
@@ -1239,15 +1241,15 @@ inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_C
 	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 	{
 		const auto Blocks = a_BlockData2.GetSection(Y);
-		//const auto BlockLights = a_LightData.GetBlockLightSection(Y);
-		//const auto SkyLights = a_LightData.GetSkyLightSection(Y);
+		// const auto BlockLights = a_LightData.GetBlockLightSection(Y);
+		// const auto SkyLights = a_LightData.GetSkyLightSection(Y);
 		m_Packet.WriteBEInt16(4096);
 		m_Packet.WriteBEUInt8(BitsPerEntry);
 		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
 		WriteBlockSectionSeamless2<Palette>(Blocks, BitsPerEntry, true);
 
-		//Biomes
-		m_Packet.WriteBEUInt8(0); 
+		// Biomes
+		m_Packet.WriteBEUInt8(0);
 		m_Packet.WriteVarInt32(0);
 		m_Packet.WriteVarInt32(0);
 	}
@@ -1290,7 +1292,7 @@ inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_C
 		if (light != nullptr)
 		{
 			m_Packet.WriteVarInt32(2048);
-			m_Packet.Write(light,2048);
+			m_Packet.Write(light, 2048);
 		}
 	}
 	m_Packet.WriteVarInt32(block_count);
@@ -1300,7 +1302,7 @@ inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_C
 		if (light != nullptr)
 		{
 			m_Packet.WriteVarInt32(2048);
-			m_Packet.Write(light,2048);
+			m_Packet.Write(light, 2048);
 		}
 	}
 }
@@ -1325,8 +1327,6 @@ inline void cChunkDataSerializer::WriteBlockSectionSeamless2(const ChunkBlockDat
 
 	for (size_t Index = 0; Index != ChunkBlockData::SectionBlockCount; Index++)
 	{
-		// const BLOCKTYPE BlockType = BlocksExist ? (*a_Blocks)[Index] : 0;
-		// const NIBBLETYPE BlockMeta = MetasExist ? cChunkDef::ExpandNibble(a_Metas->data(), Index) : 0;   
 		const auto v2 = a_Blocks == nullptr ? 0 : Palette((*a_Blocks)[Index]);
 
 		const auto Value = v2;  // Palette(BlockType, BlockMeta);

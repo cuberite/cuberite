@@ -333,7 +333,6 @@ private:
 					a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Bucket));
 				}
 				a_Player.GetStatistics().Custom[CustomStatistic::FillCauldron]++;
-		
 				break;
 			}
 			case Item::LavaBucket:
@@ -345,7 +344,6 @@ private:
 					a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Bucket));
 				}
 				a_Player.GetStatistics().Custom[CustomStatistic::FillCauldron]++;
-		
 				break;
 			}
 			case Item::PowderSnowBucket:
@@ -357,7 +355,6 @@ private:
 					a_Player.ReplaceOneEquippedItemTossRest(cItem(Item::Bucket));
 				}
 				a_Player.GetStatistics().Custom[CustomStatistic::FillCauldron]++;
-		
 				break;
 			}
 			case Item::GlassBottle:
@@ -483,7 +480,7 @@ private:
 		*/
 
 		BlockState Block = a_Chunk.GetBlock(a_RelPos);
-		if ((Block.Type() == BlockType::WaterCauldron || Block.Type() == BlockType::Cauldron) && a_WorldInterface.IsWeatherWetAtXYZ(WorldPos.addedY(1)))
+		if (((Block.Type() == BlockType::WaterCauldron) || (Block.Type() == BlockType::Cauldron)) && a_WorldInterface.IsWeatherWetAtXYZ(WorldPos.addedY(1)))
 		{
 			auto FillState = Block::WaterCauldron::Level(a_Chunk.GetBlock(a_RelPos));
 			if (FillState < 3)
@@ -493,7 +490,7 @@ private:
 		}
 		/*
 		TODO: check if its snowing
-		else if ((Block.Type() == BlockType::PowderSnowCauldron || Block.Type() == BlockType::Cauldron) && a_WorldInterface.i)
+		else if (((Block.Type() == BlockType::PowderSnowCauldron) || (Block.Type() == BlockType::Cauldron)) && a_WorldInterface.i)
 		{
 			auto FillState = Block::PowderSnowCauldron::Level(a_Chunk.GetBlock(a_RelPos));
 			if (FillState < 3)

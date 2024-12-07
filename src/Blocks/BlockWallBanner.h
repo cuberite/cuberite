@@ -32,15 +32,15 @@ public:
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Self) const override
 	{
 		Vector3i Offset;
-
-		//switch (GetBlockFace(Self))
-		//{
-		//	case BLOCK_FACE_ZM: Offset = Vector3i( 0, 0,  1); break;
-		//	case BLOCK_FACE_ZP: Offset = Vector3i( 0, 0, -1); break;
-		//	case BLOCK_FACE_XM: Offset = Vector3i( 1, 0,  0); break;
-		//	case BLOCK_FACE_XP: Offset = Vector3i(-1, 0,  0); break;
-		//	default: return false;
-		//}
+		/*
+		switch (GetBlockFace(Self))
+		{
+			case BLOCK_FACE_ZM: Offset = Vector3i( 0, 0,  1); break;
+			case BLOCK_FACE_ZP: Offset = Vector3i( 0, 0, -1); break;
+			case BLOCK_FACE_XM: Offset = Vector3i( 1, 0,  0); break;
+			case BLOCK_FACE_XP: Offset = Vector3i(-1, 0,  0); break;
+			default: return false;
+		} */
 
 		// TODO: Implement GetBlockFace
 

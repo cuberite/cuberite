@@ -2924,11 +2924,11 @@ short cItemHandler::GetDurabilityLossByAction(eDurabilityLostAction aAction) con
 
 char cItemHandler::GetMaxStackSize(void) const
 {
-	//if (IsPlaceable())
-	//{
-	//	// All blocks can stack up to 64
-	//	return 64;
-	//}
+	if (IsPlaceable())
+	{
+		// All blocks can stack up to 64
+		return 64;
+	}
 
 	switch (m_ItemType)
 	{

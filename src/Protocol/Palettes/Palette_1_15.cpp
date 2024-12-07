@@ -8682,10 +8682,10 @@ namespace Palette_1_15
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_ZM).ID: return 6010;
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_ZP).ID: return 6011;
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XM).ID: return 6012;
-			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XP).ID: return 6013;*/
+			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XP).ID: return 6013; */
 			default: return 0;
 		}
-	} 
+	}
 
 	UInt32 From(const Item ID)
 	{
@@ -9572,7 +9572,7 @@ namespace Palette_1_15
 			case Item::YellowWool: return 86;
 			case Item::ZombieHead: return 772;
 			case Item::ZombieHorseSpawnEgg: return 753;
-			case Item::ZombifiedPiglinSpawnEgg: return 754; // piglisn do not exist in this verion. temp fix
+			case Item::ZombifiedPiglinSpawnEgg: return 754;  // piglins do not exist in this verion. temp fix
 			case Item::ZombieSpawnEgg: return 752;
 			case Item::ZombieVillagerSpawnEgg: return 755;
 			default: return 0;

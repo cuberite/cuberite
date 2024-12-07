@@ -404,7 +404,7 @@ public:
 				if (!a_Item.m_Enchantments.IsEmpty())
 				{
 					const char * TagName = (a_Item.m_ItemType == Item::Book) ? "StoredEnchantments" : "ench";
-					EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, mWriter, TagName,false);
+					EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, mWriter, TagName, false);
 				}
 			mWriter.EndCompound();
 		}
@@ -692,7 +692,7 @@ public:
 
 	void AddMobHeadEntity(cMobHeadEntity * a_MobHead)
 	{
-		//TODO: update for new versions
+		// TODO: update for new versions
 		/*
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_MobHead, "Skull");
@@ -712,7 +712,7 @@ public:
 					mWriter.EndList();
 				mWriter.EndCompound();
 			mWriter.EndCompound();
-		mWriter.EndCompound();*/
+		mWriter.EndCompound(); */
 	}
 
 
@@ -1286,20 +1286,20 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 	aWriter.BeginList("sections", TAG_Compound);
 
-	const bool use_padding = true;	// used in 1.16+
+	const bool use_padding = true;  // used in 1.16+
 	for (size_t Y = 0; Y < cChunkDef::NumSections; Y++)
 	{
-		const auto Blocks = serializer.m_BlockData.GetSection(Y); 
-		const auto BlockLights = serializer.m_LightData.GetBlockLightSection(Y); 
+		const auto Blocks = serializer.m_BlockData.GetSection(Y);
+		const auto BlockLights = serializer.m_LightData.GetBlockLightSection(Y);
 		const auto SkyLights = serializer.m_LightData.GetSkyLightSection(Y);
 		aWriter.BeginCompound("");
 		aWriter.AddInt("Y", static_cast<Int32>(Y));
 		if (Blocks != nullptr)
-		{ 
+		{
 			ChunkBlockData::BlockArray temparr;
-			std::copy(Blocks->begin(),Blocks->end(),temparr.begin());
+			std::copy(Blocks->begin(), Blocks->end(), temparr.begin());
 			std::sort(temparr.begin(), temparr.end());
-			auto newlistend = std::unique(temparr.begin(),temparr.end());
+			auto newlistend = std::unique(temparr.begin(), temparr.end());
 			int newsize = static_cast<int>(newlistend - temparr.begin());
 			int bitused = Clamp(CeilC(log2(newsize)), 4, 16);
 
@@ -1313,7 +1313,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 			}
 			else
 			{
-				longarrsize = CeilC((bitused * 4096)/8/8); 
+				longarrsize = CeilC((bitused * 4096) / 8 / 8);
 			}
 
 			aWriter.BeginCompound("block_states");
@@ -1327,13 +1327,13 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				auto strval = AString(NamespaceSerializer::From(val.Type()));
 				auto splitpos = std::find(strval.begin(), strval.end(), ' ');
 				auto id_end_index = static_cast<int>(std::distance(strval.begin(), splitpos));
-				AString stringid = strval.substr(0,id_end_index);
+				AString stringid = strval.substr(0, id_end_index);
 				AString blockstates;
 				AStringVector blockstatesstrings;
 				if (splitpos != strval.end())
 				{
 					hasblockstats = true;
-					auto blockstates = strval.substr(id_end_index+1,std::string::npos);
+					auto blockstates = strval.substr(id_end_index + 1, std::string::npos);
 					blockstatesstrings = StringSplit(blockstates, " ");
 				}
 
@@ -1341,12 +1341,12 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				if (hasblockstats)
 				{
 					aWriter.BeginCompound("Properties");
-					for (size_t j = 0; j < blockstatesstrings.size(); j+=2)
+					for (size_t j = 0; j < blockstatesstrings.size(); j +=2)
 					{
-						//AString str = blockstatesstrings[j];
-						//auto nameendindex = static_cast<int>(std::distance(strval.begin(),std::find(strval.begin(), strval.end(), ':')));
+						// AString str = blockstatesstrings[j];
+						// auto nameendindex = static_cast<int>(std::distance(strval.begin(), std::find(strval.begin(), strval.end(), ':')));
 						AString val;
-						if (j+2 >= blockstatesstrings.size())
+						if ((j + 2) >= blockstatesstrings.size())
 						{
 							val = blockstatesstrings[j + 1];
 						}
@@ -1354,39 +1354,40 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 						{
 							val = blockstatesstrings[j + 1].substr(0, blockstatesstrings[j + 1].length() - 1);
 						}
-						aWriter.AddString(blockstatesstrings[j].substr(0,blockstatesstrings[j].length()-1), val);
+						aWriter.AddString(blockstatesstrings[j].substr(0, blockstatesstrings[j].length() - 1), val);
 					}
 					aWriter.EndCompound();
 				}
-				//auto bls = PaletteUpgrade::GetSaveStrings(val);
-				//aWriter.AddString("Name", "minecraft:"+bls[0].second);
-				//if (bls[1].first != "")
-				//{
-				//	aWriter.BeginCompound("Properties");
-				//	for (size_t j = 1; j < bls.size(); j++)
-				//	{
-				//		if (bls[j].first == "")
-				//		{
-				//			break;
-				//		}
-				//		aWriter.AddString(bls[j].first, bls[j].second);
-				//	}
-				//	aWriter.EndCompound();
-				//}
+				/*
+				auto bls = PaletteUpgrade::GetSaveStrings(val);
+				aWriter.AddString("Name", "minecraft:" + bls[0].second);
+				if (bls[1].first != "")
+				{
+					aWriter.BeginCompound("Properties");
+					for (size_t j = 1; j < bls.size(); j++)
+					{
+						if (bls[j].first == "")
+						{
+							break;
+						}
+						aWriter.AddString(bls[j].first, bls[j].second);
+					}
+					aWriter.EndCompound();
+				} */
 				aWriter.EndCompound();
 			}
 			aWriter.EndList();
 
 
 
-			Int64* arr = new Int64[longarrsize];
+			Int64 * arr = new Int64[longarrsize];
 
 			UInt64 tbuf = 0;
 			int BitIndex = 0;
 			int longindex = 0;
 			int toloop = static_cast<int>(Blocks->size());
-			//int bitswritten = 0;
-			//std::vector<int> bw = {0};
+			// int bitswritten = 0;
+			// std::vector<int> bw = {0};
 			for (size_t i = 0; i < toloop; i++)
 			{
 				auto & v = Blocks->at(i);
@@ -1394,12 +1395,12 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				Int64 towrite = ind - temparr.begin();
 				tbuf |= towrite << BitIndex;
 				BitIndex += bitused;
-				//bitswritten += bitused;
-				//ASSERT(bitswritten >= bw[bw.size()-1]);
-				//bw.push_back(bitswritten);
-				//LOGD(std::to_string(bitswritten) + " - bits written");
-				//ASSERT(bitswritten == (longindex*64+BitIndex));
-				if (BitIndex + bitused > 64 || i == toloop-1)  // not enough bits in current long for the next value?
+				// bitswritten += bitused;
+				// ASSERT(bitswritten >= bw[bw.size() - 1]);
+				// bw.push_back(bitswritten);
+				// LOGD(std::to_string(bitswritten) + " - bits written");
+				// ASSERT(bitswritten == (longindex * 64 + BitIndex));
+				if (((BitIndex + bitused) > 64) || (i == (toloop - 1)))  // not enough bits in current long for the next value?
 				{
 					if (use_padding)
 					{
@@ -1418,11 +1419,11 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 							upperpart = towrite >> (64 - BitIndex);
 							Int64 lowerpart = towrite & ((static_cast<Int64>(1) << (64 - BitIndex)) - 1);
 							tbuf |= lowerpart;
-							//bitswritten += 64 - BitIndex;
+							// bitswritten += 64 - BitIndex;
 							BitIndex = bitused - (64 - BitIndex);
-							//bitswritten += BitIndex;
-							//ASSERT(bitswritten >= bw[bw.size()-1]);
-							//bw.push_back(bitswritten);
+							// bitswritten += BitIndex;
+							// ASSERT(bitswritten >= bw[bw.size() - 1]);
+							// bw.push_back(bitswritten);
 							i++;
 						}
 						else
@@ -1433,12 +1434,12 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 						arr[longindex] = tbuf;
 						longindex++;
 						tbuf = 0;
-						tbuf |= upperpart; 
-						//ASSERT(bitswritten == (longindex*64+BitIndex));
+						tbuf |= upperpart;
+						// ASSERT(bitswritten == ((longindex * 64) + BitIndex));
 					}
 				}
 			}
-			
+
 			if (Blocks != nullptr)
 			{
 				aWriter.AddLongArray("data", arr, longindex);
@@ -1480,5 +1481,5 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 	aWriter.AddByte("isLightOn", 1);
 
-	//TODO: height maps not implemented yet 
+	// TODO: height maps not implemented yet
 }

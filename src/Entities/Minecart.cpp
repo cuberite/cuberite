@@ -190,7 +190,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 		m_bIsOnDetectorRail = false;
 	}
-	
+
 	BlockState InsideBlock = a_Chunk.GetBlock(RelPos);
 
 	auto ContainedBlock = Chunk->GetBlock(RelPos);
