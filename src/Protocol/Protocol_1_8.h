@@ -150,7 +150,7 @@ public:
 
 	virtual State GetCurrentState(void) const override { return m_State; }
 
-  protected:
+protected:
 
 	/** State of the protocol. */
 	State m_State;

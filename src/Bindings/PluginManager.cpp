@@ -1754,54 +1754,68 @@ void cPluginManager::SetupNewCommands(void)
 	auto node = cCommandManager::cCommandNode();
 	node.Then(
 		cCommandManager::cCommandNode::Literal("testcmd")
-			.Executable([](const cCommandExecutionContext & a_Ctx) -> bool {
+			.Executable([](const cCommandExecutionContext & a_Ctx) -> bool
+			{
 				a_Ctx.SendFeedback("test cmd success");
 				return true;
 			})
-			->Then(cCommandManager::cCommandNode::Argument("test float", std::make_shared<cCommandFloatArgument>()).Executable([](const cCommandExecutionContext & a_Ctx) -> bool {
-				 a_Ctx.SendFeedback(
-					 "test cmd success2 " + std::to_string(cCommandFloatArgument::GetFloatFromCtx(a_Ctx, "test float")));
-				  	 return true; })));
+			->Then(cCommandManager::cCommandNode::Argument("test float", std::make_shared<cCommandFloatArgument>()).Executable([](const cCommandExecutionContext & a_Ctx) -> bool
+			{
+				a_Ctx.SendFeedback("test cmd success2 " + std::to_string(cCommandFloatArgument::GetFloatFromCtx(a_Ctx, "test float")));
+				return true;
+			})
+		)
+	);
 	node.Then(LITERAL("weather").Then(
 		LITERAL("rain")
 			.Executable(EXECUTE(
 				cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Rain);))
 				->Then(ARGUMENT("duration", cCommandTimeArgument)
-					   .Executable(EXECUTE(
-						   cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Rain);
-						   cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)))
+					.Executable(EXECUTE(
+						cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Rain);
+						cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)
+					)
+				)
 			)->Then(
 		LITERAL("clear")
 			.Executable(EXECUTE(
 				cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Sunny);))
 				->Then(ARGUMENT("duration", cCommandTimeArgument)
-					   .Executable(EXECUTE(
-						   cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Sunny);
-						   cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)))
+					.Executable(EXECUTE(
+						cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Sunny);
+						cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)
+					)
+				)
 			)->Then(
 		LITERAL("thunder")
 			.Executable(EXECUTE(
 				cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_ThunderStorm);))
 				->Then(ARGUMENT("duration", cCommandTimeArgument)
-					   .Executable(EXECUTE(
-						   cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_ThunderStorm);
-						   cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)))
-			));
+					.Executable(EXECUTE(
+						cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_ThunderStorm);
+						cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)
+					)
+				)
+			)
+		);
 	node.Then(LITERAL("gamemode")
-		.Then(ARGUMENT("gamemode",cCommandGameModeArgument)
-							.Executable(EXECUTE(a_Ctx.GetPlayer()->SetGameMode(
-								cCommandGameModeArgument::GetGameModeFromCtx(a_Ctx, "gamemode"));))));
+			.Then(ARGUMENT("gamemode", cCommandGameModeArgument)
+				.Executable(EXECUTE(a_Ctx.GetPlayer()->SetGameMode(
+					cCommandGameModeArgument::GetGameModeFromCtx(a_Ctx, "gamemode"));
+				)
+			)
+		)
+	);
 	node.Then(LITERAL("time")
 		.Then(LITERAL("set")
-			.Then(ARGUMENT("time",cCommandTimeArgument)
+			.Then(ARGUMENT("time", cCommandTimeArgument)
 				.Executable(EXECUTE(
 					cRoot::Get()->GetDefaultWorld()->SetTimeOfDay(cTickTime(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "time")));
-					)))
+				)))
 			->Then(LITERAL("day").Executable(EXECUTE(cRoot::Get()->GetDefaultWorld()->SetTimeOfDay(cTickTime(1000));)))
 			->Then(LITERAL("night").Executable(EXECUTE(cRoot::Get()->GetDefaultWorld()->SetTimeOfDay(cTickTime(13000));)))
 			->Then(LITERAL("noon").Executable(EXECUTE(cRoot::Get()->GetDefaultWorld()->SetTimeOfDay(cTickTime(6000));)))
 			->Then(LITERAL("midnight").Executable(EXECUTE(cRoot::Get()->GetDefaultWorld()->SetTimeOfDay(cTickTime(18000));)))));
-		
 
 	m_RootCommandNode = node;
 }

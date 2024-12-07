@@ -80,9 +80,9 @@ void cProtocol_1_21::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	}
 	else if (BlockTags::FlowerPots(type))
 	{
-		return; // temp fix
+		return;  // temp fix
 	}
-	else 	//TODO: skulls
+	else 	// TODO: skulls
 	{
 		switch (a_BlockEntity.GetBlockType())
 		{
@@ -94,7 +94,7 @@ void cProtocol_1_21::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 			case BlockType::Bell:                  Action = 30; break;
 			case BlockType::BlastFurnace:          Action = 28; break;
 			case BlockType::BrewingStand:          Action = 11; break;
-			//case BlockType::BrushableBlock:        Action = 39; break;
+			// case BlockType::BrushableBlock:        Action = 39; break;
 			case BlockType::CalibratedSculkSensor: Action = 35; break;
 			case BlockType::Campfire:              Action = 32; break;
 			case BlockType::Chest:                 Action = 1; break;
@@ -133,7 +133,6 @@ void cProtocol_1_21::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 
 			default: UNREACHABLE("Unknown block entity");  // Block entities change between versions
 		}
-		
 	}
 
 
@@ -581,7 +580,7 @@ UInt32 cProtocol_1_21_2::GetPacketID(ePacketType a_PacketType) const
 {
 	switch (a_PacketType)
 	{
-		/// Status packets
+		// Status packets
 		case cProtocol::pktStatusResponse:       return 0x00;
 		case cProtocol::pktPingResponse:         return 0x01;
 
@@ -590,11 +589,11 @@ UInt32 cProtocol_1_21_2::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktEncryptionRequest:    return 0x01;
 		case cProtocol::pktLoginSuccess:         return 0x02;
 		case cProtocol::pktStartCompression:     return 0x03;
-			//login query request 0x4
-			//cookie request 0x5
+			// login query request 0x4
+			// cookie request 0x5
 
 		// Configuration
-			//CookieRequestS2CPacket 0x0
+			// CookieRequestS2CPacket 0x0
 		case cProtocol::pktConfigurationCustomPayload: return 0x01;
 			//  Disconnect 0x02
 		case cProtocol::pktConfigurationReady:   return 0x03;
@@ -602,11 +601,11 @@ UInt32 cProtocol_1_21_2::GetPacketID(ePacketType a_PacketType) const
 			//  CommonPing 0x05
 			// RestChat 0x06
 		case cProtocol::pktConfigurationDynamicRegistries: return 0x07;
-			//	Resource pack remove 0x08
-			//  ResourcePackSend  0x09
-			//	StoreCookie 0x0A
-			//  ServerTransfer 0x0B
-			//  Features 0x0C
+			// Resource pack remove 0x08
+			// ResourcePackSend  0x09
+			// StoreCookie 0x0A
+			// ServerTransfer 0x0B
+			// Features 0x0C
 		case cProtocol::pktConfigurationTags:    return 0x0D;
 		case cProtocol::pktSelectKnownPacks:     return 0x0E;
 			// CustomReportDetailsS2CPacket 0x0F
@@ -621,7 +620,7 @@ UInt32 cProtocol_1_21_2::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktEntityAnimation:      return 0x03;
 		case cProtocol::pktStatistics:           return 0x04;
 		case cProtocol::pktPlayerActionResponse: return 0x05;
-        //  case cProtocol::pktBlockbreakingprogress:   return 0x06;
+		// case cProtocol::pktBlockbreakingprogress:   return 0x06;
 		case cProtocol::pktUpdateBlockEntity:    return 0x07;
 		case cProtocol::pktBlockAction:          return 0x08;
 		case cProtocol::pktBlockChange:          return 0x09;
@@ -637,7 +636,7 @@ UInt32 cProtocol_1_21_2::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktWindowItems:          return 0x13;  //  Inventory packet
 		case cProtocol::pktWindowProperty:       return 0x14;  //  ScreenHandlerPropertyUpdateS2CPacket
 		case cProtocol::pktInventorySlot:        return 0x15;  //  ScreenHandlerSlotUpdateS2CPacket
-						//  CookieRequest 0x16
+			//  CookieRequest 0x16
 			//  cooldown update 0x17
 			//  chat suggestions 0x18
 		case cProtocol::pktCustomPayload:        return 0x19;
@@ -666,7 +665,7 @@ UInt32 cProtocol_1_21_2::GetPacketID(ePacketType a_PacketType) const
 			//  set trade offers 0x2E
 		case cProtocol::pktEntityRelMove:        return 0x2F;
 		case cProtocol::pktEntityRelMoveLook:    return 0x30;
-						// MoveMinecartAlongTrack 0x31
+			// MoveMinecartAlongTrack 0x31
 		case cProtocol::pktEntityLook:           return 0x32;
 			//  vehicle move 0x33
 			//  open written book 0x34
@@ -684,11 +683,11 @@ UInt32 cProtocol_1_21_2::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktPlayerList:           return 0x40;
 			//  look at 0x41
 		case cProtocol::pktPlayerMoveLook:       return 0x42;
-						// player rotation 0x43
+			// player rotation 0x43
 		case cProtocol::pktUnlockRecipe:         return 0x44;
-						// recipe add 0x43
-						// recipe remove 0x45
-						// recipe settings 0x46
+			// recipe add 0x43
+			// recipe remove 0x45
+			// recipe settings 0x46
 		case cProtocol::pktDestroyEntity:        return 0x47;
 		case cProtocol::pktRemoveEntityEffect:   return 0x48;
 			// ScoreboardScoreResetS2CPacket 0x49
@@ -732,8 +731,8 @@ UInt32 cProtocol_1_21_2::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktSoundEffect:          return 0x6F;
 			//  EnterReconfigurationS2CPacket 0x70
 			//  stop sound 0x71
-						//  StoreCookies 0x72
-		case cProtocol::pktChatRaw:              return 0x73; //  Gamemessage
+			//  StoreCookies 0x72
+		case cProtocol::pktChatRaw:              return 0x73;  //  Gamemessage
 			//  player list header 0x74
 			//  NbtQueryResponseS2CPacket 0x75
 		case cProtocol::pktCollectEntity:        return 0x76;
@@ -793,7 +792,6 @@ bool cProtocol_1_21_2::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 			}
 			break;
 		}
-
 		case State::Login:
 		{
 			switch (a_PacketType)
@@ -841,7 +839,7 @@ bool cProtocol_1_21_2::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x0B: /* ClientTickEnd */ return false;
 				case 0x0C: HandlePacketClientSettings(a_ByteBuffer); return true;
 				case 0x0D: HandlePacketTabComplete(a_ByteBuffer); return true;
-				case 0x0E: /* AcknowledgeReconfigurationC2SPacket*/ return false;
+				case 0x0E: /* AcknowledgeReconfigurationC2SPacket */ return false;
 				case 0x0F: /* ButtonClickC2SPacket */ return false;
 				case 0x10: HandlePacketWindowClick(a_ByteBuffer); return true;
 				case 0x11: HandlePacketWindowClose(a_ByteBuffer); return true;
@@ -878,7 +876,7 @@ bool cProtocol_1_21_2::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x30: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 				case 0x31: HandlePacketSlotSelect(a_ByteBuffer); return true;
 				case 0x32: /* update command block */ return false;
-				case 0x33: /* update minecart command block*/ return false;
+				case 0x33: /* update minecart command block */ return false;
 				case 0x34: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 				case 0x35: /* Update jigsaw block */ return false;
 				case 0x36: /* Update structure block */ return false;
@@ -908,7 +906,7 @@ void cProtocol_1_21_2::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 		Pkt.WriteVarInt32(1);  // Number of dimensions
 		Pkt.WriteString("overworld");
 		Pkt.WriteVarInt32(static_cast<UInt32>(Server->GetMaxPlayers()));
-		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));  
+		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));
 		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));  // simulation distance
 		Pkt.WriteBool(false);  // Reduced debug info
 		Pkt.WriteBool(true);   // Show deaths screen
@@ -1409,8 +1407,8 @@ void cProtocol_1_21_2::SendInventorySlot(char a_WindowID, short a_SlotNum, const
 	}
 
 	cPacketizer Pkt(*this, pktInventorySlot);
-	Pkt.WriteVarInt32(0); // sync id
-	Pkt.WriteVarInt32(0); // revision
+	Pkt.WriteVarInt32(0);  // sync id
+	Pkt.WriteVarInt32(0);  // revision
 	Pkt.WriteBEInt16(a_SlotNum);
 	WriteItem(Pkt, a_Item);
 }
@@ -1529,7 +1527,7 @@ bool cProtocol_1_21_4::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x0B: /* ClientTickEnd */ return false;
 				case 0x0C: HandlePacketClientSettings(a_ByteBuffer); return true;
 				case 0x0D: HandlePacketTabComplete(a_ByteBuffer); return true;
-				case 0x0E: /* AcknowledgeReconfigurationC2SPacket*/ return false;
+				case 0x0E: /* AcknowledgeReconfigurationC2SPacket */ return false;
 				case 0x0F: /* ButtonClickC2SPacket */ return false;
 				case 0x10: HandlePacketWindowClick(a_ByteBuffer); return true;
 				case 0x11: HandlePacketWindowClose(a_ByteBuffer); return true;
@@ -1544,14 +1542,14 @@ bool cProtocol_1_21_4::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x1A: HandlePacketKeepAlive(a_ByteBuffer); return true;
 				case 0x1B: /* Update difficulty lock */ return false;  // only used in single player
 				case 0x1C: HandlePacketPlayerPos(a_ByteBuffer); return true;  // PositionAndOnGround
-				case 0x1D: HandlePacketPlayerPosLook(a_ByteBuffer); return true; // full
-				case 0x1E: HandlePacketPlayerLook(a_ByteBuffer); return true; // LookAndOnGround
+				case 0x1D: HandlePacketPlayerPosLook(a_ByteBuffer); return true;  // full
+				case 0x1E: HandlePacketPlayerLook(a_ByteBuffer); return true;  // LookAndOnGround
 				case 0x1F: HandlePacketPlayer(a_ByteBuffer); return true;
 				case 0x20: HandlePacketVehicleMove(a_ByteBuffer); return true;
 				case 0x21: HandlePacketBoatSteer(a_ByteBuffer); return true;
 				case 0x22: /* pick item from block */ return false;
 				case 0x23: /* pick item from entity */ return false;
-				case 0x24: /*QueryPingC2SPacket*/ return false;
+				case 0x24: /* QueryPingC2SPacket */ return false;
 				case 0x25: HandleCraftRecipe(a_ByteBuffer); return true;
 				case 0x26: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
 				case 0x27: HandlePacketBlockDig(a_ByteBuffer); return true;
@@ -1568,7 +1566,7 @@ bool cProtocol_1_21_4::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x32: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 				case 0x33: HandlePacketSlotSelect(a_ByteBuffer); return true;
 				case 0x34: /* update command block */ return false;
-				case 0x35: /* update minecart command block*/ return false;
+				case 0x35: /* update minecart command block */ return false;
 				case 0x36: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 				case 0x37: /* Update jigsaw block */ return false;
 				case 0x38: /* Update structure block */ return false;

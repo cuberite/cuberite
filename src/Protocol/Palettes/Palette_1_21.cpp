@@ -28115,7 +28115,7 @@ namespace Palette_1_21
 			case 1085: return Item::ZombieHorseSpawnEgg;
 			case 1084: return Item::ZombieSpawnEgg;
 			case 1086: return Item::ZombieVillagerSpawnEgg;
-			case 1087: return Item::ZombifiedPiglinSpawnEgg;			
+			case 1087: return Item::ZombifiedPiglinSpawnEgg;
 		}
 	}
 	UInt32 From(const Item ID)
@@ -29963,7 +29963,7 @@ namespace Palette_1_21
 			{ "block.pointed_dripstone.drip_lava",               439 },
 			{ "block.pointed_dripstone.drip_lava_into_cauldron", 441 },
 			{ "block.pointed_dripstone.drip_water",              440 },
-			{ "block.pointed_dripstone.drip_water_into_cauldron",442 },
+			{ "block.pointed_dripstone.drip_water_into_cauldron", 442 },
 			{ "block.pointed_dripstone.fall",                    437 },
 			{ "block.pointed_dripstone.hit",                     436 },
 			{ "block.pointed_dripstone.land",                    438 },

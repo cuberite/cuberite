@@ -69,7 +69,7 @@ public:  // tolua_export
 
 private:
 
-	//eMobHeadType m_Type;
+	// eMobHeadType m_Type;
 	Item m_Type;
 	eMobHeadRotation m_Rotation;
 

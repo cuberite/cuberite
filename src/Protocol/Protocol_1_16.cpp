@@ -47,9 +47,9 @@ UInt32 cProtocol_1_16::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktCommnadTree:          return 0x11;
 			//  confirm gui action 0x12
 		case cProtocol::pktWindowClose:          return 0x13;
-		case cProtocol::pktWindowItems:          return 0x14; //  Inventory packet
-		case cProtocol::pktWindowProperty:       return 0x15; //  ScreenHandlerPropertyUpdateS2CPacket
-		case cProtocol::pktInventorySlot:        return 0x16; //  ScreenHandlerSlotUpdateS2CPacket
+		case cProtocol::pktWindowItems:          return 0x14;  //  Inventory packet
+		case cProtocol::pktWindowProperty:       return 0x15;  //  ScreenHandlerPropertyUpdateS2CPacket
+		case cProtocol::pktInventorySlot:        return 0x16;  //  ScreenHandlerSlotUpdateS2CPacket
 			//  0x17 cooldown update
 		case cProtocol::pktCustomPayload:        return 0x18;
 		case cProtocol::pktPluginMessage:        return 0x18;
@@ -68,7 +68,7 @@ UInt32 cProtocol_1_16::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktLightUpdate:          return 0x24;
 		case cProtocol::pktJoinGame:             return 0x25;
 		case cProtocol::pktMapData:              return 0x26;
-			//  set trade offers 0x27 
+			//  set trade offers 0x27
 		case cProtocol::pktEntityRelMove:        return 0x28;
 		case cProtocol::pktEntityRelMoveLook:    return 0x29;
 		case cProtocol::pktEntityLook:           return 0x2A;
@@ -79,7 +79,7 @@ UInt32 cProtocol_1_16::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktUpdateSign:           return 0x2F;
 			//  craft failed response 0x30
 		case cProtocol::pktPlayerAbilities:      return 0x31;
-			//  combat events 0x32 
+			//  combat events 0x32
 		case cProtocol::pktPlayerList:           return 0x33;
 			//  look at 0x34
 		case cProtocol::pktPlayerMoveLook:       return 0x35;
@@ -112,7 +112,7 @@ UInt32 cProtocol_1_16::GetPacketID(ePacketType a_PacketType) const
 			//  play sound 0x51
 			//  stop sound 0x52
 			//  player list header 0x53
-			//  tag query response 0x54 
+			//  tag query response 0x54
 		case cProtocol::pktCollectEntity:        return 0x55;
 		case cProtocol::pktTeleportEntity:       return 0x56;
 			//  advancment update 0x57
@@ -176,19 +176,17 @@ bool cProtocol_1_16::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x24: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 		case 0x25: HandlePacketSlotSelect(a_ByteBuffer); return true;
 		case 0x26: /* update command block */ return false;
-		case 0x27: /* update minecart command block*/ return false;
+		case 0x27: /* update minecart command block */ return false;
 		case 0x28: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 		case 0x29: /* Update jigsaw block */ return false;
 		case 0x2A: /* Update structure block */ return false;
 		case 0x2B: HandlePacketUpdateSign(a_ByteBuffer); return true;
 		case 0x2C: /* Update hand swing */ return false;
 		case 0x2D: /* Spectator teleport */ return false;
-		// case 0x2D: HandlePacketBlockPlace(a_ByteBuffer); return true;
 		case 0x2E: HandlePacketUseItem(a_ByteBuffer); return true;
 		default: break;
 	}
 }
-
 
 
 
@@ -214,7 +212,6 @@ void cProtocol_1_16::SendLoginSuccess(void)
 		Pkt.WriteBEInt32(arr[1]);
 		Pkt.WriteBEInt32(arr[2]);
 		Pkt.WriteBEInt32(arr[3]);
-		//  Pkt.WriteString(m_Client->GetUUID().ToLongString());
 		Pkt.WriteString(m_Client->GetUsername());
 	}
 }
@@ -234,11 +231,11 @@ void cProtocol_1_16::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()));
 		Pkt.WriteVarInt32(1);  // Number of dimensions
 		Pkt.WriteString("overworld");
-		//Pkt.WriteString("the_nether");
-		//Pkt.WriteString("the_end");
+		// Pkt.WriteString("the_nether");
+		// Pkt.WriteString("the_end");
 
 		cFastNBTWriter Writer;
-		Writer.BeginList("dimension",eTagType::TAG_Compound);
+		Writer.BeginList("dimension", eTagType::TAG_Compound);
 		Writer.BeginCompound("");
 		Writer.AddString("name", "overworld");
 		Writer.AddFloat("ambient_light", 1.0);
@@ -255,12 +252,11 @@ void cProtocol_1_16::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Writer.AddByte("has_skylight", 1);
 		Writer.EndCompound();
 		Writer.EndList();
-		//Writer.EndCompound();
 		Writer.Finish();
 		Pkt.WriteBuf(Writer.GetResult());
 
-		Pkt.WriteString("overworld"); // dimension type key
-		Pkt.WriteString("overworld"); // dimension id
+		Pkt.WriteString("overworld");  // dimension type key
+		Pkt.WriteString("overworld");  // dimension id
 
 		Pkt.WriteBEInt64(0);  // Seed
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<size_t>(Server->GetMaxPlayers(), 0, 255)));
@@ -479,6 +475,7 @@ UInt32 cProtocol_1_16::GetProtocolMobType(eMonsterType a_MobType) const
 
 
 
+
 int cProtocol_1_16::GetProtocolParticleID(const AString & a_ParticleName) const
 {
 	static const std::unordered_map<AString, int> ParticleMap
@@ -636,6 +633,7 @@ cProtocol::Version cProtocol_1_16_1::GetProtocolVersion() const
 
 
 
+
 void cProtocol_1_16_1::HandlePacketUseEntity(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, UInt32, EntityID);
@@ -724,9 +722,9 @@ UInt32 cProtocol_1_16_2::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktCommnadTree:          return 0x10;
 			//  confirm gui action 0x11
 		case cProtocol::pktWindowClose:          return 0x12;
-		case cProtocol::pktWindowItems:          return 0x13; //  Inventory packet
-		case cProtocol::pktWindowProperty:       return 0x14; //  ScreenHandlerPropertyUpdateS2CPacket
-		case cProtocol::pktInventorySlot:        return 0x15; //  ScreenHandlerSlotUpdateS2CPacket
+		case cProtocol::pktWindowItems:          return 0x13;  //  Inventory packet
+		case cProtocol::pktWindowProperty:       return 0x14;  //  ScreenHandlerPropertyUpdateS2CPacket
+		case cProtocol::pktInventorySlot:        return 0x15;  //  ScreenHandlerSlotUpdateS2CPacket
 			//  0x16 cooldown update
 		case cProtocol::pktCustomPayload:        return 0x17;
 		case cProtocol::pktPluginMessage:        return 0x17;
@@ -745,7 +743,7 @@ UInt32 cProtocol_1_16_2::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktLightUpdate:          return 0x23;
 		case cProtocol::pktJoinGame:             return 0x24;
 		case cProtocol::pktMapData:              return 0x25;
-			//  set trade offers 0x26 
+			//  set trade offers 0x26
 		case cProtocol::pktEntityRelMove:        return 0x27;
 		case cProtocol::pktEntityRelMoveLook:    return 0x28;
 		case cProtocol::pktEntityLook:           return 0x29;
@@ -756,7 +754,7 @@ UInt32 cProtocol_1_16_2::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktUpdateSign:           return 0x2E;
 			//  craft failed response 0x2F
 		case cProtocol::pktPlayerAbilities:      return 0x30;
-			//  combat events 0x31 
+			//  combat events 0x31
 		case cProtocol::pktPlayerList:           return 0x32;
 			//  look at 0x33
 		case cProtocol::pktPlayerMoveLook:       return 0x34;
@@ -790,7 +788,7 @@ UInt32 cProtocol_1_16_2::GetPacketID(ePacketType a_PacketType) const
 			//  play sound 0x51
 			//  stop sound 0x52
 			//  player list header 0x53
-			//  tag query response 0x54 
+			//  tag query response 0x54
 		case cProtocol::pktCollectEntity:        return 0x55;
 		case cProtocol::pktTeleportEntity:       return 0x56;
 			//  advancment update 0x57
@@ -818,8 +816,8 @@ void cProtocol_1_16_2::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()));  // previous game mode
 		Pkt.WriteVarInt32(1);  // Number of dimensions
 		Pkt.WriteString("overworld");
-		//Pkt.WriteString("the_nether");
-		//Pkt.WriteString("the_end");
+		// Pkt.WriteString("the_nether");
+		// Pkt.WriteString("the_end");
 		{
 			cFastNBTWriter Writer;
 			Writer.BeginCompound("minecraft:dimension_type");
@@ -827,7 +825,7 @@ void cProtocol_1_16_2::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 				Writer.BeginList("value", eTagType::TAG_Compound);
 					Writer.BeginCompound("");
 					Writer.AddString("name", "minecraft:overworld");
-					Writer.AddInt("id",0);
+					Writer.AddInt("id", 0);
 						Writer.BeginCompound("element");
 
 						Writer.AddByte("piglin_safe", 1);
@@ -853,13 +851,13 @@ void cProtocol_1_16_2::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 				Writer.BeginList("value", eTagType::TAG_Compound);
 					Writer.BeginCompound("");
 					Writer.AddString("name", "minecraft:plains");
-					Writer.AddInt("id",0);
+					Writer.AddInt("id", 0);
 						Writer.BeginCompound("element");
 							Writer.AddString("precipitation", "rain");
 								Writer.BeginCompound("effects");
 								Writer.AddInt("sky_color", 7907327);
 								Writer.AddInt("water_fog_color", 329011);
-								Writer.AddInt("fog_color" ,12638463);
+								Writer.AddInt("fog_color", 12638463);
 								Writer.AddInt("water_color", 4159204);
 									Writer.BeginCompound("mood_sound");
 									Writer.AddInt("tick_delay", 6000);
@@ -881,7 +879,7 @@ void cProtocol_1_16_2::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 			Pkt.WriteBuf(Writer.GetResult());
 		}
 
-		//dimensional type
+		// Dimensional type
 		{
 			cFastNBTWriter Writer;
 			Writer.AddByte("piglin_safe", 1);
@@ -901,7 +899,7 @@ void cProtocol_1_16_2::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 			Pkt.WriteBuf(Writer.GetResult());
 		}
 
-		Pkt.WriteString("overworld"); // dimension id
+		Pkt.WriteString("overworld");  // dimension id
 
 		Pkt.WriteBEInt64(0);  // Seed
 		Pkt.WriteVarInt32(static_cast<UInt32>(Server->GetMaxPlayers()));

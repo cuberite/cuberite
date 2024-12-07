@@ -201,28 +201,28 @@ private:
 	Block::FenceType::North(current), \
 	Block::FenceType::South(current), \
 	Block::FenceType::Waterlogged(current), \
-	State); break; 
+	State); break;
 #define GET_FENCE_XP(FenceType, State) \
 	ToPlace = Block::FenceType::FenceType( \
 	State, \
 	Block::FenceType::North(current), \
 	Block::FenceType::South(current), \
 	Block::FenceType::Waterlogged(current), \
-	Block::FenceType::West(current)); break; 
+	Block::FenceType::West(current)); break;
 #define GET_FENCE_ZM(FenceType, State) \
 	ToPlace = Block::FenceType::FenceType( \
 	Block::FenceType::East(current), \
 	State, \
 	Block::FenceType::South(current), \
 	Block::FenceType::Waterlogged(current), \
-	Block::FenceType::West(current)); break; 
+	Block::FenceType::West(current)); break;
 #define GET_FENCE_ZP(FenceType, State) \
 	ToPlace = Block::FenceType::FenceType( \
 	Block::FenceType::East(current), \
 	Block::FenceType::North(current), \
 	State, \
 	Block::FenceType::Waterlogged(current), \
-	Block::FenceType::West(current)); break; \
+	Block::FenceType::West(current)); break;
 
 
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override

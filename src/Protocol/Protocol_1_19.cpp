@@ -32,7 +32,7 @@ UInt32 cProtocol_1_19::GetPacketID(ePacketType a_PacketType) const
 {
 	switch (a_PacketType)
 	{
-		/// Status packets
+		// Status packets
 		case cProtocol::pktStatusResponse:       return 0x00;
 		case cProtocol::pktPingResponse:         return 0x01;
 
@@ -62,9 +62,9 @@ UInt32 cProtocol_1_19::GetPacketID(ePacketType a_PacketType) const
 			//  command suggestions here 0x0E
 		case cProtocol::pktCommnadTree:          return 0x0F;
 		case cProtocol::pktWindowClose:          return 0x10;
-		case cProtocol::pktWindowItems:          return 0x11; //  Inventory packet
-		case cProtocol::pktWindowProperty:       return 0x12; //  ScreenHandlerPropertyUpdateS2CPacket
-		case cProtocol::pktInventorySlot:        return 0x13; //  ScreenHandlerSlotUpdateS2CPacket
+		case cProtocol::pktWindowItems:          return 0x11;  //  Inventory packet
+		case cProtocol::pktWindowProperty:       return 0x12;  //  ScreenHandlerPropertyUpdateS2CPacket
+		case cProtocol::pktInventorySlot:        return 0x13;  //  ScreenHandlerSlotUpdateS2CPacket
 			//  0x14 cooldown update
 		case cProtocol::pktCustomPayload:        return 0x15;
 		case cProtocol::pktPluginMessage:        return 0x15;
@@ -84,7 +84,7 @@ UInt32 cProtocol_1_19::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktLightUpdate:          return 0x22;
 		case cProtocol::pktJoinGame:             return 0x23;
 		case cProtocol::pktMapData:              return 0x24;
-			//  set trade offers 0x25 
+			//  set trade offers 0x25
 		case cProtocol::pktEntityRelMove:        return 0x26;
 		case cProtocol::pktEntityRelMoveLook:    return 0x27;
 		case cProtocol::pktEntityLook:           return 0x28;
@@ -144,7 +144,7 @@ UInt32 cProtocol_1_19::GetPacketID(ePacketType a_PacketType) const
 			//  stop sound 0x5E
 		case cProtocol::pktChatRaw:              return 0x5F;  //  Gamemessage
 			//  player list header 0x60
-			//  NbtQueryResponseS2CPacket 0x61 
+			//  NbtQueryResponseS2CPacket 0x61
 		case cProtocol::pktCollectEntity:        return 0x62;
 		case cProtocol::pktTeleportEntity:       return 0x63;
 			//  advancment update 0x64
@@ -190,8 +190,8 @@ bool cProtocol_1_19::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x11: HandlePacketKeepAlive(a_ByteBuffer); return true;
 		case 0x12: /* Update difficulty lock */ return false;  // only used in single player
 		case 0x13: HandlePacketPlayerPos(a_ByteBuffer); return true;  // PositionAndOnGround
-		case 0x14: HandlePacketPlayerPosLook(a_ByteBuffer); return true; // full
-		case 0x15: HandlePacketPlayerLook(a_ByteBuffer); return true; // LookAndOnGround
+		case 0x14: HandlePacketPlayerPosLook(a_ByteBuffer); return true;  // full
+		case 0x15: HandlePacketPlayerLook(a_ByteBuffer); return true;  // LookAndOnGround
 		case 0x16: HandlePacketPlayer(a_ByteBuffer); return true;
 		case 0x17: HandlePacketVehicleMove(a_ByteBuffer); return true;
 		case 0x18: HandlePacketBoatSteer(a_ByteBuffer); return true;
@@ -211,7 +211,7 @@ bool cProtocol_1_19::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x26: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 		case 0x27: HandlePacketSlotSelect(a_ByteBuffer); return true;
 		case 0x28: /* update command block */ return false;
-		case 0x29: /* update minecart command block*/ return false;
+		case 0x29: /* update minecart command block */ return false;
 		case 0x2A: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 		case 0x2B: /* Update jigsaw block */ return false;
 		case 0x2C: /* Update structure block */ return false;
@@ -250,8 +250,8 @@ void cProtocol_1_19::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()));  // previous game mode
 		Pkt.WriteVarInt32(1);  // Number of dimensions
 		Pkt.WriteString("overworld");
-		//Pkt.WriteString("the_nether");
-		//Pkt.WriteString("the_end");
+		// Pkt.WriteString("the_nether");
+		// Pkt.WriteString("the_end");
 		{
 			cFastNBTWriter Writer;
 			Writer.BeginCompound("minecraft:chat_type");
@@ -284,7 +284,7 @@ void cProtocol_1_19::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 								Writer.AddString("priority", "chat");
 							Writer.EndCompound();
 						Writer.EndCompound();
-					Writer.AddInt("id",0);
+					Writer.AddInt("id", 0);
 					Writer.AddString("name", "minecraft:chat");
 					Writer.EndCompound();
 				Writer.EndList();
@@ -326,7 +326,7 @@ void cProtocol_1_19::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 
 						Writer.EndCompound();
 
-						Writer.AddInt("id",0);
+						Writer.AddInt("id", 0);
 						Writer.AddString("name", "minecraft:overworld");
 					Writer.EndCompound();
 				Writer.EndList();
@@ -336,13 +336,13 @@ void cProtocol_1_19::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 				Writer.BeginList("value", eTagType::TAG_Compound);
 					Writer.BeginCompound("");
 					Writer.AddString("name", "minecraft:plains");
-					Writer.AddInt("id",0);
+					Writer.AddInt("id", 0);
 						Writer.BeginCompound("element");
 							Writer.AddString("precipitation", "rain");
 								Writer.BeginCompound("effects");
 								Writer.AddInt("sky_color", 7907327);
 								Writer.AddInt("water_fog_color", 329011);
-								Writer.AddInt("fog_color" ,12638463);
+								Writer.AddInt("fog_color", 12638463);
 								Writer.AddInt("water_color", 4159204);
 									Writer.BeginCompound("mood_sound");
 									Writer.AddInt("tick_delay", 6000);
@@ -358,7 +358,7 @@ void cProtocol_1_19::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 							Writer.AddString("category", "plains");
 						Writer.EndCompound();
 					Writer.AddString("name", "minecraft:plains");
-					Writer.AddInt("id",0);
+					Writer.AddInt("id", 0);
 					Writer.EndCompound();
 				Writer.EndList();
 			Writer.EndCompound();
@@ -366,35 +366,12 @@ void cProtocol_1_19::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 			Pkt.WriteBuf(Writer.GetResult());
 		}
 
-		////dimensional type
-		//{
-		//	cFastNBTWriter Writer;
-		//	Writer.AddByte("piglin_safe", 1);
-		//	Writer.AddByte("natural", 1);
-		//	Writer.AddFloat("ambient_light", 1.0);
-		//	Writer.AddString("infiniburn", "infiniburn_overworld");
-		//	Writer.AddByte("respawn_anchor_works", 1);
-		//	Writer.AddByte("has_skylight", 1);
-		//	Writer.AddByte("bed_works", 1);
-		//	Writer.AddString("effects", "minecraft:overworld");
-		//	Writer.AddByte("has_raids", 1);
-		//	Writer.AddInt("logical_height", 256);
-		//	Writer.AddDouble("coordinate_scale", 1.0);
-		//	Writer.AddByte("ultrawarm", 1);
-		//	Writer.AddByte("has_ceiling", 1);
-		//	Writer.AddInt("min_y", 0);
-		//	Writer.AddInt("height", 256);
-		//	Writer.Finish();
-		//	Pkt.WriteBuf(Writer.GetResult());
-		//}
-
-
-		Pkt.WriteString("minecraft:overworld"); // dimension type
-		Pkt.WriteString("minecraft:overworld"); // dimension id
+		Pkt.WriteString("minecraft:overworld");  // dimension type
+		Pkt.WriteString("minecraft:overworld");  // dimension id
 
 		Pkt.WriteBEInt64(0);  // Seed
 		Pkt.WriteVarInt32(static_cast<UInt32>(Server->GetMaxPlayers()));
-		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));  
+		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));
 		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));  // simulation distance
 		Pkt.WriteBool(false);  // Reduced debug info
 		Pkt.WriteBool(true);   // Show deaths screen
@@ -500,7 +477,7 @@ void cProtocol_1_19::SendParticleEffect(const AString & a_ParticleName, Vector3f
 	Pkt.WriteBEFloat(a_ParticleData);
 	Pkt.WriteBEInt32(a_ParticleAmount);
 
-	//todo implement particle specific data
+	// TODO implement particle specific data
 }
 
 
@@ -559,7 +536,7 @@ void cProtocol_1_19::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteByteAngle(a_Mob.GetPitch());
 	Pkt.WriteByteAngle(a_Mob.GetYaw());
 	Pkt.WriteByteAngle(a_Mob.GetHeadYaw());	 // Doesn't seem to be used
-	Pkt.WriteVarInt32(0); // Entity data not used for mobs
+	Pkt.WriteVarInt32(0);  // Entity data not used for mobs
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedX() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedY() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
@@ -585,14 +562,14 @@ void cProtocol_1_19::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuf
 	{
 		return;
 	}
-	HANDLE_READ(a_ByteBuffer,ReadBool,bool,HasNounce);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, HasNounce);
 	if (HasNounce)
 	{
 		if (!a_ByteBuffer.ReadVarInt(EncNonceLength))
 		{
 			return;
 		}
-		
+
 		if (!a_ByteBuffer.ReadSome(EncNonce, EncNonceLength))
 		{
 			return;
@@ -600,8 +577,8 @@ void cProtocol_1_19::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuf
 	}
 	else
 	{
-		HANDLE_READ(a_ByteBuffer,ReadBEInt64,Int64,salt);
-		HANDLE_READ(a_ByteBuffer,ReadVarInt32,UInt32,SignatureLength);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, salt);
+		HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, SignatureLength);
 		if (!a_ByteBuffer.ReadSome(SignatureData, SignatureLength))
 		{
 			return;
@@ -615,7 +592,6 @@ void cProtocol_1_19::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuf
 		return;
 	}
 
-	
 	cRsaPrivateKey & rsaDecryptor = cRoot::Get()->GetServer()->GetPrivateKey();
 	int res = 0;
 	if (HasNounce)
@@ -657,6 +633,8 @@ void cProtocol_1_19::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuf
 
 
 
+
+
 void cProtocol_1_19::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 {
 	AString Username;
@@ -666,25 +644,25 @@ void cProtocol_1_19::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	HANDLE_READ(a_ByteBuffer,ReadBool,bool,HasPublicKey);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, HasPublicKey);
 	if (HasPublicKey)
 	{
 		ContiguousByteBuffer PublicKey;
 		ContiguousByteBuffer KeySignature;
-		HANDLE_READ(a_ByteBuffer,ReadBEInt64,Int64,ExpiresAtEpochMilis);
-		HANDLE_READ(a_ByteBuffer,ReadVarInt32,UInt32,PubKeyLen);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, ExpiresAtEpochMilis);
+		HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, PubKeyLen);
 		if (!a_ByteBuffer.ReadSome(PublicKey, PubKeyLen))
 		{
 			return;
 		}
-		HANDLE_READ(a_ByteBuffer,ReadVarInt32,UInt32,KeySignatureLen);
+		HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, KeySignatureLen);
 		if (!a_ByteBuffer.ReadSome(KeySignature, KeySignatureLen))
 		{
 			return;
 		}
 
-		auto time = std::chrono::system_clock::now(); // get the current time
-		auto since_epoch = time.time_since_epoch(); // get the duration since epoch
+		auto time = std::chrono::system_clock::now();  // get the current time
+		auto since_epoch = time.time_since_epoch();  // get the duration since epoch
 		auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since_epoch).count();
 
 		if (millis > ExpiresAtEpochMilis)
@@ -789,7 +767,7 @@ void cProtocol_1_19::SendPlayerListAddPlayer(const cPlayer & a_Player)
 void cProtocol_1_19::SendRespawn(eDimension a_Dimension)
 {
 	cPacketizer Pkt(*this, pktRespawn);
-	cPlayer* Player = m_Client->GetPlayer();
+	cPlayer * Player = m_Client->GetPlayer();
 
 	Pkt.WriteString("minecraft:overworld");  // dimension type key
 	Pkt.WriteString("minecraft:overworld");  // world key
@@ -906,7 +884,7 @@ void cProtocol_1_19::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_19::HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer)
 {
-	UInt32 ToSetEff1 = 0,ToSetEff2 = 0;
+	UInt32 ToSetEff1 = 0, ToSetEff2 = 0;
 	HANDLE_READ(a_ByteBuffer, ReadBool, bool, HasEffect1);
 	if (HasEffect1)
 	{
@@ -1122,7 +1100,7 @@ int cProtocol_1_19::GetProtocolParticleID(const AString & a_ParticleName) const
 	if (FindResult == ParticleMap.end())
 	{
 		LOGWARNING("Unknown particle: %s", a_ParticleName.c_str());
-		//ASSERT(!"Unknown particle"); // some particles where renamed so they throw this error
+		// ASSERT(!"Unknown particle");  // some particles where renamed so they throw this error
 		return 0;
 	}
 
@@ -1215,11 +1193,11 @@ void cProtocol_1_19::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 	{
 		cItem Item;
 		HANDLE_READ(a_ByteBuffer, ReadBEInt16,  Int16,  CurrSlotNum);
-		ReadItem(a_ByteBuffer, Item, 1000000);	// HACK to make it work
+		ReadItem(a_ByteBuffer, Item, 1000000);  // HACK to make it work
 		items.emplace_back(CurrSlotNum, Item);
 	}
 	cItem Item;
-	ReadItem(a_ByteBuffer, Item,0);
+	ReadItem(a_ByteBuffer, Item, 0);
 
 	/** The slot number that the client uses to indicate "outside the window". */
 	static const Int16 SLOT_NUM_OUTSIDE = -999;
@@ -1333,7 +1311,6 @@ cProtocol::Version cProtocol_1_19_1::GetProtocolVersion() const
 
 
 
-
 void cProtocol_1_19_1::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 {
 	AString Username;
@@ -1343,25 +1320,25 @@ void cProtocol_1_19_1::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		return;
 	}
 
-	HANDLE_READ(a_ByteBuffer,ReadBool,bool,HasPublicKey);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, HasPublicKey);
 	if (HasPublicKey)
 	{
 		ContiguousByteBuffer PublicKey;
 		ContiguousByteBuffer KeySignature;
-		HANDLE_READ(a_ByteBuffer,ReadBEInt64,Int64,ExpiresAtEpochMilis);
-		HANDLE_READ(a_ByteBuffer,ReadVarInt32,UInt32,PubKeyLen);
+		HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, ExpiresAtEpochMilis);
+		HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, PubKeyLen);
 		if (!a_ByteBuffer.ReadSome(PublicKey, PubKeyLen))
 		{
 			return;
 		}
-		HANDLE_READ(a_ByteBuffer,ReadVarInt32,UInt32,KeySignatureLen);
+		HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, KeySignatureLen);
 		if (!a_ByteBuffer.ReadSome(KeySignature, KeySignatureLen))
 		{
 			return;
 		}
 
-		auto time = std::chrono::system_clock::now(); // get the current time
-		auto since_epoch = time.time_since_epoch(); // get the duration since epoch
+		auto time = std::chrono::system_clock::now();  // get the current time
+		auto since_epoch = time.time_since_epoch();  // get the duration since epoch
 		auto millis = std::chrono::duration_cast<std::chrono::milliseconds>(since_epoch).count();
 
 		if (millis > ExpiresAtEpochMilis)
@@ -1373,10 +1350,10 @@ void cProtocol_1_19_1::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 
 		// UNREACHABLE("not implemented");
 	}
-	HANDLE_READ(a_ByteBuffer,ReadBool,bool,HasUUID);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, HasUUID);
 	if (HasUUID)
 	{
-		HANDLE_READ(a_ByteBuffer,ReadUUID,cUUID,ProfileID);
+		HANDLE_READ(a_ByteBuffer, ReadUUID, cUUID, ProfileID);
 	}
 	if (!m_Client->HandleHandshake(Username))
 	{
@@ -1405,11 +1382,12 @@ void cProtocol_1_19_1::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 
 
 
+
 UInt32 cProtocol_1_19_1::GetPacketID(ePacketType a_PacketType) const
 {
 	switch (a_PacketType)
 	{
-		/// Status packets
+		// Status packets
 		case cProtocol::pktStatusResponse:       return 0x00;
 		case cProtocol::pktPingResponse:         return 0x01;
 
@@ -1439,9 +1417,9 @@ UInt32 cProtocol_1_19_1::GetPacketID(ePacketType a_PacketType) const
 			//  command suggestions here 0x0E
 		case cProtocol::pktCommnadTree:          return 0x0F;
 		case cProtocol::pktWindowClose:          return 0x10;
-		case cProtocol::pktWindowItems:          return 0x11; //  Inventory packet
-		case cProtocol::pktWindowProperty:       return 0x12; //  ScreenHandlerPropertyUpdateS2CPacket
-		case cProtocol::pktInventorySlot:        return 0x13; //  ScreenHandlerSlotUpdateS2CPacket
+		case cProtocol::pktWindowItems:          return 0x11;  //  Inventory packet
+		case cProtocol::pktWindowProperty:       return 0x12;  //  ScreenHandlerPropertyUpdateS2CPacket
+		case cProtocol::pktInventorySlot:        return 0x13;  //  ScreenHandlerSlotUpdateS2CPacket
 			//  0x14 cooldown update
 			//  chat suggestions 0x15
 		case cProtocol::pktCustomPayload:        return 0x16;
@@ -1463,7 +1441,7 @@ UInt32 cProtocol_1_19_1::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktLightUpdate:          return 0x24;
 		case cProtocol::pktJoinGame:             return 0x25;
 		case cProtocol::pktMapData:              return 0x26;
-			//  set trade offers 0x27 
+			//  set trade offers 0x27
 		case cProtocol::pktEntityRelMove:        return 0x28;
 		case cProtocol::pktEntityRelMoveLook:    return 0x29;
 		case cProtocol::pktEntityLook:           return 0x2A;
@@ -1524,7 +1502,7 @@ UInt32 cProtocol_1_19_1::GetPacketID(ePacketType a_PacketType) const
 			//  stop sound 0x61
 		case cProtocol::pktChatRaw:              return 0x62;  //  Gamemessage
 			//  player list header 0x63
-			//  NbtQueryResponseS2CPacket 0x64 
+			//  NbtQueryResponseS2CPacket 0x64
 		case cProtocol::pktCollectEntity:        return 0x65;
 		case cProtocol::pktTeleportEntity:       return 0x66;
 			//  advancment update 0x67
@@ -1535,6 +1513,7 @@ UInt32 cProtocol_1_19_1::GetPacketID(ePacketType a_PacketType) const
 		default: UNREACHABLE("unhandeled packet");
 	}
 }
+
 
 
 
@@ -1551,8 +1530,8 @@ void cProtocol_1_19_1::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()));  // previous game mode
 		Pkt.WriteVarInt32(1);  // Number of dimensions
 		Pkt.WriteString("overworld");
-		//Pkt.WriteString("the_nether");
-		//Pkt.WriteString("the_end");
+		// Pkt.WriteString("the_nether");
+		// Pkt.WriteString("the_end");
 		{
 			cFastNBTWriter Writer;
 			Writer.BeginCompound("minecraft:chat_type");
@@ -1561,26 +1540,25 @@ void cProtocol_1_19_1::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 					Writer.BeginCompound("");
 						Writer.BeginCompound("element");
 							Writer.BeginCompound("chat");
-									Writer.BeginList("parameters", eTagType::TAG_String);
-										Writer.AddString("", "sender");
-										Writer.AddString("", "content");
-									Writer.EndList();
-										Writer.BeginCompound("style");
-										Writer.EndCompound();
-									Writer.AddString("translation_key", "chat.type.text");
+								Writer.BeginList("parameters", eTagType::TAG_String);
+									Writer.AddString("", "sender");
+									Writer.AddString("", "content");
+								Writer.EndList();
+									Writer.BeginCompound("style");
+									Writer.EndCompound();
+								Writer.AddString("translation_key", "chat.type.text");
 							Writer.EndCompound();
-
 							Writer.BeginCompound("narration");
-									Writer.BeginList("parameters", eTagType::TAG_String);
-										Writer.AddString("", "sender");
-										Writer.AddString("", "content");
-									Writer.EndList();
-										Writer.BeginCompound("style");
-										Writer.EndCompound();
-									Writer.AddString("translation_key", "chat.type.narrate");
+								Writer.BeginList("parameters", eTagType::TAG_String);
+									Writer.AddString("", "sender");
+									Writer.AddString("", "content");
+								Writer.EndList();
+									Writer.BeginCompound("style");
+									Writer.EndCompound();
+								Writer.AddString("translation_key", "chat.type.narrate");
 							Writer.EndCompound();
 						Writer.EndCompound();
-					Writer.AddInt("id",0);
+					Writer.AddInt("id", 0);
 					Writer.AddString("name", "minecraft:chat");
 					Writer.EndCompound();
 				Writer.EndList();
@@ -1622,7 +1600,7 @@ void cProtocol_1_19_1::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 
 						Writer.EndCompound();
 
-						Writer.AddInt("id",0);
+						Writer.AddInt("id", 0);
 						Writer.AddString("name", "minecraft:overworld");
 					Writer.EndCompound();
 				Writer.EndList();
@@ -1632,13 +1610,13 @@ void cProtocol_1_19_1::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 				Writer.BeginList("value", eTagType::TAG_Compound);
 					Writer.BeginCompound("");
 					Writer.AddString("name", "minecraft:plains");
-					Writer.AddInt("id",0);
+					Writer.AddInt("id", 0);
 						Writer.BeginCompound("element");
 							Writer.AddString("precipitation", "rain");
 								Writer.BeginCompound("effects");
 								Writer.AddInt("sky_color", 7907327);
 								Writer.AddInt("water_fog_color", 329011);
-								Writer.AddInt("fog_color" ,12638463);
+								Writer.AddInt("fog_color", 12638463);
 								Writer.AddInt("water_color", 4159204);
 									Writer.BeginCompound("mood_sound");
 									Writer.AddInt("tick_delay", 6000);
@@ -1654,7 +1632,7 @@ void cProtocol_1_19_1::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 							Writer.AddString("category", "plains");
 						Writer.EndCompound();
 					Writer.AddString("name", "minecraft:plains");
-					Writer.AddInt("id",0);
+					Writer.AddInt("id", 0);
 					Writer.EndCompound();
 				Writer.EndList();
 			Writer.EndCompound();
@@ -1662,35 +1640,12 @@ void cProtocol_1_19_1::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 			Pkt.WriteBuf(Writer.GetResult());
 		}
 
-		////dimensional type
-		//{
-		//	cFastNBTWriter Writer;
-		//	Writer.AddByte("piglin_safe", 1);
-		//	Writer.AddByte("natural", 1);
-		//	Writer.AddFloat("ambient_light", 1.0);
-		//	Writer.AddString("infiniburn", "infiniburn_overworld");
-		//	Writer.AddByte("respawn_anchor_works", 1);
-		//	Writer.AddByte("has_skylight", 1);
-		//	Writer.AddByte("bed_works", 1);
-		//	Writer.AddString("effects", "minecraft:overworld");
-		//	Writer.AddByte("has_raids", 1);
-		//	Writer.AddInt("logical_height", 256);
-		//	Writer.AddDouble("coordinate_scale", 1.0);
-		//	Writer.AddByte("ultrawarm", 1);
-		//	Writer.AddByte("has_ceiling", 1);
-		//	Writer.AddInt("min_y", 0);
-		//	Writer.AddInt("height", 256);
-		//	Writer.Finish();
-		//	Pkt.WriteBuf(Writer.GetResult());
-		//}
-
-
-		Pkt.WriteString("minecraft:overworld"); // dimension type
-		Pkt.WriteString("minecraft:overworld"); // dimension id
+		Pkt.WriteString("minecraft:overworld");  // dimension type
+		Pkt.WriteString("minecraft:overworld");  // dimension id
 
 		Pkt.WriteBEInt64(0);  // Seed
 		Pkt.WriteVarInt32(static_cast<UInt32>(Server->GetMaxPlayers()));
-		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));  
+		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));
 		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));  // simulation distance
 		Pkt.WriteBool(false);  // Reduced debug info
 		Pkt.WriteBool(true);   // Show deaths screen
@@ -1712,6 +1667,7 @@ void cProtocol_1_19_1::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 		Pkt.WriteBool(false);  // Difficulty locked?
 	}
 }
+
 
 
 
@@ -1747,8 +1703,8 @@ bool cProtocol_1_19_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x12: HandlePacketKeepAlive(a_ByteBuffer); return true;
 		case 0x13: /* Update difficulty lock */ return false;  // only used in single player
 		case 0x14: HandlePacketPlayerPos(a_ByteBuffer); return true;  // PositionAndOnGround
-		case 0x15: HandlePacketPlayerPosLook(a_ByteBuffer); return true; // full
-		case 0x16: HandlePacketPlayerLook(a_ByteBuffer); return true; // LookAndOnGround
+		case 0x15: HandlePacketPlayerPosLook(a_ByteBuffer); return true;  // full
+		case 0x16: HandlePacketPlayerLook(a_ByteBuffer); return true;  // LookAndOnGround
 		case 0x17: HandlePacketPlayer(a_ByteBuffer); return true;
 		case 0x18: HandlePacketVehicleMove(a_ByteBuffer); return true;
 		case 0x19: HandlePacketBoatSteer(a_ByteBuffer); return true;
@@ -1768,7 +1724,7 @@ bool cProtocol_1_19_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x27: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 		case 0x28: HandlePacketSlotSelect(a_ByteBuffer); return true;
 		case 0x29: /* update command block */ return false;
-		case 0x2A: /* update minecart command block*/ return false;
+		case 0x2A: /* update minecart command block */ return false;
 		case 0x2B: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 		case 0x2C: /* Update jigsaw block */ return false;
 		case 0x2D: /* Update structure block */ return false;
@@ -1850,12 +1806,11 @@ cProtocol::Version cProtocol_1_19_3::GetProtocolVersion() const
 
 
 
-
 UInt32 cProtocol_1_19_3::GetPacketID(ePacketType a_PacketType) const
 {
 	switch (a_PacketType)
 	{
-		/// Status packets
+		// Status packets
 		case cProtocol::pktStatusResponse:       return 0x00;
 		case cProtocol::pktPingResponse:         return 0x01;
 
@@ -1884,13 +1839,13 @@ UInt32 cProtocol_1_19_3::GetPacketID(ePacketType a_PacketType) const
 			//  command suggestions here 0x0D
 		case cProtocol::pktCommnadTree:          return 0x0E;
 		case cProtocol::pktWindowClose:          return 0x0F;
-		case cProtocol::pktWindowItems:          return 0x10; //  Inventory packet
-		case cProtocol::pktWindowProperty:       return 0x11; //  ScreenHandlerPropertyUpdateS2CPacket
-		case cProtocol::pktInventorySlot:        return 0x12; //  ScreenHandlerSlotUpdateS2CPacket
+		case cProtocol::pktWindowItems:          return 0x10;  //  Inventory packet
+		case cProtocol::pktWindowProperty:       return 0x11;  //  ScreenHandlerPropertyUpdateS2CPacket
+		case cProtocol::pktInventorySlot:        return 0x12;  //  ScreenHandlerSlotUpdateS2CPacket
 			//  cooldown update 0x13
 			//  chat suggestions 0x14
-		case cProtocol::pktCustomPayload:        return 0x15; 
-		case cProtocol::pktPluginMessage:        return 0x15; 
+		case cProtocol::pktCustomPayload:        return 0x15;
+		case cProtocol::pktPluginMessage:        return 0x15;
 			// RemoveMessageS2CPacket 0x16
 		case cProtocol::pktDisconnectDuringGame: return 0x17;
 			//  ProfilelessChatMessageS2CPacket 0x18
@@ -1908,7 +1863,7 @@ UInt32 cProtocol_1_19_3::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktLightUpdate:          return 0x23;
 		case cProtocol::pktJoinGame:             return 0x24;
 		case cProtocol::pktMapData:              return 0x25;
-			//  set trade offers 0x26 
+			//  set trade offers 0x26
 		case cProtocol::pktEntityRelMove:        return 0x27;
 		case cProtocol::pktEntityRelMoveLook:    return 0x28;
 		case cProtocol::pktEntityLook:           return 0x29;
@@ -1968,7 +1923,7 @@ UInt32 cProtocol_1_19_3::GetPacketID(ePacketType a_PacketType) const
 			//  stop sound 0x5F
 		case cProtocol::pktChatRaw:              return 0x60;  //  Gamemessage
 			//  player list header 0x61
-			//  NbtQueryResponseS2CPacket 0x62 
+			//  NbtQueryResponseS2CPacket 0x62
 		case cProtocol::pktCollectEntity:        return 0x63;
 		case cProtocol::pktTeleportEntity:       return 0x64;
 			//  advancment update 0x65
@@ -1993,10 +1948,10 @@ void cProtocol_1_19_3::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 		m_Client->Kick("Bad username");
 		return;
 	}
-	HANDLE_READ(a_ByteBuffer,ReadBool,bool,HasUUID);
+	HANDLE_READ(a_ByteBuffer, ReadBool, bool, HasUUID);
 	if (HasUUID)
 	{
-		HANDLE_READ(a_ByteBuffer,ReadUUID,cUUID,ProfileID);
+		HANDLE_READ(a_ByteBuffer, ReadUUID, cUUID, ProfileID);
 	}
 	if (!m_Client->HandleHandshake(Username))
 	{
@@ -2056,8 +2011,8 @@ bool cProtocol_1_19_3::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x11: HandlePacketKeepAlive(a_ByteBuffer); return true;
 		case 0x12: /* Update difficulty lock */ return false;  // only used in single player
 		case 0x13: HandlePacketPlayerPos(a_ByteBuffer); return true;  // PositionAndOnGround
-		case 0x14: HandlePacketPlayerPosLook(a_ByteBuffer); return true; // full
-		case 0x15: HandlePacketPlayerLook(a_ByteBuffer); return true; // LookAndOnGround
+		case 0x14: HandlePacketPlayerPosLook(a_ByteBuffer); return true;  // full
+		case 0x15: HandlePacketPlayerLook(a_ByteBuffer); return true;  // LookAndOnGround
 		case 0x16: HandlePacketPlayer(a_ByteBuffer); return true;
 		case 0x17: HandlePacketVehicleMove(a_ByteBuffer); return true;
 		case 0x18: HandlePacketBoatSteer(a_ByteBuffer); return true;
@@ -2078,7 +2033,7 @@ bool cProtocol_1_19_3::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x27: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 		case 0x28: HandlePacketSlotSelect(a_ByteBuffer); return true;
 		case 0x29: /* update command block */ return false;
-		case 0x2A: /* update minecart command block*/ return false;
+		case 0x2A: /* update minecart command block */ return false;
 		case 0x2B: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 		case 0x2C: /* Update jigsaw block */ return false;
 		case 0x2D: /* Update structure block */ return false;
@@ -2109,36 +2064,25 @@ void cProtocol_1_19_3::SendChatRaw(const AString & a_MessageRaw, eChatType a_Typ
 	cPacketizer Pkt(*this, pktChatRaw);
 	Pkt.WriteString(a_MessageRaw);
 	Pkt.WriteBool(false);
-	//Pkt.WriteVarInt32([a_Type]() -> signed char
-	//{
-	//	switch (a_Type)
-	//	{
-	//		case eChatType::ctChatBox: return 0;
-	//		case eChatType::ctSystem: return 1;
-	//		case eChatType::ctAboveActionBar: return 2;
-	//	}
-	//	UNREACHABLE("Unsupported chat type");
-	//}());
-
 }
 
 
 
 
 
-void cProtocol_1_19_3::SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume,float a_Pitch)
+void cProtocol_1_19_3::SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktSoundEffect);
-	Pkt.WriteVarInt32(GetProtocolSoundID(a_SoundName)); // sound id
+	Pkt.WriteVarInt32(GetProtocolSoundID(a_SoundName));  // sound id
 	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.x * 8.0));
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.y * 8.0));
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.z * 8.0));
 	Pkt.WriteBEFloat(a_Volume);
 	Pkt.WriteBEFloat(a_Pitch);
-	Pkt.WriteBEInt64(0); // seed
+	Pkt.WriteBEInt64(0);  // seed
 }
 
 
@@ -2177,6 +2121,7 @@ void cProtocol_1_19_3::SendPlayerListAddPlayer(const cPlayer & a_Player)
 	Pkt.WriteBool(true);
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Player.GetClientHandle()->GetPing()));
 }
+
 
 
 
@@ -2486,7 +2431,7 @@ void cProtocol_1_19_3::HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer)
 		}
 	}
 
-	//Acknowledgment ???
+	// Acknowledgment ???
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32, offset);
 
 	ContiguousByteBuffer bitsetvalue;
@@ -2516,14 +2461,15 @@ void cProtocol_1_19_3::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
 		}
 	}
 
-	//Acknowledgment ???
+	// Acknowledgment ???
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32, offset);
 
 	ContiguousByteBuffer bitsetvalue;
-	a_ByteBuffer.ReadSome(bitsetvalue, 3);  // temp fix 
+	a_ByteBuffer.ReadSome(bitsetvalue, 3);  // temp fix
 
 	m_Client->HandleChat(Message);
 }
+
 
 
 
@@ -2549,7 +2495,7 @@ void cProtocol_1_19_3::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteB
 	{
 		return;
 	}
-		
+
 	if (!a_ByteBuffer.ReadSome(EncNonce, EncNonceLength))
 	{
 		return;
@@ -2613,7 +2559,7 @@ UInt32 cProtocol_1_19_4::GetPacketID(ePacketType a_PacketType) const
 {
 	switch (a_PacketType)
 	{
-		/// Status packets
+		// Status packets
 		case cProtocol::pktStatusResponse:       return 0x00;
 		case cProtocol::pktPingResponse:         return 0x01;
 
@@ -2624,124 +2570,124 @@ UInt32 cProtocol_1_19_4::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktStartCompression:     return 0x03;
 
 		//  Game packets
-        case cProtocol::pktSpawnObject:          return 0x01;
-        case cProtocol::pktSpawnMob:             return 0x01;
+		case cProtocol::pktSpawnObject:          return 0x01;
+		case cProtocol::pktSpawnMob:             return 0x01;
 		case cProtocol::pktSpawnPainting:        return 0x01;
-        case cProtocol::pktSpawnExperienceOrb:   return 0x02;
-        case cProtocol::pktSpawnOtherPlayer:     return 0x03;
-        case cProtocol::pktEntityAnimation:      return 0x04;
-        case cProtocol::pktStatistics:           return 0x05;
-        case cProtocol::pktPlayerActionResponse: return 0x06;
-        //  case cProtocol::pktBlockbreakingprogress:   return 0x07;
-        case cProtocol::pktUpdateBlockEntity:    return 0x08;
-        case cProtocol::pktBlockAction:          return 0x09;
-        case cProtocol::pktBlockChange:          return 0x0A;
-        case cProtocol::pktBossBar:              return 0x0B;
-        case cProtocol::pktDifficulty:           return 0x0C;
-				//  ChunkBiomeDataS2CPacket 0x0D
-                //  clear title 0x0E
-                //  command suggestions here 0x0F
+		case cProtocol::pktSpawnExperienceOrb:   return 0x02;
+		case cProtocol::pktSpawnOtherPlayer:     return 0x03;
+		case cProtocol::pktEntityAnimation:      return 0x04;
+		case cProtocol::pktStatistics:           return 0x05;
+		case cProtocol::pktPlayerActionResponse: return 0x06;
+		//  case cProtocol::pktBlockbreakingprogress:   return 0x07;
+		case cProtocol::pktUpdateBlockEntity:    return 0x08;
+		case cProtocol::pktBlockAction:          return 0x09;
+		case cProtocol::pktBlockChange:          return 0x0A;
+		case cProtocol::pktBossBar:              return 0x0B;
+		case cProtocol::pktDifficulty:           return 0x0C;
+			//  ChunkBiomeDataS2CPacket 0x0D
+			//  clear title 0x0E
+			//  command suggestions here 0x0F
 		case cProtocol::pktCommnadTree:          return 0x10;
-        case cProtocol::pktWindowClose:          return 0x11;
-        case cProtocol::pktWindowItems:          return 0x12;  //  Inventory packet
-        case cProtocol::pktWindowProperty:       return 0x13;  //  ScreenHandlerPropertyUpdateS2CPacket
-        case cProtocol::pktInventorySlot:        return 0x14;  //  ScreenHandlerSlotUpdateS2CPacket
-                //  cooldown update 0x15
-                //  chat suggestions 0x16
-        case cProtocol::pktCustomPayload:        return 0x17;
-        case cProtocol::pktPluginMessage:        return 0x17;
-				// EntityDamageS2CPacket 0x18
-                // RemoveMessageS2CPacket 0x19
-        case cProtocol::pktDisconnectDuringGame: return 0x1A;
-        //case cProtocol::pktSoundEffect:          return 0x1A;
-                //  ProfilelessChatMessageS2CPacket 0x1B
-        case cProtocol::pktEntityStatus:         return 0x1C;
-        case cProtocol::pktExplosion:            return 0x1D;
-        case cProtocol::pktUnloadChunk:          return 0x1E;
-        case cProtocol::pktGameMode:             return 0x1F;
-        case cProtocol::pktWeather:              return 0x1F;
-        case cProtocol::pktHorseWindowOpen:      return 0x20;
-				// DamageTiltS2CPacket 0x21
-                // wolrld border initalize 0x22
-        case cProtocol::pktKeepAlive:            return 0x23;
-                // chunk data packet 0x24
-        case cProtocol::pktSoundParticleEffect:  return 0x25;  // world event
-        case cProtocol::pktParticleEffect:       return 0x26;
-        case cProtocol::pktLightUpdate:          return 0x27;
-        case cProtocol::pktJoinGame:             return 0x28;
+		case cProtocol::pktWindowClose:          return 0x11;
+		case cProtocol::pktWindowItems:          return 0x12;  //  Inventory packet
+		case cProtocol::pktWindowProperty:       return 0x13;  //  ScreenHandlerPropertyUpdateS2CPacket
+		case cProtocol::pktInventorySlot:        return 0x14;  //  ScreenHandlerSlotUpdateS2CPacket
+			//  cooldown update 0x15
+			//  chat suggestions 0x16
+		case cProtocol::pktCustomPayload:        return 0x17;
+		case cProtocol::pktPluginMessage:        return 0x17;
+			// EntityDamageS2CPacket 0x18
+			// RemoveMessageS2CPacket 0x19
+		case cProtocol::pktDisconnectDuringGame: return 0x1A;
+			//  ProfilelessChatMessageS2CPacket 0x1B
+		case cProtocol::pktEntityStatus:         return 0x1C;
+		case cProtocol::pktExplosion:            return 0x1D;
+		case cProtocol::pktUnloadChunk:          return 0x1E;
+		case cProtocol::pktGameMode:             return 0x1F;
+		case cProtocol::pktWeather:              return 0x1F;
+		case cProtocol::pktHorseWindowOpen:      return 0x20;
+			// DamageTiltS2CPacket 0x21
+			// wolrld border initalize 0x22
+		case cProtocol::pktKeepAlive:            return 0x23;
+			// chunk data packet 0x24
+		case cProtocol::pktSoundParticleEffect:  return 0x25;  // world event
+		case cProtocol::pktParticleEffect:       return 0x26;
+		case cProtocol::pktLightUpdate:          return 0x27;
+		case cProtocol::pktJoinGame:             return 0x28;
 		case cProtocol::pktMapData:              return 0x29;
-                //  set trade offers 0x2A
-        case cProtocol::pktEntityRelMove:        return 0x2B;
-        case cProtocol::pktEntityRelMoveLook:    return 0x2C;
-        case cProtocol::pktEntityLook:           return 0x2D;
-                //  vehicle move 0x2E
-                //  open written book 0x2F
-        case cProtocol::pktWindowOpen:           return 0x30;
-        case cProtocol::pktUpdateSign:           return 0x31;
-                //  play ping 0x32
-                //  craft failed response 0x33
-        case cProtocol::pktPlayerAbilities:      return 0x34;
-                //  ChatMessageS2CPacket 0x35
-                //  combat exit 0x36
-                //  comabt enter 0x37
-                //  death msg 0x38
+			//  set trade offers 0x2A
+		case cProtocol::pktEntityRelMove:        return 0x2B;
+		case cProtocol::pktEntityRelMoveLook:    return 0x2C;
+		case cProtocol::pktEntityLook:           return 0x2D;
+			//  vehicle move 0x2E
+			//  open written book 0x2F
+		case cProtocol::pktWindowOpen:           return 0x30;
+		case cProtocol::pktUpdateSign:           return 0x31;
+			//  play ping 0x32
+			//  craft failed response 0x33
+		case cProtocol::pktPlayerAbilities:      return 0x34;
+			//  ChatMessageS2CPacket 0x35
+			//  combat exit 0x36
+			//  comabt enter 0x37
+			//  death msg 0x38
 		case cProtocol::pktPlayerLstRemove:      return 0x39;
-        case cProtocol::pktPlayerList:           return 0x3A;
-                //  look at 0x3B
-        case cProtocol::pktPlayerMoveLook:       return 0x3C;
-        case cProtocol::pktUnlockRecipe:         return 0x3D;
-        case cProtocol::pktDestroyEntity:        return 0x3E;
-        case cProtocol::pktRemoveEntityEffect:   return 0x3F;
-        case cProtocol::pktResourcePack:         return 0x40;
-        case cProtocol::pktRespawn:              return 0x41;
-        case cProtocol::pktEntityHeadLook:       return 0x42;
-        case cProtocol::pktBlockChanges:         return 0x43;
-                // select advancment tab 0x44
-                // ServerMetadataS2CPacket 0x45
-                // overlay msg 0x46
-                // wb -- worldborder wb center changed 0x47
-                // wb interpolate size 0x48
-                // wb size changed 0x49
-                // wb warning time changed 0x4A
-                // wb warning blocks changed 0x4B
-        case cProtocol::pktCameraSetTo:          return 0x4C;
-        case cProtocol::pktHeldItemChange:       return 0x4D;
-        case cProtocol::pktRenderDistanceCenter: return 0x4E;
-                //  chunk load distance 0x4F
-        case cProtocol::pktSpawnPosition:        return 0x50;
-                //  scoreboard display 0x51
-        case cProtocol::pktEntityMeta:           return 0x52;
-        case cProtocol::pktLeashEntity:          return 0x53;
-        case cProtocol::pktEntityVelocity:       return 0x54;
-        case cProtocol::pktEntityEquipment:      return 0x55;
-        case cProtocol::pktExperience:           return 0x56;
-        case cProtocol::pktUpdateHealth:         return 0x57;
-        case cProtocol::pktScoreboardObjective:  return 0x58;
-        case cProtocol::pktAttachEntity:         return 0x59;
-                // Teams 0x5A
-        case cProtocol::pktUpdateScore:          return 0x5B;
-                // simulation distance 0x5C
-                // subtitle 0x5D
-        case cProtocol::pktTimeUpdate:           return 0x5E;
-        case cProtocol::pktTitle:                return 0x5F;
-                //  title fade 0x60
-                //  play sound from entity 0x61
+		case cProtocol::pktPlayerList:           return 0x3A;
+			//  look at 0x3B
+		case cProtocol::pktPlayerMoveLook:       return 0x3C;
+		case cProtocol::pktUnlockRecipe:         return 0x3D;
+		case cProtocol::pktDestroyEntity:        return 0x3E;
+		case cProtocol::pktRemoveEntityEffect:   return 0x3F;
+		case cProtocol::pktResourcePack:         return 0x40;
+		case cProtocol::pktRespawn:              return 0x41;
+		case cProtocol::pktEntityHeadLook:       return 0x42;
+		case cProtocol::pktBlockChanges:         return 0x43;
+			// select advancment tab 0x44
+			// ServerMetadataS2CPacket 0x45
+			// overlay msg 0x46
+			// wb -- worldborder wb center changed 0x47
+			// wb interpolate size 0x48
+			// wb size changed 0x49
+			// wb warning time changed 0x4A
+			// wb warning blocks changed 0x4B
+		case cProtocol::pktCameraSetTo:          return 0x4C;
+		case cProtocol::pktHeldItemChange:       return 0x4D;
+		case cProtocol::pktRenderDistanceCenter: return 0x4E;
+			//  chunk load distance 0x4F
+		case cProtocol::pktSpawnPosition:        return 0x50;
+			//  scoreboard display 0x51
+		case cProtocol::pktEntityMeta:           return 0x52;
+		case cProtocol::pktLeashEntity:          return 0x53;
+		case cProtocol::pktEntityVelocity:       return 0x54;
+		case cProtocol::pktEntityEquipment:      return 0x55;
+		case cProtocol::pktExperience:           return 0x56;
+		case cProtocol::pktUpdateHealth:         return 0x57;
+		case cProtocol::pktScoreboardObjective:  return 0x58;
+		case cProtocol::pktAttachEntity:         return 0x59;
+			// Teams 0x5A
+		case cProtocol::pktUpdateScore:          return 0x5B;
+			// simulation distance 0x5C
+			// subtitle 0x5D
+		case cProtocol::pktTimeUpdate:           return 0x5E;
+		case cProtocol::pktTitle:                return 0x5F;
+			//  title fade 0x60
+			//  play sound from entity 0x61
 		case cProtocol::pktSoundEffect:          return 0x62;
-                //  stop sound 0x63
-        case cProtocol::pktChatRaw:              return 0x64; //  Gamemessage
-                //  player list header 0x65
-                //  NbtQueryResponseS2CPacket 0x66
-        case cProtocol::pktCollectEntity:        return 0x67;
-        case cProtocol::pktTeleportEntity:       return 0x68;
-                //  advancment update 0x69
-        case cProtocol::pktEntityProperties:     return 0x6A;
-                // FeaturesS2CPacket 0x6B
-        case cProtocol::pktEntityEffect:         return 0x6C;
-                //  sync recepies 0x6D
-                //  sync tags 0x6E
+			//  stop sound 0x63
+		case cProtocol::pktChatRaw:              return 0x64;  //  Gamemessage
+			//  player list header 0x65
+			//  NbtQueryResponseS2CPacket 0x66
+		case cProtocol::pktCollectEntity:        return 0x67;
+		case cProtocol::pktTeleportEntity:       return 0x68;
+			//  advancment update 0x69
+		case cProtocol::pktEntityProperties:     return 0x6A;
+			// FeaturesS2CPacket 0x6B
+		case cProtocol::pktEntityEffect:         return 0x6C;
+			//  sync recepies 0x6D
+			//  sync tags 0x6E
 		default: UNREACHABLE("unhandeled packet");
 	}
 }
+
 
 
 
@@ -2777,8 +2723,8 @@ bool cProtocol_1_19_4::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x12: HandlePacketKeepAlive(a_ByteBuffer); return true;
 		case 0x13: /* Update difficulty lock */ return false;  // only used in single player
 		case 0x14: HandlePacketPlayerPos(a_ByteBuffer); return true;  // PositionAndOnGround
-		case 0x15: HandlePacketPlayerPosLook(a_ByteBuffer); return true; // full
-		case 0x16: HandlePacketPlayerLook(a_ByteBuffer); return true; // LookAndOnGround
+		case 0x15: HandlePacketPlayerPosLook(a_ByteBuffer); return true;  // full
+		case 0x16: HandlePacketPlayerLook(a_ByteBuffer); return true;  // LookAndOnGround
 		case 0x17: HandlePacketPlayer(a_ByteBuffer); return true;
 		case 0x18: HandlePacketVehicleMove(a_ByteBuffer); return true;
 		case 0x19: HandlePacketBoatSteer(a_ByteBuffer); return true;
@@ -2798,7 +2744,7 @@ bool cProtocol_1_19_4::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x27: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 		case 0x28: HandlePacketSlotSelect(a_ByteBuffer); return true;
 		case 0x29: /* update command block */ return false;
-		case 0x2A: /* update minecart command block*/ return false;
+		case 0x2A: /* update minecart command block */ return false;
 		case 0x2B: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 		case 0x2C: /* Update jigsaw block */ return false;
 		case 0x2D: /* Update structure block */ return false;
@@ -2851,7 +2797,7 @@ void cProtocol_1_19_4::HandlePacketPlayerSession(cByteBuffer & a_ByteBuffer)
 void cProtocol_1_19_4::SendRespawn(eDimension a_Dimension)
 {
 	cPacketizer Pkt(*this, pktRespawn);
-	cPlayer* Player = m_Client->GetPlayer();
+	cPlayer * Player = m_Client->GetPlayer();
 
 	Pkt.WriteString("minecraft:overworld");  // dimension type key
 	Pkt.WriteString("minecraft:overworld");  // world key
@@ -2880,18 +2826,18 @@ void cProtocol_1_19_4::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()));  // previous game mode
 		Pkt.WriteVarInt32(1);  // Number of dimensions
 		Pkt.WriteString("overworld");
-		//Pkt.WriteString("the_nether");
-		//Pkt.WriteString("the_end");
+		// Pkt.WriteString("the_nether");
+		// Pkt.WriteString("the_end");
 
-		AString dmgsrc[] = {"in_fire","lightning_bolt", "on_fire","lava","hot_floor", "in_wall","cramming", "drown","starve",	"cactus", "fall","fly_into_wall","out_of_world","generic","magic","wither","dragon_breath","dry_out","sweet_berry_bush","freeze","stalagmite","player_attack"};
-		int dmgids[] =     {18          ,22                 ,27          ,21      ,17             ,19        ,3              ,5          ,33        ,2           ,8       ,14                ,28               ,16         ,23        ,40         ,4                ,6           ,35                   ,15        ,32,             34};
+		AString dmgsrc[] = {"in_fire","lightning_bolt", "on_fire","lava","hot_floor", "in_wall","cramming", "drown","starve", "cactus", "fall","fly_into_wall","out_of_world","generic","magic","wither","dragon_breath","dry_out","sweet_berry_bush","freeze","stalagmite","player_attack"};
+		int dmgids[] =     {18,          22,                 27,          21,      17,             19,        3,              5,          33,        2,           8,       14,                28,               16,         23,        40,         4,                6,           35,                   15,        32,             34};
 		{
 			cFastNBTWriter Writer;
 			Writer.BeginCompound("minecraft:damage_type");
 				Writer.AddString("type", "minecraft:damage_type");
 				Writer.BeginList("value", eTagType::TAG_Compound);
 				int id = 0;
-					for (const auto& ds : dmgsrc)
+					for (const auto & ds : dmgsrc)
 					{
 						Writer.BeginCompound("");
 							Writer.BeginCompound("element");
@@ -2905,7 +2851,6 @@ void cProtocol_1_19_4::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 						Writer.EndCompound();
 						id++;
 					}
-
 				Writer.EndList();
 			Writer.EndCompound();
 			Writer.BeginCompound("minecraft:chat_type");
@@ -2914,26 +2859,26 @@ void cProtocol_1_19_4::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 					Writer.BeginCompound("");
 						Writer.BeginCompound("element");
 							Writer.BeginCompound("chat");
-									Writer.BeginList("parameters", eTagType::TAG_String);
-										Writer.AddString("", "sender");
-										Writer.AddString("", "content");
-									Writer.EndList();
-										Writer.BeginCompound("style");
-										Writer.EndCompound();
-									Writer.AddString("translation_key", "chat.type.text");
+								Writer.BeginList("parameters", eTagType::TAG_String);
+									Writer.AddString("", "sender");
+									Writer.AddString("", "content");
+								Writer.EndList();
+									Writer.BeginCompound("style");
+									Writer.EndCompound();
+								Writer.AddString("translation_key", "chat.type.text");
 							Writer.EndCompound();
 
 							Writer.BeginCompound("narration");
-									Writer.BeginList("parameters", eTagType::TAG_String);
-										Writer.AddString("", "sender");
-										Writer.AddString("", "content");
-									Writer.EndList();
-										Writer.BeginCompound("style");
-										Writer.EndCompound();
-									Writer.AddString("translation_key", "chat.type.narrate");
+								Writer.BeginList("parameters", eTagType::TAG_String);
+									Writer.AddString("", "sender");
+									Writer.AddString("", "content");
+								Writer.EndList();
+									Writer.BeginCompound("style");
+									Writer.EndCompound();
+								Writer.AddString("translation_key", "chat.type.narrate");
 							Writer.EndCompound();
 						Writer.EndCompound();
-					Writer.AddInt("id",0);
+					Writer.AddInt("id", 0);
 					Writer.AddString("name", "minecraft:chat");
 					Writer.EndCompound();
 				Writer.EndList();
@@ -2975,7 +2920,7 @@ void cProtocol_1_19_4::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 
 						Writer.EndCompound();
 
-						Writer.AddInt("id",0);
+						Writer.AddInt("id", 0);
 						Writer.AddString("name", "minecraft:overworld");
 					Writer.EndCompound();
 				Writer.EndList();
@@ -2985,13 +2930,13 @@ void cProtocol_1_19_4::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 				Writer.BeginList("value", eTagType::TAG_Compound);
 					Writer.BeginCompound("");
 					Writer.AddString("name", "minecraft:plains");
-					Writer.AddInt("id",0);
+					Writer.AddInt("id", 0);
 						Writer.BeginCompound("element");
 							Writer.AddString("precipitation", "rain");
 								Writer.BeginCompound("effects");
 								Writer.AddInt("sky_color", 7907327);
 								Writer.AddInt("water_fog_color", 329011);
-								Writer.AddInt("fog_color" ,12638463);
+								Writer.AddInt("fog_color", 12638463);
 								Writer.AddInt("water_color", 4159204);
 									Writer.BeginCompound("mood_sound");
 									Writer.AddInt("tick_delay", 6000);
@@ -3004,11 +2949,11 @@ void cProtocol_1_19_4::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 							Writer.AddFloat("temperature", 0.5f);
 							Writer.AddFloat("scale", 0.1f);
 							Writer.AddFloat("downfall", 0.5f);
-							Writer.AddByte("has_precipitation",1);
+							Writer.AddByte("has_precipitation", 1);
 							Writer.AddString("category", "plains");
 						Writer.EndCompound();
 					Writer.AddString("name", "minecraft:plains");
-					Writer.AddInt("id",0);
+					Writer.AddInt("id", 0);
 					Writer.EndCompound();
 				Writer.EndList();
 			Writer.EndCompound();
@@ -3016,35 +2961,12 @@ void cProtocol_1_19_4::SendLogin(const cPlayer & a_Player, const cWorld & a_Worl
 			Pkt.WriteBuf(Writer.GetResult());
 		}
 
-		////dimensional type
-		//{
-		//	cFastNBTWriter Writer;
-		//	Writer.AddByte("piglin_safe", 1);
-		//	Writer.AddByte("natural", 1);
-		//	Writer.AddFloat("ambient_light", 1.0);
-		//	Writer.AddString("infiniburn", "infiniburn_overworld");
-		//	Writer.AddByte("respawn_anchor_works", 1);
-		//	Writer.AddByte("has_skylight", 1);
-		//	Writer.AddByte("bed_works", 1);
-		//	Writer.AddString("effects", "minecraft:overworld");
-		//	Writer.AddByte("has_raids", 1);
-		//	Writer.AddInt("logical_height", 256);
-		//	Writer.AddDouble("coordinate_scale", 1.0);
-		//	Writer.AddByte("ultrawarm", 1);
-		//	Writer.AddByte("has_ceiling", 1);
-		//	Writer.AddInt("min_y", 0);
-		//	Writer.AddInt("height", 256);
-		//	Writer.Finish();
-		//	Pkt.WriteBuf(Writer.GetResult());
-		//}
-
-
-		Pkt.WriteString("minecraft:overworld"); // dimension type
-		Pkt.WriteString("minecraft:overworld"); // dimension id
+		Pkt.WriteString("minecraft:overworld");  // dimension type
+		Pkt.WriteString("minecraft:overworld");  // dimension id
 
 		Pkt.WriteBEInt64(0);  // Seed
 		Pkt.WriteVarInt32(static_cast<UInt32>(Server->GetMaxPlayers()));
-		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));  
+		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));
 		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));  // simulation distance
 		Pkt.WriteBool(false);  // Reduced debug info
 		Pkt.WriteBool(true);   // Show deaths screen
@@ -3107,7 +3029,7 @@ void cProtocol_1_19_4::WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMeta
 {
 	a_Pkt.WriteBEUInt8(GetEntityMetadataID(a_Metadata));	      // Index
 	auto v = static_cast<UInt32>(a_FieldType);
-	if (v >= 2) // temp fix 
+	if (v >= 2)  // temp fix
 	{
 		v++;
 	}
@@ -3456,6 +3378,7 @@ UInt8 cProtocol_1_19_4::GetProtocolEntityType(const cEntity & a_Entity) const
 	}
 	UNREACHABLE("Unhandled entity kind");
 }
+
 
 
 

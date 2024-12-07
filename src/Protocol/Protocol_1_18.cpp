@@ -22,11 +22,12 @@ cProtocol::Version cProtocol_1_18::GetProtocolVersion() const
 
 
 
+
 UInt32 cProtocol_1_18::GetPacketID(ePacketType a_PacketType) const
 {
 	switch (a_PacketType)
 	{
-		/// Status packets
+		// Status packets
 		case cProtocol::pktStatusResponse:       return 0x00;
 		case cProtocol::pktPingResponse:         return 0x01;
 
@@ -57,9 +58,9 @@ UInt32 cProtocol_1_18::GetPacketID(ePacketType a_PacketType) const
 			//  command suggestions here 0x11
 		case cProtocol::pktCommnadTree:          return 0x12;
 		case cProtocol::pktWindowClose:          return 0x13;
-		case cProtocol::pktWindowItems:          return 0x14; //  Inventory packet
-		case cProtocol::pktWindowProperty:       return 0x15; //  ScreenHandlerPropertyUpdateS2CPacket
-		case cProtocol::pktInventorySlot:        return 0x16; //  ScreenHandlerSlotUpdateS2CPacket
+		case cProtocol::pktWindowItems:          return 0x14;  //  Inventory packet
+		case cProtocol::pktWindowProperty:       return 0x15;  //  ScreenHandlerPropertyUpdateS2CPacket
+		case cProtocol::pktInventorySlot:        return 0x16;  //  ScreenHandlerSlotUpdateS2CPacket
 			//  0x17 cooldown update
 		case cProtocol::pktCustomPayload:        return 0x18;
 		case cProtocol::pktPluginMessage:        return 0x18;
@@ -79,7 +80,7 @@ UInt32 cProtocol_1_18::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktLightUpdate:          return 0x25;
 		case cProtocol::pktJoinGame:             return 0x26;
 		case cProtocol::pktMapData:              return 0x27;
-			//  set trade offers 0x28 
+			//  set trade offers 0x28
 		case cProtocol::pktEntityRelMove:        return 0x29;
 		case cProtocol::pktEntityRelMoveLook:    return 0x2A;
 		case cProtocol::pktEntityLook:           return 0x2B;
@@ -136,7 +137,7 @@ UInt32 cProtocol_1_18::GetPacketID(ePacketType a_PacketType) const
 			//  play sound 0x5D
 			//  stop sound 0x5E
 			//  player list header 0x5F
-			//  tag query response 0x60 
+			//  tag query response 0x60
 		case cProtocol::pktCollectEntity:        return 0x61;
 		case cProtocol::pktTeleportEntity:       return 0x62;
 			//  advancment update 0x63
@@ -147,6 +148,7 @@ UInt32 cProtocol_1_18::GetPacketID(ePacketType a_PacketType) const
 		default: UNREACHABLE("unhandeled packet");
 	}
 }
+
 
 
 
@@ -187,8 +189,8 @@ void cProtocol_1_18::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()));  // previous game mode
 		Pkt.WriteVarInt32(1);  // Number of dimensions
 		Pkt.WriteString("overworld");
-		//Pkt.WriteString("the_nether");
-		//Pkt.WriteString("the_end");
+		// Pkt.WriteString("the_nether");
+		// Pkt.WriteString("the_end");
 		{
 			cFastNBTWriter Writer;
 			Writer.BeginCompound("minecraft:dimension_type");
@@ -215,7 +217,7 @@ void cProtocol_1_18::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 						Writer.AddInt("height", 256);
 						Writer.EndCompound();
 
-						Writer.AddInt("id",0);
+						Writer.AddInt("id", 0);
 						Writer.AddString("name", "minecraft:overworld");
 					Writer.EndCompound();
 				Writer.EndList();
@@ -225,13 +227,13 @@ void cProtocol_1_18::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 				Writer.BeginList("value", eTagType::TAG_Compound);
 					Writer.BeginCompound("");
 					Writer.AddString("name", "minecraft:plains");
-					Writer.AddInt("id",0);
+					Writer.AddInt("id", 0);
 						Writer.BeginCompound("element");
 							Writer.AddString("precipitation", "rain");
 								Writer.BeginCompound("effects");
 								Writer.AddInt("sky_color", 7907327);
 								Writer.AddInt("water_fog_color", 329011);
-								Writer.AddInt("fog_color" ,12638463);
+								Writer.AddInt("fog_color", 12638463);
 								Writer.AddInt("water_color", 4159204);
 									Writer.BeginCompound("mood_sound");
 									Writer.AddInt("tick_delay", 6000);
@@ -247,7 +249,7 @@ void cProtocol_1_18::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 							Writer.AddString("category", "plains");
 						Writer.EndCompound();
 					Writer.AddString("name", "minecraft:plains");
-					Writer.AddInt("id",0);
+					Writer.AddInt("id", 0);
 					Writer.EndCompound();
 				Writer.EndList();
 			Writer.EndCompound();
@@ -255,7 +257,7 @@ void cProtocol_1_18::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 			Pkt.WriteBuf(Writer.GetResult());
 		}
 
-		//dimensional type
+		// Dimensional type
 		{
 			cFastNBTWriter Writer;
 			Writer.AddByte("piglin_safe", 1);
@@ -277,11 +279,11 @@ void cProtocol_1_18::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 			Pkt.WriteBuf(Writer.GetResult());
 		}
 
-		Pkt.WriteString("overworld"); // dimension id
+		Pkt.WriteString("overworld");  // dimension id
 
 		Pkt.WriteBEInt64(0);  // Seed
 		Pkt.WriteVarInt32(static_cast<UInt32>(Server->GetMaxPlayers()));
-		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));  
+		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));
 		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));  // simulation distance
 		Pkt.WriteBool(false);  // Reduced debug info
 		Pkt.WriteBool(true);   // Show deaths screen

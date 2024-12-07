@@ -243,6 +243,7 @@ void cProtocol_1_8_0::SendRenderDistanceCenter(cChunkCoords a_chunk)
 
 
 
+
 void cProtocol_1_8_0::SendPlayerListInitChat(const cPlayer & a_Player)
 {
 	// not used in this version
@@ -764,6 +765,7 @@ void cProtocol_1_8_0::SendExplosion(const Vector3f a_Position, const float a_Pow
 	Pkt.WriteBEFloat(0);
 	Pkt.WriteBEFloat(0);
 }
+
 
 
 
@@ -1292,7 +1294,7 @@ void cProtocol_1_8_0::SendPlayerSpawn(const cPlayer & a_Player)
 
 void cProtocol_1_8_0::SendPluginMessage(const AString & a_Channel, const ContiguousByteBufferView a_Message)
 {
-	ASSERT(m_State == 3 || m_State == 4);  // In game mode?
+	ASSERT((m_State == 3) || (m_State == 4));  // In game mode?
 
 	cPacketizer Pkt(*this, pktPluginMessage);
 	Pkt.WriteString(a_Channel);
@@ -2370,7 +2372,7 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	Players["online"] = NumPlayers;
 	Players["max"] = MaxPlayers;
 	std::vector<std::pair<cUUID, AString>> playeruuids;
-	const std::pair<cUUID,AString> AnonPlayer = {cUUID(), "Anonymous"};
+	const std::pair<cUUID, AString> AnonPlayer = {cUUID(), "Anonymous"};
 	cRoot::Get()->ForEachPlayer([this, &playeruuids, &AnonPlayer](cPlayer & a_Player)
 	{
 		if (a_Player.GetClientHandle()->GetAllowListing())
@@ -2385,7 +2387,7 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	});
 	Json::Value sample;
 	int i = 0;
-	for (const std::pair<cUUID, AString>& PlayerId : playeruuids)
+	for (const std::pair<cUUID, AString> & PlayerId : playeruuids)
 	{
 		Json::Value entry;
 		entry["name"] = PlayerId.second;
@@ -2533,7 +2535,6 @@ void cProtocol_1_8_0::HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer)
 {
 	return;
 }
-
 
 
 
@@ -3300,7 +3301,7 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 
 	const auto PacketData = m_Compressor.GetView();
 
-	if (m_State == 3 || m_CompressionEnabled)
+	if ((m_State == 3) || m_CompressionEnabled)
 	{
 		ContiguousByteBuffer CompressedPacket;
 
@@ -3329,23 +3330,21 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 		AString Hex;
 		ASSERT(PacketData.size() > 0);
 		CreateHexDump(Hex, PacketData.data(), PacketData.size(), 16);
-		//m_CommLogFile.Write(fmt::format(
-		//	FMT_STRING("Outgoing packet: type {} (translated to 0x{:02x}), length {} (0x{:04x}), state {}. Payload (incl. type):\n{}\n"),
-		//	cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
-		//	PacketData.size(), PacketData.size(), m_State, Hex
-		//));
-		
+		m_CommLogFile.Write(fmt::format(
+			FMT_STRING("Outgoing packet: type {} (translated to 0x{:02x}), length {} (0x{:04x}), state {}. Payload (incl. type):\n{}\n"),
+			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
+			PacketData.size(), PacketData.size(), m_State, Hex
+		));
+
 		// Useful for debugging a new protocol:
 		LOGD("Outgoing packet: type %s (translated to 0x%02x), length %u (0x%04x), state %d. Payload (incl. type):\n%s\n",
 			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
 			0, 0, m_State, Hex
 		);
-		//
 	}
-	
+
 	// Useful for debugging a new protocol:
-	//std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	
+	// std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 
@@ -3438,7 +3437,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 		case BlockType::ZombieWallHead:
 		{
 			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
-			//a_Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF); // ignore 1.12 < is basically unsupportec
+			// a_Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);  // ignore 1.12 < is basically unsupported
 			a_Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
 
 			// The new Block Entity format for a Mob Head. See: https://minecraft.wiki/w/Head#Block_entity
@@ -4167,7 +4166,7 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousBy
 		}
 
 		// Check packet for compression:
-		if (m_State == 3 || m_CompressionEnabled)
+		if ((m_State == 3) || m_CompressionEnabled)
 		{
 			UInt32 NumBytesRead = static_cast<UInt32>(a_Buffer.GetReadableSpace());
 
@@ -4560,7 +4559,7 @@ void cProtocol_1_8_0::StartEncryption(const Byte * a_Key)
 
 void cProtocol_1_8_0::SendPlayerActionResponse(Vector3i a_blockpos, int a_state_id, cProtocol::PlayerActionResponses a_action, bool a_IsApproved)
 {
-	//Used by 1.15+
+	// Used by 1.15+
 }
 
 
@@ -4569,7 +4568,7 @@ void cProtocol_1_8_0::SendPlayerActionResponse(Vector3i a_blockpos, int a_state_
 
 void cProtocol_1_8_0::SendSelectKnownPacks()
 {
-	//used in 1.20.5+
+	// used in 1.20.5+
 }
 
 
@@ -4578,5 +4577,5 @@ void cProtocol_1_8_0::SendSelectKnownPacks()
 
 void cProtocol_1_8_0::SendInitialChunksComing()
 {
-	//used in 1.20.3+
+	// used in 1.20.3+
 }

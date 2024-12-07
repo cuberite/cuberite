@@ -4,5 +4,5 @@
 #include "BlockType.h"
 namespace Palette_1_19
 {
-	
+
 }  // namespace Palette_1_19

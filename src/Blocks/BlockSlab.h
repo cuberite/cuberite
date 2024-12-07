@@ -71,7 +71,7 @@ public:
 			case BlockType::StoneSlab:
 			case BlockType::WarpedSlab:
 			case BlockType::BambooMosaicSlab:
-			case BlockType::BambooSlab: 
+			case BlockType::BambooSlab:
 			case BlockType::CherrySlab:
 			case BlockType::CobbledDeepslateSlab:
 			case BlockType::TuffSlab:
@@ -81,7 +81,7 @@ public:
 			case BlockType::MangroveSlab:
 			case BlockType::DeepslateTileSlab:
 			case BlockType::DeepslateBrickSlab:
-			case BlockType::PolishedDeepslateSlab:    
+			case BlockType::PolishedDeepslateSlab:
 			case BlockType::CutCopperSlab:
 			case BlockType::ExposedCutCopperSlab:
 			case BlockType::WeatheredCutCopperSlab:
@@ -730,7 +730,7 @@ private:
 			case BlockType::StoneSlab:                   return 11;
 			case BlockType::WarpedSlab:                  return 0;  // TODO
 			case BlockType::BambooMosaicSlab:
-			case BlockType::BambooSlab: 
+			case BlockType::BambooSlab:
 			case BlockType::CherrySlab:
 			case BlockType::CobbledDeepslateSlab:
 			case BlockType::TuffSlab:
@@ -740,7 +740,7 @@ private:
 			case BlockType::MangroveSlab:
 			case BlockType::DeepslateTileSlab:
 			case BlockType::DeepslateBrickSlab:
-			case BlockType::PolishedDeepslateSlab:    
+			case BlockType::PolishedDeepslateSlab:
 			case BlockType::CutCopperSlab:
 			case BlockType::ExposedCutCopperSlab:
 			case BlockType::WeatheredCutCopperSlab:
@@ -748,7 +748,7 @@ private:
 			case BlockType::WaxedCutCopperSlab:
 			case BlockType::WaxedExposedCutCopperSlab:
 			case BlockType::WaxedWeatheredCutCopperSlab:
-			case BlockType::WaxedOxidizedCutCopperSlab: return 0; // TODO
+			case BlockType::WaxedOxidizedCutCopperSlab: return 0;  // TODO
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in slab handler!");

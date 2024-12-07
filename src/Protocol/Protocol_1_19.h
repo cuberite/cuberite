@@ -14,7 +14,7 @@ public:
 	using Super::Super;
 
 protected:
-	virtual UInt32	GetPacketID(ePacketType a_PacketType) const override;
+	virtual UInt32  GetPacketID(ePacketType a_PacketType) const override;
 
 	virtual void    SendAcknowledgeBlockChange(int a_SequenceId) override;
 	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
@@ -29,7 +29,7 @@ protected:
 	virtual void    SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch) override;
 
 	virtual void    HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer) override;
-    virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
+	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void    HandlePacketLoginStart(cByteBuffer & a_ByteBuffer) override;
 	virtual void    HandlePacketChatMessage(cByteBuffer & a_ByteBuffer) override;
 	virtual void    HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer) override;
@@ -58,10 +58,9 @@ class cProtocol_1_19_1
 public:
 
 	using Super::Super;
-	
 
-  protected:
-	virtual UInt32	GetPacketID(ePacketType a_PacketType) const override;
+protected:
+	virtual UInt32  GetPacketID(ePacketType a_PacketType) const override;
 
 
 	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
@@ -77,7 +76,6 @@ public:
 
 
 
-
 class cProtocol_1_19_3
 	: public cProtocol_1_19_1
 {
@@ -87,7 +85,7 @@ public:
 	using Super::Super;
 
 protected:
-	virtual UInt32	GetPacketID(ePacketType a_PacketType) const override;
+	virtual UInt32  GetPacketID(ePacketType a_PacketType) const override;
 	virtual void    WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
 	virtual void    WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const override;
 
@@ -112,7 +110,6 @@ protected:
 
 
 
-
 class cProtocol_1_19_4
 	: public cProtocol_1_19_3
 {
@@ -122,7 +119,7 @@ public:
 	using Super::Super;
 
 protected:
-	virtual UInt32	GetPacketID(ePacketType a_PacketType) const override;
+	virtual UInt32  GetPacketID(ePacketType a_PacketType) const override;
 	virtual void    WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
 	virtual void    WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const override;
 
