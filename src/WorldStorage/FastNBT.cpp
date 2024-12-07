@@ -710,18 +710,18 @@ void cFastNBTWriter::AddIntArray(const AString & a_Name, const Int32 * a_Value, 
 void cFastNBTWriter::AddLongArray(const AString & a_Name, const Int64 * a_Value, size_t a_NumElements)
 {
 	TagCommon(a_Name, TAG_LongArray);
-	UInt32 len = htonl(static_cast<UInt32>(a_NumElements));
+	auto Length = HostToNetwork(static_cast<UInt32>(a_NumElements));
 	size_t cap = m_Result.capacity();
 	size_t size = m_Result.length();
 	if ((cap - size) < (8 + a_NumElements * 8))
 	{
 		m_Result.reserve(size + 8 + (a_NumElements * 8));
 	}
-	m_Result.append(reinterpret_cast<const std::byte *>(&len), sizeof(len));
+	m_Result.append(Length.begin(), Length.end());
 	for (size_t i = 0; i < a_NumElements; i++)
 	{
-		UInt64 Element = (static_cast<UInt64>(htonl(static_cast<UInt32>(a_Value[i]))) << 32) | (static_cast<UInt64>(htonl(static_cast<UInt32>(a_Value[i] >> 32))));
-		m_Result.append(reinterpret_cast<const std::byte *>(&Element), sizeof(Element));
+		auto Element = HostToNetwork(a_Value[i]);
+		m_Result.append(Element.begin(), Element.end());
 	}
 }
 
