@@ -490,7 +490,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 
 				if (cnt == BlockType::Air)
 				{
-					UNREACHABLE("Could find given block while loading chunk X: " + a_Chunk.m_ChunkX + " Z: " a_Chunk.m_ChunkZ + " Y Section: " + Y);
+					// UNREACHABLE("Could find given block while loading chunk X: " + a_Chunk.m_ChunkX + " Z: " a_Chunk.m_ChunkZ + " Y Section: " + Y);
 				}
 				Paletteids.push_back(cnt);
 
