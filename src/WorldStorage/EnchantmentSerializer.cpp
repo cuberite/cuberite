@@ -18,16 +18,7 @@ void EnchantmentSerializer::WriteToNBTCompound(const cEnchantments & a_Enchantme
 		a_Writer.BeginCompound("");
 			if (stringmode)
 			{
-				AString name;
-				for (const auto & var : enchantment_names)
-				{
-					if (var.second == itr->first)
-					{
-						name = "minecraft:" + var.first;
-						break;
-					}
-				}
-				a_Writer.AddString("id", name);
+				a_Writer.AddString("id", GetEnchantmentName(itr->first));
 			}
 			else
 			{
@@ -93,8 +84,7 @@ void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const c
 				{
 					AString name = a_NBT.GetString(ch);
 					name.erase(0, strlen("minecraft:"));
-					VERIFY(enchantment_names.count(name) > 0);  // Will fail for unimplemented enchants
-					id = enchantment_names.at(name);
+					id = GetEnchantmentID(name);
 				}
 			}
 			else if (a_NBT.GetName(ch) == "lvl")
@@ -112,5 +102,90 @@ void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const c
 		// Store the enchantment:
 		a_Enchantments.m_Enchantments[id] = static_cast<unsigned int>(lvl);
 	}  // for tag - children of the ench list tag
+}
+
+
+
+
+
+int EnchantmentSerializer::GetEnchantmentID(const AString & a_Name)
+{
+	/** Used by NBT parser to convert string names into numeric ids */
+	static const std::map<AString, int> enchantment_names
+	{
+		{"protection",               0},
+		{"fire_protection",          1},
+		{"feather_falling",          2},
+		{"blast_protection",         3},
+		{"projectile_protection",    4},
+		{"respiration",              5},
+		{"aqua_affinity",            6},
+		{"thorns",                   7},
+		{"depth_strider",            8},
+		{"sharpness",               16},
+		{"smite",                   17},
+		{"bane_of_arthropods",      18},
+		{"knockback",               19},
+		{"fire_aspect",             20},
+		{"looting",                 21},
+		{"efficiency",              32},
+		{"silk_touch",              33},
+		{"unbreaking",              34},
+		{"fortune",                 35},
+		{"power",                   48},
+		{"punch",                   49},
+		{"flame",                   50},
+		{"infinity",                51},
+		{"luck_of_the_sea",         61},
+		{"lure",                    62},
+	};
+	ASSERT(enchantment_names.count(a_Name) == 1);
+	return enchantment_names.at(a_Name);
+}
+
+
+
+
+
+AString EnchantmentSerializer::GetEnchantmentName(int a_ID)
+{
+	/** Used by NBT parser to convert string names into numeric ids */
+	static const std::map<AString, int> enchantment_names
+	{
+		{"protection",               0},
+		{"fire_protection",          1},
+		{"feather_falling",          2},
+		{"blast_protection",         3},
+		{"projectile_protection",    4},
+		{"respiration",              5},
+		{"aqua_affinity",            6},
+		{"thorns",                   7},
+		{"depth_strider",            8},
+		{"sharpness",               16},
+		{"smite",                   17},
+		{"bane_of_arthropods",      18},
+		{"knockback",               19},
+		{"fire_aspect",             20},
+		{"looting",                 21},
+		{"efficiency",              32},
+		{"silk_touch",              33},
+		{"unbreaking",              34},
+		{"fortune",                 35},
+		{"power",                   48},
+		{"punch",                   49},
+		{"flame",                   50},
+		{"infinity",                51},
+		{"luck_of_the_sea",         61},
+		{"lure",                    62},
+	};
+	for (const auto & var : enchantment_names)
+	{
+		if (var.second == a_ID)
+		{
+			return "minecraft:" + var.first;
+		}
+	}
+	ASSERT(false);
+	return "";
 }
 
