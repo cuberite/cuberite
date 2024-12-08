@@ -448,7 +448,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 					ChunkLoadFailed(a_Chunk, "Invalid namespace: " + blockid + " Mods arent supported", a_RawChunkData);
 					return false;
 				}
-				const int BlockStatesId = a_NBT.FindChildByName(Child1, "Properties");
+				// const int BlockStatesId = a_NBT.FindChildByName(Child1, "Properties");
 
 				AString bls;
 				std::vector<AString> strs;
