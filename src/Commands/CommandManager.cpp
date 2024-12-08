@@ -147,14 +147,14 @@ cCommandManager::cCommandNode::cCommandNode(
 	const CommandNodeList & a_ChildrenNodes, cCommandNode * a_RedirectNode,
 	CmdArgPtr a_ParserArgument, const AString & a_Name,
 	eCommandSuggestionType a_SuggestionType, bool a_IsExecutable, CommandExecutor a_Executioner) :
+	m_IsExecutable(a_IsExecutable),
+	m_Executioner(a_Executioner),
 	m_Type(a_Type),
 	m_ChildrenNodes(a_ChildrenNodes),
 	m_RedirectNode(a_RedirectNode),
 	m_Argument(std::move(a_ParserArgument)),
 	m_Name(a_Name),
-	m_SuggestionType(a_SuggestionType),
-	m_Executioner(a_Executioner),
-	m_IsExecutable(a_IsExecutable)
+	m_SuggestionType(a_SuggestionType)
 {
 }
 

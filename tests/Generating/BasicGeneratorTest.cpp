@@ -275,7 +275,7 @@ static void checkChunkChecksums(
 		*/
 		auto checksum = chunkSHA1(chd);
 
-		LOGD(fmt::format(FMT_STRING("{} chunk {} SHA1: got {}"), aDimension, coords.mCoords.ToString(), checksum));
+		LOGERROR(fmt::format(FMT_STRING("{} chunk {} SHA1: got {}"), aDimension, coords.mCoords.ToString(), checksum));
 		/*
 		TEST_EQUAL_MSG(checksum, coords.mChecksum,
 			fmt::format(FMT_STRING("{} chunk {} SHA1: expected {}, got {}"), aDimension, coords.mCoords.ToString(), coords.mChecksum, checksum)
