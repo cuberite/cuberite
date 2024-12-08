@@ -282,7 +282,7 @@ bool cPickup::CollectedBy(cEntity & a_Dest)
 			return false;
 		}
 
-	int NumAdded = Player.GetInventory().AddItem(m_Item);
+	char NumAdded = Player.GetInventory().AddItem(m_Item);
 	if (NumAdded > 0)
 	{
 		// Check achievements
@@ -301,7 +301,7 @@ bool cPickup::CollectedBy(cEntity & a_Dest)
 			default: break;
 		}
 
-			m_Item.m_ItemCount -= static_cast<unsigned>(NumAdded);
+			m_Item.m_ItemCount -= NumAdded;
 			m_World->BroadcastCollectEntity(*this, a_Dest, static_cast<unsigned>(NumAdded));
 
 			// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)

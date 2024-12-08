@@ -715,7 +715,7 @@ void cMojangAPI::NotifyNameUUID(const AString & a_PlayerName, const cUUID & a_UU
 
 void cMojangAPI::GetMojangKeys(void)
 {
-	/* Incase this function is called multiple times there are no duplicate keys */
+	/* In case this function is called multiple times there are no duplicate keys */
 
 	for (auto mojang_public_key : MojangPublicKeys)
 	{
@@ -754,15 +754,15 @@ void cMojangAPI::GetMojangKeys(void)
 		const Json::Value & Key = ProfCertKeys[i];
 		AString pubkey = Key.get("publicKey", "").asString();
 		unsigned char * tempbfr = new unsigned char[pubkey.size()];
-		size_t BytesWiritten = -1;
-		if (mbedtls_base64_decode(tempbfr, pubkey.size(), &BytesWiritten, reinterpret_cast<const unsigned char *>(pubkey.c_str()), pubkey.size()) != 0)
+		size_t BytesWritten = 0;
+		if (mbedtls_base64_decode(tempbfr, pubkey.size(), &BytesWritten, reinterpret_cast<const unsigned char *>(pubkey.c_str()), pubkey.size()) != 0)
 		{
 			LOGWARNING("Failed to base64 decode mojang key");
 			continue;
 		}
 		mbedtls_pk_context ctx;
 		mbedtls_pk_init(&ctx);
-		if (mbedtls_pk_parse_public_key(&ctx, tempbfr, BytesWiritten) != 0)
+		if (mbedtls_pk_parse_public_key(&ctx, tempbfr, BytesWritten) != 0)
 		{
 			LOGWARNING("Failed to parse mojang public key");
 			continue;
