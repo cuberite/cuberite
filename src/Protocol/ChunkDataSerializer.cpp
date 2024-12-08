@@ -822,7 +822,7 @@ inline void cChunkDataSerializer::Serialize735(const int a_ChunkX, const int a_C
 
 	static constexpr UInt8 BitsPerEntry = 15;
 	static constexpr UInt8 EntriesPerLong = 64 / BitsPerEntry;
-	static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
+	// static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
 	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
 
 	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
@@ -899,7 +899,7 @@ inline void cChunkDataSerializer::Serialize751(const int a_ChunkX, const int a_C
 
 	static constexpr UInt8 BitsPerEntry = 15;
 	static constexpr UInt8 EntriesPerLong = 64 / BitsPerEntry;
-	static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
+	// static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
 	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
 
 	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
@@ -926,7 +926,7 @@ inline void cChunkDataSerializer::Serialize751(const int a_ChunkX, const int a_C
 	}
 
 
-	m_Packet.WriteVarInt32(DEFAULT_LENGTH);
+	m_Packet.WriteVarInt32(static_cast<UInt32>(DEFAULT_LENGTH));
 	for (int i = 0; i < DEFAULT_LENGTH; i++)
 	{
 		int realx = i % 16;
@@ -977,7 +977,7 @@ inline void cChunkDataSerializer::Serialize755(const int a_ChunkX, const int a_C
 
 	static constexpr UInt8 BitsPerEntry = 15;
 	static constexpr UInt8 EntriesPerLong = 64 / BitsPerEntry;
-	static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
+	// static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
 	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
 
 	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
@@ -1004,7 +1004,7 @@ inline void cChunkDataSerializer::Serialize755(const int a_ChunkX, const int a_C
 	}
 
 
-	m_Packet.WriteVarInt32(DEFAULT_LENGTH);
+	m_Packet.WriteVarInt32(static_cast<UInt32>(DEFAULT_LENGTH));
 	for (int i = 0; i < DEFAULT_LENGTH; i++)
 	{
 		int realx = i % 16;
@@ -1056,10 +1056,10 @@ inline void cChunkDataSerializer::Serialize757(const int a_ChunkX, const int a_C
 
 	static constexpr UInt8 BitsPerEntry = 15;
 	static constexpr UInt8 EntriesPerLong = 64 / BitsPerEntry;
-	static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
+	// static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
 	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
 
-	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
+	// const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
 
 	// Create the packet:
 	m_Packet.WriteVarInt32(a_packet_id);
@@ -1132,10 +1132,10 @@ inline void cChunkDataSerializer::Serialize763(const int a_ChunkX, const int a_C
 
 	static constexpr UInt8 BitsPerEntry = 15;
 	static constexpr UInt8 EntriesPerLong = 64 / BitsPerEntry;
-	static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
+	// static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
 	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
 
-	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
+	// const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
 
 	// Create the packet:
 	m_Packet.WriteVarInt32(a_packet_id);
@@ -1205,10 +1205,10 @@ inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_C
 
 	static constexpr UInt8 BitsPerEntry = 15;
 	static constexpr UInt8 EntriesPerLong = 64 / BitsPerEntry;
-	static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
+	// static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
 	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
 
-	const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
+	// const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
 
 	// Create the packet:
 	m_Packet.WriteVarInt32(a_packet_id);
@@ -1285,7 +1285,7 @@ inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_C
 	m_Packet.WriteVarInt32(0);
 	m_Packet.WriteVarInt32(0);
 
-	m_Packet.WriteVarInt32(light_count);
+	m_Packet.WriteVarInt32(static_cast<UInt32>(light_count));
 	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 	{
 		auto light = a_LightData.GetSkyLightSection(Y);
@@ -1295,7 +1295,7 @@ inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_C
 			m_Packet.Write(light, 2048);
 		}
 	}
-	m_Packet.WriteVarInt32(block_count);
+	m_Packet.WriteVarInt32(static_cast<UInt32>(block_count));
 	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 	{
 		auto light = a_LightData.GetBlockLightSection(Y);
