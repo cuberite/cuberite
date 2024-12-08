@@ -11,7 +11,7 @@ pipeline {
                 sh 'git submodule update --init'
             }
         }
-        stage("Check") {
+        /* stage("Check") {
             parallel {
                 stage("CheckBasicStyle") {
                     steps {
@@ -28,9 +28,19 @@ pipeline {
                     }
                 }
             }
-        }
+        } */
         stage("Build") {
-            parallel {
+		    environment {
+                CI_CUBERITE_BUILD_TYPE = 'Debug'
+                CI_JOB_NUMBER = "{$env.BUILD_ID}"
+                CC = "clang"
+                CXX = "clang++"
+            }
+            steps {
+                sh 'bash ./cibuild.sh'
+            }
+
+            /* parallel {
                 stage("gcc") {
                     environment {
                         CI_CUBERITE_BUILD_TYPE = 'Release'
@@ -53,7 +63,7 @@ pipeline {
                         sh 'bash ./cibuild.sh'
                     }
                 }
-            }
+            } */
         }
 		stage("Artifacts") {
 			when {

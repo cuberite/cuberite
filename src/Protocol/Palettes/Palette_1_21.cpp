@@ -31084,6 +31084,6 @@ namespace Palette_1_21
 			return 1;
 		}
 
-		return FindResult->second + 1;
+		return static_cast<UInt32>(FindResult->second + 1);
 	}
 }  // namespace Palette_1_21
