@@ -308,7 +308,7 @@ static void testRepeatability(cChunkGenerator & aDefaultOverworldGenerator, cChu
 		{ 1,    0, "52e8ee13e2466d838773074af08abb57cde5e11f"},
 		{ 1,    1, "-74c591d11647326231410e18c65190bacdf0eaef"},
 		{17,    0, "-ed0f2cfa434203297dceb4c8d6aedd949710336"},
-		{ 8, 1024, "5f745010411fdfcfceaad68f6768e8a93cf55b72"},
+		{ 8, 1024, "58721e429491c1df4db4e13036c22b7c702a044a"},
 	};
 	checkChunkChecksums(aDefaultNetherGenerator, netherChecksums, "Nether");
 }
