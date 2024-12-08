@@ -423,7 +423,7 @@ void cProtocol_1_15::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 		// case E_BLOCK_CAMPFIRE:       Action = 13; break;
 
 		default: return;  // Block entities change between versions
-	} 
+	}
 
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
 	Pkt.WriteXZYPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
