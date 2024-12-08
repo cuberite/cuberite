@@ -29,7 +29,7 @@ private:
 	virtual bool IsUseable(void) const override
 	{
 		return true;
-	};
+	}
 
 
 
@@ -39,7 +39,7 @@ private:
 	{
 		return 6;
 	}
-} ;
+};
 
 
 
