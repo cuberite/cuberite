@@ -270,7 +270,7 @@ cCommandManager::cCommandNode::CollectChildren(std::vector<cCommandNode *> & a_l
 cCommandManager::cCommandNode *
 cCommandManager::cCommandNode::GetNextPotentialNode(BasicStringReader & a_Reader, cCommandExecutionContext & a_Ctx)
 {
-	const int oldc = a_Reader.GetCursor();
+	const UInt64 oldc = a_Reader.GetCursor();
 	const auto lit = this->GetLiteralCommandNode(a_Reader.ReadStringUntilWhiteSpace());
 	if (lit != nullptr)
 	{

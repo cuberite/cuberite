@@ -17,7 +17,7 @@ public:
 		try
 		{
 			auto ret = m_String.substr(m_Cursor, m_String.find(' ', m_Cursor) - m_Cursor);
-			m_Cursor += static_cast<int>(ret.size())+1;
+			m_Cursor += ret.size() + 1;
 			return ret;
 		}
 		catch (std::out_of_range ex)
@@ -25,13 +25,13 @@ public:
 			return "";
 		}
 	}
-	int GetCursor() const { return m_Cursor; }
+	UInt64 GetCursor() const { return m_Cursor; }
 
-	void SetCursor(const int a_Cursor) { m_Cursor = a_Cursor; }
+	void SetCursor(const UInt64 a_Cursor) { m_Cursor = a_Cursor; }
 
-	bool IsDone() const { return static_cast<int>(m_String.size()) == m_Cursor - 1; }
+	bool IsDone() const { return m_String.size() == m_Cursor - 1; }
 	AString GetString() const { return m_String; }
 private:
-	int m_Cursor;
+	UInt64 m_Cursor;
 	AString m_String;
 };
