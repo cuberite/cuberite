@@ -22,6 +22,7 @@ public:
 		}
 		catch (std::out_of_range & ex)
 		{
+			LOGERROR(fmt::format(FMT_STRING("Command parsing failed. Reason: {}"), ex.what()));
 			return "";
 		}
 	}
