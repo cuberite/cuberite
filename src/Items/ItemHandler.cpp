@@ -1963,6 +1963,7 @@ const cItemHandler & cItemHandler::For(Item a_ItemType)
 		case Item::GraniteStairs:                      return ItemGraniteStairsHandler;
 		case Item::GraniteWall:                        return ItemGraniteWallHandler;
 		case Item::GrassBlock:                         return ItemGrassBlockHandler;
+		case Item::Grass:                              return ItemGrassHandler;
 		case Item::Gravel:                             return ItemGravelHandler;
 		case Item::GrayBanner:                         return ItemGrayBannerHandler;
 		case Item::GrayBed:                            return ItemGrayBedHandler;
