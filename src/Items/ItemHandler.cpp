@@ -472,6 +472,7 @@ namespace
 	constexpr cItemSlabHandler              ItemGraniteSlabHandler                     (Item::GraniteSlab);
 	constexpr cItemStairsHandler            ItemGraniteStairsHandler                   (Item::GraniteStairs);
 	constexpr cUnimplementedItemHandler     ItemGraniteWallHandler                     (Item::GraniteWall);
+	constexpr cSimplePlaceableItemHandler   ItemGrassBlockHandler                      (Item::GrassBlock);
 	constexpr cSimplePlaceableItemHandler   ItemGravelHandler                          (Item::Gravel);
 	constexpr cItemBannerHandler            ItemGrayBannerHandler                      (Item::GrayBanner);
 	constexpr cItemBedHandler               ItemGrayBedHandler                         (Item::GrayBed);
