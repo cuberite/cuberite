@@ -7,11 +7,10 @@ namespace Palette_1_14
 {
 	UInt32 From(const BlockState Block)
 	{
-		using namespace Block;
+		/* using namespace Block;
 
 		switch (Block.ID)
 		{
-			/*
 			case AcaciaButton::AcaciaButton(AcaciaButton::Face::Floor, eBlockFace::BLOCK_FACE_ZM, true).ID: return 5906;
 			case AcaciaButton::AcaciaButton(AcaciaButton::Face::Floor, eBlockFace::BLOCK_FACE_ZM, false).ID: return 5907;
 			case AcaciaButton::AcaciaButton(AcaciaButton::Face::Floor, eBlockFace::BLOCK_FACE_ZP, true).ID: return 5908;
@@ -8616,9 +8615,10 @@ namespace Palette_1_14
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_ZM).ID: return 6010;
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_ZP).ID: return 6011;
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XM).ID: return 6012;
-			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XP).ID: return 6013; */
+			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XP).ID: return 6013;
 			default: return 0;
-		}
+		} */
+		return 0;
 	}
 
 	UInt32 From(const Item ID)

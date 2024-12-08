@@ -358,6 +358,7 @@ bool cProtocol_1_17::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x2F: HandlePacketUseItem(a_ByteBuffer); return true;
 		default: break;
 	}
+	UNREACHABLE("");
 }
 
 

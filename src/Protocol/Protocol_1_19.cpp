@@ -222,6 +222,7 @@ bool cProtocol_1_19::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x31: HandlePacketUseItem(a_ByteBuffer); return true;
 		default: break;
 	}
+	UNREACHABLE("");
 }
 
 
@@ -1735,6 +1736,7 @@ bool cProtocol_1_19_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x32: HandlePacketUseItem(a_ByteBuffer); return true;
 		default: break;
 	}
+	UNREACHABLE("");
 }
 
 
@@ -2044,6 +2046,7 @@ bool cProtocol_1_19_3::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x32: HandlePacketUseItem(a_ByteBuffer); return true;
 		default: break;
 	}
+	UNREACHABLE("");
 }
 
 
@@ -2755,6 +2758,7 @@ bool cProtocol_1_19_4::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x32: HandlePacketUseItem(a_ByteBuffer); return true;
 		default: break;
 	}
+	UNREACHABLE("");
 }
 
 

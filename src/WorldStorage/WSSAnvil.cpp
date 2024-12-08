@@ -615,6 +615,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 	m_World->QueueSetChunkData(std::move(Data));
 	return true;
 
+	/*
 	// Load the blockdata, blocklight and skylight:
 	int Level = a_NBT.FindChildByName(0, "Level");
 	if (Level < 0)
@@ -700,7 +701,6 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 
 	Data.IsLightValid = (a_NBT.FindChildByName(Level, "MCSIsLightValid") > 0);
 
-	/*
 	// Uncomment this block for really cool stuff :)
 	// DEBUG magic: Invert the underground, so that we can see the MC generator in action :)
 	bool ShouldInvert[cChunkDef::Width * cChunkDef::Width];
@@ -734,10 +734,10 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			}
 		}
 	}  // for y
-	//*/
+	//
 
 	m_World->QueueSetChunkData(std::move(Data));
-	return true;
+	return true; */
 }
 
 
@@ -1265,7 +1265,7 @@ OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_Ta
 	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Base");
 	if (CurrentLine >= 0)
 	{
-		const auto Color = static_cast<unsigned char>(a_NBT.GetInt(CurrentLine));
+		Color = static_cast<unsigned char>(a_NBT.GetInt(CurrentLine));
 		return std::make_unique<cBannerEntity>(a_Block, a_Pos, m_World, Color);
 	}
 
