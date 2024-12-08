@@ -4,7 +4,10 @@
 
 
 
-
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+#endif
 
 class cSimplePlaceableItemHandler:
 	public cItemHandler
@@ -12,7 +15,6 @@ class cSimplePlaceableItemHandler:
 	using Super = cItemHandler;
 
 public:
-	virtual ~cSimplePlaceableItemHandler() = default;
 
 	using Super::Super;
 
@@ -27,3 +29,8 @@ public:
 		return a_Player.PlaceBlock(a_PlacePosition, BlockItemConverter::FromItem(a_HeldItem.m_ItemType));
 	}
 };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
