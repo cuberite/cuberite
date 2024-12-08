@@ -90,12 +90,12 @@ cClientHandle::cClientHandle(const AString & a_IPString, int a_ViewDistance) :
 	m_State(csConnected),
 	m_NumExplosionsThisTick(0),
 	m_NumBlockChangeInteractionsThisTick(0),
+	m_Allowslisting(true),
 	m_UniqueID(0),
 	m_HasSentPlayerChunk(false),
 	m_Locale("en_GB"),
 	m_LastPlacedSign(s_IllegalPosition),
-	m_ProtocolVersion(0),
-	m_Allowslisting(true)
+	m_ProtocolVersion(0)
 {
 	s_ClientCount++;  // Not protected by CS because clients are always constructed from the same thread
 	m_UniqueID = s_ClientCount;
@@ -1719,8 +1719,8 @@ void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 a_ExpiresAt, co
 	char * tempbfr = new char[a_PublicKey.size() + 16 + 8];
 	// ORDER: player UUID (in binary form big endian format) + ExpiresAt in big endian + publickey
 	memcpy(tempbfr, GetUUID().ToRaw().data(), 16);
-	Int64 toadd = (static_cast<UInt64>(htonl(static_cast<UInt32>(a_ExpiresAt))) << 32) | (static_cast<UInt64>(htonl(static_cast<UInt32>(a_ExpiresAt >> 32))));
-	*(reinterpret_cast<Int64*>(tempbfr + 16)) = toadd;
+	Int64 toadd = (static_cast<Int64>(htonl(static_cast<UInt32>(a_ExpiresAt))) << 32) | (static_cast<Int64>(htonl(static_cast<UInt32>(a_ExpiresAt >> 32))));
+	*(reinterpret_cast<Int64 *>(tempbfr + 16)) = toadd;
 	ContiguousByteBuffer toverify;
 	toverify.append(reinterpret_cast<std::byte*>(tempbfr), 24);
 	toverify.append(a_PublicKey);
