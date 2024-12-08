@@ -1964,7 +1964,6 @@ const cItemHandler & cItemHandler::For(Item a_ItemType)
 		case Item::GraniteStairs:                      return ItemGraniteStairsHandler;
 		case Item::GraniteWall:                        return ItemGraniteWallHandler;
 		case Item::GrassBlock:                         return ItemGrassBlockHandler;
-		case Item::Grass:                              return ItemGrassHandler;
 		case Item::Gravel:                             return ItemGravelHandler;
 		case Item::GrayBanner:                         return ItemGrayBannerHandler;
 		case Item::GrayBed:                            return ItemGrayBedHandler;
@@ -2490,7 +2489,6 @@ const cItemHandler & cItemHandler::For(Item a_ItemType)
 		case Item::SheepSpawnEgg:                      return ItemSheepSpawnEggHandler;
 		case Item::ShelterPotterySherd:                return ItemShelterPotterySherdHandler;
 		case Item::Shield:                             return ItemShieldHandler;
-		case Item::ShortGrass:                         return ItemShortGrassHandler;
 		case Item::Shroomlight:                        return ItemShroomlightHandler;
 		case Item::ShulkerBox:                         return ItemShulkerBoxHandler;
 		case Item::ShulkerShell:                       return ItemShulkerShellHandler;
