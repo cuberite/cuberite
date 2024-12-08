@@ -19,7 +19,7 @@ namespace EnchantmentSerializer
 	void ParseFromNBT(cEnchantments & a_Enchantments, const cParsedNBT & a_NBT, int a_EnchListTagIdx);
 
 	/** Used by NBT parser to convert string names into numeric ids */
-	const static std::map<AString, int> enchantment_names
+	static const std::unordered_map<AString, int> enchantment_names
 	{
 		{"protection",               0},
 		{"fire_protection",          1},
