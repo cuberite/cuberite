@@ -17,10 +17,11 @@ public:
 	cBee();
 
 	CLASS_PROTODEF(cBee)
-private:
+/*
+  private:
 	int m_angertime;
 	int m_CannotEnterHiveTicks;
-	int m_CropsGrownSincePollination;
+	int m_CropsGrownSincePollination; */
 
 
 };
