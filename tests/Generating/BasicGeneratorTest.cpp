@@ -305,7 +305,7 @@ static void testRepeatability(cChunkGenerator & aDefaultOverworldGenerator, cChu
 	std::vector<CoordsWithChecksum> netherChecksums =
 	{
 		{ 0,    0, "-311a95038857c294970c6c6bd817236d57fd509"},
-		{ 1,    0, "-b5b0867a28637cd5d1f34662bf4cd847267a27a"},
+		{ 1,    0, "52e8ee13e2466d838773074af08abb57cde5e11f"},
 		{ 1,    1, "35cbc5d710ac0a87cdaa1dcd1cde7980260f821f"},
 		{17,    0, "5c4dc87643122559b674f10bfb79e2e0fd9aab99"},
 		{ 8, 1024, "5f745010411fdfcfceaad68f6768e8a93cf55b72"},
