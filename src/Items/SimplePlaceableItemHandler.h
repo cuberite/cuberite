@@ -12,6 +12,7 @@ class cSimplePlaceableItemHandler:
 	using Super = cItemHandler;
 
 public:
+	virtual ~cSimplePlaceableItemHandler() = default;
 
 	using Super::Super;
 
