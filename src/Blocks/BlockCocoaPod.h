@@ -27,7 +27,7 @@ private:
 		eBlockFace BlockFace = Block::Cocoa::Facing(a_Chunk.GetBlock(a_Position));
 		auto LogPos = AddFaceDirection(a_Position, BlockFace, true);
 		BlockState LogBlock;
-		if (!a_Chunk.UnboundedRelGetBlock(LogPos, LogBlock));
+		if (!a_Chunk.UnboundedRelGetBlock(LogPos, LogBlock))
 		{
 			return true;
 		}
