@@ -74,7 +74,7 @@ private:
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
 		// Find the type of block the lever is attached to:
-		eBlockFace NeighbourFace;
+		eBlockFace NeighbourFace = eBlockFace::BLOCK_FACE_NONE;
 		switch (Block::Lever::Face(a_Self))
 		{
 			case Block::Lever::Face::Floor:   NeighbourFace = BLOCK_FACE_YP; break;
@@ -108,11 +108,10 @@ private:
 				case Block::Lever::Face::Ceiling: return !cBlockSlabHandler::IsSlabTop(Neighbour);
 			}
 		}
-		else if (cBlockStairsHandler::IsAnyStairType(Neighbour))
+		/* else if (cBlockStairsHandler::IsAnyStairType(Neighbour))
 		{
 			switch (NeighbourFace)
 			{
-				/*
 				UNREACHABLE("unimplemented");
 				case eBlockFace::BLOCK_FACE_YM:
 					return !(NeighborMeta & E_BLOCK_STAIRS_UPSIDE_DOWN);
@@ -130,9 +129,8 @@ private:
 				{
 					return false;
 				}
-				*/
 			}
-		}
+		} */
 		return false;
 	}
 

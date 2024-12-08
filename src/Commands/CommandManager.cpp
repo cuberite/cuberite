@@ -181,8 +181,8 @@ cCommandManager::cCommandNode::GetLiteralCommandNode(const AString & a_NodeName)
 
 void cCommandManager::cCommandNode::WriteCommandTreeInternal(cPacketizer & a_Packet, std::map<cCommandNode *, UInt32> & a_Map, const cProtocol & a_Protocol)
 {
-	Byte flags = static_cast<Byte>(this->m_Type) | (this->m_IsExecutable << 2) | ((this->m_RedirectNode != nullptr) << 3) | ((this->m_SuggestionType != eCommandSuggestionType::None) << 4);
-	a_Packet.WriteBEInt8(flags);
+	const Byte flags = static_cast<Byte>(this->m_Type) | static_cast<Byte>(this->m_IsExecutable << 2) | static_cast<Byte>((this->m_RedirectNode != nullptr) << 3) | static_cast<Byte>((this->m_SuggestionType != eCommandSuggestionType::None) << 4);
+	a_Packet.WriteBEInt8(static_cast<Int8>(flags));
 	a_Packet.WriteVarInt32(static_cast<UInt32>(this->m_ChildrenNodes.size()));
 
 	for (auto & var : this->m_ChildrenNodes)
@@ -239,7 +239,7 @@ cCommandManager::cCommandNode::ComputeChildrenIds(cCommandNode & a_node)
 	std::vector<cCommandNode*> list;
 	CollectChildren(list, a_node);
 	childmap[&a_node] = 0;
-	int i = 1;
+	UInt32 i = 1;
 	for (cCommandNode * var : list)
 	{
 		childmap[var] = i;

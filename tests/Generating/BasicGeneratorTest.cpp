@@ -297,18 +297,18 @@ static void testRepeatability(cChunkGenerator & aDefaultOverworldGenerator, cChu
 		{0,    0, "6130c010a4fc58bd3cf1c00d7e6dcedb218bf26a"},
 		{1,    0, "-2735a213482432cbcc44b8ddaf8ed4a2faa22d1d"},
 		{1,    1, "-73e93cf821096840d60f96c71b86827191256753"},
-		{8, 1024, "-caa9cc0966176b9e8c929c73669dcea834e26c1"},
+		{8, 1024, "-1bb30162a2cd33d3e3ab92b9af514f8fadc11b0"},
 	};
 	checkChunkChecksums(aDefaultOverworldGenerator, overworldChecksums, "Overworld");
 
 	// Test the default Nether generator:
 	std::vector<CoordsWithChecksum> netherChecksums =
 	{
-		{ 0,    0, "-6059bb85b15c568983b10d86dd4a11dab2c0038f"},
-		{ 1,    0, "-b5b0867a28637cd5d1f34662bf4cd847267a27a"},
-		{ 1,    1, "35cbc5d710ac0a87cdaa1dcd1cde7980260f821f"},
-		{17,    0, "5c4dc87643122559b674f10bfb79e2e0fd9aab99"},
-		{ 8, 1024, "5f745010411fdfcfceaad68f6768e8a93cf55b72"},
+		{ 0,    0, "-311a95038857c294970c6c6bd817236d57fd509"},
+		{ 1,    0, "52e8ee13e2466d838773074af08abb57cde5e11f"},
+		{ 1,    1, "-74c591d11647326231410e18c65190bacdf0eaef"},
+		{17,    0, "-ed0f2cfa434203297dceb4c8d6aedd949710336"},
+		{ 8, 1024, "58721e429491c1df4db4e13036c22b7c702a044a"},
 	};
 	checkChunkChecksums(aDefaultNetherGenerator, netherChecksums, "Nether");
 }

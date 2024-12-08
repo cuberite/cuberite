@@ -474,7 +474,6 @@ namespace
 	constexpr cUnimplementedItemHandler     ItemGraniteWallHandler                     (Item::GraniteWall);
 	constexpr cSimplePlaceableItemHandler   ItemGrassBlockHandler                      (Item::GrassBlock);
 	constexpr cUnimplementedItemHandler     ItemGrassHandler                           (Item::Grass);
-	constexpr cSimplePlaceableItemHandler   ItemGrassPathHandler                       (Item::GrassPath);
 	constexpr cSimplePlaceableItemHandler   ItemGravelHandler                          (Item::Gravel);
 	constexpr cItemBannerHandler            ItemGrayBannerHandler                      (Item::GrayBanner);
 	constexpr cItemBedHandler               ItemGrayBedHandler                         (Item::GrayBed);
@@ -503,7 +502,6 @@ namespace
 	constexpr cUnimplementedItemHandler     ItemGrindstoneHandler                      (Item::Grindstone);
 	constexpr cItemSpawnEggHandler          ItemGuardianSpawnEggHandler                (Item::GuardianSpawnEgg);
 	constexpr cDefaultItemHandler           ItemGunpowderHandler                       (Item::Gunpowder);
-	constexpr cItemHayBaleHandler           ItemHayBaleHandler                         (Item::HayBale);
 	constexpr cUnimplementedItemHandler     ItemHeartOfTheSeaHandler                   (Item::HeartOfTheSea);
 	constexpr cSimplePlaceableItemHandler   ItemHeavyWeightedPressurePlateHandler      (Item::HeavyWeightedPressurePlate);
 	constexpr cItemSpawnEggHandler          ItemHoglinSpawnEggHandler                  (Item::HoglinSpawnEgg);
@@ -983,8 +981,6 @@ namespace
 	constexpr cUnimplementedItemHandler     ItemSunflowerHandler                       (Item::Sunflower);
 	constexpr cUnimplementedItemHandler     ItemSuspiciousStewHandler                  (Item::SuspiciousStew);
 	constexpr cUnimplementedItemHandler     ItemSweetBerriesHandler                    (Item::SweetBerries);
-	constexpr cSimplePlaceableItemHandler   ItemTNTHandler                             (Item::TNT);
-	constexpr cItemMinecartHandler          ItemTNTMinecartHandler                     (Item::TNTMinecart);
 	constexpr cUnimplementedItemHandler     ItemTallGrassHandler                       (Item::TallGrass);
 	constexpr cUnimplementedItemHandler     ItemTargetHandler                          (Item::Target);
 	constexpr cUnimplementedItemHandler     ItemTerracottaHandler                      (Item::Terracotta);
@@ -1072,7 +1068,6 @@ namespace
 	constexpr cItemSpawnEggHandler          ItemZoglinSpawnEggHandler                  (Item::ZoglinSpawnEgg);
 	constexpr cItemMobHeadHandler           ItemZombieHeadHandler                      (Item::ZombieHead);
 	constexpr cItemSpawnEggHandler          ItemZombieHorseSpawnEggHandler             (Item::ZombieHorseSpawnEgg);
-	constexpr cItemSpawnEggHandler          ItemZombiePigmanSpawnEggHandler            (Item::ZombiePigmanSpawnEgg);
 	constexpr cItemSpawnEggHandler          ItemZombieSpawnEggHandler                  (Item::ZombieSpawnEgg);
 	constexpr cItemSpawnEggHandler          ItemZombieVillagerSpawnEggHandler          (Item::ZombieVillagerSpawnEgg);
 	constexpr cItemSignHandler              ItemAcaciaHangingSignHandler                 (Item::AcaciaHangingSign);
@@ -1227,7 +1222,7 @@ namespace
 	constexpr cUnimplementedItemHandler     ItemGusterBannerPatternHandler               (Item::GusterBannerPattern);
 	constexpr cUnimplementedItemHandler     ItemGusterPotterySherdHandler                (Item::GusterPotterySherd);
 	constexpr cSimplePlaceableItemHandler   ItemHangingRootsHandler                      (Item::HangingRoots);
-	constexpr cSimplePlaceableItemHandler   ItemHayBlockHandler                          (Item::HayBlock);
+	constexpr cItemHayBaleHandler           ItemHayBlockHandler                          (Item::HayBlock);
 	constexpr cUnimplementedItemHandler     ItemHeartPotterySherdHandler                 (Item::HeartPotterySherd);
 	constexpr cUnimplementedItemHandler     ItemHeartbreakPotterySherdHandler            (Item::HeartbreakPotterySherd);
 	constexpr cSimplePlaceableItemHandler   ItemHeavyCoreHandler                         (Item::HeavyCore);
@@ -1367,7 +1362,7 @@ namespace
 	constexpr cUnimplementedItemHandler     ItemTideArmorTrimSmithingTemplateHandler     (Item::TideArmorTrimSmithingTemplate);
 	constexpr cSimplePlaceableItemHandler   ItemTintedGlassHandler                       (Item::TintedGlass);
 	constexpr cSimplePlaceableItemHandler   ItemTntHandler                               (Item::Tnt);
-	constexpr cUnimplementedItemHandler     ItemTntMinecartHandler                       (Item::TntMinecart);
+	constexpr cItemMinecartHandler          ItemTntMinecartHandler                       (Item::TntMinecart);
 	constexpr cSimplePlaceableItemHandler   ItemTorchflowerHandler                       (Item::Torchflower);
 	constexpr cItemSimpleSeedsHandler       ItemTorchflowerSeedsHandler                  (Item::TorchflowerSeeds);
 	constexpr cUnimplementedItemHandler     ItemTrialKeyHandler                          (Item::TrialKey);
@@ -2493,8 +2488,8 @@ const cItemHandler & cItemHandler::For(Item a_ItemType)
 		case Item::Shears:                             return ItemShearsHandler;
 		case Item::SheepSpawnEgg:                      return ItemSheepSpawnEggHandler;
 		case Item::ShelterPotterySherd:                return ItemShelterPotterySherdHandler;
-		case Item::Shield:                             return ItemShieldHandler;
 		case Item::ShortGrass:                         return ItemShortGrassHandler;
+		case Item::Shield:                             return ItemShieldHandler;
 		case Item::Shroomlight:                        return ItemShroomlightHandler;
 		case Item::ShulkerBox:                         return ItemShulkerBoxHandler;
 		case Item::ShulkerShell:                       return ItemShulkerShellHandler;

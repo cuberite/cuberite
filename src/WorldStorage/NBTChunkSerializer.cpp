@@ -1326,15 +1326,15 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				auto val = temparr[i];
 				auto strval = AString(NamespaceSerializer::From(val.Type()));
 				auto splitpos = std::find(strval.begin(), strval.end(), ' ');
-				auto id_end_index = static_cast<int>(std::distance(strval.begin(), splitpos));
+				auto id_end_index = static_cast<UInt64>(std::distance(strval.begin(), splitpos));
 				AString stringid = strval.substr(0, id_end_index);
 				AString blockstates;
 				AStringVector blockstatesstrings;
 				if (splitpos != strval.end())
 				{
 					hasblockstats = true;
-					auto blockstates = strval.substr(id_end_index + 1, std::string::npos);
-					blockstatesstrings = StringSplit(blockstates, " ");
+					auto blockstates2 = strval.substr(id_end_index + 1, std::string::npos);
+					blockstatesstrings = StringSplit(blockstates2, " ");
 				}
 
 				aWriter.AddString("Name", "minecraft:"+stringid);
@@ -1345,16 +1345,16 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 					{
 						// AString str = blockstatesstrings[j];
 						// auto nameendindex = static_cast<int>(std::distance(strval.begin(), std::find(strval.begin(), strval.end(), ':')));
-						AString val;
+						AString val2;
 						if ((j + 2) >= blockstatesstrings.size())
 						{
-							val = blockstatesstrings[j + 1];
+							val2 = blockstatesstrings[j + 1];
 						}
 						else
 						{
-							val = blockstatesstrings[j + 1].substr(0, blockstatesstrings[j + 1].length() - 1);
+							val2 = blockstatesstrings[j + 1].substr(0, blockstatesstrings[j + 1].length() - 1);
 						}
-						aWriter.AddString(blockstatesstrings[j].substr(0, blockstatesstrings[j].length() - 1), val);
+						aWriter.AddString(blockstatesstrings[j].substr(0, blockstatesstrings[j].length() - 1), val2);
 					}
 					aWriter.EndCompound();
 				}
@@ -1380,7 +1380,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 
 
-			Int64 * arr = new Int64[longarrsize];
+			Int64 * arr = new Int64[static_cast<UInt64>(longarrsize)];
 
 			UInt64 tbuf = 0;
 			int BitIndex = 0;
@@ -1392,8 +1392,8 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 			{
 				auto & v = Blocks->at(i);
 				auto ind = std::find(temparr.begin(), newlistend, v);
-				Int64 towrite = ind - temparr.begin();
-				tbuf |= towrite << BitIndex;
+				UInt64 towrite = static_cast<UInt64>(ind - temparr.begin());
+				tbuf |= static_cast<UInt64>(towrite << BitIndex);
 				BitIndex += bitused;
 				// bitswritten += bitused;
 				// ASSERT(bitswritten >= bw[bw.size() - 1]);
@@ -1406,18 +1406,18 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 					{
 						BitIndex = 0;
 						ASSERT(longindex < longarrsize);
-						arr[longindex] = tbuf;
+						arr[longindex] = static_cast<Int64>(tbuf);
 						tbuf = 0;
 						longindex++;
 					}
 					else
 					{
 						ASSERT(longindex < longarrsize);
-						Int64 upperpart = 0;
+						UInt64 upperpart = 0;
 						if (BitIndex != 64)
 						{
 							upperpart = towrite >> (64 - BitIndex);
-							Int64 lowerpart = towrite & ((static_cast<Int64>(1) << (64 - BitIndex)) - 1);
+							UInt64 lowerpart = towrite & ((static_cast<UInt64>(1) << (64 - BitIndex)) - 1);
 							tbuf |= lowerpart;
 							// bitswritten += 64 - BitIndex;
 							BitIndex = bitused - (64 - BitIndex);
@@ -1431,7 +1431,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 							BitIndex = 0;
 							tbuf = 0;
 						}
-						arr[longindex] = tbuf;
+						arr[longindex] = static_cast<Int64>(tbuf);
 						longindex++;
 						tbuf = 0;
 						tbuf |= upperpart;
@@ -1442,7 +1442,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 			if (Blocks != nullptr)
 			{
-				aWriter.AddLongArray("data", arr, longindex);
+				aWriter.AddLongArray("data", arr, static_cast<UInt64>(longindex));
 			}
 			else
 			{

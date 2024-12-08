@@ -110,8 +110,8 @@ void cProtocol_1_15::SendBlockBreakAnim(UInt32 a_EntityID, Vector3i a_BlockPos, 
 void cProtocol_1_15::SendRenderDistanceCenter(cChunkCoords a_chunk)
 {
 	cPacketizer Pkt(*this, pktRenderDistanceCenter);
-	Pkt.WriteVarInt32(a_chunk.m_ChunkX);
-	Pkt.WriteVarInt32(a_chunk.m_ChunkZ);
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_chunk.m_ChunkX));
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_chunk.m_ChunkZ));
 }
 
 
@@ -211,7 +211,7 @@ void cProtocol_1_15::SendPlayerActionResponse(Vector3i a_blockpos, int a_state_i
 {
 	cPacketizer pkt(*this, pktDifficulty);
 	pkt.WriteXYZPosition64(a_blockpos.x, a_blockpos.y, a_blockpos.z);
-	pkt.WriteVarInt32(a_state_id);
+	pkt.WriteVarInt32(static_cast<UInt32>(a_state_id));
 	pkt.WriteVarInt32(static_cast<UInt32>(a_action));
 	pkt.WriteBool(a_IsApproved);
 }
@@ -392,8 +392,8 @@ void cProtocol_1_15::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	ASSERT(m_State == 3);  // In game mode?
 
 	return;
-	Byte Action;
 	/*
+	Byte Action;
 	switch (a_BlockEntity.GetBlockType())
 	{
 		case E_BLOCK_CHEST:
@@ -423,7 +423,7 @@ void cProtocol_1_15::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 		// case E_BLOCK_CAMPFIRE:       Action = 13; break;
 
 		default: return;  // Block entities change between versions
-	} */
+	}
 
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
 	Pkt.WriteXZYPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
@@ -433,6 +433,7 @@ void cProtocol_1_15::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	WriteBlockEntity(Writer, a_BlockEntity);
 	Writer.Finish();
 	Pkt.WriteBuf(Writer.GetResult());
+	*/
 }
 
 

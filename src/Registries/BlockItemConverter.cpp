@@ -945,11 +945,9 @@ namespace BlockItemConverter
 			default:
 			{
 				LOGERROR("{}: Got unintended item to convert to block: {}", __FUNCTION__, a_Item);
-				ASSERT(!"Converting unintended item to block");
-				return BlockType::Air;
+				UNREACHABLE("Converting unintended item to block");
 			}
 		}
-		return BlockType::Air;
 	}
 
 	Item FromBlock(BlockType a_Block)
@@ -1890,10 +1888,8 @@ namespace BlockItemConverter
 			case BlockType::YellowTerracotta:                return Item::YellowTerracotta;
 			case BlockType::YellowWool:                      return Item::YellowWool;
 			case BlockType::ZombieHead:                      return Item::ZombieHead;
-			default: return Item::Bedrock;
 		}
 		FLOGERROR("{}: Got unintended block to convert to item: {}", __FUNCTION__, a_Block);
-		ASSERT(!"Converting unintended block to item");
-		return Item::Air;
+		UNREACHABLE("Converting unintended block to item");
 	}
 }

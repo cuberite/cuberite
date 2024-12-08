@@ -26776,7 +26776,7 @@ namespace Palette_1_21
 			case CustomStatistic::WalkOnWaterOneCm:             return 9;
 			case CustomStatistic::WalkOneCm:                    return 6;
 			case CustomStatistic::WalkUnderWaterOneCm:          return 13;
-			default: return -1;
+			default: return 0;
 		}
 	}
 	Item ToItem(const UInt32 ID)
@@ -28117,6 +28117,7 @@ namespace Palette_1_21
 			case 1086: return Item::ZombieVillagerSpawnEgg;
 			case 1087: return Item::ZombifiedPiglinSpawnEgg;
 		}
+		return Item::Air;
 	}
 	UInt32 From(const Item ID)
 	{
@@ -29455,7 +29456,7 @@ namespace Palette_1_21
 			case Item::ZombieSpawnEgg: return 1084;
 			case Item::ZombieVillagerSpawnEgg: return 1086;
 			case Item::ZombifiedPiglinSpawnEgg: return 1087;
-			default: return -1;
+			default: return 0;
 		}
 	}
 	UInt32 FromSound(const AString & a_SoundName)
@@ -31083,6 +31084,6 @@ namespace Palette_1_21
 			return 1;
 		}
 
-		return FindResult->second + 1;
+		return static_cast<UInt32>(FindResult->second + 1);
 	}
 }  // namespace Palette_1_21

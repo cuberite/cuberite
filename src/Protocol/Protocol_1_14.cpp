@@ -9,6 +9,7 @@ Implements the 1.14 protocol classes:
 #include "Globals.h"
 #include "Protocol_1_14.h"
 #include "Packetizer.h"
+#include "JsonUtils.h"
 #include "../Root.h"
 #include "../Server.h"
 #include "../World.h"
@@ -18,6 +19,7 @@ Implements the 1.14 protocol classes:
 #include "../BlockEntities/BlockEntity.h"
 
 #include "../Entities/ArrowEntity.h"
+#include "../Entities/ItemFrame.h"
 #include "../Mobs/Bat.h"
 #include "../Entities/Boat.h"
 #include "../Mobs/Chicken.h"
@@ -95,6 +97,10 @@ void cProtocol_1_14::SendBlockChange(Vector3i a_BlockPos, BlockState a_Block)
 
 void cProtocol_1_14::SendEditSign(Vector3i a_BlockPos)
 {
+	{
+		cPacketizer Pkt(*this, pktUpdateSign);
+		Pkt.WriteXZYPosition64(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z);
+	}
 }
 
 
@@ -179,6 +185,32 @@ void cProtocol_1_14::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 
 void cProtocol_1_14::SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataStartY)
 {
+	{
+		cPacketizer Pkt(*this, pktMapData);
+		Pkt.WriteVarInt32(a_Map.GetID());
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Map.GetScale()));
+		Pkt.WriteBool(true);
+		Pkt.WriteBool(false);  // TODO: Implement map locking
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetDecorators().size()));
+		for (const auto & Decorator : a_Map.GetDecorators())
+		{
+			Pkt.WriteVarInt32(static_cast<UInt32>(Decorator.GetType()));
+			Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelX()));
+			Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelZ()));
+			Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetRot()));
+			Pkt.WriteBool(false);  // TODO: Implement display names
+		}
+		// TODO: Remove hardcoded values
+		Pkt.WriteBEUInt8(128);
+		Pkt.WriteBEUInt8(128);
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_DataStartX));
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_DataStartY));
+		Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetData().size()));
+		for (auto itr = a_Map.GetData().cbegin(); itr != a_Map.GetData().cend(); ++itr)
+		{
+			Pkt.WriteBEUInt8(*itr);
+		}
+	}
 }
 
 
@@ -187,6 +219,7 @@ void cProtocol_1_14::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Dat
 
 void cProtocol_1_14::SendPaintingSpawn(const cPainting & a_Painting)
 {
+
 }
 
 
@@ -260,8 +293,8 @@ void cProtocol_1_14::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	return;
-	Byte Action = 0;
 	/*
+	Byte Action = 0;
 	switch (a_BlockEntity.GetBlockType())
 	{
 		case E_BLOCK_CHEST:
@@ -291,7 +324,7 @@ void cProtocol_1_14::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 		// case E_BLOCK_CAMPFIRE:       Action = 13; break;
 
 		default: return;  // Block entities change between versions
-	} */
+	}
 
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
 	Pkt.WriteXZYPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
@@ -300,7 +333,7 @@ void cProtocol_1_14::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	cFastNBTWriter Writer;
 	WriteBlockEntity(Writer, a_BlockEntity);
 	Writer.Finish();
-	Pkt.WriteBuf(Writer.GetResult());
+	Pkt.WriteBuf(Writer.GetResult()); */
 }
 
 
@@ -441,7 +474,7 @@ void cProtocol_1_14::SendWindowOpen(const cWindow & a_Window)
 			}
 		}
 
-		Pkt.WriteString(Printf("{\"text\":\"%s\"}", a_Window.GetWindowTitle().c_str()));
+		Pkt.WriteString(JsonUtils::SerializeSingleValueJsonObject("text", a_Window.GetWindowTitle()));
 	}
 }
 
@@ -1211,7 +1244,11 @@ void cProtocol_1_14::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 
 		case cEntity::etItemFrame:
 		{
-			// TODO
+			const auto & Frame = static_cast<const cItemFrame &>(a_Entity);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemFrameItem, EntityMetadataType::Item);
+			WriteItem(a_Pkt, Frame.GetItem());
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemFrameRotation, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(Frame.GetItemRotation());
 			break;
 		}  // case etItemFrame
 
@@ -1602,8 +1639,6 @@ void cProtocol_1_14::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 		case mtDrowned:
 
-		case mtEndermite:
-
 		case mtEvoker:
 
 		case mtIllusioner:
@@ -1651,6 +1686,7 @@ void cProtocol_1_14::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}
 
+		case mtEndermite:
 		case mtGiant:
 		case mtSilverfish:
 		case mtSquid:

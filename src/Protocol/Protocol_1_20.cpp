@@ -214,8 +214,7 @@ void cProtocol_1_20::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 	// Splits the vector into chunk section and send each separately
 	std::vector<std::pair<int, sSetBlockVector>> YSplit;
 
-	std::sort(
-		vec_copy.begin(), vec_copy.end());
+	std::sort(vec_copy.begin(), vec_copy.end());
 	int OldY = std::numeric_limits<int>::max();
 	int Index = -1;
 	for (const auto & a_Change : vec_copy)
@@ -226,20 +225,20 @@ void cProtocol_1_20::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 			YSplit.emplace_back(SectionY, sSetBlockVector());
 			Index++;
 			OldY = SectionY;
-			YSplit[Index].second.push_back(a_Change);
+			YSplit[static_cast<UInt64>(Index)].second.push_back(a_Change);
 		}
 		else
 		{
-			YSplit[Index].second.push_back(a_Change);
+			YSplit[static_cast<UInt64>(Index)].second.push_back(a_Change);
 		}
 	}
 
 	for (auto& [Y, rel_changes] : YSplit)
 	{
 		cPacketizer Pkt(*this, pktBlockChanges);
-		int64_t encoded_pos =
-			((static_cast<int64_t>(a_ChunkX & 0x3FFFFF)) << 42) |
-			((static_cast<int64_t>(a_ChunkZ & 0x3FFFFF)) << 20) |
+		UInt64 encoded_pos =
+			((static_cast<UInt64>(a_ChunkX & 0x3FFFFF)) << 42) |
+			((static_cast<UInt64>(a_ChunkZ & 0x3FFFFF)) << 20) |
 			(Y & 0xFFFFF);
 
 		Pkt.WriteBEUInt64(encoded_pos);
@@ -247,8 +246,8 @@ void cProtocol_1_20::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 
 		for (const auto & Change : rel_changes)
 		{
-			Int16 Coords = static_cast<Int16>(Change.m_RelY % 16 | (Change.m_RelZ << 4) | (Change.m_RelX << 8));
-			UInt64 packed = Coords | (GetProtocolBlockType(Change.m_Block) << 12);
+			UInt64 Coords = static_cast<UInt64>(Change.m_RelY % 16 | (Change.m_RelZ << 4) | (Change.m_RelX << 8));
+			UInt64 packed = Coords | static_cast<UInt64>(GetProtocolBlockType(Change.m_Block) << 12);
 			Pkt.WriteVarInt64(packed);
 		}
 	}
@@ -784,6 +783,7 @@ bool cProtocol_1_20_2::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 			}
 		}
 	}
+	UNREACHABLE("");
 }
 
 
@@ -1109,8 +1109,8 @@ void cProtocol_1_20_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 	cFastNBTWriter Writer(true);
 	if (a_Item.m_ItemType == Item::Potion)
 	{
-		bool strong_potion = false;
-		bool long_potion = false;
+		// bool strong_potion = false;
+		// bool long_potion = false;
 		AString potionname;
 		AString finalname = "minecraft:";
 
@@ -1147,12 +1147,12 @@ void cProtocol_1_20_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 		}
 		if ((cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1) && (potionname != "thick"))
 		{
-			strong_potion = true;
+			// strong_potion = true;
 			finalname += "strong_";
 		}
 		if (((a_Item.m_ItemDamage & 0x40) == 0x40) && (potionname != "mundane"))
 		{
-			long_potion = true;
+			// long_potion = true;
 			finalname += "long_";
 		}
 		finalname += potionname;
@@ -1437,6 +1437,7 @@ bool cProtocol_1_20_3::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x36: HandlePacketUseItem(a_ByteBuffer); return true;
 		default: break;
 	}
+	UNREACHABLE("");
 }
 
 
@@ -2086,6 +2087,7 @@ bool cProtocol_1_20_5::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 			}
 		}
 	}
+	UNREACHABLE("");
 }
 
 
@@ -2466,7 +2468,7 @@ void cProtocol_1_20_5::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 		a_Pkt.WriteVarInt32(0);
 		return;
 	}
-	a_Pkt.WriteVarInt32(a_Item.m_ItemCount);
+	a_Pkt.WriteVarInt32(static_cast<UInt32>(a_Item.m_ItemCount));
 	a_Pkt.WriteVarInt32(GetProtocolItemType(a_Item.m_ItemType));
 	// TODO: item components
 	a_Pkt.WriteVarInt32(0);
