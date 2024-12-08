@@ -11,7 +11,7 @@ namespace PaletteUpgrade
 	{
 		using namespace Block;
 		switch ((Block << 4) | (Meta & 0x04))
-		{ 
+		{
 			case (0 << 4) | 0: return Air::Air();
 			case (1 << 4) | 0: return Stone::Stone();
 			case (1 << 4) | 1: return Granite::Granite();
