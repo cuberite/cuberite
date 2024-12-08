@@ -467,11 +467,11 @@ public:  // tolua_export
 		{
 
 		}
-		bool IsPopulated() const { return m_IsPopulated; };
-		cUUID GetSessionUUID() const { return m_SessionId; };
-		Int64 GetExpiresAtEpochMiliscond() const { return m_ExpiresAt; };
-		ContiguousByteBuffer GetPublicKey() const { return m_PublicKey; };
-		ContiguousByteBuffer GetKeySignature() const { return m_KeySignature; };
+		bool IsPopulated() const { return m_IsPopulated; }
+		cUUID GetSessionUUID() const { return m_SessionId; }
+		Int64 GetExpiresAtEpochMiliscond() const { return m_ExpiresAt; }
+		ContiguousByteBuffer GetPublicKey() const { return m_PublicKey; }
+		ContiguousByteBuffer GetKeySignature() const { return m_KeySignature; }
 	private:
 		bool m_IsPopulated;
 		cUUID m_SessionId;
