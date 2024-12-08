@@ -286,7 +286,7 @@ cCommandManager::cCommandNode::GetNextPotentialNode(BasicStringReader & a_Reader
 				var.m_Argument->Parse(a_Reader, a_Ctx, var.m_Name);
 				return &var;
 			}
-			catch (const cCommandParseException & ex)
+			catch ([[maybe_unused]] const cCommandParseException & ex)
 			{
 				//  TODO: put exceptions somewhere in case every attempt fails. for now just silently fail
 				a_Reader.SetCursor(oldc);

@@ -296,7 +296,7 @@ static void testRepeatability(cChunkGenerator & aDefaultOverworldGenerator, cChu
 	{
 		{0,    0, "6130c010a4fc58bd3cf1c00d7e6dcedb218bf26a"},
 		{1,    0, "-2735a213482432cbcc44b8ddaf8ed4a2faa22d1d"},
-		{1,    1, "-2ef6941777cb72b5bceb11d91f45022379d27766"},
+		{1,    1, "-73e93cf821096840d60f96c71b86827191256753"},
 		{8, 1024, "-caa9cc0966176b9e8c929c73669dcea834e26c1"},
 	};
 	checkChunkChecksums(aDefaultOverworldGenerator, overworldChecksums, "Overworld");

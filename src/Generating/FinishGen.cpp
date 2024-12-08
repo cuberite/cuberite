@@ -1900,7 +1900,7 @@ cFinishGenOres::OreInfos cFinishGenOres::OreInfosFromString(const AString & a_Or
 AString cFinishGenOres::OreInfosToString(const cFinishGenOres::OreInfos & a_OreInfos)
 {
 	AString res;
-	for (const auto & Ore: a_OreInfos)
+	for ([[maybe_unused]] const auto & Ore: a_OreInfos)
 	{
 		if (!res.empty())
 		{
