@@ -16,15 +16,15 @@ void SetChunkData::UpdateHeightMap()
 			HEIGHTTYPE Height = 0;
 			for (HEIGHTTYPE y = cChunkDef::Height - 1; y > 0; y--)
 			{
-				BLOCKTYPE BlockType = BlockData.GetBlock({x, y, z});
-				if (BlockType != E_BLOCK_AIR)
+				BlockState BlockType = BlockData.GetBlock({x, y, z});
+				if (BlockType != BlockType::Air)
 				{
 					Height = y;
 					break;
 				}
 			}  // for y
 			auto idx = x + cChunkDef::Width * z;
-			HeightMap[idx] = Height;
+			HeightMap[static_cast<UInt64>(idx)] = Height;
 		}  // for z
 	}  // for x
 }

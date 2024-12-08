@@ -3,7 +3,7 @@
 
 #include "../Defines.h"
 #include "../Item.h"
-
+#include "../Registries/Items.h"
 
 
 
@@ -34,17 +34,17 @@ public:
 		dlaBreakBlockInstant,
 	};
 
-	constexpr cItemHandler(int a_ItemType) : m_ItemType(a_ItemType)
+	constexpr cItemHandler(Item a_ItemType) : m_ItemType(a_ItemType)
 	{
-	}
 
+	}
 
 	/** Called when the player tries to place the item (right mouse button, IsPlaceable() == true).
 	a_ClickedPosition is the block that has been clicked to place this item.
 	a_ClickedBlockFace is the face has been clicked to place this item.
 	a_CursorPosition is the position of the player's cursor within a_ClickedBlockFace.
 	If the block placement is refused inside this call, it will automatically revert the client-side changes. */
-	void OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, Vector3i a_ClickedPosition, BLOCKTYPE a_ClickedBlockType, NIBBLETYPE a_ClickedBlockMeta, eBlockFace a_ClickedBlockFace, Vector3i a_CursorPosition) const;
+	void OnPlayerPlace(cPlayer & a_Player, const cItem & a_HeldItem, Vector3i a_ClickedPosition, BlockState a_ClickedBlock, eBlockFace a_ClickedBlockFace, Vector3i a_CursorPosition) const;
 
 	/** Called when the player tries to use the item (right mouse button).
 	Descendants can return false to abort the usage (default behavior). */
@@ -121,24 +121,26 @@ public:
 	virtual bool IsPlaceable(void) const;
 
 	/** Can the anvil repair this item, when a_Item is the second input? */
-	virtual bool CanRepairWithRawMaterial(short a_ItemType) const;
+	virtual bool CanRepairWithRawMaterial(const cItem & a_Item) const;
 
 	/** Returns whether this tool / item can harvest a specific block (e.g. iron pickaxe can harvest diamond ore, but wooden one can't).
 	Defaults to false unless overridden. */
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) const;
+	virtual bool CanHarvestBlock(BlockState a_Block) const;
 
 	/** Returns the strength to break a specific block.
 	Defaults to 1 unless overriden. */
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) const;
+	virtual float GetBlockBreakingStrength(BlockState a_Block) const;
 
 
 protected:
 
-	static const cItemHandler & For(int a_ItemType);
+	static const cItemHandler & For(Item a_ItemType);
 
 	~cItemHandler() = default;
 
-	const int m_ItemType;
+	Item m_ItemType;
+
+	// const Item m_NewItemType;
 
 	/** Performs the actual placement of this placeable item.
 	The descendant handler should call a_Player.PlaceBlock(s) supplying correct values for the newly placed block.

@@ -4,9 +4,10 @@
 
 #include "ItemHandler.h"
 #include "../World.h"
-#include "../Blocks/BlockHandler.h"
 #include "../BlockEntities/BannerEntity.h"
 #include "../Blocks/ChunkInterface.h"
+#include "../Blocks/BlockHandler.h"
+#include "../Blocks/BlockStandingBanner.h"
 
 
 
@@ -36,13 +37,11 @@ private:
 			return false;
 		}
 
-		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_HeldItem](cBlockEntity & a_BlockEntity)
+		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_HeldItem](cBlockEntity & BlockToPlaceEntity)
 		{
-			ASSERT((a_BlockEntity.GetBlockType() == E_BLOCK_STANDING_BANNER) || (a_BlockEntity.GetBlockType() == E_BLOCK_WALL_BANNER));
+			ASSERT(cBlockStandingBannerHandler::IsBlockBanner(BlockToPlaceEntity.GetBlock()));
 
-			cBannerEntity & BannerEntity = static_cast<cBannerEntity &>(a_BlockEntity);
-			BannerEntity.SetBaseColor(static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage));
-			BannerEntity.SetCustomName(a_HeldItem.m_CustomName);
+			static_cast<cBannerEntity &>(BlockToPlaceEntity).SetBaseColor(static_cast<unsigned char>(a_HeldItem.m_ItemDamage));
 			return false;
 		});
 
@@ -61,120 +60,69 @@ private:
 
 
 
+
 	static bool TryPlaceBanner(cPlayer & a_Player, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace)
 	{
-		const auto Rotation = a_Player.GetYaw();
-
-		// Placing on the floor:
-		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
+		using namespace Block;
+		BlockState BlockToPlace;
+		switch (a_ClickedBlockFace)
 		{
-			NIBBLETYPE Meta;
-
-			if ((Rotation >= -11.25f) && (Rotation < 11.25f))
+			// Placing on the floor
+			case BLOCK_FACE_YP:
 			{
-				// South
-				Meta = 0x08;
+				auto Rotation = RotationToFineFace(a_Player.GetYaw());
+				switch (a_Player.GetEquippedItem().m_ItemType)
+				{
+					case Item::BlackBanner:      BlockToPlace = BlackBanner::BlackBanner(Rotation);         break;
+					case Item::RedBanner:        BlockToPlace = RedBanner::RedBanner(Rotation);             break;
+					case Item::GreenBanner:      BlockToPlace = GreenBanner::GreenBanner(Rotation);         break;
+					case Item::BrownBanner:      BlockToPlace = BrownBanner::BrownBanner(Rotation);         break;
+					case Item::BlueBanner:       BlockToPlace = BlueBanner::BlueBanner(Rotation);           break;
+					case Item::PurpleBanner:     BlockToPlace = PurpleBanner::PurpleBanner(Rotation);       break;
+					case Item::CyanBanner:       BlockToPlace = CyanBanner::CyanBanner(Rotation);           break;
+					case Item::LightGrayBanner:  BlockToPlace = LightGrayBanner::LightGrayBanner(Rotation); break;
+					case Item::GrayBanner:       BlockToPlace = GrayBanner::GrayBanner(Rotation);           break;
+					case Item::PinkBanner:       BlockToPlace = PinkBanner::PinkBanner(Rotation);           break;
+					case Item::LimeBanner:       BlockToPlace = LimeBanner::LimeBanner(Rotation);           break;
+					case Item::YellowBanner:     BlockToPlace = YellowBanner::YellowBanner(Rotation);       break;
+					case Item::LightBlueBanner:  BlockToPlace = LightBlueBanner::LightBlueBanner(Rotation); break;
+					case Item::MagentaBanner:    BlockToPlace = MagentaBanner::MagentaBanner(Rotation);     break;
+					case Item::OrangeBanner:     BlockToPlace = OrangeBanner::OrangeBanner(Rotation);       break;
+					case Item::WhiteBanner:      BlockToPlace = WhiteBanner::WhiteBanner(Rotation);         break;
+				}
+				break;
 			}
-			else if ((Rotation >= 11.25f) && (Rotation < 33.75f))
+			case BLOCK_FACE_XM:
+			case BLOCK_FACE_XP:
+			case BLOCK_FACE_ZM:
+			case BLOCK_FACE_ZP:
 			{
-				// SouthSouthWest
-				Meta = 0x09;
+				// placing on the sides
+				auto Facing = a_ClickedBlockFace;//RotationToBlockFace(a_Player.GetYaw());
+				switch (a_Player.GetEquippedItem().m_ItemType)
+				{
+					case Item::BlackBanner:      BlockToPlace = BlackWallBanner::BlackWallBanner(Facing);         break;
+					case Item::RedBanner:        BlockToPlace = RedWallBanner::RedWallBanner(Facing);             break;
+					case Item::GreenBanner:      BlockToPlace = GreenWallBanner::GreenWallBanner(Facing);         break;
+					case Item::BrownBanner:      BlockToPlace = BrownWallBanner::BrownWallBanner(Facing);         break;
+					case Item::BlueBanner:       BlockToPlace = BlueWallBanner::BlueWallBanner(Facing);           break;
+					case Item::PurpleBanner:     BlockToPlace = PurpleWallBanner::PurpleWallBanner(Facing);       break;
+					case Item::CyanBanner:       BlockToPlace = CyanWallBanner::CyanWallBanner(Facing);           break;
+					case Item::LightGrayBanner:  BlockToPlace = LightGrayWallBanner::LightGrayWallBanner(Facing); break;
+					case Item::GrayBanner:       BlockToPlace = GrayWallBanner::GrayWallBanner(Facing);           break;
+					case Item::PinkBanner:       BlockToPlace = PinkWallBanner::PinkWallBanner(Facing);           break;
+					case Item::LimeBanner:       BlockToPlace = LimeWallBanner::LimeWallBanner(Facing);           break;
+					case Item::YellowBanner:     BlockToPlace = YellowWallBanner::YellowWallBanner(Facing);       break;
+					case Item::LightBlueBanner:  BlockToPlace = LightBlueWallBanner::LightBlueWallBanner(Facing); break;
+					case Item::MagentaBanner:    BlockToPlace = MagentaWallBanner::MagentaWallBanner(Facing);     break;
+					case Item::OrangeBanner:     BlockToPlace = OrangeWallBanner::OrangeWallBanner(Facing);       break;
+					case Item::WhiteBanner:      BlockToPlace = WhiteWallBanner::WhiteWallBanner(Facing);         break;
+				}
+				break;
 			}
-			else if ((Rotation >= 23.75f) && (Rotation < 56.25f))
-			{
-				// SouthWest
-				Meta = 0x0a;
-			}
-			else if ((Rotation >= 56.25f) && (Rotation < 78.75f))
-			{
-				// WestSouthWest
-				Meta = 0x0b;
-			}
-			else if ((Rotation >= 78.75f) && (Rotation < 101.25f))
-			{
-				// West
-				Meta = 0x0c;
-			}
-			else if ((Rotation >= 101.25f) && (Rotation < 123.75f))
-			{
-				// WestNorthWest
-				Meta = 0x0d;
-			}
-			else if ((Rotation >= 123.75f) && (Rotation < 146.25f))
-			{
-				// NorthWest
-				Meta = 0x0e;
-			}
-			else if ((Rotation >= 146.25f) && (Rotation < 168.75f))
-			{
-				// NorthNorthWest
-				Meta = 0x0f;
-			}
-			else if ((Rotation >= -168.75f) && (Rotation < -146.25f))
-			{
-				// NorthNorthEast
-				Meta = 0x01;
-			}
-			else if ((Rotation >= -146.25f) && (Rotation < -123.75f))
-			{
-				// NorthEast
-				Meta = 0x02;
-			}
-			else if ((Rotation >= -123.75f) && (Rotation < -101.25f))
-			{
-				// EastNorthEast
-				Meta = 0x03;
-			}
-			else if ((Rotation >= -101.25) && (Rotation < -78.75f))
-			{
-				// East
-				Meta = 0x04;
-			}
-			else if ((Rotation >= -78.75) && (Rotation < -56.25f))
-			{
-				// EastSouthEast
-				Meta = 0x05;
-			}
-			else if ((Rotation >= -56.25f) && (Rotation < -33.75f))
-			{
-				// SouthEast
-				Meta = 0x06;
-			}
-			else if ((Rotation >= -33.75f) && (Rotation < -11.25f))
-			{
-				// SouthSouthEast
-				Meta = 0x07;
-			}
-			else  // degrees jumping from 180 to -180
-			{
-				// North
-				Meta = 0x00;
-			}
-
-			return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_STANDING_BANNER, Meta);
+			default: return false;
 		}
-
-		// We must be placing on the side of a block.
-
-		NIBBLETYPE Meta;
-
-		if (a_ClickedBlockFace == BLOCK_FACE_EAST)
-		{
-			Meta = 0x05;
-		}
-		else if (a_ClickedBlockFace == BLOCK_FACE_WEST)
-		{
-			Meta = 0x04;
-		}
-		else if (a_ClickedBlockFace == BLOCK_FACE_NORTH)
-		{
-			Meta = 0x02;
-		}
-		else  // degrees jumping from 180 to -180
-		{
-			Meta = 0x03;
-		}
-
-		return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_WALL_BANNER, Meta);
+		a_Player.PlaceBlock(a_PlacePosition, BlockToPlace);
+		return true;
 	}
 };

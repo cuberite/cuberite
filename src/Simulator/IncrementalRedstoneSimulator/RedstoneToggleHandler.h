@@ -10,62 +10,63 @@
 
 namespace RedstoneToggleHandler
 {
-	static Vector3i GetOffsetAttachedTo(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+#define GETOFFSETATTACHEDTO(BlockType) \
+{\
+	switch (BlockType::Face(a_Block))\
+	{\
+		case BlockType::Face::Floor:   return { 0, 1, 0 };\
+		case BlockType::Face::Ceiling: return { 0, -1, 0 };\
+		case BlockType::Face::Wall:\
+		{\
+			switch (BlockType::Facing(a_Block))\
+			{\
+				case BLOCK_FACE_NORTH: return { -1, 0, 0 };\
+				case BLOCK_FACE_EAST:  return { 1, 0, 0 };\
+				case BLOCK_FACE_SOUTH: return { 0, 0, -1 };\
+				case BLOCK_FACE_WEST:  return { 0, 0, 1 };\
+				default: return { 0, 0, 0 };\
+			}\
+		}\
+	}\
+	break;\
+}
+
+	static Vector3i GetOffsetAttachedTo(BlockState a_Block)
 	{
-		switch (a_BlockType)
+		using namespace Block;
+		switch (a_Block.Type())
 		{
-			case E_BLOCK_LEVER:
-			{
-				switch (a_Meta & 0x7)
-				{
-					case 0x0:
-					case 0x7: return { 0, 1, 0 };
-					case 0x1: return { -1, 0, 0 };
-					case 0x2: return { 1, 0, 0 };
-					case 0x3: return { 0, 0, -1 };
-					case 0x4: return { 0, 0, 1 };
-					case 0x5:
-					case 0x6: return { 0, -1, 0 };
-					default:
-					{
-						ASSERT(!"Unhandled lever metadata!");
-						return { 0, 0, 0 };
-					}
-				}
-			}
-			case E_BLOCK_STONE_BUTTON:
-			case E_BLOCK_WOODEN_BUTTON:
-			{
-				switch (a_Meta & 0x7)
-				{
-					case 0x0: return { 0, 1, 0 };
-					case 0x1: return { -1, 0, 0 };
-					case 0x2: return { 1, 0, 0 };
-					case 0x3: return { 0, 0, -1 };
-					case 0x4: return { 0, 0, 1 };
-					case 0x5: return { 0, -1, 0 };
-					default:
-					{
-						ASSERT(!"Unhandled button metadata!");
-						return { 0, 0, 0 };
-					}
-				}
-			}
-			default:
-			{
-				ASSERT(!"Unexpected block passed to button/lever handler");
-				return { 0, 0, 0 };
-			}
+			case BlockType::Lever:                    GETOFFSETATTACHEDTO(Lever)
+			case BlockType::AcaciaButton:             GETOFFSETATTACHEDTO(AcaciaButton)
+			case BlockType::BirchButton:              GETOFFSETATTACHEDTO(BirchButton)
+			case BlockType::CrimsonButton:            GETOFFSETATTACHEDTO(CrimsonButton)
+			case BlockType::DarkOakButton:            GETOFFSETATTACHEDTO(DarkOakButton)
+			case BlockType::JungleButton:             GETOFFSETATTACHEDTO(JungleButton)
+			case BlockType::OakButton:                GETOFFSETATTACHEDTO(OakButton)
+			case BlockType::PolishedBlackstoneButton: GETOFFSETATTACHEDTO(PolishedBlackstoneButton)
+			case BlockType::SpruceButton:             GETOFFSETATTACHEDTO(SpruceButton)
+			case BlockType::StoneButton:              GETOFFSETATTACHEDTO(StoneButton)
+			case BlockType::WarpedButton:             GETOFFSETATTACHEDTO(WarpedButton)
+			default: break;
 		}
+		UNREACHABLE(!"Unexpected block passed to button/lever handler");
 	}
 
-	static unsigned char GetPowerLevel(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta)
+	static unsigned char GetPowerLevel(BlockState a_Block)
 	{
-		switch (a_BlockType)
+		switch (a_Block.Type())
 		{
-			case E_BLOCK_LEVER: return cBlockLeverHandler::IsLeverOn(a_Meta) ? 15 : 0;
-			case E_BLOCK_STONE_BUTTON:
-			case E_BLOCK_WOODEN_BUTTON: return cBlockButtonHandler::IsButtonOn(a_Meta) ? 15 : 0;
+			case BlockType::Lever: return cBlockLeverHandler::IsLeverOn(a_Block) ? 15 : 0;
+			case BlockType::AcaciaButton:
+			case BlockType::BirchButton:
+			case BlockType::CrimsonButton:
+			case BlockType::DarkOakButton:
+			case BlockType::JungleButton:
+			case BlockType::OakButton:
+			case BlockType::PolishedBlackstoneButton:
+			case BlockType::SpruceButton:
+			case BlockType::StoneButton:
+			case BlockType::WarpedButton: return cBlockButtonHandler::IsButtonOn(a_Block) ? 15 : 0;
 			default:
 			{
 				ASSERT(!"Unexpected block passed to button/lever handler");
@@ -74,32 +75,30 @@ namespace RedstoneToggleHandler
 		}
 	}
 
-	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, Vector3i a_QueryPosition, BLOCKTYPE a_QueryBlockType, bool IsLinked)
+	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block, Vector3i a_QueryPosition, BlockState a_QueryBlock, bool IsLinked)
 	{
-		UNUSED(a_QueryBlockType);
+		UNUSED(a_QueryBlock);
 
-		const auto Meta = a_Chunk.GetMeta(a_Position);
 		const auto QueryOffset = a_QueryPosition - a_Position;
 
-		if (IsLinked && (QueryOffset != GetOffsetAttachedTo(a_Position, a_BlockType, Meta)))
+		if (IsLinked && (QueryOffset != GetOffsetAttachedTo(a_Block)))
 		{
 			return 0;
 		}
 
-		return GetPowerLevel(a_BlockType, Meta);
+		return GetPowerLevel(a_Block);
 	}
 
-	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, const PowerLevel Power)
+	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BlockState a_Block, const PowerLevel Power)
 	{
-		// LOGD("Evaluating templatio<> the lever/button (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
+		LOGREDSTONE("Evaluating templatio<> the lever/button (%d %d %d)", a_Position.x, a_Position.y, a_Position.z);
 	}
 
-	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta, ForEachSourceCallback & Callback)
+	static void ForValidSourcePositions(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block, ForEachSourceCallback & Callback)
 	{
 		UNUSED(a_Chunk);
 		UNUSED(a_Position);
-		UNUSED(a_BlockType);
-		UNUSED(a_Meta);
+		UNUSED(a_Block);
 		UNUSED(Callback);
 	}
 };

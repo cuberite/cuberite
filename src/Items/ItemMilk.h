@@ -27,7 +27,7 @@ public:
 
 		if (!a_Player->IsGameModeCreative())
 		{
-			a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_BUCKET));
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(Item::Bucket));
 		}
 		return true;
 	}

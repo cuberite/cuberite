@@ -27,14 +27,14 @@ public:
 		return cPluginManager::Get()->CallHookBlockSpread(m_World, a_BlockPos, a_Source);
 	}
 
-	virtual bool CallHookPlayerBreakingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+	virtual bool CallHookPlayerBreakingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BlockState a_Block) override
 	{
-		return cPluginManager::Get()->CallHookPlayerBreakingBlock(a_Player, a_BlockPos, a_BlockFace, a_BlockType, a_BlockMeta);
+		return cPluginManager::Get()->CallHookPlayerBreakingBlock(a_Player, a_BlockPos, a_BlockFace, a_Block);
 	}
 
-	virtual bool CallHookPlayerBrokenBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override
+	virtual bool CallHookPlayerBrokenBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BlockState a_Block) override
 	{
-		return cPluginManager::Get()->CallHookPlayerBrokenBlock(a_Player, a_BlockPos, a_BlockFace, a_BlockType, a_BlockMeta);
+		return cPluginManager::Get()->CallHookPlayerBrokenBlock(a_Player, a_BlockPos, a_BlockFace, a_Block);
 	}
 
 private:

@@ -20,7 +20,7 @@ bool cChunkInterface::DoWithChunkAt(Vector3i a_BlockPos, cChunkCallback a_Callba
 
 
 
-BLOCKTYPE cChunkInterface::GetBlock(Vector3i a_Pos)
+BlockState cChunkInterface::GetBlock(Vector3i a_Pos)
 {
 	return m_ChunkMap->GetBlock(a_Pos);
 }
@@ -29,45 +29,18 @@ BLOCKTYPE cChunkInterface::GetBlock(Vector3i a_Pos)
 
 
 
-NIBBLETYPE cChunkInterface::GetBlockMeta(Vector3i a_Pos)
+void cChunkInterface::SetBlock(Vector3i a_BlockPos, BlockState a_Block)
 {
-	return m_ChunkMap->GetBlockMeta(a_Pos);
+	m_ChunkMap->SetBlock(a_BlockPos, a_Block);
 }
 
 
 
 
 
-bool cChunkInterface::GetBlockTypeMeta(Vector3i a_Pos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta)
+void cChunkInterface::FastSetBlock(Vector3i a_BlockPos, BlockState a_Block)
 {
-	return m_ChunkMap->GetBlockTypeMeta(a_Pos, a_BlockType, a_BlockMeta);
-}
-
-
-
-
-
-void cChunkInterface::SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-	m_ChunkMap->SetBlock(a_BlockPos, a_BlockType, a_BlockMeta);
-}
-
-
-
-
-
-void cChunkInterface::SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData)
-{
-	m_ChunkMap->SetBlockMeta(a_BlockPos, a_MetaData);
-}
-
-
-
-
-
-void cChunkInterface::FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
-{
-	m_ChunkMap->FastSetBlock(a_BlockPos, a_BlockType, a_BlockMeta);
+	m_ChunkMap->FastSetBlock(a_BlockPos, a_Block);
 }
 
 
@@ -103,16 +76,14 @@ bool cChunkInterface::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a
 
 bool cChunkInterface::DigBlock(cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, cEntity * a_Digger)
 {
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta);
+	auto BrokenBlock = GetBlock(a_BlockPos);
 
 	if (!m_ChunkMap->DigBlock(a_BlockPos))
 	{
 		return false;
 	}
 
-	cBlockHandler::For(BlockType).OnBroken(*this, a_WorldInterface, a_BlockPos, BlockType, BlockMeta, a_Digger);
+	cBlockHandler::For(BrokenBlock.Type()).OnBroken(*this, a_WorldInterface, a_BlockPos, BrokenBlock, a_Digger);
 	return true;
 }
 

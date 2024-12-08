@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../BlockEntities/BlockEntity.h"
+#include "../Registries/BlockStates.h"
+#include "../Registries/BlockTypes.h"
 #include "WorldStorage.h"
 #include "FastNBT.h"
 #include "StringCompression.h"
@@ -32,6 +34,8 @@ public:
 
 	cWSSAnvil(cWorld * a_World, int a_CompressionFactor);
 	virtual ~cWSSAnvil() override;
+
+	const static bool newFormat = true;
 
 protected:
 
@@ -103,6 +107,9 @@ protected:
 	/** Copies a_Length bytes of data from the specified NBT Tag's Child into the a_Destination buffer */
 	const std::byte * GetSectionData(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, size_t a_Length);
 
+	/** Same as GetSectionData but uses TAG_LongArray Instead  */
+	const std::byte * GetSectionDataLong(const cParsedNBT & a_NBT, int a_Tag, const AString & a_ChildName, size_t a_Length);
+
 	/** Sets chunk data into the correct file; locks file CS as needed */
 	bool SetChunkData(const cChunkCoords & a_Chunk, ContiguousByteBufferView a_Data);
 
@@ -130,7 +137,7 @@ protected:
 
 	/** Loads the data for a block entity from the specified NBT tag.
 	Returns the loaded block entity, or nullptr upon failure. */
-	OwnedBlockEntity LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a_Tag, Vector3i a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	OwnedBlockEntity LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int a_Tag, Vector3i a_Pos, BlockState a_Block);
 
 	/** Loads a cItem contents from the specified NBT tag; returns true if successful. Doesn't load the Slot tag */
 	bool LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_TagIdx);
@@ -150,25 +157,25 @@ protected:
 	The coordinates are used only for the log message. */
 	bool CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, const AStringVector & a_ExpectedTypes, Vector3i a_Pos);
 
-	OwnedBlockEntity LoadBannerFromNBT           (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadBeaconFromNBT           (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadBedFromNBT              (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadBrewingstandFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadChestFromNBT            (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadCommandBlockFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadDispenserFromNBT        (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadDropperFromNBT          (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadEnchantingTableFromNBT  (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadEnderChestFromNBT       (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadEndPortalFromNBT        (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadFlowerPotFromNBT        (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadFurnaceFromNBT          (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadHopperFromNBT           (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadJukeboxFromNBT          (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadMobHeadFromNBT          (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadMobSpawnerFromNBT       (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadNoteBlockFromNBT        (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
-	OwnedBlockEntity LoadSignFromNBT             (const cParsedNBT & a_NBT, int a_TagIdx, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos);
+	OwnedBlockEntity LoadBannerFromNBT           (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadBeaconFromNBT           (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadBedFromNBT              (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadBrewingstandFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadChestFromNBT            (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadCommandBlockFromNBT     (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadDispenserFromNBT        (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadDropperFromNBT          (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadEnchantingTableFromNBT  (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadEnderChestFromNBT       (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadEndPortalFromNBT        (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadFlowerPotFromNBT        (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadFurnaceFromNBT          (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadHopperFromNBT           (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadJukeboxFromNBT          (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadMobHeadFromNBT          (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadMobSpawnerFromNBT       (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadNoteBlockFromNBT        (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
+	OwnedBlockEntity LoadSignFromNBT             (const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos);
 
 	void LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_EntityTagIdx, std::string_view a_EntityName);
 

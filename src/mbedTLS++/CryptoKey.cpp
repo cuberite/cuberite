@@ -124,18 +124,15 @@ int cCryptoKey::ParsePrivate(const void * a_Data, size_t a_NumBytes, const AStri
 
 	if (a_Password.empty())
 	{
-		return mbedtls_pk_parse_key(
-			&m_Pk,
-			reinterpret_cast<const unsigned char *>(keyData.data()), a_NumBytes + 1,
-			nullptr, 0
-		);
+		return mbedtls_pk_parse_key(&m_Pk, reinterpret_cast<const unsigned char *>(keyData.data()), a_NumBytes + 1, nullptr, 0, mbedtls_ctr_drbg_random, m_CtrDrbg.GetInternal());
 	}
 	else
 	{
 		return mbedtls_pk_parse_key(
 			&m_Pk,
 			reinterpret_cast<const unsigned char *>(keyData.data()), a_NumBytes + 1,
-			reinterpret_cast<const unsigned char *>(a_Password.c_str()), a_Password.size()
+			reinterpret_cast<const unsigned char *>(a_Password.c_str()), a_Password.size(),
+			mbedtls_ctr_drbg_random, m_CtrDrbg.GetInternal()
 		);
 	}
 }

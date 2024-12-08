@@ -12,7 +12,7 @@
 
 cItemFrame::cItemFrame(eBlockFace a_BlockFace, Vector3d a_Pos):
 	Super(etItemFrame, a_BlockFace, a_Pos),
-	m_Item(E_BLOCK_AIR),
+	m_Item(Item::Air),
 	m_ItemRotation(0)
 {
 }
@@ -62,7 +62,7 @@ void cItemFrame::GetDrops(cItems & a_Items, cEntity * a_Killer)
 		a_Items.push_back(m_Item);
 	}
 
-	a_Items.emplace_back(E_ITEM_ITEM_FRAME);
+	a_Items.emplace_back(Item::ItemFrame);
 }
 
 
@@ -108,7 +108,7 @@ void cItemFrame::SpawnOn(cClientHandle & a_ClientHandle)
 	a_ClientHandle.SendSpawnEntity(*this);
 	a_ClientHandle.SendEntityMetadata(*this);
 
-	if (m_Item.m_ItemType == E_ITEM_MAP)
+	if (m_Item.m_ItemType == Item::FilledMap)
 	{
 		cMap * Map = GetWorld()->GetMapManager().GetMapData(static_cast<unsigned>(m_Item.m_ItemDamage));
 		if (Map != nullptr)

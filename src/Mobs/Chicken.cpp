@@ -40,7 +40,7 @@ void cChicken::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	{
 		cItems Drops;
 		m_EggDropTimer = 0;
-		Drops.emplace_back(E_ITEM_EGG, static_cast<char>(1));
+		Drops.emplace_back(Item::Egg);
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 	}
 	else
@@ -65,8 +65,8 @@ void cChicken::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_FEATHER);
-	AddRandomDropItem(a_Drops, 1, 1, IsOnFire() ? E_ITEM_COOKED_CHICKEN : E_ITEM_RAW_CHICKEN);
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, Item::Feather);
+	AddRandomDropItem(a_Drops, 1, 1, IsOnFire() ? Item::CookedChicken : Item::Chicken);
 }
 
 

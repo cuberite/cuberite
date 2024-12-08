@@ -15,8 +15,8 @@ public:
 
 private:
 
-	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const override
+	virtual bool CanSustainPlant(BlockState a_Plant) const override
 	{
-		return a_Plant == E_BLOCK_NETHER_WART;
+		return a_Plant.Type() == BlockType::NetherWart;
 	}
 };
