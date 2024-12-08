@@ -2468,7 +2468,7 @@ void cProtocol_1_20_5::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 		a_Pkt.WriteVarInt32(0);
 		return;
 	}
-	a_Pkt.WriteVarInt32(a_Item.m_ItemCount);
+	a_Pkt.WriteVarInt32(static_cast<UInt32>(a_Item.m_ItemCount));
 	a_Pkt.WriteVarInt32(GetProtocolItemType(a_Item.m_ItemType));
 	// TODO: item components
 	a_Pkt.WriteVarInt32(0);
