@@ -232,7 +232,7 @@ bool cProtocol_1_19::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 void cProtocol_1_19::SendAcknowledgeBlockChange(int a_SequenceId)
 {
 	cPacketizer Pkt(*this, pktPlayerActionResponse);
-	Pkt.WriteVarInt32(a_SequenceId);
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_SequenceId));
 }
 
 
@@ -412,7 +412,7 @@ void cProtocol_1_19::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type)
 	// Send the json string to the client:
 	cPacketizer Pkt(*this, pktChatRaw);
 	Pkt.WriteString(a_MessageRaw);
-	Pkt.WriteVarInt32([a_Type]() -> signed char
+	Pkt.WriteVarInt32([a_Type]() -> UInt32
 	{
 		switch (a_Type)
 		{
@@ -436,7 +436,7 @@ void cProtocol_1_19::SendParticleEffect(const AString & a_ParticleName, Vector3f
 	const auto ParticleID = GetProtocolParticleID(a_ParticleName);
 
 	cPacketizer Pkt(*this, pktParticleEffect);
-	Pkt.WriteVarInt32(ParticleID);
+	Pkt.WriteVarInt32(static_cast<UInt32>(ParticleID));
 
 	Pkt.WriteBool(false);  // Long Distance
 	Pkt.WriteBEDouble(a_Src.x);
@@ -460,11 +460,11 @@ void cProtocol_1_19::SendParticleEffect(const AString & a_ParticleName, Vector3f
 	ASSERT(m_State == 3);  // In game mode?
 
 	return;
-
+	/*
 	const auto ParticleID = GetProtocolParticleID(a_ParticleName);
 
 	cPacketizer Pkt(*this, pktParticleEffect);
-	Pkt.WriteVarInt32(ParticleID);
+	Pkt.WriteVarInt32(static_cast<UInt32>(ParticleID));
 
 	Pkt.WriteBool(false);  // Long Distance
 	Pkt.WriteBEDouble(a_Src.x);
@@ -477,7 +477,7 @@ void cProtocol_1_19::SendParticleEffect(const AString & a_ParticleName, Vector3f
 
 	Pkt.WriteBEFloat(a_ParticleData);
 	Pkt.WriteBEInt32(a_ParticleAmount);
-
+	*/
 	// TODO implement particle specific data
 }
 
@@ -502,7 +502,7 @@ void cProtocol_1_19::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Obj
 	Pkt.WriteByteAngle(a_Entity.GetPitch());
 	Pkt.WriteByteAngle(a_Entity.GetYaw());
 	Pkt.WriteByteAngle(a_Entity.GetHeadYaw());
-	Pkt.WriteVarInt32(a_ObjectData);
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_ObjectData));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedX() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedY() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Entity.GetSpeedZ() * 400));
