@@ -407,7 +407,7 @@ public:
 
 	void SetupNewCommands(void);
 
-	cCommandManager::cCommandNode * GetRootCommandNode() { return &m_RootCommandNode; };
+	cCommandManager::cCommandNode * GetRootCommandNode() { return &m_RootCommandNode; }
 
 private:
 	friend class cRoot;

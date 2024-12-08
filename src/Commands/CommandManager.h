@@ -56,7 +56,7 @@ public:
 		cCommandNode * GetLiteralCommandNode(const AString & a_NodeName);
 
 		cCommandNode * GetNextPotentialNode(BasicStringReader & a_Reader, cCommandExecutionContext & a_Ctx);
-		#if FALSE  // Disables copy constructors
+		#if 0  // Disables copy constructors
 			cCommandNode() = default;
 			~cCommandNode() = default;
 
