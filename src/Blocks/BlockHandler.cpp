@@ -476,9 +476,7 @@ namespace
 	constexpr cBlockSlabHandler                            BlockGraniteSlabHandler(BlockType::GraniteSlab);
 	constexpr cBlockStairsHandler                          BlockGraniteStairsHandler(BlockType::GraniteStairs);
 	constexpr cDefaultBlockHandler                         BlockGraniteWallHandler(BlockType::GraniteWall);
-	constexpr cBlockTallGrassHandler                       BlockGrassHandler(BlockType::ShortGrass);
 	constexpr cBlockGrassHandler                           BlockGrassBlockHandler(BlockType::GrassBlock);
-	constexpr cDefaultBlockHandler                         BlockGrassPathHandler(BlockType::DirtPath);
 	constexpr cBlockGravelHandler                          BlockGravelHandler(BlockType::Gravel);
 	constexpr cDefaultBlockHandler                         BlockGrayBannerHandler(BlockType::GrayBanner);
 	constexpr cBlockBedHandler                             BlockGrayBedHandler(BlockType::GrayBed);
@@ -505,7 +503,6 @@ namespace
 	constexpr cDefaultBlockHandler                         BlockGreenWallBannerHandler(BlockType::GreenWallBanner);
 	constexpr cBlockWoolHandler                            BlockGreenWoolHandler(BlockType::GreenWool);
 	constexpr cDefaultBlockHandler                         BlockGrindstoneHandler(BlockType::Grindstone);
-	constexpr cBlockHayBaleHandler                         BlockHayBaleHandler(BlockType::HayBlock);
 	constexpr cBlockPressurePlateHandler                   BlockHeavyWeightedPressurePlateHandler(BlockType::HeavyWeightedPressurePlate);
 	constexpr cDefaultBlockHandler                         BlockHoneyBlockHandler(BlockType::HoneyBlock);
 	constexpr cDefaultBlockHandler                         BlockHoneycombBlockHandler(BlockType::HoneycombBlock);
@@ -890,7 +887,6 @@ namespace
 	constexpr cBlockSugarCaneHandler                       BlockSugarCaneHandler(BlockType::SugarCane);
 	constexpr cBlockBigFlowerHandler                       BlockSunflowerHandler(BlockType::Sunflower);
 	constexpr cDefaultBlockHandler                         BlockSweetBerryBushHandler(BlockType::SweetBerryBush);
-	constexpr cBlockTNTHandler                             BlockTNTHandler(BlockType::Tnt);
 	constexpr cBlockTallGrassHandler                       BlockTallGrassHandler(BlockType::TallGrass);
 	constexpr cDefaultBlockHandler                         BlockTallSeagrassHandler(BlockType::TallSeagrass);
 	constexpr cDefaultBlockHandler                         BlockTargetHandler(BlockType::Target);
@@ -1083,7 +1079,7 @@ namespace
 	constexpr cDefaultBlockHandler                          BlockGreenCandleHandler(BlockType::GreenCandle);
 	constexpr cDefaultBlockHandler                          BlockGreenCandleCakeHandler(BlockType::GreenCandleCake);
 	constexpr cDefaultBlockHandler                          BlockHangingRootsHandler(BlockType::HangingRoots);
-	constexpr cDefaultBlockHandler                          BlockHayBlockHandler(BlockType::HayBlock);
+	constexpr cBlockHayBaleHandler                          BlockHayBlockHandler(BlockType::HayBlock);
 	constexpr cDefaultBlockHandler                          BlockHeavyCoreHandler(BlockType::HeavyCore);
 	constexpr cDefaultBlockHandler                          BlockInfestedDeepslateHandler(BlockType::InfestedDeepslate);
 	constexpr cBlockSignPostHandler                         BlockJungleHangingSignHandler(BlockType::JungleHangingSign);
@@ -1196,7 +1192,7 @@ namespace
 	constexpr cDefaultBlockHandler                          BlockSuspiciousGravelHandler(BlockType::SuspiciousGravel);
 	constexpr cDefaultBlockHandler                          BlockSuspiciousSandHandler(BlockType::SuspiciousSand);
 	constexpr cDefaultBlockHandler                          BlockTintedGlassHandler(BlockType::TintedGlass);
-	constexpr cDefaultBlockHandler                          BlockTntHandler(BlockType::Tnt);
+	constexpr cBlockTNTHandler                              BlockTntHandler(BlockType::Tnt);
 	constexpr cDefaultBlockHandler                          BlockTorchflowerHandler(BlockType::Torchflower);
 	constexpr cDefaultBlockHandler                          BlockTorchflowerCropHandler(BlockType::TorchflowerCrop);
 	constexpr cDefaultBlockHandler                          BlockTrialSpawnerHandler(BlockType::TrialSpawner);
