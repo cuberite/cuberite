@@ -27,7 +27,8 @@ cProtocol::Version cProtocol_1_21::GetProtocolVersion() const
 
 UInt32 cProtocol_1_21::GetPacketID(ePacketType a_PacketType) const
 {
-	switch (m_State)
+	return Super::GetPacketID(a_PacketType);
+	/* switch (m_State)
 	{
 		case cProtocol::Status:
 		case cProtocol::Login: return Super::GetPacketID(a_PacketType);
@@ -47,8 +48,9 @@ UInt32 cProtocol_1_21::GetPacketID(ePacketType a_PacketType) const
 				// ServerLinksS2CPacket 0x7B
 			}
 			break;
-		// default: ASSERT(false,"Invalid m_State: %d", m_State); break;
+		// default: ASSERT(false, "Invalid m_State: %d", m_State); break;
 	}
+	UNREACHABLE(""); */
 }
 
 
@@ -891,6 +893,7 @@ bool cProtocol_1_21_2::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 			}
 		}
 	}
+	UNREACHABLE("");
 }
 
 
@@ -1581,6 +1584,7 @@ bool cProtocol_1_21_4::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 			}
 		}
 	}
+	UNREACHABLE("");
 }
 
 

@@ -2688,7 +2688,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::ZombifiedPiglinSpawnEgg:            return "zombified_piglin_spawn_egg";
 		default: return "NOT IMPLEMENTED";
 	}
-	UNREACHABLE("Unsupported Item");
+	// UNREACHABLE("Unsupported Item");
 }
 
 

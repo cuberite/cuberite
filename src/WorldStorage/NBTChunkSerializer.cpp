@@ -1333,8 +1333,8 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				if (splitpos != strval.end())
 				{
 					hasblockstats = true;
-					auto blockstates = strval.substr(id_end_index + 1, std::string::npos);
-					blockstatesstrings = StringSplit(blockstates, " ");
+					auto blockstates2 = strval.substr(id_end_index + 1, std::string::npos);
+					blockstatesstrings = StringSplit(blockstates2, " ");
 				}
 
 				aWriter.AddString("Name", "minecraft:"+stringid);
@@ -1345,16 +1345,16 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 					{
 						// AString str = blockstatesstrings[j];
 						// auto nameendindex = static_cast<int>(std::distance(strval.begin(), std::find(strval.begin(), strval.end(), ':')));
-						AString val;
+						AString val2;
 						if ((j + 2) >= blockstatesstrings.size())
 						{
-							val = blockstatesstrings[j + 1];
+							val2 = blockstatesstrings[j + 1];
 						}
 						else
 						{
-							val = blockstatesstrings[j + 1].substr(0, blockstatesstrings[j + 1].length() - 1);
+							val2 = blockstatesstrings[j + 1].substr(0, blockstatesstrings[j + 1].length() - 1);
 						}
-						aWriter.AddString(blockstatesstrings[j].substr(0, blockstatesstrings[j].length() - 1), val);
+						aWriter.AddString(blockstatesstrings[j].substr(0, blockstatesstrings[j].length() - 1), val2);
 					}
 					aWriter.EndCompound();
 				}
