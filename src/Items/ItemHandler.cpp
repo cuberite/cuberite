@@ -2487,6 +2487,7 @@ const cItemHandler & cItemHandler::For(Item a_ItemType)
 		case Item::Shears:                             return ItemShearsHandler;
 		case Item::SheepSpawnEgg:                      return ItemSheepSpawnEggHandler;
 		case Item::ShelterPotterySherd:                return ItemShelterPotterySherdHandler;
+		case Item::ShortGrass:                         return ItemShortGrassHandler;
 		case Item::Shield:                             return ItemShieldHandler;
 		case Item::Shroomlight:                        return ItemShroomlightHandler;
 		case Item::ShulkerBox:                         return ItemShulkerBoxHandler;
