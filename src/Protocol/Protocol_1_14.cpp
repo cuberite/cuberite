@@ -324,7 +324,7 @@ void cProtocol_1_14::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 		// case E_BLOCK_CAMPFIRE:       Action = 13; break;
 
 		default: return;  // Block entities change between versions
-	} */
+	}
 
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
 	Pkt.WriteXZYPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
@@ -333,7 +333,7 @@ void cProtocol_1_14::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	cFastNBTWriter Writer;
 	WriteBlockEntity(Writer, a_BlockEntity);
 	Writer.Finish();
-	Pkt.WriteBuf(Writer.GetResult());
+	Pkt.WriteBuf(Writer.GetResult()); */
 }
 
 
