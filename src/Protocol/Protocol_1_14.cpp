@@ -293,8 +293,8 @@ void cProtocol_1_14::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 	return;
-	Byte Action = 0;
 	/*
+	Byte Action = 0;
 	switch (a_BlockEntity.GetBlockType())
 	{
 		case E_BLOCK_CHEST:
