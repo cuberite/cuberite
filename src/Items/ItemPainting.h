@@ -87,7 +87,7 @@ public:
 			"BurningSkull"
 		};
 
-		auto paint_index = a_World->GetTickRandomNumber(gPaintingTitlesList.size() - 1);
+		auto paint_index = a_World->GetTickRandomNumber(static_cast<int>(gPaintingTitlesList.size()) - 1);
 		auto PaintingTitle = gPaintingTitlesList[static_cast<size_t>(paint_index)];
 
 		// A painting, centred so pickups spawn nicely.

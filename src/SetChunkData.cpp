@@ -24,7 +24,7 @@ void SetChunkData::UpdateHeightMap()
 				}
 			}  // for y
 			auto idx = x + cChunkDef::Width * z;
-			HeightMap[idx] = Height;
+			HeightMap[static_cast<UInt64>(idx)] = Height;
 		}  // for z
 	}  // for x
 }

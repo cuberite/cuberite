@@ -429,7 +429,7 @@ void cCompositeChat::WriteAsNBT(cFastNBTWriter & a_Writer, bool a_ShouldUseChatP
 				a_Writer.EndCompound();
 				AddChatPartStyle(a_Writer, a_Part.Style);
 			},
-			[this, &a_Writer](const ShowAchievementPart & a_Part)
+			[](const ShowAchievementPart & a_Part)
 			{
 				/*
 				a_Writer.AddString("text", a_Part.Text);

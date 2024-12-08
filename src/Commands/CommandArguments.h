@@ -8,6 +8,7 @@
 class cCommandArgument
 {
 public:
+	virtual ~cCommandArgument() = default;
 	cCommandArgument() = default;
 	virtual eCommandParserType GetParserType() const { return eCommandParserType::None; }
 	virtual void WriteProperties(cPacketizer & a_Packet) const { return; }

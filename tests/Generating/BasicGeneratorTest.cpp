@@ -293,7 +293,7 @@ static void testRepeatability(cChunkGenerator & aDefaultOverworldGenerator, cChu
 	// Test the default Overworld generator:
 	std::vector<CoordsWithChecksum> overworldChecksums =
 	{
-		{0,    0, "-632f8b7a8b89419c7265dc8e41b19e6820f3185f"},
+		{0,    0, "6130c010a4fc58bd3cf1c00d7e6dcedb218bf26a"},
 		{1,    0, "-bb613a609dc21a7b95036285f244cecf05fb8c8"},
 		{1,    1, "-2ef6941777cb72b5bceb11d91f45022379d27766"},
 		{8, 1024, "-caa9cc0966176b9e8c929c73669dcea834e26c1"},

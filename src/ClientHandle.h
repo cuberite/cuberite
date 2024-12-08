@@ -408,7 +408,7 @@ public:  // tolua_export
 	void HandleUseItem          (bool a_UsedMainHand);
 	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
 	void HandleWindowClose      (UInt8 a_WindowID);
-	void HandlePlayerSession    (cUUID a_SessionID, Int64 ExpiresAt, const ContiguousByteBuffer & a_PublicKey, const ContiguousByteBuffer & a_KeySignature);
+	void HandlePlayerSession    (cUUID a_SessionID, Int64 a_ExpiresAt, const ContiguousByteBuffer & a_PublicKey, const ContiguousByteBuffer & a_KeySignature);
 
 	/** Called when a recipe from the recipe book is selected */
 	void HandleCraftRecipe      (UInt32 a_RecipeId);
@@ -467,11 +467,11 @@ public:  // tolua_export
 		{
 
 		}
-		bool IsPopulated() const { return m_IsPopulated; };
-		cUUID GetSessionUUID() const { return m_SessionId; };
-		Int64 GetExpiresAtEpochMiliscond() const { return m_ExpiresAt; };
-		ContiguousByteBuffer GetPublicKey() const { return m_PublicKey; };
-		ContiguousByteBuffer GetKeySignature() const { return m_KeySignature; };
+		bool IsPopulated() const { return m_IsPopulated; }
+		cUUID GetSessionUUID() const { return m_SessionId; }
+		Int64 GetExpiresAtEpochMiliscond() const { return m_ExpiresAt; }
+		ContiguousByteBuffer GetPublicKey() const { return m_PublicKey; }
+		ContiguousByteBuffer GetKeySignature() const { return m_KeySignature; }
 	private:
 		bool m_IsPopulated;
 		cUUID m_SessionId;
