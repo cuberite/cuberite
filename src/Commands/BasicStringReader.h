@@ -20,7 +20,7 @@ public:
 			m_Cursor += ret.size() + 1;
 			return ret;
 		}
-		catch (std::out_of_range ex)
+		catch (std::out_of_range & ex)
 		{
 			return "";
 		}

@@ -1319,7 +1319,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 			aWriter.BeginCompound("block_states");
 			aWriter.BeginList("palette", eTagType::TAG_Compound);
 
-			for (size_t i = 0; i < newsize; i++)
+			for (size_t i = 0; i < static_cast<size_t>(newsize); i++)
 			{
 				bool hasblockstats = false;
 				aWriter.BeginCompound("");
@@ -1385,7 +1385,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 			UInt64 tbuf = 0;
 			int BitIndex = 0;
 			int longindex = 0;
-			int toloop = static_cast<int>(Blocks->size());
+			auto toloop = Blocks->size();
 			// int bitswritten = 0;
 			// std::vector<int> bw = {0};
 			for (size_t i = 0; i < toloop; i++)

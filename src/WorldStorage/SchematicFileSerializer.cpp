@@ -165,7 +165,7 @@ void cSchematicFileSerializer::LoadFromSchematicNBT(cBlockArea & a_BlockArea, co
 
 ContiguousByteBuffer cSchematicFileSerializer::SaveToSchematicNBT(const cBlockArea & a_BlockArea)
 {
-	cFastNBTWriter Writer("Schematic");
+	cFastNBTWriter Writer;
 	Writer.AddShort("Width",  static_cast<Int16>(a_BlockArea.m_Size.x));
 	Writer.AddShort("Height", static_cast<Int16>(a_BlockArea.m_Size.y));
 	Writer.AddShort("Length", static_cast<Int16>(a_BlockArea.m_Size.z));
