@@ -571,20 +571,20 @@ void cProtocol_1_17::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 			YSplit.emplace_back(SectionY, sSetBlockVector());
 			Index++;
 			OldY = SectionY;
-			YSplit[Index].second.push_back(a_Change);
+			YSplit[static_cast<UInt64>(Index)].second.push_back(a_Change);
 		}
 		else
 		{
-			YSplit[Index].second.push_back(a_Change);
+			YSplit[static_cast<UInt64>(Index)].second.push_back(a_Change);
 		}
 	}
 
-	for (auto& [Y, rel_changes] : YSplit)
+	for (const auto & [Y, rel_changes] : YSplit)
 	{
 		cPacketizer Pkt(*this, pktBlockChanges);
-		int64_t encoded_pos =
-			((static_cast<int64_t>(a_ChunkX & 0x3FFFFF)) << 42) |
-			((static_cast<int64_t>(a_ChunkZ & 0x3FFFFF)) << 20) |
+		UInt64 encoded_pos =
+			((static_cast<UInt64>(a_ChunkX & 0x3FFFFF)) << 42) |
+			((static_cast<UInt64>(a_ChunkZ & 0x3FFFFF)) << 20) |
 			(Y & 0xFFFFF);
 
 		Pkt.WriteBEUInt64(encoded_pos);
@@ -593,7 +593,7 @@ void cProtocol_1_17::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBloc
 
 		for (const auto & Change : rel_changes)
 		{
-			Int16 Coords = static_cast<Int16>(Change.m_RelY % 16 | (Change.m_RelZ << 4) | (Change.m_RelX << 8));
+			UInt64 Coords = static_cast<UInt64>(Change.m_RelY % 16 | (Change.m_RelZ << 4) | (Change.m_RelX << 8));
 			UInt64 packed = Coords | (GetProtocolBlockType(Change.m_Block) << 12);
 			Pkt.WriteVarInt64(packed);
 		}
@@ -709,7 +709,7 @@ void cProtocol_1_17::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Dat
 		Pkt.WriteVarInt32(static_cast<UInt32>(a_Map.GetDecorators().size()));
 		for (const auto & Decorator : a_Map.GetDecorators())
 		{
-			Pkt.WriteVarInt32(static_cast<Int32>(Decorator.GetType()));
+			Pkt.WriteVarInt32(static_cast<UInt32>(Decorator.GetType()));
 			Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelX()));
 			Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetPixelZ()));
 			Pkt.WriteBEUInt8(static_cast<UInt8>(Decorator.GetRot()));
@@ -1064,7 +1064,7 @@ void cProtocol_1_17_1::SendWholeInventory(const cWindow & a_Window, const cItem 
 	cPacketizer Pkt(*this, pktWindowItems);
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetWindowID()));
 	Pkt.WriteVarInt32(0);  // revision
-	Pkt.WriteVarInt32(static_cast<Int16>(a_Window.GetNumSlots()));
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Window.GetNumSlots()));
 	cItems Slots;
 	a_Window.GetSlots(*(m_Client->GetPlayer()), Slots);
 	for (const auto & Slot : Slots)
