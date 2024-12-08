@@ -1187,6 +1187,10 @@ void cWorld::TickWeather(float a_Dt)
 	}
 	m_RainGradient = std::clamp(m_RainGradient, 0.0F, 1.0F);
 	m_ThunderGradient = std::clamp(m_ThunderGradient, 0.0F, 1.0F);
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
+#endif
 	if (oldrain != m_RainGradient)
 	{
 		BroadcastGameStateChange(eGameStateReason::RainGradientChanged, m_RainGradient);
@@ -1195,7 +1199,9 @@ void cWorld::TickWeather(float a_Dt)
 	{
 		BroadcastGameStateChange(eGameStateReason::ThunderGradientChanged, m_ThunderGradient);
 	}
-
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 	if (m_Weather == eWeather_ThunderStorm)
 	{
 		// 0.5% chance per tick of thunderbolt
