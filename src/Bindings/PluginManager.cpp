@@ -1749,7 +1749,7 @@ void cPluginManager::SetupNewCommands(void)
 {
 #define LITERAL(name) cCommandManager::cCommandNode::Literal(name)
 #define ARGUMENT(name, arg) cCommandManager::cCommandNode::Argument(name, std::make_shared<arg>())
-#define ARGUMENT_ARGS(name, arg, args) cCommandManager::cCommandNode::Argument(name, std::make_shared<arg>(args))
+// #define ARGUMENT_ARGS(name, arg, args) cCommandManager::cCommandNode::Argument(name, std::make_shared<arg>(args))
 #define EXECUTE(exe) [](const cCommandExecutionContext & a_Ctx) -> bool {exe return true;}
 	auto node = cCommandManager::cCommandNode();
 	node.Then(
