@@ -11,6 +11,7 @@
 
 #include "FunctionRef.h"
 #include "ChunkDef.h"
+#include "PointOfInterest.h"
 
 
 
@@ -124,6 +125,32 @@ public:
 
 	void SetAll(const cChunkDef::BlockNibbles & a_BlockLightSource, const cChunkDef::BlockNibbles & a_SkyLightSource);
 	void SetSection(const SectionType & a_BlockLightSource, const SectionType & a_SkyLightSource, size_t a_Y);
+};
+
+
+
+
+
+class cChunkPoiData
+{
+public:
+	typedef std::array<std::vector<cPointOfInterest>, cChunkDef::SectionHeight> PoiData;
+	typedef PoiData::value_type PoiArray;
+
+private:
+	PoiData m_Poies;
+
+public:
+
+	void Assign(const cChunkPoiData & a_Other);
+
+	void AddPoi(const cPointOfInterest & a_Poi);
+	// Only removes POI if it exists
+	void RemovePoi(Vector3i a_Position);
+
+	const PoiArray & GetPoies(size_t a_Y) const { return m_Poies.at(a_Y); }
+
+	PoiData & Data() { return m_Poies; }
 };
 
 
