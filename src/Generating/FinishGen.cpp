@@ -1900,19 +1900,15 @@ cFinishGenOres::OreInfos cFinishGenOres::OreInfosFromString(const AString & a_Or
 AString cFinishGenOres::OreInfosToString(const cFinishGenOres::OreInfos & a_OreInfos)
 {
 	AString res;
-	for ([[maybe_unused]] const auto & Ore: a_OreInfos)
+	for (const auto & Ore: a_OreInfos)
 	{
 		if (!res.empty())
 		{
 			res.append(" | ");
 		}
 
-		/*
 		auto NumericBlock = PaletteUpgrade::ToBlock(Ore.m_OreBlock);
-		AppendPrintf(res, "%s:%d:%d:%d:%d",
-			NamespaceSerializer::From(Ore.m_OreBlock), NumericBlock.second,
-			Ore.m_MaxHeight, Ore.m_NumNests, Ore.m_NestSize
-		); */
+		res = fmt::format(FMT_STRING("%s:%d:%d:%d:%d"), NamespaceSerializer::From(Ore.m_OreBlock), NumericBlock.second, Ore.m_MaxHeight, Ore.m_NumNests, Ore.m_NestSize);
 	}  // for ore - a_OreInfos[]
 	return res;
 }
