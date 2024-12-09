@@ -1326,7 +1326,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				auto val = temparr[i];
 				auto strval = AString(NamespaceSerializer::From(val.Type()));
 				auto splitpos = std::find(strval.begin(), strval.end(), ' ');
-				auto id_end_index = static_cast<int>(std::distance(strval.begin(), splitpos));
+				auto id_end_index = static_cast<UInt64>(std::distance(strval.begin(), splitpos));
 				AString stringid = strval.substr(0, id_end_index);
 				AString blockstates;
 				AStringVector blockstatesstrings;
@@ -1380,7 +1380,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 
 
-			Int64 * arr = new Int64[longarrsize];
+			UInt64 * arr = new UInt64[static_cast<UInt64>(longarrsize)];
 
 			UInt64 tbuf = 0;
 			int BitIndex = 0;
@@ -1392,7 +1392,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 			{
 				auto & v = Blocks->at(i);
 				auto ind = std::find(temparr.begin(), newlistend, v);
-				Int64 towrite = ind - temparr.begin();
+				UInt64 towrite = ind - temparr.begin();
 				tbuf |= towrite << BitIndex;
 				BitIndex += bitused;
 				// bitswritten += bitused;
@@ -1413,11 +1413,11 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 					else
 					{
 						ASSERT(longindex < longarrsize);
-						Int64 upperpart = 0;
+						UInt64 upperpart = 0;
 						if (BitIndex != 64)
 						{
 							upperpart = towrite >> (64 - BitIndex);
-							Int64 lowerpart = towrite & ((static_cast<Int64>(1) << (64 - BitIndex)) - 1);
+							UInt64 lowerpart = towrite & ((static_cast<UInt64>(1) << (64 - BitIndex)) - 1);
 							tbuf |= lowerpart;
 							// bitswritten += 64 - BitIndex;
 							BitIndex = bitused - (64 - BitIndex);
@@ -1442,7 +1442,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 			if (Blocks != nullptr)
 			{
-				aWriter.AddLongArray("data", arr, longindex);
+				aWriter.AddLongArray("data", static_cast<Int64 *>(arr), static_cast<UInt64>(longindex));
 			}
 			else
 			{
