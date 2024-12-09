@@ -3,9 +3,6 @@
 #include "BlockHandler.h"
 
 
-
-
-
 class cBlockVinesHandler final :
 	public cBlockHandler
 {
@@ -15,42 +12,65 @@ public:
 
 	using Super::Super;
 
-private:
-
-	static const NIBBLETYPE VINE_LOST_SUPPORT = 16;
-	static const NIBBLETYPE VINE_UNCHANGED = 17;
-
-
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	enum class Directions
 	{
-		return GetMaxMeta(a_Chunk, a_Position, a_Meta) != VINE_LOST_SUPPORT;
+		East = 0,
+		North = 1,
+		South = 2,
+		Up = 3,
+		West = 4
+	};
+
+	static inline bool IsAttachedTo(BlockState a_Block, eBlockFace a_Face)
+	{
+		switch (a_Face)
+		{
+			case BLOCK_FACE_XM: return Block::Vine::West(a_Block);
+			case BLOCK_FACE_XP: return Block::Vine::East(a_Block);
+			case BLOCK_FACE_YP: return Block::Vine::Up(a_Block);
+			case BLOCK_FACE_ZM: return Block::Vine::North(a_Block);
+			case BLOCK_FACE_ZP: return Block::Vine::South(a_Block);
+			default: return false;
+		}
 	}
 
+	static inline bool OnlyAttachedTo(BlockState a_Block, eBlockFace a_Face)
+	{
+		using namespace Block;
+		switch (a_Face)
+		{
+			case BLOCK_FACE_XM: return (Vine::West(a_Block) &&  !(Vine::East(a_Block) || Vine::Up(a_Block)     || Vine::North(a_Block) || Vine::South(a_Block)));
+			case BLOCK_FACE_XP: return (Vine::East(a_Block) &&  !(Vine::West(a_Block) || Vine::Up(a_Block)     || Vine::North(a_Block) || Vine::South(a_Block)));
+			case BLOCK_FACE_YP: return (Vine::Up(a_Block) &&    !(Vine::East(a_Block) || Vine::West(a_Block)   || Vine::North(a_Block) || Vine::South(a_Block)));
+			case BLOCK_FACE_ZM: return (Vine::North(a_Block) && !(Vine::East(a_Block) || Vine::West(a_Block)   || Vine::Up(a_Block)    || Vine::South(a_Block)));
+			case BLOCK_FACE_ZP: return (Vine::South(a_Block) && !(Vine::East(a_Block) || Vine::West(a_Block)   || Vine::Up(a_Block)    || Vine::North(a_Block)));
+			default: return false;
+		}
+	}
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+private:
+
+	static const unsigned char VINE_LOST_SUPPORT = 16;
+	static const unsigned char VINE_UNCHANGED = 17;
+
+	// TODO(12xx12)
+	/*
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
+	{
+		// return GetMaxMeta(a_Chunk, a_Position, a_Self) != VINE_LOST_SUPPORT;
+		return true;
+	}
+	*/
+
+
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// Only drops self when using shears, otherwise drops nothing:
-		if ((a_Tool == nullptr) || (a_Tool->m_ItemType != E_ITEM_SHEARS))
+		if ((a_Tool == nullptr) || (a_Tool->m_ItemType != Item::Shears))
 		{
 			return {};
 		}
-		return cItem(E_BLOCK_VINES, 1, 0);
-	}
-
-
-
-
-
-	static char MetaDataToDirection(NIBBLETYPE a_MetaData)
-	{
-		switch (a_MetaData)
-		{
-			case 0x1: return BLOCK_FACE_NORTH;
-			case 0x4: return BLOCK_FACE_SOUTH;
-			case 0x8: return BLOCK_FACE_WEST;
-			case 0x2: return BLOCK_FACE_EAST;
-			default:  return BLOCK_FACE_TOP;
-		}
+		return cItem(Item::Vine);
 	}
 
 
@@ -58,20 +78,34 @@ private:
 
 
 	/** Returns true if the specified block type is good for vines to attach to */
-	static bool IsBlockAttachable(BLOCKTYPE a_BlockType)
+	static bool IsBlockAttachable(BlockState a_BlockType)
 	{
-		switch (a_BlockType)
+		switch (a_BlockType.Type())
 		{
-			case E_BLOCK_CHEST:
-			case E_BLOCK_ENDER_CHEST:
-			case E_BLOCK_GLASS:
-			case E_BLOCK_PISTON:
-			case E_BLOCK_PISTON_EXTENSION:
-			case E_BLOCK_REDSTONE_REPEATER_OFF:
-			case E_BLOCK_REDSTONE_REPEATER_ON:
-			case E_BLOCK_STAINED_GLASS:
-			case E_BLOCK_STICKY_PISTON:
-			case E_BLOCK_TRAPPED_CHEST:
+			case BlockType::Chest:
+			case BlockType::EnderChest:
+			case BlockType::Piston:
+			case BlockType::PistonHead:
+			case BlockType::Repeater:
+			case BlockType::Glass:
+			case BlockType::BlackStainedGlass:
+			case BlockType::BlueStainedGlass:
+			case BlockType::BrownStainedGlass:
+			case BlockType::CyanStainedGlass:
+			case BlockType::GrayStainedGlass:
+			case BlockType::GreenStainedGlass:
+			case BlockType::LightBlueStainedGlass:
+			case BlockType::LightGrayStainedGlass:
+			case BlockType::LimeStainedGlass:
+			case BlockType::MagentaStainedGlass:
+			case BlockType::OrangeStainedGlass:
+			case BlockType::PinkStainedGlass:
+			case BlockType::PurpleStainedGlass:
+			case BlockType::RedStainedGlass:
+			case BlockType::YellowStainedGlass:
+			case BlockType::WhiteStainedGlass:
+			case BlockType::StickyPiston:
+			case BlockType::TrappedChest:
 			{
 				// You can't attach a vine to this solid blocks.
 				return false;
@@ -87,100 +121,81 @@ private:
 
 
 
-	/** Returns the meta that has the maximum allowable sides of the vine, given the surroundings and current vine meta.
-	Returns special values for a vine that can continue to exist unchanged, or must die completely. */
-	static NIBBLETYPE GetMaxMeta(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_CurrentMeta)
-	{
-		static const struct
-		{
-			int x, z;
-			NIBBLETYPE Bit;
-		} Coords[] =
-		{
-			{ 0,  1, 1},  // south, ZP
-			{-1,  0, 2},  // west,  XM
-			{ 0, -1, 4},  // north, ZM
-			{ 1,  0, 8},  // east,  XP
-		} ;
-
-		NIBBLETYPE MaxMeta = 0;
-		for (auto & Coord : Coords)
-		{
-			BLOCKTYPE  BlockType;
-			NIBBLETYPE BlockMeta;
-			auto checkPos = a_Position.addedXZ(Coord.x, Coord.z);
-			if (
-				a_Chunk.UnboundedRelGetBlock(checkPos.x, checkPos.y, checkPos.z, BlockType, BlockMeta) &&
-				IsBlockAttachable(BlockType)
-			)
-			{
-				MaxMeta |= Coord.Bit;
-			}
-		}
-
-		// Check if vine above us, add its meta to MaxMeta:
-		const auto AbovePos = a_Position.addedY(1);
-		if (cChunkDef::IsValidHeight(AbovePos) && (a_Chunk.GetBlock(AbovePos) == E_BLOCK_VINES))
-		{
-			MaxMeta |= a_Chunk.GetMeta(AbovePos);
-		}
-
-		NIBBLETYPE Common = a_CurrentMeta & MaxMeta;  // Neighbors that we have and are legal.
-		if (Common != a_CurrentMeta)
-		{
-			bool HasTop = cChunkDef::IsValidHeight(AbovePos) && IsBlockAttachable(a_Chunk.GetBlock(AbovePos));
-			if ((Common == 0) && !HasTop)  // Meta equals 0 also means top. Make a last-ditch attempt to save the vine.
-			{
-				return VINE_LOST_SUPPORT;
-			}
-
-			return Common;
-		}
-
-		return VINE_UNCHANGED;
-	}
-
-
-
-
-
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
 	{
-		a_ChunkInterface.DoWithChunkAt(a_BlockPos, [&](cChunk & a_Chunk)
-		{
+		using namespace Block;
+		BlockState Self = a_ChunkInterface.GetBlock(a_BlockPos);
 
-		const auto Position = cChunkDef::AbsoluteToRelative(a_BlockPos);
-		const auto MaxMeta = GetMaxMeta(a_Chunk, Position, a_Chunk.GetMeta(Position));
-
-		if (MaxMeta == VINE_UNCHANGED)
+		// If not attached - ignore
+		if (!IsAttachedTo(Self, a_WhichNeighbor))
 		{
-			return false;
+			return;
 		}
 
-		// There is a neighbor missing, need to update the meta or even destroy the block.
+		auto BlockToCheck = a_ChunkInterface.GetBlock(AddFaceDirection(a_BlockPos, a_WhichNeighbor));
 
-		if (MaxMeta == VINE_LOST_SUPPORT)
+		// If only attached to this face: destroy
+		if (OnlyAttachedTo(Self, a_WhichNeighbor) && !IsBlockAttachable(BlockToCheck))
 		{
-			// The vine just lost all its support, destroy the block:
-			a_Chunk.SetBlock(Position, E_BLOCK_AIR, 0);
-		}
-		else
-		{
-			// It lost some of its support, set it to what remains (SetBlock to notify neighbors):
-			a_Chunk.SetBlock(Position, E_BLOCK_VINES, MaxMeta);
+			a_ChunkInterface.SetBlock(a_BlockPos, Block::Air::Air());
+			return;
 		}
 
-		return false;
-		});
+		switch (a_WhichNeighbor)
+		{
+			case BLOCK_FACE_XM:
+			{
+				if (!IsBlockAttachable(BlockToCheck))
+				{
+					Self = Vine::Vine(Vine::East(Self), Vine::North(Self), Vine::South(Self), Vine::Up(Self), false);
+				}
+				break;
+			}
+			case BLOCK_FACE_XP:
+			{
+				if (!IsBlockAttachable(BlockToCheck))
+				{
+					Self = Vine::Vine(false, Vine::North(Self), Vine::South(Self), Vine::Up(Self), Vine::West(Self));
+				}
+				break;
+			}
+			case BLOCK_FACE_YP:
+			{
+				if (!IsBlockAttachable(BlockToCheck))
+				{
+					Self = Vine::Vine(Vine::East(Self), Vine::North(Self), Vine::South(Self), false, Vine::West(Self));
+				}
+				break;
+			}
+			case BLOCK_FACE_ZM:
+			{
+				if (!IsBlockAttachable(BlockToCheck))
+				{
+					Self = Vine::Vine(Vine::East(Self), false, Vine::South(Self), Vine::Up(Self), Vine::West(Self));
+				}
+				break;
+			}
+			case BLOCK_FACE_ZP:
+			{
+				if (!IsBlockAttachable(BlockToCheck))
+				{
+					Self = Vine::Vine(Vine::East(Self), Vine::North(Self), false, Vine::Up(Self), Vine::West(Self));
+				}
+				break;
+			}
+			default: break;
+		}
+		a_ChunkInterface.SetBlock(a_BlockPos, Self);
+		return;
 	}
 
 
 
 
 
-	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, const Vector3i a_Position, const NIBBLETYPE a_Meta, const eBlockFace a_ClickedBlockFace, const bool a_ClickedDirectly) const override
+	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, Vector3i a_Position, BlockState a_ClickedBlock, eBlockFace a_ClickedBlockFace, bool a_ClickedDirectly) const override
 	{
-		return !a_ClickedDirectly || (a_HeldItem.m_ItemType != m_BlockType);
+		return !a_ClickedDirectly || (BlockItemConverter::FromItem(a_HeldItem.m_ItemType) != m_BlockType);
 	}
 
 
@@ -206,14 +221,14 @@ private:
 		}
 
 		// Grow one block down, if possible:
-		BLOCKTYPE Block;
-		a_Chunk.UnboundedRelGetBlockType(GrowPos, Block);
-		if (Block == E_BLOCK_AIR)
+		BlockState DestBlock;
+		a_Chunk.UnboundedRelGetBlock(GrowPos, DestBlock);
+		if (cBlockAirHandler::IsBlockAir(DestBlock))
 		{
 			auto WorldPos = a_Chunk.RelativeToAbsolute(GrowPos);
 			if (!a_PluginInterface.CallHookBlockSpread(WorldPos, ssVineSpread))
 			{
-				a_Chunk.UnboundedRelSetBlock(GrowPos, E_BLOCK_VINES, a_Chunk.GetMeta(a_RelPos));
+				a_Chunk.UnboundedRelSetBlock(GrowPos, a_Chunk.GetBlock(a_RelPos));
 			}
 		}
 	}
@@ -222,47 +237,36 @@ private:
 
 
 
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override
+	virtual BlockState RotateCCW(BlockState a_Block) const override
 	{
-		return ((a_Meta >> 1) | (a_Meta << 3)) & 0x0f;  // Rotate bits to the right
+		using namespace Block;
+		return Vine::Vine(Vine::North(a_Block), Vine::West(a_Block), Vine::East(a_Block), Vine::Up(a_Block), Vine::South(a_Block));
 	}
 
 
-
-
-
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) const override
+	virtual BlockState RotateCW(BlockState a_Block) const override
 	{
-		return ((a_Meta << 1) | (a_Meta >> 3)) & 0x0f;  // Rotate bits to the left
+		using namespace Block;
+		return Vine::Vine(Vine::South(a_Block), Vine::East(a_Block), Vine::West(a_Block), Vine::Up(a_Block), Vine::North(a_Block));
 	}
 
 
-
-
-
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) const override
+	virtual BlockState MirrorXY(BlockState a_Block) const override
 	{
-		// Bits 2 and 4 stay, bits 1 and 3 swap
-		return static_cast<NIBBLETYPE>((a_Meta & 0x0a) | ((a_Meta & 0x01) << 2) | ((a_Meta & 0x04) >> 2));
+		using namespace Block;
+		return Vine::Vine(Vine::West(a_Block), Vine::North(a_Block), Vine::South(a_Block), Vine::Up(a_Block), Vine::East(a_Block));
 	}
 
 
-
-
-
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) const override
+	virtual BlockState MirrorYZ(BlockState a_Block) const override
 	{
-		// Bits 1 and 3 stay, bits 2 and 4 swap
-		return static_cast<NIBBLETYPE>((a_Meta & 0x05) | ((a_Meta & 0x02) << 2) | ((a_Meta & 0x08) >> 2));
+		using namespace Block;
+		return Vine::Vine(Vine::East(a_Block), Vine::South(a_Block), Vine::North(a_Block), Vine::Up(a_Block), Vine::West(a_Block));
 	}
 
 
-
-
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 7;
 	}
 } ;

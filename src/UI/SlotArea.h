@@ -361,7 +361,7 @@ public:
 	cSlotAreaBeacon(cBeaconEntity * a_Beacon, cWindow & a_ParentWindow);
 	virtual ~cSlotAreaBeacon() override;
 
-	static bool IsPlaceableItem(short a_ItemType);
+	static bool IsPlaceableItem(Item a_ItemType);
 
 	virtual void          Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem) override;
 	virtual void          DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill) override;

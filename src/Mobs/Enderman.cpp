@@ -40,7 +40,7 @@ public:
 		}
 
 		// Don't check if the player has a pumpkin on his head:
-		if (a_Player.GetEquippedHelmet().m_ItemType == E_BLOCK_PUMPKIN)
+		if (a_Player.GetEquippedHelmet().m_ItemType == Item::CarvedPumpkin)
 		{
 			return false;
 		}
@@ -81,8 +81,7 @@ protected:
 cEnderman::cEnderman(void) :
 	Super("Enderman", mtEnderman, "entity.endermen.hurt", "entity.endermen.death", "entity.endermen.ambient", 0.6f, 2.9f),
 	m_bIsScreaming(false),
-	m_CarriedBlock(E_BLOCK_AIR),
-	m_CarriedMeta(0)
+	m_CarriedBlock(Block::Air::Air())
 {
 }
 
@@ -97,7 +96,7 @@ void cEnderman::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_ENDER_PEARL);
+	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, Item::EnderPearl);
 }
 
 

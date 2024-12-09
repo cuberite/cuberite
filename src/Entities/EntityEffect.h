@@ -7,8 +7,9 @@ class cEntityEffect
 {
 public:
 
+	// Missing luck, unluck, levitation and glowing
 	/** All types of entity effects (numbers correspond to protocol / storage types) */
-	enum eType
+	enum eType : short
 	{
 		effNoEffect       = 0,
 		effSpeed          = 1,
@@ -34,6 +35,11 @@ public:
 		effHealthBoost    = 21,
 		effAbsorption     = 22,
 		effSaturation     = 23,
+		effSlowFalling    = 28,
+		effConduitPower	  = 29,
+		effDolphinsGrace  = 30,
+		effBadOmen		  = 31,
+		effHeroOfTheVillage = 32,
 	} ;
 
 	/** Returns the potion color (used by the client for visuals), based on the potion's damage value */
@@ -552,3 +558,94 @@ public:
 
 
 
+
+class cEntityEffectSlowFalling:
+	public cEntityEffect
+{
+	using Super = cEntityEffect;
+
+public:
+
+	cEntityEffectSlowFalling(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+		Super(a_Duration, a_Intensity, a_DistanceModifier)
+	{
+	}
+
+	virtual void OnTick(cPawn & a_Target) override;
+};
+
+
+
+
+
+class cEntityEffectConduitPower:
+	public cEntityEffect
+{
+	using Super = cEntityEffect;
+
+public:
+
+	cEntityEffectConduitPower(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+		Super(a_Duration, a_Intensity, a_DistanceModifier)
+	{
+	}
+
+	virtual void OnTick(cPawn & a_Target) override;
+};
+
+
+
+
+
+class cEntityEffectDolphinsGrace:
+	public cEntityEffect
+{
+	using Super = cEntityEffect;
+
+public:
+
+	cEntityEffectDolphinsGrace(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+		Super(a_Duration, a_Intensity, a_DistanceModifier)
+	{
+	}
+
+	virtual void OnTick(cPawn & a_Target) override;
+};
+
+
+
+
+
+class cEntityEffectBadOmen:
+	public cEntityEffect
+{
+	using Super = cEntityEffect;
+
+public:
+
+	cEntityEffectBadOmen(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+		Super(a_Duration, a_Intensity, a_DistanceModifier)
+	{
+	}
+
+	virtual void OnTick(cPawn & a_Target) override;
+};
+
+
+
+
+
+class cEntityEffectHeroOfTheVillage:
+	public cEntityEffect
+{
+	using Super = cEntityEffect;
+
+public:
+
+	cEntityEffectHeroOfTheVillage(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+		Super(a_Duration, a_Intensity, a_DistanceModifier)
+	{
+	}
+
+	virtual void OnTick(cPawn & a_Target) override;
+};

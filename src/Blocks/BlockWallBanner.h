@@ -19,7 +19,7 @@ public:
 
 	using Super::Super;
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(const BlockState a_BlockMeta, const cItem * const a_Tool) const override
 	{
 		// Drops handled by the block entity:
 		return {};
@@ -29,22 +29,24 @@ public:
 
 
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Self) const override
 	{
 		Vector3i Offset;
-
-		switch (a_Meta)
+		/*
+		switch (GetBlockFace(Self))
 		{
 			case BLOCK_FACE_ZM: Offset = Vector3i( 0, 0,  1); break;
 			case BLOCK_FACE_ZP: Offset = Vector3i( 0, 0, -1); break;
 			case BLOCK_FACE_XM: Offset = Vector3i( 1, 0,  0); break;
 			case BLOCK_FACE_XP: Offset = Vector3i(-1, 0,  0); break;
 			default: return false;
-		}
+		} */
+
+		// TODO: Implement GetBlockFace
 
 		auto NeighborPos = a_Position + Offset;
-		BLOCKTYPE NeighborType;
-		if (!a_Chunk.UnboundedRelGetBlockType(NeighborPos, NeighborType))
+		BlockState NeighborType;
+		if (!a_Chunk.UnboundedRelGetBlock(NeighborPos, NeighborType))
 		{
 			// The neighbour is not accessible (unloaded chunk), we'll allow it for now.
 			return true;
@@ -56,9 +58,8 @@ public:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 0;
 	}
 } ;

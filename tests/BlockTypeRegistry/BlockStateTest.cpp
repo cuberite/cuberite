@@ -8,18 +8,18 @@
 /** Tests the class constructors with static (hard-coded) data. */
 static void testStaticCreation()
 {
-	LOGD("Testing BlockState creation from static data...");
+	LOGD("Testing CustomBlockState creation from static data...");
 
-	// Create a few BlockStates using the static-data constructors:
-	BlockState bs1v1;
-	BlockState bs2v1("property", "value");
-	BlockState bs3v1({{"property1", "value1"}, {"property2", "value2"}});
-	BlockState bs1v2(bs1v1);
-	BlockState bs2v2(bs2v1);
-	BlockState bs3v2(bs3v1);
-	BlockState bs1v3(bs1v2, {{"added property", "value1"}});
-	BlockState bs2v3(bs2v2, {{"added property", "value2"}});
-	BlockState bs3v3(bs3v2, {{"added property", "value3"}});
+	// Create a few CustomBlockStates using the static-data constructors:
+	CustomBlockState bs1v1;
+	CustomBlockState bs2v1("property", "value");
+	CustomBlockState bs3v1({{"property1", "value1"}, {"property2", "value2"}});
+	CustomBlockState bs1v2(bs1v1);
+	CustomBlockState bs2v2(bs2v1);
+	CustomBlockState bs3v2(bs3v1);
+	CustomBlockState bs1v3(bs1v2, {{"added property", "value1"}});
+	CustomBlockState bs2v3(bs2v2, {{"added property", "value2"}});
+	CustomBlockState bs3v3(bs3v2, {{"added property", "value3"}});
 
 	// Test (in-)equality (v1 = v2 != v3):
 	TEST_EQUAL(bs1v1, bs1v2);
@@ -50,15 +50,15 @@ static void testStaticCreation()
 /** Tests the dynamic-data constructors (map param, deep-copy). */
 static void testDynamicCreation()
 {
-	LOGD("Testing BlockState creation from dynamic data...");
+	LOGD("Testing CustomBlockState creation from dynamic data...");
 
 	using Map = std::map<AString, AString>;
 
 	// Construct from scratch:
 	{
-		BlockState bs1a({{"property", "value"}});
+		CustomBlockState bs1a({{"property", "value"}});
 		Map map1({{"property", "value"}});
-		BlockState bs1b(map1);
+		CustomBlockState bs1b(map1);
 		TEST_EQUAL(bs1a, bs1b);  // Creation works
 		map1.clear();
 		TEST_EQUAL(bs1a, bs1b);  // Created a copy independent of map1
@@ -66,18 +66,18 @@ static void testDynamicCreation()
 
 	// Construct by moving:
 	{
-		BlockState bs2a({{"property", "value"}});
+		CustomBlockState bs2a({{"property", "value"}});
 		Map map2({{"property", "value"}});
-		BlockState bs2b(std::move(map2));
+		CustomBlockState bs2b(std::move(map2));
 		TEST_EQUAL(bs2a, bs2b);  // Creation works
 	}
 
 	// Construct by modifying:
 	{
-		BlockState bsSrc("property1", "value1");
-		BlockState bs3a(bsSrc, {{"property2", "value2"}});
+		CustomBlockState bsSrc("property1", "value1");
+		CustomBlockState bs3a(bsSrc, {{"property2", "value2"}});
 		Map map3({{"property2", "value2"}});
-		BlockState bs3b(bsSrc, map3);
+		CustomBlockState bs3b(bsSrc, map3);
 		TEST_EQUAL(bs3a, bs3b);
 		map3.clear();
 		TEST_EQUAL(bs3a, bs3b);
@@ -91,17 +91,17 @@ static void testDynamicCreation()
 /** Tests replacing the properties in the copy-and-modify constructors. */
 static void testReplacing()
 {
-	LOGD("Testing replacing / removing properties in BlockState copies...");
+	LOGD("Testing replacing / removing properties in CustomBlockState copies...");
 
 	// Test replacing:
-	BlockState bs1("property1", "value1v1");
-	BlockState bs2(bs1, {{"property1", "value1v2"}});
+	CustomBlockState bs1("property1", "value1v1");
+	CustomBlockState bs2(bs1, {{"property1", "value1v2"}});
 	TEST_EQUAL(bs2.value("property1"), "value1v2");  // Stored the new one
 	TEST_EQUAL(bs1.value("property1"), "value1v1");  // Didn't replace in the original
 
 	// Test removing:
-	BlockState bs3(bs1, {{"property1", ""}});
-	BlockState bsEmpty;
+	CustomBlockState bs3(bs1, {{"property1", ""}});
+	CustomBlockState bsEmpty;
 	TEST_EQUAL(bs3, bsEmpty);
 }
 
@@ -112,13 +112,13 @@ static void testReplacing()
 /** Tests the comparison operator. */
 static void testComparison()
 {
-	LOGD("Testing comparison of BlockStates...");
+	LOGD("Testing comparison of CustomBlockStates...");
 
 	// Simple property value tests
-	TEST_FALSE((BlockState({{"a", "a"}}) < BlockState({{"a", "a"}})));
-	TEST_FALSE((BlockState() < BlockState()));
-	TEST_TRUE((BlockState() < BlockState({{"foo", "bar"}})));
-	TEST_FALSE((BlockState({{"foo", "bar"}}) < BlockState()));
+	TEST_FALSE((CustomBlockState({{"a", "a"}}) < CustomBlockState({{"a", "a"}})));
+	TEST_FALSE((CustomBlockState() < CustomBlockState()));
+	TEST_TRUE((CustomBlockState() < CustomBlockState({{"foo", "bar"}})));
+	TEST_FALSE((CustomBlockState({{"foo", "bar"}}) < CustomBlockState()));
 }
 
 
@@ -130,14 +130,14 @@ static void testComparison2()
 {
 	/* The following test ensures that items inserted in different order result
 	in the same map. I.e. that the < operator is stable. */
-	std::vector<BlockState> v;
-	std::map<BlockState, bool> map1;
-	std::map<BlockState, bool> map2;
+	std::vector<CustomBlockState> v;
+	std::map<CustomBlockState, bool> map1;
+	std::map<CustomBlockState, bool> map2;
 
 	for (int i = 0; i < 128; ++i)
 	{
-		v.push_back(BlockState({{std::string(1, static_cast<char>(0x1F)), std::string(1, static_cast<char>(i))}}));
-		v.push_back(BlockState({{std::string(1, static_cast<char>(0x10)), std::string(1, static_cast<char>(i | 0x80))},
+		v.push_back(CustomBlockState({{std::string(1, static_cast<char>(0x1F)), std::string(1, static_cast<char>(i))}}));
+		v.push_back(CustomBlockState({{std::string(1, static_cast<char>(0x10)), std::string(1, static_cast<char>(i | 0x80))},
 			{std::string(1, static_cast<char>(0x0F)), std::string(1, static_cast<char>(0x80))}}));
 	}
 
@@ -165,7 +165,7 @@ static void testComparison2()
 
 
 
-IMPLEMENT_TEST_MAIN("BlockStateTest",
+IMPLEMENT_TEST_MAIN("CustomBlockStateTest",
 	testStaticCreation();
 	testDynamicCreation();
 	testReplacing();

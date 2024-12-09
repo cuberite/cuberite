@@ -32,6 +32,13 @@ set (SHARED_SRCS
 
 	${PROJECT_SOURCE_DIR}/src/WorldStorage/FastNBT.cpp
 	${PROJECT_SOURCE_DIR}/src/WorldStorage/SchematicFileSerializer.cpp
+
+	${PROJECT_SOURCE_DIR}/src/Registries/BlockStates.cpp  # Need for BlockState
+	${PROJECT_SOURCE_DIR}/src/Registries/BlockItemConverter.cpp
+	${PROJECT_SOURCE_DIR}/src/Protocol/Palettes/Upgrade.cpp
+	${PROJECT_SOURCE_DIR}/src/BlockState.cpp
+	${PROJECT_SOURCE_DIR}/src/WorldStorage/NamespaceSerializer.cpp
+	${PROJECT_SOURCE_DIR}/src/BlockInfo.cpp
 )
 
 set (SHARED_HDRS

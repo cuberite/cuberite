@@ -34,20 +34,20 @@ public:
 		}
 
 		// Check that there's rail in there:
-		BLOCKTYPE Block = a_World->GetBlock(a_ClickedBlockPos);
-		switch (Block)
+		auto Block = a_World->GetBlock(a_ClickedBlockPos);
+		switch (Block.Type())
 		{
-			case E_BLOCK_MINECART_TRACKS:
-			case E_BLOCK_POWERED_RAIL:
-			case E_BLOCK_DETECTOR_RAIL:
-			case E_BLOCK_ACTIVATOR_RAIL:
+			case BlockType::Rail:
+			case BlockType::PoweredRail:
+			case BlockType::DetectorRail:
+			case BlockType::ActivatorRail:
 			{
 				// These are allowed
 				break;
 			}
 			default:
 			{
-				LOGD("Used minecart on an unsuitable block %d (%s)", Block, ItemTypeToString(Block).c_str());
+				LOGD("Used minecart on an unsuitable block %d (%s)", "MISSING FUNCTION TO CONVERT BLOCK TO STRING!!", "Missing function for BlockState -> String");
 				return false;
 			}
 		}

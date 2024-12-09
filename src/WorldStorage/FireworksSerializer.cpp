@@ -8,11 +8,11 @@
 
 
 
-void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFastNBTWriter & a_Writer, const ENUM_ITEM_TYPE a_Type)
+void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFastNBTWriter & a_Writer, const Item a_ItemType)
 {
-	switch (a_Type)
+	switch (a_ItemType)
 	{
-		case E_ITEM_FIREWORK_ROCKET:
+		case Item::FireworkRocket:
 		{
 			a_Writer.BeginCompound("Fireworks");
 			a_Writer.AddByte("Flight", static_cast<Byte>(a_FireworkItem.m_FlightTimeInTicks / 20));
@@ -34,7 +34,7 @@ void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFa
 			a_Writer.EndCompound();
 			break;
 		}
-		case E_ITEM_FIREWORK_STAR:
+		case Item::FireworkStar:
 		{
 			a_Writer.BeginCompound("Explosion");
 			a_Writer.AddByte("Flicker", a_FireworkItem.m_HasFlicker);
@@ -59,7 +59,7 @@ void cFireworkItem::WriteToNBTCompound(const cFireworkItem & a_FireworkItem, cFa
 
 
 
-void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNBT & a_NBT, int a_TagIdx, const ENUM_ITEM_TYPE a_Type)
+void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNBT & a_NBT, int a_TagIdx, const Item a_Type)
 {
 	if (a_TagIdx < 0)
 	{
@@ -68,7 +68,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 
 	switch (a_Type)
 	{
-		case E_ITEM_FIREWORK_STAR:
+		case Item::FireworkStar:
 		{
 			for (int explosiontag = a_NBT.GetFirstChild(a_TagIdx); explosiontag >= 0; explosiontag = a_NBT.GetNextSibling(explosiontag))
 			{
@@ -131,7 +131,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 			}
 			break;
 		}
-		case E_ITEM_FIREWORK_ROCKET:
+		case Item::FireworkRocket:
 		{
 			for (int fireworkstag = a_NBT.GetFirstChild(a_TagIdx); fireworkstag >= 0; fireworkstag = a_NBT.GetNextSibling(fireworkstag))
 			{
@@ -148,7 +148,7 @@ void cFireworkItem::ParseFromNBT(cFireworkItem & a_FireworkItem, const cParsedNB
 					int ExplosionsChild = a_NBT.GetFirstChild(fireworkstag);
 					if ((a_NBT.GetType(ExplosionsChild) == TAG_Compound) && (a_NBT.GetName(ExplosionsChild).empty()))
 					{
-						ParseFromNBT(a_FireworkItem, a_NBT, ExplosionsChild, E_ITEM_FIREWORK_STAR);
+						ParseFromNBT(a_FireworkItem, a_NBT, ExplosionsChild, Item::FireworkStar);
 					}
 				}
 			}
@@ -228,7 +228,7 @@ void cFireworkItem::FadeColoursFromString(const AString & a_String, cFireworkIte
 
 
 
-int cFireworkItem::GetVanillaColourCodeFromDye(NIBBLETYPE a_DyeMeta)
+int cFireworkItem::GetVanillaColourCodeFromDye(unsigned char a_DyeMeta)
 {
 	/*
 	Colours are supposed to be calculated via: R << 16 + G << 8 + B
