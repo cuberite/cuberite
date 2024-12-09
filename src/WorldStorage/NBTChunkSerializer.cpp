@@ -1393,7 +1393,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				auto & v = Blocks->at(i);
 				auto ind = std::find(temparr.begin(), newlistend, v);
 				UInt64 towrite = ind - temparr.begin();
-				tbuf |= towrite << BitIndex;
+				tbuf |= static_cast<UInt64>(towrite << BitIndex);
 				BitIndex += bitused;
 				// bitswritten += bitused;
 				// ASSERT(bitswritten >= bw[bw.size() - 1]);
