@@ -36,7 +36,7 @@ public:
 	static void DigestToHex(const Checksum & a_Digest, AString & a_Out);
 
 	/** Converts a raw 160-bit SHA1 digest into a Java Hex representation
-	According to http://wiki.vg/Protocol_Encryption
+	According to https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol_Encryption
 	*/
 	static void DigestToJava(const Checksum & a_Digest, AString & a_Out);
 

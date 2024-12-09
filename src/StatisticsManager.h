@@ -12,7 +12,7 @@ In case you are trying to add new statistics to Cuberite you need to do a few th
 In case you want to add a mapping of network IDs to the used stats
 you will find a lua script in ../Tools/BlockTypePaletteGenerator/ExportStatMapping.lua
 it will provide you with information how to use it. you need a registries.json
-exported from the server https://wiki.vg/Data_Generators
+exported from the server https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Data_Generators
 
 		Greetings 12xx12 */
 

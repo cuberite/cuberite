@@ -2576,7 +2576,7 @@ void cProtocol_1_8_0::HandlePacketPlayerPosLook(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_8_0::HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer)
 {
-	// https://wiki.vg/index.php?title=Plugin_channels&oldid=14089#MC.7CAdvCmd
+	// https://wiki.vg/index.php?title=Plugin_channels&oldid=14089#MC.7CAdvCmd -- page probably no longer exists
 
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Channel);
 
