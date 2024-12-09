@@ -75,9 +75,9 @@ public:
 	virtual void SendExplosion                  (Vector3f a_Position, float a_Power) override;
 	virtual void SendGameMode                   (eGameMode a_GameMode) override;
 	virtual void SendHealth                     (void) override;
-	virtual void SendHeldItemChange             (int a_ItemIndex) override;
+	virtual void SendHeldItemChange             (std::size_t a_ItemIndex) override;
 	virtual void SendHideTitle                  (void) override;
-	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
+	virtual void SendInventorySlot              (char a_WindowID, std::size_t a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive                  (UInt32 a_PingID) override;
 	virtual void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) override;

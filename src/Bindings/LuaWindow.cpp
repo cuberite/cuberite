@@ -20,7 +20,7 @@ extern "C"
 ////////////////////////////////////////////////////////////////////////////////
 // cLuaWindow:
 
-cLuaWindow::cLuaWindow(cLuaState & a_LuaState, cWindow::WindowType a_WindowType, int a_SlotsX, int a_SlotsY, const AString & a_Title) :
+cLuaWindow::cLuaWindow(cLuaState & a_LuaState, cWindow::WindowType a_WindowType, std::size_t a_SlotsX, std::size_t a_SlotsY, const AString & a_Title) :
 	Super(a_WindowType, a_Title),
 	m_Contents(a_SlotsX, a_SlotsY),
 	m_LuaState(a_LuaState.QueryCanonLuaState())
@@ -179,7 +179,7 @@ void cLuaWindow::Destroy(void)
 
 
 
-void cLuaWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
+void cLuaWindow::DistributeStack(cItem & a_ItemStack, std::size_t a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
 {
 	cSlotAreas Areas;
 	for (auto && Area : m_SlotAreas)
@@ -197,14 +197,14 @@ void cLuaWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Pl
 
 
 
-void cLuaWindow::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
+void cLuaWindow::OnSlotChanged(cItemGrid * a_ItemGrid, std::size_t a_SlotNum)
 {
 	ASSERT(a_ItemGrid == &m_Contents);
 
 	// If an OnSlotChanged callback has been registered, call it:
 	if (m_OnSlotChanged != nullptr)
 	{
-		m_OnSlotChanged->Call(this, a_SlotNum);
+		m_OnSlotChanged->Call(this, static_cast<UInt32>(a_SlotNum));
 	}
 }
 
@@ -212,16 +212,16 @@ void cLuaWindow::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 
 
-void cLuaWindow::Clicked(cPlayer & a_Player, int a_WindowID, short a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+void cLuaWindow::Clicked(cPlayer & a_Player, int a_WindowID, std::size_t a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
 {
 	if (m_OnClicked != nullptr)
 	{
 		// Plugin can stop a click
 		bool res;
-		if (m_OnClicked->Call(this, &a_Player, a_SlotNum, a_ClickAction, a_ClickedItem, cLuaState::Return, res) && res)
+		if (m_OnClicked->Call(this, &a_Player, static_cast<UInt32>(a_SlotNum), a_ClickAction, a_ClickedItem, cLuaState::Return, res) && res)
 		{
 			// Tell the client the actual state of the window
-			a_Player.GetClientHandle()->SendInventorySlot(-1, -1, a_Player.GetDraggingItem());
+			a_Player.GetClientHandle()->SendInventorySlot(-1, ILLEGAL_SLOT_NUMBER, a_Player.GetDraggingItem());
 			BroadcastWholeWindow();
 			return;
 		}
