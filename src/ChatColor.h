@@ -32,7 +32,7 @@ public:
 	static const char * White;
 
 	// Styles
-	// source: https://minecraft.wiki/w/Text_format
+	// source: https://minecraft.wiki/w/Formatting_codes
 	static const char * Random;
 	static const char * Bold;
 	static const char * Strikethrough;
