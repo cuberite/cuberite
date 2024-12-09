@@ -2745,18 +2745,15 @@ void cSlotAreaTemporary::TossItems(cPlayer & a_Player, int a_Begin, int a_End)
 		return;
 	}
 
-	cItems Drops;
 	for (int i = a_Begin; i < a_End; i++)
 	{
 		cItem & Item = itr->second[static_cast<size_t>(i)];
 		if (!Item.IsEmpty())
 		{
-			Drops.push_back(Item);
+			a_Player.TossPickup(Item);
+			Item.Empty();
 		}
-		Item.Empty();
 	}  // for i - itr->second[]
-
-	a_Player.TossItems(Drops);
 }
 
 
