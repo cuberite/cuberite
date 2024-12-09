@@ -175,8 +175,6 @@ bool cServer::InitServer(cSettingsRepositoryInterface & a_Settings, bool a_Shoul
 
 	m_Ports = ReadUpgradeIniPorts(a_Settings, "Server", "Ports", "Port", "PortsIPv6", "25565");
 
-	LOGINFO("Server Running On Port: %s", m_Ports[0]);
-
 	m_RCONServer.Initialize(a_Settings);
 
 	m_bIsConnected = true;
@@ -413,6 +411,7 @@ bool cServer::Start(void)
 		auto Handle = cNetwork::Listen(PortNum, std::make_shared<cServerListenCallbacks>(*this, PortNum));
 		if (Handle->IsListening())
 		{
+			LOGINFO("Server Running On Port: %s", port.c_str());
 			m_ServerHandles.push_back(Handle);
 		}
 	}  // for port - Ports[]
