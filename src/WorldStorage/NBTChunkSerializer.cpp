@@ -1380,7 +1380,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 
 
-			UInt64 * arr = new UInt64[static_cast<UInt64>(longarrsize)];
+			Int64 * arr = new Int64[static_cast<UInt64>(longarrsize)];
 
 			UInt64 tbuf = 0;
 			int BitIndex = 0;
@@ -1406,7 +1406,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 					{
 						BitIndex = 0;
 						ASSERT(longindex < longarrsize);
-						arr[longindex] = tbuf;
+						arr[longindex] = static_cast<Int64>(tbuf);
 						tbuf = 0;
 						longindex++;
 					}
@@ -1431,7 +1431,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 							BitIndex = 0;
 							tbuf = 0;
 						}
-						arr[longindex] = tbuf;
+						arr[longindex] = static_cast<Int64>(tbuf);
 						longindex++;
 						tbuf = 0;
 						tbuf |= upperpart;
@@ -1442,7 +1442,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 			if (Blocks != nullptr)
 			{
-				aWriter.AddLongArray("data", static_cast<Int64 *>(arr), static_cast<UInt64>(longindex));
+				aWriter.AddLongArray("data", arr, static_cast<UInt64>(longindex));
 			}
 			else
 			{
