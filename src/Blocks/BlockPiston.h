@@ -46,7 +46,7 @@ public:
 	static Vector3i MetadataToOffset(NIBBLETYPE a_PistonMeta);
 
 	static void ExtendPiston(Vector3i a_BlockPos, cWorld & a_World);
-	static void RetractPiston(Vector3i a_BlockPos, cWorld & a_World);
+	static void RetractPiston(Vector3i a_BlockPos, cWorld & a_World, bool should_pull_block);
 
 	/** Returns true if the piston (with the specified meta) is extended */
 	static inline bool IsExtended(NIBBLETYPE a_PistonMeta) { return ((a_PistonMeta & 0x8) != 0x0); }
