@@ -525,7 +525,7 @@ inline void cChunkDataSerializer::Serialize477(const int a_ChunkX, const int a_C
 template <auto Palette>
 inline void cChunkDataSerializer::WriteBlockSectionSeamless(const ChunkBlockData::BlockArray * a_Blocks, const ChunkBlockData::MetaArray * a_Metas, const UInt8 a_BitsPerEntry)
 {
-	// https://wiki.vg/Chunk_Format#Data_structure
+	// https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Chunk_Format#Data_structure
 
 	// We shift a UInt64 by a_BitsPerEntry, the latter cannot be too big:
 	ASSERT(a_BitsPerEntry < 64);
