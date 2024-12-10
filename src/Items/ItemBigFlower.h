@@ -27,22 +27,70 @@ public:
 
 		const auto & World = *a_Player.GetWorld();
 		const auto TopPos = a_PlacePosition.addedY(1);
-		BLOCKTYPE TopType;
-		NIBBLETYPE TopMeta;
-		if (!World.GetBlockTypeMeta(TopPos, TopType, TopMeta))
+		BlockState BlockToReplace;
+		if (World.GetBlock(TopPos, BlockToReplace))
 		{
 			return false;
 		}
 
-		if (!cBlockHandler::For(TopType).DoesIgnoreBuildCollision(World, a_HeldItem, TopPos, TopMeta, a_ClickedBlockFace, false))
+		if (!cBlockHandler::For(BlockToReplace.Type()).DoesIgnoreBuildCollision(World, a_HeldItem, TopPos, BlockToReplace, a_ClickedBlockFace, false))
 		{
 			return false;
 		}
 
-		return a_Player.PlaceBlocks(
+		using namespace Block;
+
+		switch (a_HeldItem.m_ItemDamage)
 		{
-			{ a_PlacePosition, E_BLOCK_BIG_FLOWER, static_cast<NIBBLETYPE>(a_HeldItem.m_ItemDamage & 0x07) },
-			{ TopPos,          E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_TOP }
-		});
+			case E_META_BIG_FLOWER_SUNFLOWER:
+			{
+				return a_Player.PlaceBlocks(
+				{
+					{ a_PlacePosition, Sunflower::Sunflower(Sunflower::Half::Lower) },
+					{ TopPos,          Sunflower::Sunflower(Sunflower::Half::Upper) }
+				});
+			}
+			case E_META_BIG_FLOWER_LILAC:
+			{
+				return a_Player.PlaceBlocks(
+				{
+					{ a_PlacePosition, Lilac::Lilac(Lilac::Half::Lower) },
+					{ TopPos,           Lilac::Lilac(Lilac::Half::Upper) }
+				});
+			}
+			case E_META_BIG_FLOWER_DOUBLE_TALL_GRASS:
+			{
+				return a_Player.PlaceBlocks(
+				{
+					{ a_PlacePosition, TallGrass::TallGrass(TallGrass::Half::Lower) },
+					{ TopPos,          TallGrass::TallGrass(TallGrass::Half::Upper) }
+				});
+			}
+			case E_META_BIG_FLOWER_LARGE_FERN:
+			{
+				return a_Player.PlaceBlocks(
+				{
+					{ a_PlacePosition, LargeFern::LargeFern(LargeFern::Half::Lower) },
+					{ TopPos,          LargeFern::LargeFern(LargeFern::Half::Upper) }
+				});
+			}
+			case E_META_BIG_FLOWER_ROSE_BUSH:
+			{
+				return a_Player.PlaceBlocks(
+				{
+					{ a_PlacePosition, RoseBush::RoseBush(RoseBush::Half::Lower) },
+					{ TopPos,          RoseBush::RoseBush(RoseBush::Half::Upper) }
+				});
+			}
+			case E_META_BIG_FLOWER_PEONY:
+			{
+				return a_Player.PlaceBlocks(
+				{
+					{ a_PlacePosition, Peony::Peony(Peony::Half::Lower) },
+					{ TopPos,          Peony::Peony(Peony::Half::Upper) }
+				});
+			}
+			default: return false;
+		}
 	}
 };

@@ -383,7 +383,7 @@ void cWindow::BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum)
 
 void cWindow::SendWholeWindow(cClientHandle & a_Client)
 {
-	a_Client.SendWholeInventory(*this);
+	a_Client.SendWholeInventory(*this, a_Client.GetPlayer()->GetDraggingItem());
 }
 
 

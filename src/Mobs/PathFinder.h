@@ -85,7 +85,7 @@ private:
 	void ResetPathFinding(cChunk &a_Chunk);
 
 	/** Return true the the blocktype is either water or solid */
-	bool IsWaterOrSolid(BLOCKTYPE a_BlockType);
+	bool IsWaterOrSolid(BlockState a_BlockType);
 
 	/** Is the path too old and should be recalculated? When this is true ResetPathFinding() is called. */
 	bool PathIsTooOld() const;

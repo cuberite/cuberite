@@ -400,7 +400,7 @@ bool cEnchantments::operator !=(const cEnchantments & a_Other) const
 
 
 
-void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, unsigned a_EnchantmentLevel)
+void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, Item a_ItemType, unsigned a_EnchantmentLevel)
 {
 	if (ItemCategory::IsSword(a_ItemType))
 	{
@@ -682,7 +682,7 @@ void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantm
 		}
 	}
 
-	else if (a_ItemType == E_ITEM_BOW)
+	else if (a_ItemType == Item::Bow)
 	{
 		// Power
 		if ((a_EnchantmentLevel >= 31) && (a_EnchantmentLevel <= 46))
@@ -720,7 +720,7 @@ void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantm
 		}
 	}
 
-	else if (a_ItemType == E_ITEM_FISHING_ROD)
+	else if (a_ItemType == Item::FishingRod)
 	{
 		// Luck of the Sea and Lure
 		if ((a_EnchantmentLevel >= 33) && (a_EnchantmentLevel <= 83))
@@ -740,7 +740,7 @@ void cEnchantments::AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantm
 		}
 	}
 
-	else if (a_ItemType == E_ITEM_BOOK)
+	else if (a_ItemType == Item::Book)
 	{
 		// All Enchantments
 

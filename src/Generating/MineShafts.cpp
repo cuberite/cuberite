@@ -481,11 +481,11 @@ void cMineShaftDirtRoom::ProcessChunk(cChunkDesc & a_ChunkDesc)
 		{
 			for (int y = m_BoundingBox.p1.y + 1; y < m_BoundingBox.p2.y; y++)
 			{
-				a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
+				a_ChunkDesc.SetBlock({x, y, z}, Block::Air::Air());
 			}
-			if (a_ChunkDesc.GetBlockType(x, m_BoundingBox.p1.y, z) != E_BLOCK_AIR)
+			if (a_ChunkDesc.GetBlock({x, m_BoundingBox.p1.y, z}).Type() != BlockType::Air)
 			{
-				a_ChunkDesc.SetBlockType(x, m_BoundingBox.p1.y, z, E_BLOCK_DIRT);
+				a_ChunkDesc.SetBlock({x, m_BoundingBox.p1.y, z}, Block::Dirt::Dirt());
 			}
 		}  // for x
 	}  // for z
@@ -648,18 +648,18 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 	cCuboid Top(RelBoundingBox);
 	Top.p2.y += 1;
 	Top.p1.y = Top.p2.y;
-	a_ChunkDesc.FillRelCuboid(RelBoundingBox, E_BLOCK_AIR, 0);
-	a_ChunkDesc.RandomFillRelCuboid(Top, E_BLOCK_AIR, 0, (BlockX ^ (BlockZ + BlockX)), 8000);
+	a_ChunkDesc.FillRelCuboid(RelBoundingBox, Block::Air::Air());
+	a_ChunkDesc.RandomFillRelCuboid(Top, Block::Air::Air(), (BlockX ^ (BlockZ + BlockX)), 8000);
 	if (m_SpawnerPosition >= 0)
 	{
 		// Cobwebs around the spider spawner
-		a_ChunkDesc.RandomFillRelCuboid(RelBoundingBox, E_BLOCK_COBWEB, 0, (BlockX ^ (BlockZ + BlockZ)), 8000);
-		a_ChunkDesc.RandomFillRelCuboid(Top,            E_BLOCK_COBWEB, 0, (BlockX ^ (BlockZ + BlockX)), 5000);
+		a_ChunkDesc.RandomFillRelCuboid(RelBoundingBox, Block::Cobweb::Cobweb(), (BlockX ^ (BlockZ + BlockZ)), 8000);
+		a_ChunkDesc.RandomFillRelCuboid(Top,            Block::Cobweb::Cobweb(), (BlockX ^ (BlockZ + BlockX)), 5000);
 	}
-	a_ChunkDesc.RandomFillRelCuboid(Top, E_BLOCK_COBWEB, 0, (BlockX ^ (BlockZ + BlockX + 10)), 500);
+	a_ChunkDesc.RandomFillRelCuboid(Top, Block::Cobweb::Cobweb(), (BlockX ^ (BlockZ + BlockX + 10)), 500);
 	RelBoundingBox.p1.y = m_BoundingBox.p1.y;
 	RelBoundingBox.p2.y = m_BoundingBox.p1.y;
-	a_ChunkDesc.FloorRelCuboid(RelBoundingBox, E_BLOCK_PLANKS, 0);
+	a_ChunkDesc.FloorRelCuboid(RelBoundingBox, Block::OakPlanks::OakPlanks());
 	switch (m_Direction)
 	{
 		case dirXM:
@@ -679,19 +679,19 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 				}
 				if ((z1 >= 0) && (z1 < cChunkDef::Width))
 				{
-					a_ChunkDesc.SetBlockTypeMeta(x, y1, z1, E_BLOCK_FENCE, 0);
-					a_ChunkDesc.SetBlockTypeMeta(x, y2, z1, E_BLOCK_FENCE, 0);
-					a_ChunkDesc.SetBlockTypeMeta(x, y3, z1, E_BLOCK_PLANKS, 0);
+					a_ChunkDesc.SetBlock({x, y1, z1}, Block::OakFence::OakFence());
+					a_ChunkDesc.SetBlock({x, y2, z1}, Block::OakFence::OakFence());
+					a_ChunkDesc.SetBlock({x, y3, z1}, Block::OakPlanks::OakPlanks());
 				}
 				if ((z2 >= 0) && (z2 < cChunkDef::Width))
 				{
-					a_ChunkDesc.SetBlockTypeMeta(x, y1, z2, E_BLOCK_FENCE, 0);
-					a_ChunkDesc.SetBlockTypeMeta(x, y2, z2, E_BLOCK_FENCE, 0);
-					a_ChunkDesc.SetBlockTypeMeta(x, y3, z2, E_BLOCK_PLANKS, 0);
+					a_ChunkDesc.SetBlock({x, y1, z2}, Block::OakFence::OakFence());
+					a_ChunkDesc.SetBlock({x, y2, z2}, Block::OakFence::OakFence());
+					a_ChunkDesc.SetBlock({x, y3, z2}, Block::OakPlanks::OakPlanks());
 				}
 				if ((z1 >= -1) && (z1 < cChunkDef::Width - 1) && m_HasFullBeam[i])
 				{
-					a_ChunkDesc.SetBlockTypeMeta(x, y3, z1 + 1, E_BLOCK_PLANKS, 0);
+					a_ChunkDesc.SetBlock({x, y3, z1 + 1}, Block::OakPlanks::OakPlanks());
 				}
 			}  // for i - NumSegments
 			break;
@@ -714,19 +714,19 @@ void cMineShaftCorridor::ProcessChunk(cChunkDesc & a_ChunkDesc)
 				}
 				if ((x1 >= 0) && (x1 < cChunkDef::Width))
 				{
-					a_ChunkDesc.SetBlockTypeMeta(x1, y1, z, E_BLOCK_FENCE, 0);
-					a_ChunkDesc.SetBlockTypeMeta(x1, y2, z, E_BLOCK_FENCE, 0);
-					a_ChunkDesc.SetBlockTypeMeta(x1, y3, z, E_BLOCK_PLANKS, 0);
+					a_ChunkDesc.SetBlock({x1, y1, z}, Block::OakFence::OakFence());
+					a_ChunkDesc.SetBlock({x1, y2, z}, Block::OakFence::OakFence());
+					a_ChunkDesc.SetBlock({x1, y3, z}, Block::OakPlanks::OakPlanks());
 				}
 				if ((x2 >= 0) && (x2 < cChunkDef::Width))
 				{
-					a_ChunkDesc.SetBlockTypeMeta(x2, y1, z, E_BLOCK_FENCE, 0);
-					a_ChunkDesc.SetBlockTypeMeta(x2, y2, z, E_BLOCK_FENCE, 0);
-					a_ChunkDesc.SetBlockTypeMeta(x2, y3, z, E_BLOCK_PLANKS, 0);
+					a_ChunkDesc.SetBlock({x2, y1, z}, Block::OakFence::OakFence());
+					a_ChunkDesc.SetBlock({x2, y2, z}, Block::OakFence::OakFence());
+					a_ChunkDesc.SetBlock({x2, y3, z}, Block::OakPlanks::OakPlanks());
 				}
 				if ((x1 >= -1) && (x1 < cChunkDef::Width - 1) && m_HasFullBeam[i])
 				{
-					a_ChunkDesc.SetBlockTypeMeta(x1 + 1, y3, z, E_BLOCK_PLANKS, 0);
+					a_ChunkDesc.SetBlock({x1 + 1, y3, z}, Block::OakPlanks::OakPlanks());
 				}
 			}  // for i - NumSegments
 			break;
@@ -747,18 +747,18 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 {
 	static const cLootProbab LootProbab[] =
 	{
-		// Item,                          MinAmount, MaxAmount, Weight
-		{ cItem(E_ITEM_IRON),             1,         5,         10 },
-		{ cItem(E_ITEM_GOLD),             1,         3,          5 },
-		{ cItem(E_ITEM_REDSTONE_DUST),    4,         9,          5 },
-		{ cItem(E_ITEM_DIAMOND),          1,         2,          3 },
-		{ cItem(E_ITEM_DYE, 1, 4),        4,         9,          5 },  // lapis lazuli dye
-		{ cItem(E_ITEM_COAL),             3,         8,         10 },
-		{ cItem(E_ITEM_BREAD),            1,         3,         15 },
-		{ cItem(E_ITEM_IRON_PICKAXE),     1,         1,          1 },
-		{ cItem(E_BLOCK_MINECART_TRACKS), 4,         8,          1 },
-		{ cItem(E_ITEM_MELON_SEEDS),      2,         4,         10 },
-		{ cItem(E_ITEM_PUMPKIN_SEEDS),    2,         4,         10 },
+		// Item,                        MinAmount, MaxAmount, Weight
+		{ cItem(Item::IronIngot),       1,         5,         10 },
+		{ cItem(Item::GoldIngot),       1,         3,          5 },
+		{ cItem(Item::Redstone),        4,         9,          5 },
+		{ cItem(Item::Diamond),         1,         2,          3 },
+		{ cItem(Item::LapisLazuli),     4,         9,          5 },
+		{ cItem(Item::Coal),            3,         8,         10 },
+		{ cItem(Item::Bread),           1,         3,         15 },
+		{ cItem(Item::IronPickaxe),     1,         1,          1 },
+		{ cItem(Item::Rail),            4,         8,          1 },
+		{ cItem(Item::MelonSeeds),      2,         4,         10 },
+		{ cItem(Item::PumpkinSeeds),    2,         4,         10 },
 	} ;
 
 	if (m_ChestPosition < 0)
@@ -769,7 +769,7 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 	int BlockX = a_ChunkDesc.GetChunkX() * cChunkDef::Width;
 	int BlockZ = a_ChunkDesc.GetChunkZ() * cChunkDef::Width;
 	int x, z;
-	NIBBLETYPE Meta = 0;
+	eBlockFace Facing;
 	[&]
 	{
 		switch (m_Direction)
@@ -779,7 +779,7 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 			{
 				x = m_BoundingBox.p1.x + m_ChestPosition - BlockX;
 				z = m_BoundingBox.p1.z - BlockZ;
-				Meta = E_META_CHEST_FACING_ZP;
+				Facing = eBlockFace::BLOCK_FACE_ZP;
 				return;
 			}
 
@@ -788,7 +788,7 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 			{
 				x = m_BoundingBox.p1.x - BlockX;
 				z = m_BoundingBox.p1.z + m_ChestPosition - BlockZ;
-				Meta = E_META_CHEST_FACING_XP;
+				Facing = eBlockFace::BLOCK_FACE_XP;
 				return;
 			}
 		}  // switch (Dir)
@@ -800,9 +800,9 @@ void cMineShaftCorridor::PlaceChest(cChunkDesc & a_ChunkDesc)
 		(z >= 0) && (z < cChunkDef::Width)
 	)
 	{
-		a_ChunkDesc.SetBlockTypeMeta(x, m_BoundingBox.p1.y + 1, z, E_BLOCK_CHEST, Meta);
-		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity(x, m_BoundingBox.p1.y + 1, z));
-		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == E_BLOCK_CHEST));
+		a_ChunkDesc.SetBlock({x, m_BoundingBox.p1.y + 1, z}, Block::Chest::Chest(Facing, Block::Chest::Type::Single, false));
+		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity({x, m_BoundingBox.p1.y + 1, z}));
+		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == BlockType::Chest));
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
 		int NumSlots = 3 + ((Noise.IntNoise3DInt(x, m_BoundingBox.p1.y, z) / 11) % 4);
 		int Seed = Noise.IntNoise2DInt(x, z);
@@ -827,24 +827,24 @@ void cMineShaftCorridor::PlaceTracks(cChunkDesc & a_ChunkDesc)
 	Box.p2.x -= 1;
 	Box.p1.z += 1;
 	Box.p2.z -= 1;
-	NIBBLETYPE Meta = 0;
+	enum Block::Rail::Shape Shape = Block::Rail::Shape::EastWest;
 	switch (m_Direction)
 	{
 		case dirXM:
 		case dirXP:
 		{
-			Meta = E_META_TRACKS_X;
+			Shape = Block::Rail::Shape::EastWest;
 			break;
 		}
 
 		case dirZM:
 		case dirZP:
 		{
-			Meta = E_META_TRACKS_Z;
+			Shape = Block::Rail::Shape::NorthSouth;
 			break;
 		}
 	}  // switch (direction)
-	a_ChunkDesc.RandomFillRelCuboid(Box, E_BLOCK_MINECART_TRACKS, Meta, a_ChunkDesc.GetChunkX() + a_ChunkDesc.GetChunkZ(), 6000);
+	a_ChunkDesc.RandomFillRelCuboid(Box, Block::Rail::Rail(Shape, false), a_ChunkDesc.GetChunkX() + a_ChunkDesc.GetChunkZ(), 6000);
 }
 
 
@@ -880,9 +880,9 @@ void cMineShaftCorridor::PlaceSpawner(cChunkDesc & a_ChunkDesc)
 		(SpawnerRelZ >= 0) && (SpawnerRelZ < cChunkDef::Width)
 	)
 	{
-		a_ChunkDesc.SetBlockTypeMeta(SpawnerRelX, m_BoundingBox.p1.y + 1, SpawnerRelZ, E_BLOCK_MOB_SPAWNER, 0);
-		cMobSpawnerEntity * MobSpawner = static_cast<cMobSpawnerEntity *>(a_ChunkDesc.GetBlockEntity(SpawnerRelX, m_BoundingBox.p1.y + 1, SpawnerRelZ));
-		ASSERT((MobSpawner != nullptr) && (MobSpawner->GetBlockType() == E_BLOCK_MOB_SPAWNER));
+		a_ChunkDesc.SetBlock({SpawnerRelX, m_BoundingBox.p1.y + 1, SpawnerRelZ}, Block::Spawner::Spawner());
+		cMobSpawnerEntity * MobSpawner = static_cast<cMobSpawnerEntity *>(a_ChunkDesc.GetBlockEntity({SpawnerRelX, m_BoundingBox.p1.y + 1, SpawnerRelZ}));
+		ASSERT((MobSpawner != nullptr) && (MobSpawner->GetBlockType() == BlockType::Spawner));
 		MobSpawner->SetEntity(mtCaveSpider);
 	}
 }
@@ -916,7 +916,7 @@ void cMineShaftCorridor::PlaceTorches(cChunkDesc & a_ChunkDesc)
 				{
 					if (((Noise.IntNoise2DInt(x, z) / 7) % 10000) < m_ParentSystem.m_ChanceTorch)
 					{
-						a_ChunkDesc.SetBlockTypeMeta(x, m_BoundingBox.p2.y, z, E_BLOCK_TORCH, E_META_TORCH_XP);
+						a_ChunkDesc.SetBlock({x, m_BoundingBox.p2.y, z}, Block::WallTorch::WallTorch(eBlockFace::BLOCK_FACE_XP));
 					}
 				}
 				x += 2;
@@ -924,7 +924,7 @@ void cMineShaftCorridor::PlaceTorches(cChunkDesc & a_ChunkDesc)
 				{
 					if (((Noise.IntNoise2DInt(x, z) / 7) % 10000) < m_ParentSystem.m_ChanceTorch)
 					{
-						a_ChunkDesc.SetBlockTypeMeta(x, m_BoundingBox.p2.y, z, E_BLOCK_TORCH, E_META_TORCH_XM);
+						a_ChunkDesc.SetBlock({x, m_BoundingBox.p2.y, z}, Block::WallTorch::WallTorch(eBlockFace::BLOCK_FACE_XM));
 					}
 				}
 			}  // for i
@@ -951,7 +951,7 @@ void cMineShaftCorridor::PlaceTorches(cChunkDesc & a_ChunkDesc)
 				{
 					if (((Noise.IntNoise2DInt(x, z) / 7) % 10000) < m_ParentSystem.m_ChanceTorch)
 					{
-						a_ChunkDesc.SetBlockTypeMeta(x, m_BoundingBox.p2.y, z, E_BLOCK_TORCH, E_META_TORCH_ZP);
+						a_ChunkDesc.SetBlock({x, m_BoundingBox.p2.y, z}, Block::WallTorch::WallTorch(eBlockFace::BLOCK_FACE_ZP));
 					}
 				}
 				z += 2;
@@ -959,7 +959,7 @@ void cMineShaftCorridor::PlaceTorches(cChunkDesc & a_ChunkDesc)
 				{
 					if (((Noise.IntNoise2DInt(x, z) / 7) % 10000) < m_ParentSystem.m_ChanceTorch)
 					{
-						a_ChunkDesc.SetBlockTypeMeta(x, m_BoundingBox.p2.y, z, E_BLOCK_TORCH, E_META_TORCH_ZM);
+						a_ChunkDesc.SetBlock({x, m_BoundingBox.p2.y, z}, Block::WallTorch::WallTorch(eBlockFace::BLOCK_FACE_ZM));
 					}
 				}
 			}  // for i
@@ -1074,33 +1074,33 @@ void cMineShaftCrossing::ProcessChunk(cChunkDesc & a_ChunkDesc)
 	int Ceil = box.p2.y;
 
 	// The supports:
-	a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p1.x + 1, Floor, Ceil, box.p1.z + 1, box.p1.z + 1, E_BLOCK_PLANKS, 0);
-	a_ChunkDesc.FillRelCuboid(box.p2.x - 1, box.p2.x - 1, Floor, Ceil, box.p1.z + 1, box.p1.z + 1, E_BLOCK_PLANKS, 0);
-	a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p1.x + 1, Floor, Ceil, box.p2.z - 1, box.p2.z - 1, E_BLOCK_PLANKS, 0);
-	a_ChunkDesc.FillRelCuboid(box.p2.x - 1, box.p2.x - 1, Floor, Ceil, box.p2.z - 1, box.p2.z - 1, E_BLOCK_PLANKS, 0);
+	a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p1.x + 1, Floor, Ceil, box.p1.z + 1, box.p1.z + 1, Block::OakPlanks::OakPlanks());
+	a_ChunkDesc.FillRelCuboid(box.p2.x - 1, box.p2.x - 1, Floor, Ceil, box.p1.z + 1, box.p1.z + 1, Block::OakPlanks::OakPlanks());
+	a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p1.x + 1, Floor, Ceil, box.p2.z - 1, box.p2.z - 1, Block::OakPlanks::OakPlanks());
+	a_ChunkDesc.FillRelCuboid(box.p2.x - 1, box.p2.x - 1, Floor, Ceil, box.p2.z - 1, box.p2.z - 1, Block::OakPlanks::OakPlanks());
 
 	// The air in between:
-	a_ChunkDesc.FillRelCuboid(box.p1.x + 2, box.p1.x + 2, Floor, Ceil, box.p1.z + 1, box.p2.z - 1, E_BLOCK_AIR, 0);
-	a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Floor, Ceil, box.p1.z + 2, box.p1.z + 2, E_BLOCK_AIR, 0);
+	a_ChunkDesc.FillRelCuboid(box.p1.x + 2, box.p1.x + 2, Floor, Ceil, box.p1.z + 1, box.p2.z - 1, Block::Air::Air());
+	a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Floor, Ceil, box.p1.z + 2, box.p1.z + 2, Block::Air::Air());
 
 	// The air on the edges:
 	int Mid = Floor + 2;
-	a_ChunkDesc.FillRelCuboid(box.p1.x,     box.p1.x,     Floor, Mid, box.p1.z + 1, box.p2.z - 1, E_BLOCK_AIR, 0);
-	a_ChunkDesc.FillRelCuboid(box.p2.x,     box.p2.x,     Floor, Mid, box.p1.z + 1, box.p2.z - 1, E_BLOCK_AIR, 0);
-	a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Floor, Mid, box.p1.z,     box.p1.z,     E_BLOCK_AIR, 0);
-	a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Floor, Mid, box.p2.z,     box.p2.z,     E_BLOCK_AIR, 0);
+	a_ChunkDesc.FillRelCuboid(box.p1.x,     box.p1.x,     Floor, Mid, box.p1.z + 1, box.p2.z - 1, Block::Air::Air());
+	a_ChunkDesc.FillRelCuboid(box.p2.x,     box.p2.x,     Floor, Mid, box.p1.z + 1, box.p2.z - 1, Block::Air::Air());
+	a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Floor, Mid, box.p1.z,     box.p1.z,     Block::Air::Air());
+	a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Floor, Mid, box.p2.z,     box.p2.z,     Block::Air::Air());
 	Mid += 2;
 	if (Mid < Ceil)
 	{
-		a_ChunkDesc.FillRelCuboid(box.p1.x,     box.p1.x,     Mid, Ceil, box.p1.z + 1, box.p2.z - 1, E_BLOCK_AIR, 0);
-		a_ChunkDesc.FillRelCuboid(box.p2.x,     box.p2.x,     Mid, Ceil, box.p1.z + 1, box.p2.z - 1, E_BLOCK_AIR, 0);
-		a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Mid, Ceil, box.p1.z,     box.p1.z,     E_BLOCK_AIR, 0);
-		a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Mid, Ceil, box.p2.z,     box.p2.z,     E_BLOCK_AIR, 0);
+		a_ChunkDesc.FillRelCuboid(box.p1.x,     box.p1.x,     Mid, Ceil, box.p1.z + 1, box.p2.z - 1, Block::Air::Air());
+		a_ChunkDesc.FillRelCuboid(box.p2.x,     box.p2.x,     Mid, Ceil, box.p1.z + 1, box.p2.z - 1, Block::Air::Air());
+		a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Mid, Ceil, box.p1.z,     box.p1.z,     Block::Air::Air());
+		a_ChunkDesc.FillRelCuboid(box.p1.x + 1, box.p2.x - 1, Mid, Ceil, box.p2.z,     box.p2.z,     Block::Air::Air());
 	}
 
 	// The floor, if needed:
 	box.p2.y = box.p1.y;
-	a_ChunkDesc.FloorRelCuboid(box, E_BLOCK_PLANKS, 0);
+	a_ChunkDesc.FloorRelCuboid(box, Block::OakPlanks::OakPlanks());
 }
 
 
@@ -1216,15 +1216,15 @@ void cMineShaftStaircase::ProcessChunk(cChunkDesc & a_ChunkDesc)
 	{
 		case dirXM:
 		{
-			a_ChunkDesc.FillRelCuboid (RelB.p2.x - 1, RelB.p2.x,     SFloor,     SFloor + 2, RelB.p1.z, RelB.p2.z, E_BLOCK_AIR, 0);
-			a_ChunkDesc.FillRelCuboid (RelB.p1.x,     RelB.p1.x + 1, DFloor,     DFloor + 2, RelB.p1.z, RelB.p2.z, E_BLOCK_AIR, 0);
-			a_ChunkDesc.FloorRelCuboid(RelB.p2.x - 1, RelB.p2.x,     SFloor - 1, SFloor - 1, RelB.p1.z, RelB.p2.z, E_BLOCK_PLANKS, 0);
-			a_ChunkDesc.FloorRelCuboid(RelB.p1.x,     RelB.p1.x + 1, DFloor - 1, DFloor - 1, RelB.p1.z, RelB.p2.z, E_BLOCK_PLANKS, 0);
+			a_ChunkDesc.FillRelCuboid (RelB.p2.x - 1, RelB.p2.x,     SFloor,     SFloor + 2, RelB.p1.z, RelB.p2.z, Block::Air::Air());
+			a_ChunkDesc.FillRelCuboid (RelB.p1.x,     RelB.p1.x + 1, DFloor,     DFloor + 2, RelB.p1.z, RelB.p2.z, Block::Air::Air());
+			a_ChunkDesc.FloorRelCuboid(RelB.p2.x - 1, RelB.p2.x,     SFloor - 1, SFloor - 1, RelB.p1.z, RelB.p2.z, Block::OakPlanks::OakPlanks());
+			a_ChunkDesc.FloorRelCuboid(RelB.p1.x,     RelB.p1.x + 1, DFloor - 1, DFloor - 1, RelB.p1.z, RelB.p2.z, Block::OakPlanks::OakPlanks());
 			Box.Assign({RelB.p2.x - 2, SFloor + InitAdd, RelB.p1.z}, {RelB.p2.x - 2, SFloor + 3 + InitAdd, RelB.p2.z});
 			for (int i = 0; i < 4; i++)
 			{
-				a_ChunkDesc.FillRelCuboid(Box, E_BLOCK_AIR, 0);
-				a_ChunkDesc.FloorRelCuboid(Box.p1.x, Box.p2.x, Box.p1.y - 1, Box.p1.y - 1, Box.p1.z, Box.p2.z, E_BLOCK_PLANKS, 0);
+				a_ChunkDesc.FillRelCuboid(Box, Block::Air::Air());
+				a_ChunkDesc.FloorRelCuboid(Box.p1.x, Box.p2.x, Box.p1.y - 1, Box.p1.y - 1, Box.p1.z, Box.p2.z, Block::OakPlanks::OakPlanks());
 				Box.Move({-1, Add, 0});
 			}
 			break;
@@ -1232,15 +1232,15 @@ void cMineShaftStaircase::ProcessChunk(cChunkDesc & a_ChunkDesc)
 
 		case dirXP:
 		{
-			a_ChunkDesc.FillRelCuboid (RelB.p1.x,     RelB.p1.x + 1, SFloor,     SFloor + 2, RelB.p1.z, RelB.p2.z, E_BLOCK_AIR, 0);
-			a_ChunkDesc.FillRelCuboid (RelB.p2.x - 1, RelB.p2.x,     DFloor,     DFloor + 2, RelB.p1.z, RelB.p2.z, E_BLOCK_AIR, 0);
-			a_ChunkDesc.FloorRelCuboid(RelB.p1.x,     RelB.p1.x + 1, SFloor - 1, SFloor - 1, RelB.p1.z, RelB.p2.z, E_BLOCK_PLANKS, 0);
-			a_ChunkDesc.FloorRelCuboid(RelB.p2.x - 1, RelB.p2.x,     DFloor - 1, DFloor - 1, RelB.p1.z, RelB.p2.z, E_BLOCK_PLANKS, 0);
+			a_ChunkDesc.FillRelCuboid (RelB.p1.x,     RelB.p1.x + 1, SFloor,     SFloor + 2, RelB.p1.z, RelB.p2.z, Block::Air::Air());
+			a_ChunkDesc.FillRelCuboid (RelB.p2.x - 1, RelB.p2.x,     DFloor,     DFloor + 2, RelB.p1.z, RelB.p2.z, Block::Air::Air());
+			a_ChunkDesc.FloorRelCuboid(RelB.p1.x,     RelB.p1.x + 1, SFloor - 1, SFloor - 1, RelB.p1.z, RelB.p2.z, Block::OakPlanks::OakPlanks());
+			a_ChunkDesc.FloorRelCuboid(RelB.p2.x - 1, RelB.p2.x,     DFloor - 1, DFloor - 1, RelB.p1.z, RelB.p2.z, Block::OakPlanks::OakPlanks());
 			Box.Assign({RelB.p1.x + 2, SFloor + InitAdd, RelB.p1.z}, {RelB.p1.x + 2, SFloor + 3 + InitAdd, RelB.p2.z});
 			for (int i = 0; i < 4; i++)
 			{
-				a_ChunkDesc.FillRelCuboid(Box, E_BLOCK_AIR, 0);
-				a_ChunkDesc.FloorRelCuboid(Box.p1.x, Box.p2.x, Box.p1.y - 1, Box.p1.y - 1, Box.p1.z, Box.p2.z, E_BLOCK_PLANKS, 0);
+				a_ChunkDesc.FillRelCuboid(Box, Block::Air::Air());
+				a_ChunkDesc.FloorRelCuboid(Box.p1.x, Box.p2.x, Box.p1.y - 1, Box.p1.y - 1, Box.p1.z, Box.p2.z, Block::OakPlanks::OakPlanks());
 				Box.Move({1, Add, 0});
 			}
 			break;
@@ -1248,15 +1248,15 @@ void cMineShaftStaircase::ProcessChunk(cChunkDesc & a_ChunkDesc)
 
 		case dirZM:
 		{
-			a_ChunkDesc.FillRelCuboid (RelB.p1.x, RelB.p2.x, SFloor,     SFloor + 2, RelB.p2.z - 1, RelB.p2.z,      E_BLOCK_AIR, 0);
-			a_ChunkDesc.FillRelCuboid (RelB.p1.x, RelB.p2.x, DFloor,     DFloor + 2, RelB.p1.z,     RelB.p1.z + 1,  E_BLOCK_AIR, 0);
-			a_ChunkDesc.FloorRelCuboid(RelB.p1.x, RelB.p2.x, SFloor - 1, SFloor - 1, RelB.p2.z - 1, RelB.p2.z,      E_BLOCK_PLANKS, 0);
-			a_ChunkDesc.FloorRelCuboid(RelB.p1.x, RelB.p2.x, DFloor - 1, DFloor - 1, RelB.p1.z,     RelB.p1.z + 1,  E_BLOCK_PLANKS, 0);
+			a_ChunkDesc.FillRelCuboid (RelB.p1.x, RelB.p2.x, SFloor,     SFloor + 2, RelB.p2.z - 1, RelB.p2.z,      Block::Air::Air());
+			a_ChunkDesc.FillRelCuboid (RelB.p1.x, RelB.p2.x, DFloor,     DFloor + 2, RelB.p1.z,     RelB.p1.z + 1,  Block::Air::Air());
+			a_ChunkDesc.FloorRelCuboid(RelB.p1.x, RelB.p2.x, SFloor - 1, SFloor - 1, RelB.p2.z - 1, RelB.p2.z,      Block::OakPlanks::OakPlanks());
+			a_ChunkDesc.FloorRelCuboid(RelB.p1.x, RelB.p2.x, DFloor - 1, DFloor - 1, RelB.p1.z,     RelB.p1.z + 1,  Block::OakPlanks::OakPlanks());
 			Box.Assign({RelB.p1.x, SFloor + InitAdd, RelB.p2.z - 2}, {RelB.p2.x, SFloor + 3 + InitAdd, RelB.p2.z - 2});
 			for (int i = 0; i < 4; i++)
 			{
-				a_ChunkDesc.FillRelCuboid(Box, E_BLOCK_AIR, 0);
-				a_ChunkDesc.FloorRelCuboid(Box.p1.x, Box.p2.x, Box.p1.y - 1, Box.p1.y - 1, Box.p1.z, Box.p2.z, E_BLOCK_PLANKS, 0);
+				a_ChunkDesc.FillRelCuboid(Box, Block::Air::Air());
+				a_ChunkDesc.FloorRelCuboid(Box.p1.x, Box.p2.x, Box.p1.y - 1, Box.p1.y - 1, Box.p1.z, Box.p2.z, Block::OakPlanks::OakPlanks());
 				Box.Move({0, Add, -1});
 			}
 			break;
@@ -1264,15 +1264,15 @@ void cMineShaftStaircase::ProcessChunk(cChunkDesc & a_ChunkDesc)
 
 		case dirZP:
 		{
-			a_ChunkDesc.FillRelCuboid (RelB.p1.x, RelB.p2.x, SFloor,     SFloor + 2, RelB.p1.z,     RelB.p1.z + 1,  E_BLOCK_AIR, 0);
-			a_ChunkDesc.FillRelCuboid (RelB.p1.x, RelB.p2.x, DFloor,     DFloor + 2, RelB.p2.z - 1, RelB.p2.z,      E_BLOCK_AIR, 0);
-			a_ChunkDesc.FloorRelCuboid(RelB.p1.x, RelB.p2.x, SFloor - 1, SFloor - 1, RelB.p1.z,     RelB.p1.z + 1,  E_BLOCK_PLANKS, 0);
-			a_ChunkDesc.FloorRelCuboid(RelB.p1.x, RelB.p2.x, DFloor - 1, DFloor - 1, RelB.p2.z - 1, RelB.p2.z,      E_BLOCK_PLANKS, 0);
+			a_ChunkDesc.FillRelCuboid (RelB.p1.x, RelB.p2.x, SFloor,     SFloor + 2, RelB.p1.z,     RelB.p1.z + 1,  Block::Air::Air());
+			a_ChunkDesc.FillRelCuboid (RelB.p1.x, RelB.p2.x, DFloor,     DFloor + 2, RelB.p2.z - 1, RelB.p2.z,      Block::Air::Air());
+			a_ChunkDesc.FloorRelCuboid(RelB.p1.x, RelB.p2.x, SFloor - 1, SFloor - 1, RelB.p1.z,     RelB.p1.z + 1,  Block::OakPlanks::OakPlanks());
+			a_ChunkDesc.FloorRelCuboid(RelB.p1.x, RelB.p2.x, DFloor - 1, DFloor - 1, RelB.p2.z - 1, RelB.p2.z,      Block::OakPlanks::OakPlanks());
 			Box.Assign({RelB.p1.x, SFloor + InitAdd, RelB.p1.z + 2}, {RelB.p2.x, SFloor + 3 + InitAdd, RelB.p1.z + 2});
 			for (int i = 0; i < 4; i++)
 			{
-				a_ChunkDesc.FillRelCuboid(Box, E_BLOCK_AIR, 0);
-				a_ChunkDesc.FloorRelCuboid(Box.p1.x, Box.p2.x, Box.p1.y - 1, Box.p1.y - 1, Box.p1.z, Box.p2.z, E_BLOCK_PLANKS, 0);
+				a_ChunkDesc.FillRelCuboid(Box, Block::Air::Air());
+				a_ChunkDesc.FloorRelCuboid(Box.p1.x, Box.p2.x, Box.p1.y - 1, Box.p1.y - 1, Box.p1.z, Box.p2.z, Block::OakPlanks::OakPlanks());
 				Box.Move({0, Add, 1});
 			}
 			break;

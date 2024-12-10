@@ -147,8 +147,8 @@ function TestBlockAreas()
 	end
 
 	-- Debug block area cuboid filling:
-	BA1:FillRelCuboid(2, 9, 2, 8, 2, 8, cBlockArea.baTypes, E_BLOCK_GOLD_BLOCK);
-	BA1:RelLine(2, 2, 2, 9, 8, 8, cBlockArea.baTypes or cBlockArea.baMetas, E_BLOCK_SAPLING, E_META_SAPLING_BIRCH);
+	BA1:FillRelCuboid(2, 9, 2, 8, 2, 8, cBlockArea.baBlocks, E_BLOCK_GOLD_BLOCK);
+	BA1:RelLine(2, 2, 2, 9, 8, 8, cBlockArea.baBlocks or cBlockArea.baMetas, E_BLOCK_SAPLING, E_META_SAPLING_BIRCH);
 	BA1:SaveToSchematicFile("schematics/fillrel.schematic");
 
 	-- Debug block area mirroring:
@@ -222,9 +222,9 @@ end
 function TestBlockAreasString()
 	-- Write one area to string, then to file:
 	local BA1 = cBlockArea()
-	BA1:Create(5, 5, 5, cBlockArea.baTypes + cBlockArea.baMetas)
-	BA1:Fill(cBlockArea.baTypes, E_BLOCK_DIAMOND_BLOCK)
-	BA1:FillRelCuboid(1, 3, 1, 3, 1, 3, cBlockArea.baTypes, E_BLOCK_GOLD_BLOCK)
+	BA1:Create(5, 5, 5, cBlockArea.baBlocks + cBlockArea.baMetas)
+	BA1:Fill(cBlockArea.baBlocks, E_BLOCK_DIAMOND_BLOCK)
+	BA1:FillRelCuboid(1, 3, 1, 3, 1, 3, cBlockArea.baBlocks, E_BLOCK_GOLD_BLOCK)
 	local Data = BA1:SaveToSchematicString()
 	if ((type(Data) ~= "string") or (Data == "")) then
 		LOG("Cannot save schematic to string")
@@ -964,9 +964,9 @@ function HandleGenRailsCmd(a_Split, a_Player)
 	local MAX_RAIL_META = 9
 	local pos = a_Player:GetPosition()
 	local ba = cBlockArea:new()
-	ba:Create(2 * MAX_RAIL_META + 3, 4, 3, cBlockArea.baTypes + cBlockArea.baMetas)
-	ba:FillRelCuboid(0, 2 * MAX_RAIL_META + 2, 0, 0, 0, 2, cBlockArea.baTypes, E_BLOCK_STONE)
-	ba:FillRelCuboid(0, 2 * MAX_RAIL_META + 2, 1, 3, 0, 2, cBlockArea.baTypes, E_BLOCK_AIR)
+	ba:Create(2 * MAX_RAIL_META + 3, 4, 3, cBlockArea.baBlocks + cBlockArea.baMetas)
+	ba:FillRelCuboid(0, 2 * MAX_RAIL_META + 2, 0, 0, 0, 2, cBlockArea.baBlocks, E_BLOCK_STONE)
+	ba:FillRelCuboid(0, 2 * MAX_RAIL_META + 2, 1, 3, 0, 2, cBlockArea.baBlocks, E_BLOCK_AIR)
 	for x = 0, MAX_RAIL_META do
 		ba:SetRelBlockTypeMeta(2 * x + 1, 1, 1, E_BLOCK_RAIL, x)
 	end

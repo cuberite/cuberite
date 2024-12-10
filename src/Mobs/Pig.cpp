@@ -31,10 +31,10 @@ void cPig::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? E_ITEM_COOKED_PORKCHOP : E_ITEM_RAW_PORKCHOP);
+	AddRandomDropItem(a_Drops, 1, 3 + LootingLevel, IsOnFire() ? Item::CookedPorkchop : Item::Porkchop);
 	if (m_bIsSaddled)
 	{
-		a_Drops.emplace_back(E_ITEM_SADDLE, static_cast<char>(1));
+		a_Drops.emplace_back(Item::Saddle, 1);
 	}
 }
 
@@ -70,7 +70,7 @@ void cPig::OnRightClicked(cPlayer & a_Player)
 		// Attach the player to this pig:
 		a_Player.AttachTo(*this);
 	}
-	else if (a_Player.GetEquippedItem().m_ItemType == E_ITEM_SADDLE)
+	else if (a_Player.GetEquippedItem().m_ItemType == Item::Saddle)
 	{
 		if (!a_Player.IsGameModeCreative())
 		{
@@ -99,7 +99,7 @@ void cPig::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	// If the attachee player is holding a carrot-on-stick, let them drive this pig:
 	if (m_bIsSaddled && (m_Attachee != nullptr))
 	{
-		if (m_Attachee->IsPlayer() && (m_Attachee->GetEquippedWeapon().m_ItemType == E_ITEM_CARROT_ON_STICK))
+		if (m_Attachee->IsPlayer() && (m_Attachee->GetEquippedWeapon().m_ItemType == Item::CarrotOnAStick))
 		{
 			MoveToPosition((m_Attachee->GetPosition()) + (m_Attachee->GetLookVector()*10));
 		}

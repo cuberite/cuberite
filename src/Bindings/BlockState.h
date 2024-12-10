@@ -16,50 +16,50 @@ A BlockState instance can be created from hard-coded data or from dynamic data:
 	map["key3"] = "value3";
 	BlockState bs(map);  // From dynamic data
 */
-class BlockState
+class CustomBlockState
 {
 public:
 
 	/** Creates a new instance with an empty map. */
-	BlockState();
+	CustomBlockState();
 
 	/** Creates a new instance consisting of a single key-value pair.
 	If the value is empty, it is not stored wihin the map. */
-	BlockState(const AString & aKey, const AString & aValue);
+	CustomBlockState(const AString & aKey, const AString & aValue);
 
 	/** Creates a new instance initialized with several (hard-coded) key-value pairs.
 	Any key with an empty value is not stored within the map. */
-	BlockState(std::initializer_list<std::pair<const AString, AString>> aKeysAndValues);
+	CustomBlockState(std::initializer_list<std::pair<const AString, AString>> aKeysAndValues);
 
 	/** Creates a new instance initialized with several (dynamic) key-value pairs.
 	Makes a copy of aKeysAndValues for this object.
 	Any key with an empty value is not stored within the map. */
-	BlockState(const std::map<AString, AString> & aKeysAndValues);
+	CustomBlockState(const std::map<AString, AString> & aKeysAndValues);
 
 	/** Creates a new instance initialized with several (dynamic) key-value pairs.
 	Any key with an empty value is not stored within the map. */
-	BlockState(std::map<AString, AString> && aKeysAndValues);
+	CustomBlockState(std::map<AString, AString> && aKeysAndValues);
 
-	/** Creates a copy of the specified BlockState with the (hard-coded) additional keys and values added to it.
+	/** Creates a copy of the specified CustomBlockState with the (hard-coded) additional keys and values added to it.
 	Any key in aAdditionalKeysAndValues that is already present in aCopyFrom is overwritten with the aAdditionalKeysAndValues' one.
 	Any key with an empty value is not stored in the map.
 	(it's possible to erase a key from aCopyFrom by setting it to empty string in aAdditionalKeysAndValues). */
-	BlockState(const BlockState & aCopyFrom, std::initializer_list<std::pair<const AString, AString>> aAdditionalKeysAndValues);
+	CustomBlockState(const CustomBlockState & aCopyFrom, std::initializer_list<std::pair<const AString, AString>> aAdditionalKeysAndValues);
 
 	/** Creates a copy of the specified BlockState with the (dynamic) additional keys and values added to it.
 	Any key in aAdditionalKeysAndValues that is already present in aCopyFrom is overwritten with the aAdditionalKeysAndValues' one.
 	Any key with an empty value is not stored in the map.
 	(it's possible to erase a key from aCopyFrom by setting it to empty string in aAdditionalKeysAndValues). */
-	BlockState(const BlockState & aCopyFrom, const std::map<AString, AString> & aAdditionalKeysAndValues);
+	CustomBlockState(const CustomBlockState & aCopyFrom, const std::map<AString, AString> & aAdditionalKeysAndValues);
 
 	/** Less-than comparison. */
-	bool operator <(const BlockState & aOther) const;
+	bool operator <(const CustomBlockState & aOther) const;
 
 	/** Fast equality check. */
-	bool operator ==(const BlockState & aOther) const;
+	bool operator ==(const CustomBlockState & aOther) const;
 
 	/** Fast inequality check. */
-	bool operator !=(const BlockState & aOther) const
+	bool operator !=(const CustomBlockState & aOther) const
 	{
 		return !(operator ==(aOther));
 	}
