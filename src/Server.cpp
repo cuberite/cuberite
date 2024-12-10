@@ -4,6 +4,7 @@
 
 #include "Server.h"
 #include "ClientHandle.h"
+#include "LoggerSimple.h"
 #include "Mobs/Monster.h"
 #include "Root.h"
 #include "World.h"
@@ -410,6 +411,7 @@ bool cServer::Start(void)
 		auto Handle = cNetwork::Listen(PortNum, std::make_shared<cServerListenCallbacks>(*this, PortNum));
 		if (Handle->IsListening())
 		{
+			LOGINFO("Server Running On Port: %s", port.c_str());
 			m_ServerHandles.push_back(Handle);
 		}
 	}  // for port - Ports[]
