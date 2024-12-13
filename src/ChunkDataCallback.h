@@ -41,6 +41,9 @@ public:
 	/** Called once to provide biome data. */
 	virtual void BiomeMap(const cChunkDef::BiomeMap & a_BiomeMap) { UNUSED(a_BiomeMap); }
 
+	/** Called once to provide poi data. */
+	virtual void PoiData(const cChunkPoiData & a_PoiData) { UNUSED(a_PoiData); }
+
 	/** Called for each entity in the chunk */
 	virtual void Entity(cEntity * a_Entity) { UNUSED(a_Entity); }
 
