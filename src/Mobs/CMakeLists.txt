@@ -85,3 +85,5 @@ target_sources(
 	ZombiePigman.h
 	ZombieVillager.h
 )
+
+add_subdirectory(AI)
