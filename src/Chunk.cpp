@@ -104,13 +104,6 @@ cChunk::~cChunk()
 	{
 		m_NeighborZP->m_NeighborZM = nullptr;
 	}
-
-	delete m_WaterSimulatorData;
-	m_WaterSimulatorData = nullptr;
-	delete m_LavaSimulatorData;
-	m_LavaSimulatorData = nullptr;
-	delete m_RedstoneSimulatorData;
-	m_RedstoneSimulatorData = nullptr;
 }
 
 
