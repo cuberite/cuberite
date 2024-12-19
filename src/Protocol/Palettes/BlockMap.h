@@ -22,10 +22,10 @@ public:
 
 		bool IsVersionLoaded(cProtocol::Version a_Version)
 		{
-			return PerVersionMap.count(a_Version) != 0;
+			return m_PerVersionMap.count(a_Version) != 0;
 		}
 private:
 		/** Maps each protocol to its corrpesoing plaette */
-		std::map<cProtocol::Version, BlockTypePalette> PerVersionMap;
+		std::map<cProtocol::Version, BlockTypePalette> m_PerVersionMap;
 	};
 }

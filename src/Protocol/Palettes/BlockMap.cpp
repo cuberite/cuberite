@@ -8,7 +8,7 @@ namespace BlockMap
 {
 	void cBlockMap::AddVersion(cProtocol::Version a_Version)
 	{
-		if (PerVersionMap.count(a_Version) != 0)
+		if (m_PerVersionMap.count(a_Version) != 0)
 		{
 			LOGWARNING(fmt::format(FMT_STRING("Tried to add version {} twice, ignoring"), cMultiVersionProtocol::GetVersionTextFromInt(a_Version)));
 			return;
@@ -30,8 +30,8 @@ namespace BlockMap
 		const auto sz = std::filesystem::file_size(file_name);
 		std::string result(sz, '\0');
 		file.read(result.data(), static_cast<std::streamsize>(sz));
-		PerVersionMap[a_Version] = BlockTypePalette();
-		PerVersionMap.at(a_Version).loadFromString(result);
+		m_PerVersionMap[a_Version] = BlockTypePalette();
+		m_PerVersionMap.at(a_Version).loadFromString(result);
 	}
 
 
@@ -40,8 +40,8 @@ namespace BlockMap
 
 	UInt32 cBlockMap::GetProtocolBlockId(cProtocol::Version a_target, BlockState a_block)
 	{
-		const BlockTypePalette & latest = PerVersionMap[cProtocol::Version::Latest];
-		BlockTypePalette & target_ver = PerVersionMap[a_target];
+		const BlockTypePalette & latest = m_PerVersionMap[cProtocol::Version::Latest];
+		BlockTypePalette & target_ver = m_PerVersionMap[a_target];
 
 		const auto & entry = latest.entry(a_block.ID);
 		const auto ret = target_ver.maybeIndex(entry.first, entry.second);
