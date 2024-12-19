@@ -8,7 +8,7 @@
 
 namespace BlockMap
 {
-	static class cBlockMap
+	class cBlockMap
 	{
 public:
 		void AddVersion(cProtocol::Version a_Version);
