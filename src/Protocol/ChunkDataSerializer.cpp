@@ -90,6 +90,47 @@ namespace
 		return Palette_1_16::From(a_Block);
 	}
 
+	auto Palette757(const BlockState a_Block)
+	{
+		return Palette_1_18::From(a_Block);
+	}
+
+	auto Palette759(const BlockState a_Block)
+	{
+		return Palette_1_19::From(a_Block);
+	}
+
+	// TODO: Implement palettes
+	auto Palette760(const BlockState a_Block)
+	{
+		// return Palette_1_19_1::From(a_Block);
+	}
+
+	auto Palette761(const BlockState a_Block)
+	{
+		// return Palette_1_19_3::From(a_Block);
+	}
+
+	auto Palette762(const BlockState a_Block)
+	{
+		// return Palette_1_19_4::From(a_Block);
+	}
+
+	auto Palette766(const BlockState a_Block)
+	{
+		// return Palette_1_20_5::From(a_Block);
+	}
+
+	auto Palette763(const BlockState a_Block)
+	{
+		return Palette_1_20::From(a_Block);
+	}
+
+	auto Palette764(const BlockState a_Block)
+	{
+		// return Palette_1_20_2::From(a_Block);
+	}
+
 	auto Palette767(const BlockState a_Block)
 	{
 		return Palette_1_21::From(a_Block);
@@ -333,43 +374,43 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 		}
 		case CacheVersion::v757:
 		{
-			Serialize757<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x22);
+			Serialize757<&Palette757>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x22);
 			break;
 		}
 		case CacheVersion::v759:
 		{
-			Serialize757<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x1F);
+			Serialize757<&Palette759>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x1F);
 			break;
 		}
 		case CacheVersion::v760:
 		{
-			Serialize757<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x21);
+			Serialize757<&Palette760>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x21);
 			break;
 		}
 		case CacheVersion::v761:
 		{
-			Serialize757<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x20);
+			Serialize757<&Palette761>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x20);
 			break;
 		}
 		case CacheVersion::v762:
 		{
-			Serialize757<&Palette754>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x24);
+			Serialize757<&Palette762>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x24);
 			break;
 		}
 		case CacheVersion::v763:
 		{
-			Serialize763<&Palette767>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x24);
+			Serialize763<&Palette763>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x24);
 			break;
 		}
 		case CacheVersion::v764:
 		case CacheVersion::v765:
 		{
-			Serialize764<&Palette767>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x25);
+			Serialize764<&Palette764>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x25);
 			break;
 		}
 		case CacheVersion::v766:
 		{
-			Serialize764<&Palette767>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x27);
+			Serialize764<&Palette766>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, 0x27);
 			break;
 		}
 		case CacheVersion::v767:
