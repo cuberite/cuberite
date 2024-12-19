@@ -3,7 +3,7 @@
 # Use CMake to generate the build files for your platform
 
 cmake_minimum_required (VERSION 3.13)
-cmake_policy(VERSION 3.13...3.17.2)
+cmake_policy(VERSION 3.13...3.29.5)
 project(
 	Cuberite
 	DESCRIPTION "A lightweight, fast and extensible game server for Minecraft"
@@ -19,6 +19,9 @@ option(SELF_TEST "Enables testing code to be built" OFF)
 option(UNITY_BUILDS "Enables source aggregation for faster builds" ON)
 option(WHOLE_PROGRAM_OPTIMISATION "Enables link time optimisation for Release" ON)
 
+#add_link_options("$<$<CONFIG:Debug>:/INCREMENTAL>")
+#add_compile_options("$<$<CONFIG:Debug>:/ZI>")
+
 include("CMake/AddDependencies.cmake")
 include("CMake/Fixups.cmake")
 include("CMake/GenerateBindings.cmake")
@@ -32,6 +35,7 @@ include("CMake/StampBuild.cmake")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+#set(WHOLE_PROGRAM_OPTIMISATION OFF)
 
 # Static CRT:
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -49,6 +53,11 @@ link_dependencies(${CMAKE_PROJECT_NAME})
 # Set the startup project to Cuberite, and the debugger dir:
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/Server")
+
+if(NOT WIN32)
+	target_compile_options(Cuberite PRIVATE -Wno-address)
+	target_compile_options(Cuberite PRIVATE -Wno-switch)
+endif()
 
 # Enable PCH and jumbo builds on supporting CMake:
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")
@@ -94,6 +103,7 @@ endif()
 
 # The need for speed (in Release):
 if(WHOLE_PROGRAM_OPTIMISATION)
+	message(STATUS "WHOLE_PROGRAM_OPTIMISATION enabled")
     include(CheckIPOSupported)
     check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_CHECK_OUTPUT)
     if(IPO_SUPPORTED)

@@ -19,32 +19,29 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		if (ToolHasSilkTouch(a_Tool))
 		{
-			return cItem(m_BlockType);
-		}
-		else if ((a_BlockMeta == E_META_MUSHROOM_FULL_STEM) || (a_BlockMeta == E_META_MUSHROOM_STEM))
-		{
-			// Stems don't drop anything
-			return cItem();
+			return cItem(BlockItemConverter::FromBlock(m_BlockType));
 		}
 
-		const auto MushroomType = (m_BlockType == E_BLOCK_HUGE_BROWN_MUSHROOM) ? E_BLOCK_BROWN_MUSHROOM : E_BLOCK_RED_MUSHROOM;
 		const auto DropNum = GetRandomProvider().RandInt<char>(2);
-
-		return cItem(MushroomType, DropNum);
+		switch (a_Block.Type())
+		{
+			case BlockType::BrownMushroomBlock: return cItem(Item::BrownMushroom, DropNum);
+			case BlockType::RedMushroomBlock:   return cItem(Item::RedMushroom, DropNum);
+			default: return {};
+		}
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
-		return (m_BlockType == E_BLOCK_HUGE_BROWN_MUSHROOM) ? 10 : 28;
+		return (m_BlockType == BlockType::BrownMushroomBlock) ? 10 : 28;
 	}
 } ;
 

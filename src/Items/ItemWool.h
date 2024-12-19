@@ -7,11 +7,11 @@
 
 
 
-class cItemClothHandler final :
+class cItemWoolHandler final :
 	public cItemHandler
 {
 public:
-	constexpr cItemClothHandler(int a_ItemType)
+	constexpr cItemWoolHandler(Item a_ItemType)
 		: cItemHandler(a_ItemType)
 	{
 

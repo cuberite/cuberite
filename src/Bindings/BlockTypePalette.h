@@ -1,7 +1,7 @@
 #pragma once
 
 #include <utility>
-#include "BlockState.h"
+#include "Bindings/BlockState.h"
 
 
 
@@ -71,18 +71,18 @@ public:
 
 	/** Returns the index of the specified block type name and state.
 	If the combination is not found, it is added to the palette and the new index is returned. */
-	UInt32 index(const AString & aBlockTypeName, const BlockState & aBlockState);
+	UInt32 index(const AString & aBlockTypeName, const CustomBlockState & aBlockState);
 
 	/** Returns the <index, true> of the specified block type name and state, if it exists.
 	If the combination is not found, returns <undefined, false>. */
-	std::pair<UInt32, bool> maybeIndex(const AString & aBlockTypeName, const BlockState & aBlockState) const;
+	std::pair<UInt32, bool> maybeIndex(const AString & aBlockTypeName, const CustomBlockState & aBlockState) const;
 
 	/** Returns the total number of entries in the palette. */
 	UInt32 count() const;
 
 	/** Returns the blockspec represented by the specified palette index.
 	If the index is not valid, throws a NoSuchIndexException. */
-	const std::pair<AString, BlockState> & entry(UInt32 aIndex) const;
+	const std::pair<AString, CustomBlockState> & entry(UInt32 aIndex) const;
 
 	/** Returns an index-transform map from aFrom to this (this.entry(idx) == aFrom.entry(res[idx])).
 	Entries from aFrom that are not present in this are added.
@@ -106,12 +106,12 @@ public:
 protected:
 
 	/** The mapping from numeric to stringular representation.
-	mNumberToBlock[index] = {"blockTypeName", blockState}. */
-	std::map<UInt32, std::pair<AString, BlockState>> mNumberToBlock;
+	mNumberToBlock[index] = {"blockTypeName", CustomBlockState}. */
+	std::map<UInt32, std::pair<AString, CustomBlockState>> mNumberToBlock;
 
 	/** The mapping from stringular to numeric representation.
-	mStringToNumber["blockTypeName"][blockState] = index. */
-	std::unordered_map<AString, std::map<BlockState, UInt32>> mBlockToNumber;
+	mStringToNumber["blockTypeName"][CustomBlockState] = index. */
+	std::unordered_map<AString, std::map<CustomBlockState, UInt32>> mBlockToNumber;
 
 	/** The maximum index ever used in the maps.
 	Used when adding new entries through the index() call. */
@@ -134,5 +134,5 @@ protected:
 	/** Adds a mapping between the numeric and stringular representation into both maps,
 	updates the mMaxIndex, if appropriate.
 	Silently overwrites any previous mapping for the ID, if present, but keeps the old string->id mapping. */
-	void addMapping(UInt32 aID, const AString & aBlockTypeName, const BlockState & aBlockState);
+	void addMapping(UInt32 aID, const AString & aBlockTypeName, const CustomBlockState & aBlockState);
 };

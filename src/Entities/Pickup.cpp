@@ -61,7 +61,7 @@ public:
 
 			if (Item.m_ItemCount <= 0)
 			{
-				a_Entity.GetWorld()->BroadcastCollectEntity(a_Entity, *m_Pickup, static_cast<unsigned>(CombineCount));
+				// a_Entity.GetWorld()->BroadcastCollectEntity(a_Entity, *m_Pickup, static_cast<unsigned>(CombineCount));  // Disabled because it crashes new clients
 				a_Entity.Destroy();
 
 				// Reset the timer
@@ -282,18 +282,24 @@ bool cPickup::CollectedBy(cEntity & a_Dest)
 			return false;
 		}
 
-		char NumAdded = Player.GetInventory().AddItem(m_Item);
-		if (NumAdded > 0)
+	char NumAdded = Player.GetInventory().AddItem(m_Item);
+	if (NumAdded > 0)
+	{
+		// Check achievements
+		switch (m_Item.m_ItemType)
 		{
-			// Check achievements
-			switch (m_Item.m_ItemType)
-			{
-				case E_BLOCK_LOG:      Player.AwardAchievement(CustomStatistic::AchMineWood); break;
-				case E_ITEM_LEATHER:   Player.AwardAchievement(CustomStatistic::AchKillCow);  break;
-				case E_ITEM_DIAMOND:   Player.AwardAchievement(CustomStatistic::AchDiamonds); break;
-				case E_ITEM_BLAZE_ROD: Player.AwardAchievement(CustomStatistic::AchBlazeRod); break;
-				default: break;
-			}
+			case Item::AcaciaLog:
+			case Item::BirchLog:
+			case Item::DarkOakLog:
+			case Item::JungleLog:
+			case Item::OakLog:
+			case Item::SpruceLog:
+				Player.AwardAchievement(CustomStatistic::AchMineWood); break;
+			case Item::Leather:  Player.AwardAchievement(CustomStatistic::AchKillCow);  break;
+			case Item::Diamond:  Player.AwardAchievement(CustomStatistic::AchDiamonds); break;
+			case Item::BlazeRod: Player.AwardAchievement(CustomStatistic::AchBlazeRod); break;
+			default: break;
+		}
 
 			m_Item.m_ItemCount -= NumAdded;
 			m_World->BroadcastCollectEntity(*this, a_Dest, static_cast<unsigned>(NumAdded));

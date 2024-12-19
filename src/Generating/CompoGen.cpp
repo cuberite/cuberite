@@ -13,6 +13,9 @@
 #include "../LinearUpscale.h"
 #include "../IniFile.h"
 
+#include "../Protocol/Palettes/Upgrade.h"
+#include "../Registries/BlockItemConverter.h"
+
 
 
 
@@ -23,7 +26,7 @@
 void cCompoGenSameBlock::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape)
 {
 	a_ChunkDesc.SetHeightFromShape(a_Shape);
-	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
+	a_ChunkDesc.FillBlocks(Block::Air::Air());
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
@@ -31,7 +34,7 @@ void cCompoGenSameBlock::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDe
 			int Start;
 			if (m_IsBedrocked)
 			{
-				a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
+				a_ChunkDesc.SetBlock({x, 0, z}, Block::Bedrock::Bedrock());
 				Start = 1;
 			}
 			else
@@ -40,7 +43,7 @@ void cCompoGenSameBlock::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDe
 			}
 			for (int y = a_ChunkDesc.GetHeight(x, z); y >= Start; y--)
 			{
-				a_ChunkDesc.SetBlockType(x, y, z, m_BlockType);
+				a_ChunkDesc.SetBlock({x, y, z}, m_Block);
 			}  // for y
 		}  // for z
 	}  // for x
@@ -52,7 +55,9 @@ void cCompoGenSameBlock::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDe
 
 void cCompoGenSameBlock::InitializeCompoGen(cIniFile & a_IniFile)
 {
-	m_BlockType = static_cast<BLOCKTYPE>(GetIniItemSet(a_IniFile, "Generator", "SameBlockType", "stone").m_ItemType);
+	auto Item = GetIniItemSet(a_IniFile, "Generator", "SameBlockType", "stone");
+
+	m_Block = BlockItemConverter::FromItem(Item.m_ItemType);
 	m_IsBedrocked = (a_IniFile.GetValueSetI("Generator", "SameBlockBedrocked", 1) != 0);
 }
 
@@ -65,44 +70,44 @@ void cCompoGenSameBlock::InitializeCompoGen(cIniFile & a_IniFile)
 
 void cCompoGenDebugBiomes::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape)
 {
-	static BLOCKTYPE Blocks[] =
+	static std::array<BlockState, 23> Blocks =
 	{
-		E_BLOCK_STONE,
-		E_BLOCK_COBBLESTONE,
-		E_BLOCK_LOG,
-		E_BLOCK_PLANKS,
-		E_BLOCK_SANDSTONE,
-		E_BLOCK_WOOL,
-		E_BLOCK_COAL_ORE,
-		E_BLOCK_IRON_ORE,
-		E_BLOCK_GOLD_ORE,
-		E_BLOCK_DIAMOND_ORE,
-		E_BLOCK_LAPIS_ORE,
-		E_BLOCK_REDSTONE_ORE,
-		E_BLOCK_IRON_BLOCK,
-		E_BLOCK_GOLD_BLOCK,
-		E_BLOCK_DIAMOND_BLOCK,
-		E_BLOCK_LAPIS_BLOCK,
-		E_BLOCK_BRICK,
-		E_BLOCK_MOSSY_COBBLESTONE,
-		E_BLOCK_OBSIDIAN,
-		E_BLOCK_NETHERRACK,
-		E_BLOCK_SOULSAND,
-		E_BLOCK_NETHER_BRICK,
-		E_BLOCK_BEDROCK,
+		Block::Stone::Stone(),
+		Block::Cobblestone::Cobblestone(),
+		Block::OakLog::OakLog(),
+		Block::OakPlanks::OakPlanks(),
+		Block::Sandstone::Sandstone(),
+		Block::WhiteWool::WhiteWool(),
+		Block::CoalOre::CoalOre(),
+		Block::IronOre::IronOre(),
+		Block::GoldOre::GoldOre(),
+		Block::DiamondOre::DiamondOre(),
+		Block::LapisOre::LapisOre(),
+		Block::RedstoneOre::RedstoneOre(),
+		Block::IronBlock::IronBlock(),
+		Block::GoldBlock::GoldBlock(),
+		Block::DiamondBlock::DiamondBlock(),
+		Block::LapisBlock::LapisBlock(),
+		Block::Bricks::Bricks(),
+		Block::MossyCobblestone::MossyCobblestone(),
+		Block::Obsidian::Obsidian(),
+		Block::Netherrack::Netherrack(),
+		Block::SoulSand::SoulSand(),
+		Block::NetherBricks::NetherBricks(),
+		Block::Bedrock::Bedrock(),
 	} ;
 
 	a_ChunkDesc.SetHeightFromShape(a_Shape);
-	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
+	a_ChunkDesc.FillBlocks(Block::Air::Air());
 
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			BLOCKTYPE BlockType = Blocks[a_ChunkDesc.GetBiome(x, z)];
+			auto Block = Blocks[static_cast<size_t>(a_ChunkDesc.GetBiome(x, z))];
 			for (int y = a_ChunkDesc.GetHeight(x, z); y >= 0; y--)
 			{
-				a_ChunkDesc.SetBlockType(x, y, z, BlockType);
+				a_ChunkDesc.SetBlock({x, y, z}, Block);
 			}  // for y
 		}  // for z
 	}  // for x
@@ -119,12 +124,12 @@ cCompoGenClassic::cCompoGenClassic(void) :
 	m_SeaLevel(60),
 	m_BeachHeight(2),
 	m_BeachDepth(4),
-	m_BlockTop(E_BLOCK_GRASS),
-	m_BlockMiddle(E_BLOCK_DIRT),
-	m_BlockBottom(E_BLOCK_STONE),
-	m_BlockBeach(E_BLOCK_SAND),
-	m_BlockBeachBottom(E_BLOCK_SANDSTONE),
-	m_BlockSea(E_BLOCK_STATIONARY_WATER)
+	m_BlockTop(Block::GrassBlock::GrassBlock()),
+	m_BlockMiddle(Block::Dirt::Dirt()),
+	m_BlockBottom(Block::Stone::Stone()),
+	m_BlockBeach(Block::Sand::Sand()),
+	m_BlockBeachBottom(Block::Sandstone::Sandstone()),
+	m_BlockSea(Block::Water::Water())
 {
 }
 
@@ -142,50 +147,50 @@ void cCompoGenClassic::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc
 		- bedrock at the bottom
 	*/
 
-	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
+	a_ChunkDesc.FillBlocks(Block::Air::Air());
 	a_ChunkDesc.SetHeightFromShape(a_Shape);
 
 	// The patterns to use for different situations, must be same length!
-	const BLOCKTYPE PatternGround[] = {m_BlockTop,    m_BlockMiddle, m_BlockMiddle, m_BlockMiddle} ;
-	const BLOCKTYPE PatternBeach[]  = {m_BlockBeach,  m_BlockBeach,  m_BlockBeach,  m_BlockBeachBottom} ;
-	const BLOCKTYPE PatternOcean[]  = {m_BlockMiddle, m_BlockMiddle, m_BlockMiddle, m_BlockBottom} ;
-	static int PatternLength = ARRAYCOUNT(PatternGround);
-	ASSERT(ARRAYCOUNT(PatternGround) == ARRAYCOUNT(PatternBeach));
-	ASSERT(ARRAYCOUNT(PatternGround) == ARRAYCOUNT(PatternOcean));
+	const std::array<BlockState, 4> PatternGround = {m_BlockTop,    m_BlockMiddle, m_BlockMiddle, m_BlockMiddle} ;
+	const std::array<BlockState, 4> PatternBeach  = {m_BlockBeach,  m_BlockBeach,  m_BlockBeach,  m_BlockBeachBottom} ;
+	const std::array<BlockState, 4> PatternOcean  = {m_BlockMiddle, m_BlockMiddle, m_BlockMiddle, m_BlockBottom} ;
+	static size_t PatternLength = PatternGround.size();
+	ASSERT(PatternGround.size() == PatternBeach.size());
+	ASSERT(PatternGround.size() == PatternOcean.size());
 
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
 		{
-			int Height = a_ChunkDesc.GetHeight(x, z);
-			const BLOCKTYPE * Pattern;
+			auto Height = a_ChunkDesc.GetHeight(x, z);
+			const std::array<BlockState, 4> * Pattern;
 			if (Height > m_SeaLevel + m_BeachHeight)
 			{
-				Pattern = PatternGround;
+				Pattern = &PatternGround;
 			}
 			else if (Height > m_SeaLevel - m_BeachDepth)
 			{
-				Pattern = PatternBeach;
+				Pattern = &PatternBeach;
 			}
 			else
 			{
-				Pattern = PatternOcean;
+				Pattern = &PatternOcean;
 			}
 
 			// Fill water from sealevel down to height (if any):
 			for (int y = m_SeaLevel; y >= Height; --y)
 			{
-				a_ChunkDesc.SetBlockType(x, y, z, m_BlockSea);
+				a_ChunkDesc.SetBlock({x, y, z}, m_BlockSea);
 			}
 
 			// Fill from height till the bottom:
 			for (int y = Height; y >= 1; y--)
 			{
-				a_ChunkDesc.SetBlockType(x, y, z, (Height - y < PatternLength) ? Pattern[Height - y] : m_BlockBottom);
+				a_ChunkDesc.SetBlock({x, y, z}, (Height - y < static_cast<int>(PatternLength)) ? Pattern->at(static_cast<size_t>(Height - y)) : m_BlockBottom);
 			}
 
 			// The last layer is always bedrock:
-			a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
+			a_ChunkDesc.SetBlock({x, 0, z}, Block::Bedrock::Bedrock());
 		}  // for x
 	}  // for z
 }
@@ -199,12 +204,21 @@ void cCompoGenClassic::InitializeCompoGen(cIniFile & a_IniFile)
 	m_SeaLevel         = a_IniFile.GetValueSetI("Generator", "SeaLevel",           m_SeaLevel);
 	m_BeachHeight      = a_IniFile.GetValueSetI("Generator", "ClassicBeachHeight", m_BeachHeight);
 	m_BeachDepth       = a_IniFile.GetValueSetI("Generator", "ClassicBeachDepth",  m_BeachDepth);
-	m_BlockTop         = static_cast<BLOCKTYPE>(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockTop",         "grass").m_ItemType);
-	m_BlockMiddle      = static_cast<BLOCKTYPE>(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockMiddle",      "dirt").m_ItemType);
-	m_BlockBottom      = static_cast<BLOCKTYPE>(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBottom",      "stone").m_ItemType);
-	m_BlockBeach       = static_cast<BLOCKTYPE>(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBeach",       "sand").m_ItemType);
-	m_BlockBeachBottom = static_cast<BLOCKTYPE>(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBeachBottom", "sandstone").m_ItemType);
-	m_BlockSea         = static_cast<BLOCKTYPE>(GetIniItemSet(a_IniFile, "Generator", "ClassicBlockSea",         "stationarywater").m_ItemType);
+
+	auto BlockTop         = GetIniItemSet(a_IniFile, "Generator", "ClassicBlockTop",         "grass");
+	auto BlockMiddle      = GetIniItemSet(a_IniFile, "Generator", "ClassicBlockMiddle",      "dirt");
+	auto BlockBottom      = GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBottom",      "stone");
+	auto BlockBeach       = GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBeach",       "sand");
+	auto BlockBeachBottom = GetIniItemSet(a_IniFile, "Generator", "ClassicBlockBeachBottom", "sandstone");
+	auto BlockSea         = GetIniItemSet(a_IniFile, "Generator", "ClassicBlockSea",         "water");
+
+
+	m_BlockTop         = BlockItemConverter::FromItem(BlockTop.m_ItemType);
+	m_BlockMiddle      = BlockItemConverter::FromItem(BlockMiddle.m_ItemType);
+	m_BlockBottom      = BlockItemConverter::FromItem(BlockBottom.m_ItemType);
+	m_BlockBeach       = BlockItemConverter::FromItem(BlockBeach.m_ItemType);
+	m_BlockBeachBottom = BlockItemConverter::FromItem(BlockBeachBottom.m_ItemType);
+	m_BlockSea         = BlockItemConverter::FromItem(BlockSea.m_ItemType);
 }
 
 
@@ -281,7 +295,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 				int Val = Lo + (Hi - Lo) * y / SEGMENT_HEIGHT;
 				if (Val < Threshold)
 				{
-					a_ChunkDesc.SetBlockType(x, y + Segment, z, E_BLOCK_NETHERRACK);
+					a_ChunkDesc.SetBlock({x, y + Segment, z}, Block::Netherrack::Netherrack());
 				}
 			}
 		}
@@ -293,10 +307,10 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 	// Bedrock at the bottom and at the top, cover ceiling with netherrack:
 	for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
 	{
-		a_ChunkDesc.SetBlockType(x, 0, z, E_BLOCK_BEDROCK);
+		a_ChunkDesc.SetBlock({x, 0, z}, Block::Bedrock::Bedrock());
 
 		int Height = a_ChunkDesc.GetHeight(x, z);
-		a_ChunkDesc.SetBlockType(x, Height, z, E_BLOCK_BEDROCK);
+		a_ChunkDesc.SetBlock({x, Height, z}, Block::Bedrock::Bedrock());
 
 		NOISE_DATATYPE CeilingDisguise = (m_Noise1.CubicNoise2D(static_cast<float>(a_ChunkDesc.GetChunkX() * cChunkDef::Width + x) / 10, static_cast<float>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z) / 10));
 		if (CeilingDisguise < 0)
@@ -308,7 +322,7 @@ void cCompoGenNether::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc:
 
 		for (int y = Height - 1; y > CeilingDisguiseHeight; y--)
 		{
-			a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_NETHERRACK);
+			a_ChunkDesc.SetBlock({x, y, z}, Block::Netherrack::Netherrack());
 		}
 	}
 }
@@ -395,9 +409,8 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::
 		m_CacheOrder[0] = Idx;
 
 		// Use the cached data:
-		memcpy(a_ChunkDesc.GetBlockTypes(),             m_CacheData[Idx].m_BlockTypes, sizeof(a_ChunkDesc.GetBlockTypes()));
-		memcpy(a_ChunkDesc.GetBlockMetasUncompressed(), m_CacheData[Idx].m_BlockMetas, sizeof(a_ChunkDesc.GetBlockMetasUncompressed()));
-		memcpy(a_ChunkDesc.GetHeightMap(),              m_CacheData[Idx].m_HeightMap,  sizeof(a_ChunkDesc.GetHeightMap()));
+		memcpy(a_ChunkDesc.GetBlocks(),             m_CacheData[Idx].m_BlockTypes,        sizeof(a_ChunkDesc.GetBlocks()));
+		memcpy(a_ChunkDesc.GetHeightMap().data(),   m_CacheData[Idx].m_HeightMap.data(),  sizeof(a_ChunkDesc.GetHeightMap()));
 
 		m_NumHits++;
 		m_TotalChain += i;
@@ -415,9 +428,8 @@ void cCompoGenCache::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::
 		m_CacheOrder[i] = m_CacheOrder[i - 1];
 	}  // for i - m_CacheOrder[]
 	m_CacheOrder[0] = Idx;
-	memcpy(m_CacheData[Idx].m_BlockTypes, a_ChunkDesc.GetBlockTypes(),             sizeof(a_ChunkDesc.GetBlockTypes()));
-	memcpy(m_CacheData[Idx].m_BlockMetas, a_ChunkDesc.GetBlockMetasUncompressed(), sizeof(a_ChunkDesc.GetBlockMetasUncompressed()));
-	memcpy(m_CacheData[Idx].m_HeightMap,  a_ChunkDesc.GetHeightMap(),              sizeof(a_ChunkDesc.GetHeightMap()));
+	memcpy(m_CacheData[Idx].m_BlockTypes,        a_ChunkDesc.GetBlocks(),           sizeof(a_ChunkDesc.GetBlocks()));
+	memcpy(m_CacheData[Idx].m_HeightMap.data(),  a_ChunkDesc.GetHeightMap().data(), sizeof(a_ChunkDesc.GetHeightMap()));
 	m_CacheData[Idx].m_ChunkX = ChunkX;
 	m_CacheData[Idx].m_ChunkZ = ChunkZ;
 }

@@ -9,6 +9,11 @@
 #include "../Bindings/LuaState.h"
 #include "../WorldStorage/SchematicFileSerializer.h"
 #include "../StringCompression.h"
+#include "../Registries/BlockItemConverter.h"
+#include "../Protocol/Palettes/Upgrade.h"
+
+
+
 
 
 /** Returns the map of string => eMergeStrategy used when translating cubeset file merge strategies. */
@@ -620,19 +625,34 @@ void cPrefabPiecePool::ApplyBaseMetadataCubesetVer1(
 	// Set the metadata values to defaults:
 	m_MinDensity = 100;
 	m_MaxDensity = 100;
-	m_VillageRoadBlockType = E_BLOCK_GRAVEL;
-	m_VillageRoadBlockMeta = 0;
-	m_VillageWaterRoadBlockType = E_BLOCK_PLANKS;
-	m_VillageWaterRoadBlockMeta = 0;
+	m_VillageRoadBlockType = Block::Gravel::Gravel();
+	m_VillageWaterRoadBlockType = Block::OakPlanks::OakPlanks();
+
+	unsigned char VillageRoadBlockType = 0;
+	unsigned char VillageRoadBlockMeta = 0;
+	unsigned char VillageWaterRoadBlockType = 0;
+	unsigned char VillageWaterRoadBlockMeta = 0;
+
+	// TODO: Add better reading method
 
 	// Read the metadata values:
 	m_IntendedUse = GetMetadata("IntendedUse");
 	GetStringMapInteger(m_Metadata, "MaxDensity",                m_MaxDensity);
 	GetStringMapInteger(m_Metadata, "MinDensity",                m_MinDensity);
-	GetStringMapInteger(m_Metadata, "VillageRoadBlockType",      m_VillageRoadBlockType);
-	GetStringMapInteger(m_Metadata, "VillageRoadBlockMeta",      m_VillageRoadBlockMeta);
-	GetStringMapInteger(m_Metadata, "VillageWaterRoadBlockType", m_VillageWaterRoadBlockType);
-	GetStringMapInteger(m_Metadata, "VillageWaterRoadBlockMeta", m_VillageWaterRoadBlockMeta);
+	GetStringMapInteger(m_Metadata, "VillageRoadBlockType",      VillageRoadBlockType);
+	GetStringMapInteger(m_Metadata, "VillageRoadBlockMeta",      VillageRoadBlockMeta);
+	GetStringMapInteger(m_Metadata, "VillageWaterRoadBlockType", VillageWaterRoadBlockType);
+	GetStringMapInteger(m_Metadata, "VillageWaterRoadBlockMeta", VillageWaterRoadBlockMeta);
+
+	if (VillageRoadBlockType != 0)
+	{
+		m_VillageRoadBlockType = PaletteUpgrade::FromBlock(VillageWaterRoadBlockType, VillageRoadBlockMeta);
+	}
+
+	if (VillageWaterRoadBlockType != 0)
+	{
+		m_VillageRoadBlockType = PaletteUpgrade::FromBlock(VillageRoadBlockType, VillageRoadBlockMeta);
+	}
 
 	// Read the allowed biomes:
 	AString allowedBiomes = GetMetadata("AllowedBiomes");

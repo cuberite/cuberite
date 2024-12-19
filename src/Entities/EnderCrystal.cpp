@@ -75,9 +75,9 @@ void cEnderCrystal::SpawnOn(cClientHandle & a_ClientHandle)
 void cEnderCrystal::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 {
 	UNUSED(a_Dt);
-	if ((m_World->GetDimension() == dimEnd) && (m_World->GetBlock(POS_TOINT) != E_BLOCK_FIRE))
+	if ((m_World->GetDimension() == dimEnd) && (m_World->GetBlock(POS_TOINT).Type() != BlockType::Fire))
 	{
-		m_World->SetBlock(POS_TOINT, E_BLOCK_FIRE, 0);
+		m_World->SetBlock(POS_TOINT, Block::Fire::Fire());
 	}
 }
 
@@ -97,6 +97,6 @@ void cEnderCrystal::KilledBy(TakeDamageInfo & a_TDI)
 	const auto Position = GetPosition().Floor();
 	if (cChunkDef::IsValidHeight(Position))
 	{
-		m_World->SetBlock(Position, E_BLOCK_FIRE, 0);
+		m_World->SetBlock(Position, Block::Fire::Fire());
 	}
 }
