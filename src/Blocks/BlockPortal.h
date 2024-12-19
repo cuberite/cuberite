@@ -18,7 +18,7 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// No pickups
 		return {};
@@ -33,7 +33,7 @@ private:
 		cWorldInterface & a_WorldInterface,
 		cBlockPluginInterface & a_PluginInterface,
 		cChunk & a_Chunk,
-		const Vector3i a_RelPos
+		const Vector3i a_Position
 	) const override
 	{
 		// Spawn zombie pigmen with a 0.05% chance:
@@ -41,7 +41,7 @@ private:
 		{
 			return;
 		}
-		auto WorldPos = a_Chunk.RelativeToAbsolute(a_RelPos);
+		auto WorldPos = a_Chunk.RelativeToAbsolute(a_Position);
 		a_WorldInterface.SpawnMob(WorldPos.x, WorldPos.y, WorldPos.z, mtZombiePigman, false);
 	}
 
@@ -49,16 +49,16 @@ private:
 
 
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
 		if (!cChunkDef::IsValidHeight(a_Position.addedY(-1)) || !cChunkDef::IsValidHeight(a_Position.addedY(1)))
 		{
 			return false;  // Must be 1 away from the boundary, there will always be another portal or an obsidian between the portal block and the boundary.
 		}
 
-		switch (a_Meta)
+		switch (Block::NetherPortal::Axis(a_Chunk.GetBlock(a_Position)))
 		{
-			case 0x1:
+			case Block::NetherPortal::Axis::X:
 			{
 				static const std::array<Vector3i, 4> PortalCheck
 				{
@@ -72,16 +72,16 @@ private:
 
 				for (const auto & Direction : PortalCheck)
 				{
-					BLOCKTYPE Block;
-					a_Chunk.UnboundedRelGetBlockType(a_Position + Direction, Block);
-					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
+					BlockState Block;
+					a_Chunk.UnboundedRelGetBlock(a_Position + Direction, Block);
+					if ((Block.Type() != BlockType::NetherPortal) && (Block.Type() != BlockType::Obsidian))
 					{
 						return false;
 					}
 				}
 				break;
 			}
-			case 0x2:
+			case Block::NetherPortal::Axis::Z:
 			{
 				static const std::array<Vector3i, 4> PortalCheck
 				{
@@ -95,9 +95,9 @@ private:
 
 				for (const auto & Direction : PortalCheck)
 				{
-					BLOCKTYPE Block;
-					a_Chunk.UnboundedRelGetBlockType(a_Position + Direction, Block);
-					if ((Block != E_BLOCK_NETHER_PORTAL) && (Block != E_BLOCK_OBSIDIAN))
+					BlockState Block;
+					a_Chunk.UnboundedRelGetBlock(a_Position + Direction, Block);
+					if ((Block.Type() != BlockType::NetherPortal) && (Block.Type() != BlockType::Obsidian))
 					{
 						return false;
 					}
@@ -112,9 +112,8 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 24;
 	}
 } ;

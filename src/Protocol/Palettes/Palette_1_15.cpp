@@ -7,7 +7,7 @@ namespace Palette_1_15
 {
 	UInt32 From(const BlockState Block)
 	{
-		using namespace Block;
+		/* using namespace Block;
 
 		switch (Block.ID)
 		{
@@ -8683,7 +8683,8 @@ namespace Palette_1_15
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XM).ID: return 6012;
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XP).ID: return 6013;
 			default: return 0;
-		}
+		} */
+		return 0;
 	}
 
 	UInt32 From(const Item ID)
@@ -9034,9 +9035,9 @@ namespace Palette_1_15
 			case Item::GraniteSlab: return 500;
 			case Item::GraniteStairs: return 487;
 			case Item::GraniteWall: return 251;
-			case Item::Grass: return 76;
+			case Item::ShortGrass: return 76;
 			case Item::GrassBlock: return 8;
-			case Item::GrassPath: return 322;
+			case Item::DirtPath: return 322;
 			case Item::Gravel: return 28;
 			case Item::GrayBanner: return 809;
 			case Item::GrayBed: return 661;
@@ -9065,7 +9066,7 @@ namespace Palette_1_15
 			case Item::Grindstone: return 870;
 			case Item::GuardianSpawnEgg: return 715;
 			case Item::Gunpowder: return 554;
-			case Item::HayBale: return 299;
+			case Item::HayBlock: return 299;
 			case Item::HeartOfTheSea: return 856;
 			case Item::HeavyWeightedPressurePlate: return 270;
 			case Item::HoneyBlock: return 882;
@@ -9408,7 +9409,7 @@ namespace Palette_1_15
 			case Item::SandstoneStairs: return 235;
 			case Item::SandstoneWall: return 256;
 			case Item::Scaffolding: return 505;
-			case Item::Scute: return 519;
+			case Item::TurtleScute: return 519;
 			case Item::SeaLantern: return 367;
 			case Item::SeaPickle: return 80;
 			case Item::Seagrass: return 79;
@@ -9506,8 +9507,8 @@ namespace Palette_1_15
 			case Item::TallGrass: return 327;
 			case Item::Terracotta: return 316;
 			case Item::TippedArrow: return 827;
-			case Item::TNT: return 142;
-			case Item::TNTMinecart: return 783;
+			case Item::Tnt: return 142;
+			case Item::TntMinecart: return 783;
 			case Item::Torch: return 146;
 			case Item::TotemOfUndying: return 836;
 			case Item::TraderLlamaSpawnEgg: return 742;
@@ -9571,7 +9572,7 @@ namespace Palette_1_15
 			case Item::YellowWool: return 86;
 			case Item::ZombieHead: return 772;
 			case Item::ZombieHorseSpawnEgg: return 753;
-			case Item::ZombiePigmanSpawnEgg: return 754;
+			case Item::ZombifiedPiglinSpawnEgg: return 754;  // piglins do not exist in this verion. temp fix
 			case Item::ZombieSpawnEgg: return 752;
 			case Item::ZombieVillagerSpawnEgg: return 755;
 			default: return 0;
@@ -10005,9 +10006,9 @@ namespace Palette_1_15
 			case 500: return Item::GraniteSlab;
 			case 487: return Item::GraniteStairs;
 			case 251: return Item::GraniteWall;
-			case 76: return Item::Grass;
+			case 76: return Item::ShortGrass;
 			case 8: return Item::GrassBlock;
-			case 322: return Item::GrassPath;
+			case 322: return Item::DirtPath;
 			case 28: return Item::Gravel;
 			case 809: return Item::GrayBanner;
 			case 661: return Item::GrayBed;
@@ -10379,7 +10380,7 @@ namespace Palette_1_15
 			case 235: return Item::SandstoneStairs;
 			case 256: return Item::SandstoneWall;
 			case 505: return Item::Scaffolding;
-			case 519: return Item::Scute;
+			case 519: return Item::TurtleScute;
 			case 367: return Item::SeaLantern;
 			case 80: return Item::SeaPickle;
 			case 79: return Item::Seagrass;
@@ -10477,8 +10478,8 @@ namespace Palette_1_15
 			case 327: return Item::TallGrass;
 			case 316: return Item::Terracotta;
 			case 827: return Item::TippedArrow;
-			case 142: return Item::TNT;
-			case 783: return Item::TNTMinecart;
+			case 142: return Item::Tnt;
+			case 783: return Item::TntMinecart;
 			case 146: return Item::Torch;
 			case 836: return Item::TotemOfUndying;
 			case 742: return Item::TraderLlamaSpawnEgg;
@@ -10542,7 +10543,7 @@ namespace Palette_1_15
 			case 86: return Item::YellowWool;
 			case 772: return Item::ZombieHead;
 			case 753: return Item::ZombieHorseSpawnEgg;
-			case 754: return Item::ZombiePigmanSpawnEgg;
+			case 754: return Item::ZombifiedPiglinSpawnEgg;
 			case 752: return Item::ZombieSpawnEgg;
 			case 755: return Item::ZombieVillagerSpawnEgg;
 			default: return Item::Air;

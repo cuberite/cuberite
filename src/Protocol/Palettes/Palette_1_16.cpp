@@ -7,7 +7,7 @@ namespace Palette_1_16
 {
 	UInt32 From(const BlockState Block)
 	{
-		using namespace Block;
+		/* using namespace Block;
 
 		switch (Block.ID)
 		{
@@ -11776,7 +11776,8 @@ namespace Palette_1_16
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XM).ID: return 6548;
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XP).ID: return 6549;
 			default: return 0;
-		}
+		} */
+		return 0;
 	}
 
 	UInt32 From(const Item ID)
@@ -12561,7 +12562,7 @@ namespace Palette_1_16
 			case Item::SandstoneStairs: return 275;
 			case Item::SandstoneWall: return 298;
 			case Item::Scaffolding: return 556;
-			case Item::Scute: return 571;
+			case Item::TurtleScute: return 571;
 			case Item::SeaLantern: return 417;
 			case Item::SeaPickle: return 93;
 			case Item::Seagrass: return 92;
@@ -12698,7 +12699,7 @@ namespace Palette_1_16
 			case Item::WarpedFence: return 215;
 			case Item::WarpedFenceGate: return 259;
 			case Item::WarpedFungus: return 127;
-			case Item::WarpedFungusOnA_stick: return 842;
+			case Item::WarpedFungusOnAStick: return 842;
 			case Item::WarpedHyphae: return 68;
 			case Item::WarpedNylium: return 13;
 			case Item::WarpedPlanks: return 22;
@@ -13626,7 +13627,7 @@ namespace Palette_1_16
 			case 275: return Item::SandstoneStairs;
 			case 298: return Item::SandstoneWall;
 			case 556: return Item::Scaffolding;
-			case 571: return Item::Scute;
+			case 571: return Item::TurtleScute;
 			case 417: return Item::SeaLantern;
 			case 93: return Item::SeaPickle;
 			case 92: return Item::Seagrass;
@@ -13763,7 +13764,7 @@ namespace Palette_1_16
 			case 215: return Item::WarpedFence;
 			case 259: return Item::WarpedFenceGate;
 			case 127: return Item::WarpedFungus;
-			case 842: return Item::WarpedFungusOnA_stick;
+			case 842: return Item::WarpedFungusOnAStick;
 			case 68: return Item::WarpedHyphae;
 			case 13: return Item::WarpedNylium;
 			case 22: return Item::WarpedPlanks;

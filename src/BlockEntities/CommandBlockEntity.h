@@ -27,7 +27,7 @@ class cCommandBlockEntity :
 public:  // tolua_export
 
 	/** Creates a new empty command block entity */
-	cCommandBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cCommandBlockEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World);
 
 	// cBlockEntity overrides:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
@@ -37,7 +37,7 @@ public:  // tolua_export
 
 	void SetLastOutput(const AString & a_LastOut);
 
-	void SetResult(const NIBBLETYPE a_Result);
+	void SetResult(const unsigned char a_Result);
 
 	// tolua_begin
 
@@ -54,7 +54,7 @@ public:  // tolua_export
 	const AString & GetLastOutput(void) const;
 
 	/** Retrieves the result (signal strength) of the last operation */
-	NIBBLETYPE GetResult(void) const;
+	unsigned char GetResult(void) const;
 
 	// tolua_end
 
@@ -69,5 +69,5 @@ private:
 
 	AString m_LastOutput;
 
-	NIBBLETYPE m_Result;
+	unsigned char m_Result;
 } ;  // tolua_export

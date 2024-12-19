@@ -127,9 +127,9 @@ void cItemGrid::SetSlot(int a_X, int a_Y, const cItem & a_Item)
 
 
 
-void cItemGrid::SetSlot(int a_X, int a_Y, short a_ItemType, char a_ItemCount, short a_ItemDamage)
+void cItemGrid::SetSlot(int a_X, int a_Y, Item a_Item, char a_ItemCount, short a_ItemDamage)
 {
-	SetSlot(GetSlotNum(a_X, a_Y), cItem(a_ItemType, a_ItemCount, a_ItemDamage));
+	SetSlot(GetSlotNum(a_X, a_Y), cItem(a_Item, a_ItemCount, a_ItemDamage));
 }
 
 
@@ -157,9 +157,9 @@ void cItemGrid::SetSlot(int a_SlotNum, const cItem & a_Item)
 
 
 
-void cItemGrid::SetSlot(int a_SlotNum, short a_ItemType, char a_ItemCount, short a_ItemDamage)
+void cItemGrid::SetSlot(int a_SlotNum, Item a_Item, char a_ItemCount, short a_ItemDamage)
 {
-	SetSlot(a_SlotNum, cItem(a_ItemType, a_ItemCount, a_ItemDamage));
+	SetSlot(a_SlotNum, cItem(a_Item, a_ItemCount, a_ItemDamage));
 }
 
 
@@ -765,11 +765,11 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, s
 		int Rnd = (Noise.IntNoise1DInt(i) / 7);
 		int LootRnd = Rnd % TotalProbab;
 		Rnd >>= 8;
-		cItem CurrentLoot = cItem(E_ITEM_ENCHANTED_BOOK, 1, 0);
+		cItem CurrentLoot = cItem(Item::EnchantedBook, 1);
 
 		// Choose the enchantments
 		cWeightedEnchantments Enchantments;
-		cEnchantments::AddItemEnchantmentWeights(Enchantments, E_ITEM_BOOK, static_cast<unsigned>(24 + Noise.IntNoise2DInt(a_Seed, TotalProbab) % 7));
+		cEnchantments::AddItemEnchantmentWeights(Enchantments, Item::Book, static_cast<unsigned>(24 + Noise.IntNoise2DInt(a_Seed, TotalProbab) % 7));
 		int NumEnchantments = Noise.IntNoise3DInt(TotalProbab, Rnd, a_Seed) % 5;  // The number of enchantments this book wil get.
 
 		for (int j = 0; j <= NumEnchantments; j++)

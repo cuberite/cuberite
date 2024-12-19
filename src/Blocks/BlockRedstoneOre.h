@@ -28,7 +28,7 @@ public:
 		const Vector3i a_CursorPos
 	) const override
 	{
-		a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_REDSTONE_ORE_GLOWING, 0);
+		a_ChunkInterface.FastSetBlock(a_BlockPos, Block::RedstoneOre::RedstoneOre(!Block::RedstoneOre::Lit(a_ChunkInterface.GetBlock(a_BlockPos))));
 		return false;
 	}
 
@@ -43,7 +43,7 @@ public:
 		const Vector3i a_BlockPos
 	) const override
 	{
-		a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_REDSTONE_ORE_GLOWING, 0);
+		a_ChunkInterface.FastSetBlock(a_BlockPos, Block::RedstoneOre::RedstoneOre(!Block::RedstoneOre::Lit(a_ChunkInterface.GetBlock(a_BlockPos))));
 	}
 
 
@@ -55,38 +55,3 @@ public:
 		return true;
 	}
 };
-
-
-
-
-
-class cBlockGlowingRedstoneOreHandler final :
-	public cBlockOreHandler
-{
-	using Super = cBlockOreHandler;
-
-public:
-
-	using Super::Super;  // Inherit constructor from base
-
-
-
-
-
-	virtual void OnUpdate(
-		cChunkInterface & a_ChunkInterface,
-		cWorldInterface & a_WorldInterface,
-		cBlockPluginInterface & a_BlockPluginInterface,
-		cChunk & a_Chunk,
-		const Vector3i a_RelPos
-	) const override
-	{
-		auto BlockPos = a_Chunk.RelativeToAbsolute(a_RelPos);
-		a_ChunkInterface.SetBlock(BlockPos, E_BLOCK_REDSTONE_ORE, 0);
-	}
-};
-
-
-
-
-

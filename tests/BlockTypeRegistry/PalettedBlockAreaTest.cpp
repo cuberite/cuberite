@@ -12,16 +12,16 @@ static void testCreation()
 	LOG("Testing PBA creation...");
 
 	// Check failures:
-	TEST_ASSERTS(PalettedBlockArea::createFilled({-2, 3, 4}, "block", BlockState()));  // Negative coords
-	TEST_THROWS(PalettedBlockArea::createFilled({4096, 4096, 4096}, "block", BlockState()), std::runtime_error);  // Size too large for UInt32
+	TEST_ASSERTS(PalettedBlockArea::createFilled({-2, 3, 4}, "block", CustomBlockState()));  // Negative coords
+	TEST_THROWS(PalettedBlockArea::createFilled({4096, 4096, 4096}, "block", CustomBlockState()), std::runtime_error);  // Size too large for UInt32
 
 	// Check that a created area really is filled:
-	auto pba = PalettedBlockArea::createFilled({2, 3, 4}, "block", BlockState());
+	auto pba = PalettedBlockArea::createFilled({2, 3, 4}, "block", CustomBlockState());
 	TEST_EQUAL(pba.size(), Vector3i(2, 3, 4));
 	TEST_EQUAL(pba.whole(), cCuboid({0, 0, 0}, {2, 3, 4}));
 	TEST_EQUAL(pba.palette().count(), 1);
-	TEST_EQUAL(pba.maybePaletteIndex("block", BlockState()), (std::make_pair<UInt32, bool>(0, true)));
-	TEST_EQUAL(pba.maybePaletteIndex("nonexistentBlock", BlockState()).second, false);
+	TEST_EQUAL(pba.maybePaletteIndex("block", CustomBlockState()), (std::make_pair<UInt32, bool>(0, true)));
+	TEST_EQUAL(pba.maybePaletteIndex("nonexistentBlock", CustomBlockState()).second, false);
 	for (int x = 0; x < 2; ++x)
 	{
 		for (int y = 0; y < 3; ++y)
@@ -42,20 +42,20 @@ static void testCreation()
 static void testSetting()
 {
 	LOG("Testing PBA's set and get APIs...");
-	auto pba = PalettedBlockArea::createFilled({2, 3, 4}, "block1", BlockState());
-	pba.setBlock({0, 0, 0}, "block2", BlockState());
-	pba.setBlock({1, 0, 0}, "block2", BlockState("key1", "value1"));
-	TEST_ASSERTS(pba.setBlock({2, 0, 0}, "block2", BlockState()));  // Invalid coords
+	auto pba = PalettedBlockArea::createFilled({2, 3, 4}, "block1", CustomBlockState());
+	pba.setBlock({0, 0, 0}, "block2", CustomBlockState());
+	pba.setBlock({1, 0, 0}, "block2", CustomBlockState("key1", "value1"));
+	TEST_ASSERTS(pba.setBlock({2, 0, 0}, "block2", CustomBlockState()));  // Invalid coords
 	pba.setBlock({0, 1, 0}, 1);
 	TEST_ASSERTS(pba.setBlock({1, 1, 0}, 100));  // Invalid palette index
 
 	// Check that the blocks have been set:
 	TEST_EQUAL(pba.palette().count(), 3);
-	TEST_EQUAL(pba.block({0, 0, 0}), (std::make_pair<AString, BlockState>("block2", BlockState())));
-	TEST_EQUAL(pba.block({1, 0, 0}), (std::make_pair<AString, BlockState>("block2", BlockState("key1", "value1"))));
+	TEST_EQUAL(pba.block({0, 0, 0}), (std::make_pair<AString, CustomBlockState>("block2", CustomBlockState())));
+	TEST_EQUAL(pba.block({1, 0, 0}), (std::make_pair<AString, CustomBlockState>("block2", CustomBlockState("key1", "value1"))));
 	TEST_ASSERTS(pba.block({2, 0, 0}));  // Invalid coords
-	TEST_EQUAL(pba.block({0, 1, 0}), (std::make_pair<AString, BlockState>("block2", BlockState())));
-	TEST_EQUAL(pba.block({1, 1, 0}), (std::make_pair<AString, BlockState>("block1", BlockState())));  // Didn't overwrite with invalid palette index
+	TEST_EQUAL(pba.block({0, 1, 0}), (std::make_pair<AString, CustomBlockState>("block2", CustomBlockState())));
+	TEST_EQUAL(pba.block({1, 1, 0}), (std::make_pair<AString, CustomBlockState>("block1", CustomBlockState())));  // Didn't overwrite with invalid palette index
 	TEST_EQUAL(pba.blockPaletteIndex({0, 0, 0}), 1);
 	TEST_EQUAL(pba.blockPaletteIndex({1, 0, 0}), 2);
 	TEST_ASSERTS(pba.blockPaletteIndex({2, 0, 0}));  // Invalid coords
@@ -64,9 +64,9 @@ static void testSetting()
 
 	// Test filling:
 	LOG("Testing PBA's fill API...");
-	pba.fill("block3", BlockState("key1", "value1"));
+	pba.fill("block3", CustomBlockState("key1", "value1"));
 	TEST_EQUAL(pba.palette().count(), 1);
-	TEST_EQUAL(pba.paletteEntry(0), (std::make_pair<AString, BlockState>("block3", BlockState("key1", "value1"))));
+	TEST_EQUAL(pba.paletteEntry(0), (std::make_pair<AString, CustomBlockState>("block3", CustomBlockState("key1", "value1"))));
 	for (int x = 0; x < 2; ++x)
 	{
 		for (int y = 0; y < 2; ++y)
@@ -87,25 +87,25 @@ static void testSetting()
 The PBAs are then used for paste()-testing.
 Used to be a function, but clang-3.5 didn't like it ("error: debug information for auto is not yet supported"). */
 #define PREPARE_PASTING_PBAS \
-	auto pbaA = PalettedBlockArea::createFilled({5, 5, 5}, "blockA", BlockState()); \
+	auto pbaA = PalettedBlockArea::createFilled({5, 5, 5}, "blockA", CustomBlockState()); \
 	for (int x = 0; x < 5; ++x) \
 	{ \
 		for (int y = 0; y < 5; ++y) \
 		{ \
 			for (int z = 0; z < 5; ++z) \
 			{ \
-				pbaA.setBlock({x, y, z}, fmt::format(FMT_STRING("A-{}-{}-{}"), x, y, z), BlockState()); \
+				pbaA.setBlock({x, y, z}, fmt::format(FMT_STRING("A-{}-{}-{}"), x, y, z), CustomBlockState()); \
 			} \
 		} \
 	} \
-	auto pbaB = PalettedBlockArea::createFilled({6, 6, 6}, "blockB", BlockState()); \
+	auto pbaB = PalettedBlockArea::createFilled({6, 6, 6}, "blockB", CustomBlockState()); \
 	for (int x = 0; x < 6; ++x) \
 	{ \
 		for (int y = 0; y < 6; ++y) \
 		{ \
 			for (int z = 0; z < 6; ++z) \
 			{ \
-				pbaB.setBlock({x, y, z}, fmt::format(FMT_STRING("B-{}-{}-{}"), x, y, z), BlockState()); \
+				pbaB.setBlock({x, y, z}, fmt::format(FMT_STRING("B-{}-{}-{}"), x, y, z), CustomBlockState()); \
 			} \
 		} \
 	} \

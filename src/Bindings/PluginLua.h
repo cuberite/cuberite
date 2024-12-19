@@ -65,7 +65,7 @@ public:
 	virtual void Tick(float a_Dt) override;
 
 	virtual bool OnBlockSpread              (cWorld & a_World, int a_BlockX, int a_BlockY, int a_BlockZ, eSpreadSource a_Source) override;
-	virtual bool OnBlockToPickups           (cWorld & a_World, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, const cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool, cItems & a_Pickups) override;
+	virtual bool OnBlockToPickups           (cWorld & a_World, Vector3i a_BlockPos, BlockState a_Block, const cBlockEntity * a_BlockEntity, const cEntity * a_Digger, const cItem * a_Tool, cItems & a_Pickups) override;
 	virtual bool OnBrewingCompleting        (cWorld & a_World, cBrewingstandEntity & a_BrewingstandEntity) override;
 	virtual bool OnBrewingCompleted         (cWorld & a_World, cBrewingstandEntity & a_BrewingstandEntity) override;
 	virtual bool OnChat                     (cPlayer & a_Player, AString & a_Message) override;
@@ -92,8 +92,8 @@ public:
 	virtual bool OnLogin                    (cClientHandle & a_Client, UInt32 a_ProtocolVersion, const AString & a_Username) override;
 	virtual bool OnLoginForge               (cClientHandle & a_Client, const AStringMap & a_Mods) override;
 	virtual bool OnPlayerAnimation          (cPlayer & a_Player, int a_Animation) override;
-	virtual bool OnPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
-	virtual bool OnPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual bool OnPlayerBreakingBlock      (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BlockState a_Block) override;
+	virtual bool OnPlayerBrokenBlock        (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, BlockState a_Block) override;
 	virtual bool OnPlayerDestroyed          (cPlayer & a_Player) override;
 	virtual bool OnPlayerEating             (cPlayer & a_Player) override;
 	virtual bool OnPlayerFished             (cPlayer & a_Player, const cItems & a_Reward, const int ExperienceAmount) override;
@@ -112,9 +112,9 @@ public:
 	virtual bool OnPlayerSpawned            (cPlayer & a_Player) override;
 	virtual bool OnEntityTeleport           (cEntity & a_Entity, const Vector3d & a_OldPosition, const Vector3d & a_NewPosition) override;
 	virtual bool OnPlayerTossingItem        (cPlayer & a_Player) override;
-	virtual bool OnPlayerUsedBlock          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual bool OnPlayerUsedBlock          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BlockState a_Block) override;
 	virtual bool OnPlayerUsedItem           (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
-	virtual bool OnPlayerUsingBlock         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual bool OnPlayerUsingBlock         (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ, BlockState a_Block) override;
 	virtual bool OnPlayerUsingItem          (cPlayer & a_Player, int a_BlockX, int a_BlockY, int a_BlockZ, eBlockFace a_BlockFace, int a_CursorX, int a_CursorY, int a_CursorZ) override;
 	virtual bool OnPluginMessage            (cClientHandle & a_Client, const AString & a_Channel, ContiguousByteBufferView a_Message) override;
 	virtual bool OnPluginsLoaded            (void) override;
