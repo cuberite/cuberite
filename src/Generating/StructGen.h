@@ -78,7 +78,7 @@ class cStructGenLakes :
 	public cFinishGen
 {
 public:
-	cStructGenLakes(int a_Seed, BLOCKTYPE a_Fluid, cTerrainShapeGen & a_ShapeGen, int a_Probability) :
+	cStructGenLakes(int a_Seed, BlockType a_Fluid, cTerrainShapeGen & a_ShapeGen, int a_Probability) :
 		m_Noise(a_Seed),
 		m_Seed(a_Seed),
 		m_Fluid(a_Fluid),
@@ -90,7 +90,7 @@ public:
 protected:
 	cNoise             m_Noise;
 	int                m_Seed;
-	BLOCKTYPE          m_Fluid;
+	BlockType          m_Fluid;
 	cTerrainShapeGen & m_ShapeGen;
 
 	/** Chance, [0 .. 100], of a chunk having the lake. */

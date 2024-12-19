@@ -68,6 +68,7 @@ public:
 		wtHopper      = 9,
 		wtDropper     = 10,
 		wtAnimalChest = 11,
+		wtCrafter     = 12,
 	};
 
 	// tolua_end

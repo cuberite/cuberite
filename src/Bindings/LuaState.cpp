@@ -1105,6 +1105,17 @@ void cLuaState::Push(std::chrono::milliseconds a_Value)
 
 
 
+void cLuaState::Push(BlockState a_Block)
+{
+	ASSERT(IsValid());
+
+	tolua_pushnumber(m_LuaState, static_cast<lua_Number>(a_Block.ID));
+}
+
+
+
+
+
 void cLuaState::Pop(int a_NumValuesToPop)
 {
 	ASSERT(IsValid());
@@ -1493,6 +1504,20 @@ bool cLuaState::GetStackValue(int a_StackPos, std::string_view & a_Value)
 	if (Value != nullptr)
 	{
 		a_Value = { Value, Length };
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
+bool cLuaState::GetStackValue(int a_StackPos, BlockState & a_Value)
+{
+	if (lua_isnumber(m_LuaState, a_StackPos))
+	{
+		a_Value = static_cast<BlockState::DataType>(tolua_tonumber(m_LuaState, a_StackPos, a_Value.ID));
 		return true;
 	}
 	return false;

@@ -4,6 +4,8 @@
 #include "ItemHandler.h"
 #include "../World.h"
 #include "../Entities/Player.h"
+#include "../Blocks/BlockWool.h"
+#include "../Blocks/BlockLeaves.h"
 
 
 
@@ -30,14 +32,12 @@ public:
 		eBlockFace a_ClickedBlockFace
 	) const override
 	{
-		BLOCKTYPE Block;
-		NIBBLETYPE BlockMeta;
-		if (!a_World->GetBlockTypeMeta(a_ClickedBlockPos, Block, BlockMeta))
+		BlockState BrokenBlock;
+		if (a_World->GetBlock(a_ClickedBlockPos, BrokenBlock))
 		{
 			return false;
 		}
-
-		if ((Block == E_BLOCK_LEAVES) || (Block == E_BLOCK_NEW_LEAVES))
+		if (cBlockLeavesHandler::IsBlockLeaves(BrokenBlock))
 		{
 			a_World->DropBlockAsPickups(a_ClickedBlockPos, a_Player, &a_HeldItem);
 			return true;
@@ -50,18 +50,16 @@ public:
 
 
 
-	virtual bool CanHarvestBlock(BLOCKTYPE a_BlockType) const override
+	virtual bool CanHarvestBlock(BlockState a_Block) const override
 	{
-		switch (a_BlockType)
+		switch (a_Block.Type())
 		{
-			case E_BLOCK_COBWEB:
-			case E_BLOCK_DEAD_BUSH:
-			case E_BLOCK_VINES:
-			{
+			case BlockType::Cobweb:
+			case BlockType::DeadBush:
+			case BlockType::Vine:
 				return true;
-			}
+			default: return Super::CanHarvestBlock(a_Block);
 		}
-		return Super::CanHarvestBlock(a_BlockType);
 	}
 
 
@@ -77,19 +75,20 @@ public:
 			case dlaBreakBlockInstant:  return 1;
 		}
 		UNREACHABLE("Unsupported durability loss action");
+		return 0;
 	}
 
 
 
 
 
-	virtual float GetBlockBreakingStrength(BLOCKTYPE a_Block) const override
+	virtual float GetBlockBreakingStrength(BlockState a_Block) const override
 	{
-		if ((a_Block == E_BLOCK_COBWEB) || IsBlockMaterialLeaves(a_Block))
+		if ((a_Block == BlockType::Cobweb) || cBlockLeavesHandler::IsBlockLeaves(a_Block))
 		{
 			return 15.0f;
 		}
-		else if (a_Block == E_BLOCK_WOOL)
+		else if (cBlockWoolHandler::IsBlockWool(a_Block))
 		{
 			return 5.0f;
 		}

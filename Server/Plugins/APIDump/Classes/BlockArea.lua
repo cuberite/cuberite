@@ -146,7 +146,7 @@ return
 							Type = "number",
 						},
 					},
-					Notes = "Initializes this BlockArea to an empty area of the specified size and origin of {0, 0, 0}. Datatypes are set to baTypes + baMetas. Any previous contents are lost.",
+					Notes = "Initializes this BlockArea to an empty area of the specified size and origin of {0, 0, 0}. Datatypes are set to baBlocks + baMetas. Any previous contents are lost.",
 				},
 				{
 					Params =
@@ -178,7 +178,7 @@ return
 							Type = "Vector3i",
 						},
 					},
-					Notes = "Creates a new area of the specified size. Datatypes are set to baTypes + baMetas. Origin is set to all zeroes. BlockTypes are set to air, block metas to zero, blocklights to zero and skylights to full light.",
+					Notes = "Creates a new area of the specified size. Datatypes are set to baBlocks + baMetas. Origin is set to all zeroes. BlockTypes are set to air, block metas to zero, blocklights to zero and skylights to full light.",
 				},
 				{
 					Params =
@@ -513,6 +513,32 @@ return
 				Notes = "Calls the specified callback with the block entity for each block entity contained in the object. Returns true if all block entities have been processed (including when there are zero block entities), or false if the callback has aborted the enumeration by returning true. The CallbackFunction has the following signature: <pre class=\"prettyprint lang-lua\">function Callback({{cBlockEntity|BlockEntity}})</pre> The callback should return false or no value to continue with the next block entity, or true to abort the enumeration.",
 			},  -- ForEachBlockEntity
 
+			GetBlock =
+			{
+				Params =
+				{
+					{
+						Name = "BlockX",
+						Type = "number",
+					},
+					{
+						Name = "BlockY",
+						Type = "number",
+					},
+					{
+						Name = "BlockZ",
+						Type = "number",
+					},
+				},
+				Returns =
+				{
+					{
+						Name = "Block",
+						Type = "number",
+					},
+				},
+				Notes = "Returns the block at the specified absolute coords",
+			},
 			GetBlockLight =
 			{
 				Params =
@@ -1026,7 +1052,17 @@ return
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if current datatypes include block metas",
+				Notes = "Returns true if current datatypes include block metas. DEPRECATED!",
+			},
+			HasBlocks =
+			{
+				Return =
+				{
+					{
+						Type = "boolean",
+					},
+				},
+				Notes = "Returns true if current datatypes include blocks",
 			},
 			HasBlockSkyLights =
 			{
@@ -1109,7 +1145,7 @@ return
 						Type = "boolean",
 					},
 				},
-				Notes = "Returns true if the specified combination of datatypes (ba* constants added together) is valid. Most combinations are valid, but for example baBlockEntities without baTypes is an invalid combination.",
+				Notes = "Returns true if the specified combination of datatypes (ba* constants added together) is valid. Most combinations are valid, but for example baBlockEntities without baBlocks is an invalid combination.",
 			},  -- IsValidDataTypeCombination
 
 			IsValidRelCoords =
@@ -1278,7 +1314,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Reads the area from World, returns true if successful. baTypes and baMetas are read.",
+					Notes = "Reads the area from World, returns true if successful. baBlocks and baMetas are read.",
 				},
 				{
 					Params =
@@ -1328,7 +1364,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Reads the area from World, returns true if successful. baTypes and baMetas are read.",
+					Notes = "Reads the area from World, returns true if successful. baBlocks and baMetas are read.",
 				},
 				{
 					Params =
@@ -1397,7 +1433,7 @@ return
 							Type = "boolean",
 						},
 					},
-					Notes = "Reads the area from World, returns true if successful. baTypes and baMetas are read.",
+					Notes = "Reads the area from World, returns true if successful. baBlocks and baMetas are read.",
 				},
 				{
 					Params =
@@ -1602,6 +1638,29 @@ return
 					},
 				},
 				Notes = "Sets the blocklight at the specified absolute coords",
+			},
+			SetBlock =
+			{
+				Params =
+				{
+					{
+						Name = "BlockX",
+						Type = "number",
+					},
+					{
+						Name = "BlockY",
+						Type = "number",
+					},
+					{
+						Name = "BlockZ",
+						Type = "number",
+					},
+					{
+						Name = "Block",
+						Type = "number",
+					},
+				},
+				Notes = "Sets the block at the specified absolute coords",
 			},
 			SetBlockMeta =
 			{
@@ -1996,7 +2055,7 @@ return
 		{
 			baBlockEntities =
 			{
-				Notes = "Operations should work on block entities. Note that this flag is invalid without baTypes.",
+				Notes = "Operations should work on block entities. Note that this flag is invalid without baBlocks.",
 			},
 			baLight =
 			{
@@ -2010,7 +2069,7 @@ return
 			{
 				Notes = "Operations should work on skylight",
 			},
-			baTypes =
+			baBlocks =
 			{
 				Notes = "Operation should work on block types",
 			},
@@ -2049,7 +2108,7 @@ return
 		},
 		ConstantGroups =
 		{
-			BATypes =
+			baBlocks =
 			{
 				Include = "ba.*",
 				TextBefore = [[
