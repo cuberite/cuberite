@@ -12,6 +12,7 @@ target_sources(
 	Palette_1_21.cpp
 	Palette_1_21_2.cpp
 	Upgrade.cpp
+	BlockMap.cpp
 
 	Palette_1_13.h
 	Palette_1_13_1.h
@@ -24,5 +25,5 @@ target_sources(
 	Palette_1_21.h
 	Palette_1_21_2.h
 	Upgrade.h
-
-	BlockMap.h)
+	BlockMap.h
+)

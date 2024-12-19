@@ -56,7 +56,6 @@
 #include <fstream>
 
 
-
 #ifdef __clang__
 	#pragma clang diagnostic push
 	#pragma clang diagnostic ignored "-Wglobal-constructors"
@@ -141,27 +140,12 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 		m_SettingsFilename = a_OverridesRepo.GetValue("Server","ConfigFile");
 	}
 
-	/*
-	auto & loadmap = *BlockMap::BlMap::GetMap();
-	auto & savemap = *BlockMap::BlMap::GetSaveMap();
-	loadmap.reserve(30000);
-	savemap.reserve(30000);
-	std::fstream f;
-	f.open("Protocol/Blocks.txt", std::ios::in);
-	ASSERT(!f.fail());
-	AString line;
-	while (std::getline(f, line))
-	{
-		auto pos = std::find(line.begin(), line.end(), '-');
-		size_t b = static_cast<size_t>(std::distance(line.begin(), pos)) + 1;
-		auto id = static_cast<ENUM_BLOCKS>(std::stoi(line, nullptr, 10));
-		auto strid = line.substr(b, std::string::npos);
-		loadmap[strid] = id;
-		savemap[id] = strid;
-	}
-	*/
-
-	// LOGD("%d hash tbl size", (*BlockMap::BlMap::GetMap()).size());
+	LOGD("Loading block palettes");
+	m_BlockMap = new BlockMap::cBlockMap();
+	m_BlockMap->AddVersion(cProtocol::Version::Latest);
+	m_BlockMap->AddVersion(cProtocol::Version::v1_21);
+	m_BlockMap->AddVersion(cProtocol::Version::v1_20);
+	m_BlockMap->AddVersion(cProtocol::Version::v1_19);
 
 	auto IniFile = std::make_unique<cIniFile>();
 	bool IsNewIniFile = !IniFile->ReadFile(m_SettingsFilename);
@@ -271,6 +255,9 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 
 	LOGD("Stopping plugin manager...");
 	delete m_PluginManager; m_PluginManager = nullptr;
+
+	LOGD("Unloading block palettes");
+	delete m_BlockMap; m_BlockMap = nullptr;
 
 	LOG("Cleaning up...");
 	delete m_Server; m_Server = nullptr;

@@ -6,5 +6,5 @@
 
 namespace Palette_1_18
 {
-
+	UInt32 From(BlockState Block);
 }
