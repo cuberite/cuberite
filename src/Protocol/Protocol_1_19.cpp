@@ -13,7 +13,7 @@
 #include "../Entities/ArrowEntity.h"
 #include "../Entities/Boat.h"
 #include "../Entities/EnderCrystal.h"
-
+#include "Palettes/Palette_1_19.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -223,6 +223,33 @@ bool cProtocol_1_19::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		default: break;
 	}
 	UNREACHABLE("");
+}
+
+
+
+
+
+UInt32 cProtocol_1_19::GetProtocolBlockType(BlockState a_Block) const
+{
+	return Palette_1_19::From(a_Block);
+}
+
+
+
+
+
+UInt32 cProtocol_1_19::GetProtocolItemType(Item a_ItemID) const
+{
+	return Palette_1_19::From(a_ItemID);
+}
+
+
+
+
+
+Item cProtocol_1_19::GetItemFromProtocolID(UInt32 a_ProtocolID) const
+{
+	return Palette_1_19::ToItem(a_ProtocolID);
 }
 
 
@@ -1291,7 +1318,7 @@ Int32 cProtocol_1_19::GetProtocolCommandArgumentID(eCommandParserType a_ParserTy
 		case eCommandParserType::IntRange:          return 37;
 		case eCommandParserType::FloatRange:        return 38;
 		case eCommandParserType::Dimension:         return 41;
-		case eCommandParserType::Time:              return 42;
+		// case eCommandParserType::Time:              return 42;
 		case eCommandParserType::ResourceOrTag:     return 43;
 		case eCommandParserType::Resource:          return 44;
 		case eCommandParserType::TemplateMirror:    return 45;
