@@ -18,7 +18,7 @@ option(PRECOMPILE_HEADERS "Enable precompiled headers for faster builds" ON)
 option(SELF_TEST "Enables testing code to be built" OFF)
 option(UNITY_BUILDS "Enables source aggregation for faster builds" ON)
 option(WHOLE_PROGRAM_OPTIMISATION "Enables link time optimisation for Release" ON)
-
+вафыавфыафвы
 include("CMake/AddDependencies.cmake")
 include("CMake/Fixups.cmake")
 include("CMake/GenerateBindings.cmake")
