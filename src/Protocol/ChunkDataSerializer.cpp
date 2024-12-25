@@ -92,33 +92,39 @@ namespace
 
 	auto Palette757(const BlockState a_Block)
 	{
-		return Palette_1_18::From(a_Block);
+		// return Palette_1_18::From(a_Block);
+		return 0;
 	}
 
 	auto Palette759(const BlockState a_Block)
 	{
-		return Palette_1_19::From(a_Block);
+		// return Palette_1_19::From(a_Block);
+		return 0;
 	}
 
 	// TODO: Implement palettes
 	auto Palette760(const BlockState a_Block)
 	{
 		// return Palette_1_19_1::From(a_Block);
+		return 0;
 	}
 
 	auto Palette761(const BlockState a_Block)
 	{
 		// return Palette_1_19_3::From(a_Block);
+		return 0;
 	}
 
 	auto Palette762(const BlockState a_Block)
 	{
 		// return Palette_1_19_4::From(a_Block);
+		return 0;
 	}
 
 	auto Palette766(const BlockState a_Block)
 	{
 		// return Palette_1_20_5::From(a_Block);
+		return 0;
 	}
 
 	auto Palette763(const BlockState a_Block)
@@ -129,6 +135,7 @@ namespace
 	auto Palette764(const BlockState a_Block)
 	{
 		// return Palette_1_20_2::From(a_Block);
+		return 0;
 	}
 
 	auto Palette767(const BlockState a_Block)
