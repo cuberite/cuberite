@@ -231,7 +231,8 @@ bool cProtocol_1_19::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 
 UInt32 cProtocol_1_19::GetProtocolBlockType(BlockState a_Block) const
 {
-	return Palette_1_19::From(a_Block);
+	// return Palette_1_19::From(a_Block);
+	return 0;
 }
 
 
@@ -240,7 +241,8 @@ UInt32 cProtocol_1_19::GetProtocolBlockType(BlockState a_Block) const
 
 UInt32 cProtocol_1_19::GetProtocolItemType(Item a_ItemID) const
 {
-	return Palette_1_19::From(a_ItemID);
+	// return Palette_1_19::From(a_ItemID);
+	return 0;
 }
 
 
@@ -249,7 +251,8 @@ UInt32 cProtocol_1_19::GetProtocolItemType(Item a_ItemID) const
 
 Item cProtocol_1_19::GetItemFromProtocolID(UInt32 a_ProtocolID) const
 {
-	return Palette_1_19::ToItem(a_ProtocolID);
+	// return Palette_1_19::ToItem(a_ProtocolID);
+	return Item();
 }
 
 
