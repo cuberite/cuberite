@@ -1808,8 +1808,6 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 	cFastNBTWriter Writer;
 	if (a_Item.m_ItemType == Item::Potion)
 	{
-		bool strong_potion = false;
-		bool long_potion = false;
 		AString potionname;
 		AString finalname = "minecraft:";
 		int potion_dmg = a_Item.m_ItemDamage & 0x1F;
@@ -1845,12 +1843,10 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 		}
 		if ((cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1) && (potionname != "thick"))
 		{
-			strong_potion = true;
 			finalname += "strong_";
 		}
 		if (((a_Item.m_ItemDamage & 0x40) == 0x40) && (potionname != "mundane"))
 		{
-			long_potion = true;
 			finalname += "long_";
 		}
 		finalname += potionname;
