@@ -92,12 +92,14 @@ namespace
 
 	auto Palette757(const BlockState a_Block)
 	{
-		return Palette_1_18::From(a_Block);
+		// return Palette_1_18::From(a_Block);
+		return 0;
 	}
 
 	auto Palette759(const BlockState a_Block)
 	{
-		return Palette_1_19::From(a_Block);
+		// return Palette_1_19::From(a_Block);
+		return 0;
 	}
 
 	// TODO: Implement palettes

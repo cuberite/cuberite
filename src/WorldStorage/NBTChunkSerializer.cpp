@@ -312,7 +312,8 @@ public:
 
 			default:
 			{
-				ASSERT(!"Unhandled block entity saved into Anvil");
+				FLOGERROR("{}: Got unintended block entity to save: {}", __FUNCTION__, a_Entity->GetBlockType());
+				UNREACHABLE("Unhandled block entity saved into Anvil");
 			}
 		}
 		mHasHadBlockEntity = true;
