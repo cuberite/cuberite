@@ -43,7 +43,7 @@ public:
 			case Item::BambooDoor:               GET_DOOR_TYPE(BambooDoor)
 			case Item::CherryDoor:               GET_DOOR_TYPE(CherryDoor)
 			case Item::CopperDoor:               GET_DOOR_TYPE(CopperDoor)
-			case Item::MangroveDoor:             GET_DOOR_TYPE(MangroveDoor);
+			case Item::MangroveDoor:             GET_DOOR_TYPE(MangroveDoor)
 			case Item::ExposedCopperDoor:        GET_DOOR_TYPE(ExposedCopperDoor)
 			case Item::WeatheredCopperDoor:      GET_DOOR_TYPE(WeatheredCopperDoor)
 			case Item::OxidizedCopperDoor:       GET_DOOR_TYPE(OxidizedCopperDoor)

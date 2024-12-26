@@ -262,7 +262,7 @@ public:
 			case BlockType::BambooDoor:               SETOPEN(BambooDoor)
 			case BlockType::CherryDoor:               SETOPEN(CherryDoor)
 			case BlockType::CopperDoor:               SETOPEN(CopperDoor)
-			case BlockType::MangroveDoor:             SETOPEN(MangroveDoor);
+			case BlockType::MangroveDoor:             SETOPEN(MangroveDoor)
 			case BlockType::ExposedCopperDoor:        SETOPEN(ExposedCopperDoor)
 			case BlockType::WeatheredCopperDoor:      SETOPEN(WeatheredCopperDoor)
 			case BlockType::OxidizedCopperDoor:       SETOPEN(OxidizedCopperDoor)
@@ -313,7 +313,7 @@ public:
 			case BlockType::BambooDoor:               DoorBlock = SETPOWERED(BambooDoor); break;
 			case BlockType::CherryDoor:               DoorBlock = SETPOWERED(CherryDoor); break;
 			case BlockType::CopperDoor:               DoorBlock = SETPOWERED(CopperDoor); break;
-			case BlockType::MangroveDoor:             DoorBlock = SETPOWERED(MangroveDoor); break;;
+			case BlockType::MangroveDoor:             DoorBlock = SETPOWERED(MangroveDoor); break;
 			case BlockType::ExposedCopperDoor:        DoorBlock = SETPOWERED(ExposedCopperDoor); break;
 			case BlockType::WeatheredCopperDoor:      DoorBlock = SETPOWERED(WeatheredCopperDoor); break;
 			case BlockType::OxidizedCopperDoor:       DoorBlock = SETPOWERED(OxidizedCopperDoor); break;
@@ -389,7 +389,7 @@ private:
 			case BlockType::WaxedOxidizedCopperDoor:   return cItem(Item::WaxedOxidizedCopperDoor);
 			default:
 			{
-				ASSERT(!"Unhandled door type!");;
+				ASSERT(!"Unhandled door type!");
 				return {};
 			}
 		}
