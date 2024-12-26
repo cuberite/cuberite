@@ -62,7 +62,7 @@ private:
 
 
 
-#define ROTATE_CW(SignType) \
+#define ROTATE_CW_SIGN(SignType) \
 	return SignType::SignType(  (SignType::Rotation(a_Block)  + 4) % 16, SignType::Waterlogged(a_Block)); \
 
 	virtual BlockState RotateCW(BlockState a_Block) const override
@@ -78,16 +78,16 @@ private:
 			case BlockType::OakSign:     return OakSign::OakSign(        (OakSign::Rotation(a_Block)     + 4) % 16, OakSign::Waterlogged(a_Block));
 			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(  (SpruceSign::Rotation(a_Block)  + 4) % 16, SpruceSign::Waterlogged(a_Block));
 			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(  (WarpedSign::Rotation(a_Block)  + 4) % 16, WarpedSign::Waterlogged(a_Block));
-			case BlockType::CherrySign:  ROTATE_CW(CherrySign)
-			case BlockType::BambooSign:  ROTATE_CW(BambooSign)
-			case BlockType::MangroveSign:  ROTATE_CW(MangroveSign)
+			case BlockType::CherrySign:  ROTATE_CW_SIGN(CherrySign)
+			case BlockType::BambooSign:  ROTATE_CW_SIGN(BambooSign)
+			case BlockType::MangroveSign:  ROTATE_CW_SIGN(MangroveSign)
 			default: return a_Block;
 		}
 	}
 
 
 
-#define ROTATE_CCW(SignType) \
+#define ROTATE_CCW_SIGN(SignType) \
 	return SignType::SignType(  (SignType::Rotation(a_Block)  + 12) % 16, SignType::Waterlogged(a_Block)); \
 
 	virtual BlockState RotateCCW(BlockState a_Block) const override
@@ -103,16 +103,16 @@ private:
 			case BlockType::OakSign:     return OakSign::OakSign(         (OakSign::Rotation(a_Block)    + 12) % 16, OakSign::Waterlogged(a_Block));
 			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(   (SpruceSign::Rotation(a_Block) + 12) % 16, SpruceSign::Waterlogged(a_Block));
 			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(   (WarpedSign::Rotation(a_Block) + 12) % 16, WarpedSign::Waterlogged(a_Block));
-			case BlockType::CherrySign:  ROTATE_CCW(CherrySign)
-			case BlockType::BambooSign:  ROTATE_CCW(BambooSign)
-			case BlockType::MangroveSign:  ROTATE_CCW(MangroveSign)
+			case BlockType::CherrySign:  ROTATE_CCW_SIGN(CherrySign)
+			case BlockType::BambooSign:  ROTATE_CCW_SIGN(BambooSign)
+			case BlockType::MangroveSign:  ROTATE_CCW_SIGN(MangroveSign)
 			default: return a_Block;
 		}
 	}
 
 	// TODO: check is mirrorXY and mirrorYZ are identical
 
-#define MIRROR_XY(SignType) \
+#define MIRROR_XY_SIGN(SignType) \
 	return SignType::SignType(  (SignType::Rotation(a_Block)  + 8) % 16, SignType::Waterlogged(a_Block)); \
 
 
@@ -130,14 +130,14 @@ private:
 			case BlockType::OakSign:     return OakSign::OakSign(         (OakSign::Rotation(a_Block)    + 8) % 16, OakSign::Waterlogged(a_Block));
 			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(   (SpruceSign::Rotation(a_Block) + 8) % 16, SpruceSign::Waterlogged(a_Block));
 			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(   (WarpedSign::Rotation(a_Block) + 8) % 16, WarpedSign::Waterlogged(a_Block));
-			case BlockType::CherrySign:  MIRROR_XY(CherrySign)
-			case BlockType::BambooSign:  MIRROR_XY(BambooSign)
-			case BlockType::MangroveSign:  MIRROR_XY(MangroveSign)
+			case BlockType::CherrySign:  MIRROR_XY_SIGN(CherrySign)
+			case BlockType::BambooSign:  MIRROR_XY_SIGN(BambooSign)
+			case BlockType::MangroveSign:  MIRROR_XY_SIGN(MangroveSign)
 			default: return a_Block;
 		}
 	}
 
-#define MIRROR_YZ(SignType) \
+#define MIRROR_YZ_SIGN(SignType) \
 	return SignType::SignType(  (SignType::Rotation(a_Block)  + 8) % 16, SignType::Waterlogged(a_Block)); \
 
 
@@ -156,9 +156,9 @@ private:
 			case BlockType::OakSign:     return OakSign::OakSign(         (OakSign::Rotation(a_Block)    + 8) % 16, OakSign::Waterlogged(a_Block));
 			case BlockType::SpruceSign:  return SpruceSign::SpruceSign(   (SpruceSign::Rotation(a_Block) + 8) % 16, SpruceSign::Waterlogged(a_Block));
 			case BlockType::WarpedSign:  return WarpedSign::WarpedSign(   (WarpedSign::Rotation(a_Block) + 8) % 16, WarpedSign::Waterlogged(a_Block));
-			case BlockType::CherrySign:  MIRROR_YZ(CherrySign)
-			case BlockType::BambooSign:  MIRROR_YZ(BambooSign)
-			case BlockType::MangroveSign:  MIRROR_YZ(MangroveSign)
+			case BlockType::CherrySign:  MIRROR_YZ_SIGN(CherrySign)
+			case BlockType::BambooSign:  MIRROR_YZ_SIGN(BambooSign)
+			case BlockType::MangroveSign:  MIRROR_YZ_SIGN(MangroveSign)
 			default: return a_Block;
 		}
 	}
