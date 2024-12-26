@@ -598,9 +598,10 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			{
 				Data.IsLightValid = false;
 			}
-			memset(&Data.HeightMap, 0, 256);  // temp
-			memset(&Data.BiomeMap, 0, 1024);  // temp
 		}  // for itr - LevelSections[]
+
+		memset(&Data.HeightMap, 0, 256);  // temp
+		memset(&Data.BiomeMap, 0, 1024);  // temp
 
 		// Load the entities from NBT:
 		int entities = a_NBT.FindChildByName(Level, "Entities");
