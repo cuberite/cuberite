@@ -190,6 +190,7 @@ void cStructGenTrees::ApplyTreeImage(
 						break;
 					}
 					// fallthrough:
+					[[fallthrough]];
 				}
 				CASE_TREE_OVERWRITTEN_BLOCKS:
 				{

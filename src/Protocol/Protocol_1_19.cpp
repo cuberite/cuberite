@@ -2370,6 +2370,7 @@ void cProtocol_1_19_3::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 				case cProjectileEntity::pkSplashPotion:
 				{
 					// TODO
+					break;
 				}
 				default:
 				{
@@ -3202,6 +3203,7 @@ void cProtocol_1_19_4::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 				case cProjectileEntity::pkSplashPotion:
 				{
 					// TODO
+					break;
 				}
 				default:
 				{

@@ -51,13 +51,21 @@ public:
 					case Chest::Type::Left:   return ChestType::Left;
 					case Chest::Type::Right:  return ChestType::Right;
 				}
+				break;
 			}
 			case BlockType::TrappedChest:
 			{
-
+				switch (TrappedChest::Type(a_Block))
+				{
+					case TrappedChest::Type::Single: return ChestType::Single;
+					case TrappedChest::Type::Left:   return ChestType::Left;
+					case TrappedChest::Type::Right:  return ChestType::Right;
+				}
+				break;
 			}
 			default: return ChestType::Single;
 		}
+		UNREACHABLE("Block is not a chest");
 	}
 
 private:

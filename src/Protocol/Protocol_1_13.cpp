@@ -1098,6 +1098,7 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 				case cProjectileEntity::pkSplashPotion:
 				{
 					// TODO
+					break;
 				}
 				default:
 				{

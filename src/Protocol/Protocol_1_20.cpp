@@ -1800,6 +1800,7 @@ void cProtocol_1_20_3::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 				case cProjectileEntity::pkSplashPotion:
 				{
 					// TODO
+					break;
 				}
 				default:
 				{

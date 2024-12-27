@@ -824,6 +824,7 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 					a_Pkt.WriteBEUInt8(POTION_THROWN);  // Potion item which was thrown
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
 					WriteItem(a_Pkt, static_cast<const cSplashPotionEntity &>(Projectile).GetItem());
+					break;
 				}
 				default:
 				{
