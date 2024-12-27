@@ -154,7 +154,7 @@ function(set_exe_flags TARGET)
 
 			# TODO: actually fix the warnings instead of disabling them
 			# or at least disable on a file-level basis:
-			-Wno-missing-noreturn -Wno-padded -Wno-implicit-fallthrough
+			-Wno-padded
 			-Wno-double-promotion
 
 			# This is a pretty useless warning, we've already got -Wswitch which is what we need:

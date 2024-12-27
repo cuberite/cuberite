@@ -498,12 +498,15 @@ void cCompositeChat::AddChatPartStyle(Json::Value & a_Value, const AString & a_P
 			case 'l': a_Value["bold"] = Json::Value(true); break;
 			case 's':  // Deprecated
 				LOGERROR("Value s in AddChatPartStyle() is deprecated");
+				[[fallthrough]];
 			case 'm': a_Value["strikethrough"] = Json::Value(true); break;
 			case 'u':  // Deprecated
 				LOGERROR("Value u in AddChatPartStyle() is deprecated");
+				[[fallthrough]];
 			case 'n': a_Value["underlined"] = Json::Value(true); break;
 			case 'i':  // Deprecated
 				LOGERROR("Value i in AddChatPartStyle() is deprecated");
+				[[fallthrough]];
 			case 'o': a_Value["italic"] = Json::Value(true); break;
 			case '0': a_Value["color"] = Json::Value("black"); break;
 			case '1': a_Value["color"] = Json::Value("dark_blue"); break;

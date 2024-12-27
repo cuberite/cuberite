@@ -85,7 +85,7 @@ bool cCommandManager::cCommandNode::Parse(BasicStringReader & a_Command, cComman
 			{
 				return cmd->Parse(a_Command, a_Ctx);
 			}
-			catch (cCommandParseException ex)
+			catch (cCommandParseException & ex)
 			{
 				a_Ctx.SendFeedback(ex.what());
 			}
