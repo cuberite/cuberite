@@ -1597,6 +1597,7 @@ bool cFinishGenFluidSprings::TryPlaceSpring(cChunkDesc & a_ChunkDesc, Vector3i a
 				{
 					return false;
 				}
+				break;
 			}
 			default: break;
 		}

@@ -345,6 +345,7 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 						a_Player.GetInventory().RemoveOneEquippedItem();
 					}
 				}
+				break;
 			}
 			default:
 			{

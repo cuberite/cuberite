@@ -1701,6 +1701,7 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 					a_Pkt.WriteBEUInt8(5);  // Index 5: Potion item which was thrown
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
 					WriteItem(a_Pkt, static_cast<const cSplashPotionEntity &>(Projectile).GetItem());
+					break;
 				}
 				default:
 				{
@@ -1976,6 +1977,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 				Writer.AddString("id", "minecraft:" + cMonster::MobTypeToVanillaNBT(MonsterType));
 				Writer.EndCompound();
 			}
+			break;
 		}
 		default: break;
 	}

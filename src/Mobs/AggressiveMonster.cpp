@@ -62,7 +62,6 @@ cMonster * cAggressiveMonster::GetMonsterOfTypeInSight(eMonsterType a_MobType, u
 	};
 
 	auto Callbacks = cCallback();
-	auto Tracer = cLineBlockTracer(*GetWorld(), Callbacks);
 
 	cEntityCallback Callback = [&](cEntity & a_Entity)
 	{
