@@ -207,7 +207,8 @@ public:
 		mIsTagOpen = true;
 
 		// Add tile-entity into NBT:
-		switch (a_Entity->GetBlockType())
+		auto type = a_Entity->GetBlockType();
+		switch (type)
 		{
 			case BlockType::BlackBanner:
 			case BlockType::BlueBanner:
@@ -310,6 +311,42 @@ public:
 
 			case BlockType::TrappedChest:    AddChestEntity          (static_cast<cChestEntity *>          (a_Entity), a_Entity->GetBlockType()); break;
 
+			case BlockType::PottedAcaciaSapling:
+			case BlockType::PottedAzureBluet:
+			case BlockType::PottedBamboo:
+			case BlockType::PottedBirchSapling:
+			case BlockType::PottedBlueOrchid:
+			case BlockType::PottedBrownMushroom:
+			case BlockType::PottedCactus:
+			case BlockType::PottedCornflower:
+			case BlockType::PottedCrimsonRoots:
+			case BlockType::PottedCrimsonFungus:
+			case BlockType::PottedDandelion:
+			case BlockType::PottedDarkOakSapling:
+			case BlockType::PottedDeadBush:
+			case BlockType::PottedFern:
+			case BlockType::PottedJungleSapling:
+			case BlockType::PottedLilyOfTheValley:
+			case BlockType::PottedOakSapling:
+			case BlockType::PottedOrangeTulip:
+			case BlockType::PottedOxeyeDaisy:
+			case BlockType::PottedPinkTulip:
+			case BlockType::PottedPoppy:
+			case BlockType::PottedRedMushroom:
+			case BlockType::PottedRedTulip:
+			case BlockType::PottedSpruceSapling:
+			case BlockType::PottedWarpedFungus:
+			case BlockType::PottedWarpedRoots:
+			case BlockType::PottedWhiteTulip:
+			case BlockType::PottedWitherRose:
+			case BlockType::PottedAllium:
+			case BlockType::PottedAzaleaBush:
+			case BlockType::PottedCherrySapling:
+			case BlockType::PottedFloweringAzaleaBush:
+			case BlockType::PottedMangrovePropagule:
+			case BlockType::PottedPaleOakSapling:
+			case BlockType::PottedTorchflower:  /* Flower pots aren't block entities anymore however, but old code thinks they are, so it tries to save them. This is to prevent crashes */
+				FLOGWARNING("Tried to save a flower pot {} as block entity ignoring. TODO: fix flower pots", a_Entity->GetBlockType()); break;
 			default:
 			{
 				FLOGERROR("{}: Got unintended block entity to save: {}", __FUNCTION__, a_Entity->GetBlockType());
