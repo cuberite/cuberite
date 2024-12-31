@@ -1333,7 +1333,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 				if (!map.empty())
 				{
 					aWriter.BeginCompound("Properties");
-					for (auto block_state : vls.second.getMap())
+					for (const auto & block_state : vls.second.getMap())
 					{
 						aWriter.AddString(block_state.first, block_state.second);
 					}
