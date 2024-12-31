@@ -68,6 +68,7 @@ public:
 	If the key is not present, returns an empty string. */
 	const AString & value(const AString & aKey) const;
 
+	const std::map<AString, AString> & getMap() const { return mState; }
 
 protected:
 

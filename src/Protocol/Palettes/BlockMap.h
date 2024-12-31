@@ -19,13 +19,14 @@ public:
 		*  Perhaps a compile option or a config option?
 		*/
 		UInt32 GetProtocolBlockId(cProtocol::Version a_target, BlockState a_block);
+		const BlockTypePalette & GetPalette(cProtocol::Version a_target) const;
 
-		bool IsVersionLoaded(cProtocol::Version a_Version)
+		bool IsVersionLoaded(cProtocol::Version a_Version) const
 		{
 			return m_PerVersionMap.count(a_Version) != 0;
 		}
 private:
-		/** Maps each protocol to its corrpesoing plaette */
+		/** Maps each protocol to its corresponding palette */
 		std::map<cProtocol::Version, BlockTypePalette> m_PerVersionMap;
 	};
 }

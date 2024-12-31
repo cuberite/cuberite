@@ -51,4 +51,13 @@ namespace BlockMap
 		}
 		return 0;
 	}
+
+
+
+
+
+	const BlockTypePalette & cBlockMap::GetPalette(cProtocol::Version a_target) const
+	{
+		return m_PerVersionMap.at(a_target);
+	}
 }

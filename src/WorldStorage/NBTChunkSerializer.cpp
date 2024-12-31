@@ -1287,6 +1287,8 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 	aWriter.BeginList("sections", TAG_Compound);
 
+	const auto & bp = cRoot::Get()->GetBlocMap()->GetPalette(cProtocol::Version::Latest);
+
 	const bool use_padding = true;  // used in 1.16+
 	for (size_t Y = 0; Y < cChunkDef::NumSections; Y++)
 	{
@@ -1322,64 +1324,24 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 			for (size_t i = 0; i < static_cast<size_t>(newsize); i++)
 			{
-				bool hasblockstats = false;
 				aWriter.BeginCompound("");
 				auto val = temparr[i];
-				auto strval = AString(NamespaceSerializer::From(val.Type()));
-				auto splitpos = std::find(strval.begin(), strval.end(), ' ');
-				auto id_end_index = static_cast<UInt64>(std::distance(strval.begin(), splitpos));
-				AString stringid = strval.substr(0, id_end_index);
-				AString blockstates;
-				AStringVector blockstatesstrings;
-				if (splitpos != strval.end())
-				{
-					hasblockstats = true;
-					auto blockstates2 = strval.substr(id_end_index + 1, std::string::npos);
-					blockstatesstrings = StringSplit(blockstates2, " ");
-				}
 
-				aWriter.AddString("Name", "minecraft:"+stringid);
-				if (hasblockstats)
+				auto vls = bp.entry(val.ID);
+				auto map = vls.second.getMap();
+				aWriter.AddString("Name", vls.first);
+				if (!map.empty())
 				{
 					aWriter.BeginCompound("Properties");
-					for (size_t j = 0; j < blockstatesstrings.size(); j +=2)
+					for (auto block_state : vls.second.getMap())
 					{
-						// AString str = blockstatesstrings[j];
-						// auto nameendindex = static_cast<int>(std::distance(strval.begin(), std::find(strval.begin(), strval.end(), ':')));
-						AString val2;
-						if ((j + 2) >= blockstatesstrings.size())
-						{
-							val2 = blockstatesstrings[j + 1];
-						}
-						else
-						{
-							val2 = blockstatesstrings[j + 1].substr(0, blockstatesstrings[j + 1].length() - 1);
-						}
-						aWriter.AddString(blockstatesstrings[j].substr(0, blockstatesstrings[j].length() - 1), val2);
+						aWriter.AddString(block_state.first, block_state.second);
 					}
 					aWriter.EndCompound();
 				}
-				/*
-				auto bls = PaletteUpgrade::GetSaveStrings(val);
-				aWriter.AddString("Name", "minecraft:" + bls[0].second);
-				if (bls[1].first != "")
-				{
-					aWriter.BeginCompound("Properties");
-					for (size_t j = 1; j < bls.size(); j++)
-					{
-						if (bls[j].first == "")
-						{
-							break;
-						}
-						aWriter.AddString(bls[j].first, bls[j].second);
-					}
-					aWriter.EndCompound();
-				} */
 				aWriter.EndCompound();
 			}
 			aWriter.EndList();
-
-
 
 			Int64 * arr = new Int64[static_cast<UInt64>(longarrsize)];
 

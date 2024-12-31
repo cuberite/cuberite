@@ -63,7 +63,7 @@
 #include "../BoundingBox.h"
 
 #include "../Protocol/Palettes/BlockMap.h"
-
+#include "Protocol/Protocol.h"
 
 
 /** If defined, the BlockSkyLight values will be copied over to BlockLight upon chunk saving,
@@ -448,14 +448,16 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 					ChunkLoadFailed(a_Chunk, "Invalid namespace: " + blockid + " Mods arent supported", a_RawChunkData);
 					return false;
 				}
-				// const int BlockStatesId = a_NBT.FindChildByName(Child1, "Properties");
 
-				AString bls;
-				std::vector<AString> strs;
-				#define READ_BLOCK_STATES 0
-				#if READ_BLOCK_STATES  // Temporarily disabled
-				if (BlockStatesId > 0 && false)
+				// AString bls;
+				// std::vector<AString> strs;
+				#define READ_BLOCK_STATES 1
+				#if READ_BLOCK_STATES
+				static auto bp = cRoot::Get()->GetBlocMap()->GetPalette(cProtocol::Version::Latest);
+				const int BlockStatesId = a_NBT.FindChildByName(Child1, "Properties");
+				if (BlockStatesId > 0)
 				{
+					std::map<AString, AString> state;
 					if (a_NBT.GetType(BlockStatesId) != TAG_Compound)
 					{
 						ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Properties", a_RawChunkData);
@@ -465,13 +467,43 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 					{
 						AString name = a_NBT.GetName(ProChild);
 						AString value = a_NBT.GetString(ProChild);
-						bls = name + ": " + value + ", ";
-						strs.push_back(bls);
+						state[name] = value;
+						// bls = name + ": " + value + ", ";
+						// strs.push_back(bls);
+					}
+					auto rez = bp.maybeIndex(blockid, state);
+					if (rez.second)
+					{
+						Paletteids.emplace_back(static_cast<UInt16>(rez.first));
+					}
+					else
+					{
+						Paletteids.emplace_back(0);
+						LOGWARNING(fmt::format(FMT_STRING("Failed to load block {}"), blockid));
 					}
 				}
+				else  // block has no block states
+				{
+					std::map<AString, AString> state;
+					// auto rez = bp.maybeIndex(blockid, state);
+					AString tosearch = blockid.substr(10, std::string::npos);
+					BlockState cnt = NamespaceSerializer::ToBlockType(tosearch);
+					Paletteids.push_back(cnt);
+					/*
+					if (rez.second)
+					{
+						Paletteids.emplace_back(static_cast<UInt16>(rez.first));
+					}
+					else
+					{
+						Paletteids.emplace_back(0);
+						LOGWARNING(fmt::format(FMT_STRING("Failed to load block {}"), blockid));
+					}
+					*/
+				}
 				#endif
+				/*
 				std::sort(strs.begin(), strs.end());
-
 				AString tosearch = blockid.substr(10, std::string::npos);  // substr to remove the "minecraft:"
 				if (strs.size() != 0)
 				{
@@ -493,6 +525,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 					// UNREACHABLE("Could find given block while loading chunk X: " + a_Chunk.m_ChunkX + " Z: " a_Chunk.m_ChunkZ + " Y Section: " + Y);
 				}
 				Paletteids.push_back(cnt);
+				*/
 
 				Palette.emplace_back(blockid.substr(strlen("minecraft:"), std::string::npos));
 			}
