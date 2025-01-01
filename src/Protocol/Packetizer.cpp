@@ -102,6 +102,7 @@ AString cPacketizer::PacketTypeToStr(cProtocol::ePacketType a_PacketType)
 		case cProtocol::pktPlayerListHeaderFooter: return "pktPlayerListHeaderFooter";
 		case cProtocol::pktPlayerMoveLook:         return "pktPlayerMoveLook";
 		case cProtocol::pktPluginMessage:          return "pktPluginMessage";
+		case cProtocol::pktPlayerActionResponse:   return "pktPlayerActionResponse";
 		case cProtocol::pktRemoveEntityEffect:     return "pktRemoveEntityEffect";
 		case cProtocol::pktResourcePack:           return "pktResourcePack";
 		case cProtocol::pktRespawn:                return "pktRespawn";
@@ -134,6 +135,10 @@ AString cPacketizer::PacketTypeToStr(cProtocol::ePacketType a_PacketType)
 		case cProtocol::pktWindowClose:            return "pktWindowClose";
 		case cProtocol::pktWindowOpen:             return "pktWindowOpen";
 		case cProtocol::pktWindowProperty:         return "pktWindowProperty";
+		case cProtocol::pktRenderDistanceCenter:   return "pktRenderDistanceCenter";
+		case cProtocol::pktConfigurationCustomPayload: return "pktConfigurationCustomPayload";
+		case cProtocol::pktConfigurationDynamicRegistries: return "pktConfigurationDynamicRegistries";
+		case cProtocol::pktConfigurationReady: return "pktConfigurationReady";
 	}
 	return fmt::format(FMT_STRING("Unknown packet type: 0x{:02x}"), a_PacketType);
 }

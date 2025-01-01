@@ -10,19 +10,21 @@
 #pragma once
 
 #include "FunctionRef.h"
-#include "ChunkDef.h"
+#include "BlockType.h"
 
 
 
 
 
-template <class ElementType, size_t ElementCount, ElementType DefaultValue>
+template <class ElementType, size_t ElementCount>
 struct ChunkDataStore
 {
 	using Type = std::array<ElementType, ElementCount>;
 
+	ChunkDataStore(ElementType a_DefaultValue) : DefaultValue(a_DefaultValue) {}
+
 	/** Copy assign from another ChunkDataStore. */
-	void Assign(const ChunkDataStore<ElementType, ElementCount, DefaultValue> & a_Other);
+	void Assign(const ChunkDataStore<ElementType, ElementCount> & a_Other);
 
 	/** Gets one value at the given position.
 	Returns DefaultValue if the section is not allocated. */
@@ -46,6 +48,7 @@ struct ChunkDataStore
 
 	/** Contains all the sections this ChunkDataStore manages. */
 	std::unique_ptr<Type> Store[cChunkDef::NumSections];
+	ElementType DefaultValue;
 };
 
 
@@ -56,38 +59,34 @@ class ChunkBlockData
 {
 public:
 
+	ChunkBlockData() : m_Blocks(DefaultValue) {}
+
 	static constexpr size_t SectionBlockCount = cChunkDef::SectionHeight * cChunkDef::Width * cChunkDef::Width;
 	static constexpr size_t SectionMetaCount = SectionBlockCount / 2;
 
-	static constexpr BLOCKTYPE DefaultValue = 0x00;
-	static constexpr NIBBLETYPE DefaultMetaValue = 0x00;
+	static constexpr BlockState DefaultValue = Block::Air::Air();
 
-	using SectionType = BLOCKTYPE[SectionBlockCount];
-	using SectionMetaType = NIBBLETYPE[SectionMetaCount];
+	using SectionType = BlockState[SectionBlockCount];
+	using SectionMetaType = unsigned char[SectionMetaCount];
 
 private:
 
-	ChunkDataStore<BLOCKTYPE, SectionBlockCount, DefaultValue> m_Blocks;
-	ChunkDataStore<NIBBLETYPE, SectionMetaCount, DefaultMetaValue> m_Metas;
+	ChunkDataStore<BlockState, SectionBlockCount> m_Blocks;
 
 public:
 
 	using BlockArray = decltype(m_Blocks)::Type;
-	using MetaArray = decltype(m_Metas)::Type;
 
 	void Assign(const ChunkBlockData & a_Other);
 
-	BLOCKTYPE GetBlock(Vector3i a_Position) const { return m_Blocks.Get(a_Position); }
-	NIBBLETYPE GetMeta(Vector3i a_Position) const { return m_Metas.Get(a_Position); }
+	BlockState GetBlock(Vector3i a_Position) const { return m_Blocks.Get(a_Position); }
 
 	BlockArray * GetSection(size_t a_Y) const { return m_Blocks.GetSection(a_Y); }
-	MetaArray * GetMetaSection(size_t a_Y) const { return m_Metas.GetSection(a_Y); }
 
-	void SetBlock(Vector3i a_Position, BLOCKTYPE a_Block) { m_Blocks.Set(a_Position, a_Block); }
-	void SetMeta(Vector3i a_Position, NIBBLETYPE a_Meta) { m_Metas.Set(a_Position, a_Meta); }
+	void SetBlock(Vector3i a_Position, BlockState a_Block) { m_Blocks.Set(a_Position, a_Block); }
 
-	void SetAll(const cChunkDef::BlockTypes & a_BlockSource, const cChunkDef::BlockNibbles & a_MetaSource);
-	void SetSection(const SectionType & a_BlockSource, const SectionMetaType & a_MetaSource, size_t a_Y);
+	void SetAll(const cChunkDef::BlockStates & a_BlockSource);
+	void SetSection(const SectionType & a_BlockSource, size_t a_Y);
 };
 
 
@@ -98,17 +97,19 @@ class ChunkLightData
 {
 public:
 
+	ChunkLightData() : m_BlockLights(DefaultBlockLightValue), m_SkyLights(DefaultBlockLightValue) {}
+
 	static constexpr size_t SectionLightCount = (cChunkDef::SectionHeight * cChunkDef::Width * cChunkDef::Width) / 2;
 
-	static constexpr NIBBLETYPE DefaultBlockLightValue = 0x00;
-	static constexpr NIBBLETYPE DefaultSkyLightValue = 0xFF;
+	static constexpr LIGHTTYPE DefaultBlockLightValue = 0x00;
+	static constexpr LIGHTTYPE DefaultSkyLightValue = 0xFF;
 
-	using SectionType = NIBBLETYPE[SectionLightCount];
+	using SectionType = LIGHTTYPE[SectionLightCount];
 
 private:
 
-	ChunkDataStore<NIBBLETYPE, SectionLightCount, DefaultBlockLightValue> m_BlockLights;
-	ChunkDataStore<NIBBLETYPE, SectionLightCount, DefaultSkyLightValue> m_SkyLights;
+	ChunkDataStore<LIGHTTYPE, SectionLightCount> m_BlockLights;
+	ChunkDataStore<LIGHTTYPE, SectionLightCount> m_SkyLights;
 
 public:
 
@@ -116,13 +117,13 @@ public:
 
 	void Assign(const ChunkLightData & a_Other);
 
-	NIBBLETYPE GetBlockLight(Vector3i a_Position) const { return m_BlockLights.Get(a_Position); }
-	NIBBLETYPE GetSkyLight(Vector3i a_Position) const { return m_SkyLights.Get(a_Position); }
+	LIGHTTYPE GetBlockLight(Vector3i a_Position) const { return m_BlockLights.Get(a_Position); }
+	LIGHTTYPE GetSkyLight(Vector3i a_Position) const { return m_SkyLights.Get(a_Position); }
 
 	LightArray * GetBlockLightSection(size_t a_Y) const { return m_BlockLights.GetSection(a_Y); }
 	LightArray * GetSkyLightSection(size_t a_Y) const { return m_SkyLights.GetSection(a_Y); }
 
-	void SetAll(const cChunkDef::BlockNibbles & a_BlockLightSource, const cChunkDef::BlockNibbles & a_SkyLightSource);
+	void SetAll(const cChunkDef::LightNibbles & a_BlockLightSource, const cChunkDef::LightNibbles & a_SkyLightSource);
 	void SetSection(const SectionType & a_BlockLightSource, const SectionType & a_SkyLightSource, size_t a_Y);
 };
 
@@ -139,10 +140,9 @@ In macro form to work around a Visual Studio 2017 ICE bug. */
 		for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y) \
 		{ \
 			const auto Blocks = BlockData.GetSection(Y); \
-			const auto Metas = BlockData.GetMetaSection(Y); \
 			const auto BlockLights = LightData.GetBlockLightSection(Y); \
 			const auto SkyLights = LightData.GetSkyLightSection(Y); \
-			if ((Blocks != nullptr) || (Metas != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr)) \
+			if ((Blocks != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr)) \
 			{ \
 				Callback \
 			} \
@@ -153,6 +153,5 @@ In macro form to work around a Visual Studio 2017 ICE bug. */
 
 
 
-extern template struct ChunkDataStore<BLOCKTYPE, ChunkBlockData::SectionBlockCount, ChunkBlockData::DefaultValue>;
-extern template struct ChunkDataStore<NIBBLETYPE, ChunkBlockData::SectionMetaCount, ChunkLightData::DefaultBlockLightValue>;
-extern template struct ChunkDataStore<NIBBLETYPE, ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue>;
+extern template struct ChunkDataStore<BlockState, ChunkBlockData::SectionBlockCount>;
+extern template struct ChunkDataStore<LIGHTTYPE, ChunkLightData::SectionLightCount>;

@@ -38,7 +38,7 @@ public:
 		m_BiomeGen.GenBiomes(a_ChunkCoords, desc.GetBiomeMap());  // Need to initialize biomes for the composition gen
 		desc.SetHeightFromShape(shape);
 		m_CompositionGen.ComposeTerrain(desc, shape);
-		memcpy(a_HeightMap, desc.GetHeightMap(), sizeof(a_HeightMap));
+		memcpy(a_HeightMap.data(), desc.GetHeightMap().data(), sizeof(a_HeightMap));
 	}
 
 protected:

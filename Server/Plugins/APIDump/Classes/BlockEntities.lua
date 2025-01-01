@@ -204,6 +204,17 @@ return
 		]],
 		Functions =
 		{
+			GetBlock =
+			{
+				Returns =
+				{
+					{
+						Name = "Block",
+						Type = "number",
+					},
+				},
+				Notes = "Returns the block which is represented by this blockentity. This is the primary means of type-identification",
+			},
 			GetBlockType =
 			{
 				Returns =

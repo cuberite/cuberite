@@ -8,20 +8,9 @@
 
 
 class cBlockEndPortalFrameHandler final :
-	public cYawRotator<cBlockHandler, 0x03,
-		E_META_END_PORTAL_FRAME_ZP,
-		E_META_END_PORTAL_FRAME_XM,
-		E_META_END_PORTAL_FRAME_ZM,
-		E_META_END_PORTAL_FRAME_XP
-	>
+	public cBlockHandler
 {
-	using Super = cYawRotator<
-		cBlockHandler, 0x03,
-		E_META_END_PORTAL_FRAME_ZP,
-		E_META_END_PORTAL_FRAME_XM,
-		E_META_END_PORTAL_FRAME_ZM,
-		E_META_END_PORTAL_FRAME_XP
-	>;
+	using Super = cBlockHandler;
 
 public:
 
@@ -29,15 +18,15 @@ public:
 
 private:
 
-	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) const override
+	virtual void OnPlaced(cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface, Vector3i a_BlockPos, BlockState a_Block) const override
 	{
 		// E_META_END_PORTAL_FRAME_EYE is the bit which signifies the eye of ender is in it.
 		// LOG("PortalPlaced, meta %d", a_BlockMeta);
-		if ((a_BlockMeta & E_META_END_PORTAL_FRAME_EYE) == E_META_END_PORTAL_FRAME_EYE)
+		if (Block::EndPortalFrame::Eye(a_Block))
 		{
 			// LOG("Location is %d %d %d", a_BlockX, a_BlockY, a_BlockZ);
 			// Direction is the first two bits, masked by 0x3
-			FindAndSetPortal(a_BlockPos, a_BlockMeta & 3, a_ChunkInterface, a_WorldInterface);
+			FindAndSetPortal(a_BlockPos, Block::EndPortalFrame::Facing(a_Block), a_ChunkInterface, a_WorldInterface);
 		}
 	}
 
@@ -46,7 +35,7 @@ private:
 
 
 	/** Returns false if portal cannot be made, true if portal was made. */
-	static bool FindAndSetPortal(Vector3i a_FirstFrame, NIBBLETYPE a_Direction, cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface)
+	static bool FindAndSetPortal(Vector3i a_FirstFrame, eBlockFace a_Direction, cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface)
 	{
 		/*
 		PORTAL FINDING ALGORITH
@@ -85,7 +74,7 @@ private:
 		int EdgesComplete = -1;  // We start search _before_ finding the first edge
 		Vector3i NorthWestCorner;
 		int EdgeWidth[4] = { 1, 1, 1, 1 };
-		NIBBLETYPE CurrentDirection = a_Direction;
+		auto CurrentDirection = a_Direction;
 		Vector3i CurrentPos = a_FirstFrame;
 
 		// Scan clockwise until we have seen all 4 edges
@@ -96,7 +85,7 @@ private:
 			if (IsPortalFrame(a_ChunkInterface.GetBlock(NextPos)))
 			{
 				// We have found the corner, move clockwise to next edge
-				if (CurrentDirection == E_META_END_PORTAL_FRAME_XP)
+				if (CurrentDirection == eBlockFace::BLOCK_FACE_XP)
 				{
 					// We are on the NW (XM, ZM) Corner
 					// Relative to the previous frame, the portal should appear to the right of this portal frame.
@@ -110,7 +99,7 @@ private:
 				}
 
 				// Rotate 90 degrees clockwise
-				CurrentDirection = (CurrentDirection + 1) % 4;
+				CurrentDirection = RotateBlockFaceCW(CurrentDirection);
 				EdgesComplete++;
 			}
 			else
@@ -152,8 +141,7 @@ private:
 		{
 			for (int j = 0; j < EdgeWidth[1]; j++)
 			{
-				a_ChunkInterface.SetBlock(NorthWestCorner.x + i, NorthWestCorner.y, NorthWestCorner.z + j, E_BLOCK_END_PORTAL, 0);
-				// TODO: Create block entity so portal doesn't become invisible on relog.
+				a_ChunkInterface.SetBlock({NorthWestCorner.x + i, NorthWestCorner.y, NorthWestCorner.z + j}, Block::EndPortal::EndPortal());
 			}
 		}
 		return true;
@@ -164,15 +152,12 @@ private:
 
 
 	/** Return true if this block is a portal frame, has an eye, and is facing the correct direction. */
-	static bool IsValidFrameAtPos(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, NIBBLETYPE a_ShouldFace)
+	static bool IsValidFrameAtPos(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_ShouldFace)
 	{
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
-
+		auto Self = a_ChunkInterface.GetBlock(a_BlockPos);
 		return (
-			a_ChunkInterface.GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta) &&
-			(BlockType == E_BLOCK_END_PORTAL_FRAME) &&
-			(BlockMeta == (a_ShouldFace | E_META_END_PORTAL_FRAME_EYE))
+			(Self.Type() == BlockType::EndPortalFrame) &&
+			(Self == Block::EndPortalFrame::EndPortalFrame(true, a_ShouldFace))
 		);
 	}
 
@@ -180,18 +165,17 @@ private:
 
 
 	/** Return true if this block is a portal frame. */
-	static bool IsPortalFrame(BLOCKTYPE BlockType)
+	static bool IsPortalFrame(BlockState a_Block)
 	{
-		return (BlockType == E_BLOCK_END_PORTAL_FRAME);
+		return (a_Block.Type() == BlockType::EndPortalFrame);
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 27;
 	}
 };

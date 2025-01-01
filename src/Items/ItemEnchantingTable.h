@@ -10,9 +10,9 @@
 
 
 class cItemEnchantingTableHandler final:
-	public cItemHandler
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 
@@ -22,7 +22,7 @@ private:
 
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
-		if (!Super::CommitPlacement(a_Player, a_HeldItem, a_PlacePosition, a_ClickedBlockFace, a_CursorPosition))
+		if (!a_Player.PlaceBlock(a_PlacePosition, Block::EnchantingTable::EnchantingTable()))
 		{
 			return false;
 		}
@@ -34,18 +34,12 @@ private:
 
 		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_HeldItem](cBlockEntity & a_BlockEntity)
 		{
-			ASSERT(a_BlockEntity.GetBlockType() == E_BLOCK_ENCHANTMENT_TABLE);
+			ASSERT(a_BlockEntity.GetBlockType() == BlockType::EnchantingTable);
 
 			static_cast<cEnchantingTableEntity &>(a_BlockEntity).SetCustomName(a_HeldItem.m_CustomName);
 			return false;
 		});
 
-		return true;
-	}
-
-
-	virtual bool IsPlaceable(void) const override
-	{
 		return true;
 	}
 } ;

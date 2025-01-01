@@ -17,38 +17,42 @@ public:
 
 	using Super::Super;
 
+	const unsigned char RipeAge = 3;
+
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
-		if (a_BlockMeta == 0x03)
+		if (Block::NetherWart::Age(a_Block) == RipeAge)
 		{
 			// Fully grown, drop the entire produce:
 			const auto DropNum = FortuneDiscreteRandom(2, 4, ToolFortuneLevel(a_Tool));
-			return cItem(E_ITEM_NETHER_WART, DropNum);
+			return cItem(Item::NetherWart, DropNum);
 		}
 
-		return cItem(E_ITEM_NETHER_WART);
+		return cItem(Item::NetherWart);
 	}
 
 
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, char a_NumStages = 1) const override
 	{
-		auto oldMeta = a_Chunk.GetMeta(a_RelPos);
-		auto meta = std::min(oldMeta + a_NumStages, 3);
-		if ((oldMeta < 3) && (CanGrow(a_Chunk, a_RelPos) == paGrowth))
+		auto OldAge = Block::NetherWart::Age(a_Chunk.GetBlock(a_RelPos));
+		const auto NumStages = static_cast<unsigned char>(std::clamp<char>(a_NumStages, 0, std::numeric_limits<char>::max()));
+
+		auto NewAge = std::min<unsigned char>(OldAge + NumStages, RipeAge);
+		if ((OldAge < RipeAge) && (CanGrow(a_Chunk, a_RelPos) == paGrowth))
 		{
-			a_Chunk.SetBlock(a_RelPos, m_BlockType, static_cast<NIBBLETYPE>(meta));
-			return meta - oldMeta;
+			a_Chunk.FastSetBlock(a_RelPos, Block::NetherWart::NetherWart(NewAge));
+			return NewAge - OldAge;
 		}
 
 		// In older versions of cuberite, there was a bug which made wart grow too much. This check fixes previously saved buggy warts.
-		if (oldMeta > 3)
+		if (OldAge > 3)
 		{
-			a_Chunk.FastSetBlock(a_RelPos, m_BlockType, 3);
+			a_Chunk.FastSetBlock(a_RelPos, Block::NetherWart::NetherWart(RipeAge));
 		}
 		return 0;
 	}
@@ -57,20 +61,19 @@ private:
 
 
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
 		// Needs to be placed on top of a Soulsand block:
 		const auto BasePos = a_Position.addedY(-1);
-		return cChunkDef::IsValidHeight(BasePos) && (a_Chunk.GetBlock(BasePos) == E_BLOCK_SOULSAND);
+		return (cChunkDef::IsValidHeight(BasePos) && (a_Chunk.GetBlock(BasePos).Type() == BlockType::SoulSand));
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 35;
 	}
 } ;

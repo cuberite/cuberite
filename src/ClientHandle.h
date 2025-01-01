@@ -149,10 +149,11 @@ public:  // tolua_export
 
 	// The following functions send the various packets:
 	// (Please keep these alpha-sorted)
+	void SendAcknowledgeBlockChange     (int a_SequenceId);
 	void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle);
-	void SendBlockAction                (Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType);
+	void SendBlockAction                (Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BlockState a_Block);
 	void SendBlockBreakAnim             (UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage);  // tolua_export
-	void SendBlockChange                (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);  // tolua_export
+	void SendBlockChange                (Vector3i a_BlockPos, BlockState a_Block);  // tolua_export
 	void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes);
 	void SendBossBarAdd                 (UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog);  // tolua_export
 	void SendBossBarUpdateFlags         (UInt32 a_UniqueID, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog);  // tolua_export
@@ -187,6 +188,7 @@ public:  // tolua_export
 	void SendExperience                 (void);
 	void SendExperienceOrb              (const cExpOrb & a_ExpOrb);
 	void SendExplosion                  (Vector3f a_Position, float a_Power);
+	void SendFinishConfiguration        (void);
 	void SendGameMode                   (eGameMode a_GameMode);
 	void SendHealth                     (void);
 	void SendHeldItemChange             (int a_ItemIndex);
@@ -199,6 +201,7 @@ public:  // tolua_export
 	void SendParticleEffect             (const AString & a_ParticleName, const Vector3f a_Src, const Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data);
 	void SendPlayerAbilities            (void);
 	void SendPlayerListAddPlayer        (const cPlayer & a_Player);
+	void SendPlayerListInitChat         (const cPlayer & a_Player);
 	void SendPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer);  // tolua_export
 	void SendPlayerListRemovePlayer     (const cPlayer & a_Player);
 	void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName);
@@ -214,6 +217,7 @@ public:  // tolua_export
 	void SendRemoveEntityEffect         (const cEntity & a_Entity, int a_EffectID);
 	void SendResourcePack               (const AString & a_ResourcePackUrl);  // tolua_export
 	void SendResetTitle                 (void);  // tolua_export
+	void SendRenderDistanceCenter       (cChunkCoords a_chunk);
 	void SendRespawn                    (eDimension a_Dimension, bool a_IsRespawningFromDeath);
 	void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode);
 	void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode);
@@ -227,7 +231,7 @@ public:  // tolua_export
 	void SendSpawnEntity                (const cEntity & a_Entity);
 	void SendSpawnMob                   (const cMonster & a_Mob);
 	void SendStatistics                 (const StatisticsManager & a_Manager);
-	void SendTabCompletionResults       (const AStringVector & a_Results);
+	void SendTabCompletionResults       (const AStringVector & a_Results, UInt32 CompletionId);
 	void SendThunderbolt                (Vector3i a_BlockPos);  // tolua_export
 	void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks);  // tolua_export
 	void SendTimeUpdate                 (cTickTimeLong a_WorldAge, cTickTimeLong a_WorldDate, bool a_DoDaylightCycle);
@@ -243,7 +247,8 @@ public:  // tolua_export
 	void SendInitRecipes                (UInt32 a_RecipeId);
 
 	void SendWeather                    (eWeather a_Weather);
-	void SendWholeInventory             (const cWindow & a_Window);
+	void SendGameStateChange            (eGameStateReason a_Reason, float a_Value);
+	void SendWholeInventory             (const cWindow & a_Window, const cItem & a_CursorStack);
 	void SendWindowClose                (const cWindow & a_Window);
 	void SendWindowOpen                 (const cWindow & a_Window);
 	void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value);
@@ -266,6 +271,12 @@ public:  // tolua_export
 
 	void SetLocale(const AString & a_Locale) { m_Locale = a_Locale; }
 	AString GetLocale(void) const { return m_Locale; }
+
+	void SetAllowListing(bool a_AllowsListing) { m_Allowslisting = a_AllowsListing; }
+	bool GetAllowListing(void) const { return m_Allowslisting; }
+
+	void SetParticleMode(eParticleModeSetting a_ParticelMode) { m_ParticleMode = a_ParticelMode; }
+	eParticleModeSetting GetParticleMode(void) const { return m_ParticleMode; }
 
 	int GetUniqueID(void) const { return m_UniqueID; }
 
@@ -390,17 +401,14 @@ public:  // tolua_export
 	void HandleStartElytraFlight();
 
 	void HandleSteerVehicle     (float Forward, float Sideways);
-	void HandleTabCompletion    (const AString & a_Text);
-	void HandleUpdateSign       (
-		Vector3i a_BlockPos,
-		const AString & a_Line1, const AString & a_Line2,
-		const AString & a_Line3, const AString & a_Line4
-	);
+	void HandleTabCompletion    (const AString & a_Text, UInt32 CompletionId);
+	void HandleUpdateSign       (Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4);
 	void HandleUnmount          (void);
 	void HandleUseEntity        (UInt32 a_TargetEntityID, bool a_IsLeftClick);
 	void HandleUseItem          (bool a_UsedMainHand);
 	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
 	void HandleWindowClose      (UInt8 a_WindowID);
+	void HandlePlayerSession    (cUUID a_SessionID, Int64 a_ExpiresAt, const ContiguousByteBuffer & a_PublicKey, const ContiguousByteBuffer & a_KeySignature);
 
 	/** Called when a recipe from the recipe book is selected */
 	void HandleCraftRecipe      (UInt32 a_RecipeId);
@@ -423,9 +431,59 @@ public:  // tolua_export
 
 	bool IsPlayerChunkSent();
 
+	friend class cForgeHandshake;   // Needs access to FinishAuthenticate()
+
+	/** Finish logging the user in after authenticating. */
+	void FinishAuthenticate();
+
+	/** Converts the protocol-formatted channel list (NUL-separated) into a proper string vector. */
+	AStringVector BreakApartPluginChannels(ContiguousByteBufferView a_PluginChannels);
+
+	/** Adds all of the channels to the list of current plugin channels. Handles duplicates gracefully. */
+	void RegisterPluginChannels(const AStringVector & a_ChannelList);
+
+	/** Removes all of the channels from the list of current plugin channels. Ignores channels that are not found. */
+	void UnregisterPluginChannels(const AStringVector & a_ChannelList);
+
+	/* Contains information for verifying chat messages form players only used in 1.19+ */
+	class cPlayerSessionData
+	{
+	public:
+		cPlayerSessionData() :
+			m_IsPopulated(false),
+			m_SessionId(cUUID()),
+			m_ExpiresAt(-1),
+			m_PublicKey(),
+			m_KeySignature()
+		{
+
+		}
+		cPlayerSessionData(cUUID a_SessionID, Int64 a_ExpiresAt, ContiguousByteBuffer a_PublicKey, ContiguousByteBuffer a_KeySignature) :
+			m_IsPopulated(true),
+			m_SessionId(a_SessionID),
+			m_ExpiresAt(a_ExpiresAt),
+			m_PublicKey(std::move(a_PublicKey)),
+			m_KeySignature(std::move(a_KeySignature))
+		{
+
+		}
+		bool IsPopulated() const { return m_IsPopulated; }
+		cUUID GetSessionUUID() const { return m_SessionId; }
+		Int64 GetExpiresAtEpochMiliscond() const { return m_ExpiresAt; }
+		ContiguousByteBuffer GetPublicKey() const { return m_PublicKey; }
+		ContiguousByteBuffer GetKeySignature() const { return m_KeySignature; }
+	private:
+		bool m_IsPopulated;
+		cUUID m_SessionId;
+		Int64 m_ExpiresAt;
+		ContiguousByteBuffer m_PublicKey;
+		ContiguousByteBuffer m_KeySignature;
+	} m_PlayerSession;
+
+	const cPlayerSessionData GetPlayerSessionData() const { return m_PlayerSession; }
+
 private:
 
-	friend class cForgeHandshake;   // Needs access to FinishAuthenticate()
 
 	/** The type used for storing the names of registered plugin channels. */
 	typedef std::set<AString> cChannels;
@@ -475,6 +533,8 @@ private:
 	The player self-destructs some time after the client handle enters the Destroyed state.
 	We are therefore guaranteed that while m_State < Destroyed, that is when when we need to access m_Player, m_Player is valid. */
 	cPlayer * m_Player;
+
+	std::unique_ptr<cPlayer> m_temp_player;
 
 	/** This is an optimization which saves you an iteration of m_SentChunks if you just want to know
 	whether or not the player is standing at a sent chunk.
@@ -540,6 +600,11 @@ private:
 	/** Number of place or break interactions this tick */
 	int m_NumBlockChangeInteractionsThisTick;
 
+	/* Should the player be displayed in player tab list or sent in server status packets. Set by ClientSettings packet */
+	bool m_Allowslisting;
+
+	eParticleModeSetting m_ParticleMode;
+
 	static int s_ClientCount;
 
 	static Vector3i s_IllegalPosition;
@@ -576,9 +641,6 @@ private:
 	0 for just started, 1 and above for broken. Used for anti-cheat. */
 	float m_BreakProgress;
 
-	/** Finish logging the user in after authenticating. */
-	void FinishAuthenticate();
-
 	/** Returns true if the rate block interactions is within a reasonable limit (bot protection) */
 	bool CheckBlockInteractionsRate(void);
 
@@ -596,15 +658,6 @@ private:
 
 	/** The clients will receive a finished dig animation */
 	void FinishDigAnimation();
-
-	/** Converts the protocol-formatted channel list (NUL-separated) into a proper string vector. */
-	AStringVector BreakApartPluginChannels(ContiguousByteBufferView a_PluginChannels);
-
-	/** Adds all of the channels to the list of current plugin channels. Handles duplicates gracefully. */
-	void RegisterPluginChannels(const AStringVector & a_ChannelList);
-
-	/** Removes all of the channels from the list of current plugin channels. Ignores channels that are not found. */
-	void UnregisterPluginChannels(const AStringVector & a_ChannelList);
 
 	/** Called when the network socket has been closed. */
 	void SocketClosed(void);

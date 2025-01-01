@@ -105,8 +105,8 @@ public:
 	void SetAllData(SetChunkData && a_SetChunkData);
 
 	void SetLight(
-		const cChunkDef::BlockNibbles & a_BlockLight,
-		const cChunkDef::BlockNibbles & a_SkyLight
+		const cChunkDef::LightNibbles & a_BlockLight,
+		const cChunkDef::LightNibbles & a_SkyLight
 	);
 
 	/** Writes the specified cBlockArea at the coords specified. Note that the coords may extend beyond the chunk! */
@@ -134,25 +134,26 @@ public:
 
 	cWorld * GetWorld(void) const { return m_World; }
 
-	void SetBlock(Vector3i a_RelBlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void SetBlock(Vector3i a_RelBlockPos, BlockState a_Block);
 	// SetBlock() does a lot of work (heightmap, tickblocks, blockentities) so a BlockIdx version doesn't make sense
 
-	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
-	void FastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, BLOCKTYPE a_BlockMeta)
+	void FastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block);  // Doesn't force block updates on neighbors, use for simple changes such as grass growing etc.
+	void FastSetBlock(Vector3i a_RelPos, BlockState a_Block)
 	{
-		FastSetBlock(a_RelPos.x, a_RelPos.y, a_RelPos.z, a_BlockType, a_BlockMeta);
+		FastSetBlock(a_RelPos.x, a_RelPos.y, a_RelPos.z, a_Block);
 	}
 
-	BLOCKTYPE GetBlock(int a_RelX, int a_RelY, int a_RelZ) const { return m_BlockData.GetBlock({ a_RelX, a_RelY, a_RelZ }); }
-	BLOCKTYPE GetBlock(Vector3i a_RelCoords) const { return m_BlockData.GetBlock(a_RelCoords); }
+	BlockState GetBlock(int a_RelX, int a_RelY, int a_RelZ) const { return m_BlockData.GetBlock({ a_RelX, a_RelY, a_RelZ }); }
+	BlockState GetBlock(Vector3i a_RelCoords) const { return m_BlockData.GetBlock(a_RelCoords); }
 
+	/*
 	void GetBlockTypeMeta(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
 	void GetBlockTypeMeta(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
 	{
 		GetBlockTypeMeta({ a_RelX, a_RelY, a_RelZ }, a_BlockType, a_BlockMeta);
 	}
-
-	void GetBlockInfo(Vector3i a_RelPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
+	*/
+	void GetBlockInfo(Vector3i a_RelPos, BlockState & a_Block, LIGHTTYPE & a_SkyLight, LIGHTTYPE & a_BlockLight) const;
 
 	/** Convert absolute coordinates into relative coordinates.
 	Returns false on failure to obtain a valid chunk. Returns true otherwise.
@@ -276,134 +277,91 @@ public:
 		m_BlockToTick = a_RelPos;
 	}
 
-	inline NIBBLETYPE GetMeta(int a_RelX, int a_RelY, int a_RelZ) const
-	{
-		return m_BlockData.GetMeta({ a_RelX, a_RelY, a_RelZ });
-	}
-
-	NIBBLETYPE GetMeta(Vector3i a_RelPos) const { return m_BlockData.GetMeta(a_RelPos); }
-
-	void SetMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_Meta)
-	{
-		SetMeta({ a_RelX, a_RelY, a_RelZ }, a_Meta);
-	}
-
-	inline void SetMeta(Vector3i a_RelPos, NIBBLETYPE a_Meta)
-	{
-		m_BlockData.SetMeta(a_RelPos, a_Meta);
-		MarkDirty();
-		m_PendingSendBlocks.emplace_back(m_PosX, m_PosZ, a_RelPos.x, a_RelPos.y, a_RelPos.z, GetBlock(a_RelPos), a_Meta);
-	}
-
 	/** Light alterations based on time */
-	NIBBLETYPE GetTimeAlteredLight(NIBBLETYPE a_Skylight) const;
+	LIGHTTYPE GetTimeAlteredLight(LIGHTTYPE a_Skylight) const;
 
 	/** Get the level of artificial light illuminating the block (0 - 15) */
-	inline NIBBLETYPE GetBlockLight(Vector3i a_RelPos) const { return m_LightData.GetBlockLight(a_RelPos); }
-	inline NIBBLETYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetBlockLight({ a_RelX, a_RelY, a_RelZ }); }
+	inline LIGHTTYPE GetBlockLight(Vector3i a_RelPos) const { return m_LightData.GetBlockLight(a_RelPos); }
+	inline LIGHTTYPE GetBlockLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetBlockLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15) independent of daytime. */
-	inline NIBBLETYPE GetSkyLight(Vector3i a_RelPos) const { return m_LightData.GetSkyLight(a_RelPos); }
-	inline NIBBLETYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetSkyLight({ a_RelX, a_RelY, a_RelZ }); }
+	inline LIGHTTYPE GetSkyLight(Vector3i a_RelPos) const { return m_LightData.GetSkyLight(a_RelPos); }
+	inline LIGHTTYPE GetSkyLight(int a_RelX, int a_RelY, int a_RelZ) const { return m_LightData.GetSkyLight({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Get the level of sky light illuminating the block (0 - 15), taking daytime into a account. */
-	inline NIBBLETYPE GetSkyLightAltered(Vector3i a_RelPos) const { return GetTimeAlteredLight(m_LightData.GetSkyLight(a_RelPos)); }
-	inline NIBBLETYPE GetSkyLightAltered(int a_RelX, int a_RelY, int a_RelZ) const { return GetSkyLightAltered({ a_RelX, a_RelY, a_RelZ }); }
+	inline LIGHTTYPE GetSkyLightAltered(Vector3i a_RelPos) const { return GetTimeAlteredLight(m_LightData.GetSkyLight(a_RelPos)); }
+	inline LIGHTTYPE GetSkyLightAltered(int a_RelX, int a_RelY, int a_RelZ) const { return GetSkyLightAltered({ a_RelX, a_RelY, a_RelZ }); }
 
 	/** Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlock(Vector3i a_RelCoords, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
-
-	/** OBSOLETE, use the Vector3i-based overload.
-	Same as GetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
-	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const
-	{
-		return UnboundedRelGetBlock({a_RelX, a_RelY, a_RelZ}, a_BlockType, a_BlockMeta);
-	}
-
-	/** Same as GetBlockType(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
-	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockType(Vector3i a_RelCoords, BLOCKTYPE & a_BlockType) const;
+	bool UnboundedRelGetBlock(Vector3i a_RelCoords, BlockState & a_Block) const;
 
 	/** OBSOLETE, use the Vector3i-based overload.
 	Same as GetBlockType(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockType(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE & a_BlockType) const
+	bool UnboundedRelGetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState & a_Block) const
 	{
-		return UnboundedRelGetBlockType({a_RelX, a_RelY, a_RelZ}, a_BlockType);
-	}
-
-	/** Same as GetBlockMeta(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
-	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockMeta(Vector3i a_RelPos, NIBBLETYPE & a_BlockMeta) const;
-
-	/** OBSOLETE, use the Vector3i-based overload.
-	Same as GetBlockMeta(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
-	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockMeta(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockMeta) const
-	{
-		return UnboundedRelGetBlockMeta({a_RelX, a_RelY, a_RelZ}, a_BlockMeta);
+		return UnboundedRelGetBlock({a_RelX, a_RelY, a_RelZ}, a_Block);
 	}
 
 	/** Same as GetBlockBlockLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockBlockLight(Vector3i a_RelPos, NIBBLETYPE & a_BlockLight) const;
+	bool UnboundedRelGetBlockBlockLight(Vector3i a_RelPos, LIGHTTYPE & a_BlockLight) const;
 
 	/** OBSOLETE, use the Vector3i-based overload.
 	Same as GetBlockBlockLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockBlockLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockLight) const
+	bool UnboundedRelGetBlockBlockLight(int a_RelX, int a_RelY, int a_RelZ, LIGHTTYPE & a_BlockLight) const
 	{
 		return UnboundedRelGetBlockBlockLight({a_RelX, a_RelY, a_RelZ}, a_BlockLight);
 	}
 
 	/** Same as GetBlockSkyLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockSkyLight(Vector3i a_RelPos, NIBBLETYPE & a_SkyLight) const;
+	bool UnboundedRelGetBlockSkyLight(Vector3i a_RelPos, LIGHTTYPE & a_SkyLight) const;
 
 	/** OBSOLETE, use the Vector3i-based overload.
 	Same as GetBlockSkyLight(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_SkyLight) const
+	bool UnboundedRelGetBlockSkyLight(int a_RelX, int a_RelY, int a_RelZ, LIGHTTYPE & a_SkyLight) const
 	{
 		return UnboundedRelGetBlockSkyLight({a_RelX, a_RelY, a_RelZ}, a_SkyLight);
 	}
 
 	/** Queries both BlockLight and SkyLight, relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockLights(Vector3i a_RelPos, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_SkyLight) const;
+	bool UnboundedRelGetBlockLights(Vector3i a_RelPos, LIGHTTYPE & a_BlockLight, LIGHTTYPE & a_SkyLight) const;
 
 	/** OBSOLETE, use the Vector3i-based overload.
 	Queries both BlockLight and SkyLight, relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelGetBlockLights(int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE & a_BlockLight, NIBBLETYPE & a_SkyLight) const
+	bool UnboundedRelGetBlockLights(int a_RelX, int a_RelY, int a_RelZ, LIGHTTYPE & a_BlockLight, LIGHTTYPE & a_SkyLight) const
 	{
 		return UnboundedRelGetBlockLights({a_RelX, a_RelY, a_RelZ}, a_BlockLight, a_SkyLight);
 	}
 
 	/** Same as SetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool UnboundedRelSetBlock(Vector3i a_RelPos, BlockState a_Block);
 
 	/** OBSOLETE, use the Vector3i-based overload.
 	Same as SetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	bool UnboundedRelSetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block)
 	{
-		return UnboundedRelSetBlock({a_RelX, a_RelY, a_RelZ}, a_BlockType, a_BlockMeta);
+		return UnboundedRelSetBlock({a_RelX, a_RelY, a_RelZ}, a_Block);
 	}
 
 	/** Same as FastSetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelFastSetBlock(Vector3i a_RelPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool UnboundedRelFastSetBlock(Vector3i a_RelPos, BlockState a_Block);
 
 	/** OBSOLETE, use the Vector3i-based overload.
 	Same as FastSetBlock(), but relative coords needn't be in this chunk (uses m_Neighbor-s or m_ChunkMap in such a case)
 	Returns true on success, false if queried chunk not loaded. */
-	bool UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	bool UnboundedRelFastSetBlock(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block)
 	{
-		return UnboundedRelFastSetBlock({a_RelX, a_RelY, a_RelZ}, a_BlockType, a_BlockMeta);
+		return UnboundedRelFastSetBlock({a_RelX, a_RelY, a_RelZ}, a_Block);
 	}
 
 
@@ -463,12 +421,11 @@ private:
 	{
 		Int64 m_Tick;
 		int m_RelX, m_RelY, m_RelZ;
-		BLOCKTYPE m_BlockType;
-		NIBBLETYPE m_BlockMeta;
-		BLOCKTYPE m_PreviousType;
+		BlockState m_Block;
+		BlockType m_PreviousType;
 
-		sSetBlockQueueItem(int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Int64 a_Tick, BLOCKTYPE a_PreviousBlockType) :
-			m_Tick(a_Tick), m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ), m_BlockType(a_BlockType), m_BlockMeta(a_BlockMeta), m_PreviousType(a_PreviousBlockType)
+		sSetBlockQueueItem(int a_RelX, int a_RelY, int a_RelZ, BlockState a_Block, Int64 a_Tick, BlockType a_PreviousBlockType) :
+			m_Tick(a_Tick), m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ), m_Block(a_Block), m_PreviousType(a_PreviousBlockType)
 		{
 		}
 	} ;
@@ -562,7 +519,7 @@ private:
 	/** Grows the plant at the specified position by at most a_NumStages.
 	The block's Grow handler is invoked.
 	Returns the number of stages the plant has grown, 0 if not a plant. */
-	int GrowPlantAt(Vector3i a_RelPos, int a_NumStages = 1);
+	int GrowPlantAt(Vector3i a_RelPos, char a_NumStages = 1);
 
 	/** Called by Tick() when an entity moves out of this chunk into a neighbor; moves the entity and sends spawn / despawn packet to clients */
 	void MoveEntityToNewChunk(OwnedEntity a_Entity);

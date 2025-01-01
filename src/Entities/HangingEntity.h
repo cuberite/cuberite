@@ -28,7 +28,7 @@ public:  // tolua_export
 	Byte GetProtocolFacing() const { return m_Facing; }
 
 	/** Returns if the given block can support hanging entity placements. */
-	static bool IsValidSupportBlock(BLOCKTYPE a_BlockType);  // tolua_export
+	static bool IsValidSupportBlock(BlockState a_Block);  // tolua_export
 
 	/** Set the direction in which the entity is facing. */
 	void SetFacing(eBlockFace a_Facing) { m_Facing = cHangingEntity::BlockFaceToProtocolFace(a_Facing); }  // tolua_export

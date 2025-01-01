@@ -21,12 +21,11 @@ public:  // tolua_export
 
 	/** Creates a new falling block.
 	a_Position is expected in world coords */
-	cFallingBlock(Vector3d a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	cFallingBlock(Vector3d a_Position, BlockState a_Block);
 
 	// tolua_begin
 
-	BLOCKTYPE  GetBlockType(void) const { return m_BlockType; }
-	NIBBLETYPE GetBlockMeta(void) const { return m_BlockMeta; }
+	BlockState GetBlock(void) const { return m_Block; }
 
 	// tolua_end
 
@@ -35,8 +34,7 @@ public:  // tolua_export
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 private:
-	BLOCKTYPE  m_BlockType;
-	NIBBLETYPE m_BlockMeta;
+	BlockState m_Block;
 } ;  // tolua_export
 
 

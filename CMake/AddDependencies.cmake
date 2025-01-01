@@ -71,6 +71,7 @@ function(link_dependencies TARGET)
 		mbedtls
 		SQLiteCpp
 		tolualib
+		stdc++fs
 	)
 
 	# Link process information, multimedia (for sleep resolution) libraries:
