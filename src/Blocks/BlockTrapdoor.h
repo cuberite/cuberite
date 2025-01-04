@@ -41,6 +41,7 @@ public:
 			case BlockType::WaxedExposedCopperTrapdoor:
 			case BlockType::WaxedWeatheredCopperTrapdoor:
 			case BlockType::WaxedOxidizedCopperTrapdoor:
+			case BlockType::PaleOakTrapdoor:
 				return true;
 			default: return false;
 		}
@@ -75,6 +76,7 @@ public:
 			case BlockType::WaxedExposedCopperTrapdoor:   TOGGLE_TRAPDOOR(WaxedExposedCopperTrapdoor)
 			case BlockType::WaxedWeatheredCopperTrapdoor: TOGGLE_TRAPDOOR(WaxedWeatheredCopperTrapdoor)
 			case BlockType::WaxedOxidizedCopperTrapdoor:  TOGGLE_TRAPDOOR(WaxedOxidizedCopperTrapdoor)
+			case BlockType::PaleOakTrapdoor:              TOGGLE_TRAPDOOR(PaleOakTrapdoor)
 			default: return a_Block;
 		}
 	}
@@ -109,6 +111,7 @@ public:
 			case BlockType::WaxedExposedCopperTrapdoor:   TOGGLE_TRAPDOOR_POWER(WaxedExposedCopperTrapdoor)
 			case BlockType::WaxedWeatheredCopperTrapdoor: TOGGLE_TRAPDOOR_POWER(WaxedWeatheredCopperTrapdoor)
 			case BlockType::WaxedOxidizedCopperTrapdoor:  TOGGLE_TRAPDOOR_POWER(WaxedOxidizedCopperTrapdoor)
+			case BlockType::PaleOakTrapdoor:              TOGGLE_TRAPDOOR_POWER(PaleOakTrapdoor)
 			default: return a_Block;
 		}
 	}
@@ -141,6 +144,7 @@ public:
 			case BlockType::WaxedExposedCopperTrapdoor:   IS_TRAPDOOR_OPEN(WaxedExposedCopperTrapdoor)
 			case BlockType::WaxedWeatheredCopperTrapdoor: IS_TRAPDOOR_OPEN(WaxedWeatheredCopperTrapdoor)
 			case BlockType::WaxedOxidizedCopperTrapdoor:  IS_TRAPDOOR_OPEN(WaxedOxidizedCopperTrapdoor)
+			case BlockType::PaleOakTrapdoor:              IS_TRAPDOOR_OPEN(PaleOakTrapdoor)
 			default: return false;
 		}
 	}
@@ -222,7 +226,8 @@ private:
 			case BlockType::WaxedCopperTrapdoor:
 			case BlockType::WaxedExposedCopperTrapdoor:
 			case BlockType::WaxedWeatheredCopperTrapdoor:
-			case BlockType::WaxedOxidizedCopperTrapdoor: return 0;
+			case BlockType::WaxedOxidizedCopperTrapdoor:
+			case BlockType::PaleOakTrapdoor: return 0;
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in trapdoor handler!");

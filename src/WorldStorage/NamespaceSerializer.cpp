@@ -263,6 +263,7 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::ChiseledPolishedBlackstone:      return "chiseled_polished_blackstone";
 		case BlockType::ChiseledQuartzBlock:             return "chiseled_quartz_block";
 		case BlockType::ChiseledRedSandstone:            return "chiseled_red_sandstone";
+		case BlockType::ChiseledResinBricks:             return "chiseled_resin_bricks";
 		case BlockType::ChiseledSandstone:               return "chiseled_sandstone";
 		case BlockType::ChiseledStoneBricks:             return "chiseled_stone_bricks";
 		case BlockType::ChiseledTuff:                    return "chiseled_tuff";
@@ -270,6 +271,7 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::ChorusFlower:                    return "chorus_flower";
 		case BlockType::ChorusPlant:                     return "chorus_plant";
 		case BlockType::Clay:                            return "clay";
+		case BlockType::ClosedEyeblossom:                return "closed_eyeblossom";
 		case BlockType::CoalBlock:                       return "coal_block";
 		case BlockType::CoalOre:                         return "coal_ore";
 		case BlockType::CoarseDirt:                      return "coarse_dirt";
@@ -301,6 +303,7 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::CrackedStoneBricks:              return "cracked_stone_bricks";
 		case BlockType::Crafter:                         return "crafter";
 		case BlockType::CraftingTable:                   return "crafting_table";
+		case BlockType::CreakingHeart:                   return "creaking_heart";
 		case BlockType::CreeperHead:                     return "creeper_head";
 		case BlockType::CreeperWallHead:                 return "creeper_wall_head";
 		case BlockType::CrimsonButton:                   return "crimson_button";
@@ -694,6 +697,7 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::Observer:                        return "observer";
 		case BlockType::Obsidian:                        return "obsidian";
 		case BlockType::OchreFroglight:                  return "ochre_froglight";
+		case BlockType::OpenEyeblossom:                  return "open_eyeblossom";
 		case BlockType::OrangeBanner:                    return "orange_banner";
 		case BlockType::OrangeBed:                       return "orange_bed";
 		case BlockType::OrangeCandle:                    return "orange_candle";
@@ -721,6 +725,26 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::OxidizedCutCopperStairs:         return "oxidized_cut_copper_stairs";
 		case BlockType::PackedIce:                       return "packed_ice";
 		case BlockType::PackedMud:                       return "packed_mud";
+		case BlockType::PaleHangingMoss:                 return "pale_hanging_moss";
+		case BlockType::PaleMossBlock:                   return "pale_moss_block";
+		case BlockType::PaleMossCarpet:                  return "pale_moss_carpet";
+		case BlockType::PaleOakButton:                   return "pale_oak_button";
+		case BlockType::PaleOakDoor:                     return "pale_oak_door";
+		case BlockType::PaleOakFence:                    return "pale_oak_fence";
+		case BlockType::PaleOakFenceGate:                return "pale_oak_fence_gate";
+		case BlockType::PaleOakHangingSign:              return "pale_oak_hanging_sign";
+		case BlockType::PaleOakLeaves:                   return "pale_oak_leaves";
+		case BlockType::PaleOakLog:                      return "pale_oak_log";
+		case BlockType::PaleOakPlanks:                   return "pale_oak_planks";
+		case BlockType::PaleOakPressurePlate:            return "pale_oak_pressure_plate";
+		case BlockType::PaleOakSapling:                  return "pale_oak_sapling";
+		case BlockType::PaleOakSign:                     return "pale_oak_sign";
+		case BlockType::PaleOakSlab:                     return "pale_oak_slab";
+		case BlockType::PaleOakStairs:                   return "pale_oak_stairs";
+		case BlockType::PaleOakTrapdoor:                 return "pale_oak_trapdoor";
+		case BlockType::PaleOakWallHangingSign:          return "pale_oak_wall_hanging_sign";
+		case BlockType::PaleOakWallSign:                 return "pale_oak_wall_sign";
+		case BlockType::PaleOakWood:                     return "pale_oak_wood";
 		case BlockType::PearlescentFroglight:            return "pearlescent_froglight";
 		case BlockType::Peony:                           return "peony";
 		case BlockType::PetrifiedOakSlab:                return "petrified_oak_slab";
@@ -790,6 +814,7 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::PottedBrownMushroom:             return "potted_brown_mushroom";
 		case BlockType::PottedCactus:                    return "potted_cactus";
 		case BlockType::PottedCherrySapling:             return "potted_cherry_sapling";
+		case BlockType::PottedClosedEyeblossom:          return "potted_closed_eyeblossom";
 		case BlockType::PottedCornflower:                return "potted_cornflower";
 		case BlockType::PottedCrimsonFungus:             return "potted_crimson_fungus";
 		case BlockType::PottedCrimsonRoots:              return "potted_crimson_roots";
@@ -802,8 +827,10 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::PottedLilyOfTheValley:           return "potted_lily_of_the_valley";
 		case BlockType::PottedMangrovePropagule:         return "potted_mangrove_propagule";
 		case BlockType::PottedOakSapling:                return "potted_oak_sapling";
+		case BlockType::PottedOpenEyeblossom:            return "potted_open_eyeblossom";
 		case BlockType::PottedOrangeTulip:               return "potted_orange_tulip";
 		case BlockType::PottedOxeyeDaisy:                return "potted_oxeye_daisy";
+		case BlockType::PottedPaleOakSapling:            return "potted_pale_oak_sapling";
 		case BlockType::PottedPinkTulip:                 return "potted_pink_tulip";
 		case BlockType::PottedPoppy:                     return "potted_poppy";
 		case BlockType::PottedRedMushroom:               return "potted_red_mushroom";
@@ -888,6 +915,12 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::ReinforcedDeepslate:             return "reinforced_deepslate";
 		case BlockType::Repeater:                        return "repeater";
 		case BlockType::RepeatingCommandBlock:           return "repeating_command_block";
+		case BlockType::ResinBlock:                      return "resin_block";
+		case BlockType::ResinBrickSlab:                  return "resin_brick_slab";
+		case BlockType::ResinBrickStairs:                return "resin_brick_stairs";
+		case BlockType::ResinBrickWall:                  return "resin_brick_wall";
+		case BlockType::ResinBricks:                     return "resin_bricks";
+		case BlockType::ResinClump:                      return "resin_clump";
 		case BlockType::RespawnAnchor:                   return "respawn_anchor";
 		case BlockType::RootedDirt:                      return "rooted_dirt";
 		case BlockType::RoseBush:                        return "rose_bush";
@@ -985,6 +1018,8 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::StrippedMangroveWood:            return "stripped_mangrove_wood";
 		case BlockType::StrippedOakLog:                  return "stripped_oak_log";
 		case BlockType::StrippedOakWood:                 return "stripped_oak_wood";
+		case BlockType::StrippedPaleOakLog:              return "stripped_pale_oak_log";
+		case BlockType::StrippedPaleOakWood:             return "stripped_pale_oak_wood";
 		case BlockType::StrippedSpruceLog:               return "stripped_spruce_log";
 		case BlockType::StrippedSpruceWood:              return "stripped_spruce_wood";
 		case BlockType::StrippedWarpedHyphae:            return "stripped_warped_hyphae";
@@ -1279,6 +1314,7 @@ std::string_view NamespaceSerializer::From(const eMonsterType a_ID)
 		case mtCod:            return "cod";
 		case mtCow:            return "cow";
 		case mtCreeper:        return "creeper";
+		case mtCreaking:       return "creaking";
 		case mtDolphin:        return "dolphin";
 		case mtDonkey:         return "donkey";
 		case mtDrowned:        return "drowned";
@@ -1450,6 +1486,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::BirchWood:                          return "birch_wood";
 		case Item::BlackBanner:                        return "black_banner";
 		case Item::BlackBed:                           return "black_bed";
+		case Item::BlackBundle:                        return "black_bundle";
 		case Item::BlackCandle:                        return "black_candle";
 		case Item::BlackCarpet:                        return "black_carpet";
 		case Item::BlackConcrete:                      return "black_concrete";
@@ -1472,6 +1509,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::BlazeSpawnEgg:                      return "blaze_spawn_egg";
 		case Item::BlueBanner:                         return "blue_banner";
 		case Item::BlueBed:                            return "blue_bed";
+		case Item::BlueBundle:                         return "blue_bundle";
 		case Item::BlueCandle:                         return "blue_candle";
 		case Item::BlueCarpet:                         return "blue_carpet";
 		case Item::BlueConcrete:                       return "blue_concrete";
@@ -1492,6 +1530,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::BoneMeal:                           return "bone_meal";
 		case Item::Book:                               return "book";
 		case Item::Bookshelf:                          return "bookshelf";
+		case Item::BordureIndentedBannerPattern:       return "bordure_indented_banner_pattern";
 		case Item::Bow:                                return "bow";
 		case Item::Bowl:                               return "bowl";
 		case Item::BrainCoral:                         return "brain_coral";
@@ -1509,6 +1548,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::Bricks:                             return "bricks";
 		case Item::BrownBanner:                        return "brown_banner";
 		case Item::BrownBed:                           return "brown_bed";
+		case Item::BrownBundle:                        return "brown_bundle";
 		case Item::BrownCandle:                        return "brown_candle";
 		case Item::BrownCarpet:                        return "brown_carpet";
 		case Item::BrownConcrete:                      return "brown_concrete";
@@ -1580,6 +1620,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::ChiseledPolishedBlackstone:         return "chiseled_polished_blackstone";
 		case Item::ChiseledQuartzBlock:                return "chiseled_quartz_block";
 		case Item::ChiseledRedSandstone:               return "chiseled_red_sandstone";
+		case Item::ChiseledResinBricks:                return "chiseled_resin_bricks";
 		case Item::ChiseledSandstone:                  return "chiseled_sandstone";
 		case Item::ChiseledStoneBricks:                return "chiseled_stone_bricks";
 		case Item::ChiseledTuff:                       return "chiseled_tuff";
@@ -1590,6 +1631,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::Clay:                               return "clay";
 		case Item::ClayBall:                           return "clay_ball";
 		case Item::Clock:                              return "clock";
+		case Item::ClosedEyeblossom:                   return "closed_eyeblossom";
 		case Item::Coal:                               return "coal";
 		case Item::CoalBlock:                          return "coal_block";
 		case Item::CoalOre:                            return "coal_ore";
@@ -1638,6 +1680,8 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::CrackedStoneBricks:                 return "cracked_stone_bricks";
 		case Item::Crafter:                            return "crafter";
 		case Item::CraftingTable:                      return "crafting_table";
+		case Item::CreakingHeart:                      return "creaking_heart";
+		case Item::CreakingSpawnEgg:                   return "creaking_spawn_egg";
 		case Item::CreeperBannerPattern:               return "creeper_banner_pattern";
 		case Item::CreeperHead:                        return "creeper_head";
 		case Item::CreeperSpawnEgg:                    return "creeper_spawn_egg";
@@ -1668,6 +1712,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::CutSandstoneSlab:                   return "cut_sandstone_slab";
 		case Item::CyanBanner:                         return "cyan_banner";
 		case Item::CyanBed:                            return "cyan_bed";
+		case Item::CyanBundle:                         return "cyan_bundle";
 		case Item::CyanCandle:                         return "cyan_candle";
 		case Item::CyanCarpet:                         return "cyan_carpet";
 		case Item::CyanConcrete:                       return "cyan_concrete";
@@ -1812,6 +1857,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::Feather:                            return "feather";
 		case Item::FermentedSpiderEye:                 return "fermented_spider_eye";
 		case Item::Fern:                               return "fern";
+		case Item::FieldMasonedBannerPattern:          return "field_masoned_banner_pattern";
 		case Item::FilledMap:                          return "filled_map";
 		case Item::FireCharge:                         return "fire_charge";
 		case Item::FireCoral:                          return "fire_coral";
@@ -1877,6 +1923,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::Gravel:                             return "gravel";
 		case Item::GrayBanner:                         return "gray_banner";
 		case Item::GrayBed:                            return "gray_bed";
+		case Item::GrayBundle:                         return "gray_bundle";
 		case Item::GrayCandle:                         return "gray_candle";
 		case Item::GrayCarpet:                         return "gray_carpet";
 		case Item::GrayConcrete:                       return "gray_concrete";
@@ -1890,6 +1937,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::GrayWool:                           return "gray_wool";
 		case Item::GreenBanner:                        return "green_banner";
 		case Item::GreenBed:                           return "green_bed";
+		case Item::GreenBundle:                        return "green_bundle";
 		case Item::GreenCandle:                        return "green_candle";
 		case Item::GreenCarpet:                        return "green_carpet";
 		case Item::GreenConcrete:                      return "green_concrete";
@@ -1997,6 +2045,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::Light:                              return "light";
 		case Item::LightBlueBanner:                    return "light_blue_banner";
 		case Item::LightBlueBed:                       return "light_blue_bed";
+		case Item::LightBlueBundle:                    return "light_blue_bundle";
 		case Item::LightBlueCandle:                    return "light_blue_candle";
 		case Item::LightBlueCarpet:                    return "light_blue_carpet";
 		case Item::LightBlueConcrete:                  return "light_blue_concrete";
@@ -2010,6 +2059,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::LightBlueWool:                      return "light_blue_wool";
 		case Item::LightGrayBanner:                    return "light_gray_banner";
 		case Item::LightGrayBed:                       return "light_gray_bed";
+		case Item::LightGrayBundle:                    return "light_gray_bundle";
 		case Item::LightGrayCandle:                    return "light_gray_candle";
 		case Item::LightGrayCarpet:                    return "light_gray_carpet";
 		case Item::LightGrayConcrete:                  return "light_gray_concrete";
@@ -2028,6 +2078,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::LilyPad:                            return "lily_pad";
 		case Item::LimeBanner:                         return "lime_banner";
 		case Item::LimeBed:                            return "lime_bed";
+		case Item::LimeBundle:                         return "lime_bundle";
 		case Item::LimeCandle:                         return "lime_candle";
 		case Item::LimeCarpet:                         return "lime_carpet";
 		case Item::LimeConcrete:                       return "lime_concrete";
@@ -2046,6 +2097,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::Mace:                               return "mace";
 		case Item::MagentaBanner:                      return "magenta_banner";
 		case Item::MagentaBed:                         return "magenta_bed";
+		case Item::MagentaBundle:                      return "magenta_bundle";
 		case Item::MagentaCandle:                      return "magenta_candle";
 		case Item::MagentaCarpet:                      return "magenta_carpet";
 		case Item::MagentaConcrete:                    return "magenta_concrete";
@@ -2181,8 +2233,10 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::OchreFroglight:                     return "ochre_froglight";
 		case Item::OminousBottle:                      return "ominous_bottle";
 		case Item::OminousTrialKey:                    return "ominous_trial_key";
+		case Item::OpenEyeblossom:                     return "open_eyeblossom";
 		case Item::OrangeBanner:                       return "orange_banner";
 		case Item::OrangeBed:                          return "orange_bed";
+		case Item::OrangeBundle:                       return "orange_bundle";
 		case Item::OrangeCandle:                       return "orange_candle";
 		case Item::OrangeCarpet:                       return "orange_carpet";
 		case Item::OrangeConcrete:                     return "orange_concrete";
@@ -2208,6 +2262,26 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::PackedIce:                          return "packed_ice";
 		case Item::PackedMud:                          return "packed_mud";
 		case Item::Painting:                           return "painting";
+		case Item::PaleHangingMoss:                    return "pale_hanging_moss";
+		case Item::PaleMossBlock:                      return "pale_moss_block";
+		case Item::PaleMossCarpet:                     return "pale_moss_carpet";
+		case Item::PaleOakBoat:                        return "pale_oak_boat";
+		case Item::PaleOakButton:                      return "pale_oak_button";
+		case Item::PaleOakChestBoat:                   return "pale_oak_chest_boat";
+		case Item::PaleOakDoor:                        return "pale_oak_door";
+		case Item::PaleOakFence:                       return "pale_oak_fence";
+		case Item::PaleOakFenceGate:                   return "pale_oak_fence_gate";
+		case Item::PaleOakHangingSign:                 return "pale_oak_hanging_sign";
+		case Item::PaleOakLeaves:                      return "pale_oak_leaves";
+		case Item::PaleOakLog:                         return "pale_oak_log";
+		case Item::PaleOakPlanks:                      return "pale_oak_planks";
+		case Item::PaleOakPressurePlate:               return "pale_oak_pressure_plate";
+		case Item::PaleOakSapling:                     return "pale_oak_sapling";
+		case Item::PaleOakSign:                        return "pale_oak_sign";
+		case Item::PaleOakSlab:                        return "pale_oak_slab";
+		case Item::PaleOakStairs:                      return "pale_oak_stairs";
+		case Item::PaleOakTrapdoor:                    return "pale_oak_trapdoor";
+		case Item::PaleOakWood:                        return "pale_oak_wood";
 		case Item::PandaSpawnEgg:                      return "panda_spawn_egg";
 		case Item::Paper:                              return "paper";
 		case Item::ParrotSpawnEgg:                     return "parrot_spawn_egg";
@@ -2224,6 +2298,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::PillagerSpawnEgg:                   return "pillager_spawn_egg";
 		case Item::PinkBanner:                         return "pink_banner";
 		case Item::PinkBed:                            return "pink_bed";
+		case Item::PinkBundle:                         return "pink_bundle";
 		case Item::PinkCandle:                         return "pink_candle";
 		case Item::PinkCarpet:                         return "pink_carpet";
 		case Item::PinkConcrete:                       return "pink_concrete";
@@ -2299,6 +2374,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::PumpkinSeeds:                       return "pumpkin_seeds";
 		case Item::PurpleBanner:                       return "purple_banner";
 		case Item::PurpleBed:                          return "purple_bed";
+		case Item::PurpleBundle:                       return "purple_bundle";
 		case Item::PurpleCandle:                       return "purple_candle";
 		case Item::PurpleCarpet:                       return "purple_carpet";
 		case Item::PurpleConcrete:                     return "purple_concrete";
@@ -2337,6 +2413,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::RecoveryCompass:                    return "recovery_compass";
 		case Item::RedBanner:                          return "red_banner";
 		case Item::RedBed:                             return "red_bed";
+		case Item::RedBundle:                          return "red_bundle";
 		case Item::RedCandle:                          return "red_candle";
 		case Item::RedCarpet:                          return "red_carpet";
 		case Item::RedConcrete:                        return "red_concrete";
@@ -2368,6 +2445,13 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::ReinforcedDeepslate:                return "reinforced_deepslate";
 		case Item::Repeater:                           return "repeater";
 		case Item::RepeatingCommandBlock:              return "repeating_command_block";
+		case Item::ResinBlock:                         return "resin_block";
+		case Item::ResinBrick:                         return "resin_brick";
+		case Item::ResinBrickSlab:                     return "resin_brick_slab";
+		case Item::ResinBrickStairs:                   return "resin_brick_stairs";
+		case Item::ResinBrickWall:                     return "resin_brick_wall";
+		case Item::ResinBricks:                        return "resin_bricks";
+		case Item::ResinClump:                         return "resin_clump";
 		case Item::RespawnAnchor:                      return "respawn_anchor";
 		case Item::RibArmorTrimSmithingTemplate:       return "rib_armor_trim_smithing_template";
 		case Item::RootedDirt:                         return "rooted_dirt";
@@ -2507,6 +2591,8 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::StrippedMangroveWood:               return "stripped_mangrove_wood";
 		case Item::StrippedOakLog:                     return "stripped_oak_log";
 		case Item::StrippedOakWood:                    return "stripped_oak_wood";
+		case Item::StrippedPaleOakLog:                 return "stripped_pale_oak_log";
+		case Item::StrippedPaleOakWood:                return "stripped_pale_oak_wood";
 		case Item::StrippedSpruceLog:                  return "stripped_spruce_log";
 		case Item::StrippedSpruceWood:                 return "stripped_spruce_wood";
 		case Item::StrippedWarpedHyphae:               return "stripped_warped_hyphae";
@@ -2640,6 +2726,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::WheatSeeds:                         return "wheat_seeds";
 		case Item::WhiteBanner:                        return "white_banner";
 		case Item::WhiteBed:                           return "white_bed";
+		case Item::WhiteBundle:                        return "white_bundle";
 		case Item::WhiteCandle:                        return "white_candle";
 		case Item::WhiteCarpet:                        return "white_carpet";
 		case Item::WhiteConcrete:                      return "white_concrete";
@@ -2670,6 +2757,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::WrittenBook:                        return "written_book";
 		case Item::YellowBanner:                       return "yellow_banner";
 		case Item::YellowBed:                          return "yellow_bed";
+		case Item::YellowBundle:                       return "yellow_bundle";
 		case Item::YellowCandle:                       return "yellow_candle";
 		case Item::YellowCarpet:                       return "yellow_carpet";
 		case Item::YellowConcrete:                     return "yellow_concrete";
@@ -2890,6 +2978,7 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "chiseled_polished_blackstone",      BlockType::ChiseledPolishedBlackstone },
 		{ "chiseled_quartz_block",             BlockType::ChiseledQuartzBlock },
 		{ "chiseled_red_sandstone",            BlockType::ChiseledRedSandstone },
+		{ "chiseled_resin_bricks",             BlockType::ChiseledResinBricks },
 		{ "chiseled_sandstone",                BlockType::ChiseledSandstone },
 		{ "chiseled_stone_bricks",             BlockType::ChiseledStoneBricks },
 		{ "chiseled_tuff",                     BlockType::ChiseledTuff },
@@ -2897,6 +2986,7 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "chorus_flower",                     BlockType::ChorusFlower },
 		{ "chorus_plant",                      BlockType::ChorusPlant },
 		{ "clay",                              BlockType::Clay },
+		{ "closed_eyeblossom",                 BlockType::ClosedEyeblossom },
 		{ "coal_block",                        BlockType::CoalBlock },
 		{ "coal_ore",                          BlockType::CoalOre },
 		{ "coarse_dirt",                       BlockType::CoarseDirt },
@@ -2928,6 +3018,7 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "cracked_stone_bricks",              BlockType::CrackedStoneBricks },
 		{ "crafter",                           BlockType::Crafter },
 		{ "crafting_table",                    BlockType::CraftingTable },
+		{ "creaking_heart",                    BlockType::CreakingHeart },
 		{ "creeper_head",                      BlockType::CreeperHead },
 		{ "creeper_wall_head",                 BlockType::CreeperWallHead },
 		{ "crimson_button",                    BlockType::CrimsonButton },
@@ -3321,6 +3412,7 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "observer",                          BlockType::Observer },
 		{ "obsidian",                          BlockType::Obsidian },
 		{ "ochre_froglight",                   BlockType::OchreFroglight },
+		{ "open_eyeblossom",                   BlockType::OpenEyeblossom },
 		{ "orange_banner",                     BlockType::OrangeBanner },
 		{ "orange_bed",                        BlockType::OrangeBed },
 		{ "orange_candle",                     BlockType::OrangeCandle },
@@ -3348,6 +3440,26 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "oxidized_cut_copper_stairs",        BlockType::OxidizedCutCopperStairs },
 		{ "packed_ice",                        BlockType::PackedIce },
 		{ "packed_mud",                        BlockType::PackedMud },
+		{ "pale_hanging_moss",                 BlockType::PaleHangingMoss },
+		{ "pale_moss_block",                   BlockType::PaleMossBlock },
+		{ "pale_moss_carpet",                  BlockType::PaleMossCarpet },
+		{ "pale_oak_button",                   BlockType::PaleOakButton },
+		{ "pale_oak_door",                     BlockType::PaleOakDoor },
+		{ "pale_oak_fence",                    BlockType::PaleOakFence },
+		{ "pale_oak_fence_gate",               BlockType::PaleOakFenceGate },
+		{ "pale_oak_hanging_sign",             BlockType::PaleOakHangingSign },
+		{ "pale_oak_leaves",                   BlockType::PaleOakLeaves },
+		{ "pale_oak_log",                      BlockType::PaleOakLog },
+		{ "pale_oak_planks",                   BlockType::PaleOakPlanks },
+		{ "pale_oak_pressure_plate",           BlockType::PaleOakPressurePlate },
+		{ "pale_oak_sapling",                  BlockType::PaleOakSapling },
+		{ "pale_oak_sign",                     BlockType::PaleOakSign },
+		{ "pale_oak_slab",                     BlockType::PaleOakSlab },
+		{ "pale_oak_stairs",                   BlockType::PaleOakStairs },
+		{ "pale_oak_trapdoor",                 BlockType::PaleOakTrapdoor },
+		{ "pale_oak_wall_hanging_sign",        BlockType::PaleOakWallHangingSign },
+		{ "pale_oak_wall_sign",                BlockType::PaleOakWallSign },
+		{ "pale_oak_wood",                     BlockType::PaleOakWood },
 		{ "pearlescent_froglight",             BlockType::PearlescentFroglight },
 		{ "peony",                             BlockType::Peony },
 		{ "petrified_oak_slab",                BlockType::PetrifiedOakSlab },
@@ -3417,6 +3529,7 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "potted_brown_mushroom",             BlockType::PottedBrownMushroom },
 		{ "potted_cactus",                     BlockType::PottedCactus },
 		{ "potted_cherry_sapling",             BlockType::PottedCherrySapling },
+		{ "potted_closed_eyeblossom",          BlockType::PottedClosedEyeblossom },
 		{ "potted_cornflower",                 BlockType::PottedCornflower },
 		{ "potted_crimson_fungus",             BlockType::PottedCrimsonFungus },
 		{ "potted_crimson_roots",              BlockType::PottedCrimsonRoots },
@@ -3429,8 +3542,10 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "potted_lily_of_the_valley",         BlockType::PottedLilyOfTheValley },
 		{ "potted_mangrove_propagule",         BlockType::PottedMangrovePropagule },
 		{ "potted_oak_sapling",                BlockType::PottedOakSapling },
+		{ "potted_open_eyeblossom",            BlockType::PottedOpenEyeblossom },
 		{ "potted_orange_tulip",               BlockType::PottedOrangeTulip },
 		{ "potted_oxeye_daisy",                BlockType::PottedOxeyeDaisy },
+		{ "potted_pale_oak_sapling",           BlockType::PottedPaleOakSapling },
 		{ "potted_pink_tulip",                 BlockType::PottedPinkTulip },
 		{ "potted_poppy",                      BlockType::PottedPoppy },
 		{ "potted_red_mushroom",               BlockType::PottedRedMushroom },
@@ -3515,6 +3630,12 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "reinforced_deepslate",              BlockType::ReinforcedDeepslate },
 		{ "repeater",                          BlockType::Repeater },
 		{ "repeating_command_block",           BlockType::RepeatingCommandBlock },
+		{ "resin_block",                       BlockType::ResinBlock },
+		{ "resin_brick_slab",                  BlockType::ResinBrickSlab },
+		{ "resin_brick_stairs",                BlockType::ResinBrickStairs },
+		{ "resin_brick_wall",                  BlockType::ResinBrickWall },
+		{ "resin_bricks",                      BlockType::ResinBricks },
+		{ "resin_clump",                       BlockType::ResinClump },
 		{ "respawn_anchor",                    BlockType::RespawnAnchor },
 		{ "rooted_dirt",                       BlockType::RootedDirt },
 		{ "rose_bush",                         BlockType::RoseBush },
@@ -3612,6 +3733,8 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "stripped_mangrove_wood",            BlockType::StrippedMangroveWood },
 		{ "stripped_oak_log",                  BlockType::StrippedOakLog },
 		{ "stripped_oak_wood",                 BlockType::StrippedOakWood },
+		{ "stripped_pale_oak_log",             BlockType::StrippedPaleOakLog },
+		{ "stripped_pale_oak_wood",            BlockType::StrippedPaleOakWood },
 		{ "stripped_spruce_log",               BlockType::StrippedSpruceLog },
 		{ "stripped_spruce_wood",              BlockType::StrippedSpruceWood },
 		{ "stripped_warped_hyphae",            BlockType::StrippedWarpedHyphae },
@@ -3760,6 +3883,8 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "yellow_wool",                       BlockType::YellowWool },
 		{ "zombie_head",                       BlockType::ZombieHead },
 		{ "zombie_wall_head",                  BlockType::ZombieWallHead },
+
+
 
 		// Old names
 		{ "yellowflower",                        BlockType::Dandelion },
@@ -4031,6 +4156,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "birch_wood",                            Item::BirchWood },
 		{ "black_banner",                          Item::BlackBanner },
 		{ "black_bed",                             Item::BlackBed },
+		{ "black_bundle",                          Item::BlackBundle },
 		{ "black_candle",                          Item::BlackCandle },
 		{ "black_carpet",                          Item::BlackCarpet },
 		{ "black_concrete",                        Item::BlackConcrete },
@@ -4053,6 +4179,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "blaze_spawn_egg",                       Item::BlazeSpawnEgg },
 		{ "blue_banner",                           Item::BlueBanner },
 		{ "blue_bed",                              Item::BlueBed },
+		{ "blue_bundle",                           Item::BlueBundle },
 		{ "blue_candle",                           Item::BlueCandle },
 		{ "blue_carpet",                           Item::BlueCarpet },
 		{ "blue_concrete",                         Item::BlueConcrete },
@@ -4073,6 +4200,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "bone_meal",                             Item::BoneMeal },
 		{ "book",                                  Item::Book },
 		{ "bookshelf",                             Item::Bookshelf },
+		{ "bordure_indented_banner_pattern",       Item::BordureIndentedBannerPattern },
 		{ "bow",                                   Item::Bow },
 		{ "bowl",                                  Item::Bowl },
 		{ "brain_coral",                           Item::BrainCoral },
@@ -4090,6 +4218,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "bricks",                                Item::Bricks },
 		{ "brown_banner",                          Item::BrownBanner },
 		{ "brown_bed",                             Item::BrownBed },
+		{ "brown_bundle",                          Item::BrownBundle },
 		{ "brown_candle",                          Item::BrownCandle },
 		{ "brown_carpet",                          Item::BrownCarpet },
 		{ "brown_concrete",                        Item::BrownConcrete },
@@ -4161,6 +4290,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "chiseled_polished_blackstone",          Item::ChiseledPolishedBlackstone },
 		{ "chiseled_quartz_block",                 Item::ChiseledQuartzBlock },
 		{ "chiseled_red_sandstone",                Item::ChiseledRedSandstone },
+		{ "chiseled_resin_bricks",                 Item::ChiseledResinBricks },
 		{ "chiseled_sandstone",                    Item::ChiseledSandstone },
 		{ "chiseled_stone_bricks",                 Item::ChiseledStoneBricks },
 		{ "chiseled_tuff",                         Item::ChiseledTuff },
@@ -4171,6 +4301,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "clay",                                  Item::Clay },
 		{ "clay_ball",                             Item::ClayBall },
 		{ "clock",                                 Item::Clock },
+		{ "closed_eyeblossom",                     Item::ClosedEyeblossom },
 		{ "coal",                                  Item::Coal },
 		{ "coal_block",                            Item::CoalBlock },
 		{ "coal_ore",                              Item::CoalOre },
@@ -4219,6 +4350,8 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "cracked_stone_bricks",                  Item::CrackedStoneBricks },
 		{ "crafter",                               Item::Crafter },
 		{ "crafting_table",                        Item::CraftingTable },
+		{ "creaking_heart",                        Item::CreakingHeart },
+		{ "creaking_spawn_egg",                    Item::CreakingSpawnEgg },
 		{ "creeper_banner_pattern",                Item::CreeperBannerPattern },
 		{ "creeper_head",                          Item::CreeperHead },
 		{ "creeper_spawn_egg",                     Item::CreeperSpawnEgg },
@@ -4249,6 +4382,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "cut_sandstone_slab",                    Item::CutSandstoneSlab },
 		{ "cyan_banner",                           Item::CyanBanner },
 		{ "cyan_bed",                              Item::CyanBed },
+		{ "cyan_bundle",                           Item::CyanBundle },
 		{ "cyan_candle",                           Item::CyanCandle },
 		{ "cyan_carpet",                           Item::CyanCarpet },
 		{ "cyan_concrete",                         Item::CyanConcrete },
@@ -4393,6 +4527,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "feather",                               Item::Feather },
 		{ "fermented_spider_eye",                  Item::FermentedSpiderEye },
 		{ "fern",                                  Item::Fern },
+		{ "field_masoned_banner_pattern",          Item::FieldMasonedBannerPattern },
 		{ "filled_map",                            Item::FilledMap },
 		{ "fire_charge",                           Item::FireCharge },
 		{ "fire_coral",                            Item::FireCoral },
@@ -4458,6 +4593,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "gravel",                                Item::Gravel },
 		{ "gray_banner",                           Item::GrayBanner },
 		{ "gray_bed",                              Item::GrayBed },
+		{ "gray_bundle",                           Item::GrayBundle },
 		{ "gray_candle",                           Item::GrayCandle },
 		{ "gray_carpet",                           Item::GrayCarpet },
 		{ "gray_concrete",                         Item::GrayConcrete },
@@ -4471,6 +4607,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "gray_wool",                             Item::GrayWool },
 		{ "green_banner",                          Item::GreenBanner },
 		{ "green_bed",                             Item::GreenBed },
+		{ "green_bundle",                          Item::GreenBundle },
 		{ "green_candle",                          Item::GreenCandle },
 		{ "green_carpet",                          Item::GreenCarpet },
 		{ "green_concrete",                        Item::GreenConcrete },
@@ -4578,6 +4715,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "light",                                 Item::Light },
 		{ "light_blue_banner",                     Item::LightBlueBanner },
 		{ "light_blue_bed",                        Item::LightBlueBed },
+		{ "light_blue_bundle",                     Item::LightBlueBundle },
 		{ "light_blue_candle",                     Item::LightBlueCandle },
 		{ "light_blue_carpet",                     Item::LightBlueCarpet },
 		{ "light_blue_concrete",                   Item::LightBlueConcrete },
@@ -4591,6 +4729,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "light_blue_wool",                       Item::LightBlueWool },
 		{ "light_gray_banner",                     Item::LightGrayBanner },
 		{ "light_gray_bed",                        Item::LightGrayBed },
+		{ "light_gray_bundle",                     Item::LightGrayBundle },
 		{ "light_gray_candle",                     Item::LightGrayCandle },
 		{ "light_gray_carpet",                     Item::LightGrayCarpet },
 		{ "light_gray_concrete",                   Item::LightGrayConcrete },
@@ -4609,6 +4748,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "lily_pad",                              Item::LilyPad },
 		{ "lime_banner",                           Item::LimeBanner },
 		{ "lime_bed",                              Item::LimeBed },
+		{ "lime_bundle",                           Item::LimeBundle },
 		{ "lime_candle",                           Item::LimeCandle },
 		{ "lime_carpet",                           Item::LimeCarpet },
 		{ "lime_concrete",                         Item::LimeConcrete },
@@ -4627,6 +4767,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "mace",                                  Item::Mace },
 		{ "magenta_banner",                        Item::MagentaBanner },
 		{ "magenta_bed",                           Item::MagentaBed },
+		{ "magenta_bundle",                        Item::MagentaBundle },
 		{ "magenta_candle",                        Item::MagentaCandle },
 		{ "magenta_carpet",                        Item::MagentaCarpet },
 		{ "magenta_concrete",                      Item::MagentaConcrete },
@@ -4762,8 +4903,10 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "ochre_froglight",                       Item::OchreFroglight },
 		{ "ominous_bottle",                        Item::OminousBottle },
 		{ "ominous_trial_key",                     Item::OminousTrialKey },
+		{ "open_eyeblossom",                       Item::OpenEyeblossom },
 		{ "orange_banner",                         Item::OrangeBanner },
 		{ "orange_bed",                            Item::OrangeBed },
+		{ "orange_bundle",                         Item::OrangeBundle },
 		{ "orange_candle",                         Item::OrangeCandle },
 		{ "orange_carpet",                         Item::OrangeCarpet },
 		{ "orange_concrete",                       Item::OrangeConcrete },
@@ -4789,6 +4932,26 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "packed_ice",                            Item::PackedIce },
 		{ "packed_mud",                            Item::PackedMud },
 		{ "painting",                              Item::Painting },
+		{ "pale_hanging_moss",                     Item::PaleHangingMoss },
+		{ "pale_moss_block",                       Item::PaleMossBlock },
+		{ "pale_moss_carpet",                      Item::PaleMossCarpet },
+		{ "pale_oak_boat",                         Item::PaleOakBoat },
+		{ "pale_oak_button",                       Item::PaleOakButton },
+		{ "pale_oak_chest_boat",                   Item::PaleOakChestBoat },
+		{ "pale_oak_door",                         Item::PaleOakDoor },
+		{ "pale_oak_fence",                        Item::PaleOakFence },
+		{ "pale_oak_fence_gate",                   Item::PaleOakFenceGate },
+		{ "pale_oak_hanging_sign",                 Item::PaleOakHangingSign },
+		{ "pale_oak_leaves",                       Item::PaleOakLeaves },
+		{ "pale_oak_log",                          Item::PaleOakLog },
+		{ "pale_oak_planks",                       Item::PaleOakPlanks },
+		{ "pale_oak_pressure_plate",               Item::PaleOakPressurePlate },
+		{ "pale_oak_sapling",                      Item::PaleOakSapling },
+		{ "pale_oak_sign",                         Item::PaleOakSign },
+		{ "pale_oak_slab",                         Item::PaleOakSlab },
+		{ "pale_oak_stairs",                       Item::PaleOakStairs },
+		{ "pale_oak_trapdoor",                     Item::PaleOakTrapdoor },
+		{ "pale_oak_wood",                         Item::PaleOakWood },
 		{ "panda_spawn_egg",                       Item::PandaSpawnEgg },
 		{ "paper",                                 Item::Paper },
 		{ "parrot_spawn_egg",                      Item::ParrotSpawnEgg },
@@ -4805,6 +4968,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "pillager_spawn_egg",                    Item::PillagerSpawnEgg },
 		{ "pink_banner",                           Item::PinkBanner },
 		{ "pink_bed",                              Item::PinkBed },
+		{ "pink_bundle",                           Item::PinkBundle },
 		{ "pink_candle",                           Item::PinkCandle },
 		{ "pink_carpet",                           Item::PinkCarpet },
 		{ "pink_concrete",                         Item::PinkConcrete },
@@ -4880,6 +5044,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "pumpkin_seeds",                         Item::PumpkinSeeds },
 		{ "purple_banner",                         Item::PurpleBanner },
 		{ "purple_bed",                            Item::PurpleBed },
+		{ "purple_bundle",                         Item::PurpleBundle },
 		{ "purple_candle",                         Item::PurpleCandle },
 		{ "purple_carpet",                         Item::PurpleCarpet },
 		{ "purple_concrete",                       Item::PurpleConcrete },
@@ -4918,6 +5083,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "recovery_compass",                      Item::RecoveryCompass },
 		{ "red_banner",                            Item::RedBanner },
 		{ "red_bed",                               Item::RedBed },
+		{ "red_bundle",                            Item::RedBundle },
 		{ "red_candle",                            Item::RedCandle },
 		{ "red_carpet",                            Item::RedCarpet },
 		{ "red_concrete",                          Item::RedConcrete },
@@ -4949,6 +5115,13 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "reinforced_deepslate",                  Item::ReinforcedDeepslate },
 		{ "repeater",                              Item::Repeater },
 		{ "repeating_command_block",               Item::RepeatingCommandBlock },
+		{ "resin_block",                           Item::ResinBlock },
+		{ "resin_brick",                           Item::ResinBrick },
+		{ "resin_brick_slab",                      Item::ResinBrickSlab },
+		{ "resin_brick_stairs",                    Item::ResinBrickStairs },
+		{ "resin_brick_wall",                      Item::ResinBrickWall },
+		{ "resin_bricks",                          Item::ResinBricks },
+		{ "resin_clump",                           Item::ResinClump },
 		{ "respawn_anchor",                        Item::RespawnAnchor },
 		{ "rib_armor_trim_smithing_template",      Item::RibArmorTrimSmithingTemplate },
 		{ "rooted_dirt",                           Item::RootedDirt },
@@ -5088,6 +5261,8 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "stripped_mangrove_wood",                Item::StrippedMangroveWood },
 		{ "stripped_oak_log",                      Item::StrippedOakLog },
 		{ "stripped_oak_wood",                     Item::StrippedOakWood },
+		{ "stripped_pale_oak_log",                 Item::StrippedPaleOakLog },
+		{ "stripped_pale_oak_wood",                Item::StrippedPaleOakWood },
 		{ "stripped_spruce_log",                   Item::StrippedSpruceLog },
 		{ "stripped_spruce_wood",                  Item::StrippedSpruceWood },
 		{ "stripped_warped_hyphae",                Item::StrippedWarpedHyphae },
@@ -5221,6 +5396,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "wheat_seeds",                           Item::WheatSeeds },
 		{ "white_banner",                          Item::WhiteBanner },
 		{ "white_bed",                             Item::WhiteBed },
+		{ "white_bundle",                          Item::WhiteBundle },
 		{ "white_candle",                          Item::WhiteCandle },
 		{ "white_carpet",                          Item::WhiteCarpet },
 		{ "white_concrete",                        Item::WhiteConcrete },
@@ -5251,6 +5427,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "written_book",                          Item::WrittenBook },
 		{ "yellow_banner",                         Item::YellowBanner },
 		{ "yellow_bed",                            Item::YellowBed },
+		{ "yellow_bundle",                         Item::YellowBundle },
 		{ "yellow_candle",                         Item::YellowCandle },
 		{ "yellow_carpet",                         Item::YellowCarpet },
 		{ "yellow_concrete",                       Item::YellowConcrete },
@@ -5268,6 +5445,8 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "zombie_spawn_egg",                      Item::ZombieSpawnEgg },
 		{ "zombie_villager_spawn_egg",             Item::ZombieVillagerSpawnEgg },
 		{ "zombified_piglin_spawn_egg",            Item::ZombifiedPiglinSpawnEgg },
+
+
 
 		// Old item names
 		{ "workbench",                           Item::CraftingTable },
@@ -5485,6 +5664,7 @@ eMonsterType NamespaceSerializer::ToMonsterType(const std::string_view a_ID)
 		{ "chicken",          mtChicken },
 		{ "cod",              mtCod },
 		{ "cow",              mtCow },
+		{ "creaking",         mtCreaking},
 		{ "creeper",          mtCreeper },
 		{ "dolphin",          mtDolphin },
 		{ "donkey",           mtDonkey },

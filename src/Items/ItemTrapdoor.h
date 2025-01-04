@@ -156,6 +156,7 @@ private:
 			case BlockType::WaxedExposedCopperTrapdoor:   PLACE_TRAPDOOR(WaxedExposedCopperTrapdoor)
 			case BlockType::WaxedWeatheredCopperTrapdoor: PLACE_TRAPDOOR(WaxedWeatheredCopperTrapdoor)
 			case BlockType::WaxedOxidizedCopperTrapdoor:  PLACE_TRAPDOOR(WaxedOxidizedCopperTrapdoor)
+			case BlockType::PaleOakTrapdoor:              PLACE_TRAPDOOR(PaleOakTrapdoor)
 			default: return false;
 		}
 
