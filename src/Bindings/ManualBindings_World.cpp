@@ -1791,6 +1791,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "DoWithNoteBlockAt",            DoWithBlockEntityAt<cNoteEntity, E_BLOCK_NOTE_BLOCK>);
 			tolua_function(tolua_S, "DoWithPlayer",                 DoWith<cWorld, cPlayer, &cWorld::DoWithPlayer>);
 			tolua_function(tolua_S, "DoWithPlayerByUUID",           tolua_cWorld_DoWithPlayerByUUID);
+			tolua_function(tolua_S, "DoWithShulkerBoxAt",           DoWithXYZ<cWorld, cShulkerBoxEntity,   &cWorld::DoWithShulkerBoxAt>);
 			tolua_function(tolua_S, "FastSetBlock",                 tolua_cWorld_FastSetBlock);
 			tolua_function(tolua_S, "FindAndDoWithPlayer",          DoWith<cWorld, cPlayer, &cWorld::FindAndDoWithPlayer>);
 			tolua_function(tolua_S, "ForEachBlockEntityInChunk",    ForEachBlockEntityInChunk<cBlockEntity>);
@@ -1802,6 +1803,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "ForEachFurnaceInChunk",        ForEachBlockEntityInChunk<cFurnaceEntity, E_BLOCK_FURNACE, E_BLOCK_LIT_FURNACE>);
 			tolua_function(tolua_S, "ForEachLoadedChunk",           tolua_cWorld_ForEachLoadedChunk);
 			tolua_function(tolua_S, "ForEachPlayer",                ForEach<cWorld, cPlayer, &cWorld::ForEachPlayer>);
+			tolua_function(tolua_S, "ForEachShulkerBoxInChunk",     ForEachInChunk<cWorld, cShulkerBoxEntity, &cWorld::ForEachShulkerBoxInChunk>);
 			tolua_function(tolua_S, "GetBlock",                     tolua_cWorld_GetBlock);
 			tolua_function(tolua_S, "GetBlockBlockLight",           tolua_cWorld_GetBlockBlockLight);
 			tolua_function(tolua_S, "GetBlockInfo",                 tolua_cWorld_GetBlockInfo);

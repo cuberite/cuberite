@@ -1583,6 +1583,47 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 		},
 		Inherits = "cBlockEntity",
 	},
+	cShulkerBoxEntity =
+	{
+		Desc = [[
+			A shulker box entity is a {{cBlockEntityWithItems|cBlockEntityWithItems}} descendant that represents a shulker box
+			in the world.</p>
+			<p>
+			To manipulate a shulker box already in the game, you need to use {{cWorld}}'s callback mechanism with
+			either DoWithShulkerBoxAt() or ForEachShulkerBoxInChunk() function. See the code example below
+		]],
+		Constants =
+		{
+			ContentsHeight =
+			{
+				Notes = "Height of the contents' {{cItemGrid|ItemGrid}}, as required by the parent class, {{cBlockEntityWithItems}}",
+			},
+			ContentsWidth =
+			{
+				Notes = "Width of the contents' {{cItemGrid|ItemGrid}}, as required by the parent class, {{cBlockEntityWithItems}}",
+			},
+		},
+		AdditionalInfo =
+		{
+			{
+				Header = "Code example",
+				Contents = [[
+					The following example code sets the top-left item of each shulker box in the same chunk as Player to
+					64 * diamond:
+<pre class="prettyprint lang-lua">
+-- Player is a {{cPlayer}} object instance
+local World = Player:GetWorld();
+World:ForEachShulkerBoxInChunk(Player:GetChunkX(), Player:GetChunkZ(),
+	function (ShulkerBoxEntity)
+		ShulkerBoxEntity:SetSlot(0, 0, cItem(E_ITEM_DIAMOND, 64));
+	end
+);
+</pre>
+				]],
+			},
+		},
+		Inherits = "cBlockEntityWithItems",
+	},
 	cSignEntity =
 	{
 		Desc = [[

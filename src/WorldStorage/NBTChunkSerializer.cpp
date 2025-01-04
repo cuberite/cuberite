@@ -31,6 +31,7 @@
 #include "../BlockEntities/SignEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
+#include "../BlockEntities/ShulkerBoxEntity.h"
 
 #include "../Entities/Entity.h"
 #include "../Entities/EnderCrystal.h"
@@ -605,6 +606,21 @@ public:
 			mWriter.AddString("Text2",   a_Sign->GetLine(1));
 			mWriter.AddString("Text3",   a_Sign->GetLine(2));
 			mWriter.AddString("Text4",   a_Sign->GetLine(3));
+		mWriter.EndCompound();
+	}
+
+
+
+
+
+	void AddShulkerBoxEntity(cShulkerBoxEntity * a_ShulkerBox)
+	{
+		mWriter.BeginCompound("");
+			AddBasicTileEntity(a_ShulkerBox, "ShulkerBox");
+			mWriter.BeginList("Items", TAG_Compound);
+				AddItemGrid(a_ShulkerBox->GetContents());
+			mWriter.EndList();
+			mWriter.AddString("CustomName", a_ShulkerBox->m_CustomName);
 		mWriter.EndCompound();
 	}
 
