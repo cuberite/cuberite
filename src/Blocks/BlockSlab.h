@@ -90,6 +90,7 @@ public:
 			case BlockType::WaxedExposedCutCopperSlab:
 			case BlockType::WaxedWeatheredCutCopperSlab:
 			case BlockType::WaxedOxidizedCutCopperSlab:
+			case BlockType::PaleOakSlab:
 				return true;
 			default: return false;
 		}
@@ -283,6 +284,7 @@ public:
 			case BlockType::WaxedExposedCutCopperSlab:        ISSLABTOP(WaxedExposedCutCopperSlab)
 			case BlockType::WaxedWeatheredCutCopperSlab:      ISSLABTOP(WaxedWeatheredCutCopperSlab)
 			case BlockType::WaxedOxidizedCutCopperSlab:       ISSLABTOP(WaxedOxidizedCutCopperSlab)
+			case BlockType::PaleOakSlab:                  ISSLABTOP(PaleOakSlab)
 			default: return false;
 		}
 	}
@@ -475,6 +477,7 @@ public:
 			case BlockType::WaxedExposedCutCopperSlab:        ISSLABFULL(WaxedExposedCutCopperSlab)
 			case BlockType::WaxedWeatheredCutCopperSlab:      ISSLABFULL(WaxedWeatheredCutCopperSlab)
 			case BlockType::WaxedOxidizedCutCopperSlab:       ISSLABFULL(WaxedOxidizedCutCopperSlab)
+			case BlockType::PaleOakSlab:                  ISSLABFULL(PaleOakSlab)
 			default: return false;
 		}
 	}
@@ -549,7 +552,7 @@ private:
 			case BlockType::WaxedExposedCutCopperSlab:    return cItem(Item::WaxedExposedCutCopperSlab);
 			case BlockType::WaxedWeatheredCutCopperSlab:  return cItem(Item::WaxedWeatheredCutCopperSlab);
 			case BlockType::WaxedOxidizedCutCopperSlab:   return cItem(Item::WaxedOxidizedCutCopperSlab);
-
+			case BlockType::PaleOakSlab:                  return cItem(Item::PaleOakSlab);
 			default: return cItem();
 		}
 	}
@@ -677,6 +680,7 @@ private:
 			case BlockType::WaxedExposedCutCopperSlab:        METAMIRRORXZ(WaxedExposedCutCopperSlab)
 			case BlockType::WaxedWeatheredCutCopperSlab:      METAMIRRORXZ(WaxedWeatheredCutCopperSlab)
 			case BlockType::WaxedOxidizedCutCopperSlab:       METAMIRRORXZ(WaxedOxidizedCutCopperSlab)
+			case BlockType::PaleOakSlab:                 METAMIRRORXZ(PaleOakSlab)
 			default: return a_Block;
 		}
 	}
@@ -748,7 +752,8 @@ private:
 			case BlockType::WaxedCutCopperSlab:
 			case BlockType::WaxedExposedCutCopperSlab:
 			case BlockType::WaxedWeatheredCutCopperSlab:
-			case BlockType::WaxedOxidizedCutCopperSlab: return 0;  // TODO
+			case BlockType::WaxedOxidizedCutCopperSlab:
+			case BlockType::PaleOakSlab: return 0;  // TODO
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in slab handler!");

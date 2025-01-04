@@ -86,6 +86,7 @@ public:
 			case Item::ChickenSpawnEgg:         return mtChicken;
 			case Item::CodSpawnEgg:             return mtCod;
 			case Item::CowSpawnEgg:             return mtCow;
+			case Item::CreakingSpawnEgg:        return mtCreaking;
 			case Item::CreeperSpawnEgg:         return mtCreeper;
 			case Item::DolphinSpawnEgg:         return mtDolphin;
 			case Item::DonkeySpawnEgg:          return mtDonkey;
@@ -174,6 +175,7 @@ public:
 			case Item::ChickenSpawnEgg:
 			case Item::CodSpawnEgg:
 			case Item::CowSpawnEgg:
+			case Item::CreakingSpawnEgg:
 			case Item::CreeperSpawnEgg:
 			case Item::DolphinSpawnEgg:
 			case Item::DonkeySpawnEgg:

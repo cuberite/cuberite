@@ -40,6 +40,7 @@ public:
 			case BlockType::BambooButton:
 			case BlockType::CherryButton:
 			case BlockType::MangroveButton:
+			case BlockType::PaleOakButton:
 				return true;
 			default: return false;
 		}
@@ -63,6 +64,7 @@ public:
 			case BlockType::BambooButton:             return BambooButton::Powered(a_Block);
 			case BlockType::CherryButton:             return CherryButton::Powered(a_Block);
 			case BlockType::MangroveButton:           return MangroveButton::Powered(a_Block);
+			case BlockType::PaleOakButton:            return PaleOakButton::Powered(a_Block);
 			default: return false;
 		}
 	}
@@ -90,6 +92,7 @@ public:
 			case BlockType::BambooButton:             TOGGLEBUTTON(BambooButton);
 			case BlockType::CherryButton:             TOGGLEBUTTON(CherryButton);
 			case BlockType::MangroveButton:           TOGGLEBUTTON(MangroveButton);
+			case BlockType::PaleOakButton:            TOGGLEBUTTON(PaleOakButton);
 			default: break;
 		}
 	}
@@ -313,6 +316,7 @@ private:
 			case BlockType::BambooButton:             return GETFACE(BambooButton);
 			case BlockType::CherryButton:             return GETFACE(CherryButton);
 			case BlockType::MangroveButton:           return GETFACE(MangroveButton);
+			case BlockType::PaleOakButton:            return GETFACE(PaleOakButton);
 			default: return eBlockFace::BLOCK_FACE_NONE;
 		}
 	}

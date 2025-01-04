@@ -5748,15 +5748,6 @@ namespace Palette_1_21_2
 			case Crafter::Crafter(false, Crafter::Orientation::SouthUp, true).ID: return 27105;
 			case Crafter::Crafter(false, Crafter::Orientation::SouthUp, false).ID: return 27106;
 			case CraftingTable::CraftingTable().ID: return 4329;
-			case CreakingHeart::CreakingHeart(CreakingHeart::Axis::X, CreakingHeart::Creaking::Disabled).ID: return 2917;
-			case CreakingHeart::CreakingHeart(CreakingHeart::Axis::X, CreakingHeart::Creaking::Dormant).ID: return 2918;
-			case CreakingHeart::CreakingHeart(CreakingHeart::Axis::X, CreakingHeart::Creaking::Active).ID: return 2919;
-			case CreakingHeart::CreakingHeart(CreakingHeart::Axis::Y, CreakingHeart::Creaking::Disabled).ID: return 2920;
-			case CreakingHeart::CreakingHeart(CreakingHeart::Axis::Y, CreakingHeart::Creaking::Dormant).ID: return 2921;
-			case CreakingHeart::CreakingHeart(CreakingHeart::Axis::Y, CreakingHeart::Creaking::Active).ID: return 2922;
-			case CreakingHeart::CreakingHeart(CreakingHeart::Axis::Z, CreakingHeart::Creaking::Disabled).ID: return 2923;
-			case CreakingHeart::CreakingHeart(CreakingHeart::Axis::Z, CreakingHeart::Creaking::Dormant).ID: return 2924;
-			case CreakingHeart::CreakingHeart(CreakingHeart::Axis::Z, CreakingHeart::Creaking::Active).ID: return 2925;
 			case CreeperHead::CreeperHead(true, 0).ID: return 9242;
 			case CreeperHead::CreeperHead(true, 1).ID: return 9243;
 			case CreeperHead::CreeperHead(true, 2).ID: return 9244;

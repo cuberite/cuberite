@@ -28,6 +28,10 @@ public:
 			case BlockType::JungleWallSign:
 			case BlockType::WarpedWallSign:
 			case BlockType::SpruceWallSign:
+			case BlockType::BambooWallSign:
+			case BlockType::CherryWallSign:
+			case BlockType::MangroveWallSign:
+			case BlockType::PaleOakWallSign:
 				return true;
 			default: return false;
 		}
@@ -45,6 +49,10 @@ public:
 			case BlockType::OakSign:
 			case BlockType::SpruceSign:
 			case BlockType::WarpedSign:
+			case BlockType::BambooWallSign:
+			case BlockType::CherryWallSign:
+			case BlockType::MangroveWallSign:
+			case BlockType::PaleOakWallSign:
 				return true;
 			default: return false;
 		}
@@ -63,6 +71,10 @@ public:
 			case BlockType::JungleWallSign:  return JungleWallSign::Facing(a_Block);
 			case BlockType::WarpedWallSign:  return WarpedWallSign::Facing(a_Block);
 			case BlockType::SpruceWallSign:  return SpruceWallSign::Facing(a_Block);
+			case BlockType::BambooWallSign:  return BambooWallSign::Facing(a_Block);
+			case BlockType::CherryWallSign:  return CherryWallSign::Facing(a_Block);
+			case BlockType::MangroveWallSign:  return MangroveWallSign::Facing(a_Block);
+			case BlockType::PaleOakWallSign: return PaleOakWallSign::Facing(a_Block);
 			default: return eBlockFace::BLOCK_FACE_NONE;
 		}
 	}

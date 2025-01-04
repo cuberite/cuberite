@@ -122,7 +122,8 @@ private:
 			case BlockType::WarpedFenceGate:  return 56;
 			case BlockType::BambooFenceGate:
 			case BlockType::CherryFenceGate:
-			case BlockType::MangroveFenceGate: return 0;
+			case BlockType::MangroveFenceGate:
+			case BlockType::PaleOakFence:     return 0;
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in fence gate handler!");

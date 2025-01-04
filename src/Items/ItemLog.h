@@ -214,6 +214,7 @@ public:
 			}
 			case Item::CherryLog: SET_AXIS(CherryLog)
 			case Item::MangroveLog: SET_AXIS(MangroveLog)
+			case Item::PaleOakLog: SET_AXIS(PaleOakLog)
 			default:
 			{
 				FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, m_ItemType);

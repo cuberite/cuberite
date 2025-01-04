@@ -110,6 +110,7 @@ private:
 			case BlockType::WaxedExposedCutCopperStairs:   SET_BLOCK_TO_PLACE(WaxedExposedCutCopperStairs)
 			case BlockType::WaxedWeatheredCutCopperStairs: SET_BLOCK_TO_PLACE(WaxedWeatheredCutCopperStairs)
 			case BlockType::WaxedOxidizedCutCopperStairs:  SET_BLOCK_TO_PLACE(WaxedOxidizedCutCopperStairs)
+			case BlockType::PaleOakStairs:                 SET_BLOCK_TO_PLACE(PaleOakStairs)
 			default: return false;
 		}
 		return a_Player.PlaceBlock(a_PlacePosition, BlockToPlace);

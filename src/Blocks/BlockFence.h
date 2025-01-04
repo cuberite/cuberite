@@ -37,6 +37,7 @@ public:
 			case BlockType::CherryFence:
 			case BlockType::CrimsonFence:
 			case BlockType::MangroveFence:
+			case BlockType::PaleOakFence:
 				return true;
 			default: return false;
 		}

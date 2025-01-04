@@ -404,6 +404,7 @@ protected:
 			case BlockType::WaxedExposedCutCopperSlab:        GET_DOUBLE_SLAB(WaxedExposedCutCopperSlab)
 			case BlockType::WaxedWeatheredCutCopperSlab:      GET_DOUBLE_SLAB(WaxedWeatheredCutCopperSlab)
 			case BlockType::WaxedOxidizedCutCopperSlab:       GET_DOUBLE_SLAB(WaxedOxidizedCutCopperSlab)
+			case BlockType::PaleOakSlab:                 GET_DOUBLE_SLAB(PaleOakSlab)
 			default: return Air::Air();
 		}
 	}
