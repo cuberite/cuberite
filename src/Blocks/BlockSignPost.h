@@ -20,6 +20,7 @@ public:
 
 	static inline bool IsBlockSignPost(BlockState a_Block)
 	{
+		// TODO: implement wall signs and hanging variants
 		switch (a_Block.Type())
 		{
 			case BlockType::AcaciaSign:
@@ -33,6 +34,7 @@ public:
 			case BlockType::CherrySign:
 			case BlockType::BambooSign:
 			case BlockType::MangroveSign:
+			case BlockType::PaleOakSign:
 				return true;
 			default: return false;
 		}
@@ -80,6 +82,7 @@ private:
 			case BlockType::CherrySign:  ROTATE_CW_SIGN(CherrySign)
 			case BlockType::BambooSign:  ROTATE_CW_SIGN(BambooSign)
 			case BlockType::MangroveSign:  ROTATE_CW_SIGN(MangroveSign)
+			case BlockType::PaleOakSign: ROTATE_CW_SIGN(PaleOakSign)
 			default: return a_Block;
 		}
 	}
@@ -105,6 +108,7 @@ private:
 			case BlockType::CherrySign:  ROTATE_CCW_SIGN(CherrySign)
 			case BlockType::BambooSign:  ROTATE_CCW_SIGN(BambooSign)
 			case BlockType::MangroveSign:  ROTATE_CCW_SIGN(MangroveSign)
+			case BlockType::PaleOakSign: ROTATE_CCW_SIGN(PaleOakSign)
 			default: return a_Block;
 		}
 	}
@@ -132,6 +136,7 @@ private:
 			case BlockType::CherrySign:  MIRROR_XY_SIGN(CherrySign)
 			case BlockType::BambooSign:  MIRROR_XY_SIGN(BambooSign)
 			case BlockType::MangroveSign:  MIRROR_XY_SIGN(MangroveSign)
+			case BlockType::PaleOakSign: MIRROR_XY_SIGN(PaleOakSign)
 			default: return a_Block;
 		}
 	}
@@ -158,6 +163,7 @@ private:
 			case BlockType::CherrySign:  MIRROR_YZ_SIGN(CherrySign)
 			case BlockType::BambooSign:  MIRROR_YZ_SIGN(BambooSign)
 			case BlockType::MangroveSign:  MIRROR_YZ_SIGN(MangroveSign)
+			case BlockType::PaleOakSign: MIRROR_YZ_SIGN(PaleOakSign)
 			default: return a_Block;
 		}
 	}

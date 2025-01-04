@@ -51,6 +51,7 @@ public:
 			case Item::WaxedExposedCopperDoor:   GET_DOOR_TYPE(WaxedExposedCopperDoor)
 			case Item::WaxedWeatheredCopperDoor: GET_DOOR_TYPE(WaxedWeatheredCopperDoor)
 			case Item::WaxedOxidizedCopperDoor:  GET_DOOR_TYPE(WaxedOxidizedCopperDoor)
+			case Item::PaleOakDoor:              GET_DOOR_TYPE(PaleOakDoor)
 			default:
 			{
 				UNREACHABLE("Unhandled door type");
@@ -142,6 +143,7 @@ public:
 			case BlockType::WaxedExposedCopperDoor:   PLACE_DOOR(WaxedExposedCopperDoor)
 			case BlockType::WaxedWeatheredCopperDoor: PLACE_DOOR(WaxedWeatheredCopperDoor)
 			case BlockType::WaxedOxidizedCopperDoor:  PLACE_DOOR(WaxedOxidizedCopperDoor)
+			case BlockType::PaleOakDoor:              PLACE_DOOR(PaleOakDoor)
 			default: return false;
 		}
 		return true;

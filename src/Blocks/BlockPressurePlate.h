@@ -5,6 +5,7 @@
 #include "BlockSlab.h"
 #include "../Chunk.h"
 #include "BlockStairs.h"
+#include "BlockFence.h"
 
 
 
@@ -34,6 +35,10 @@ public:
 			case BlockType::SprucePressurePlate:
 			case BlockType::StonePressurePlate:
 			case BlockType::WarpedPressurePlate:
+			case BlockType::BambooPressurePlate:
+			case BlockType::CherryPressurePlate:
+			case BlockType::MangrovePressurePlate:
+			case BlockType::PaleOakPressurePlate:
 				return true;
 			default: return false;
 		}
@@ -57,6 +62,10 @@ public:
 			case BlockType::SprucePressurePlate:             Self = Block::SprucePressurePlate::SprucePressurePlate(a_Pressed); break;
 			case BlockType::StonePressurePlate:              Self = Block::StonePressurePlate::StonePressurePlate(a_Pressed); break;
 			case BlockType::WarpedPressurePlate:             Self = Block::WarpedPressurePlate::WarpedPressurePlate(a_Pressed); break;
+			case BlockType::BambooPressurePlate:             Self = Block::BambooPressurePlate::BambooPressurePlate(a_Pressed); break;
+			case BlockType::CherryPressurePlate:             Self = Block::CherryPressurePlate::CherryPressurePlate(a_Pressed); break;
+			case BlockType::MangrovePressurePlate:           Self = Block::MangrovePressurePlate::MangrovePressurePlate(a_Pressed); break;
+			case BlockType::PaleOakPressurePlate:            Self = Block::PaleOakPressurePlate::PaleOakPressurePlate(a_Pressed); break;
 			default: return;
 		}
 		a_ChunkInterface.FastSetBlock(a_Position, Self);
@@ -85,26 +94,12 @@ private:
 			return cBlockStairsHandler::IsStairsTopHalf(Block);
 		}
 
-		switch (Block.Type())
+		if (cBlockFenceHandler::IsBlockFence(Block.Type()))
 		{
-			case BlockType::AcaciaFence:
-			case BlockType::BirchFence:
-			case BlockType::CrimsonFence:
-			case BlockType::DarkOakFence:
-			case BlockType::OakFence:
-			case BlockType::Hopper:
-			case BlockType::JungleFence:
-			case BlockType::NetherBrickFence:
-			case BlockType::SpruceFence:
-			case BlockType::WarpedFence:
-			{
-				return true;
-			}
-			default:
-			{
-				return !cBlockInfo::IsTransparent(Block);
-			}
+			return true;
 		}
+
+		return !cBlockInfo::IsTransparent(Block);
 	}
 
 
@@ -127,6 +122,10 @@ private:
 			case BlockType::SprucePressurePlate:             return 34;
 			case BlockType::StonePressurePlate:              return 11;
 			case BlockType::WarpedPressurePlate:             return 56;
+			case BlockType::BambooPressurePlate:
+			case BlockType::CherryPressurePlate:
+			case BlockType::MangrovePressurePlate:
+			case BlockType::PaleOakPressurePlate: return 0;
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in pressure plate handler!");
