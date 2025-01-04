@@ -36,6 +36,7 @@ private:
 			case BlockType::BambooFenceGate:  return a_Player.PlaceBlock(a_PlacePosition, BambooFenceGate::BambooFenceGate(RotationToBlockFace(a_Player.GetYaw()), false, false, false));
 			case BlockType::CherryFenceGate:  return a_Player.PlaceBlock(a_PlacePosition, CherryFenceGate::CherryFenceGate(RotationToBlockFace(a_Player.GetYaw()), false, false, false));
 			case BlockType::MangroveFenceGate: return a_Player.PlaceBlock(a_PlacePosition, MangroveFenceGate::MangroveFenceGate(RotationToBlockFace(a_Player.GetYaw()), false, false, false));
+			case BlockType::PaleOakFenceGate: return a_Player.PlaceBlock(a_PlacePosition, PaleOakFenceGate::PaleOakFenceGate(RotationToBlockFace(a_Player.GetYaw()), false, false, false));
 			default: return false;
 		}
 	}

@@ -56,6 +56,7 @@ private:
 			case BlockType::BambooButton:             GETBLOCKFROMPLACEMENT(BambooButton)
 			case BlockType::CherryButton:             GETBLOCKFROMPLACEMENT(CherryButton)
 			case BlockType::MangroveButton:           GETBLOCKFROMPLACEMENT(MangroveButton)
+			case BlockType::PaleOakButton:            GETBLOCKFROMPLACEMENT(PaleOakButton)
 			default: return false;
 		}
 	}

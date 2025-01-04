@@ -80,6 +80,7 @@ bool cBlockDoorHandler::OnUse(
 		case BlockType::WaxedExposedCopperDoor:
 		case BlockType::WaxedWeatheredCopperDoor:
 		case BlockType::WaxedOxidizedCopperDoor:
+		case BlockType::PaleOakDoor:
 		{
 			ChangeDoor(a_ChunkInterface, a_BlockPos);
 			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_WOODEN_DOOR_OPEN, a_BlockPos, 0, a_Player.GetClientHandle());
@@ -169,6 +170,7 @@ BlockState cBlockDoorHandler::RotateCCW(BlockState a_Block) const
 		case BlockType::WaxedExposedCopperDoor:   ROTATE_CCW(WaxedExposedCopperDoor)
 		case BlockType::WaxedWeatheredCopperDoor: ROTATE_CCW(WaxedWeatheredCopperDoor)
 		case BlockType::WaxedOxidizedCopperDoor:  ROTATE_CCW(WaxedOxidizedCopperDoor)
+		case BlockType::PaleOakDoor:              ROTATE_CCW(PaleOakDoor)
 		default: return a_Block;
 	}
 }
@@ -204,6 +206,7 @@ BlockState cBlockDoorHandler::RotateCW(BlockState a_Block) const
 		case BlockType::WaxedExposedCopperDoor:   ROTATE_CW(WaxedExposedCopperDoor)
 		case BlockType::WaxedWeatheredCopperDoor: ROTATE_CW(WaxedWeatheredCopperDoor)
 		case BlockType::WaxedOxidizedCopperDoor:  ROTATE_CW(WaxedOxidizedCopperDoor)
+		case BlockType::PaleOakDoor:              ROTATE_CW(PaleOakDoor)
 		default: return a_Block;
 	}
 }
@@ -239,6 +242,7 @@ BlockState cBlockDoorHandler::MirrorXY(BlockState a_Block) const
 		case BlockType::WaxedExposedCopperDoor:   MIRROR_XY(WaxedExposedCopperDoor)
 		case BlockType::WaxedWeatheredCopperDoor: MIRROR_XY(WaxedWeatheredCopperDoor)
 		case BlockType::WaxedOxidizedCopperDoor:  MIRROR_XY(WaxedOxidizedCopperDoor)
+		case BlockType::PaleOakDoor:              MIRROR_XY(PaleOakDoor)
 		default: return a_Block;
 	}
 }
@@ -274,6 +278,7 @@ BlockState cBlockDoorHandler::MirrorYZ(BlockState a_Block) const
 		case BlockType::WaxedExposedCopperDoor:   MIRROR_YZ(WaxedExposedCopperDoor)
 		case BlockType::WaxedWeatheredCopperDoor: MIRROR_YZ(WaxedWeatheredCopperDoor)
 		case BlockType::WaxedOxidizedCopperDoor:  MIRROR_YZ(WaxedOxidizedCopperDoor)
+		case BlockType::PaleOakDoor:              MIRROR_YZ(PaleOakDoor)
 		default: return a_Block;
 	}
 }

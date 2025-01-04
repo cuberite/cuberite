@@ -43,6 +43,7 @@ private:
 				case Item::CherrySign:  BLOCK_PLACE_SIGN(CherrySign)
 				case Item::BambooSign:  BLOCK_PLACE_SIGN(BambooSign)
 				case Item::MangroveSign: BLOCK_PLACE_SIGN(MangroveSign)
+				case Item::PaleOakSign: BLOCK_PLACE_SIGN(PaleOakSign)
 				default: return false;
 			}
 		}
@@ -61,6 +62,7 @@ private:
 				case Item::CherrySign:  BlockToPlace = Block::CherrySign::CherrySign(); break;
 				case Item::BambooSign:  BlockToPlace = Block::BambooSign::BambooSign(); break;
 				case Item::MangroveSign: BlockToPlace = Block::MangroveSign::MangroveSign(); break;
+				case Item::PaleOakSign: BlockToPlace = Block::PaleOakSign::PaleOakSign(); break;
 				default: return false;
 			}
 		}

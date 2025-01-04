@@ -32,22 +32,34 @@ private:
 
 		const auto FortuneLevel = ToolFortuneLevel(a_Tool);
 
-		if (m_BlockType == BlockType::RedstoneOre)
+		if ((m_BlockType == BlockType::RedstoneOre) || (m_BlockType == BlockType::DeepslateRedstoneOre))
 		{   // Redstone follows the discrete random distribution, unlike other ores
 			const auto DropNum = FortuneDiscreteRandom(4, 5, FortuneLevel);
 			return cItem(Item::Redstone, DropNum);
 		}
 
+		// TODO: drop raw ores
 		auto & Random = GetRandomProvider();
 		const auto DropMult = std::max(static_cast<char>(1), FloorC<char>(Random.RandReal(FortuneLevel + 2.0)));
 		switch (m_BlockType)
 		{
+			case BlockType::DeepslateLapisOre:
 			case BlockType::LapisOre:        return cItem(Item::LapisLazuli, DropMult * Random.RandInt<char>(4, 9), 4);
+			case BlockType::DeepslateDiamondOre:
 			case BlockType::DiamondOre:      return cItem(Item::Diamond,     DropMult);
+			case BlockType::DeepslateEmeraldOre:
 			case BlockType::EmeraldOre:      return cItem(Item::Emerald,     DropMult);
+			case BlockType::DeepslateCoalOre:
 			case BlockType::CoalOre:         return cItem(Item::Coal,        DropMult);
 			case BlockType::NetherQuartzOre: return cItem(Item::Quartz,      DropMult);
 			case BlockType::Clay:            return cItem(Item::ClayBall,    4);
+			case BlockType::CopperOre:
+			case BlockType::DeepslateCopperOre: return cItem(Item::RawCopper, DropMult * Random.RandInt<char>(2, 5), 4);
+			case BlockType::IronOre:
+			case BlockType::DeepslateIronOre: return cItem(Item::RawIron, static_cast<char>(1 + FortuneLevel));
+			case BlockType::GoldOre:
+			case BlockType::DeepslateGoldOre: return cItem(Item::RawGold, static_cast<char>(1 + FortuneLevel));
+			case BlockType::NetherGoldOre: return cItem(Item::GoldNugget, DropMult * Random.RandInt<char>(2, 6));
 			default:
 			{
 				return cItem(BlockItemConverter::FromBlock(m_BlockType));

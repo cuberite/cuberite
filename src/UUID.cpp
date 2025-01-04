@@ -49,6 +49,7 @@ static sShortUUID ShortenUUID(const AString & a_StringUUID)
 			std::memcpy(UUID.Data + 16, a_StringUUID.data() + 19,  4);
 			std::memcpy(UUID.Data + 20, a_StringUUID.data() + 24, 12);
 			UUID.IsValid = true;
+			break;
 		}
 		default: break;
 	}

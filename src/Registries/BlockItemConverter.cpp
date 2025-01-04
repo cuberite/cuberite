@@ -171,6 +171,7 @@ namespace BlockItemConverter
 			case Item::ChiseledPolishedBlackstone:         return BlockType::ChiseledPolishedBlackstone;
 			case Item::ChiseledQuartzBlock:                return BlockType::ChiseledQuartzBlock;
 			case Item::ChiseledRedSandstone:               return BlockType::ChiseledRedSandstone;
+			case Item::ChiseledResinBricks:                return BlockType::ChiseledResinBricks;
 			case Item::ChiseledSandstone:                  return BlockType::ChiseledSandstone;
 			case Item::ChiseledStoneBricks:                return BlockType::ChiseledStoneBricks;
 			case Item::ChiseledTuff:                       return BlockType::ChiseledTuff;
@@ -178,6 +179,7 @@ namespace BlockItemConverter
 			case Item::ChorusFlower:                       return BlockType::ChorusFlower;
 			case Item::ChorusPlant:                        return BlockType::ChorusPlant;
 			case Item::Clay:                               return BlockType::Clay;
+			case Item::ClosedEyeblossom:                   return BlockType::ClosedEyeblossom;
 			case Item::CoalBlock:                          return BlockType::CoalBlock;
 			case Item::CoalOre:                            return BlockType::CoalOre;
 			case Item::CoarseDirt:                         return BlockType::CoarseDirt;
@@ -559,6 +561,7 @@ namespace BlockItemConverter
 			case Item::Observer:                           return BlockType::Observer;
 			case Item::Obsidian:                           return BlockType::Obsidian;
 			case Item::OchreFroglight:                     return BlockType::OchreFroglight;
+			case Item::OpenEyeblossom:                     return BlockType::OpenEyeblossom;
 			case Item::OrangeBanner:                       return BlockType::OrangeBanner;
 			case Item::OrangeBed:                          return BlockType::OrangeBed;
 			case Item::OrangeCandle:                       return BlockType::OrangeCandle;
@@ -719,6 +722,12 @@ namespace BlockItemConverter
 			case Item::ReinforcedDeepslate:                return BlockType::ReinforcedDeepslate;
 			case Item::Repeater:                           return BlockType::Repeater;
 			case Item::RepeatingCommandBlock:              return BlockType::RepeatingCommandBlock;
+			case Item::ResinBlock:                         return BlockType::ResinBlock;
+			case Item::ResinBrickSlab:                     return BlockType::ResinBrickSlab;
+			case Item::ResinBrickStairs:                   return BlockType::ResinBrickStairs;
+			case Item::ResinBrickWall:                     return BlockType::ResinBrickWall;
+			case Item::ResinBricks:                        return BlockType::ResinBricks;
+			case Item::ResinClump:                         return BlockType::ResinClump;
 			case Item::RespawnAnchor:                      return BlockType::RespawnAnchor;
 			case Item::RootedDirt:                         return BlockType::RootedDirt;
 			case Item::RoseBush:                           return BlockType::RoseBush;
@@ -1117,6 +1126,7 @@ namespace BlockItemConverter
 			case BlockType::ChiseledPolishedBlackstone:      return Item::ChiseledPolishedBlackstone;
 			case BlockType::ChiseledQuartzBlock:             return Item::ChiseledQuartzBlock;
 			case BlockType::ChiseledRedSandstone:            return Item::ChiseledRedSandstone;
+			case BlockType::ChiseledResinBricks:             return Item::ChiseledResinBricks;
 			case BlockType::ChiseledSandstone:               return Item::ChiseledSandstone;
 			case BlockType::ChiseledStoneBricks:             return Item::ChiseledStoneBricks;
 			case BlockType::ChiseledTuff:                    return Item::ChiseledTuff;
@@ -1124,6 +1134,7 @@ namespace BlockItemConverter
 			case BlockType::ChorusFlower:                    return Item::ChorusFlower;
 			case BlockType::ChorusPlant:                     return Item::ChorusPlant;
 			case BlockType::Clay:                            return Item::Clay;
+			case BlockType::ClosedEyeblossom:                return Item::ClosedEyeblossom;
 			case BlockType::CoalBlock:                       return Item::CoalBlock;
 			case BlockType::CoalOre:                         return Item::CoalOre;
 			case BlockType::CoarseDirt:                      return Item::CoarseDirt;
@@ -1505,6 +1516,7 @@ namespace BlockItemConverter
 			case BlockType::Observer:                        return Item::Observer;
 			case BlockType::Obsidian:                        return Item::Obsidian;
 			case BlockType::OchreFroglight:                  return Item::OchreFroglight;
+			case BlockType::OpenEyeblossom:                  return Item::OpenEyeblossom;
 			case BlockType::OrangeBanner:                    return Item::OrangeBanner;
 			case BlockType::OrangeBed:                       return Item::OrangeBed;
 			case BlockType::OrangeCandle:                    return Item::OrangeCandle;
@@ -1665,6 +1677,12 @@ namespace BlockItemConverter
 			case BlockType::ReinforcedDeepslate:             return Item::ReinforcedDeepslate;
 			case BlockType::Repeater:                        return Item::Repeater;
 			case BlockType::RepeatingCommandBlock:           return Item::RepeatingCommandBlock;
+			case BlockType::ResinBlock:                      return Item::ResinBlock;
+			case BlockType::ResinBrickSlab:                  return Item::ResinBrickSlab;
+			case BlockType::ResinBrickStairs:                return Item::ResinBrickStairs;
+			case BlockType::ResinBrickWall:                  return Item::ResinBrickWall;
+			case BlockType::ResinBricks:                     return Item::ResinBricks;
+			case BlockType::ResinClump:                      return Item::ResinClump;
 			case BlockType::RespawnAnchor:                   return Item::RespawnAnchor;
 			case BlockType::RootedDirt:                      return Item::RootedDirt;
 			case BlockType::RoseBush:                        return Item::RoseBush;

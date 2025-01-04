@@ -29,6 +29,8 @@ public:
 			case BlockType::DarkOakSapling:
 			case BlockType::OakSapling:
 			case BlockType::SpruceSapling:
+			case BlockType::CherrySapling:
+			case BlockType::PaleOakSapling:
 				return true;
 			default: return false;
 		}
@@ -45,6 +47,8 @@ public:
 			case BlockType::DarkOakSapling: return DarkOakSapling::Stage(a_Block);
 			case BlockType::OakSapling:     return OakSapling::Stage(a_Block);
 			case BlockType::SpruceSapling:  return SpruceSapling::Stage(a_Block);
+			case BlockType::CherrySapling:  return CherrySapling::Stage(a_Block);
+			case BlockType::PaleOakSapling:  return PaleOakSapling::Stage(a_Block);
 			default: return 0;
 		}
 	}
@@ -60,6 +64,8 @@ public:
 			case BlockType::DarkOakSapling: return DarkOakSapling::DarkOakSapling(a_State);
 			case BlockType::OakSapling:     return OakSapling::OakSapling(a_State);
 			case BlockType::SpruceSapling:  return SpruceSapling::SpruceSapling(a_State);
+			case BlockType::CherrySapling:  return CherrySapling::CherrySapling(a_State);
+			case BlockType::PaleOakSapling:  return PaleOakSapling::PaleOakSapling(a_State);
 			default: return a_Block;
 		}
 	}
@@ -169,6 +175,7 @@ private:
 				break;
 			}
 			default: return false;
+			// TODO: implement Azalea, pale oak, cherry, and mangrove saplings and bamboo
 		}
 		// We should always get a valid CheckHeight
 		ASSERT(CheckHeight != 0);

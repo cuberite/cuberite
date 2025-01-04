@@ -108,6 +108,7 @@ public:
 			case BlockType::WaxedExposedCopperDoor:   Facing = WaxedExposedCopperDoor::Facing(a_Block); break;
 			case BlockType::WaxedWeatheredCopperDoor: Facing = WaxedWeatheredCopperDoor::Facing(a_Block); break;
 			case BlockType::WaxedOxidizedCopperDoor:  Facing = WaxedOxidizedCopperDoor::Facing(a_Block); break;
+			case BlockType::PaleOakDoor:              Facing = PaleOakDoor::Facing(a_Block); break;
 			default: return Vector3i();
 		}
 
@@ -146,6 +147,7 @@ public:
 			case BlockType::WaxedExposedCopperDoor:
 			case BlockType::WaxedWeatheredCopperDoor:
 			case BlockType::WaxedOxidizedCopperDoor:
+			case BlockType::PaleOakDoor:
 			{
 				return true;
 			}
@@ -184,7 +186,7 @@ public:
 			case BlockType::WaxedExposedCopperDoor:   return WaxedExposedCopperDoor::Open(State);
 			case BlockType::WaxedWeatheredCopperDoor: return WaxedWeatheredCopperDoor::Open(State);
 			case BlockType::WaxedOxidizedCopperDoor:  return WaxedOxidizedCopperDoor::Open(State);
-
+			case BlockType::PaleOakDoor: return PaleOakDoor::Open(State);
 			default: return false;
 		}
 	}
@@ -217,6 +219,7 @@ public:
 			case BlockType::WaxedExposedCopperDoor:  return ISTOP(WaxedExposedCopperDoor);
 			case BlockType::WaxedWeatheredCopperDoor:return ISTOP(WaxedWeatheredCopperDoor);
 			case BlockType::WaxedOxidizedCopperDoor: return ISTOP(WaxedOxidizedCopperDoor);
+			case BlockType::PaleOakDoor: return ISTOP(PaleOakDoor);
 			default: return false;
 		}
 	}
@@ -270,6 +273,7 @@ public:
 			case BlockType::WaxedExposedCopperDoor:   SETOPEN(WaxedExposedCopperDoor)
 			case BlockType::WaxedWeatheredCopperDoor: SETOPEN(WaxedWeatheredCopperDoor)
 			case BlockType::WaxedOxidizedCopperDoor:  SETOPEN(WaxedOxidizedCopperDoor)
+			case BlockType::PaleOakDoor:  SETOPEN(PaleOakDoor)
 			default: return;
 		}
 
@@ -321,6 +325,7 @@ public:
 			case BlockType::WaxedExposedCopperDoor:   DoorBlock = SETPOWERED(WaxedExposedCopperDoor); break;
 			case BlockType::WaxedWeatheredCopperDoor: DoorBlock = SETPOWERED(WaxedWeatheredCopperDoor); break;
 			case BlockType::WaxedOxidizedCopperDoor:  DoorBlock = SETPOWERED(WaxedOxidizedCopperDoor); break;
+			case BlockType::PaleOakDoor:  DoorBlock = SETPOWERED(PaleOakDoor); break;
 			default: return;
 		}
 		a_ChunkInterface.SetBlock(a_BlockPos, DoorBlock);
@@ -387,6 +392,7 @@ private:
 			case BlockType::WaxedExposedCopperDoor:    return cItem(Item::WaxedExposedCopperDoor);
 			case BlockType::WaxedWeatheredCopperDoor:  return cItem(Item::WaxedWeatheredCopperDoor);
 			case BlockType::WaxedOxidizedCopperDoor:   return cItem(Item::WaxedOxidizedCopperDoor);
+			case BlockType::PaleOakDoor: return cItem(Item::PaleOakDoor);
 			default:
 			{
 				ASSERT(!"Unhandled door type!");
@@ -453,7 +459,8 @@ private:
 			case BlockType::WaxedCopperDoor:
 			case BlockType::WaxedExposedCopperDoor:
 			case BlockType::WaxedWeatheredCopperDoor:
-			case BlockType::WaxedOxidizedCopperDoor: return 0;
+			case BlockType::WaxedOxidizedCopperDoor:
+			case BlockType::PaleOakDoor: return 0;
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in door handler!");

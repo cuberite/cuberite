@@ -28,6 +28,10 @@ public:
 			case BlockType::OakPlanks:
 			case BlockType::SprucePlanks:
 			case BlockType::WarpedPlanks:
+			case BlockType::BambooPlanks:
+			case BlockType::CherryPlanks:
+			case BlockType::MangrovePlanks:
+			case BlockType::PaleOakPlanks:
 				return true;
 			default: return false;
 		}
@@ -51,6 +55,10 @@ private:
 			case BlockType::OakPlanks:     return 13;
 			case BlockType::SprucePlanks:  return 34;
 			case BlockType::WarpedPlanks:  return 56;
+			case BlockType::BambooPlanks:
+			case BlockType::CherryPlanks:
+			case BlockType::MangrovePlanks:
+			case BlockType::PaleOakPlanks: return 0;
 			default:
 			{
 				ASSERT(!"Unhandled BlockType in planks handler!");

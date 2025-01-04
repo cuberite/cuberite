@@ -414,7 +414,7 @@ public:
 		v1_21_2 = 768,
 		// v1_21_3 = 768
 		v1_21_4 = 769,
-		Latest = v1_21_2,
+		Latest = v1_21_4,
 	};
 
 	enum State
