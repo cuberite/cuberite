@@ -40,10 +40,12 @@ public:
 	virtual void DataPrepared(ContiguousByteBuffer & a_Data) override;
 
 	// Sending stuff to clients (alphabetically sorted):
+	virtual void SendAcknowledgeBlockChange     (int a_SequenceId) override;
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
-	virtual void SendBlockAction                (Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) override;
+	virtual void SendBlockAction                (Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BlockState a_Block) override;
 	virtual void SendBlockBreakAnim	            (UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage) override;
-	virtual void SendBlockChange                (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) override;
+	virtual void SendRenderDistanceCenter       (cChunkCoords a_chunk) override;
+	virtual void SendBlockChange                (Vector3i a_BlockPos, BlockState a_Block) override;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
 	virtual void SendBossBarAdd                 (UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) override;
 	virtual void SendBossBarRemove              (UInt32 a_UniqueID) override;
@@ -57,9 +59,11 @@ public:
 	virtual void SendChatRaw                    (const AString & a_MessageRaw, eChatType a_Type) override;
 	virtual void SendChunkData                  (ContiguousByteBufferView a_ChunkData) override;
 	virtual void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) override;
+	virtual void SendCommandTree                (void) override;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) override;
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void SendDisconnect                 (const AString & a_Reason) override;
+	virtual void SendDynamicRegistries          (void) override;
 	virtual void SendEditSign                   (Vector3i a_BlockPos) override;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation) override;
 	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration) override;
@@ -73,12 +77,15 @@ public:
 	virtual void SendExperience                 (void) override;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) override;
 	virtual void SendExplosion                  (Vector3f a_Position, float a_Power) override;
+	virtual void SendFinishConfiguration        (void) override;
 	virtual void SendGameMode                   (eGameMode a_GameMode) override;
 	virtual void SendHealth                     (void) override;
 	virtual void SendHeldItemChange             (int a_ItemIndex) override;
 	virtual void SendHideTitle                  (void) override;
 	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendKeepAlive                  (UInt32 a_PingID) override;
+	virtual void SendSelectKnownPacks           (void) override;
+	virtual void SendInitialChunksComing        () override;
 	virtual void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void SendLoginSuccess               (void) override;
@@ -87,7 +94,9 @@ public:
 	virtual void SendPlayerAbilities            (void) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
+	virtual void SendPlayerActionResponse       (Vector3i a_blockpos, int a_state_id, cProtocol::PlayerActionResponses a_action, bool a_IsApproved) override;
 	virtual void SendPlayerListAddPlayer        (const cPlayer & a_Player) override;
+	virtual void SendPlayerListInitChat         (const cPlayer & a_Player) override;
 	virtual void SendPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer) override;
 	virtual void SendPlayerListRemovePlayer     (const cPlayer & a_Player) override;
 	virtual void SendPlayerListUpdateDisplayName(const cPlayer & a_Player, const AString & a_CustomName) override;
@@ -115,7 +124,8 @@ public:
 	virtual void SendSpawnEntity                (const cEntity & a_Entity) override;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) override;
 	virtual void SendStatistics                 (const StatisticsManager & a_Manager) override;
-	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
+	virtual void SendTabCompletionResults       (const AStringVector & a_Results, UInt32 CompletionId) override;
+	virtual void SendTags                       (void) override;
 	virtual void SendThunderbolt                (Vector3i a_BlockPos) override;
 	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) override;
 	virtual void SendTimeUpdate                 (cTickTimeLong a_WorldAge, cTickTimeLong a_WorldDate, bool a_DoDaylightCycle) override;
@@ -126,7 +136,8 @@ public:
 	virtual void SendUnlockRecipe               (UInt32 a_RecipeID) override;
 	virtual void SendInitRecipes                (UInt32 a_RecipeID) override;
 	virtual void SendWeather                    (eWeather a_Weather) override;
-	virtual void SendWholeInventory             (const cWindow & a_Window) override;
+	virtual void SendGameStateChange            (eGameStateReason a_Reason, float a_Value) override;
+	virtual void SendWholeInventory             (const cWindow & a_Window, const cItem & a_CursorStack) override;
 	virtual void SendWindowClose                (const cWindow & a_Window) override;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) override;
 	virtual void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value) override;
@@ -136,6 +147,8 @@ public:
 	/** Compress the packet. a_Packet must be without packet length.
 	a_Compressed will be set to the compressed packet includes packet length and data length. */
 	static void CompressPacket(CircularBufferCompressor & a_Packet, ContiguousByteBuffer & a_Compressed);
+
+	virtual State GetCurrentState(void) const override { return m_State; }
 
 protected:
 
@@ -181,6 +194,10 @@ protected:
 	// Packet handlers while in the Login state (m_State == 2):
 	virtual void HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketLoginStart(cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer);
+
+	// Packet handlers while in the Configuration state (m_State == 4):  Only used in 1.20.2+
+	virtual void HandlePacketReady(cByteBuffer & a_ByteBuffer);
 
 	// Packet handlers while in the Game state (m_State == 3):
 	virtual void HandlePacketAnimation              (cByteBuffer & a_ByteBuffer);
@@ -198,6 +215,7 @@ protected:
 	virtual void HandlePacketPlayerPos              (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketPlayerPosLook          (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketPluginMessage          (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketPlayerSession          (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketResourcePackStatus     (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketSlotSelect             (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketSpectate               (cByteBuffer & a_ByteBuffer);
@@ -208,7 +226,8 @@ protected:
 	virtual void HandlePacketEnchantItem            (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketWindowClick            (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketWindowClose            (cByteBuffer & a_ByteBuffer);
-
+	virtual void HandlePacketBookUpdate             (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketCommandExecution       (cByteBuffer & a_ByteBuffer);
 	/** Parses Vanilla plugin messages into specific ClientHandle calls.
 	The message payload is still in the bytebuffer, the handler reads it specifically for each handled channel. */
 	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, std::string_view a_Channel);
@@ -242,6 +261,8 @@ protected:
 	/** Writes the mob-specific metadata for the specified mob */
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const;
 
+	void StartEncryption(const Byte * a_Key);
+
 private:
 
 	AString m_ServerAddress;
@@ -269,6 +290,4 @@ private:
 
 	/** Handle a complete packet stored in the given buffer. */
 	void HandlePacket(cByteBuffer & a_Buffer);
-
-	void StartEncryption(const Byte * a_Key);
 } ;

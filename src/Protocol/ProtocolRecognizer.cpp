@@ -14,6 +14,13 @@
 #include "Protocol_1_12.h"
 #include "Protocol_1_13.h"
 #include "Protocol_1_14.h"
+#include "Protocol_1_15.h"
+#include "Protocol_1_16.h"
+#include "Protocol_1_17.h"
+#include "Protocol_1_18.h"
+#include "Protocol_1_19.h"
+#include "Protocol_1_20.h"
+#include "Protocol_1_21.h"
 #include "../ClientHandle.h"
 #include "../Root.h"
 #include "../Server.h"
@@ -70,6 +77,29 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 		case cProtocol::Version::v1_14_2:  return "1.14.2";
 		case cProtocol::Version::v1_14_3:  return "1.14.3";
 		case cProtocol::Version::v1_14_4:  return "1.14.4";
+		case cProtocol::Version::v1_15:    return "1.15";
+		case cProtocol::Version::v1_15_1:  return "1.15.1";
+		case cProtocol::Version::v1_15_2:  return "1.15.2";
+		case cProtocol::Version::v1_16:    return "1.16";
+		case cProtocol::Version::v1_16_1:  return "1.16.1";
+		case cProtocol::Version::v1_16_2:  return "1.16.2";
+		case cProtocol::Version::v1_16_3:  return "1.16.3";
+		case cProtocol::Version::v1_16_4:  return "1.16.4";
+		case cProtocol::Version::v1_17:    return "1.17";
+		case cProtocol::Version::v1_17_1:  return "1.17.1";
+		case cProtocol::Version::v1_18:    return "1.18";
+		case cProtocol::Version::v1_18_2:  return "1.18.2";
+		case cProtocol::Version::v1_19:    return "1.19";
+		case cProtocol::Version::v1_19_1:  return "1.19";
+		case cProtocol::Version::v1_19_3:  return "1.19.3";
+		case cProtocol::Version::v1_19_4:  return "1.19.4";
+		case cProtocol::Version::v1_20:    return "1.20";
+		case cProtocol::Version::v1_20_2:  return "1.20.2";
+		case cProtocol::Version::v1_20_3:  return "1.20.3";
+		case cProtocol::Version::v1_20_5:  return "1.20.5";
+		case cProtocol::Version::v1_21:    return "1.21";
+		case cProtocol::Version::v1_21_2:  return "1.21.2";
+		case cProtocol::Version::v1_21_4:  return "1.21.4";
 	}
 
 	ASSERT(!"Unknown protocol version");
@@ -317,6 +347,12 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 		}
 	}();
 
+	// Stating with 1.16.4 Pre-Release 1 non-release versions have the 30th bit set
+	if ((ProtocolVersion & 0x4000000) > 0)
+	{
+		throw TriedToJoinWithUnsupportedProtocolException("Snapshots, experimental snapshots, pre-releases and release candidates aren't supported by cuberite. Please join with a release version");
+	}
+
 	// TODO: this should be a protocol property, not ClientHandle:
 	a_Client.SetProtocolVersion(ProtocolVersion);
 
@@ -344,7 +380,29 @@ std::unique_ptr<cProtocol> cMultiVersionProtocol::TryRecognizeLengthedProtocol(c
 		case static_cast<UInt32>(cProtocol::Version::v1_14_2): return std::make_unique<cProtocol_1_14_2>(&a_Client, ServerAddress, NextState);
 		case static_cast<UInt32>(cProtocol::Version::v1_14_3): return std::make_unique<cProtocol_1_14_3>(&a_Client, ServerAddress, NextState);
 		case static_cast<UInt32>(cProtocol::Version::v1_14_4): return std::make_unique<cProtocol_1_14_4>(&a_Client, ServerAddress, NextState);
-
+		case static_cast<UInt32>(cProtocol::Version::v1_15):   return std::make_unique<cProtocol_1_15>  (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_15_1): return std::make_unique<cProtocol_1_15_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_15_2): return std::make_unique<cProtocol_1_15_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_16):   return std::make_unique<cProtocol_1_16>  (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_16_1): return std::make_unique<cProtocol_1_16_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_16_2): return std::make_unique<cProtocol_1_16_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_16_3): return std::make_unique<cProtocol_1_16_3>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_16_4): return std::make_unique<cProtocol_1_16_4>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_17):   return std::make_unique<cProtocol_1_17>  (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_17_1): return std::make_unique<cProtocol_1_17_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_18):   return std::make_unique<cProtocol_1_18>  (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_18_2): return std::make_unique<cProtocol_1_18_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_19):   return std::make_unique<cProtocol_1_19>  (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_19_1): return std::make_unique<cProtocol_1_19_1>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_19_3): return std::make_unique<cProtocol_1_19_3>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_19_4): return std::make_unique<cProtocol_1_19_4>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_20):   return std::make_unique<cProtocol_1_20>  (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_20_2): return std::make_unique<cProtocol_1_20_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_20_3): return std::make_unique<cProtocol_1_20_3>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_20_5): return std::make_unique<cProtocol_1_20_5>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_21):   return std::make_unique<cProtocol_1_21>  (&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_21_2): return std::make_unique<cProtocol_1_21_2>(&a_Client, ServerAddress, NextState);
+		case static_cast<UInt32>(cProtocol::Version::v1_21_4): return std::make_unique<cProtocol_1_21_4>(&a_Client, ServerAddress, NextState);
 		default:
 		{
 			LOGD("Client \"%s\" uses an unsupported protocol (lengthed, version %u (0x%x))",

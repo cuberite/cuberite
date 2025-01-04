@@ -30,7 +30,7 @@ cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest):
 	);
 
 	// Send out the chest-open packet:
-	m_World->BroadcastBlockAction(m_BlockPos, 1, 1, E_BLOCK_ENDER_CHEST);
+	m_World->BroadcastBlockAction(m_BlockPos, 1, 1, BlockType::EnderChest);
 }
 
 
@@ -40,7 +40,7 @@ cEnderChestWindow::cEnderChestWindow(cEnderChestEntity * a_EnderChest):
 cEnderChestWindow::~cEnderChestWindow()
 {
 	// Send out the chest-close packet:
-	m_World->BroadcastBlockAction(m_BlockPos, 1, 0, E_BLOCK_ENDER_CHEST);
+	m_World->BroadcastBlockAction(m_BlockPos, 1, 0, BlockType::EnderChest);
 
 	// Play the closing sound
 	m_World->BroadcastSoundEffect(

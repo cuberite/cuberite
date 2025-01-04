@@ -10,7 +10,7 @@
 /** Handler for stems from which produce grows in an adjacent block (melon, pumpkin) after it becomes ripe (meta == 7).
 ProduceBlockType is the blocktype for the produce to be grown.
 StemPickupType is the item type for the pickup resulting from breaking the stem. */
-template <BLOCKTYPE ProduceBlockType, ENUM_ITEM_TYPE StemPickupType>
+template <BlockType ProduceBlockType, Item StemPickupType>
 class cBlockStemsHandler final :
 	public cBlockPlant<true>
 {
@@ -20,9 +20,45 @@ public:
 
 	using Super::Super;
 
+	static constexpr unsigned char MaxStemAge = 7;
+
+	static inline bool IsBlockStem(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::PumpkinStem:
+			case BlockType::AttachedPumpkinStem:
+			case BlockType::MelonStem:
+			case BlockType::AttachedMelonStem:
+				return true;
+			default: return false;
+		}
+	}
+
+	static inline unsigned char GetStemAge(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::PumpkinStem:         return Block::PumpkinStem::Age(a_Block);
+			case BlockType::AttachedPumpkinStem: return MaxStemAge;
+			case BlockType::MelonStem:           return Block::MelonStem::Age(a_Block);
+			case BlockType::AttachedMelonStem:   return MaxStemAge;
+			default: return 0;
+		}
+	}
+
+
+
+
+
+	bool FullyOccupiesVoxel(const BlockState a_Block) const override
+	{
+		return false;
+	}
+
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		/*
 			Use correct percent:
@@ -30,8 +66,9 @@ private:
 			https://minecraft.wiki/w/Pumpkin_Seeds#Breaking
 		*/
 
+		auto Age = GetStemAge(a_Block);
 		// Age > 7 (Impossible)
-		if (a_BlockMeta > 7)
+		if (Age > MaxStemAge)
 		{
 			return cItem(StemPickupType);
 		}
@@ -42,7 +79,7 @@ private:
 
 		for (; Count < 4; Count++)
 		{
-			Cumulative += m_AgeSeedDropProbability[static_cast<size_t>(a_BlockMeta)][static_cast<size_t>(Count)];
+			Cumulative += m_AgeSeedDropProbability[static_cast<size_t>(Age)][static_cast<size_t>(Count)];
 			if (Cumulative > Threshold)
 			{
 				break;
@@ -56,19 +93,18 @@ private:
 
 
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_BlockToReplace) const override
 	{
 		const auto BelowPos = a_Position.addedY(-1);
-		return cChunkDef::IsValidHeight(BelowPos) && (a_Chunk.GetBlock(BelowPos) == E_BLOCK_FARMLAND);
+		return (cChunkDef::IsValidHeight(BelowPos) && (a_Chunk.GetBlock(BelowPos) == BlockType::Farmland));
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 7;
 	}
 
@@ -76,12 +112,17 @@ private:
 
 
 
-	virtual int Grow(cChunk & a_Chunk, Vector3i a_RelPos, int a_NumStages = 1) const override
+	virtual int Grow(cChunk & a_Chunk, Vector3i a_Position, char a_NumStages = 1) const override
 	{
-		const auto OldMeta = a_Chunk.GetMeta(a_RelPos);
-		const auto NewMeta = std::clamp<NIBBLETYPE>(static_cast<NIBBLETYPE>(OldMeta + a_NumStages), 0, 7);
-		a_Chunk.SetMeta(a_RelPos, NewMeta);
-		return NewMeta - OldMeta;
+		const auto OldAge = GetStemAge(a_Chunk.GetBlock(a_Position));
+		const auto NewAge = std::clamp<unsigned char>(static_cast<unsigned char>(OldAge + a_NumStages), 0, 7);
+		switch (m_BlockType)
+		{
+			case BlockType::PumpkinStem: a_Chunk.SetBlock(a_Position, Block::PumpkinStem::PumpkinStem(NewAge)); break;
+			case BlockType::MelonStem:   a_Chunk.SetBlock(a_Position, Block::MelonStem::MelonStem(NewAge)); break;
+			default: return 0;
+		}
+		return NewAge - OldAge;
 	}
 
 
@@ -103,16 +144,16 @@ private:
 			}
 		};
 
-		std::array<BLOCKTYPE, 4> BlockType;
+		std::array<BlockState, 4> Neighbors;
 		if (
-			!a_Chunk.UnboundedRelGetBlockType(a_StemRelPos + NeighborOfs[0], BlockType[0]) ||
-			!a_Chunk.UnboundedRelGetBlockType(a_StemRelPos + NeighborOfs[1], BlockType[1]) ||
-			!a_Chunk.UnboundedRelGetBlockType(a_StemRelPos + NeighborOfs[2], BlockType[2]) ||
-			!a_Chunk.UnboundedRelGetBlockType(a_StemRelPos + NeighborOfs[3], BlockType[3]) ||
-			(BlockType[0] == ProduceBlockType) ||
-			(BlockType[1] == ProduceBlockType) ||
-			(BlockType[2] == ProduceBlockType) ||
-			(BlockType[3] == ProduceBlockType)
+			!a_Chunk.UnboundedRelGetBlock(a_StemRelPos + NeighborOfs[0], Neighbors[0]) ||
+			!a_Chunk.UnboundedRelGetBlock(a_StemRelPos + NeighborOfs[1], Neighbors[1]) ||
+			!a_Chunk.UnboundedRelGetBlock(a_StemRelPos + NeighborOfs[2], Neighbors[2]) ||
+			!a_Chunk.UnboundedRelGetBlock(a_StemRelPos + NeighborOfs[3], Neighbors[3]) ||
+			(Neighbors[0].Type() == ProduceBlockType) ||
+			(Neighbors[1].Type() == ProduceBlockType) ||
+			(Neighbors[2].Type() == ProduceBlockType) ||
+			(Neighbors[3].Type() == ProduceBlockType)
 		)
 		{
 			// Neighbors not valid or already taken by the same produce:
@@ -131,12 +172,14 @@ private:
 		}
 
 		// Check that the block in that direction is empty:
-		switch (BlockType[CheckType])
+		switch (Neighbors[CheckType].Type())
 		{
-			case E_BLOCK_AIR:
-			case E_BLOCK_SNOW:
-			case E_BLOCK_TALL_GRASS:
-			case E_BLOCK_DEAD_BUSH:
+			case BlockType::Air:
+			case BlockType::CaveAir:
+			case BlockType::VoidAir:
+			case BlockType::Snow:
+			case BlockType::TallGrass:
+			case BlockType::DeadBush:
 			{
 				break;
 			}
@@ -144,29 +187,27 @@ private:
 		}
 
 		// Check if there's soil under the neighbor. We already know the neighbors are valid. Place produce if ok
-		BLOCKTYPE SoilType;
+		BlockState SoilBlock;
 		const auto ProduceRelPos = a_StemRelPos + Vector3i(x, 0, z);
-		VERIFY(a_Chunk.UnboundedRelGetBlockType(ProduceRelPos.addedY(-1), SoilType));
+		VERIFY(a_Chunk.UnboundedRelGetBlock(ProduceRelPos.addedY(-1), SoilBlock));
 
-		switch (SoilType)
+		switch (SoilBlock.Type())
 		{
-			case E_BLOCK_DIRT:
-			case E_BLOCK_GRASS:
-			case E_BLOCK_FARMLAND:
+			case BlockType::Dirt:
+			case BlockType::ShortGrass:
+			case BlockType::Farmland:
 			{
-				const NIBBLETYPE Meta = (ProduceBlockType == E_BLOCK_MELON) ? 0 : static_cast<NIBBLETYPE>(Random.RandInt(4) % 4);
-
 				FLOGD("Growing melon / pumpkin at {0} (<{1}, {2}> from stem), overwriting {3}, growing on top of {4}, meta {5}",
 					a_Chunk.RelativeToAbsolute(ProduceRelPos),
 					x, z,
-					ItemTypeToString(BlockType[CheckType]),
-					ItemTypeToString(SoilType),
-					Meta
+					Neighbors[CheckType],
+					SoilBlock
 				);
-
 				// Place a randomly-facing produce:
-				a_Chunk.SetBlock(ProduceRelPos, ProduceBlockType, Meta);
+				a_Chunk.SetBlock(ProduceRelPos, ProduceBlockType);
+				break;
 			}
+			default: break;
 		}
 	}
 
@@ -207,5 +248,5 @@ private:
 	};
 } ;
 
-using cBlockMelonStemHandler   = cBlockStemsHandler<E_BLOCK_MELON,   E_ITEM_MELON_SEEDS>;
-using cBlockPumpkinStemHandler = cBlockStemsHandler<E_BLOCK_PUMPKIN, E_ITEM_PUMPKIN_SEEDS>;
+using cBlockMelonStemHandler           = cBlockStemsHandler<BlockType::Melon,   Item::MelonSeeds>;
+using cBlockPumpkinStemHandler         = cBlockStemsHandler<BlockType::Pumpkin, Item::PumpkinSeeds>;

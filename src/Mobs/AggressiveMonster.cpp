@@ -55,14 +55,13 @@ cMonster * cAggressiveMonster::GetMonsterOfTypeInSight(eMonsterType a_MobType, u
 	class cCallback : public cBlockTracer::cCallbacks
 	{
 		public:
-		bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+		bool OnNextBlock(Vector3i a_BlockPos, BlockState a_Block, eBlockFace a_EntryFace) override
 		{
-			return a_BlockType != E_BLOCK_AIR;
+			return a_Block != BlockType::Air;
 		}
 	};
 
 	auto Callbacks = cCallback();
-	auto Tracer = cLineBlockTracer(*GetWorld(), Callbacks);
 
 	cEntityCallback Callback = [&](cEntity & a_Entity)
 	{

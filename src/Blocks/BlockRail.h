@@ -1,13 +1,13 @@
 #pragma once
 
 #include "BlockHandler.h"
+#include "BlockSlab.h"
+#include "BlockStairs.h"
 #include "BlockType.h"
-#include "Mixins/Mixins.h"
-#include "Mixins/SolidSurfaceUnderneath.h"
 #include "../BlockInfo.h"
 #include "../Chunk.h"
 #include "ChunkDef.h"
-
+#include "../Entities/Player.h"
 
 
 
@@ -16,7 +16,8 @@ enum ENUM_PURE
 {
 	E_PURE_UPDOWN = 0,
 	E_PURE_DOWN = 1,
-	E_PURE_NONE = 2
+	E_PURE_NONE = 2,
+	E_PURE_UNSET
 };
 
 
@@ -24,29 +25,266 @@ enum ENUM_PURE
 
 
 class cBlockRailHandler final :
-	public cSolidSurfaceUnderneath<cClearMetaOnDrop<cBlockHandler>>
+	public cBlockHandler
 {
-	using Super = cSolidSurfaceUnderneath<cClearMetaOnDrop<cBlockHandler>>;
+	using Super = cBlockHandler;
 
 public:
 
 	using Super::Super;
 
-
-	static NIBBLETYPE FindMeta(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, BLOCKTYPE a_RailType)
+	enum class Shape
 	{
-		NIBBLETYPE Meta = 0;
+		NorthSouth,
+		EastWest,
+		AscendingEast,
+		AscendingWest,
+		AscendingNorth,
+		AscendingSouth,
+		SouthEast,
+		SouthWest,
+		NorthWest,
+		NorthEast,
+		None
+	};
+
+	static inline bool IsBlockRail(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Rail:
+			case BlockType::ActivatorRail:
+			case BlockType::DetectorRail:
+			case BlockType::PoweredRail:
+				return true;
+			default: return false;
+		}
+	}
+
+	static inline void SetPowered(cChunkInterface & a_ChunkInterface, Vector3i a_Position, bool a_Powered)
+	{
+		using namespace Block;
+		auto Self = a_ChunkInterface.GetBlock(a_Position);
+		switch (Self.Type())
+		{
+			case BlockType::Rail: break;   // Nothing to do
+			case BlockType::ActivatorRail: a_ChunkInterface.FastSetBlock(a_Position, ActivatorRail::ActivatorRail(a_Powered, ActivatorRail::Shape(Self), ActivatorRail::Waterlogged(Self))); break;
+			case BlockType::DetectorRail:  a_ChunkInterface.FastSetBlock(a_Position, DetectorRail::DetectorRail(a_Powered, DetectorRail::Shape(Self), DetectorRail::Waterlogged(Self))); break;
+			case BlockType::PoweredRail:   a_ChunkInterface.FastSetBlock(a_Position, PoweredRail::PoweredRail(a_Powered, PoweredRail::Shape(Self), PoweredRail::Waterlogged(Self))); break;
+			default: break;
+		}
+	}
+
+	static inline enum Shape GetShapeFromRail(BlockState a_Block)
+	{
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::Rail:
+			{
+				switch (Rail::Shape(a_Block))
+				{
+					case Rail::Shape::NorthSouth:     return Shape::NorthSouth;
+					case Rail::Shape::EastWest:       return Shape::EastWest;
+					case Rail::Shape::AscendingEast:  return Shape::AscendingEast;
+					case Rail::Shape::AscendingWest:  return Shape::AscendingWest;
+					case Rail::Shape::AscendingNorth: return Shape::AscendingNorth;
+					case Rail::Shape::AscendingSouth: return Shape::AscendingSouth;
+					case Rail::Shape::SouthEast:      return Shape::SouthEast;
+					case Rail::Shape::SouthWest:      return Shape::SouthWest;
+					case Rail::Shape::NorthWest:      return Shape::NorthWest;
+					case Rail::Shape::NorthEast:      return Shape::NorthEast;
+				}
+				break;
+			}
+			case BlockType::ActivatorRail:
+			{
+				switch (ActivatorRail::Shape(a_Block))
+				{
+					case ActivatorRail::Shape::NorthSouth:     return Shape::NorthSouth;
+					case ActivatorRail::Shape::EastWest:       return Shape::EastWest;
+					case ActivatorRail::Shape::AscendingEast:  return Shape::AscendingEast;
+					case ActivatorRail::Shape::AscendingWest:  return Shape::AscendingWest;
+					case ActivatorRail::Shape::AscendingNorth: return Shape::AscendingNorth;
+					case ActivatorRail::Shape::AscendingSouth: return Shape::AscendingSouth;
+				}
+				break;
+			}
+			case BlockType::DetectorRail:
+			{
+				switch (DetectorRail::Shape(a_Block))
+				{
+					case DetectorRail::Shape::NorthSouth:     return Shape::NorthSouth;
+					case DetectorRail::Shape::EastWest:       return Shape::EastWest;
+					case DetectorRail::Shape::AscendingEast:  return Shape::AscendingEast;
+					case DetectorRail::Shape::AscendingWest:  return Shape::AscendingWest;
+					case DetectorRail::Shape::AscendingNorth: return Shape::AscendingNorth;
+					case DetectorRail::Shape::AscendingSouth: return Shape::AscendingSouth;
+				}
+				break;
+			}
+			case BlockType::PoweredRail:
+			{
+				switch (PoweredRail::Shape(a_Block))
+				{
+					case PoweredRail::Shape::NorthSouth:     return Shape::NorthSouth;
+					case PoweredRail::Shape::EastWest:       return Shape::EastWest;
+					case PoweredRail::Shape::AscendingEast:  return Shape::AscendingEast;
+					case PoweredRail::Shape::AscendingWest:  return Shape::AscendingWest;
+					case PoweredRail::Shape::AscendingNorth: return Shape::AscendingNorth;
+					case PoweredRail::Shape::AscendingSouth: return Shape::AscendingSouth;
+				}
+				break;
+			}
+			default: return Shape::None;
+		}
+		return Shape::None;
+	}
+
+	static inline BlockState GetRailFromShape(BlockState a_Block, Shape a_Shape)
+	{
+		using namespace Block;
+
+		switch (a_Block.Type())
+		{
+			case BlockType::Rail:
+			{
+				switch (a_Shape)
+				{
+					case Shape::NorthSouth:      return Rail::Rail(Rail::Shape::NorthSouth, Rail::Waterlogged(a_Block));
+					case Shape::EastWest:        return Rail::Rail(Rail::Shape::EastWest, Rail::Waterlogged(a_Block));
+					case Shape::AscendingEast:   return Rail::Rail(Rail::Shape::AscendingEast, Rail::Waterlogged(a_Block));
+					case Shape::AscendingWest:   return Rail::Rail(Rail::Shape::AscendingWest, Rail::Waterlogged(a_Block));
+					case Shape::AscendingNorth:  return Rail::Rail(Rail::Shape::AscendingNorth, Rail::Waterlogged(a_Block));
+					case Shape::AscendingSouth:  return Rail::Rail(Rail::Shape::AscendingSouth, Rail::Waterlogged(a_Block));
+					case Shape::SouthEast:       return Rail::Rail(Rail::Shape::SouthEast, Rail::Waterlogged(a_Block));
+					case Shape::SouthWest:       return Rail::Rail(Rail::Shape::SouthWest, Rail::Waterlogged(a_Block));
+					case Shape::NorthWest:       return Rail::Rail(Rail::Shape::NorthWest, Rail::Waterlogged(a_Block));
+					case Shape::NorthEast:       return Rail::Rail(Rail::Shape::NorthEast, Rail::Waterlogged(a_Block));
+					case Shape::None:            return a_Block;
+				}
+				break;
+			}
+			case BlockType::ActivatorRail:
+			{
+				switch (a_Shape)
+				{
+					case Shape::NorthSouth:      return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::NorthSouth, ActivatorRail::Waterlogged(a_Block));
+					case Shape::EastWest:        return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::EastWest, ActivatorRail::Waterlogged(a_Block));
+					case Shape::AscendingEast:   return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingEast, ActivatorRail::Waterlogged(a_Block));
+					case Shape::AscendingWest:   return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingWest, ActivatorRail::Waterlogged(a_Block));
+					case Shape::AscendingNorth:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingNorth, ActivatorRail::Waterlogged(a_Block));
+					case Shape::AscendingSouth:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingSouth, ActivatorRail::Waterlogged(a_Block));
+					case Shape::None:            return a_Block;
+					case Shape::SouthEast:
+					case Shape::SouthWest:
+					case Shape::NorthWest:
+					case Shape::NorthEast:
+					{
+						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
+						return a_Block;
+					}
+				}
+				break;
+			}
+			case BlockType::DetectorRail:
+			{
+				switch (a_Shape)
+				{
+					case Shape::NorthSouth:      return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::NorthSouth, DetectorRail::Waterlogged(a_Block));
+					case Shape::EastWest:        return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::EastWest, DetectorRail::Waterlogged(a_Block));
+					case Shape::AscendingEast:   return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingEast, DetectorRail::Waterlogged(a_Block));
+					case Shape::AscendingWest:   return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingWest, DetectorRail::Waterlogged(a_Block));
+					case Shape::AscendingNorth:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingNorth, DetectorRail::Waterlogged(a_Block));
+					case Shape::AscendingSouth:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingSouth, DetectorRail::Waterlogged(a_Block));
+					case Shape::None:            return a_Block;
+					case Shape::SouthEast:
+					case Shape::SouthWest:
+					case Shape::NorthWest:
+					case Shape::NorthEast:
+					{
+						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
+						return a_Block;
+					}
+				}
+				break;
+			}
+			case BlockType::PoweredRail:
+			{
+				switch (a_Shape)
+				{
+					case Shape::NorthSouth:      return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::NorthSouth, PoweredRail::Waterlogged(a_Block));
+					case Shape::EastWest:        return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::EastWest, PoweredRail::Waterlogged(a_Block));
+					case Shape::AscendingEast:   return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingEast, PoweredRail::Waterlogged(a_Block));
+					case Shape::AscendingWest:   return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingWest, PoweredRail::Waterlogged(a_Block));
+					case Shape::AscendingNorth:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingNorth, PoweredRail::Waterlogged(a_Block));
+					case Shape::AscendingSouth:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingSouth, PoweredRail::Waterlogged(a_Block));
+					case Shape::None:            return a_Block;
+					case Shape::SouthEast:
+					case Shape::SouthWest:
+					case Shape::NorthWest:
+					case Shape::NorthEast:
+					{
+						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
+						return a_Block;
+					}
+				}
+				break;
+			}
+			default: UNREACHABLE("Got unknown block type in cBlockRailHandler!");
+		}
+		return a_Block;
+	}
+
+
+
+
+
+	BlockState static GetRailFromRotation(BlockState a_RailType, double a_Yaw)
+	{
+		switch (RotationToBlockFace(a_Yaw))
+		{
+			case BLOCK_FACE_WEST:
+			case BLOCK_FACE_EAST:
+			{
+				return GetRailFromShape(a_RailType, Shape::EastWest);
+			}
+			case BLOCK_FACE_NORTH:
+			case BLOCK_FACE_SOUTH:
+			{
+				return GetRailFromShape(a_RailType, Shape::NorthSouth);
+			}
+			case BLOCK_FACE_YM:
+			case BLOCK_FACE_YP:
+			case BLOCK_FACE_NONE:
+			{
+				UNREACHABLE("Got unknown rotation!");
+			}
+		}
+		UNREACHABLE("Got unknown rotation!");
+		return Block::Air::Air();
+	}
+
+
+
+
+
+	BlockState static FindBlock(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, BlockState a_OldBlock)
+	{
+		Shape NewShape = Shape::None;
+
 		char RailsCnt = 0;
 		bool Neighbors[8];  // 0 - EAST, 1 - WEST, 2 - NORTH, 3 - SOUTH, 4 - EAST UP, 5 - WEST UP, 6 - NORTH UP, 7 - SOUTH UP
 		memset(Neighbors, 0, sizeof(Neighbors));
-		Neighbors[0] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(1, 0, 0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_EAST, E_PURE_DOWN));
-		Neighbors[1] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(-1, 0, 0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_WEST, E_PURE_DOWN));
-		Neighbors[2] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, 0, -1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_NORTH, E_PURE_DOWN));
-		Neighbors[3] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, 0, 1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_SOUTH, E_PURE_DOWN));
-		Neighbors[4] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(1, 1, 0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_EAST, E_PURE_NONE));
-		Neighbors[5] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(-1, 1, 0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_WEST, E_PURE_NONE));
-		Neighbors[6] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, -1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_NORTH, E_PURE_NONE));
-		Neighbors[7] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_SOUTH, E_PURE_NONE));
+		Neighbors[0] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 1, 0,  0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_EAST, E_PURE_DOWN));
+		Neighbors[1] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(-1, 0,  0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_WEST, E_PURE_DOWN));
+		Neighbors[2] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 0, 0, -1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_NORTH, E_PURE_DOWN));
+		Neighbors[3] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 0, 0,  1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos, BLOCK_FACE_SOUTH, E_PURE_DOWN));
+		Neighbors[4] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 1, 1,  0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_EAST, E_PURE_NONE));
+		Neighbors[5] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(-1, 1,  0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_WEST, E_PURE_NONE));
+		Neighbors[6] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 0, 1, -1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_NORTH, E_PURE_NONE));
+		Neighbors[7] = (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i( 0, 1,  1)) || !IsNotConnected(a_ChunkInterface, a_BlockPos + Vector3i(0, 1, 0), BLOCK_FACE_SOUTH, E_PURE_NONE));
+
 		if (IsUnstable(a_ChunkInterface, a_BlockPos + Vector3i(1, -1, 0)) || !IsNotConnected(a_ChunkInterface, a_BlockPos - Vector3i(0, 1, 0), BLOCK_FACE_EAST))
 		{
 			Neighbors[0] = true;
@@ -63,6 +301,7 @@ public:
 		{
 			Neighbors[3] = true;
 		}
+
 		for (int i = 0; i < 8; i++)
 		{
 			if (Neighbors[i])
@@ -70,35 +309,39 @@ public:
 				RailsCnt++;
 			}
 		}
+
 		if (RailsCnt == 1)
 		{
 			if (Neighbors[7])
 			{
-				return E_META_RAIL_ASCEND_ZP;
+				NewShape = Shape::AscendingSouth;
 			}
 			else if (Neighbors[6])
 			{
-				return E_META_RAIL_ASCEND_ZM;
+				NewShape = Shape::AscendingNorth;
 			}
 			else if (Neighbors[5])
 			{
-				return E_META_RAIL_ASCEND_XM;
+				NewShape = Shape::AscendingWest;
 			}
 			else if (Neighbors[4])
 			{
-				return E_META_RAIL_ASCEND_XP;
+				NewShape = Shape::AscendingEast;
 			}
 			else if (Neighbors[0] || Neighbors[1])
 			{
-				return E_META_RAIL_XM_XP;
+				NewShape = Shape::EastWest;
 			}
 			else if (Neighbors[2] || Neighbors[3])
 			{
-				return E_META_RAIL_ZM_ZP;
+				NewShape = Shape::NorthSouth;
 			}
-			ASSERT(!"Weird neighbor count");
-			return Meta;
+			else
+			{
+				ASSERT(!"Weird neighbor count");
+			}
 		}
+
 		for (int i = 0; i < 4; i++)
 		{
 			if (Neighbors[i + 4])
@@ -106,238 +349,338 @@ public:
 				Neighbors[i] = true;
 			}
 		}
+
 		if (RailsCnt > 1)
 		{
-			const bool CanCurve = a_RailType == E_BLOCK_RAIL;
+			bool CanCurve = CanThisRailCurve(a_OldBlock);
 
 			if (Neighbors[3] && Neighbors[0] && CanCurve)
 			{
-				return E_META_RAIL_CURVED_ZP_XP;
+				NewShape = Shape::SouthEast;
 			}
 			else if (Neighbors[3] && Neighbors[1] && CanCurve)
 			{
-				return E_META_RAIL_CURVED_ZP_XM;
+				NewShape = Shape::SouthWest;
 			}
 			else if (Neighbors[2] && Neighbors[0] && CanCurve)
 			{
-				return E_META_RAIL_CURVED_ZM_XP;
+				NewShape = Shape::NorthEast;
 			}
 			else if (Neighbors[2] && Neighbors[1] && CanCurve)
 			{
-				return E_META_RAIL_CURVED_ZM_XM;
+				NewShape = Shape::NorthWest;
 			}
 			else if (Neighbors[7] && Neighbors[2])
 			{
-				return E_META_RAIL_ASCEND_ZP;
+				NewShape = Shape::AscendingSouth;
 			}
 			else if (Neighbors[3] && Neighbors[6])
 			{
-				return E_META_RAIL_ASCEND_ZM;
+				NewShape = Shape::AscendingNorth;
 			}
 			else if (Neighbors[5] && Neighbors[0])
 			{
-				return E_META_RAIL_ASCEND_XM;
+				NewShape = Shape::AscendingWest;
 			}
 			else if (Neighbors[4] && Neighbors[1])
 			{
-				return E_META_RAIL_ASCEND_XP;
+				NewShape = Shape::AscendingEast;
 			}
 			else if (Neighbors[0] && Neighbors[1])
 			{
-				return E_META_RAIL_XM_XP;
+				NewShape = Shape::EastWest;
 			}
 			else if (Neighbors[2] && Neighbors[3])
 			{
-				return E_META_RAIL_ZM_ZP;
+				NewShape = Shape::NorthSouth;
 			}
-
-			if (CanCurve)
+			else if (CanCurve)
 			{
+				FLOG("{}", a_BlockPos);
 				ASSERT(!"Weird neighbor count");
 			}
 		}
-		return Meta;
+		return GetRailFromShape(a_OldBlock, NewShape);
 	}
 
 private:
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, NIBBLETYPE a_Meta) const override
+	static bool CanBeSupportedBy(BlockState a_Block)
 	{
-		if (!Super::CanBeAt(a_Chunk, a_Position, a_Meta))
+		if (cBlockSlabHandler::IsAnySlabType(a_Block))
+		{
+			return cBlockSlabHandler::IsSlabUpsideDown(a_Block);
+		}
+		else if (cBlockStairsHandler::IsAnyStairType(a_Block))
+		{
+			return cBlockStairsHandler::IsStairsUpsideDown(a_Block);
+		}
+		return cBlockInfo::FullyOccupiesVoxel(a_Block);
+	}
+
+	virtual void OnPlaced(
+			cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+			Vector3i a_BlockPos,
+			BlockState a_Block
+	) const override
+	{
+		Super::OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_Block);
+
+		// Alert diagonal rails:
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1,  1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1,  1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1,  1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1, -1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1, -1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1, -1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1,  1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1, -1), BLOCK_FACE_NONE);
+	}
+
+
+
+
+
+	virtual void OnBroken(
+			cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
+			Vector3i a_BlockPos,
+			BlockState a_OldBlock,
+			const cEntity * a_Digger
+	) const override
+	{
+		Super::OnBroken(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_OldBlock, a_Digger);
+
+		// Alert diagonal rails:
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1,  1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1,  1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1,  1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1, -1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1, -1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1, -1,  0), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1,  1), BLOCK_FACE_NONE);
+		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1, -1), BLOCK_FACE_NONE);
+	}
+
+
+
+#define GETOFFSET(RailType) \
+{ \
+	switch (Rail::Shape(Self)) \
+	{ \
+		case Rail::Shape::AscendingEast:  Offset = { 1, 0,  0}; break; \
+		case Rail::Shape::AscendingWest:  Offset = {-1, 0,  0}; break; \
+		case Rail::Shape::AscendingNorth: Offset = { 0, 0, -1}; break; \
+		case Rail::Shape::AscendingSouth: Offset = { 0, 0,  1}; break; \
+		default: break; \
+	} \
+	break; \
+}
+
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
+	{
+		BlockState BelowBlock = a_Chunk.GetBlock(a_Position.addedY(-1));
+
+		if ((a_Position.y <= 0) || !CanBeSupportedBy(BelowBlock))
 		{
 			return false;
 		}
 
-		switch (a_Meta)
+		auto Shape = GetShapeFromRail(a_Self);
+
+		switch (Shape)
 		{
-			case E_META_RAIL_ASCEND_XP:
-			case E_META_RAIL_ASCEND_XM:
-			case E_META_RAIL_ASCEND_ZM:
-			case E_META_RAIL_ASCEND_ZP:
+			case Shape::AscendingEast:
+			case Shape::AscendingWest:
+			case Shape::AscendingNorth:
+			case Shape::AscendingSouth:
 			{
 				// Mapping between the meta and the neighbors that need checking
-				a_Meta -= E_META_RAIL_ASCEND_XP;  // Base index at zero
-				static const Vector3i Coords[] =
+				size_t Index = static_cast<size_t>(Shape) - static_cast<size_t>(Shape::AscendingEast);  // Base index at zero
+				static const std::array<Vector3i, 4> Coords =
 				{
-					{ 1, 0,  0},  // east,  XP
-					{-1, 0,  0},  // west,  XM
-					{ 0, 0, -1},  // north, ZM
-					{ 0, 0,  1},  // south, ZP
+					Vector3i( 1, 0,  0),  // east,  XP
+					Vector3i(-1, 0,  0),  // west,  XM
+					Vector3i( 0, 0, -1),  // north, ZM
+					Vector3i( 0, 0,  1),  // south, ZP
 				} ;
-				BLOCKTYPE  BlockType;
-				NIBBLETYPE BlockMeta;
-				if (!a_Chunk.UnboundedRelGetBlock(a_Position + Coords[a_Meta], BlockType, BlockMeta))
+				BlockState Block;
+				if (!a_Chunk.UnboundedRelGetBlock(a_Position + Coords[Index], Block))
 				{
 					// Too close to the edge, cannot simulate
 					return true;
 				}
-				return cBlockInfo::FullyOccupiesVoxel(BlockType);
+				return cBlockInfo::FullyOccupiesVoxel(Block);
 			}
 		}
-
 		return true;
 	}
 
+	static bool CanThisRailCurve(BlockState a_Block)
+	{
+		return a_Block.Type() == BlockType::Rail;
+	}
+
+#define ISUNSTABLE(RailType) \
+	case RailType::Shape::NorthSouth: \
+	{ \
+		FirstFaceToCheck = BLOCK_FACE_NORTH; \
+		SecondFaceToCheck = BLOCK_FACE_SOUTH; \
+		FirstStrategy = E_PURE_DOWN; \
+		SecondStrategy = E_PURE_DOWN; \
+		break; \
+	} \
+	case RailType::Shape::EastWest: \
+	{ \
+		FirstFaceToCheck = BLOCK_FACE_EAST; \
+		SecondFaceToCheck = BLOCK_FACE_WEST; \
+		FirstStrategy = E_PURE_DOWN; \
+		SecondStrategy = E_PURE_DOWN; \
+		break; \
+	} \
+	case RailType::Shape::AscendingEast: \
+	{ \
+		FirstPos + Vector3i(0, 1, 0); \
+		FirstFaceToCheck = BLOCK_FACE_EAST; \
+		SecondFaceToCheck = BLOCK_FACE_WEST; \
+		FirstStrategy = E_PURE_UPDOWN; \
+		SecondStrategy = E_PURE_UPDOWN; \
+		break; \
+	} \
+	case RailType::Shape::AscendingWest: \
+	{ \
+		SecondPos + Vector3i(0, 1, 0); \
+		FirstFaceToCheck = BLOCK_FACE_EAST; \
+		SecondFaceToCheck = BLOCK_FACE_WEST; \
+		FirstStrategy = E_PURE_UPDOWN; \
+		SecondStrategy = E_PURE_UPDOWN; \
+		break; \
+	} \
+	case RailType::Shape::AscendingNorth: \
+	{ \
+		FirstPos + Vector3i(0, 1, 0); \
+		FirstFaceToCheck = BLOCK_FACE_NORTH; \
+		SecondFaceToCheck = BLOCK_FACE_SOUTH; \
+		FirstStrategy = E_PURE_UPDOWN; \
+		SecondStrategy = E_PURE_UPDOWN; \
+		break; \
+	} \
+	case RailType::Shape::AscendingSouth: \
+	{ \
+		SecondPos + Vector3i(0, 1, 0); \
+		FirstFaceToCheck = BLOCK_FACE_NORTH; \
+		SecondFaceToCheck = BLOCK_FACE_SOUTH; \
+		FirstStrategy = E_PURE_UPDOWN; \
+		SecondStrategy = E_PURE_UPDOWN; \
+		break; \
+	} \
 
 	static bool IsUnstable(cChunkInterface & a_ChunkInterface, Vector3i a_Pos)
 	{
-		if (!IsBlockRail(a_ChunkInterface.GetBlock(a_Pos)))
+		using namespace Block;
+		auto Self = a_ChunkInterface.GetBlock(a_Pos);
+		if (!IsBlockRail(Self))
 		{
 			return false;
 		}
-		NIBBLETYPE Meta = a_ChunkInterface.GetBlockMeta(a_Pos);
-		switch (Meta)
+		auto FirstPos = a_Pos;
+		auto SecondPos = a_Pos;
+		eBlockFace FirstFaceToCheck = BLOCK_FACE_NONE;
+		eBlockFace SecondFaceToCheck = BLOCK_FACE_NONE;
+		ENUM_PURE FirstStrategy = E_PURE_UNSET;
+		ENUM_PURE SecondStrategy = E_PURE_UNSET;
+		switch (Self.Type())
 		{
-			case E_META_RAIL_ZM_ZP:
+			case BlockType::Rail:
 			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_NORTH, E_PURE_DOWN) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_SOUTH, E_PURE_DOWN)
-				)
+				switch (Rail::Shape(Self))
 				{
-					return true;
+					ISUNSTABLE(Rail)
+					case Rail::Shape::SouthEast:
+					{
+						FirstFaceToCheck = BLOCK_FACE_SOUTH;
+						SecondFaceToCheck = BLOCK_FACE_EAST;
+						FirstStrategy = E_PURE_UPDOWN;
+						SecondStrategy = E_PURE_UPDOWN;
+						break;
+					}
+					case Rail::Shape::SouthWest:
+					{
+						FirstFaceToCheck = BLOCK_FACE_SOUTH;
+						SecondFaceToCheck = BLOCK_FACE_WEST;
+						FirstStrategy = E_PURE_UPDOWN;
+						SecondStrategy = E_PURE_UPDOWN;
+						break;
+					}
+					case Rail::Shape::NorthWest:
+					{
+						FirstFaceToCheck = BLOCK_FACE_NORTH;
+						SecondFaceToCheck = BLOCK_FACE_WEST;
+						FirstStrategy = E_PURE_UPDOWN;
+						SecondStrategy = E_PURE_UPDOWN;
+						break;
+					}
+					case Rail::Shape::NorthEast:
+					{
+						FirstFaceToCheck = BLOCK_FACE_NORTH;
+						SecondFaceToCheck = BLOCK_FACE_EAST;
+						FirstStrategy = E_PURE_UPDOWN;
+						SecondStrategy = E_PURE_UPDOWN;
+						break;
+					}
 				}
 				break;
 			}
-
-			case E_META_RAIL_XM_XP:
+			case BlockType::ActivatorRail:
 			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_EAST, E_PURE_DOWN) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_WEST, E_PURE_DOWN)
-				)
+				switch (ActivatorRail::Shape(Self))
 				{
-					return true;
+					ISUNSTABLE(ActivatorRail)
 				}
 				break;
 			}
-
-			case E_META_RAIL_ASCEND_XP:
+			case BlockType::DetectorRail:
 			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos + Vector3i(0, 1, 0), BLOCK_FACE_EAST) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_WEST)
-				)
+				switch (DetectorRail::Shape(Self))
 				{
-					return true;
+					ISUNSTABLE(DetectorRail)
 				}
 				break;
 			}
-
-			case E_META_RAIL_ASCEND_XM:
+			case BlockType::PoweredRail:
 			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_EAST) ||
-					IsNotConnected(a_ChunkInterface, a_Pos + Vector3i(0, 1, 0), BLOCK_FACE_WEST)
-				)
+				switch (PoweredRail::Shape(Self))
 				{
-					return true;
+					ISUNSTABLE(PoweredRail)
 				}
 				break;
 			}
-
-			case E_META_RAIL_ASCEND_ZM:
-			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos + Vector3i(0, 1, 0), BLOCK_FACE_NORTH) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_SOUTH)
-				)
-				{
-					return true;
-				}
-				break;
-			}
-
-			case E_META_RAIL_ASCEND_ZP:
-			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_NORTH) ||
-					IsNotConnected(a_ChunkInterface, a_Pos + Vector3i(0, 1, 0), BLOCK_FACE_SOUTH)
-				)
-				{
-					return true;
-				}
-				break;
-			}
-
-			case E_META_RAIL_CURVED_ZP_XP:
-			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_SOUTH) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_EAST)
-				)
-				{
-					return true;
-				}
-				break;
-			}
-
-			case E_META_RAIL_CURVED_ZP_XM:
-			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_SOUTH) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_WEST)
-				)
-				{
-					return true;
-				}
-				break;
-			}
-
-			case E_META_RAIL_CURVED_ZM_XM:
-			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_NORTH) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_WEST)
-				)
-				{
-					return true;
-				}
-				break;
-			}
-
-			case E_META_RAIL_CURVED_ZM_XP:
-			{
-				if (
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_NORTH) ||
-					IsNotConnected(a_ChunkInterface, a_Pos, BLOCK_FACE_EAST)
-				)
-				{
-					return true;
-				}
-				break;
-			}
+			default: return false;
 		}
-		return false;
+
+		if (
+			(FirstFaceToCheck == BLOCK_FACE_NONE) ||
+			(SecondFaceToCheck == BLOCK_FACE_NONE) ||
+			(FirstStrategy == E_PURE_UNSET) ||
+			(SecondStrategy == E_PURE_UNSET)
+		)
+		{
+			return false;
+		}
+
+		return
+		(
+			IsNotConnected(a_ChunkInterface, FirstPos,  FirstFaceToCheck, FirstStrategy) ||
+			IsNotConnected(a_ChunkInterface, SecondPos, SecondFaceToCheck, SecondStrategy)
+		);
 	}
 
 
-	static bool IsNotConnected(cChunkInterface  & a_ChunkInterface, Vector3i a_Pos, eBlockFace a_BlockFace, char a_Pure = 0)
+	static bool IsNotConnected(cChunkInterface  & a_ChunkInterface, Vector3i a_Pos, eBlockFace a_BlockFace, enum ENUM_PURE a_Pure = ENUM_PURE::E_PURE_UPDOWN)
 	{
+		using namespace Block;
+		auto Self = a_ChunkInterface.GetBlock(a_Pos);
 		a_Pos = AddFaceDirection(a_Pos, a_BlockFace, false);
-
-		NIBBLETYPE Meta;
-
+		BlockState Other = 0;
 		if (!IsBlockRail(a_ChunkInterface.GetBlock(a_Pos)))
 		{
 			if (!IsBlockRail(a_ChunkInterface.GetBlock(a_Pos + Vector3i(0, 1, 0))) || (a_Pure != E_PURE_UPDOWN))
@@ -348,76 +691,340 @@ private:
 				}
 				else
 				{
-					Meta = a_ChunkInterface.GetBlockMeta(a_Pos - Vector3i(0, 1, 0));
+					Other = a_ChunkInterface.GetBlock(a_Pos - Vector3i(0, 1, 0));
 				}
 			}
 			else
 			{
-				Meta = a_ChunkInterface.GetBlockMeta(a_Pos + Vector3i(0, 1, 0));
+				Other = a_ChunkInterface.GetBlock(a_Pos + Vector3i(0, 1, 0));
 			}
 		}
 		else
 		{
-			Meta = a_ChunkInterface.GetBlockMeta(a_Pos);
+			Other = a_ChunkInterface.GetBlock(a_Pos);
 		}
 
 		switch (a_BlockFace)
 		{
 			case BLOCK_FACE_NORTH:
 			{
-				if (
-					(Meta == E_META_RAIL_ZM_ZP) ||
-					(Meta == E_META_RAIL_ASCEND_ZM) ||
-					(Meta == E_META_RAIL_ASCEND_ZP) ||
-					(Meta == E_META_RAIL_CURVED_ZP_XP) ||
-					(Meta == E_META_RAIL_CURVED_ZP_XM)
-				)
+				switch (Self.Type())
 				{
-					return false;
+					case BlockType::Rail:
+					{
+						switch (Rail::Shape(Self))
+						{
+							case Rail::Shape::NorthSouth:
+							case Rail::Shape::AscendingNorth:
+							case Rail::Shape::AscendingSouth:
+							case Rail::Shape::SouthEast:
+							case Rail::Shape::SouthWest:
+								return false;
+							case Rail::Shape::EastWest:
+							case Rail::Shape::AscendingEast:
+							case Rail::Shape::AscendingWest:
+							case Rail::Shape::NorthWest:
+							case Rail::Shape::NorthEast:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					case BlockType::ActivatorRail:
+					{
+						switch (ActivatorRail::Shape(Self))
+						{
+							case ActivatorRail::Shape::NorthSouth:
+							case ActivatorRail::Shape::AscendingNorth:
+							case ActivatorRail::Shape::AscendingSouth:
+								return false;
+							case ActivatorRail::Shape::EastWest:
+							case ActivatorRail::Shape::AscendingEast:
+							case ActivatorRail::Shape::AscendingWest:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					case BlockType::DetectorRail:
+					{
+						switch (DetectorRail::Shape(Self))
+						{
+							case DetectorRail::Shape::NorthSouth:
+							case DetectorRail::Shape::AscendingNorth:
+							case DetectorRail::Shape::AscendingSouth:
+								return false;
+							case DetectorRail::Shape::EastWest:
+							case DetectorRail::Shape::AscendingEast:
+							case DetectorRail::Shape::AscendingWest:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					case BlockType::PoweredRail:
+					{
+						switch (PoweredRail::Shape(Self))
+						{
+							case PoweredRail::Shape::NorthSouth:
+							case PoweredRail::Shape::AscendingNorth:
+							case PoweredRail::Shape::AscendingSouth:
+								return false;
+							case PoweredRail::Shape::EastWest:
+							case PoweredRail::Shape::AscendingEast:
+							case PoweredRail::Shape::AscendingWest:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					default: return false;
 				}
 				break;
 			}
 
 			case BLOCK_FACE_SOUTH:
 			{
-				if (
-					(Meta == E_META_RAIL_ZM_ZP) ||
-					(Meta == E_META_RAIL_ASCEND_ZM) ||
-					(Meta == E_META_RAIL_ASCEND_ZP) ||
-					(Meta == E_META_RAIL_CURVED_ZM_XP) ||
-					(Meta == E_META_RAIL_CURVED_ZM_XM)
-				)
+				switch (Self.Type())
 				{
-					return false;
+					case BlockType::Rail:
+					{
+						switch (Rail::Shape(Self))
+						{
+							case Rail::Shape::NorthSouth:
+							case Rail::Shape::AscendingNorth:
+							case Rail::Shape::AscendingSouth:
+							case Rail::Shape::NorthEast:
+							case Rail::Shape::NorthWest:
+								return false;
+							case Rail::Shape::EastWest:
+							case Rail::Shape::AscendingEast:
+							case Rail::Shape::AscendingWest:
+							case Rail::Shape::SouthEast:
+							case Rail::Shape::SouthWest:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					case BlockType::ActivatorRail:
+					{
+						switch (ActivatorRail::Shape(Self))
+						{
+							case ActivatorRail::Shape::NorthSouth:
+							case ActivatorRail::Shape::AscendingNorth:
+							case ActivatorRail::Shape::AscendingSouth:
+								return false;
+							case ActivatorRail::Shape::EastWest:
+							case ActivatorRail::Shape::AscendingEast:
+							case ActivatorRail::Shape::AscendingWest:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					case BlockType::DetectorRail:
+					{
+						switch (DetectorRail::Shape(Self))
+						{
+							case DetectorRail::Shape::NorthSouth:
+							case DetectorRail::Shape::AscendingNorth:
+							case DetectorRail::Shape::AscendingSouth:
+								return false;
+							case DetectorRail::Shape::EastWest:
+							case DetectorRail::Shape::AscendingEast:
+							case DetectorRail::Shape::AscendingWest:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					case BlockType::PoweredRail:
+					{
+						switch (PoweredRail::Shape(Self))
+						{
+							case PoweredRail::Shape::NorthSouth:
+							case PoweredRail::Shape::AscendingNorth:
+							case PoweredRail::Shape::AscendingSouth:
+								return false;
+							case PoweredRail::Shape::EastWest:
+							case PoweredRail::Shape::AscendingEast:
+							case PoweredRail::Shape::AscendingWest:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					default: return false;
 				}
 				break;
 			}
 
 			case BLOCK_FACE_EAST:
 			{
-				if (
-					(Meta == E_META_RAIL_XM_XP) ||
-					(Meta == E_META_RAIL_ASCEND_XP) ||
-					(Meta == E_META_RAIL_ASCEND_XM) ||
-					(Meta == E_META_RAIL_CURVED_ZP_XM) ||
-					(Meta == E_META_RAIL_CURVED_ZM_XM)
-				)
+				switch (Self.Type())
 				{
-					return false;
+					case BlockType::Rail:
+					{
+						switch (Rail::Shape(Self))
+						{
+							case Rail::Shape::EastWest:
+							case Rail::Shape::AscendingEast:
+							case Rail::Shape::AscendingWest:
+							case Rail::Shape::SouthWest:
+							case Rail::Shape::NorthWest:
+								return false;
+							case Rail::Shape::NorthSouth:
+							case Rail::Shape::AscendingNorth:
+							case Rail::Shape::AscendingSouth:
+							case Rail::Shape::SouthEast:
+							case Rail::Shape::NorthEast:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					case BlockType::ActivatorRail:
+					{
+						switch (ActivatorRail::Shape(Self))
+						{
+							case ActivatorRail::Shape::EastWest:
+							case ActivatorRail::Shape::AscendingEast:
+							case ActivatorRail::Shape::AscendingWest:
+								return false;
+							case ActivatorRail::Shape::NorthSouth:
+							case ActivatorRail::Shape::AscendingNorth:
+							case ActivatorRail::Shape::AscendingSouth:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					case BlockType::DetectorRail:
+					{
+						switch (DetectorRail::Shape(Self))
+						{
+							case DetectorRail::Shape::EastWest:
+							case DetectorRail::Shape::AscendingEast:
+							case DetectorRail::Shape::AscendingWest:
+								return false;
+							case DetectorRail::Shape::NorthSouth:
+							case DetectorRail::Shape::AscendingNorth:
+							case DetectorRail::Shape::AscendingSouth:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					case BlockType::PoweredRail:
+					{
+						switch (PoweredRail::Shape(Self))
+						{
+							case PoweredRail::Shape::EastWest:
+							case PoweredRail::Shape::AscendingEast:
+							case PoweredRail::Shape::AscendingWest:
+								return false;
+							case PoweredRail::Shape::NorthSouth:
+							case PoweredRail::Shape::AscendingNorth:
+							case PoweredRail::Shape::AscendingSouth:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					default: return false;
 				}
 				break;
 			}
 			case BLOCK_FACE_WEST:
 			{
-				if (
-					(Meta == E_META_RAIL_XM_XP) ||
-					(Meta == E_META_RAIL_ASCEND_XP) ||
-					(Meta == E_META_RAIL_ASCEND_XM) ||
-					(Meta == E_META_RAIL_CURVED_ZP_XP) ||
-					(Meta == E_META_RAIL_CURVED_ZM_XP)
-				)
+				switch (Self.Type())
 				{
-					return false;
+					case BlockType::Rail:
+					{
+						switch (Rail::Shape(Self))
+						{
+							case Rail::Shape::EastWest:
+							case Rail::Shape::AscendingEast:
+							case Rail::Shape::AscendingWest:
+							case Rail::Shape::SouthEast:
+							case Rail::Shape::NorthEast:
+								return false;
+							case Rail::Shape::NorthSouth:
+							case Rail::Shape::AscendingNorth:
+							case Rail::Shape::AscendingSouth:
+							case Rail::Shape::SouthWest:
+							case Rail::Shape::NorthWest:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					case BlockType::ActivatorRail:
+					{
+						switch (ActivatorRail::Shape(Self))
+						{
+							case ActivatorRail::Shape::EastWest:
+							case ActivatorRail::Shape::AscendingEast:
+							case ActivatorRail::Shape::AscendingWest:
+								return false;
+							case ActivatorRail::Shape::NorthSouth:
+							case ActivatorRail::Shape::AscendingNorth:
+							case ActivatorRail::Shape::AscendingSouth:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					case BlockType::DetectorRail:
+					{
+						switch (DetectorRail::Shape(Self))
+						{
+							case DetectorRail::Shape::EastWest:
+							case DetectorRail::Shape::AscendingEast:
+							case DetectorRail::Shape::AscendingWest:
+								return false;
+							case DetectorRail::Shape::NorthSouth:
+							case DetectorRail::Shape::AscendingNorth:
+							case DetectorRail::Shape::AscendingSouth:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					case BlockType::PoweredRail:
+					{
+						switch (PoweredRail::Shape(Self))
+						{
+							case PoweredRail::Shape::EastWest:
+							case PoweredRail::Shape::AscendingEast:
+							case PoweredRail::Shape::AscendingWest:
+								return false;
+							case PoweredRail::Shape::NorthSouth:
+							case PoweredRail::Shape::AscendingNorth:
+							case PoweredRail::Shape::AscendingSouth:
+							{
+								return true;
+							}
+						}
+						break;
+					}
+					default: return false;
 				}
 				break;
 			}
@@ -432,214 +1039,255 @@ private:
 	}
 
 
-	virtual void OnBroken(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
-		const cEntity * a_Digger
-	) const override
-	{
-		Super::OnBroken(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_OldBlockType, a_OldBlockMeta, a_Digger);
-
-		// Alert diagonal rails:
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1,  1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1,  1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1,  1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1, -1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1, -1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1, -1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1,  1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1, -1), BLOCK_FACE_NONE);
-	}
-
-
 	virtual void OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_BlockPos, eBlockFace a_WhichNeighbor) const override
 	{
-		const auto Meta = a_ChunkInterface.GetBlockMeta(a_BlockPos);
-		const auto NewMeta = FindMeta(a_ChunkInterface, a_BlockPos, m_BlockType);
-		if ((Meta != NewMeta) && IsUnstable(a_ChunkInterface, a_BlockPos))
+		const auto OldBlock = a_ChunkInterface.GetBlock(a_BlockPos);
+		const auto NewBlock = FindBlock(a_ChunkInterface, a_BlockPos, OldBlock);
+		if ((OldBlock != NewBlock) && IsUnstable(a_ChunkInterface, a_BlockPos))
 		{
-			a_ChunkInterface.FastSetBlock(a_BlockPos, m_BlockType, (m_BlockType == E_BLOCK_RAIL) ? NewMeta : NewMeta | (Meta & 0x08));
+			a_ChunkInterface.FastSetBlock(a_BlockPos, NewBlock);
 		}
 
 		Super::OnNeighborChanged(a_ChunkInterface, a_BlockPos, a_WhichNeighbor);
 	}
 
-
-	virtual void OnPlaced(
-		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
-		Vector3i a_BlockPos,
-		BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
-	) const override
+	virtual BlockState RotateCCW(BlockState a_Block) const override
 	{
-		Super::OnPlaced(a_ChunkInterface, a_WorldInterface, a_BlockPos, a_BlockType, a_BlockMeta);
+		using namespace Block;
+		switch (a_Block.Type())
+		{
+			case BlockType::Rail:
+			{
+				switch (Rail::Shape(a_Block))
+				{
 
-		// Alert diagonal rails:
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1,  1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1,  1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1,  1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, +1, -1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 1, -1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i(-1, -1,  0), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1,  1), BLOCK_FACE_NONE);
-		NeighborChanged(a_ChunkInterface, a_BlockPos + Vector3i( 0, -1, -1), BLOCK_FACE_NONE);
+					case Rail::Shape::NorthSouth:     return Rail::Rail(Rail::Shape::EastWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::EastWest:       return Rail::Rail(Rail::Shape::NorthSouth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingEast:  return Rail::Rail(Rail::Shape::AscendingNorth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingWest:  return Rail::Rail(Rail::Shape::AscendingSouth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingNorth: return Rail::Rail(Rail::Shape::AscendingWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingSouth: return Rail::Rail(Rail::Shape::AscendingEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthEast:      return Rail::Rail(Rail::Shape::NorthEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthWest:      return Rail::Rail(Rail::Shape::SouthEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthWest:      return Rail::Rail(Rail::Shape::SouthWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthEast:      return Rail::Rail(Rail::Shape::NorthWest, Rail::Waterlogged(a_Block));
+				}
+				break;
+			}
+			case BlockType::ActivatorRail:
+			{
+				switch (ActivatorRail::Shape(a_Block))
+				{
+					case ActivatorRail::Shape::NorthSouth:     return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::EastWest, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::EastWest:       return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::NorthSouth, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingEast:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingNorth, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingWest:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingSouth, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingNorth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingWest, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingSouth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingEast, ActivatorRail::Waterlogged(a_Block));
+				}
+				break;
+			}
+			case BlockType::DetectorRail:
+			{
+				switch (DetectorRail::Shape(a_Block))
+				{
+					case DetectorRail::Shape::NorthSouth:     return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::EastWest, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::EastWest:       return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::NorthSouth, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingEast:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingNorth, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingWest:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingSouth, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingNorth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingWest, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingSouth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingEast, DetectorRail::Waterlogged(a_Block));
+				}
+				break;
+			}
+			case BlockType::PoweredRail:
+			{
+				switch (PoweredRail::Shape(a_Block))
+				{
+					case PoweredRail::Shape::NorthSouth:     return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::EastWest, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::EastWest:       return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::NorthSouth, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingEast:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingNorth, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingWest:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingSouth, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingNorth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingWest, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingSouth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingEast, PoweredRail::Waterlogged(a_Block));
+				}
+				break;
+			}
+			default: return a_Block;
+		}
+		return a_Block;
 	}
 
 
-	virtual NIBBLETYPE MetaRotateCCW(NIBBLETYPE a_Meta) const override
+	virtual BlockState RotateCW(BlockState a_Block) const override
 	{
-		// Bit 0x08 is a flag when a_Meta is in the range 0x00--0x05 and 0x0A--0x0F.
-		// Bit 0x08 specifies direction when a_Meta is in the range 0x06-0x09.
-		if ((a_Meta < 0x06) || (a_Meta > 0x09))
+		using namespace Block;
+		switch (a_Block.Type())
 		{
-			//  Save powered rail flag.
-			NIBBLETYPE OtherMeta = a_Meta & 0x08;
-			// Rotates according to table; 0x07 == 0111.
-			// Rails can either be flat (North / South) or Ascending (Asc. East)
-			switch (a_Meta & 0x07)
+			case BlockType::Rail:
 			{
-				case 0x00: return 0x01 + OtherMeta;  // North / South -> East / West
-				case 0x01: return 0x00 + OtherMeta;  // East / West   -> North / South
-
-				case 0x02: return 0x04 + OtherMeta;  // Asc. East   -> Asc. North
-				case 0x04: return 0x03 + OtherMeta;  // Asc. North  -> Asc. West
-				case 0x03: return 0x05 + OtherMeta;  // Asc. West   -> Asc. South
-				case 0x05: return 0x02 + OtherMeta;  // Asc. South  -> Asc. East
+				switch (Rail::Shape(a_Block))
+				{
+					case Rail::Shape::NorthSouth:     return Rail::Rail(Rail::Shape::EastWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::EastWest:       return Rail::Rail(Rail::Shape::NorthSouth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingEast:  return Rail::Rail(Rail::Shape::AscendingSouth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingWest:  return Rail::Rail(Rail::Shape::AscendingNorth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingNorth: return Rail::Rail(Rail::Shape::AscendingEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingSouth: return Rail::Rail(Rail::Shape::AscendingWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthEast:      return Rail::Rail(Rail::Shape::SouthWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthWest:      return Rail::Rail(Rail::Shape::NorthWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthWest:      return Rail::Rail(Rail::Shape::NorthEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthEast:      return Rail::Rail(Rail::Shape::SouthEast, Rail::Waterlogged(a_Block));
+				}
+				break;
 			}
-		}
-		else
-		{
-			switch (a_Meta)
+			case BlockType::ActivatorRail:
 			{
-				// Corner Directions
-				case 0x06: return 0x09;  // Northwest Cnr. -> Southwest Cnr.
-				case 0x07: return 0x06;  // Northeast Cnr. -> Northwest Cnr.
-				case 0x08: return 0x07;  // Southeast Cnr. -> Northeast Cnr.
-				case 0x09: return 0x08;  // Southwest Cnr. -> Southeast Cnr.
+				switch (ActivatorRail::Shape(a_Block))
+				{
+					case ActivatorRail::Shape::NorthSouth:     return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::EastWest, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::EastWest:       return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::NorthSouth, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingEast:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingSouth, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingWest:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingNorth, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingNorth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingEast, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingSouth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingWest, ActivatorRail::Waterlogged(a_Block));
+				}
+				break;
 			}
+			case BlockType::DetectorRail:
+			{
+				switch (DetectorRail::Shape(a_Block))
+				{
+					case DetectorRail::Shape::NorthSouth:     return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::EastWest, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::EastWest:       return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::NorthSouth, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingEast:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingSouth, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingWest:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingNorth, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingNorth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingEast, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingSouth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingWest, DetectorRail::Waterlogged(a_Block));
+				}
+				break;
+			}
+			case BlockType::PoweredRail:
+			{
+				switch (PoweredRail::Shape(a_Block))
+				{
+					case PoweredRail::Shape::NorthSouth:     return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::EastWest, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::EastWest:       return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::NorthSouth, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingEast:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingSouth, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingWest:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingNorth, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingNorth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingEast, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingSouth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingWest, PoweredRail::Waterlogged(a_Block));
+				}
+				break;
+			}
+			default: return a_Block;
 		}
-		// To avoid a compiler warning;
-		return a_Meta;
+		return a_Block;
 	}
 
 
-	virtual NIBBLETYPE MetaRotateCW(NIBBLETYPE a_Meta) const override
+	virtual BlockState MirrorXY(BlockState a_Block) const override
 	{
-		// Bit 0x08 is a flag for value in the range 0x00--0x05 and specifies direction for values withint 0x006--0x09.
-		if ((a_Meta < 0x06) || (a_Meta > 0x09))
+		using namespace Block;
+		switch (a_Block.Type())
 		{
-			//  Save powered rail flag.
-			NIBBLETYPE OtherMeta = a_Meta & 0x08;
-			// Rotates according to table; 0x07 == 0111.
-			// Rails can either be flat (North / South) or Ascending (Asc. East)
-			switch (a_Meta & 0x07)
+			case BlockType::Rail:
 			{
-				case 0x00: return 0x01 + OtherMeta;  // North / South -> East / West
-				case 0x01: return 0x00 + OtherMeta;  // East / West   -> North / South
-
-				case 0x02: return 0x05 + OtherMeta;  // Asc. East   -> Asc. South
-				case 0x05: return 0x03 + OtherMeta;  // Asc. South  -> Asc. West
-				case 0x03: return 0x04 + OtherMeta;  // Asc. West   -> Asc. North
-				case 0x04: return 0x02 + OtherMeta;  // Asc. North  -> Asc. East
+				switch (Rail::Shape(a_Block))
+				{
+					case Rail::Shape::AscendingNorth: return Rail::Rail(Rail::Shape::AscendingSouth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingSouth: return Rail::Rail(Rail::Shape::AscendingNorth, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthEast:      return Rail::Rail(Rail::Shape::NorthEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthWest:      return Rail::Rail(Rail::Shape::NorthWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthWest:      return Rail::Rail(Rail::Shape::SouthWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthEast:      return Rail::Rail(Rail::Shape::SouthEast, Rail::Waterlogged(a_Block));
+					default: return a_Block;
+				}
 			}
-		}
-		else
-		{
-			switch (a_Meta)
+			case BlockType::ActivatorRail:
 			{
-				// Corner Directions
-				case 0x06: return 0x07;  // Northwest Cnr. -> Northeast Cnr.
-				case 0x07: return 0x08;  // Northeast Cnr. -> Southeast Cnr.
-				case 0x08: return 0x09;  // Southeast Cnr. -> Southwest Cnr.
-				case 0x09: return 0x06;  // Southwest Cnr. -> Northwest Cnr.
+				switch (ActivatorRail::Shape(a_Block))
+				{
+					case ActivatorRail::Shape::AscendingNorth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingSouth, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingSouth: return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingNorth, ActivatorRail::Waterlogged(a_Block));
+					default: return a_Block;
+				}
 			}
+			case BlockType::DetectorRail:
+			{
+				switch (DetectorRail::Shape(a_Block))
+				{
+					case DetectorRail::Shape::AscendingNorth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingSouth, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingSouth: return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingNorth, DetectorRail::Waterlogged(a_Block));
+					default: return a_Block;
+				}
+			}
+			case BlockType::PoweredRail:
+			{
+				switch (PoweredRail::Shape(a_Block))
+				{
+					case PoweredRail::Shape::AscendingNorth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingSouth, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingSouth: return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingNorth, PoweredRail::Waterlogged(a_Block));
+					default: return a_Block;
+				}
+			}
+			default: return a_Block;
 		}
-		// To avoid a compiler warning;
-		return a_Meta;
 	}
 
 
-	virtual NIBBLETYPE MetaMirrorXY(NIBBLETYPE a_Meta) const override
+	virtual BlockState MirrorYZ(BlockState a_Block) const override
 	{
-		// MirrorXY basically flips the ZP and ZM parts of the meta
-		if (m_BlockType == E_BLOCK_RAIL)
+		using namespace Block;
+		switch (a_Block.Type())
 		{
-			// Basic rails can have curves and thus their meta behaves differently from specialized rails:
-			switch (a_Meta)
+			case BlockType::Rail:
 			{
-				case E_META_RAIL_ASCEND_XM:    return E_META_RAIL_ASCEND_XM;
-				case E_META_RAIL_ASCEND_XP:    return E_META_RAIL_ASCEND_XP;
-				case E_META_RAIL_ASCEND_ZM:    return E_META_RAIL_ASCEND_ZP;
-				case E_META_RAIL_ASCEND_ZP:    return E_META_RAIL_ASCEND_ZM;
-				case E_META_RAIL_CURVED_ZM_XM: return E_META_RAIL_CURVED_ZP_XM;
-				case E_META_RAIL_CURVED_ZM_XP: return E_META_RAIL_CURVED_ZP_XP;
-				case E_META_RAIL_CURVED_ZP_XM: return E_META_RAIL_CURVED_ZM_XM;
-				case E_META_RAIL_CURVED_ZP_XP: return E_META_RAIL_CURVED_ZM_XP;
-				case E_META_RAIL_XM_XP:        return E_META_RAIL_XM_XP;
-				case E_META_RAIL_ZM_ZP:        return E_META_RAIL_ZM_ZP;
+				switch (Rail::Shape(a_Block))
+				{
+					case Rail::Shape::AscendingEast:  return Rail::Rail(Rail::Shape::AscendingWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::AscendingWest:  return Rail::Rail(Rail::Shape::AscendingEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthEast:      return Rail::Rail(Rail::Shape::SouthWest, Rail::Waterlogged(a_Block));
+					case Rail::Shape::SouthWest:      return Rail::Rail(Rail::Shape::SouthEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthWest:      return Rail::Rail(Rail::Shape::NorthEast, Rail::Waterlogged(a_Block));
+					case Rail::Shape::NorthEast:      return Rail::Rail(Rail::Shape::NorthWest, Rail::Waterlogged(a_Block));
+					default: return a_Block;
+				}
 			}
-		}
-		else
-		{
-			// Specialized rails don't have curves, instead they use bit 0x08 as a flag
-			NIBBLETYPE flag = a_Meta & 0x08;
-			switch (a_Meta & 0x07)
+			case BlockType::ActivatorRail:
 			{
-				case E_META_RAIL_ASCEND_XM: return flag | E_META_RAIL_ASCEND_XM;
-				case E_META_RAIL_ASCEND_XP: return flag | E_META_RAIL_ASCEND_XP;
-				case E_META_RAIL_ASCEND_ZM: return flag | E_META_RAIL_ASCEND_ZP;
-				case E_META_RAIL_ASCEND_ZP: return flag | E_META_RAIL_ASCEND_ZM;
-				case E_META_RAIL_XM_XP:     return flag | E_META_RAIL_XM_XP;
-				case E_META_RAIL_ZM_ZP:     return flag | E_META_RAIL_ZM_ZP;
+				switch (ActivatorRail::Shape(a_Block))
+				{
+					case ActivatorRail::Shape::AscendingEast:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingWest, ActivatorRail::Waterlogged(a_Block));
+					case ActivatorRail::Shape::AscendingWest:  return ActivatorRail::ActivatorRail(ActivatorRail::Powered(a_Block), ActivatorRail::Shape::AscendingEast, ActivatorRail::Waterlogged(a_Block));
+					default: return a_Block;
+				}
 			}
+			case BlockType::DetectorRail:
+			{
+				switch (DetectorRail::Shape(a_Block))
+				{
+					case DetectorRail::Shape::AscendingEast:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingWest, DetectorRail::Waterlogged(a_Block));
+					case DetectorRail::Shape::AscendingWest:  return DetectorRail::DetectorRail(DetectorRail::Powered(a_Block), DetectorRail::Shape::AscendingEast, DetectorRail::Waterlogged(a_Block));
+					default: return a_Block;
+				}
+			}
+			case BlockType::PoweredRail:
+			{
+				switch (PoweredRail::Shape(a_Block))
+				{
+					case PoweredRail::Shape::AscendingEast:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingWest, PoweredRail::Waterlogged(a_Block));
+					case PoweredRail::Shape::AscendingWest:  return PoweredRail::PoweredRail(PoweredRail::Powered(a_Block), PoweredRail::Shape::AscendingEast, PoweredRail::Waterlogged(a_Block));
+					default: return a_Block;
+				}
+			}
+			default: return a_Block;
 		}
-		ASSERT(!"Unknown rail meta");
-		return a_Meta;
 	}
 
 
-	virtual NIBBLETYPE MetaMirrorYZ(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		// MirrorYZ basically flips the XP and XM parts of the meta
-		if (m_BlockType == E_BLOCK_RAIL)
-		{
-			// Basic rails can have curves and thus their meta behaves differently from specialized rails:
-			switch (a_Meta)
-			{
-				case E_META_RAIL_ASCEND_XM:    return E_META_RAIL_ASCEND_XP;
-				case E_META_RAIL_ASCEND_XP:    return E_META_RAIL_ASCEND_XM;
-				case E_META_RAIL_ASCEND_ZM:    return E_META_RAIL_ASCEND_ZM;
-				case E_META_RAIL_ASCEND_ZP:    return E_META_RAIL_ASCEND_ZP;
-				case E_META_RAIL_CURVED_ZM_XM: return E_META_RAIL_CURVED_ZM_XP;
-				case E_META_RAIL_CURVED_ZM_XP: return E_META_RAIL_CURVED_ZM_XM;
-				case E_META_RAIL_CURVED_ZP_XM: return E_META_RAIL_CURVED_ZP_XP;
-				case E_META_RAIL_CURVED_ZP_XP: return E_META_RAIL_CURVED_ZP_XM;
-				case E_META_RAIL_XM_XP:        return E_META_RAIL_XM_XP;
-				case E_META_RAIL_ZM_ZP:        return E_META_RAIL_ZM_ZP;
-			}
-		}
-		else
-		{
-			// Specialized rails don't have curves, instead they use bit 0x08 as a flag
-			NIBBLETYPE flag = a_Meta & 0x08;
-			switch (a_Meta & 0x07)
-			{
-				case E_META_RAIL_ASCEND_XM: return flag | E_META_RAIL_ASCEND_XP;
-				case E_META_RAIL_ASCEND_XP: return flag | E_META_RAIL_ASCEND_XM;
-				case E_META_RAIL_ASCEND_ZM: return flag | E_META_RAIL_ASCEND_ZM;
-				case E_META_RAIL_ASCEND_ZP: return flag | E_META_RAIL_ASCEND_ZP;
-				case E_META_RAIL_XM_XP:     return flag | E_META_RAIL_XM_XP;
-				case E_META_RAIL_ZM_ZP:     return flag | E_META_RAIL_ZM_ZP;
-			}
-		}
-		ASSERT(!"Unknown rail meta");
-		return a_Meta;
-	}
-
-
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
-	{
-		UNUSED(a_Meta);
 		return 0;
 	}
 } ;

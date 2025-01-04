@@ -8,6 +8,9 @@
 #include "../LinearUpscale.h"
 #include "../BlockInfo.h"
 
+#include "../Blocks/BlockLog.h"
+#include "../Blocks/BlockAir.h"
+
 
 
 
@@ -107,8 +110,8 @@ void cStructGenTrees::GenerateSingleTree(
 	}
 
 	// Check the block underneath the tree:
-	BLOCKTYPE TopBlock = a_ChunkDesc.GetBlockType(a_Pos.x, a_Pos.y, a_Pos.z);
-	if ((TopBlock != E_BLOCK_DIRT) && (TopBlock != E_BLOCK_GRASS) && (TopBlock != E_BLOCK_FARMLAND) && (TopBlock != E_BLOCK_MYCELIUM))
+	auto TopBlock = a_ChunkDesc.GetBlock(a_Pos);
+	if (!IsBlockMaterialDirt(TopBlock))
 	{
 		return;
 	}
@@ -122,21 +125,21 @@ void cStructGenTrees::GenerateSingleTree(
 	);
 
 	// Check if the generated image fits the terrain. Only the logs are checked:
-	for (sSetBlockVector::const_iterator itr = TreeLogs.begin(); itr != TreeLogs.end(); ++itr)
+	for (const auto & SetBlock : TreeLogs)
 	{
-		if ((itr->m_ChunkX != a_ChunkX) || (itr->m_ChunkZ != a_ChunkZ))
+		if ((SetBlock.m_ChunkX != a_ChunkX) || (SetBlock.m_ChunkZ != a_ChunkZ))
 		{
 			// Outside the chunk
 			continue;
 		}
-		if (itr->m_RelY >= cChunkDef::Height)
+		if (SetBlock.m_RelY >= cChunkDef::Height)
 		{
 			// Above the chunk, cut off (this shouldn't happen too often, we're limiting trees to y < 230)
 			continue;
 		}
 
-		BLOCKTYPE Block = a_ChunkDesc.GetBlockType(itr->m_RelX, itr->m_RelY, itr->m_RelZ);
-		switch (Block)
+		auto Block = a_ChunkDesc.GetBlock(SetBlock.GetRelativePos());
+		switch (Block.Type())
 		{
 			CASE_TREE_ALLOWED_BLOCKS:
 			{
@@ -166,37 +169,43 @@ void cStructGenTrees::ApplyTreeImage(
 )
 {
 	// Put the generated image into a_BlockTypes, push things outside this chunk into a_Blocks
-	for (sSetBlockVector::const_iterator itr = a_Image.begin(), end = a_Image.end(); itr != end; ++itr)
+	for (const auto & InspectBlock : a_Image)
 	{
-		if ((itr->m_ChunkX == a_ChunkX) && (itr->m_ChunkZ == a_ChunkZ) && (itr->m_RelY < cChunkDef::Height))
+		if ((InspectBlock.m_ChunkX == a_ChunkX) && (InspectBlock.m_ChunkZ == a_ChunkZ) && (InspectBlock.m_RelY < cChunkDef::Height))
 		{
 			// Inside this chunk, integrate into a_ChunkDesc:
-			switch (a_ChunkDesc.GetBlockType(itr->m_RelX, itr->m_RelY, itr->m_RelZ))
+			switch (a_ChunkDesc.GetBlock(InspectBlock.GetRelativePos()).Type())
 			{
-				case E_BLOCK_NEW_LEAVES:
-				case E_BLOCK_LEAVES:
-				case E_BLOCK_HUGE_BROWN_MUSHROOM:
-				case E_BLOCK_HUGE_RED_MUSHROOM:
+				case BlockType::AcaciaLeaves:
+				case BlockType::BirchLeaves:
+				case BlockType::DarkOakLeaves:
+				case BlockType::JungleLeaves:
+				case BlockType::OakLeaves:
+				case BlockType::SpruceLeaves:
+				case BlockType::BrownMushroom:
+				case BlockType::RedMushroom:
 				{
-					if ((itr->m_BlockType != E_BLOCK_LOG) && (itr->m_BlockType != E_BLOCK_NEW_LOG))
+					if (!cBlockLogHandler::IsBlockLog(InspectBlock.m_Block))
 					{
 						break;
 					}
 					// fallthrough:
+					[[fallthrough]];
 				}
 				CASE_TREE_OVERWRITTEN_BLOCKS:
 				{
-					a_ChunkDesc.SetBlockTypeMeta(itr->m_RelX, itr->m_RelY, itr->m_RelZ, itr->m_BlockType, itr->m_BlockMeta);
+					a_ChunkDesc.SetBlock(InspectBlock.GetRelativePos(), InspectBlock.m_Block);
 					// If grass is below our tree, turn it to dirt
 					if (
-						(cBlockInfo::IsSolid(itr->m_BlockType)) &&
-						(a_ChunkDesc.GetBlockType(itr->m_RelX, itr->m_RelY - 1, itr->m_RelZ) == E_BLOCK_GRASS)
+						(cBlockInfo::IsSolid(InspectBlock.m_Block)) &&
+						(a_ChunkDesc.GetBlock(InspectBlock.GetRelativePos().addedY(-1)).Type() == BlockType::GrassBlock)
 					)
 					{
-						a_ChunkDesc.SetBlockType(itr->m_RelX, itr->m_RelY - 1, itr->m_RelZ, E_BLOCK_DIRT);
+						a_ChunkDesc.SetBlock(InspectBlock.GetRelativePos().addedY(-1), Block::Dirt::Dirt());
 					}
 					break;
 				}
+				default: break;
 
 			}  // switch (GetBlock())
 			continue;
@@ -204,7 +213,7 @@ void cStructGenTrees::ApplyTreeImage(
 
 		// Outside the chunk, push into a_Overflow.
 		// Don't check if already present there, by separating logs and others we don't need the checks anymore:
-		a_Overflow.push_back(*itr);
+		a_Overflow.push_back(InspectBlock);
 	}
 }
 
@@ -330,7 +339,7 @@ void cStructGenLakes::GenFinish(cChunkDesc & a_ChunkDesc)
 		int OfsZ = Lake.GetOriginZ() + z * cChunkDef::Width;
 
 		// Merge the lake into the current data
-		a_ChunkDesc.WriteBlockArea(Lake, OfsX, Lake.GetOriginY(), OfsZ, cBlockArea::msLake);
+		a_ChunkDesc.WriteBlockArea(Lake, {OfsX, Lake.GetOriginY(), OfsZ}, cBlockArea::msLake);
 	}  // for x, z - neighbor chunks
 }
 
@@ -341,7 +350,7 @@ void cStructGenLakes::GenFinish(cChunkDesc & a_ChunkDesc)
 void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeHeight, cBlockArea & a_Lake)
 {
 	a_Lake.Create(16, 8, 16);
-	a_Lake.Fill(cBlockArea::baTypes, E_BLOCK_SPONGE);  // Sponge is the NOP blocktype for lake merging strategy
+	a_Lake.Fill(cBlockArea::baBlocks, Block::Sponge::Sponge());  // Sponge is the NOP blocktype for lake merging strategy
 
 	// Make a random position in the chunk by using a random 16 block XZ offset and random height up to chunk's max height minus 6
 	int MinHeight = std::max(a_MaxLakeHeight - 6, 2);
@@ -359,7 +368,7 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeH
 
 	// Hollow out a few bubbles inside the blockarea:
 	int NumBubbles = 4 + ((Rnd >> 18) & 0x03);  // 4 .. 7 bubbles
-	BLOCKTYPE * BlockTypes = a_Lake.GetBlockTypes();
+	auto Blocks = a_Lake.GetBlocks();
 	for (int i = 0; i < NumBubbles; i++)
 	{
 		int BubbleRnd = m_Noise.IntNoise3DInt(a_ChunkX, i, a_ChunkZ) / 13;
@@ -389,7 +398,7 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeH
 				{
 					if (x * x + DistYZ < RSquared)
 					{
-						BlockTypes[x + IdxYZ] = E_BLOCK_AIR;
+						Blocks[x + IdxYZ] = Block::Air::Air();
 					}
 				}  // for x
 			}  // for z
@@ -401,9 +410,18 @@ void cStructGenLakes::CreateLakeImage(int a_ChunkX, int a_ChunkZ, int a_MaxLakeH
 	{
 		for (int z = 0; z < 16; z++) for (int x = 0; x < 16; x++)
 		{
-			if (BlockTypes[x + z * 16 + y * 16 * 16] == E_BLOCK_AIR)
+			if (cBlockAirHandler::IsBlockAir(Blocks[x + z * 16 + y * 16 * 16]))
 			{
-				BlockTypes[x + z * 16 + y * 16 * 16] = m_Fluid;
+				switch (m_Fluid)
+				{
+					case BlockType::Lava:  Blocks[x + z * 16 + y * 16 * 16] = Block::Lava::Lava(); break;
+					case BlockType::Water: Blocks[x + z * 16 + y * 16 * 16] = Block::Water::Water(); break;
+					default:
+					{
+						ASSERT(!"Unhandled Fluid Block in lake generator.");
+						break;
+					}
+				}
 			}
 		}  // for z, x
 	}  // for y
@@ -492,7 +510,7 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 					int Val = Lo + (Hi - Lo) * y / SEGMENT_HEIGHT;
 					if (Val < 0)
 					{
-						a_ChunkDesc.SetBlockType(x, y + Segment, z, E_BLOCK_AIR);
+						a_ChunkDesc.SetBlock({x, y + Segment, z}, Block::Air::Air());
 					}
 				}  // for y
 				break;
@@ -510,10 +528,10 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 
 bool cStructGenDirectOverhangs::HasWantedBiome(cChunkDesc & a_ChunkDesc) const
 {
-	cChunkDef::BiomeMap & Biomes = a_ChunkDesc.GetBiomeMap();
-	for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
+	auto & Biomes = a_ChunkDesc.GetBiomeMap();
+	for (const auto & Biome : Biomes)
 	{
-		switch (Biomes[i])
+		switch (Biome)
 		{
 			case biExtremeHills:
 			case biExtremeHillsEdge:
@@ -556,7 +574,7 @@ void cStructGenDistortedMembraneOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 	{
 		NOISE_DATATYPE NoiseY = static_cast<NOISE_DATATYPE>(y) / 32;
 		// TODO: proper water level - where to get?
-		BLOCKTYPE ReplacementBlock = (y > 62) ? E_BLOCK_AIR : E_BLOCK_STATIONARY_WATER;
+		auto ReplacementBlock = (y > 62) ? Block::Air::Air() : Block::Water::Water();
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
 			NOISE_DATATYPE NoiseZ = static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + z) / Frequency;
@@ -569,7 +587,7 @@ void cStructGenDistortedMembraneOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 				int MembraneHeight = 96 - static_cast<int>((DistortY + m_NoiseH.CubicNoise2D(NoiseX + DistortX, NoiseZ + DistortZ)) * 30);
 				if (MembraneHeight < y)
 				{
-					a_ChunkDesc.SetBlockType(x, y, z, ReplacementBlock);
+					a_ChunkDesc.SetBlock({x, y, z}, ReplacementBlock);
 				}
 			}  // for y
 		}  // for x

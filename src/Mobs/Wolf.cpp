@@ -167,12 +167,12 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 {
 	cMonster::OnRightClicked(a_Player);
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
-	const int EquippedItemType = EquippedItem.m_ItemType;
+	const auto EquippedItemType = EquippedItem.m_ItemType;
 
 	if (!IsTame() && !IsAngry())
 	{
 		// If the player is holding a bone, try to tame the wolf:
-		if (EquippedItemType == E_ITEM_BONE)
+		if (EquippedItemType == Item::Bone)
 		{
 			if (!a_Player.IsGameModeCreative())
 			{
@@ -203,17 +203,17 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 		// Feed the wolf, restoring its health, or dye its collar:
 		switch (EquippedItemType)
 		{
-			case E_ITEM_RAW_BEEF:
-			case E_ITEM_STEAK:
-			case E_ITEM_RAW_PORKCHOP:
-			case E_ITEM_COOKED_PORKCHOP:
-			case E_ITEM_RAW_CHICKEN:
-			case E_ITEM_COOKED_CHICKEN:
-			case E_ITEM_ROTTEN_FLESH:
-			case E_ITEM_RAW_MUTTON:
-			case E_ITEM_RAW_RABBIT:
-			case E_ITEM_COOKED_RABBIT:
-			case E_ITEM_COOKED_MUTTON:
+			case Item::Beef:
+			case Item::CookedBeef:
+			case Item::Porkchop:
+			case Item::CookedPorkchop:
+			case Item::Chicken:
+			case Item::CookedChicken:
+			case Item::RottenFlesh:
+			case Item::Mutton:
+			case Item::CookedMutton:
+			case Item::Rabbit:
+			case Item::CookedRabbit:
 			{
 				if (m_Health < m_MaxHealth)
 				{
@@ -232,7 +232,22 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				}
 				break;
 			}
-			case E_ITEM_DYE:
+			case Item::BlackDye:
+			case Item::BlueDye:
+			case Item::BrownDye:
+			case Item::CyanDye:
+			case Item::GrayDye:
+			case Item::GreenDye:
+			case Item::LightBlueDye:
+			case Item::LightGrayDye:
+			case Item::LimeDye:
+			case Item::MagentaDye:
+			case Item::OrangeDye:
+			case Item::PinkDye:
+			case Item::PurpleDye:
+			case Item::RedDye:
+			case Item::WhiteDye:
+			case Item::YellowDye:
 			{
 				if (a_Player.GetUUID() == m_OwnerUUID)  // Is the player the owner of the dog?
 				{
@@ -245,7 +260,34 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 				break;
 			}
 			// Multiplication is handled in cMonster. Just prevents from sitting down.
-			case E_ITEM_SPAWN_EGG:
+			case Item::BatSpawnEgg:
+			case Item::BlazeSpawnEgg:
+			case Item::CaveSpiderSpawnEgg:
+			case Item::ChickenSpawnEgg:
+			case Item::CowSpawnEgg:
+			case Item::CreeperSpawnEgg:
+			case Item::EndermanSpawnEgg:
+			case Item::GhastSpawnEgg:
+			case Item::GuardianSpawnEgg:
+			case Item::HorseSpawnEgg:
+			case Item::MagmaCubeSpawnEgg:
+			case Item::MooshroomSpawnEgg:
+			case Item::OcelotSpawnEgg:
+			case Item::PigSpawnEgg:
+			case Item::RabbitSpawnEgg:
+			case Item::SheepSpawnEgg:
+			case Item::SilverfishSpawnEgg:
+			case Item::SkeletonSpawnEgg:
+			case Item::SlimeSpawnEgg:
+			case Item::SpiderSpawnEgg:
+			case Item::SquidSpawnEgg:
+			case Item::VillagerSpawnEgg:
+			case Item::WitchSpawnEgg:
+			case Item::WitherSkeletonSpawnEgg:
+			case Item::WolfSpawnEgg:
+			case Item::ZombieSpawnEgg:
+			case Item::ZombiePigmanSpawnEgg:
+			case Item::ZombieVillagerSpawnEgg:
 			{
 				break;
 			}
@@ -259,17 +301,55 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 		}
 	}
 
-	if ((EquippedItemType == E_ITEM_SPAWN_EGG) && (!IsTame()))
+	if (!IsTame())
 	{
-		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(EquippedItem.m_ItemDamage);
-		if (
-			(MonsterType == m_MobType) &&
-			(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID))  // Spawning succeeded
+		switch (EquippedItemType)
 		{
-			if (!a_Player.IsGameModeCreative())
+			case Item::BatSpawnEgg:
+			case Item::BlazeSpawnEgg:
+			case Item::CaveSpiderSpawnEgg:
+			case Item::ChickenSpawnEgg:
+			case Item::CowSpawnEgg:
+			case Item::CreeperSpawnEgg:
+			case Item::EndermanSpawnEgg:
+			case Item::GhastSpawnEgg:
+			case Item::GuardianSpawnEgg:
+			case Item::HorseSpawnEgg:
+			case Item::MagmaCubeSpawnEgg:
+			case Item::MooshroomSpawnEgg:
+			case Item::OcelotSpawnEgg:
+			case Item::PigSpawnEgg:
+			case Item::RabbitSpawnEgg:
+			case Item::SheepSpawnEgg:
+			case Item::SilverfishSpawnEgg:
+			case Item::SkeletonSpawnEgg:
+			case Item::SlimeSpawnEgg:
+			case Item::SpiderSpawnEgg:
+			case Item::SquidSpawnEgg:
+			case Item::VillagerSpawnEgg:
+			case Item::WitchSpawnEgg:
+			case Item::WitherSkeletonSpawnEgg:
+			case Item::WolfSpawnEgg:
+			case Item::ZombieSpawnEgg:
+			case Item::ZombiePigmanSpawnEgg:
+			case Item::ZombieVillagerSpawnEgg:
 			{
-				// The mob was spawned, "use" the item:
-				a_Player.GetInventory().RemoveOneEquippedItem();
+				eMonsterType MonsterType = cItemSpawnEggHandler::ItemToMonsterType(EquippedItem.m_ItemType);
+				if (
+					(MonsterType == m_MobType) &&
+					(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID))  // Spawning succeeded
+				{
+					if (!a_Player.IsGameModeCreative())
+					{
+						// The mob was spawned, "use" the item:
+						a_Player.GetInventory().RemoveOneEquippedItem();
+					}
+				}
+				break;
+			}
+			default:
+			{
+				break;
 			}
 		}
 	}
@@ -308,14 +388,14 @@ void cWolf::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			switch (a_Player.GetEquippedItem().m_ItemType)
 			{
-				case E_ITEM_BONE:
-				case E_ITEM_RAW_BEEF:
-				case E_ITEM_STEAK:
-				case E_ITEM_RAW_CHICKEN:
-				case E_ITEM_COOKED_CHICKEN:
-				case E_ITEM_ROTTEN_FLESH:
-				case E_ITEM_RAW_PORKCHOP:
-				case E_ITEM_COOKED_PORKCHOP:
+				case Item::Bone:
+				case Item::Beef:
+				case Item::CookedBeef:
+				case Item::Chicken:
+				case Item::CookedChicken:
+				case Item::RottenFlesh:
+				case Item::Porkchop:
+				case Item::CookedPorkchop:
 				{
 					if (!IsBegging())
 					{

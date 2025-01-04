@@ -1288,7 +1288,7 @@ static int tolua_cPluginManager_BindCommand(lua_State * a_LuaState)
 	/* Function signatures:
 		cPluginManager:Get():BindCommand(Command, Permission, Function, HelpString)  -- regular
 		cPluginManager:BindCommand(Command, Permission, Function, HelpString)        -- static
-		cPluginManager.BindCommand(Command, Permission, Function, HelpString)        -- without the "self" param
+		cPluginManager.BindCommand(Command, Permission, Function, HelpString)        -- without the "Self" param
 	*/
 	cLuaState L(a_LuaState);
 	cPluginLua * Plugin = cManualBindings::GetLuaPlugin(L);
@@ -1322,7 +1322,7 @@ static int tolua_cPluginManager_BindCommand(lua_State * a_LuaState)
 		luaL_error(L, "\"BindCommand\" function expects a function as its 3rd parameter. Command-binding aborted.");
 		return 0;
 	}
-	cPluginManager * self = cPluginManager::Get();
+	cPluginManager * Self = cPluginManager::Get();
 	AString Command, Permission, HelpString;
 	cLuaState::cCallbackPtr Handler;
 	L.GetStackValues(idx, Command, Permission, Handler, HelpString);
@@ -1333,7 +1333,7 @@ static int tolua_cPluginManager_BindCommand(lua_State * a_LuaState)
 	}
 
 	auto CommandHandler = std::make_shared<LuaCommandHandler>(std::move(Handler));
-	if (!self->BindCommand(Command, Plugin, CommandHandler, Permission, HelpString))
+	if (!Self->BindCommand(Command, Plugin, CommandHandler, Permission, HelpString))
 	{
 		// Refused. Possibly already bound. Error message has been given, display the callstack:
 		L.LogStackTrace();
@@ -1353,7 +1353,7 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * a_LuaState)
 	/* Function signatures:
 		cPluginManager:Get():BindConsoleCommand(Command, Function, HelpString)  -- regular
 		cPluginManager:BindConsoleCommand(Command, Function, HelpString)        -- static
-		cPluginManager.BindConsoleCommand(Command, Function, HelpString)        -- without the "self" param
+		cPluginManager.BindConsoleCommand(Command, Function, HelpString)        -- without the "Self" param
 	*/
 
 	// Get the plugin identification out of LuaState:
@@ -1388,7 +1388,7 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * a_LuaState)
 		luaL_error(L, "\"BindConsoleCommand\" function expects a function as its 2nd parameter. Command-binding aborted.");
 		return 0;
 	}
-	cPluginManager * self = cPluginManager::Get();
+	cPluginManager * Self = cPluginManager::Get();
 	AString Command, HelpString;
 	cLuaState::cCallbackPtr Handler;
 	L.GetStackValues(idx, Command, Handler, HelpString);
@@ -1399,7 +1399,7 @@ static int tolua_cPluginManager_BindConsoleCommand(lua_State * a_LuaState)
 	}
 
 	auto CommandHandler = std::make_shared<LuaCommandHandler>(std::move(Handler));
-	if (!self->BindConsoleCommand(Command, Plugin, CommandHandler, HelpString))
+	if (!Self->BindConsoleCommand(Command, Plugin, CommandHandler, HelpString))
 	{
 		// Refused. Possibly already bound. Error message has been given, display the callstack:
 		L.LogStackTrace();
@@ -1448,7 +1448,7 @@ static int tolua_cPluginManager_CallPlugin(lua_State * tolua_S)
 	}
 	if (ThisPlugin->GetName() == PluginName)
 	{
-		LOGWARNING("cPluginManager::CallPlugin(): Calling self is not implemented (why would it?)");
+		LOGWARNING("cPluginManager::CallPlugin(): Calling Self is not implemented (why would it?)");
 		L.LogStackTrace();
 		return 0;
 	}
@@ -1547,15 +1547,15 @@ static int tolua_cPlayer_GetPermissions(lua_State * tolua_S)
 	}
 
 	// Get the params:
-	cPlayer * self = static_cast<cPlayer *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cPlayer * Self = static_cast<cPlayer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Self == nullptr)
 	{
-		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
+		LOGWARNING("%s: invalid Self (%p)", __FUNCTION__, static_cast<void *>(Self));
 		return 0;
 	}
 
 	// Push the permissions:
-	L.Push(self->GetPermissions());
+	L.Push(Self->GetPermissions());
 	return 1;
 }
 
@@ -1578,15 +1578,15 @@ static int tolua_cPlayer_GetRestrictions(lua_State * tolua_S)
 	}
 
 	// Get the params:
-	cPlayer * self = static_cast<cPlayer *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cPlayer * Self = static_cast<cPlayer *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Self == nullptr)
 	{
-		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
+		LOGWARNING("%s: invalid Self (%p)", __FUNCTION__, static_cast<void *>(Self));
 		return 0;
 	}
 
 	// Push the permissions:
-	L.Push(self->GetRestrictions());
+	L.Push(Self->GetRestrictions());
 	return 1;
 }
 
@@ -1633,9 +1633,8 @@ static int tolua_cPlayer_PlaceBlock(lua_State * tolua_S)
 	// Get the params:
 	cPlayer * Self;
 	Vector3i Position;
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-	L.GetStackValues(1, Self, Position, BlockType, BlockMeta);
+	BlockState Block;
+	L.GetStackValues(1, Self, Position, Block);
 
 	if (!cChunkDef::IsValidHeight(Position))
 	{
@@ -1643,7 +1642,7 @@ static int tolua_cPlayer_PlaceBlock(lua_State * tolua_S)
 	}
 
 	// Return the result of placement:
-	L.Push(Self->PlaceBlock(Position, BlockType, BlockMeta));
+	L.Push(Self->PlaceBlock(Position, Block));
 	return 1;
 }
 
@@ -1687,11 +1686,11 @@ static int tolua_SetObjectCallback(lua_State * tolua_S)
 {
 	// Function signature: OBJTYPE:SetWhateverCallback(CallbackFunction)
 
-	// Get the parameters - self and the function reference:
+	// Get the parameters - Self and the function reference:
 	cLuaState L(tolua_S);
-	OBJTYPE * self;
+	OBJTYPE * Self;
 	cLuaState::cCallbackPtr callback;
-	if (!L.GetStackValues(1, self, callback))
+	if (!L.GetStackValues(1, Self, callback))
 	{
 		LOGWARNING("%s: Cannot get parameters", __FUNCTION__);
 		L.LogStackTrace();
@@ -1699,7 +1698,7 @@ static int tolua_SetObjectCallback(lua_State * tolua_S)
 	}
 
 	// Set the callback
-	(self->*SetCallback)(std::move(callback));
+	(Self->*SetCallback)(std::move(callback));
 	return 0;
 }
 
@@ -1742,8 +1741,8 @@ static int tolua_cPluginLua_AddWebTab(lua_State * tolua_S)
 
 	// Check params:
 	cLuaState LuaState(tolua_S);
-	cPluginLua * self = cManualBindings::GetLuaPlugin(tolua_S);
-	if (self == nullptr)
+	cPluginLua * Self = cManualBindings::GetLuaPlugin(tolua_S);
+	if (Self == nullptr)
 	{
 		return 0;
 	}
@@ -1770,7 +1769,7 @@ static int tolua_cPluginLua_AddWebTab(lua_State * tolua_S)
 		urlPath = cWebAdmin::GetURLEncodedString(title);
 	}
 
-	cRoot::Get()->GetWebAdmin()->AddWebTab(title, urlPath, self->GetName(), callback);
+	cRoot::Get()->GetWebAdmin()->AddWebTab(title, urlPath, Self->GetName(), callback);
 
 	return 0;
 }
@@ -1926,14 +1925,14 @@ static int tolua_sha1HexString(lua_State * tolua_S)
 static int tolua_get_HTTPRequest_Params(lua_State * a_LuaState)
 {
 	cLuaState L(a_LuaState);
-	HTTPRequest * self;
-	if (!L.GetStackValues(1, self))
+	HTTPRequest * Self;
+	if (!L.GetStackValues(1, Self))
 	{
 		tolua_Error err;
-		tolua_error(a_LuaState, "Invalid self parameter, expected a HTTPRequest instance", &err);
+		tolua_error(a_LuaState, "Invalid Self parameter, expected a HTTPRequest instance", &err);
 		return 0;
 	}
-	L.Push(self->Params);
+	L.Push(Self->Params);
 	return 1;
 }
 
@@ -1944,14 +1943,14 @@ static int tolua_get_HTTPRequest_Params(lua_State * a_LuaState)
 static int tolua_get_HTTPRequest_PostParams(lua_State * a_LuaState)
 {
 	cLuaState L(a_LuaState);
-	HTTPRequest * self;
-	if (!L.GetStackValues(1, self))
+	HTTPRequest * Self;
+	if (!L.GetStackValues(1, Self))
 	{
 		tolua_Error err;
-		tolua_error(a_LuaState, "Invalid self parameter, expected a HTTPRequest instance", &err);
+		tolua_error(a_LuaState, "Invalid Self parameter, expected a HTTPRequest instance", &err);
 		return 0;
 	}
-	L.Push(self->PostParams);
+	L.Push(Self->PostParams);
 	return 1;
 }
 
@@ -1962,15 +1961,15 @@ static int tolua_get_HTTPRequest_PostParams(lua_State * a_LuaState)
 static int tolua_get_HTTPRequest_FormData(lua_State* a_LuaState)
 {
 	cLuaState L(a_LuaState);
-	HTTPRequest * self;
-	if (!L.GetStackValues(1, self))
+	HTTPRequest * Self;
+	if (!L.GetStackValues(1, Self))
 	{
 		tolua_Error err;
-		tolua_error(a_LuaState, "Invalid self parameter, expected a HTTPRequest instance", &err);
+		tolua_error(a_LuaState, "Invalid Self parameter, expected a HTTPRequest instance", &err);
 		return 0;
 	}
 
-	auto & FormData = self->FormData;
+	auto & FormData = Self->FormData;
 	lua_newtable(a_LuaState);
 	int top = lua_gettop(a_LuaState);
 	for (auto & Data : FormData)
@@ -2192,8 +2191,8 @@ static int tolua_cWebAdmin_AddWebTab(lua_State * tolua_S)
 
 	// Check params:
 	cLuaState LuaState(tolua_S);
-	cPluginLua * self = cManualBindings::GetLuaPlugin(tolua_S);
-	if (self == nullptr)
+	cPluginLua * Self = cManualBindings::GetLuaPlugin(tolua_S);
+	if (Self == nullptr)
 	{
 		return 0;
 	}
@@ -2216,7 +2215,7 @@ static int tolua_cWebAdmin_AddWebTab(lua_State * tolua_S)
 		return 0;
 	}
 
-	cRoot::Get()->GetWebAdmin()->AddWebTab(title, urlPath, self->GetName(), callback);
+	cRoot::Get()->GetWebAdmin()->AddWebTab(title, urlPath, Self->GetName(), callback);
 
 	return 0;
 }
@@ -2847,15 +2846,15 @@ static int Lua_ItemGrid_GetSlotCoords(lua_State * L)
 	}
 
 	{
-		const cItemGrid * self = static_cast<const cItemGrid *>(tolua_tousertype(L, 1, nullptr));
+		const cItemGrid * Self = static_cast<const cItemGrid *>(tolua_tousertype(L, 1, nullptr));
 		int SlotNum = static_cast<int>(tolua_tonumber(L, 2, 0));
-		if (self == nullptr)
+		if (Self == nullptr)
 		{
-			tolua_error(L, "invalid 'self' in function 'cItemGrid:GetSlotCoords'", nullptr);
+			tolua_error(L, "invalid 'Self' in function 'cItemGrid:GetSlotCoords'", nullptr);
 			return 0;
 		}
 		int X, Y;
-		self->GetSlotCoords(SlotNum, X, Y);
+		Self->GetSlotCoords(SlotNum, X, Y);
 		tolua_pushnumber(L, static_cast<lua_Number>(X));
 		tolua_pushnumber(L, static_cast<lua_Number>(Y));
 		return 2;
@@ -2880,14 +2879,13 @@ public:
 	{
 	}
 
-	virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	virtual bool OnNextBlock(Vector3i a_BlockPos, BlockState a_Block, eBlockFace a_EntryFace) override
 	{
 		bool res = false;
 		if (m_Callbacks->CallTableFn(
 			"OnNextBlock",
 			a_BlockPos,
-			a_BlockType,
-			a_BlockMeta,
+			a_Block,
 			a_EntryFace,
 			cLuaState::Return, res)
 		)
@@ -2973,14 +2971,13 @@ public:
 	{
 	}
 
-	virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+	virtual bool OnNextBlock(Vector3i a_BlockPos, BlockState a_Block, eBlockFace a_EntryFace) override
 	{
 		bool res = false;
 		if (m_Callbacks->CallTableFn(
 			"OnNextBlock",
 			a_BlockPos.x, a_BlockPos.y, a_BlockPos.z,
-			a_BlockType,
-			a_BlockMeta,
+			a_Block,
 			a_EntryFace,
 			cLuaState::Return, res)
 		)
@@ -3684,15 +3681,14 @@ static int tolua_cHopperEntity_GetOutputBlockPos(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cHopperEntity * self = static_cast<cHopperEntity *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cHopperEntity * Self = static_cast<cHopperEntity *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Self == nullptr)
 	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cHopperEntity::GetOutputBlockPos()'", nullptr);
+		tolua_error(tolua_S, "invalid 'Self' in function 'cHopperEntity::GetOutputBlockPos()'", nullptr);
 		return 0;
 	}
 
-	NIBBLETYPE a_BlockMeta = static_cast<NIBBLETYPE>(tolua_tonumber(tolua_S, 2, 0));
-	auto res = self->GetOutputBlockPos(a_BlockMeta);
+	auto res = Self->GetOutputBlockPos(Self->GetBlock());
 	tolua_pushboolean(tolua_S, res.first);
 	if (res.first)
 	{
@@ -3756,16 +3752,16 @@ static int tolua_cBoundingBox_Intersect(lua_State * a_LuaState)
 	bbox:Intersect(a_OtherBbox) -> bool, cBoundingBox
 	*/
 	cLuaState L(a_LuaState);
-	const cBoundingBox * self;
+	const cBoundingBox * Self;
 	const cBoundingBox * other;
-	if (!L.GetStackValues(1, self, other))
+	if (!L.GetStackValues(1, Self, other))
 	{
 		L.LogStackValues();
 		tolua_error(a_LuaState, "Invalid function params. Expected bbox:Intersect(otherBbox).", nullptr);
 		return 0;
 	}
-	auto intersection = new cBoundingBox(*self);
-	auto res = self->Intersect(*other, *intersection);
+	auto intersection = new cBoundingBox(*Self);
+	auto res = Self->Intersect(*other, *intersection);
 	L.Push(res);
 	if (!res)
 	{
@@ -3788,18 +3784,17 @@ static int tolua_cChunkDesc_GetBlockTypeMeta(lua_State * a_LuaState)
 	*/
 
 	cLuaState L(a_LuaState);
-	const cChunkDesc * self;
+	const cChunkDesc * Self;
 	int relX, relY, relZ;
-	if (!L.GetStackValues(1, self, relX, relY, relZ))
+	if (!L.GetStackValues(1, Self, relX, relY, relZ))
 	{
 		L.LogStackValues();
 		tolua_error(a_LuaState, "Invalid function params. Expected chunkDesc:GetBlockTypeMeta(relX, relY, relZ)", nullptr);
 		return 0;
 	}
-	BLOCKTYPE blockType;
-	NIBBLETYPE blockMeta;
-	self->GetBlockTypeMeta(relX, relY, relZ, blockType, blockMeta);
-	L.Push(blockType, blockMeta);
+	auto Block = Self->GetBlock({relX, relY, relZ});
+	auto NumericBlock = PaletteUpgrade::ToBlock(Block);
+	L.Push(NumericBlock.first, NumericBlock.second);
 	return 2;
 }
 
@@ -3811,13 +3806,13 @@ static int tolua_cColor_GetColor(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
 
-	cColor * self;
-	if (!L.CheckParamSelf("cColor") || !L.GetStackValue(1, self))
+	cColor * Self;
+	if (!L.CheckParamSelf("cColor") || !L.GetStackValue(1, Self))
 	{
 		return 0;
 	}
 
-	L.Push(self->GetRed(), self->GetGreen(), self->GetBlue());
+	L.Push(Self->GetRed(), Self->GetGreen(), Self->GetBlue());
 	return 3;
 }
 
@@ -3940,10 +3935,10 @@ static int tolua_cCompositeChat_AddRunCommandPart(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cCompositeChat * Self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Self == nullptr)
 	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddRunCommandPart'", nullptr);
+		tolua_error(tolua_S, "invalid 'Self' in function 'cCompositeChat:AddRunCommandPart'", nullptr);
 		return 0;
 	}
 
@@ -3952,7 +3947,7 @@ static int tolua_cCompositeChat_AddRunCommandPart(lua_State * tolua_S)
 	L.GetStackValue(2, Text);
 	L.GetStackValue(3, Command);
 	L.GetStackValue(4, Style);
-	self->AddRunCommandPart(Text, Command, Style);
+	Self->AddRunCommandPart(Text, Command, Style);
 
 	// Cut away everything from the stack except for the cCompositeChat instance; return that:
 	lua_settop(L, 1);
@@ -3977,10 +3972,10 @@ static int tolua_cCompositeChat_AddSuggestCommandPart(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cCompositeChat * Self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Self == nullptr)
 	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddSuggestCommandPart'", nullptr);
+		tolua_error(tolua_S, "invalid 'Self' in function 'cCompositeChat:AddSuggestCommandPart'", nullptr);
 		return 0;
 	}
 
@@ -3989,7 +3984,7 @@ static int tolua_cCompositeChat_AddSuggestCommandPart(lua_State * tolua_S)
 	L.GetStackValue(2, Text);
 	L.GetStackValue(3, Command);
 	L.GetStackValue(4, Style);
-	self->AddSuggestCommandPart(Text, Command, Style);
+	Self->AddSuggestCommandPart(Text, Command, Style);
 
 	// Cut away everything from the stack except for the cCompositeChat instance; return that:
 	lua_settop(L, 1);
@@ -4014,10 +4009,10 @@ static int tolua_cCompositeChat_AddTextPart(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cCompositeChat * Self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Self == nullptr)
 	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddTextPart'", nullptr);
+		tolua_error(tolua_S, "invalid 'Self' in function 'cCompositeChat:AddTextPart'", nullptr);
 		return 0;
 	}
 
@@ -4025,7 +4020,7 @@ static int tolua_cCompositeChat_AddTextPart(lua_State * tolua_S)
 	AString Text, Style;
 	L.GetStackValue(2, Text);
 	L.GetStackValue(3, Style);
-	self->AddTextPart(Text, Style);
+	Self->AddTextPart(Text, Style);
 
 	// Cut away everything from the stack except for the cCompositeChat instance; return that:
 	lua_settop(L, 1);
@@ -4050,10 +4045,10 @@ static int tolua_cCompositeChat_AddUrlPart(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cCompositeChat * Self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Self == nullptr)
 	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:AddUrlPart'", nullptr);
+		tolua_error(tolua_S, "invalid 'Self' in function 'cCompositeChat:AddUrlPart'", nullptr);
 		return 0;
 	}
 
@@ -4062,7 +4057,7 @@ static int tolua_cCompositeChat_AddUrlPart(lua_State * tolua_S)
 	L.GetStackValue(2, Text);
 	L.GetStackValue(3, Url);
 	L.GetStackValue(4, Style);
-	self->AddUrlPart(Text, Url, Style);
+	Self->AddUrlPart(Text, Url, Style);
 
 	// Cut away everything from the stack except for the cCompositeChat instance; return that:
 	lua_settop(L, 1);
@@ -4087,15 +4082,15 @@ static int tolua_cCompositeChat_Clear(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cCompositeChat * Self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Self == nullptr)
 	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:ParseText'", nullptr);
+		tolua_error(tolua_S, "invalid 'Self' in function 'cCompositeChat:ParseText'", nullptr);
 		return 0;
 	}
 
 	// Clear all the parts:
-	self->Clear();
+	Self->Clear();
 
 	// Cut away everything from the stack except for the cCompositeChat instance; return that:
 	lua_settop(L, 1);
@@ -4120,17 +4115,17 @@ static int tolua_cCompositeChat_ParseText(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cCompositeChat * Self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Self == nullptr)
 	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:ParseText'", nullptr);
+		tolua_error(tolua_S, "invalid 'Self' in function 'cCompositeChat:ParseText'", nullptr);
 		return 0;
 	}
 
 	// Parse the text:
 	AString Text;
 	L.GetStackValue(2, Text);
-	self->ParseText(Text);
+	Self->ParseText(Text);
 
 	// Cut away everything from the stack except for the cCompositeChat instance; return that:
 	lua_settop(L, 1);
@@ -4155,17 +4150,17 @@ static int tolua_cCompositeChat_SetMessageType(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cCompositeChat * Self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Self == nullptr)
 	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:SetMessageType'", nullptr);
+		tolua_error(tolua_S, "invalid 'Self' in function 'cCompositeChat:SetMessageType'", nullptr);
 		return 0;
 	}
 
 	// Set the type:
 	int MessageType = mtCustom;
 	L.GetStackValue(2, MessageType);
-	self->SetMessageType(static_cast<eMessageType>(MessageType));
+	Self->SetMessageType(static_cast<eMessageType>(MessageType));
 
 	// Cut away everything from the stack except for the cCompositeChat instance; return that:
 	lua_settop(L, 1);
@@ -4179,7 +4174,7 @@ static int tolua_cCompositeChat_SetMessageType(lua_State * tolua_S)
 static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
 {
 	// function cCompositeChat:UnderlineUrls()
-	// Exported manually to support call-chaining (return self)
+	// Exported manually to support call-chaining (return Self)
 
 	// Check params:
 	cLuaState L(tolua_S);
@@ -4187,15 +4182,15 @@ static int tolua_cCompositeChat_UnderlineUrls(lua_State * tolua_S)
 	{
 		return 0;
 	}
-	cCompositeChat * self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cCompositeChat * Self = static_cast<cCompositeChat *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Self == nullptr)
 	{
-		tolua_error(tolua_S, "invalid 'self' in function 'cCompositeChat:UnderlineUrls'", nullptr);
+		tolua_error(tolua_S, "invalid 'Self' in function 'cCompositeChat:UnderlineUrls'", nullptr);
 		return 0;
 	}
 
 	// Call the processing
-	self->UnderlineUrls();
+	Self->UnderlineUrls();
 
 	// Cut away everything from the stack except for the cCompositeChat instance; return that:
 	lua_settop(L, 1);
@@ -4215,8 +4210,8 @@ static int tolua_cCuboid_Assign(lua_State * tolua_S)
 		return 0;
 	}
 
-	cCuboid * self = nullptr;
-	L.GetStackValue(1, self);
+	cCuboid * Self = nullptr;
+	L.GetStackValue(1, Self);
 
 	// Check the old coord-based signature:
 	int x1, y1, z1, x2, y2, z2;
@@ -4224,7 +4219,7 @@ static int tolua_cCuboid_Assign(lua_State * tolua_S)
 	{
 		LOGWARNING("cCuboid:Assign(x1, y1, z1, x2, y2, z2) is deprecated, use cCuboid:Assign(Vector3i, Vector3i) instead.");
 		L.LogStackTrace();
-		self->Assign({x1, y1, z1}, {x2, y2, z2});
+		Self->Assign({x1, y1, z1}, {x2, y2, z2});
 		return 0;
 	}
 
@@ -4232,7 +4227,7 @@ static int tolua_cCuboid_Assign(lua_State * tolua_S)
 	cCuboid * other = nullptr;
 	if (L.GetStackValue(2, other) && (other != nullptr))
 	{
-		self->Assign(*other);
+		Self->Assign(*other);
 		return 0;
 	}
 
@@ -4241,7 +4236,7 @@ static int tolua_cCuboid_Assign(lua_State * tolua_S)
 	Vector3i pt2;
 	if (L.GetStackValues(2, pt1, pt2))
 	{
-		self->Assign(pt1, pt2);
+		Self->Assign(pt1, pt2);
 		return 0;
 	}
 	return L.ApiParamError("Invalid parameter, expected either a cCuboid or two Vector3i-s.");
@@ -4260,8 +4255,8 @@ static int tolua_cCuboid_IsInside(lua_State * tolua_S)
 		return 0;
 	}
 
-	cCuboid * self = nullptr;
-	L.GetStackValue(1, self);
+	cCuboid * Self = nullptr;
+	L.GetStackValue(1, Self);
 
 	// Check the old coord-based signature:
 	int x, y, z;
@@ -4269,7 +4264,7 @@ static int tolua_cCuboid_IsInside(lua_State * tolua_S)
 	{
 		LOGWARNING("cCuboid:IsInside(x, y, z) is deprecated, use cCuboid:IsInside(Vector3) instead.");
 		L.LogStackTrace();
-		L.Push(self->IsInside(Vector3i{x, y, z}));
+		L.Push(Self->IsInside(Vector3i{x, y, z}));
 		return 1;
 	}
 
@@ -4277,7 +4272,7 @@ static int tolua_cCuboid_IsInside(lua_State * tolua_S)
 	Vector3d pt;
 	if (L.GetStackValue(2, pt))
 	{
-		L.Push(self->IsInside(pt));
+		L.Push(Self->IsInside(pt));
 		return 1;
 	}
 	return L.ApiParamError("Invalid parameter #2, expected a Vector3.");
@@ -4296,8 +4291,8 @@ static int tolua_cCuboid_Move(lua_State * tolua_S)
 		return 0;
 	}
 
-	cCuboid * self = nullptr;
-	L.GetStackValue(1, self);
+	cCuboid * Self = nullptr;
+	L.GetStackValue(1, Self);
 
 	// Check the old coord-based signature:
 	int x, y, z;
@@ -4305,7 +4300,7 @@ static int tolua_cCuboid_Move(lua_State * tolua_S)
 	{
 		LOGWARNING("cCuboid:Move(x, y, z) is deprecated, use cCuboid:Move(Vector3i) instead.");
 		L.LogStackTrace();
-		self->Move({x, y, z});
+		Self->Move({x, y, z});
 		return 0;
 	}
 
@@ -4314,7 +4309,7 @@ static int tolua_cCuboid_Move(lua_State * tolua_S)
 	{
 		return L.ApiParamError("Invalid parameter #2, expected a Vector3.");
 	}
-	self->Move(offset);
+	Self->Move(offset);
 	return 0;
 }
 
@@ -4332,20 +4327,20 @@ static int tolua_cEntity_Destroy(lua_State * tolua_S)
 	}
 
 	// Get the params:
-	cEntity * self = nullptr;
-	L.GetStackValue(1, self);
+	cEntity * Self = nullptr;
+	L.GetStackValue(1, Self);
 
 	if (lua_gettop(L) == 2)
 	{
 		LOGWARNING("cEntity:Destroy(bool) is deprecated, use cEntity:Destroy() instead.");
 	}
 
-	if (self->IsPlayer())
+	if (Self->IsPlayer())
 	{
 		return L.ApiParamError("Cannot call cEntity:Destroy() on a cPlayer, use cClientHandle:Kick() instead.");
 	}
 
-	self->Destroy();
+	Self->Destroy();
 	return 0;
 }
 
@@ -4363,14 +4358,14 @@ static int tolua_cEntity_IsSubmerged(lua_State * tolua_S)
 	}
 
 	// Get the params:
-	cEntity * self = nullptr;
-	L.GetStackValue(1, self);
+	cEntity * Self = nullptr;
+	L.GetStackValue(1, Self);
 
 	// API function deprecated:
 	LOGWARNING("cEntity:IsSubmerged() is deprecated. Use cEntity:IsHeadInWater() instead.");
 	cLuaState::LogStackTrace(tolua_S);
 
-	L.Push(self->IsHeadInWater());
+	L.Push(Self->IsHeadInWater());
 	return 1;
 }
 
@@ -4388,14 +4383,14 @@ static int tolua_cEntity_IsSwimming(lua_State * tolua_S)
 	}
 
 	// Get the params:
-	cEntity * self = nullptr;
-	L.GetStackValue(1, self);
+	cEntity * Self = nullptr;
+	L.GetStackValue(1, Self);
 
 	// API function deprecated
 	LOGWARNING("cEntity:IsSwimming() is deprecated. Use cEntity:IsInWater() instead.");
 	cLuaState::LogStackTrace(tolua_S);
 
-	L.Push(self->IsInWater());
+	L.Push(Self->IsInWater());
 	return 1;
 }
 
@@ -4408,14 +4403,14 @@ static int tolua_cEntity_GetPosition(lua_State * tolua_S)
 	cLuaState L(tolua_S);
 
 	// Get the params:
-	cEntity * self = static_cast<cEntity *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cEntity * Self = static_cast<cEntity *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Self == nullptr)
 	{
-		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
+		LOGWARNING("%s: invalid Self (%p)", __FUNCTION__, static_cast<void *>(Self));
 		return 0;
 	}
 
-	L.Push(Mtolua_new((Vector3d)(self->GetPosition())));
+	L.Push(Mtolua_new((Vector3d)(Self->GetPosition())));
 
 	tolua_register_gc(L, lua_gettop(L));  // Make Lua own the object
 	return 1;
@@ -4430,14 +4425,14 @@ static int tolua_cEntity_GetSpeed(lua_State * tolua_S)
 	cLuaState L(tolua_S);
 
 	// Get the params:
-	cEntity * self = static_cast<cEntity *>(tolua_tousertype(tolua_S, 1, nullptr));
-	if (self == nullptr)
+	cEntity * Self = static_cast<cEntity *>(tolua_tousertype(tolua_S, 1, nullptr));
+	if (Self == nullptr)
 	{
-		LOGWARNING("%s: invalid self (%p)", __FUNCTION__, static_cast<void *>(self));
+		LOGWARNING("%s: invalid Self (%p)", __FUNCTION__, static_cast<void *>(Self));
 		return 0;
 	}
 
-	L.Push(Mtolua_new((Vector3d)(self->GetSpeed())));
+	L.Push(Mtolua_new((Vector3d)(Self->GetSpeed())));
 
 	tolua_register_gc(L, lua_gettop(L));  // Make Lua own the object
 	return 1;
