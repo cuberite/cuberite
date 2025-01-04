@@ -2775,7 +2775,6 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::ZombieSpawnEgg:                     return "zombie_spawn_egg";
 		case Item::ZombieVillagerSpawnEgg:             return "zombie_villager_spawn_egg";
 		case Item::ZombifiedPiglinSpawnEgg:            return "zombified_piglin_spawn_egg";
-		default: return "NOT IMPLEMENTED";
 	}
 	// UNREACHABLE("Unsupported Item");
 }
