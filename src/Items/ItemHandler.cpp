@@ -2747,7 +2747,7 @@ const cItemHandler & cItemHandler::For(Item a_ItemType)
 		case Item::TuffWall:                           return ItemTuffWallHandler;
 		case Item::TurtleEgg:                          return ItemTurtleEggHandler;
 		case Item::TurtleHelmet:                       return ItemTurtleHelmetHandler;
-		case Item::TurtleScute:                        return ItemTurtleHelmetHandler;
+		case Item::TurtleScute:                        return ItemScuteHandler;
 		case Item::TurtleSpawnEgg:                     return ItemTurtleSpawnEggHandler;
 		case Item::TwistingVines:                      return ItemTwistingVinesHandler;
 		case Item::Vault:                              return ItemVaultHandler;
