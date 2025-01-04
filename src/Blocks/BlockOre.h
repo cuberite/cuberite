@@ -56,9 +56,9 @@ private:
 			case BlockType::CopperOre:
 			case BlockType::DeepslateCopperOre: return cItem(Item::RawCopper, DropMult * Random.RandInt<char>(2, 5), 4);
 			case BlockType::IronOre:
-			case BlockType::DeepslateIronOre: return cItem(Item::RawIron, static_cast<char>(1) + FortuneLevel);
+			case BlockType::DeepslateIronOre: return cItem(Item::RawIron, static_cast<char>(1 + FortuneLevel));
 			case BlockType::GoldOre:
-			case BlockType::DeepslateGoldOre: return cItem(Item::RawGold, static_cast<char>(1) + FortuneLevel);
+			case BlockType::DeepslateGoldOre: return cItem(Item::RawGold, static_cast<char>(1 + FortuneLevel));
 			case BlockType::NetherGoldOre: return cItem(Item::GoldNugget, DropMult * Random.RandInt<char>(2, 6));
 			default:
 			{
