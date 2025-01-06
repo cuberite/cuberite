@@ -9829,6 +9829,25 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Removes a currently applied entity effect",
 				},
+				TeleportToCoords =
+				{
+					Params =
+					{
+						{
+							Name = "PosX",
+							Type = "number",
+						},
+						{
+							Name = "PosY",
+							Type = "number",
+						},
+						{
+							Name = "PosZ",
+							Type = "number",
+						},
+					},
+					Notes = "Teleports the entity to the specified coords. Asks plugins if the teleport is allowed.",
+				},
 			},
 			Inherits = "cEntity",
 		},
