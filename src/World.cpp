@@ -1872,9 +1872,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, double a
 		float SpeedY = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(40, 50));
 		float SpeedZ = static_cast<float>(a_FlyAwaySpeed * Random.RandInt(-10, 10));
 
-		auto Pickup = std::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, Vector3f{SpeedX, SpeedY, SpeedZ});
-		auto PickupPtr = Pickup.get();
-		PickupPtr->Initialize(std::move(Pickup), *this);
+		SpawnItemPickup(a_Pos, cItem(*itr), { SpeedX, SpeedY, SpeedZ });
 	}
 }
 
@@ -1891,10 +1889,55 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d
 			continue;
 		}
 
-		auto pickup = std::make_unique<cPickup>(a_Pos, *itr, a_IsPlayerCreated, a_Speed);
-		auto pickupPtr = pickup.get();
-		pickupPtr->Initialize(std::move(pickup), *this);
+		SpawnItemPickup(a_Pos, cItem(*itr), a_Speed);
 	}
+}
+
+
+
+
+
+UInt32 cWorld::SpawnItemPickup(Vector3d a_Position, cItem && a_Item, Vector3d a_Speed, cTickTime a_CollectionDelay, cTickTime a_Lifetime, bool a_CanCombine)
+{
+	auto Pickup = std::make_unique<cPickup>(a_Position, std::move(a_Item), a_Speed, a_CollectionDelay, a_Lifetime);
+	auto PickupPtr = Pickup.get();
+
+	if (!PickupPtr->Initialize(std::move(Pickup), *this))
+	{
+		return cEntity::INVALID_ID;
+	}
+
+	return PickupPtr->GetUniqueID();
+}
+
+
+
+
+
+UInt32 cWorld::SpawnItemPickup(Vector3d a_Position, cItem && a_Item, Vector3d a_Speed, cBoundingBox a_CombineBounds, cTickTime a_CollectionDelay, cTickTime a_Lifetime)
+{
+	const auto MaxStackSize = a_Item.GetMaxStackSize();
+
+	for (const auto & [Entity, World] : m_EntitiesToAdd)
+	{
+		if (cPickup::TryCombineWithQueuedEntity(*Entity, a_CombineBounds, a_Item, MaxStackSize))
+		{
+			return Entity->GetUniqueID();
+		}
+	}
+
+	return SpawnItemPickup(a_Position, std::move(a_Item), a_Speed, a_CollectionDelay, a_Lifetime, true);
+}
+
+
+
+
+
+UInt32 cWorld::SpawnItemPickup(Vector3d a_Position, cItem && a_Item, double a_SpeedMultiplier, cTickTime a_CollectionDelay, cTickTime a_Lifetime, bool a_CanCombine)
+{
+	auto & Random = GetRandomProvider();
+	const auto InitialSpeed = Vector3d(Random.RandReal(-2.0, 2.0), 4.0, Random.RandReal(-2.0, 2.0)) * a_SpeedMultiplier;
+	return SpawnItemPickup(a_Position, std::move(a_Item), InitialSpeed, a_CollectionDelay, a_Lifetime, a_CanCombine);
 }
 
 
@@ -1903,13 +1946,7 @@ void cWorld::SpawnItemPickups(const cItems & a_Pickups, Vector3d a_Pos, Vector3d
 
 UInt32 cWorld::SpawnItemPickup(Vector3d a_Pos, const cItem & a_Item, Vector3f a_Speed, int a_LifetimeTicks, bool a_CanCombine)
 {
-	auto pickup = std::make_unique<cPickup>(a_Pos, a_Item, false, a_Speed, a_LifetimeTicks, a_CanCombine);
-	auto pickupPtr = pickup.get();
-	if (!pickupPtr->Initialize(std::move(pickup), *this))
-	{
-		return cEntity::INVALID_ID;
-	}
-	return pickupPtr->GetUniqueID();
+	return SpawnItemPickup(a_Pos, cItem(a_Item), a_Speed, 0_tick, cTickTime(a_LifetimeTicks), a_CanCombine);
 }
 
 
@@ -2136,12 +2173,19 @@ bool cWorld::DigBlock(Vector3i a_BlockPos, const cEntity * a_Digger)
 
 bool cWorld::DropBlockAsPickups(Vector3i a_BlockPos, const cEntity * a_Digger, const cItem * a_Tool)
 {
-	auto pickups = PickupsFromBlock(a_BlockPos, a_Digger, a_Tool);
+	auto Pickups = PickupsFromBlock(a_BlockPos, a_Digger, a_Tool);
+
 	if (!DigBlock(a_BlockPos, a_Digger))
 	{
 		return false;
 	}
-	SpawnItemPickups(pickups, Vector3d(0.5, 0.5, 0.5) + a_BlockPos, 10);
+
+	auto & Random = GetRandomProvider();
+	for (auto & Item : Pickups)
+	{
+		SpawnItemPickup(Vector3d(Random.RandReal(0.25, 0.75), Random.RandReal(0.25, 0.75), Random.RandReal(0.25, 0.75)) + a_BlockPos, std::move(Item));
+	}
+
 	return true;
 }
 

@@ -915,14 +915,15 @@ void cChunkMap::AddEntity(OwnedEntity a_Entity)
 	}
 
 	const auto EntityPtr = a_Entity.get();
-	ASSERT(EntityPtr->GetWorld() == m_World);
 
 	auto & Chunk = ConstructChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
 	Chunk.AddEntity(std::move(a_Entity));
 
-	EntityPtr->OnAddToWorld(*m_World);
 	ASSERT(!EntityPtr->IsTicking());
+	ASSERT(EntityPtr->GetWorld() == m_World);
+
 	EntityPtr->SetIsTicking(true);
+	EntityPtr->OnAddToWorld(*m_World);
 
 	cPluginManager::Get()->CallHookSpawnedEntity(*m_World, *EntityPtr);
 }
@@ -1015,8 +1016,8 @@ bool cChunkMap::ForEachEntityInBox(const cBoundingBox & a_Box, cEntityCallback a
 	// Calculate the chunk range for the box:
 	int MinChunkX = FloorC(a_Box.GetMinX() / cChunkDef::Width);
 	int MinChunkZ = FloorC(a_Box.GetMinZ() / cChunkDef::Width);
-	int MaxChunkX = FloorC((a_Box.GetMaxX() + cChunkDef::Width) / cChunkDef::Width);
-	int MaxChunkZ = FloorC((a_Box.GetMaxZ() + cChunkDef::Width) / cChunkDef::Width);
+	int MaxChunkX = FloorC(a_Box.GetMaxX() / cChunkDef::Width);
+	int MaxChunkZ = FloorC(a_Box.GetMaxZ() / cChunkDef::Width);
 
 	// Iterate over each chunk in the range:
 	cCSLock Lock(m_CSChunks);
