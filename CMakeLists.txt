@@ -23,6 +23,7 @@ include("CMake/AddDependencies.cmake")
 include("CMake/Fixups.cmake")
 include("CMake/GenerateBindings.cmake")
 include("CMake/GroupSources.cmake")
+include("CMake/SetVersion.cmake")
 include("SetFlags.cmake")
 
 # Add build timestamp and details:
