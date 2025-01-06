@@ -25,7 +25,7 @@ class cBlockEntity
 {
 protected:
 
-	cBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cBlockEntity(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 public:
 
@@ -49,7 +49,7 @@ public:
 	/** Creates a new block entity for the specified block type at the specified absolute pos.
 	If a_World is valid, then the entity is created bound to that world
 	Returns nullptr for unknown block types. */
-	static OwnedBlockEntity CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World = nullptr);
+	static OwnedBlockEntity CreateByBlockType(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World = nullptr);
 
 	/** Called when this block entity's associated block is destroyed.
 	It is guaranteed that this function is called before OnRemoveFromWorld. */
@@ -119,9 +119,14 @@ protected:
 	Mainly used for multi-block-type entities, such as furnaces / lit furnaces. */
 	BLOCKTYPE m_BlockType;
 
-	/** The block meta representing this particular instance in the world
-	Mainly used for directional entities, such as dispensers. */
-	NIBBLETYPE m_BlockMeta;
+	/** The block meta representing this particular instance in the world.
+	Mainly used for directional entities, such as dispensers.
+	Note that pre-1.13 protocols _only_ use the lower 4 bits of the block meta
+	(usually indicating rotation / facing / etc.) as part of the block id sent
+	and any data stored in the upper 4 bits has to be sent by "other means".
+	1.13+ uses the whole meta when converting the internal block id to a protocol
+	specific id. See, for example, BannerEntity, which has colour as part of the meta. */
+	BLOCKMETATYPE m_BlockMeta;
 
 	cWorld * m_World;
 } ;  // tolua_export

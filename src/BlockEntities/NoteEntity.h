@@ -37,7 +37,7 @@ class cNoteEntity :
 public:  // tolua_export
 
 	/** Creates a new note entity. a_World may be nullptr */
-	cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cNoteEntity(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	// tolua_begin
 
