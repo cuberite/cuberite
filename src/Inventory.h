@@ -66,7 +66,7 @@ public:
 	int HowManyCanFit(const cItem & a_ItemStack, bool a_ConsiderEmptySlots = true);
 
 	/** Returns how many items of the specified type would fit into the slot range specified */
-	int HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int a_EndSlotNum, bool a_ConsiderEmptySlots = true);
+	int HowManyCanFit(const cItem & a_ItemStack, std::size_t a_BeginSlotNum, std::size_t a_EndSlotNum, bool a_ConsiderEmptySlots = true);
 
 	/** Adds as many items out of a_ItemStack as can fit.
 	If a_AllowNewStacks is set to false, only existing stacks can be topped up;
@@ -86,7 +86,7 @@ public:
 
 	/** Removes the specified item from the inventory, as many as possible, up to a_ItemStack.m_ItemCount.
 	Returns the number of items that were removed. */
-	int RemoveItem(const cItem & a_ItemStack);
+	char RemoveItem(const cItem & a_ItemStack);
 
 	/** Finds an item based on ItemType and ItemDamage (<- defines the itemType, too) */
 	cItem * FindItem(const cItem & a_RecipeItem);
@@ -133,42 +133,42 @@ public:
 	// tolua_begin
 
 	/** Returns current item in a_SlotNum slot */
-	const cItem & GetSlot(int a_SlotNum) const;
+	const cItem & GetSlot(std::size_t a_SlotNum) const;
 	/** Returns current item in a_ArmorSlotNum in armor slots */
-	const cItem & GetArmorSlot(int a_ArmorSlotNum) const;
+	const cItem & GetArmorSlot(std::size_t a_ArmorSlotNum) const;
 	/** Returns current item in a_ArmorSlotNum in inventory slots */
-	const cItem & GetInventorySlot(int a_InventorySlotNum) const;
+	const cItem & GetInventorySlot(std::size_t a_InventorySlotNum) const;
 	/** Returns current item in a_ArmorSlotNum in hotbar slots */
-	const cItem & GetHotbarSlot(int a_HotBarSlotNum) const;
+	const cItem & GetHotbarSlot(std::size_t a_HotBarSlotNum) const;
 	/** Returns current item in shield slot */
 	const cItem & GetShieldSlot() const;
 	/** Returns current equiped item */
 	const cItem & GetEquippedItem(void) const;
 	/** Puts a_Item item in a_SlotNum slot number */
-	void          SetSlot(int a_SlotNum, const cItem & a_Item);
+	void          SetSlot(std::size_t a_SlotNum, const cItem & a_Item);
 	/** Puts a_Item item in a_ArmorSlotNum slot number in armor slots */
-	void          SetArmorSlot(int a_ArmorSlotNum, const cItem & a_Item);
+	void          SetArmorSlot(std::size_t a_ArmorSlotNum, const cItem & a_Item);
 	/** Puts a_Item item in a_InventorySlotNum slot number in inventory slots */
-	void          SetInventorySlot(int a_InventorySlotNum, const cItem & a_Item);
+	void          SetInventorySlot(std::size_t a_InventorySlotNum, const cItem & a_Item);
 	/** Puts a_Item item in a_HotBarSlotNum slot number in hotbar slots */
-	void          SetHotbarSlot(int a_HotBarSlotNum, const cItem & a_Item);
+	void          SetHotbarSlot(std::size_t a_HotBarSlotNum, const cItem & a_Item);
 	/** Sets current item in shield slot */
 	void          SetShieldSlot(const cItem & a_Item);
 	/** Sets current item in the equipped hotbar slot */
 	void          SetEquippedItem(const cItem & a_Item);
 	/** Sets equiped item to the a_SlotNum slot number */
-	void          SetEquippedSlotNum(int a_SlotNum);
+	void          SetEquippedSlotNum(std::size_t a_SlotNum);
 	/** Returns slot number of equiped item */
-	int           GetEquippedSlotNum(void) { return m_EquippedSlotNum; }
+	std::size_t   GetEquippedSlotNum(void) { return m_EquippedSlotNum; }
 
 	/** Adds (or subtracts, if a_AddToCount is negative) to the count of items in the specified slot.
 	If the slot is empty, ignores the call.
 	Returns the new count, or -1 if the slot number is invalid.
 	*/
-	char ChangeSlotCount(int a_SlotNum, char a_AddToCount);
+	char ChangeSlotCount(std::size_t a_SlotNum, char a_AddToCount);
 
 	/** Adds the specified damage to the specified item; deletes the item and returns true if the item broke. */
-	bool DamageItem(int a_SlotNum, short a_Amount);
+	bool DamageItem(std::size_t a_SlotNum, short a_Amount);
 
 	/** Adds the specified damage to the currently held item; deletes the item and returns true if the item broke. */
 	bool DamageEquippedItem(short a_Amount = 1);
@@ -181,7 +181,7 @@ public:
 	// tolua_end
 
 	/** Sends the slot contents to the owner */
-	void SendSlot(int a_SlotNum);
+	void SendSlot(std::size_t a_SlotNum);
 
 	/** Update items (e.g. Maps) */
 	void UpdateItems(void);
@@ -200,16 +200,16 @@ protected:
 	cItemGrid m_HotbarSlots;
 	cItemGrid m_ShieldSlots;
 
-	int m_EquippedSlotNum;
+	std::size_t m_EquippedSlotNum;
 
 	cPlayer & m_Owner;
 
 	/** Returns the ItemGrid and the (grid-local) slot number for a (global) slot number; return nullptr for invalid SlotNum */
-	const cItemGrid * GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum) const;
+	const cItemGrid * GetGridForSlotNum(std::size_t a_SlotNum, std::size_t & a_GridSlotNum) const;
 
 	/** Returns the ItemGrid and the (grid-local) slot number for a (global) slot number; return nullptr for invalid SlotNum */
-	cItemGrid * GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum);
+	cItemGrid * GetGridForSlotNum(std::size_t a_SlotNum, std::size_t & a_GridSlotNum);
 
 	// cItemGrid::cListener override:
-	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
+	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, std::size_t a_SlotNum) override;
 };  // tolua_export

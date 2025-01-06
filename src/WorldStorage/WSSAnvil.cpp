@@ -776,9 +776,9 @@ bool cWSSAnvil::LoadItemFromNBT(cItem & a_Item, const cParsedNBT & a_NBT, int a_
 
 
 
-void cWSSAnvil::LoadItemGridFromNBT(cItemGrid & a_ItemGrid, const cParsedNBT & a_NBT, int a_ItemsTagIdx, int a_SlotOffset)
+void cWSSAnvil::LoadItemGridFromNBT(cItemGrid & a_ItemGrid, const cParsedNBT & a_NBT, int a_ItemsTagIdx, std::size_t a_SlotOffset)
 {
-	int NumSlots = a_ItemGrid.GetNumSlots();
+	auto NumSlots = a_ItemGrid.GetNumSlots();
 	for (int Child = a_NBT.GetFirstChild(a_ItemsTagIdx); Child != -1; Child = a_NBT.GetNextSibling(Child))
 	{
 		int SlotTag = a_NBT.FindChildByName(Child, "Slot");
@@ -786,8 +786,8 @@ void cWSSAnvil::LoadItemGridFromNBT(cItemGrid & a_ItemGrid, const cParsedNBT & a
 		{
 			continue;
 		}
-		int SlotNum = static_cast<int>(a_NBT.GetByte(SlotTag)) - a_SlotOffset;
-		if ((SlotNum < 0) || (SlotNum >= NumSlots))
+		auto SlotNum = static_cast<std::size_t>(a_NBT.GetByte(SlotTag)) - a_SlotOffset;
+		if (SlotNum >= NumSlots)
 		{
 			// SlotNum outside of the range
 			continue;
