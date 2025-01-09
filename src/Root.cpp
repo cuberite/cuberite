@@ -143,6 +143,7 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOGD("Loading block palettes");
 	m_BlockMap = new BlockMap::cBlockMap();
 	m_BlockMap->AddVersion(cProtocol::Version::Latest);
+	m_BlockMap->AddVersion(cProtocol::Version::v1_21_2);
 	m_BlockMap->AddVersion(cProtocol::Version::v1_21);
 	m_BlockMap->AddVersion(cProtocol::Version::v1_20);
 	m_BlockMap->AddVersion(cProtocol::Version::v1_19);

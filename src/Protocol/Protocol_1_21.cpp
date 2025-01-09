@@ -11,6 +11,7 @@
 #include "Palettes/Palette_1_21.h"
 #include "Palettes/Palette_1_21_2.h"
 #include "../Entities/Entity.h"
+#include "Palettes/Palette_1_21_4.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1684,3 +1685,26 @@ UInt32 cProtocol_1_21_4::GetProtocolMobType(eMonsterType a_MobType) const
 
 
 
+
+UInt32 cProtocol_1_21_4::GetProtocolBlockType(BlockState a_Block) const
+{
+	return Palette_1_21_4::From(a_Block);
+}
+
+
+
+
+
+UInt32 cProtocol_1_21_4::GetProtocolItemType(Item a_ItemID) const
+{
+	return Palette_1_21_4::From(a_ItemID);
+}
+
+
+
+
+
+Item cProtocol_1_21_4::GetItemFromProtocolID(UInt32 a_ProtocolID) const
+{
+	return Palette_1_21_4::ToItem(a_ProtocolID);
+}
