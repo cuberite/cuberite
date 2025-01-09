@@ -36,7 +36,7 @@ public:
 		if (a_ClickedBlockFace != BLOCK_FACE_NONE)
 		{
 			BlockState DestBlock;
-			if (a_World->GetBlock(a_ClickedBlockPos, DestBlock))
+			if (!a_World->GetBlock(a_ClickedBlockPos, DestBlock))
 			{
 				return false;
 			}
@@ -198,7 +198,8 @@ public:
 
 		return (
 			(EndPortalFrame.Type() == BlockType::EndPortalFrame) &&
-			(Block::EndPortalFrame::Facing(EndPortalFrame) == a_ShouldFace)
+			(Block::EndPortalFrame::Facing(EndPortalFrame) == a_ShouldFace) &&
+			(Block::EndPortalFrame::Eye(EndPortalFrame))
 		);
 	}
 } ;
