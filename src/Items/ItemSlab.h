@@ -313,6 +313,7 @@ protected:
 			case Item::WaxedExposedCutCopperSlab:        PLACE_SLAB(WaxedExposedCutCopperSlab)
 			case Item::WaxedWeatheredCutCopperSlab:      PLACE_SLAB(WaxedWeatheredCutCopperSlab)
 			case Item::WaxedOxidizedCutCopperSlab:       PLACE_SLAB(WaxedOxidizedCutCopperSlab)
+			case Item::ResinBrickSlab:                   PLACE_SLAB(ResinBrickSlab)
 			default:
 			{
 				FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, m_ItemType);
@@ -405,6 +406,7 @@ protected:
 			case BlockType::WaxedWeatheredCutCopperSlab:      GET_DOUBLE_SLAB(WaxedWeatheredCutCopperSlab)
 			case BlockType::WaxedOxidizedCutCopperSlab:       GET_DOUBLE_SLAB(WaxedOxidizedCutCopperSlab)
 			case BlockType::PaleOakSlab:                 GET_DOUBLE_SLAB(PaleOakSlab)
+			case BlockType::ResinBrickSlab:              GET_DOUBLE_SLAB(ResinBrickSlab)
 			default: return Air::Air();
 		}
 	}

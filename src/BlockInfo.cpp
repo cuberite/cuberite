@@ -2140,6 +2140,8 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::AcaciaPlanks:  return 2.000000f;
 		case BlockType::CherryPlanks:  return 2.000000f;
 		case BlockType::DarkOakPlanks:  return 2.000000f;
+		case BlockType::PaleOakWood:  return 2.000000f;
+		case BlockType::PaleOakPlanks:  return 2.000000f;
 		case BlockType::MangrovePlanks:  return 2.000000f;
 		case BlockType::BambooPlanks:  return 2.000000f;
 		case BlockType::BambooMosaic:  return 2.000000f;
@@ -2150,6 +2152,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::AcaciaSapling:  return 0.000000f;
 		case BlockType::CherrySapling:  return 0.000000f;
 		case BlockType::DarkOakSapling:  return 0.000000f;
+		case BlockType::PaleOakSapling:  return 0.000000f;
 		case BlockType::MangrovePropagule:  return 0.000000f;
 		case BlockType::Bedrock:  return -1.000000f;
 		case BlockType::Water:  return 100.000000f;
@@ -2173,6 +2176,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::AcaciaLog:  return 2.000000f;
 		case BlockType::CherryLog:  return 2.000000f;
 		case BlockType::DarkOakLog:  return 2.000000f;
+		case BlockType::PaleOakLog:  return 2.000000f;
 		case BlockType::MangroveLog:  return 2.000000f;
 		case BlockType::MangroveRoots:  return 0.700000f;
 		case BlockType::MuddyMangroveRoots:  return 0.700000f;
@@ -2183,6 +2187,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::StrippedAcaciaLog:  return 2.000000f;
 		case BlockType::StrippedCherryLog:  return 2.000000f;
 		case BlockType::StrippedDarkOakLog:  return 2.000000f;
+		case BlockType::StrippedPaleOakLog:  return 2.000000f;
 		case BlockType::StrippedOakLog:  return 2.000000f;
 		case BlockType::StrippedMangroveLog:  return 2.000000f;
 		case BlockType::StrippedBambooBlock:  return 2.000000f;
@@ -2201,6 +2206,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::StrippedAcaciaWood:  return 2.000000f;
 		case BlockType::StrippedCherryWood:  return 2.000000f;
 		case BlockType::StrippedDarkOakWood:  return 2.000000f;
+		case BlockType::StrippedPaleOakWood:  return 2.000000f;
 		case BlockType::StrippedMangroveWood:  return 2.000000f;
 		case BlockType::OakLeaves:  return 0.200000f;
 		case BlockType::SpruceLeaves:  return 0.200000f;
@@ -2209,6 +2215,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::AcaciaLeaves:  return 0.200000f;
 		case BlockType::CherryLeaves:  return 0.200000f;
 		case BlockType::DarkOakLeaves:  return 0.200000f;
+		case BlockType::PaleOakLeaves:  return 0.200000f;
 		case BlockType::MangroveLeaves:  return 0.200000f;
 		case BlockType::AzaleaLeaves:  return 0.200000f;
 		case BlockType::FloweringAzaleaLeaves:  return 0.200000f;
@@ -2296,6 +2303,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::Fire:  return 0.000000f;
 		case BlockType::SoulFire:  return 0.000000f;
 		case BlockType::Spawner:  return 5.000000f;
+		case BlockType::CreakingHeart:  return 10.000000f;
 		case BlockType::OakStairs:  return 2.000000f;
 		case BlockType::Chest:  return 2.500000f;
 		case BlockType::RedstoneWire:  return 0.000000f;
@@ -2313,6 +2321,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::CherrySign:  return 1.000000f;
 		case BlockType::JungleSign:  return 1.000000f;
 		case BlockType::DarkOakSign:  return 1.000000f;
+		case BlockType::PaleOakSign:  return 1.000000f;
 		case BlockType::MangroveSign:  return 1.000000f;
 		case BlockType::BambooSign:  return 1.000000f;
 		case BlockType::OakDoor:  return 3.000000f;
@@ -2326,6 +2335,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::CherryWallSign:  return 1.000000f;
 		case BlockType::JungleWallSign:  return 1.000000f;
 		case BlockType::DarkOakWallSign:  return 1.000000f;
+		case BlockType::PaleOakWallSign:  return 1.000000f;
 		case BlockType::MangroveWallSign:  return 1.000000f;
 		case BlockType::BambooWallSign:  return 1.000000f;
 		case BlockType::OakHangingSign:  return 1.000000f;
@@ -2335,6 +2345,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::CherryHangingSign:  return 1.000000f;
 		case BlockType::JungleHangingSign:  return 1.000000f;
 		case BlockType::DarkOakHangingSign:  return 1.000000f;
+		case BlockType::PaleOakHangingSign:  return 1.000000f;
 		case BlockType::CrimsonHangingSign:  return 1.000000f;
 		case BlockType::WarpedHangingSign:  return 1.000000f;
 		case BlockType::MangroveHangingSign:  return 1.000000f;
@@ -2346,6 +2357,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::CherryWallHangingSign:  return 1.000000f;
 		case BlockType::JungleWallHangingSign:  return 1.000000f;
 		case BlockType::DarkOakWallHangingSign:  return 1.000000f;
+		case BlockType::PaleOakWallHangingSign:  return 1.000000f;
 		case BlockType::MangroveWallHangingSign:  return 1.000000f;
 		case BlockType::CrimsonWallHangingSign:  return 1.000000f;
 		case BlockType::WarpedWallHangingSign:  return 1.000000f;
@@ -2360,6 +2372,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::AcaciaPressurePlate:  return 0.500000f;
 		case BlockType::CherryPressurePlate:  return 0.500000f;
 		case BlockType::DarkOakPressurePlate:  return 0.500000f;
+		case BlockType::PaleOakPressurePlate:  return 0.500000f;
 		case BlockType::MangrovePressurePlate:  return 0.500000f;
 		case BlockType::BambooPressurePlate:  return 0.500000f;
 		case BlockType::RedstoneOre:  return 3.000000f;
@@ -2411,6 +2424,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::AcaciaTrapdoor:  return 3.000000f;
 		case BlockType::CherryTrapdoor:  return 3.000000f;
 		case BlockType::DarkOakTrapdoor:  return 3.000000f;
+		case BlockType::PaleOakTrapdoor:  return 3.000000f;
 		case BlockType::MangroveTrapdoor:  return 3.000000f;
 		case BlockType::BambooTrapdoor:  return 3.000000f;
 		case BlockType::StoneBricks:  return 1.500000f;
@@ -2439,12 +2453,19 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::MelonStem:  return 0.000000f;
 		case BlockType::Vine:  return 0.200000f;
 		case BlockType::GlowLichen:  return 0.200000f;
+		case BlockType::ResinClump:  return 0.000000f;
 		case BlockType::OakFenceGate:  return 2.000000f;
 		case BlockType::BrickStairs:  return 2.000000f;
 		case BlockType::StoneBrickStairs:  return 1.500000f;
 		case BlockType::MudBrickStairs:  return 1.500000f;
 		case BlockType::Mycelium:  return 0.600000f;
 		case BlockType::LilyPad:  return 0.000000f;
+		case BlockType::ResinBlock:  return 0.000000f;
+		case BlockType::ResinBricks:  return 1.500000f;
+		case BlockType::ResinBrickStairs:  return 1.500000f;
+		case BlockType::ResinBrickSlab:  return 1.500000f;
+		case BlockType::ResinBrickWall:  return 1.500000f;
+		case BlockType::ChiseledResinBricks:  return 1.500000f;
 		case BlockType::NetherBricks:  return 2.000000f;
 		case BlockType::NetherBrickFence:  return 2.000000f;
 		case BlockType::NetherBrickStairs:  return 2.000000f;
@@ -2484,6 +2505,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::PottedAcaciaSapling:  return 0.000000f;
 		case BlockType::PottedCherrySapling:  return 0.000000f;
 		case BlockType::PottedDarkOakSapling:  return 0.000000f;
+		case BlockType::PottedPaleOakSapling:  return 0.000000f;
 		case BlockType::PottedMangrovePropagule:  return 0.000000f;
 		case BlockType::PottedFern:  return 0.000000f;
 		case BlockType::PottedDandelion:  return 0.000000f;
@@ -2512,6 +2534,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::AcaciaButton:  return 0.500000f;
 		case BlockType::CherryButton:  return 0.500000f;
 		case BlockType::DarkOakButton:  return 0.500000f;
+		case BlockType::PaleOakButton:  return 0.500000f;
 		case BlockType::MangroveButton:  return 0.500000f;
 		case BlockType::BambooButton:  return 0.500000f;
 		case BlockType::SkeletonSkull:  return 1.000000f;
@@ -2580,6 +2603,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::AcaciaStairs:  return 2.000000f;
 		case BlockType::CherryStairs:  return 2.000000f;
 		case BlockType::DarkOakStairs:  return 2.000000f;
+		case BlockType::PaleOakStairs:  return 2.000000f;
 		case BlockType::MangroveStairs:  return 2.000000f;
 		case BlockType::BambooStairs:  return 2.000000f;
 		case BlockType::BambooMosaicStairs:  return 2.000000f;
@@ -2666,6 +2690,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::AcaciaSlab:  return 2.000000f;
 		case BlockType::CherrySlab:  return 2.000000f;
 		case BlockType::DarkOakSlab:  return 2.000000f;
+		case BlockType::PaleOakSlab:  return 2.000000f;
 		case BlockType::MangroveSlab:  return 2.000000f;
 		case BlockType::BambooSlab:  return 2.000000f;
 		case BlockType::BambooMosaicSlab:  return 2.000000f;
@@ -2693,6 +2718,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::AcaciaFenceGate:  return 2.000000f;
 		case BlockType::CherryFenceGate:  return 2.000000f;
 		case BlockType::DarkOakFenceGate:  return 2.000000f;
+		case BlockType::PaleOakFenceGate:  return 2.000000f;
 		case BlockType::MangroveFenceGate:  return 2.000000f;
 		case BlockType::BambooFenceGate:  return 2.000000f;
 		case BlockType::SpruceFence:  return 2.000000f;
@@ -2701,6 +2727,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::AcaciaFence:  return 2.000000f;
 		case BlockType::CherryFence:  return 2.000000f;
 		case BlockType::DarkOakFence:  return 2.000000f;
+		case BlockType::PaleOakFence:  return 2.000000f;
 		case BlockType::MangroveFence:  return 2.000000f;
 		case BlockType::BambooFence:  return 2.000000f;
 		case BlockType::SpruceDoor:  return 3.000000f;
@@ -2709,6 +2736,7 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::AcaciaDoor:  return 3.000000f;
 		case BlockType::CherryDoor:  return 3.000000f;
 		case BlockType::DarkOakDoor:  return 3.000000f;
+		case BlockType::PaleOakDoor:  return 3.000000f;
 		case BlockType::MangroveDoor:  return 3.000000f;
 		case BlockType::BambooDoor:  return 3.000000f;
 		case BlockType::EndRod:  return 0.000000f;
@@ -3180,6 +3208,13 @@ float cBlockInfo::GetHardness(BlockState a_Block)
 		case BlockType::TrialSpawner:  return 50.000000f;
 		case BlockType::Vault:  return 50.000000f;
 		case BlockType::HeavyCore:  return 10.000000f;
+		case BlockType::PaleMossBlock:  return 0.100000f;
+		case BlockType::PaleMossCarpet:  return 0.100000f;
+		case BlockType::PaleHangingMoss:  return 0.000000f;
+		case BlockType::OpenEyeblossom:  return 0.000000f;
+		case BlockType::ClosedEyeblossom:  return 0.000000f;
+		case BlockType::PottedOpenEyeblossom:  return 0.000000f;
+		case BlockType::PottedClosedEyeblossom:  return 0.000000f;
 	}
 	UNREACHABLE("Unhandled block type");
 }

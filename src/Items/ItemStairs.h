@@ -26,7 +26,7 @@ private:
 		BlockState BlockToPlace;
 		using namespace Block;
 
-		auto BlockFace = RotationToBlockFace(a_Player.GetYaw());
+		auto BlockFace = RotationToBlockFace(a_Player.GetYaw(), true);
 		bool Inverse = false;
 		switch (a_ClickedBlockFace)
 		{
@@ -111,6 +111,7 @@ private:
 			case BlockType::WaxedWeatheredCutCopperStairs: SET_BLOCK_TO_PLACE(WaxedWeatheredCutCopperStairs)
 			case BlockType::WaxedOxidizedCutCopperStairs:  SET_BLOCK_TO_PLACE(WaxedOxidizedCutCopperStairs)
 			case BlockType::PaleOakStairs:                 SET_BLOCK_TO_PLACE(PaleOakStairs)
+			case BlockType::ResinBrickStairs:              SET_BLOCK_TO_PLACE(ResinBrickStairs)
 			default: return false;
 		}
 		return a_Player.PlaceBlock(a_PlacePosition, BlockToPlace);
