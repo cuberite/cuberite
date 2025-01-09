@@ -77,6 +77,7 @@ public:
 			case BlockType::WaxedWeatheredCutCopperStairs:
 			case BlockType::WaxedOxidizedCutCopperStairs:
 			case BlockType::PaleOakStairs:
+			case BlockType::ResinBrickStairs:
 				return true;
 			default: return false;
 		}
@@ -148,6 +149,7 @@ public:
 			case BlockType::WaxedWeatheredCutCopperStairs: IS_STAIR_TOP_HALF(WaxedWeatheredCutCopperStairs)
 			case BlockType::WaxedOxidizedCutCopperStairs:  IS_STAIR_TOP_HALF(WaxedOxidizedCutCopperStairs)
 			case BlockType::PaleOakStairs:                 IS_STAIR_TOP_HALF(PaleOakStairs)
+			case BlockType::ResinBrickStairs:              IS_STAIR_TOP_HALF(ResinBrickStairs)
 			default: return false;
 		}
 	}
@@ -238,7 +240,8 @@ private:
 			case BlockType::WaxedExposedCutCopperStairs:
 			case BlockType::WaxedWeatheredCutCopperStairs:
 			case BlockType::WaxedOxidizedCutCopperStairs:
-			case BlockType::PaleOakStairs: return 0;
+			case BlockType::PaleOakStairs:
+			case BlockType::ResinBrickStairs: return 0;
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in stairs handler!");
