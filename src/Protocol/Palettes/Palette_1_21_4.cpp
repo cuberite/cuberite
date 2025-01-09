@@ -2874,7 +2874,6 @@ namespace Palette_1_21_4
 			case Item::ZombieSpawnEgg: return 1134;
 			case Item::ZombieVillagerSpawnEgg: return 1136;
 			case Item::ZombifiedPiglinSpawnEgg: return 1137;
-			default: return 0;
 		}
 	}
 }  // namespace Palette_1_21_4
