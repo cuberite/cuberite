@@ -91,6 +91,7 @@ public:
 			case BlockType::WaxedWeatheredCutCopperSlab:
 			case BlockType::WaxedOxidizedCutCopperSlab:
 			case BlockType::PaleOakSlab:
+			case BlockType::ResinBrickSlab:
 				return true;
 			default: return false;
 		}
@@ -284,7 +285,8 @@ public:
 			case BlockType::WaxedExposedCutCopperSlab:        ISSLABTOP(WaxedExposedCutCopperSlab)
 			case BlockType::WaxedWeatheredCutCopperSlab:      ISSLABTOP(WaxedWeatheredCutCopperSlab)
 			case BlockType::WaxedOxidizedCutCopperSlab:       ISSLABTOP(WaxedOxidizedCutCopperSlab)
-			case BlockType::PaleOakSlab:                  ISSLABTOP(PaleOakSlab)
+			case BlockType::PaleOakSlab:                 ISSLABTOP(PaleOakSlab)
+			case BlockType::ResinBrickSlab:              ISSLABTOP(ResinBrickSlab)
 			default: return false;
 		}
 	}
@@ -477,7 +479,8 @@ public:
 			case BlockType::WaxedExposedCutCopperSlab:        ISSLABFULL(WaxedExposedCutCopperSlab)
 			case BlockType::WaxedWeatheredCutCopperSlab:      ISSLABFULL(WaxedWeatheredCutCopperSlab)
 			case BlockType::WaxedOxidizedCutCopperSlab:       ISSLABFULL(WaxedOxidizedCutCopperSlab)
-			case BlockType::PaleOakSlab:                  ISSLABFULL(PaleOakSlab)
+			case BlockType::PaleOakSlab:                 ISSLABFULL(PaleOakSlab)
+			case BlockType::ResinBrickSlab:              ISSLABFULL(ResinBrickSlab)
 			default: return false;
 		}
 	}
@@ -553,6 +556,7 @@ private:
 			case BlockType::WaxedWeatheredCutCopperSlab:  return cItem(Item::WaxedWeatheredCutCopperSlab);
 			case BlockType::WaxedOxidizedCutCopperSlab:   return cItem(Item::WaxedOxidizedCutCopperSlab);
 			case BlockType::PaleOakSlab:                  return cItem(Item::PaleOakSlab);
+			case BlockType::ResinBrickSlab:               return cItem(Item::ResinBrickSlab);
 			default: return cItem();
 		}
 	}
@@ -681,6 +685,7 @@ private:
 			case BlockType::WaxedWeatheredCutCopperSlab:      METAMIRRORXZ(WaxedWeatheredCutCopperSlab)
 			case BlockType::WaxedOxidizedCutCopperSlab:       METAMIRRORXZ(WaxedOxidizedCutCopperSlab)
 			case BlockType::PaleOakSlab:                 METAMIRRORXZ(PaleOakSlab)
+			case BlockType::ResinBrickSlab:              METAMIRRORXZ(ResinBrickSlab)
 			default: return a_Block;
 		}
 	}
@@ -753,7 +758,8 @@ private:
 			case BlockType::WaxedExposedCutCopperSlab:
 			case BlockType::WaxedWeatheredCutCopperSlab:
 			case BlockType::WaxedOxidizedCutCopperSlab:
-			case BlockType::PaleOakSlab: return 0;  // TODO
+			case BlockType::PaleOakSlab:
+			case BlockType::ResinBrickSlab: return 0;  // TODO
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in slab handler!");
