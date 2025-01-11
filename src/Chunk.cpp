@@ -397,7 +397,7 @@ void cChunk::SetAllData(SetChunkData && a_SetChunkData)
 	}
 
 	// Wake up all simulators for their respective blocks:
-	// WakeUpSimulators();
+	WakeUpSimulators();
 }
 
 

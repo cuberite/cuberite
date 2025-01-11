@@ -20,7 +20,6 @@ enum eMonsterType
 	mtBogged,                       // Added in 1.21
 	mtBreeze,                       // Added in 1.21
 	mtCreaking,	                    // Added in 1.21.2
-	mtCreakingTransient,	        // Added in 1.21.2
 	mtCamel,                        // Added in 1.20
 	mtCat,                          // Added in 1.14
 	mtCaveSpider,
