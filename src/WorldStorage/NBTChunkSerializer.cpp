@@ -265,6 +265,8 @@ public:
 
 			case BlockType::BrewingStand:    AddBrewingstandEntity   (static_cast<cBrewingstandEntity *>   (a_Entity)); break;
 			case BlockType::Chest:           AddChestEntity          (static_cast<cChestEntity *>          (a_Entity), a_Entity->GetBlockType()); break;
+			case BlockType::RepeatingCommandBlock:
+			case BlockType::ChainCommandBlock:
 			case BlockType::CommandBlock:    AddCommandBlockEntity   (static_cast<cCommandBlockEntity *>   (a_Entity)); break;
 			case BlockType::Dispenser:       AddDispenserEntity      (static_cast<cDispenserEntity *>      (a_Entity)); break;
 			case BlockType::Dropper:         AddDropperEntity        (static_cast<cDropperEntity *>        (a_Entity)); break;

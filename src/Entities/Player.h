@@ -96,6 +96,10 @@ public:
 	/** Called when spectation stops, because the player crouched or when the entity we're spectating gets removed from the world. */
 	void OnLoseSpectated();
 
+	/** Resend the RenderDistanceCenter packet to the player */
+	void ResendRenderDistanceCenter();
+
+	void SendPlayerInventoryJoin();
 	// tolua_begin
 
 	/** Sets the experience total
@@ -103,11 +107,6 @@ public:
 	"should" really only be called at init or player death, plugins excepted
 	*/
 	bool SetCurrentExperience(int a_XpTotal);
-
-	/** Resend the RenderDistanceCenter packet to the player */
-	void ResendRenderDistanceCenter();
-
-		void SendPlayerInventoryJoin();
 
 	/* changes Xp by Xp_delta, you "shouldn't" inc more than MAX_EXPERIENCE_ORB_SIZE
 	Wont't allow xp to go negative

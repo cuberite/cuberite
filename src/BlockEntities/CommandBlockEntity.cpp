@@ -22,7 +22,7 @@ cCommandBlockEntity::cCommandBlockEntity(BlockState a_Block, Vector3i a_Pos, cWo
 	m_ShouldExecute(false),
 	m_Result(0)
 {
-	ASSERT(a_Block.Type() == BlockType::CommandBlock);
+	ASSERT((a_Block.Type() == BlockType::CommandBlock) || (a_Block.Type() == BlockType::ChainCommandBlock) || (a_Block.Type() == BlockType::RepeatingCommandBlock));
 }
 
 
