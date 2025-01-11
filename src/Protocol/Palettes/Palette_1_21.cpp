@@ -7,7 +7,7 @@ namespace Palette_1_21
 {
 	UInt32 From(const BlockState Block)
 	{
-		return cRoot::Get()->GetBlocMap()->GetProtocolBlockId(cProtocol::Version::v1_21, Block);
+		return cRoot::Get()->GetBlockMap()->GetProtocolBlockId(cProtocol::Version::v1_21, Block);
 	}
 	UInt32 From(const CustomStatistic ID)
 	{

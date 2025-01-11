@@ -1324,7 +1324,7 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 
 	aWriter.BeginList("sections", TAG_Compound);
 
-	const auto & bp = cRoot::Get()->GetBlocMap()->GetPalette(cProtocol::Version::Latest);
+	const auto & bp = cRoot::Get()->GetBlockMap()->GetPalette(cProtocol::Version::Latest);
 
 	const bool use_padding = true;  // used in 1.16+
 	for (size_t Y = 0; Y < cChunkDef::NumSections; Y++)

@@ -8,7 +8,7 @@ namespace Palette_1_19
 {
 	UInt32 From(BlockState Block)
 	{
-		return cRoot::Get()->GetBlocMap()->GetProtocolBlockId(cProtocol::Version::v1_19, Block);
+		return cRoot::Get()->GetBlockMap()->GetProtocolBlockId(cProtocol::Version::v1_19, Block);
 	}
 	UInt32 From(Item ID) { return 0; }
 	UInt32 From(CustomStatistic ID) { return 0; }

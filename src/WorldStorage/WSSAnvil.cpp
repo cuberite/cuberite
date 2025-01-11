@@ -453,7 +453,7 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 				// std::vector<AString> strs;
 				#define READ_BLOCK_STATES 1
 				#if READ_BLOCK_STATES
-				static auto bp = cRoot::Get()->GetBlocMap()->GetPalette(cProtocol::Version::Latest);
+				static auto bp = cRoot::Get()->GetBlockMap()->GetPalette(cProtocol::Version::Latest);
 				const int BlockStatesId = a_NBT.FindChildByName(Child1, "Properties");
 				if (BlockStatesId > 0)
 				{

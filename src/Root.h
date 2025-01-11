@@ -73,7 +73,7 @@ public:
 
 	/** Returns a pointer to the world specified. If no world of that name exists, returns a nullptr. */
 	cWorld * GetWorld(const AString & a_WorldName);
-	BlockMap::cBlockMap * GetBlocMap(void) { return m_BlockMap; }
+	BlockMap::cBlockMap * GetBlockMap(void) const { return m_BlockMap; }
 
 	/** Returns the up time of the server in seconds */
 	int GetServerUpTime(void)

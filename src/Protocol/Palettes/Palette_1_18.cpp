@@ -9,6 +9,6 @@ namespace Palette_1_18
 {
 	UInt32 From(BlockState Block)
 	{
-		return cRoot::Get()->GetBlocMap()->GetProtocolBlockId(cProtocol::Version::v1_19, Block);
+		return cRoot::Get()->GetBlockMap()->GetProtocolBlockId(cProtocol::Version::v1_19, Block);
 	}
 }
