@@ -100,9 +100,9 @@ public:
 
 	virtual ~cWorld() override;
 
-	// tolua_begin
-
 	virtual void FlushPendingBlockChanges() override;
+
+	// tolua_begin
 
 	/** Get whether saving chunks is enabled */
 	bool IsSavingEnabled(void) const { return m_IsSavingEnabled; }

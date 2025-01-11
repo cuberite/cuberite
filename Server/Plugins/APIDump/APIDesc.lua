@@ -725,58 +725,6 @@ return
 					},
 					Notes = "Returns the block entity for the block at the specified coords. Creates it if it doesn't exist. Returns nil if the block has no block entity capability.",
 				},
-				GetBlockMeta =
-				{
-					Params =
-					{
-						{
-							Name = "RelX",
-							Type = "number",
-						},
-						{
-							Name = "RelY",
-							Type = "number",
-						},
-						{
-							Name = "RelZ",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Name = "NIBBLETYPE",
-							Type = "number",
-						},
-					},
-					Notes = "Returns the block meta at the specified relative coords",
-				},
-				GetBlockType =
-				{
-					Params =
-					{
-						{
-							Name = "RelX",
-							Type = "number",
-						},
-						{
-							Name = "RelY",
-							Type = "number",
-						},
-						{
-							Name = "RelZ",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Name = "BLOCKTYPE",
-							Type = "number",
-						},
-					},
-					Notes = "Returns the block type at the specified relative coords",
-				},
 				GetBlockTypeMeta =
 				{
 					Params =
@@ -1134,79 +1082,6 @@ return
 						},
 					},
 					Notes = "Sets the block at the specified relative coords.",
-				},
-				SetBlockMeta =
-				{
-					Params =
-					{
-						{
-							Name = "RelX",
-							Type = "number",
-						},
-						{
-							Name = "RelY",
-							Type = "number",
-						},
-						{
-							Name = "RelZ",
-							Type = "number",
-						},
-						{
-							Name = "BlockMeta",
-							Type = "number",
-						},
-					},
-					Notes = "Sets the block meta at the specified relative coords.",
-				},
-				SetBlockType =
-				{
-					Params =
-					{
-						{
-							Name = "RelX",
-							Type = "number",
-						},
-						{
-							Name = "RelY",
-							Type = "number",
-						},
-						{
-							Name = "RelZ",
-							Type = "number",
-						},
-						{
-							Name = "BlockType",
-							Type = "number",
-						},
-					},
-					Notes = "Sets the block type at the specified relative coords",
-				},
-				SetBlockTypeMeta =
-				{
-					Params =
-					{
-						{
-							Name = "RelX",
-							Type = "number",
-						},
-						{
-							Name = "RelY",
-							Type = "number",
-						},
-						{
-							Name = "RelZ",
-							Type = "number",
-						},
-						{
-							Name = "BlockType",
-							Type = "number",
-						},
-						{
-							Name = "BlockMeta",
-							Type = "number",
-						},
-					},
-					Notes = "Sets the block type and meta at the specified relative coords",
 				},
 				SetHeight =
 				{
@@ -4969,6 +4844,14 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					Include = { "eff.*" },
 				},
 			},  -- ConstantGroups
+			Constants =
+			{
+				effBadOmen = { Notes = "" },
+				effConduitPower = { Notes = "" },
+				effDolphinsGrace = { Notes = "" },
+				effHeroOfTheVillage = { Notes = "" },
+				effSlowFalling = { Notes = "" },
+			},
 		},  -- cEntityEffect
 
 		cFile =
@@ -10039,28 +9922,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns the block of the falling block.",
 				},
-				GetBlockType =
-				{
-					Returns =
-					{
-						{
-							Name = "BlockType",
-							Type = "number",
-						}
-					},
-					Notes = "Returns the block type of the falling block.",
-				},
-				GetBlockMeta =
-				{
-					Returns =
-					{
-						{
-							Name = "BlockMeta",
-							Type = "number",
-						}
-					},
-					Notes = "Returns the block meta of the falling block.",
-				},
 			},
 			Inherits = "cEntity",
 		},
@@ -14795,23 +14656,6 @@ end
 					},
 					Notes = "Returns true if the biome is a type of Mesa (mutations of the Mesa biome)."
 				},
-				IsValidBlock =
-				{
-					Params =
-					{
-						{
-							Name = "BlockType",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if BlockType is a known block type",
-				},
 				IsValidItem =
 				{
 					Params =
@@ -16928,7 +16772,7 @@ end
 				{
 					Notes = "The itemtype for book"
 				},
-				E_BLOCK_BOOK_AND_QUILL =
+				E_ITEM_BOOK_AND_QUILL =
 				{
 					Notes = "The itemtype for book and quill"
 				},
