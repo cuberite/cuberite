@@ -30,6 +30,8 @@ public:  // tolua_export
 	/** Set the color of the bed. */
 	void SetColor(short a_Color);
 
+	bool IsPillowBlock(void) const;
+
 	// tolua_end
 
 	// cBlockEntity overrides:
@@ -37,7 +39,6 @@ public:  // tolua_export
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
 	virtual bool UsedBy(cPlayer * a_Player) override { return false; }
 	virtual void SendTo(cClientHandle & a_Client) override;
-
 private:
 
 	short m_Color;
