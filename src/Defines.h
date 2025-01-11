@@ -198,7 +198,6 @@ enum eMobHeadType  // TODO: remove this no longer used
 
 
 
-
 enum eMobHeadRotation
 {
 	SKULL_ROTATION_NORTH = 0,
