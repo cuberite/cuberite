@@ -463,6 +463,7 @@ enum class BossBarDivisionType
 
 
 
+// tolua_end
 
 
 enum class eGameStateReason
@@ -482,8 +483,6 @@ enum class eGameStateReason
 	LimitedCraftingToggled,
 	InitialChunksComing
 };
-
-// tolua_end
 
 
 

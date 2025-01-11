@@ -1367,6 +1367,48 @@ end
 					},
 					Notes = "Generates an UUID based on the player name provided. This is used for the offline (non-auth) mode, when there's no UUID source. Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same. Returns a 32-char UUID (no dashes).",
 				},
+				GetAllowListing =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whenever the client wanted to be listed on the player list",
+				},
+				SetAllowListing =
+				{
+					Params =
+					{
+						{
+							Name = "a_AllowsListing",
+							Type = "boolean",
+						},
+					},
+					Notes = "Should this player be displayed in the player list. Initaily set as requested by the player",
+				},
+				GetParticleMode =
+				{
+					Returns =
+					{
+						{
+							Type = "eParticleModeSetting",
+						},
+					},
+					Notes = "Gets the players particle mode",
+				},
+				SetParticleMode =
+				{
+					Params =
+					{
+						{
+							Name = "a_AllowsListing",
+							Type = "eParticleModeSetting",
+						},
+					},
+					Notes = "Currently only changes the internal variable does not send the change to the player. Initaily set as requested by the player",
+				},
 				GetClientBrand =
 				{
 					Returns =
@@ -13425,6 +13467,10 @@ end
 				{
 					Notes = "A {{cChestEntity|chest}} or doublechest window",
 				},
+				wtCrafter =
+				{
+					Notes = "A crafter window -- currently not implemented",
+				},
 				wtDropSpenser =
 				{
 					Notes = "A {{cDropperEntity|dropper}} or a {{cDispenserEntity|dispenser}} window",
@@ -13664,6 +13710,27 @@ end
 				Piglin =
 				{
 					Notes = "A snoot."
+				},
+			},
+		},
+		eParticleModeSetting =
+		{
+			Desc = [[
+				How many particles should the client display. Puerly aesthetic only works in 1.21.2+
+			]],
+			Constants =
+			{
+				All =
+				{
+					Notes = ""
+				},
+				Decreased =
+				{
+					Notes = ""
+				},
+				Minimal =
+				{
+					Notes = ""
 				},
 			},
 		},
@@ -14287,6 +14354,14 @@ end
 				WalkUnderWaterOneCm =
 				{
 					Notes = "The total distance walked underwater.",
+				},
+				TotalWorldTime =
+				{
+					Notes = "The total amount of time the world was opened (tracked in ticks) -- NOT IMPLEMENTED",
+				},
+				PlayTime =
+				{
+					Notes = "The total amount of time played (tracked in ticks) -- NOT IMPLEMENTED",
 				},
 			},
 		},
@@ -18107,11 +18182,43 @@ end
 				},
 
 				-- eMonsterType:
+				mtAllay =
+				{
+					Notes = "",
+				},
+				mtArmadillo =
+				{
+					Notes = "",
+				},
+				mtAxolotl =
+				{
+					Notes = "",
+				},
 				mtBat =
 				{
 					Notes = "",
 				},
+				mtBee =
+				{
+					Notes = "",
+				},
 				mtBlaze =
+				{
+					Notes = "",
+				},
+				mtBogged =
+				{
+					Notes = "",
+				},
+				mtBreeze =
+				{
+					Notes = "",
+				},
+				mtCreaking =
+				{
+					Notes = "",
+				},
+				mtCamel =
 				{
 					Notes = "",
 				},
@@ -18175,11 +18282,23 @@ end
 				{
 					Notes = "",
 				},
+				mtFrog =
+				{
+					Notes = "",
+				},
 				mtGhast =
 				{
 					Notes = "",
 				},
 				mtGiant =
+				{
+					Notes = "",
+				},
+				mtGlowSquid =
+				{
+					Notes = "",
+				},
+				mtGoat =
 				{
 					Notes = "",
 				},
@@ -18295,6 +18414,10 @@ end
 				{
 					Notes = "",
 				},
+				mtSniffer =
+				{
+					Notes = "",
+				},
 				mtStray =
 				{
 					Notes = "",
@@ -18308,6 +18431,10 @@ end
 					Notes = "",
 				},
 				mtSpider =
+				{
+					Notes = "",
+				},
+				mtTadpole =
 				{
 					Notes = "",
 				},
@@ -18340,6 +18467,10 @@ end
 					Notes = "",
 				},
 				mtWanderingTrader =
+				{
+					Notes = "",
+				},
+				mtWarden =
 				{
 					Notes = "",
 				},
