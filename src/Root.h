@@ -67,13 +67,14 @@ public:
 	/** Interrupts the server and restarts it, as if "/restart" was typed in the console. */
 	static void Restart();
 
+	BlockMap::cBlockMap * GetBlockMap(void) const { return m_BlockMap; }
+
 	// tolua_begin
 	cServer * GetServer(void) { return m_Server; }
 	cWorld *  GetDefaultWorld(void);
 
 	/** Returns a pointer to the world specified. If no world of that name exists, returns a nullptr. */
 	cWorld * GetWorld(const AString & a_WorldName);
-	BlockMap::cBlockMap * GetBlockMap(void) const { return m_BlockMap; }
 
 	/** Returns the up time of the server in seconds */
 	int GetServerUpTime(void)
