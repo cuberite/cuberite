@@ -183,8 +183,8 @@ enum eWeather
 
 
 
-/*
-enum eMobHeadType
+
+enum eMobHeadType  // TODO: remove this no longer used
 {
 	SKULL_TYPE_SKELETON    = 0,
 	SKULL_TYPE_WITHER      = 1,
@@ -192,9 +192,7 @@ enum eMobHeadType
 	SKULL_TYPE_PLAYER      = 3,
 	SKULL_TYPE_CREEPER     = 4,
 	SKULL_TYPE_DRAGON      = 5,
-	SKULL_TYPE_PIGLIN      = 6,
 };
-*/
 
 
 
@@ -463,6 +461,7 @@ enum class BossBarDivisionType
 
 
 
+// tolua_end
 
 
 enum class eGameStateReason
@@ -482,8 +481,6 @@ enum class eGameStateReason
 	LimitedCraftingToggled,
 	InitialChunksComing
 };
-
-// tolua_end
 
 
 

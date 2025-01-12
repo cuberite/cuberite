@@ -58,13 +58,11 @@ namespace
 		return { Mask, Present };
 	}
 
-	/*
-	auto PaletteLegacy(const BLOCKTYPE a_BlockType, const NIBBLETYPE a_Meta)
+	auto PaletteLegacy(const BlockState a_Block)
 	{
 		auto NumericBlock = PaletteUpgrade::ToBlock(a_Block);
 		return (NumericBlock.first << 4) | NumericBlock.second;
 	}
-	*/
 
 	auto Palette393(const BlockState a_Block)
 	{
@@ -592,7 +590,7 @@ inline void cChunkDataSerializer::Serialize107(const int a_ChunkX, const int a_C
 		m_Packet.WriteBEUInt8(BitsPerEntry);
 		m_Packet.WriteVarInt32(0);  // Palette length is 0
 		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-		// WriteBlockSectionSeamless<&PaletteLegacy>(Blocks, BitsPerEntry);
+		WriteBlockSectionSeamless<&PaletteLegacy>(Blocks, BitsPerEntry);
 		WriteLightSectionGrouped(BlockLights, SkyLights);
 	});
 
@@ -650,7 +648,7 @@ inline void cChunkDataSerializer::Serialize110(const int a_ChunkX, const int a_C
 		m_Packet.WriteBEUInt8(BitsPerEntry);
 		m_Packet.WriteVarInt32(0);  // Palette length is 0
 		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
-		// WriteBlockSectionSeamless<&PaletteLegacy>(Blocks, BitsPerEntry);
+		WriteBlockSectionSeamless<&PaletteLegacy>(Blocks, BitsPerEntry);
 		WriteLightSectionGrouped(BlockLights, SkyLights);
 	});
 

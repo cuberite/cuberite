@@ -102,6 +102,8 @@ void cProtocol_1_21::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 			case BlockType::Campfire:              Action = 32; break;
 			case BlockType::Chest:                 Action = 1; break;
 			case BlockType::ChiseledBookshelf:     Action = 38; break;
+			case BlockType::RepeatingCommandBlock:
+			case BlockType::ChainCommandBlock:
 			case BlockType::CommandBlock:          Action = 22; break;
 			case BlockType::Comparator:            Action = 18; break;
 			case BlockType::Conduit:               Action = 25; break;
@@ -1010,7 +1012,6 @@ UInt32 cProtocol_1_21_2::GetProtocolMobType(eMonsterType a_MobType) const
 		case mtCod: return 26;
 		case mtCow: return 28;
 		case mtCreaking: return 29;
-		case mtCreakingTransient: return 30;
 		case mtCreeper: return 31;
 		case mtDolphin: return 34;
 		case mtDonkey: return 35;

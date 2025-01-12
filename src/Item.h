@@ -64,6 +64,9 @@ public:
 	/** Empties the item and frees up any dynamic storage used by the internals. */
 	void Empty(void);
 
+	// Deprecated - for compatibility with old plugins
+	void Clear(void) { Empty(); }
+
 	/** Returns true if the item represents an empty stack - either the type is invalid, or count is zero. */
 	bool IsEmpty(void) const
 	{

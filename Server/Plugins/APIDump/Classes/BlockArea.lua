@@ -1273,25 +1273,13 @@ return
 			{
 				Notes = "Mirrors this block area around the XY plane. Modifies blocks' metas (if present) to match (i. e. furnaces facing the opposite direction).",
 			},
-			MirrorXYNoMeta =
-			{
-				Notes = "Mirrors this block area around the XY plane. Doesn't modify blocks' metas.",
-			},
 			MirrorXZ =
 			{
 				Notes = "Mirrors this block area around the XZ plane. Modifies blocks' metas (if present)",
 			},
-			MirrorXZNoMeta =
-			{
-				Notes = "Mirrors this block area around the XZ plane. Doesn't modify blocks' metas.",
-			},
 			MirrorYZ =
 			{
 				Notes = "Mirrors this block area around the YZ plane. Modifies blocks' metas (if present)",
-			},
-			MirrorYZNoMeta =
-			{
-				Notes = "Mirrors this block area around the YZ plane. Doesn't modify blocks' metas.",
 			},
 			Read =
 			{
@@ -1577,17 +1565,9 @@ return
 			{
 				Notes = "Rotates the block area around the Y axis, counter-clockwise (east -> north). Modifies blocks' metas (if present) to match.",
 			},
-			RotateCCWNoMeta =
-			{
-				Notes = "Rotates the block area around the Y axis, counter-clockwise (east -> north). Doesn't modify blocks' metas.",
-			},
 			RotateCW =
 			{
 				Notes = "Rotates the block area around the Y axis, clockwise (north -> east). Modifies blocks' metas (if present) to match.",
-			},
-			RotateCWNoMeta =
-			{
-				Notes = "Rotates the block area around the Y axis, clockwise (north -> east). Doesn't modify blocks' metas.",
 			},
 			SaveToSchematicFile =
 			{
@@ -2060,10 +2040,6 @@ return
 			baLight =
 			{
 				Notes = "Operations should work on block (emissive) light",
-			},
-			baMetas =
-			{
-				Notes = "Operations should work on block metas",
 			},
 			baSkyLight =
 			{
