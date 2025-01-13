@@ -1086,6 +1086,56 @@ UInt32 cProtocol_1_21_2::GetProtocolMobType(eMonsterType a_MobType) const
 
 
 
+UInt8 cProtocol_1_21_2::GetProtocolEntityType(const cEntity & a_Entity) const
+{
+	using Type = cEntity::eEntityType;
+
+	switch (a_Entity.GetEntityType())
+	{
+		case Type::etEnderCrystal: return 44;
+		case Type::etPickup: return 69;
+		case Type::etFallingBlock: return 50;
+		case Type::etMinecart: return 82;
+		case Type::etBoat: return 85;
+		case Type::etTNT: return 126;
+		case Type::etProjectile:
+		{
+			using PType = cProjectileEntity::eKind;
+			const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
+
+			switch (Projectile.GetProjectileKind())
+			{
+				case PType::pkArrow: return 6;
+				case PType::pkSnowball: return 114;
+				case PType::pkEgg: return 38;
+				case PType::pkGhastFireball: return 112;
+				case PType::pkFireCharge: return 51;
+				case PType::pkEnderPearl: return 43;
+				case PType::pkExpBottle: return 47;
+				case PType::pkSplashPotion: return 100;
+				case PType::pkFirework: return 52;
+				case PType::pkWitherSkull: return 141;
+			}
+			break;
+		}
+		case Type::etFloater: return 149;
+		case Type::etItemFrame: return 71;
+		case Type::etLeashKnot: return 74;
+
+		// Non-objects must not be sent
+		case Type::etEntity:
+		case Type::etPlayer:
+		case Type::etMonster:
+		case Type::etExpOrb:
+		case Type::etPainting: break;
+	}
+	UNREACHABLE("Unhandled entity kind");
+}
+
+
+
+
+
 void cProtocol_1_21_2::SendDynamicRegistries()
 {
 	{
@@ -1424,6 +1474,28 @@ void cProtocol_1_21_2::SendInventorySlot(char a_WindowID, short a_SlotNum, const
 
 
 
+void cProtocol_1_21_2::SendRespawn(eDimension a_Dimension)
+{
+	cPacketizer Pkt(*this, pktRespawn);
+	cPlayer * Player = m_Client->GetPlayer();
+
+	Pkt.WriteVarInt32(0);  // dimension type key
+	Pkt.WriteString("minecraft:overworld");  // world key
+	Pkt.WriteBEUInt64(0);  // Appears to be a SHA256 od the world seed
+	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
+	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
+	Pkt.WriteBool(false);  // debug world
+	Pkt.WriteBool(false);  // flat world
+	Pkt.WriteBool(false);  // optional last death pos
+	Pkt.WriteVarInt32(0);  // portal cool down
+	Pkt.WriteBEInt8(0x3);  // keep metadata and attributes
+	Pkt.WriteVarInt32(60);  // Sea level
+}
+
+
+
+
+
 void cProtocol_1_21_2::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
@@ -1699,6 +1771,56 @@ UInt32 cProtocol_1_21_4::GetProtocolBlockType(BlockState a_Block) const
 UInt32 cProtocol_1_21_4::GetProtocolItemType(Item a_ItemID) const
 {
 	return Palette_1_21_4::From(a_ItemID);
+}
+
+
+
+
+
+UInt8 cProtocol_1_21_4::GetProtocolEntityType(const cEntity & a_Entity) const
+{
+	using Type = cEntity::eEntityType;
+
+	switch (a_Entity.GetEntityType())
+	{
+		case Type::etEnderCrystal: return 43;
+		case Type::etPickup: return 68;
+		case Type::etFallingBlock: return 49;
+		case Type::etMinecart: return 81;
+		case Type::etBoat: return 84;
+		case Type::etTNT: return 125;
+		case Type::etProjectile:
+		{
+			using PType = cProjectileEntity::eKind;
+			const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
+
+			switch (Projectile.GetProjectileKind())
+			{
+				case PType::pkArrow: return 6;
+				case PType::pkSnowball: return 113;
+				case PType::pkEgg: return 37;
+				case PType::pkGhastFireball: return 111;
+				case PType::pkFireCharge: return 50;
+				case PType::pkEnderPearl: return 42;
+				case PType::pkExpBottle: return 46;
+				case PType::pkSplashPotion: return 99;
+				case PType::pkFirework: return 51;
+				case PType::pkWitherSkull: return 140;
+			}
+			break;
+		}
+		case Type::etFloater: return 148;
+		case Type::etItemFrame: return 70;
+		case Type::etLeashKnot: return 73;
+
+		// Non-objects must not be sent
+		case Type::etEntity:
+		case Type::etPlayer:
+		case Type::etMonster:
+		case Type::etExpOrb:
+		case Type::etPainting: break;
+	}
+	UNREACHABLE("Unhandled entity kind");
 }
 
 
