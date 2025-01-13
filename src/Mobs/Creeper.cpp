@@ -9,9 +9,9 @@
 
 
 
-
+// looks like creepers no longer have ambient sounds
 cCreeper::cCreeper(void) :
-	Super("Creeper", mtCreeper, "entity.creeper.hurt", "entity.creeper.death", "entity.creeper.ambient", 0.6f, 1.7f),
+	Super("Creeper", mtCreeper, "entity.creeper.hurt", "entity.creeper.death", "", 0.6f, 1.7f),
 	m_bIsBlowing(false),
 	m_bIsCharged(false),
 	m_BurnedWithFlintAndSteel(false),
@@ -73,7 +73,7 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_GUNPOWDER);
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, Item::Gunpowder);
 
 	// If the creeper was killed by a skeleton, add a random music disc drop:
 	if (
@@ -91,7 +91,26 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 		if (GetWorld()->DoWithEntityByID(static_cast<cProjectileEntity *>(a_Killer)->GetCreatorUniqueID(), ProjectileCreatorCallback))
 		{
-			AddRandomDropItem(a_Drops, 1, 1, static_cast<short>(m_World->GetTickRandomNumber(11) + E_ITEM_FIRST_DISC));
+			AddRandomDropItem(a_Drops, 1, 1, [&]
+			{
+				switch (m_World->GetTickRandomNumber(12))
+				{
+					case  0: return Item::MusicDiscBlocks;
+					case  1: return Item::MusicDiscCat;
+					case  2: return Item::MusicDiscChirp;
+					case  3: return Item::MusicDiscFar;
+					case  4: return Item::MusicDiscMall;
+					case  5: return Item::MusicDiscMellohi;
+					case  6: return Item::MusicDiscPigstep;
+					case  7: return Item::MusicDiscStal;
+					case  8: return Item::MusicDiscStrad;
+					case  9: return Item::MusicDiscWait;
+					case 10: return Item::MusicDiscWard;
+					case 11: return Item::MusicDisc11;
+					case 12: return Item::MusicDisc13;
+				}
+				return Item::Air;
+			}());
 		}
 	}
 }
@@ -143,7 +162,7 @@ void cCreeper::OnRightClicked(cPlayer & a_Player)
 {
 	Super::OnRightClicked(a_Player);
 
-	if ((a_Player.GetEquippedItem().m_ItemType == E_ITEM_FLINT_AND_STEEL))
+	if ((a_Player.GetEquippedItem().m_ItemType == Item::FlintAndSteel))
 	{
 		if (!a_Player.IsGameModeCreative())
 		{

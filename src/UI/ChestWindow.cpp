@@ -14,7 +14,7 @@
 
 
 cChestWindow::cChestWindow(cChestEntity * a_Chest):
-	cWindow(wtChest, (a_Chest->GetBlockType() == E_BLOCK_CHEST) ? "Chest" : "Trapped Chest"),
+	cWindow(wtChest, (a_Chest->GetBlockType() == BlockType::Chest) ? "Chest" : "Trapped Chest"),
 	m_World(a_Chest->GetWorld()),
 	m_BlockPos(a_Chest->GetPos()),
 	m_PrimaryChest(a_Chest),
@@ -36,7 +36,7 @@ cChestWindow::cChestWindow(cChestEntity * a_Chest):
 
 
 cChestWindow::cChestWindow(cChestEntity * a_PrimaryChest, cChestEntity * a_SecondaryChest) :
-	cWindow(wtChest, (a_PrimaryChest->GetBlockType() == E_BLOCK_CHEST) ? "Double Chest" : "Double Trapped Chest"),
+	cWindow(wtChest, (a_PrimaryChest->GetBlockType() == BlockType::Chest) ? "Double Chest" : "Double Trapped Chest"),
 	m_World(a_PrimaryChest->GetWorld()),
 	m_BlockPos(a_PrimaryChest->GetPos()),
 	m_PrimaryChest(a_PrimaryChest),

@@ -6,35 +6,38 @@
 
 
 class cBlockObserverHandler final :
-	public cClearMetaOnDrop<cDisplacementYawRotator<cBlockHandler>>
+	public cBlockHandler
 {
-	using Super = cClearMetaOnDrop<cDisplacementYawRotator<cBlockHandler>>;
+	using Super = cBlockHandler;
 
 public:
 
 	using Super::Super;
 
-	inline static Vector3i GetObservingFaceOffset(NIBBLETYPE a_Meta)
+	inline static Vector3i GetObservingFaceOffset(BlockState a_Block)
 	{
-		return -GetSignalOutputOffset(a_Meta);
+		return -GetSignalOutputOffset(a_Block);
 	}
 
-	inline static Vector3i GetSignalOutputOffset(NIBBLETYPE a_Meta)
+	inline static Vector3i GetSignalOutputOffset(BlockState a_Block)
 	{
-		switch (a_Meta & 0x7)
+		using namespace Block;
+		switch (Observer::Facing(a_Block))
 		{
-			case 0x00: return { 0, 1, 0 };
-			case 0x01: return { 0, -1, 0 };
-			case 0x02: return { 0, 0, 1 };
-			case 0x03: return { 0, 0, -1 };
-			case 0x04: return { 1, 0, 0 };
-			case 0x05: return { -1, 0, 0 };
-			default:
-			{
-				LOGWARNING("%s: Unknown metadata: %d", __FUNCTION__, a_Meta);
-				ASSERT(!"Unknown metadata while determining orientation of observer!");
-				return { 0, 0, 0 };
-			}
+			case BLOCK_FACE_XM:   return { -1, 0, 0 };
+			case BLOCK_FACE_XP:   return { 1, 0, 0 };
+			case BLOCK_FACE_YM:   return { 0, -1, 0 };
+			case BLOCK_FACE_YP:   return { 0, 1, 0 };
+			case BLOCK_FACE_ZM:   return { 0, 0, -1 };
+			case BLOCK_FACE_ZP:   return { 0, 0, 1 };
+			default: return Vector3i();
 		}
+	}
+
+	inline static void Toggle(cChunkInterface & a_ChunkInterface, Vector3i a_Position)
+	{
+		using namespace Block;
+		auto Self = a_ChunkInterface.GetBlock(a_Position);
+		a_ChunkInterface.FastSetBlock(a_Position, Observer::Observer(Observer::Facing(Self), Observer::Powered(Self)));
 	}
 };

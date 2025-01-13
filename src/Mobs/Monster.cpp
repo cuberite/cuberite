@@ -22,7 +22,8 @@
 
 #include "PathFinder.h"
 #include "../Entities/LeashKnot.h"
-
+#include "../Protocol/Palettes/Upgrade.h"
+#include "../Blocks/BlockLeaves.h"
 
 
 /** Map for eType <-> string
@@ -72,7 +73,8 @@ static const struct
 	{mtZombie,         "zombie",         "Zombie",         "zombie"},
 	{mtZombiePigman,   "zombiepigman",   "PigZombie",      "zombie_pigman"},
 	{mtZombieVillager, "zombievillager", "ZombieVillager", "zombie_villager"},
-} ;
+	{mtBee,			   "bee",			 "Bee",			   "bee"},
+	{mtParrot,         "parrot",         "Parrot",         "parrot"}};
 
 
 
@@ -709,7 +711,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 	Super::OnRightClicked(a_Player);
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
-	if ((EquippedItem.m_ItemType == E_ITEM_NAME_TAG) && !EquippedItem.m_CustomName.empty())
+	if ((EquippedItem.m_ItemType == Item::NameTag) && !EquippedItem.m_CustomName.empty())
 	{
 		SetCustomName(EquippedItem.m_CustomName);
 		if (!a_Player.IsGameModeCreative())
@@ -729,7 +731,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 		// Mob is already leashed but client anticipates the server action and draws a leash link, so we need to send current leash to cancel it
 		m_World->BroadcastLeashEntity(*this, *this->GetLeashedTo());
 	}
-	else if (CanBeLeashed() && (EquippedItem.m_ItemType == E_ITEM_LEASH))
+	else if (CanBeLeashed() && (EquippedItem.m_ItemType == Item::Lead))
 	{
 		if (!a_Player.IsGameModeCreative())
 		{
@@ -890,15 +892,13 @@ void cMonster::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				return;
 			}
 
-			BLOCKTYPE BlockType;
-			NIBBLETYPE BlockMeta;
 			int RelX = static_cast<int>(Destination.x) - Chunk->GetPosX() * cChunkDef::Width;
 			int RelZ = static_cast<int>(Destination.z) - Chunk->GetPosZ() * cChunkDef::Width;
 			int YBelowUs = static_cast<int>(Destination.y) - 1;
 			if (YBelowUs >= 0)
 			{
-				Chunk->GetBlockTypeMeta(RelX, YBelowUs, RelZ, BlockType, BlockMeta);
-				if (BlockType != E_BLOCK_STATIONARY_WATER)  // Idle mobs shouldn't enter water on purpose
+				auto BlockToCheck = Chunk->GetBlock(RelX, YBelowUs, RelZ);
+				if ((BlockToCheck.Type() != BlockType::Water) || (Block::Water::Level(BlockToCheck) != 0))  // Idle mobs shouldn't enter water on purpose
 				{
 					MoveToPosition(Destination);
 				}
@@ -1184,6 +1184,7 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 		case mtZombieHorse:     return mfPassive;
 		case mtZombiePigman:    return mfHostile;
 		case mtZombieVillager:  return mfHostile;
+		case mtBee:             return mfPassive;
 		case mtInvalidType:     break;
 	}
 	UNREACHABLE("Unhandled mob type");
@@ -1324,6 +1325,7 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		case mtWolf:           return std::make_unique<cWolf>();
 		case mtZombie:         return std::make_unique<cZombie>();
 		case mtZombiePigman:   return std::make_unique<cZombiePigman>();
+		case mtBee:			   return std::make_unique<cBee>();
 		default:
 		{
 			ASSERT(!"Unhandled mob type whilst trying to spawn mob!");
@@ -1491,7 +1493,7 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 	{
 		cItems Items;
 		GetBreedingItems(Items);
-		if (Items.ContainsType(EquippedItem.m_ItemType))
+		if (Items.ContainsType(EquippedItem))
 		{
 			if (!a_Player.IsGameModeCreative())
 			{
@@ -1502,9 +1504,9 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 		}
 	}
 	// If a player holding my spawn egg right-clicked me, spawn a new baby
-	if (EquippedItem.m_ItemType == E_ITEM_SPAWN_EGG)
+	if (cItemSpawnEggHandler::IsSpawnEgg(EquippedItem))
 	{
-		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(EquippedItem.m_ItemDamage);
+		eMonsterType MonsterType = cItemSpawnEggHandler::ItemToMonsterType(EquippedItem);
 		if (
 			(MonsterType == m_MobType) &&
 			(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID)  // Spawning succeeded
@@ -1525,18 +1527,18 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 
 
 
-void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth)
+void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, Item a_Item)
 {
 	auto Count = GetRandomProvider().RandInt(a_Min, a_Max);
 	auto MaxStackSize = static_cast<unsigned int>(cItem(a_Item).GetMaxStackSize());
 	while (Count > MaxStackSize)
 	{
-		a_Drops.emplace_back(a_Item, MaxStackSize, a_ItemHealth);
+		a_Drops.emplace_back(a_Item, MaxStackSize);
 		Count -= MaxStackSize;
 	}
 	if (Count > 0)
 	{
-		a_Drops.emplace_back(a_Item, Count, a_ItemHealth);
+		a_Drops.emplace_back(a_Item, Count);
 	}
 }
 
@@ -1544,11 +1546,11 @@ void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned 
 
 
 
-void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth)
+void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, enum Item a_Item)
 {
 	if (GetRandomProvider().RandBool(a_Chance / 100.0))
 	{
-		a_Drops.emplace_back(a_Item, static_cast<char>(1), a_ItemHealth);
+		a_Drops.emplace_back(a_Item);
 	}
 }
 
@@ -1680,8 +1682,8 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 	}
 
 	if (
-		(Chunk->GetBlock(Rel) != E_BLOCK_SOULSAND) &&   // Not on soulsand
-		(GetWorld()->GetTimeOfDay() < 13000_tick) &&    // Daytime
+		(Chunk->GetBlock(Rel) != BlockType::SoulSand) &&   // Not on soulsand
+		(GetWorld()->GetTimeOfDay() < 13000_tick) &&  // Daytime
 		Chunk->IsWeatherSunnyAt(Rel.x, Rel.z) &&        // Not raining
 		!IsInWater()                                    // Isn't swimming
 	)
@@ -1698,13 +1700,12 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 		int CurrentBlock = Chunk->GetHeight(Rel.x, Rel.z);
 		while (CurrentBlock > MobHeight)
 		{
-			BLOCKTYPE Block = Chunk->GetBlock(Rel.x, CurrentBlock, Rel.z);
+			auto BlockToCheck = Chunk->GetBlock(Rel.x, CurrentBlock, Rel.z);
 			if (
 				// Do not burn if a block above us meets one of the following conditions:
-				(!cBlockInfo::IsTransparent(Block)) ||
-				(Block == E_BLOCK_LEAVES) ||
-				(Block == E_BLOCK_NEW_LEAVES) ||
-				(IsBlockWater(Block))
+				(!cBlockInfo::IsTransparent(BlockToCheck)) ||
+				(cBlockLeavesHandler::IsBlockLeaves(BlockToCheck)) ||
+				(BlockToCheck.Type() == BlockType::Water)
 			)
 			{
 				return false;
@@ -1769,7 +1770,7 @@ void cMonster::Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast)
 	if (a_ShouldDropLeashPickup)
 	{
 		cItems Pickups;
-		Pickups.Add(cItem(E_ITEM_LEASH, 1, 0));
+		Pickups.Add(cItem(Item::Lead));
 		GetWorld()->SpawnItemPickups(Pickups, GetPosX() + 0.5, GetPosY() + 0.5, GetPosZ() + 0.5);
 	}
 

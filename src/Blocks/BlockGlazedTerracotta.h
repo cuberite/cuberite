@@ -1,18 +1,17 @@
 
 #pragma once
 
-#include "Mixins/Mixins.h"
-
 
 
 
 
 class cBlockGlazedTerracottaHandler final :
-	public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>
+	public cBlockHandler
 {
-	using Super = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x00, 0x01, 0x02, 0x03>>;
+	using Super = cBlockHandler;
 
 public:
 
 	using Super::Super;
+
 };

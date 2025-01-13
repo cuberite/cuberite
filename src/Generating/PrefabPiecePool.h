@@ -92,10 +92,8 @@ public:
 	const AString & GetIntendedUse(void) const { return m_IntendedUse; }
 	int GetMinDensity(void) const { return m_MinDensity; }
 	int GetMaxDensity(void) const { return m_MaxDensity; }
-	BLOCKTYPE  GetVillageRoadBlockType     (void) const { return m_VillageRoadBlockType; }
-	NIBBLETYPE GetVillageRoadBlockMeta     (void) const { return m_VillageRoadBlockMeta; }
-	BLOCKTYPE  GetVillageWaterRoadBlockType(void) const { return m_VillageWaterRoadBlockType; }
-	NIBBLETYPE GetVillageWaterRoadBlockMeta(void) const { return m_VillageWaterRoadBlockMeta; }
+	BlockState  GetVillageRoadBlock     (void) const { return m_VillageRoadBlockType; }
+	BlockState  GetVillageWaterRoadBlock(void) const { return m_VillageWaterRoadBlockType; }
 
 	/** Returns true if a_Biome is among the accepted biomes in the m_AcceptedBiomes metadata member. */
 	bool IsBiomeAllowed(EMCSBiome a_Biome) const { return (m_AllowedBiomes.find(a_Biome) != m_AllowedBiomes.end()); }
@@ -146,16 +144,10 @@ protected:
 	int m_MaxDensity;
 
 	/** The block type to use for the village roads. */
-	BLOCKTYPE m_VillageRoadBlockType;
-
-	/** The block meta to use for the village roads. */
-	NIBBLETYPE m_VillageRoadBlockMeta;
+	BlockState m_VillageRoadBlockType;
 
 	/** The block type used for the village roads if the road is on water. */
-	BLOCKTYPE m_VillageWaterRoadBlockType;
-
-	/** The block meta used for the village roads if the road is on water. */
-	NIBBLETYPE m_VillageWaterRoadBlockMeta;
+	BlockState m_VillageWaterRoadBlockType;
 
 	/** A set of allowed  biomes for the pool. The pool will only be used within the specified biomes. */
 	std::unordered_set<EMCSBiome, BiomeHasher> m_AllowedBiomes;

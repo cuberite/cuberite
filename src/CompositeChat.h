@@ -7,7 +7,7 @@
 
 #include "Defines.h"
 #include "json/json.h"
-
+#include "WorldStorage/FastNBT.h"
 
 
 
@@ -171,6 +171,10 @@ public:
 	/** Converts the MessageType to a LogLevel value.
 	Used by the logging bindings when logging a cCompositeChat object. */
 	static eLogLevel MessageTypeToLogLevel(eMessageType a_MessageType);
+
+	void WriteAsNBT(cFastNBTWriter & a_Writer, bool a_ShouldUseChatPrefixes) const;
+
+	void AddChatPartStyle(cFastNBTWriter & a_Writer, const AString & a_PartStyle) const;
 
 	/** Adds the chat part's style (represented by the part's stylestring) into the Json object. */
 	void AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle) const;

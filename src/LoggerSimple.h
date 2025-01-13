@@ -93,6 +93,15 @@ void LOGERROR(std::string_view a_Format, const Args & ... args)
 	#define FLOGD(...)
 #endif  // !NDEBUG
 
+// Conditionally log a warning
+#define CONDWARNING(ShouldLog, ...) \
+	do { \
+		if (ShouldLog) \
+		{ \
+			LOGWARNING(__VA_ARGS__); \
+		} \
+	} while (false)
+
 #define FLOGWARN FLOGWARNING
 
 // Conditionally log a warning
