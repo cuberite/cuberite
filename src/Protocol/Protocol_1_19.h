@@ -20,7 +20,7 @@ protected:
 	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void    SendChatRaw(const AString & a_MessageRaw, eChatType a_Type) override;
 	virtual void    SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount) override;
-	virtual void    SendParticleEffect(const AString & a_SoundName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
+	virtual void    SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
 	virtual void    SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData) override;
 	virtual void    SendLoginSuccess(void) override;
 	virtual void    SendPlayerListAddPlayer(const cPlayer & a_Player) override;
