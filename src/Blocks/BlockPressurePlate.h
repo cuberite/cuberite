@@ -19,7 +19,7 @@ public:
 
 	using Super::Super;
 
-	static inline bool PolishedBlackstonePressurePlate(BlockState a_Block)
+	static inline bool IsPressurePlate(BlockState a_Block)
 	{
 		switch (a_Block.Type())
 		{

@@ -116,15 +116,14 @@ private:
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
 		eBlockFace Face;
-		auto Self = a_Chunk.GetBlock(a_Position);
-		switch (Self.Type())
+		switch (a_Self.Type())
 		{
 			case BlockType::Torch:             Face = eBlockFace::BLOCK_FACE_YP; break;
-			case BlockType::WallTorch:         Face = Block::WallTorch::Facing(Self); break;
+			case BlockType::WallTorch:         Face = Block::WallTorch::Facing(a_Self); break;
 			case BlockType::RedstoneTorch:     Face = eBlockFace::BLOCK_FACE_YP; break;
-			case BlockType::RedstoneWallTorch: Face = Block::RedstoneWallTorch::Facing(Self); break;
+			case BlockType::RedstoneWallTorch: Face = Block::RedstoneWallTorch::Facing(a_Self); break;
 			case BlockType::SoulTorch:         Face = eBlockFace::BLOCK_FACE_YP; break;
-			case BlockType::SoulWallTorch:     Face = Block::SoulWallTorch::Facing(Self); break;
+			case BlockType::SoulWallTorch:     Face = Block::SoulWallTorch::Facing(a_Self); break;
 			default: return false;
 		}
 		auto NeighborRelPos = AddFaceDirection(a_Position, Face, true);

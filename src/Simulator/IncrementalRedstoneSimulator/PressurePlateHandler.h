@@ -171,7 +171,7 @@ namespace PressurePlateHandler
 			ChunkData.SetCachedPowerData(a_Position, PowerLevel);
 
 			// Immediately depress plate
-			cBlockPressurePlateHandler::SetPressuredState(ChunkInterface, a_Position, true);
+			cBlockPressurePlateHandler::SetPressuredState(ChunkInterface, Absolute, true);
 
 			UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
 			return;
@@ -239,7 +239,7 @@ namespace PressurePlateHandler
 		a_Chunk.GetWorld()->BroadcastSoundEffect(GetClickOffSound(a_Block), Absolute, 0.5f, 0.5f);
 		ChunkData.SetCachedPowerData(a_Position, PowerLevel);
 
-		cBlockPressurePlateHandler::SetPressuredState(ChunkInterface, a_Position, false);
+		cBlockPressurePlateHandler::SetPressuredState(ChunkInterface, Absolute, false);
 		UpdateAdjustedRelatives(a_Chunk, CurrentlyTicking, a_Position, RelativeAdjacents);
 	}
 

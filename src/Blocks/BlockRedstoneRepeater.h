@@ -71,7 +71,7 @@ public:
 		using namespace Block;
 		return Repeater::Repeater
 		(
-			(Repeater::Delay(a_Block) + 1) % 5,
+			(Repeater::Delay(a_Block) + 1) % 4,
 			Repeater::Facing(a_Block),
 			Repeater::Locked(a_Block),
 			Repeater::Powered(a_Block)

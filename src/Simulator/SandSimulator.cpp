@@ -402,6 +402,7 @@ bool cSandSimulator::IsAllowedBlock(BlockState a_Block)
 		case BlockType::DragonEgg:
 		case BlockType::Gravel:
 		case BlockType::Sand:
+		case BlockType::RedSand:
 		{
 			return true;
 		}
