@@ -7,19 +7,19 @@
 
 
 
-class cItemRawFishHandler:
+class cItemRawFishHandler final:
 	public cItemFoodHandler
 {
 	using Super = cItemFoodHandler;
 
 public:
 
-	cItemRawFishHandler():
-		Super(Item::Cod, FoodInfo(0, 0))
+	constexpr cItemRawFishHandler(Item a_ItemType):
+		Super(a_ItemType, FoodInfo(0, 0))
 	{
 	}
 
-	virtual FoodInfo GetFoodInfo(const cItem * a_Item) override
+	virtual FoodInfo GetFoodInfo(const cItem * a_Item) const override
 	{
 		switch (a_Item->m_ItemType)
 		{
@@ -31,7 +31,7 @@ public:
 		}
 	}
 
-	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) const override
 	{
 		if (!Super::EatItem(a_Player, a_Item))
 		{

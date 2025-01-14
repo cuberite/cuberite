@@ -71,8 +71,8 @@ private:
 		}
 
 		const auto Player = static_cast<const cPlayer *>(a_Digger);
-		auto Handler = Player->GetEquippedItem().GetHandler();
-		if (!Player->IsGameModeSurvival() || !Handler->CanHarvestBlock(a_OldBlock))
+		auto & Handler = Player->GetEquippedItem().GetHandler();
+		if (!Player->IsGameModeSurvival() || !Handler.CanHarvestBlock(a_OldBlock))
 		{
 			return;
 		}

@@ -1,12 +1,12 @@
 
 #pragma once
 
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
 
 
 
 
-class cBlockEnderchestHandler final :
+class cBlockEnderChestHandler final :
 	public cBlockEntityHandler
 {
 	using Super = cBlockEntityHandler;
@@ -17,7 +17,7 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// Only drop something when mined with a pickaxe:
 		if (
@@ -38,7 +38,3 @@ private:
 	}
 
 };
-
-
-
-

@@ -7,19 +7,19 @@
 
 
 
-class cItemCookedFishHandler:
+class cItemCookedFishHandler final:
 	public cItemFoodHandler
 {
 	using Super = cItemFoodHandler;
 
 public:
 
-	cItemCookedFishHandler():
-		Super(Item::CookedCod, FoodInfo(0, 0))
+	constexpr cItemCookedFishHandler(Item a_ItemType):
+		Super(a_ItemType, FoodInfo(0, 0))
 	{
 	}
 
-	virtual FoodInfo GetFoodInfo(const cItem * a_Item) override
+	virtual FoodInfo GetFoodInfo(const cItem * a_Item) const override
 	{
 		switch (a_Item->m_ItemType)
 		{

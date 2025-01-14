@@ -80,7 +80,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		return false;
 	}
 
-	if (cChunkDef::IsValidHeight(a_RelPos.y - 1) && (a_Chunk->GetBlock(a_RelPos.addedY(-1)).Type() == BlockType::Bedrock))
+	if (cChunkDef::IsValidHeight(a_RelPos.addedY(-1)) && (a_Chunk->GetBlock(a_RelPos.addedY(-1)).Type() == BlockType::Bedrock))
 	{
 		return false;   // Make sure mobs do not spawn on bedrock.
 	}
@@ -209,12 +209,32 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 		case mtMagmaCube:
 		case mtSlime:
 		{
+			const int AMOUNT_MOON_PHASES = 8;
+			auto maxLight = Random.RandInt(0, 7);
+			auto moonPhaseNumber = static_cast<int>(std::floor(a_Chunk->GetWorld()->GetWorldAge().count() / 24000)) % AMOUNT_MOON_PHASES;
+			auto moonThreshold = static_cast<float>(std::abs(moonPhaseNumber - (AMOUNT_MOON_PHASES / 2)) / (AMOUNT_MOON_PHASES / 2));
 			return
 			(
 				IsBlockAir(TargetBlock) &&
 				IsBlockAir(BlockAbove) &&
-				((!cBlockInfo::IsTransparent(BlockBelow)) || (a_DisableSolidBelowCheck)) &&
-				((a_RelPos.y <= 40) || (a_Biome == biSwampland))
+				(
+					(!cBlockInfo::IsTransparent(BlockBelow)) ||
+					(a_DisableSolidBelowCheck)) &&
+				(
+					(
+						(a_RelPos.y <= 40) &&
+						a_Chunk->IsSlimeChunk()
+					) ||
+					(
+						(a_Biome == biSwampland) &&
+						(a_RelPos.y >= 50) &&
+						(a_RelPos.y <= 70) &&
+						(SkyLight <= maxLight) &&
+						(BlockLight <= maxLight) &&
+						(Random.RandBool(moonThreshold)) &&
+						(Random.RandBool(0.5))
+					)
+				)
 			);
 		}
 

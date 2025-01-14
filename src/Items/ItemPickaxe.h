@@ -6,22 +6,16 @@
 #include "../Protocol/Palettes/Upgrade.h"
 
 
-class cItemPickaxeHandler:
+class cItemPickaxeHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemPickaxeHandler(Item a_ItemType):
-		Super(a_ItemType)
-	{
+	using Super::Super;
 
-	}
-
-
-
-	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) override
+	virtual short GetDurabilityLossByAction(eDurabilityLostAction a_Action) const override
 	{
 		switch (a_Action)
 		{
@@ -34,7 +28,7 @@ public:
 
 
 
-	char PickaxeLevel()
+	char PickaxeLevel() const
 	{
 		switch (m_ItemType)
 		{
@@ -48,7 +42,7 @@ public:
 		}
 	}
 
-	virtual bool CanHarvestBlock(BlockState a_Block) override
+	virtual bool CanHarvestBlock(BlockState a_Block) const override
 	{
 		// NOTICE: Make sure to update cItemHandler::CanHarvestBlock() if adding new blocks here!
 		switch (a_Block.Type())
@@ -250,7 +244,7 @@ public:
 		}
 	}
 
-	virtual bool CanRepairWithRawMaterial(const cItem & a_Item) override
+	virtual bool CanRepairWithRawMaterial(const cItem & a_Item) const override
 	{
 		switch (m_ItemType)
 		{
@@ -293,7 +287,7 @@ public:
 	}
 
 
-	virtual float GetBlockBreakingStrength(BlockState a_Block) override
+	virtual float GetBlockBreakingStrength(BlockState a_Block) const override
 	{
 		if (!IsBlockMaterialIron(a_Block) && (IsBlockAnvil(a_Block)) && !IsBlockMaterialRock(a_Block))
 		{

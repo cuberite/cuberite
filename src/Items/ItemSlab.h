@@ -9,7 +9,7 @@
 
 
 
-class cItemSlabHandler:
+class cItemSlabHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
@@ -25,7 +25,7 @@ public:
 
 protected:
 
-	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) override
+	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
 		auto OldBlock = a_Player.GetWorld()->GetBlock(a_PlacePosition);
 		// Confer BlockSlab.h, which we're in cahoots with to make the below logic work.
@@ -38,7 +38,7 @@ protected:
 				return false;
 			}
 
-			a_Player.SendBlocksAround(a_PlacePosition.x, a_PlacePosition.y, a_PlacePosition.z, 2);  // (see below)
+			a_Player.SendBlocksAround(a_PlacePosition, 2);  // (see below)
 			return true;
 		}
 
@@ -330,7 +330,7 @@ protected:
 		direction of the clicked block face of a block ignoring build collision, rather than replacing said block.
 		Resend blocks to the client to fix the bug.
 		Ref.: https://forum.cuberite.org/thread-434-post-17388.html#pid17388 */
-		a_Player.SendBlocksAround(a_PlacePosition.x, a_PlacePosition.y, a_PlacePosition.z, 2);
+		a_Player.SendBlocksAround(a_PlacePosition, 2);
 
 		return true;
 	}

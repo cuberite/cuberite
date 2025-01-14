@@ -10,17 +10,14 @@
 
 
 
-class cItemLighterHandler:
+class cItemLighterHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemLighterHandler(Item a_ItemType):
-		Super(a_ItemType)
-	{
-	}
+	using Super::Super;
 
 
 
@@ -33,7 +30,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		if (a_ClickedBlockFace < 0)
 		{
@@ -61,7 +58,7 @@ public:
 		}
 
 		const auto FirePos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace);
-		if (!cChunkDef::IsValidHeight(FirePos.y))
+		if (!cChunkDef::IsValidHeight(FirePos))
 		{
 			return false;
 		}

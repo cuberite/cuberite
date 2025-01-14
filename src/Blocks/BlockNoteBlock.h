@@ -26,18 +26,12 @@ private:
 		const Vector3i a_BlockPos
 	) const override
 	{
-		a_WorldInterface.DoWithBlockEntityAt(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, [](cBlockEntity & a_BlockEntity)
+		a_WorldInterface.DoWithBlockEntityAt(a_BlockPos, [](cBlockEntity & a_BlockEntity)
 		{
-			if (a_BlockEntity.GetBlockType() != BlockType::NoteBlock)
-			{
-				return false;
-			}
+			ASSERT(a_BlockEntity.GetBlockType() == BlockType::NoteBlock);
 
-			auto & NoteEntity = static_cast<cNoteEntity &>(a_BlockEntity);
-
-			NoteEntity.MakeSound();
-
-			return true;
+			static_cast<cNoteEntity &>(a_BlockEntity).MakeSound();
+			return false;
 		});
 	}
 };

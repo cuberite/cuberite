@@ -10,7 +10,7 @@
 
 
 cPig::cPig(void) :
-	Super("Pig", mtPig, "entity.pig.hurt", "entity.pig.death", "entity.pig.ambient", 0.9, 0.9),
+	Super("Pig", mtPig, "entity.pig.hurt", "entity.pig.death", "entity.pig.ambient", 0.9f, 0.9f),
 	m_bIsSaddled(false)
 {
 }
@@ -67,8 +67,8 @@ void cPig::OnRightClicked(cPlayer & a_Player)
 			m_Attachee->Detach();
 		}
 
-		// Attach the player to this pig
-		a_Player.AttachTo(this);
+		// Attach the player to this pig:
+		a_Player.AttachTo(*this);
 	}
 	else if (a_Player.GetEquippedItem().m_ItemType == Item::Saddle)
 	{

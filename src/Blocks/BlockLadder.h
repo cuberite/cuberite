@@ -3,7 +3,7 @@
 
 #include "BlockHandler.h"
 #include "BlockInfo.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
 
 
 
@@ -31,7 +31,7 @@ public:
 			return false;
 		}
 
-		return cBlockInfo::IsSolid(a_Block);
+		return cBlockInfo::FullyOccupiesVoxel(a_Block);
 	}
 
 

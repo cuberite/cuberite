@@ -33,7 +33,7 @@ private:
 			return false;
 		}
 
-		a_Player.GetStatManager().AddValue(Statistic::EatCakeSlice);
+		a_Player.GetStatistics().Custom[CustomStatistic::EatCakeSlice]++;
 		auto EatenSlices = Block::Cake::Bites(Self);
 		if (EatenSlices >= 5)
 		{
@@ -50,7 +50,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(BlockState a_Block, const cEntity * a_Digger, const cItem * a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// Give nothing
 		return {};

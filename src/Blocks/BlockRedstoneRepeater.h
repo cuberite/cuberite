@@ -3,10 +3,9 @@
 
 #include "BlockHandler.h"
 #include "BlockType.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
+#include "Mixins/SolidSurfaceUnderneath.h"
 #include "ChunkInterface.h"
-#include "BlockSlab.h"
-#include "BlockStairs.h"
 #include "../Chunk.h"
 
 

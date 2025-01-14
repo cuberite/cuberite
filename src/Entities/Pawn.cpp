@@ -402,7 +402,7 @@ void cPawn::HandleFalling(void)
 		auto Player = static_cast<cPlayer *>(this);
 
 		/* 3. If the player is flying or climbing, absorb fall damage */
-		FallDamageAbsorbed |= Player->IsFlying() || Player->IsClimbing();
+		FallDamageAbsorbed |= Player->IsFlying() || Player->IsClimbing() || Player->GetIsTeleporting();
 
 		/* 4. If the player is about to bounce on a slime block and is not crouching, absorb all fall damage  */
 		ShouldBounceOnSlime = !Player->IsCrouched();
@@ -656,7 +656,7 @@ bool cPawn::FindTeleportDestination(cWorld & a_World, const int a_HeightRequired
 	/*
 	Algorithm:
 	Choose random destination.
-	Seek downwards, regardless of distance until the block is made of movement-blocking material: https://minecraft.fandom.com/wiki/Materials
+	Seek downwards, regardless of distance until the block is made of movement-blocking material: https://minecraft.wiki/w/Materials
 	Succeeds if no liquid or solid blocks prevents from standing at destination.
 	*/
 	auto & Random = GetRandomProvider();

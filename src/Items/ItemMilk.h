@@ -5,25 +5,22 @@
 
 
 
-class cItemMilkHandler:
+class cItemMilkHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemMilkHandler():
-		Super(Item::MilkBucket)
-	{
-	}
+	using Super::Super;
 
-	virtual bool IsDrinkable(short a_ItemDamage) override
+	virtual bool IsDrinkable(short a_ItemDamage) const override
 	{
 		UNUSED(a_ItemDamage);
 		return true;
 	}
 
-	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) const override
 	{
 		UNUSED(a_Item);
 		a_Player->ClearEntityEffects();

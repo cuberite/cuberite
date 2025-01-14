@@ -11,7 +11,7 @@
 
 #include "BiomeDef.h"
 
-
+//#include "BlockType.h";
 
 // Used to smoothly convert to new axis ordering. One will be removed when deemed stable.
 #define AXIS_ORDER_YZX 1  // Original (1.1-)
@@ -48,12 +48,14 @@ typedef unsigned char LIGHTTYPE;
 /** The type used by the heightmap */
 typedef unsigned char HEIGHTTYPE;
 
+typedef unsigned int  NEWBLOCKTYPE;
 // tolua_end
 
 
 
 
 
+/** Wraps the chunk coords into a single structure. */
 class cChunkCoords
 {
 public:
@@ -92,9 +94,25 @@ public:
 	/** Returns a string that describes the chunk coords, suitable for logging. */
 	AString ToString() const
 	{
-		return Printf("[%d, %d]", m_ChunkX, m_ChunkZ);
+		return fmt::format(FMT_STRING("[{}, {}]"), m_ChunkX, m_ChunkZ);
 	}
 } ;
+
+
+
+
+
+/** Implements custom fmtlib formatting for cChunkCoords. */
+namespace fmt
+{
+	template <> struct formatter<cChunkCoords>: formatter<int>
+	{
+		auto format(cChunkCoords a_Coords, format_context & a_Ctx)
+		{
+			return format_to(a_Ctx.out(), "[{}, {}]", a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
+		}
+	};
+}
 
 
 
@@ -124,6 +142,9 @@ public:
 	// typedef unsigned char BlockTypes[NumBlocks];
 	/** The type used for block type operations and storage, AXIS_ORDER ordering */
 	using BlockStates = BlockState[NumBlocks];
+
+	/** The type used for block type operations and storage, AXIS_ORDER ordering */
+	typedef NEWBLOCKTYPE BlockTypes2[NumBlocks];
 
 	/** The type used for block data in nibble format, AXIS_ORDER ordering */
 	using LightNibbles = LIGHTTYPE[NumBlocks / 2];
@@ -167,10 +188,10 @@ public:
 	}
 
 
-	/** Validates a height-coordinate. Returns false if height-coordiante is out of height bounds */
-	inline static bool IsValidHeight(int a_Height)
+	/** Validates a height-coordinate. Returns false if height-coordinate is out of height bounds */
+	inline static bool IsValidHeight(Vector3i a_BlockPosition)
 	{
-		return ((a_Height >= 0) && (a_Height < Height));
+		return ((a_BlockPosition.y >= 0) && (a_BlockPosition.y < Height));
 	}
 
 
@@ -194,7 +215,7 @@ public:
 	{
 		return (
 			IsValidWidth(a_RelPos.x) &&
-			IsValidHeight(a_RelPos.y) &&
+			IsValidHeight(a_RelPos) &&
 			IsValidWidth(a_RelPos.z)
 		);
 	}

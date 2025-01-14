@@ -30,13 +30,8 @@ Implements the 1.11 protocol classes:
 
 #include "../Mobs/IncludeAllMonsters.h"
 
-#include "../BlockEntities/BannerEntity.h"
-#include "../BlockEntities/BeaconEntity.h"
 #include "../BlockEntities/BedEntity.h"
-#include "../BlockEntities/CommandBlockEntity.h"
-#include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/MobSpawnerEntity.h"
-#include "../BlockEntities/FlowerPotEntity.h"
 
 #include "../Root.h"
 #include "../Server.h"
@@ -321,19 +316,6 @@ namespace Metadata_1_11
 
 
 
-#define HANDLE_READ(ByteBuf, Proc, Type, Var) \
-	Type Var; \
-	do { \
-		if (!ByteBuf.Proc(Var))\
-		{\
-			return;\
-		} \
-	} while (false)
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_11_0:
 
@@ -345,6 +327,41 @@ void cProtocol_1_11_0::SendCollectEntity(const cEntity & a_Collected, const cEnt
 	Pkt.WriteVarInt32(a_Collected.GetUniqueID());
 	Pkt.WriteVarInt32(a_Collector.GetUniqueID());
 	Pkt.WriteVarInt32(static_cast<UInt32>(a_Count));
+}
+
+
+
+
+
+void cProtocol_1_11_0::SendEntityAnimation(const cEntity & a_Entity, const EntityAnimation a_Animation)
+{
+	switch (a_Animation)
+	{
+		case EntityAnimation::EggCracks:
+		case EntityAnimation::SnowballPoofs:
+		{
+			// Vanilla stopped doing clientside prediction for thrown projectile particle effects (for some reason).
+			// But they're still doing motion prediction, and latency exists, hence re-send the server position to avoid particle effects happening inside a block:
+			SendEntityPosition(a_Entity);
+			break;
+		}
+		case EntityAnimation::PawnChestEquipmentBreaks:
+		case EntityAnimation::PawnFeetEquipmentBreaks:
+		case EntityAnimation::PawnHeadEquipmentBreaks:
+		case EntityAnimation::PawnLegsEquipmentBreaks:
+		case EntityAnimation::PawnMainHandEquipmentBreaks:
+		case EntityAnimation::PawnOffHandEquipmentBreaks:
+		{
+			const auto Position = a_Entity.GetPosition();
+
+			// 1.11 dropped the automatic particle effect + sound on item break. Emulate at least some of it:
+			SendSoundEffect("entity.item.break", Position, 1, 0.75f + ((a_Entity.GetUniqueID() * 23) % 32) / 64.f);
+			break;
+		}
+		default: break;
+	}
+
+	Super::SendEntityAnimation(a_Entity, a_Animation);
 }
 
 
@@ -549,16 +566,24 @@ void cProtocol_1_11_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 
 
 
-cProtocol::Version cProtocol_1_11_0::GetProtocolVersion()
+signed char cProtocol_1_11_0::GetProtocolEntityStatus(const EntityAnimation a_Animation) const
 {
-	return Version::v1_11_0;
+	switch (a_Animation)
+	{
+		case EntityAnimation::EggCracks: return 3;
+		case EntityAnimation::EvokerFangsAttacks: return 4;
+		case EntityAnimation::IronGolemStashesGift: return 34;
+		case EntityAnimation::PawnTotemActivates: return 35;
+		case EntityAnimation::SnowballPoofs: return 3;
+		default: return Super::GetProtocolEntityStatus(a_Animation);
+	}
 }
 
 
 
 
 
-UInt32 cProtocol_1_11_0::GetProtocolMobType(const eMonsterType a_MobType)
+UInt32 cProtocol_1_11_0::GetProtocolMobType(const eMonsterType a_MobType) const
 {
 	switch (a_MobType)
 	{
@@ -618,10 +643,19 @@ UInt32 cProtocol_1_11_0::GetProtocolMobType(const eMonsterType a_MobType)
 
 
 
+cProtocol::Version cProtocol_1_11_0::GetProtocolVersion() const
+{
+	return Version::v1_11_0;
+}
+
+
+
+
+
 void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 {
-	int BlockX, BlockY, BlockZ;
-	if (!a_ByteBuffer.ReadXYZPosition64(BlockX, BlockY, BlockZ))
+	Vector3i Position;
+	if (!a_ByteBuffer.ReadXYZPosition64(Position))
 	{
 		return;
 	}
@@ -631,19 +665,16 @@ void cProtocol_1_11_0::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorX);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorY);
 	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, CursorZ);
-	m_Client->HandleRightClick(BlockX, BlockY, BlockZ, FaceIntToBlockFace(Face), FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16), HandIntToEnum(Hand));
+
+	m_Client->HandleRightClick(Position, FaceIntToBlockFace(Face), {FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16)}, Hand == 0);
 }
 
 
 
 
 
-void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity)
+void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
 {
-	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
-	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
-	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
-
 	switch (a_BlockEntity.GetBlockType())
 	{
 		case BlockType::BlackBed:
@@ -667,7 +698,6 @@ void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockE
 			a_Writer.AddInt("color", BedEntity.GetColor());  // New: multicoloured beds
 			break;
 		}
-
 		case BlockType::Spawner:
 		{
 			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
@@ -677,16 +707,19 @@ void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockE
 			a_Writer.AddShort("Delay", MobSpawnerEntity.GetSpawnDelay());
 			break;
 		}
-
-		default: Super::WriteBlockEntity(a_Writer, a_BlockEntity);
+		default: return Super::WriteBlockEntity(a_Writer, a_BlockEntity);
 	}
+
+	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
+	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
+	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
 }
 
 
 
 
 
-void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity)
+void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
 {
 	using namespace Metadata_1_11;
 
@@ -739,7 +772,7 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 
 			a_Pkt.WriteBEUInt8(PLAYER_MAIN_HAND);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetMainHand()));
+			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
 			break;
 		}
 		case cEntity::etPickup:
@@ -910,7 +943,7 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 
 
 
-void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob)
+void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const
 {
 	using namespace Metadata_1_11;
 
@@ -1150,6 +1183,19 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			break;
 		}  // case mtSheep
 
+		case mtSkeleton:
+		{
+			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
+			a_Pkt.WriteBEUInt8(LIVING_ACTIVE_HAND);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
+			a_Pkt.WriteBEUInt8(Skeleton.IsChargingBow() ? 0x01 : 0x00);
+
+			a_Pkt.WriteBEUInt8(ABSTRACT_SKELETON_ARMS_SWINGING);
+			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
+			a_Pkt.WriteBool(Skeleton.IsChargingBow());
+			break;
+		}  // case mtSkeleton
+
 		case mtSlime:
 		{
 			auto & Slime = static_cast<const cSlime &>(a_Mob);
@@ -1280,8 +1326,6 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 		case mtDonkey:
 		case mtMule:
 
-		case mtEndermite:
-
 		case mtEvoker:
 
 		case mtLlama:
@@ -1304,11 +1348,11 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 
 		case mtCaveSpider:
 		case mtEnderDragon:
+		case mtEndermite:
 		case mtGiant:
 		case mtIronGolem:
 		case mtMooshroom:
 		case mtSilverfish:
-		case mtSkeleton:
 		case mtStray:
 		case mtSpider:
 		case mtSquid:
@@ -1329,7 +1373,7 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_11_1:
 
-cProtocol::Version cProtocol_1_11_1::GetProtocolVersion()
+cProtocol::Version cProtocol_1_11_1::GetProtocolVersion() const
 {
 	return Version::v1_11_1;
 }
