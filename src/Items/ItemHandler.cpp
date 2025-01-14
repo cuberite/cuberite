@@ -332,7 +332,7 @@ namespace
 	constexpr cUnimplementedItemHandler     ItemCyanTerracottaHandler                  (Item::CyanTerracotta);
 	constexpr cItemWoolHandler              ItemCyanWoolHandler                        (Item::CyanWool);
 	constexpr cItemAnvilHandler             ItemDamagedAnvilHandler                    (Item::DamagedAnvil);
-	constexpr cUnimplementedItemHandler     ItemDandelionHandler                       (Item::Dandelion);
+	constexpr cSimplePlaceableItemHandler   ItemDandelionHandler                       (Item::Dandelion);
 	constexpr cItemBoatHandler              ItemDarkOakBoatHandler                     (Item::DarkOakBoat);
 	constexpr cItemButtonHandler            ItemDarkOakButtonHandler                   (Item::DarkOakButton);
 	constexpr cItemDoorHandler              ItemDarkOakDoorHandler                     (Item::DarkOakDoor);
@@ -844,8 +844,8 @@ namespace
 	constexpr cItemStairsHandler            ItemRedNetherBrickStairsHandler            (Item::RedNetherBrickStairs);
 	constexpr cUnimplementedItemHandler     ItemRedNetherBrickWallHandler              (Item::RedNetherBrickWall);
 	constexpr cUnimplementedItemHandler     ItemRedNetherBricksHandler                 (Item::RedNetherBricks);
-	constexpr cUnimplementedItemHandler     ItemRedSandHandler                         (Item::RedSand);
-	constexpr cUnimplementedItemHandler     ItemRedSandstoneHandler                    (Item::RedSandstone);
+	constexpr cSimplePlaceableItemHandler   ItemRedSandHandler                         (Item::RedSand);
+	constexpr cSimplePlaceableItemHandler   ItemRedSandstoneHandler                    (Item::RedSandstone);
 	constexpr cItemSlabHandler              ItemRedSandstoneSlabHandler                (Item::RedSandstoneSlab);
 	constexpr cItemStairsHandler            ItemRedSandstoneStairsHandler              (Item::RedSandstoneStairs);
 	constexpr cUnimplementedItemHandler     ItemRedSandstoneWallHandler                (Item::RedSandstoneWall);
@@ -856,7 +856,7 @@ namespace
 	constexpr cUnimplementedItemHandler     ItemRedTulipHandler                        (Item::RedTulip);
 	constexpr cItemWoolHandler              ItemRedWoolHandler                         (Item::RedWool);
 	constexpr cSimplePlaceableItemHandler   ItemRedstoneBlockHandler                   (Item::RedstoneBlock);
-	constexpr cUnimplementedItemHandler     ItemRedstoneHandler                        (Item::Redstone);
+	constexpr cItemRedstoneDustHandler      ItemRedstoneHandler                        (Item::Redstone);
 	constexpr cSimplePlaceableItemHandler   ItemRedstoneLampHandler                    (Item::RedstoneLamp);
 	constexpr cSimplePlaceableItemHandler   ItemRedstoneOreHandler                     (Item::RedstoneOre);
 	constexpr cItemTorchHandler             ItemRedstoneTorchHandler                   (Item::RedstoneTorch);

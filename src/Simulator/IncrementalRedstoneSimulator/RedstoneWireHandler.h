@@ -287,7 +287,7 @@ namespace RedstoneWireHandler
 		}
 
 		using namespace Block;
-		a_Chunk.SetBlock(a_Position, RedstoneWire::RedstoneWire
+		a_Chunk.FastSetBlock(a_Position, RedstoneWire::RedstoneWire
 		(
 			RedstoneWire::East(a_Block),
 			RedstoneWire::North(a_Block),
