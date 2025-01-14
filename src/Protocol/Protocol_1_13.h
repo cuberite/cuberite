@@ -36,14 +36,15 @@ public:
 
 protected:
 
-	virtual void SendBlockChange                (int a_BlockX, int a_BlockY, int a_BlockZ, BlockState a_Block) override;
+	virtual void SendBlockChange                (Vector3i a_BlockPos, BlockState a_Block) override;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) override;
+	virtual void SendCommandTree                (void) override;
 	virtual void SendMapData                    (const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 	virtual void SendPaintingSpawn              (const cPainting & a_Painting) override;
 	virtual void SendParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
 	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
 	virtual void SendStatistics                 (const StatisticsManager & a_Manager) override;
-	virtual void SendTabCompletionResults       (const AStringVector & a_Results) override;
+	virtual void SendTabCompletionResults       (const AStringVector & a_Results, UInt32 CompletionId) override;
 	virtual void SendUpdateBlockEntity          (cBlockEntity & a_BlockEntity) override;
 	virtual void SendSpawnEntity                (const cEntity & a_Entity) override;
 	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata) const;
@@ -58,8 +59,11 @@ protected:
 	virtual Version GetProtocolVersion() const override;
 
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
+	virtual void HandlePacketNameItem(cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketPluginMessage(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer);
+	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, std::string_view a_Channel) override;
+	virtual void HandlePacketTabComplete(cByteBuffer & a_ByteBuffer) override;
 
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) const override;
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, EntityMetadata a_Metadata, EntityMetadataType a_FieldType) const;

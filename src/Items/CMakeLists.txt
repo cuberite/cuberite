@@ -26,7 +26,7 @@ target_sources(
 	ItemEnchantingTable.h
 	ItemEndCrystal.h
 	ItemEndPortalFrame.h
-	ItemEnderchest.h
+	ItemEnderChest.h
 	ItemEyeOfEnder.h
 	ItemFence.h
 	ItemFenceGate.h
@@ -80,7 +80,7 @@ target_sources(
 	ItemTorch.h
 	ItemTrapdoor.h
 	ItemTripwireHook.h
-	ItemVine.h
+	ItemVines.h
 	ItemWool.h
 	SimplePlaceableItemHandler.h
 	ItemWood.h

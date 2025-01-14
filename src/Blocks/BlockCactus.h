@@ -20,11 +20,12 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		if (a_Position.y <= 0)
+		const auto SurfacePosition = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(SurfacePosition))
 		{
 			return false;
 		}
-		auto Surface = a_Chunk.GetBlock(a_Position.addedY(-1));
+		auto Surface = a_Chunk.GetBlock(SurfacePosition);
 		if ((Surface.Type() != BlockType::Sand) && (Surface.Type() != BlockType::Cactus))
 		{
 			// Cactus can only be placed on sand and itself
@@ -140,7 +141,8 @@ private:
 	virtual PlantAction CanGrow(cChunk & a_Chunk, Vector3i a_RelPos) const override
 	{
 		// Only allow growing if there's an air block above:
-		if (((a_RelPos.y + 1) < cChunkDef::Height) && IsBlockAir(a_Chunk.GetBlock(a_RelPos.addedY(1))))
+		const auto RelPosAbove = a_RelPos.addedY(1);
+		if (cChunkDef::IsValidHeight(RelPosAbove) && IsBlockAir(a_Chunk.GetBlock(RelPosAbove)))
 		{
 			return Super::CanGrow(a_Chunk, a_RelPos);
 		}

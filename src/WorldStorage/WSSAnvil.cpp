@@ -792,7 +792,7 @@ bool cWSSAnvil::LoadHeightMapFromNBT(cChunkDef::HeightMap & a_HeightMap, const c
 		for (int RelX = 0; RelX < cChunkDef::Width; RelX++)
 		{
 			const int Index = 4 * (RelX + RelZ * cChunkDef::Width);
-			const int Height = GetBEInt(HeightData + Index);
+			const int Height = NetworkBufToHost<Int32>(HeightData + Index);
 
 			if (Height > std::numeric_limits<HEIGHTTYPE>::max())
 			{

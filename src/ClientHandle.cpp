@@ -1264,10 +1264,10 @@ void cClientHandle::HandleBlockDigStarted(Vector3i a_BlockPos, eBlockFace a_Bloc
 		return;
 	}
 
-	auto DiggingBlock = m_Player->GetWorld()->GetBlock(a_BlockPos);
+	BlockState DiggingBlock;
 
 	if (
-		m_Player->IsGameModeCreative() &&
+		m_Player->GetWorld()->GetBlock(a_BlockPos, DiggingBlock) &&m_Player->IsGameModeCreative() &&
 		ItemCategory::IsSword(m_Player->GetInventory().GetEquippedItem().m_ItemType) &&
 		(DiggingBlock.Type() != BlockType::Fire)
 	)
@@ -1330,7 +1330,11 @@ void cClientHandle::HandleBlockDigFinished(Vector3i a_BlockPos, eBlockFace a_Blo
 
 	FinishDigAnimation();
 
-	auto DugBlock = m_Player->GetWorld()->GetBlock(a_BlockPos);
+	BlockState DugBlock;
+	if (!m_Player->GetWorld()->GetBlock(a_BlockPos, DugBlock))
+	{
+		return;
+	}
 
 	if (!m_Player->IsGameModeCreative())
 	{

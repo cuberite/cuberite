@@ -9,21 +9,14 @@
 
 
 
-class cItemSpawnEggHandler:
+class cItemSpawnEggHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	cItemSpawnEggHandler(Item a_ItemType):
-		Super(a_ItemType)
-	{
-	}
-
-
-
-
+	using Super::Super;
 
 	virtual bool OnItemUse(
 		cWorld * a_World,
@@ -32,7 +25,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		// Must click a valid block:
 		if (a_ClickedBlockFace < 0)

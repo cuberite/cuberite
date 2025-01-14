@@ -46,6 +46,7 @@ static const struct
 	{mtCow,            "cow",            "Cow",            "cow"},
 	{mtCreeper,        "creeper",        "Creeper",        "creeper"},
 	{mtEnderman,       "enderman",       "Enderman",       "enderman"},
+	{mtEndermite,      "endermite",      "Endermite",      "endermite"},
 	{mtEnderDragon,    "enderdragon",    "EnderDragon",    "ender_dragon"},
 	{mtGhast,          "ghast",          "Ghast",          "ghast"},
 	{mtGiant,          "giant",          "Giant",          "giant"},
@@ -72,7 +73,8 @@ static const struct
 	{mtZombie,         "zombie",         "Zombie",         "zombie"},
 	{mtZombiePigman,   "zombiepigman",   "PigZombie",      "zombie_pigman"},
 	{mtZombieVillager, "zombievillager", "ZombieVillager", "zombie_villager"},
-} ;
+	{mtBee,			   "bee",			 "Bee",			   "bee"},
+	{mtParrot,         "parrot",         "Parrot",         "parrot"}};
 
 
 
@@ -81,7 +83,7 @@ static const struct
 ////////////////////////////////////////////////////////////////////////////////
 // cMonster:
 
-cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, double a_Width, double a_Height)
+cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height)
 	: Super(etMonster, a_Width, a_Height)
 	, m_EMState(IDLE)
 	, m_EMPersonality(AGGRESSIVE)
@@ -91,7 +93,7 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_IdleInterval(0)
 	, m_DestroyTimer(0)
 	, m_MobType(a_MobType)
-	, m_CustomName("")
+	, m_CustomName()
 	, m_CustomNameAlwaysVisible(false)
 	, m_SoundHurt(a_SoundHurt)
 	, m_SoundDeath(a_SoundDeath)
@@ -227,8 +229,18 @@ void cMonster::MoveToWayPoint(cChunk & a_Chunk)
 			// Don't let the mob move too much if he's falling.
 			Distance *= 0.25f;
 		}
-		// Apply walk speed:
-		Distance *= m_RelativeWalkSpeed;
+
+		if ((m_EMState == CHASING) || (m_EMState == ESCAPING))
+		{
+			// Apply run speed:
+			Distance *= m_BaseRunSpeed * m_RelativeWalkSpeed;
+		}
+		else
+		{
+			// Apply walk speed:
+			Distance *= m_BaseWalkSpeed * m_RelativeWalkSpeed;
+		}
+
 		/* Reduced default speed.
 		Close to Vanilla, easier for mobs to follow m_NextWayPointPositions, hence
 		better pathfinding. */
@@ -542,26 +554,26 @@ void cMonster::HandleFalling()
 
 int cMonster::FindFirstNonAirBlockPosition(double a_PosX, double a_PosZ)
 {
-	int PosY = POSY_TOINT;
-	PosY = Clamp(PosY, 0, cChunkDef::Height);
+	auto Position = GetPosition().Floor();
+	Position.y = Clamp(Position.y, 0, cChunkDef::Height);
 
-	if (!cBlockInfo::IsSolid(m_World->GetBlock(FloorC(a_PosX), PosY, FloorC(a_PosZ))))
+	if (!cBlockInfo::IsSolid(m_World->GetBlock(Position)))
 	{
-		while (!cBlockInfo::IsSolid(m_World->GetBlock(FloorC(a_PosX), PosY, FloorC(a_PosZ))) && (PosY > 0))
+		while (!cBlockInfo::IsSolid(m_World->GetBlock(Position)) && (Position.y > 0))
 		{
-			PosY--;
+			Position.y--;
 		}
 
-		return PosY + 1;
+		return Position.y + 1;
 	}
 	else
 	{
-		while ((PosY < cChunkDef::Height) && cBlockInfo::IsSolid(m_World->GetBlock(static_cast<int>(floor(a_PosX)), PosY, static_cast<int>(floor(a_PosZ)))))
+		while ((Position.y < cChunkDef::Height) && cBlockInfo::IsSolid(m_World->GetBlock(Position)))
 		{
-			PosY++;
+			Position.y++;
 		}
 
-		return PosY;
+		return Position.y;
 	}
 }
 
@@ -606,6 +618,15 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 	{
 		m_World->BroadcastSoundEffect(m_SoundDeath, GetPosition(), 1.0f, 0.8f);
 	}
+
+	if (IsTame())
+	{
+		if ((m_MobType == mtWolf) || (m_MobType == mtOcelot) || (m_MobType == mtCat) || (m_MobType == mtParrot))
+		{
+			BroadcastDeathMessage(a_TDI);
+		}
+	}
+
 	int Reward;
 	switch (m_MobType)
 	{
@@ -643,6 +664,11 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 		case mtMagmaCube:
 		{
 			Reward = GetRandomProvider().RandInt(6, 8);
+			break;
+		}
+		case mtEndermite:
+		{
+			Reward = 3;
 			break;
 		}
 		case mtBlaze:
@@ -969,6 +995,15 @@ void cMonster::GetMonsterConfig(const AString & a_Name)
 
 
 
+bool cMonster::IsNetherNative(void)
+{
+	return false;
+}
+
+
+
+
+
 bool cMonster::IsUndead(void)
 {
 	return false;
@@ -1149,34 +1184,27 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 		case mtZombieHorse:     return mfPassive;
 		case mtZombiePigman:    return mfHostile;
 		case mtZombieVillager:  return mfHostile;
-
-		default:
-		{
-			ASSERT(!"Unhandled mob type");
-			return mfUnhandled;
-		}
+		case mtBee:             return mfPassive;
+		case mtInvalidType:     break;
 	}
+	UNREACHABLE("Unhandled mob type");
 }
 
 
 
 
 
-int cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
+cTickTime cMonster::GetSpawnDelay(cMonster::eFamily a_MobFamily)
 {
 	switch (a_MobFamily)
 	{
-		case mfHostile:   return 40;
-		case mfPassive:   return 40;
-		case mfAmbient:   return 40;
-		case mfWater:     return 400;
-		case mfNoSpawn:   return -1;
-		default:
-		{
-			ASSERT(!"Unhandled mob family");
-			return -1;
-		}
+		case mfHostile:   return 40_tick;
+		case mfPassive:   return 40_tick;
+		case mfAmbient:   return 40_tick;
+		case mfWater:     return 400_tick;
+		case mfNoSpawn:   return -1_tick;
 	}
+	UNREACHABLE("Unhandled mob family");
 }
 
 
@@ -1275,6 +1303,7 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		case mtCow:            return std::make_unique<cCow>();
 		case mtCreeper:        return std::make_unique<cCreeper>();
 		case mtEnderDragon:    return std::make_unique<cEnderDragon>();
+		case mtEndermite:      return std::make_unique<cEndermite>();
 		case mtEnderman:       return std::make_unique<cEnderman>();
 		case mtGhast:          return std::make_unique<cGhast>();
 		case mtGiant:          return std::make_unique<cGiant>();
@@ -1296,6 +1325,7 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 		case mtWolf:           return std::make_unique<cWolf>();
 		case mtZombie:         return std::make_unique<cZombie>();
 		case mtZombiePigman:   return std::make_unique<cZombiePigman>();
+		case mtBee:			   return std::make_unique<cBee>();
 		default:
 		{
 			ASSERT(!"Unhandled mob type whilst trying to spawn mob!");
@@ -1368,10 +1398,10 @@ void cMonster::LoveTick(void)
 
 			m_World->DoWithPlayerByUUID(m_Feeder, [&] (cPlayer & a_Player)
 			{
-				a_Player.GetStatManager().AddValue(Statistic::AnimalsBred);
+				a_Player.GetStatistics().Custom[CustomStatistic::AnimalsBred]++;
 				if (GetMobType() == eMonsterType::mtCow)
 				{
-					a_Player.AwardAchievement(Statistic::AchBreedCow);
+					a_Player.AwardAchievement(CustomStatistic::AchBreedCow);
 				}
 				return true;
 			});
@@ -1470,7 +1500,7 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 				a_Player.GetInventory().RemoveOneEquippedItem();
 			}
 			m_LoveTimer = TPS * 30;  // half a minute
-			m_World->BroadcastEntityStatus(*this, esMobInLove);
+			m_World->BroadcastEntityAnimation(*this, EntityAnimation::AnimalFallsInLove);
 		}
 	}
 	// If a player holding my spawn egg right-clicked me, spawn a new baby
@@ -1499,8 +1529,8 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 
 void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, Item a_Item)
 {
-	auto Count = GetRandomProvider().RandInt<unsigned int>(a_Min, a_Max);
-	auto MaxStackSize = static_cast<unsigned char>(ItemHandler(a_Item)->GetMaxStackSize());
+	auto Count = GetRandomProvider().RandInt(a_Min, a_Max);
+	auto MaxStackSize = static_cast<unsigned int>(cItem(a_Item).GetMaxStackSize());
 	while (Count > MaxStackSize)
 	{
 		a_Drops.emplace_back(a_Item, MaxStackSize);
@@ -1653,7 +1683,7 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 
 	if (
 		(Chunk->GetBlock(Rel) != BlockType::SoulSand) &&   // Not on soulsand
-		(GetWorld()->GetTimeOfDay() < 12000 + 1000) &&  // Daytime
+		(GetWorld()->GetTimeOfDay() < 13000_tick) &&  // Daytime
 		Chunk->IsWeatherSunnyAt(Rel.x, Rel.z) &&        // Not raining
 		!IsInWater()                                    // Isn't swimming
 	)

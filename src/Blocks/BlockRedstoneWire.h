@@ -2,17 +2,15 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "BlockSlab.h"
-#include "BlockStairs.h"
-#include "../Chunk.h"
+#include "Mixins/SolidSurfaceUnderneath.h"
 
 
 
 
 class cBlockRedstoneWireHandler final :
-	public cBlockHandler
+	public cSolidSurfaceUnderneath<cBlockHandler>
 {
-	using Super = cBlockHandler;
+	using Super = cSolidSurfaceUnderneath<cBlockHandler>;
 
 public:
 
@@ -22,7 +20,7 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		if (a_Position.y <= 0)
+		if (!cChunkDef::IsValidHeight(a_Position))
 		{
 			return false;
 		}

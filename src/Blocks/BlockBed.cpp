@@ -64,7 +64,7 @@ bool cBlockBedHandler::OnUse(
 	const Vector3i a_CursorPos
 ) const
 {
-	// Source: https://minecraft.gamepedia.com/Bed#Sleeping
+	// Source: https://minecraft.wiki/w/Bed#Sleeping
 
 	// Sleeping in bed only allowed in Overworld, beds explode elsewhere:
 	if (a_WorldInterface.GetDimension() != dimOverworld)

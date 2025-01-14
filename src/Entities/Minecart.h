@@ -42,7 +42,7 @@ public:
 	virtual bool DoTakeDamage(TakeDamageInfo & TDI) override;
 	virtual void KilledBy(TakeDamageInfo & a_TDI) override;
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
-
+	virtual void HandleSpeedFromAttachee(float a_Forward, float a_Sideways) override;
 	int LastDamage(void) const { return m_LastDamage; }
 	ePayload GetPayload(void) const { return m_Payload; }
 

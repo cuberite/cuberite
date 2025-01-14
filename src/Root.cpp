@@ -241,6 +241,7 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 		m_StartTime = std::chrono::steady_clock::now();
 
 		HandleInput();
+
 		s_StopEvent.Wait();
 
 		// Stop the server:
@@ -1034,7 +1035,7 @@ AStringVector cRoot::GetPlayerTabCompletionMultiWorld(const AString & a_Text)
 
 void cRoot::HandleInput()
 {
-	if (g_RunAsService)
+	if (g_RunAsService || g_DetachedStdin)
 	{
 		// Ignore input when running as a service, cin was never opened in that case:
 		return;

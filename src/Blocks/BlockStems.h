@@ -62,8 +62,8 @@ private:
 	{
 		/*
 			Use correct percent:
-			https://minecraft.gamepedia.com/Melon_Seeds#Breaking
-			https://minecraft.gamepedia.com/Pumpkin_Seeds#Breaking
+			https://minecraft.wiki/w/Melon_Seeds#Breaking
+			https://minecraft.wiki/w/Pumpkin_Seeds#Breaking
 		*/
 
 		auto Age = GetStemAge(a_Block);
@@ -93,9 +93,10 @@ private:
 
 
 
-	virtual bool CanBeAt(cChunkInterface & a_ChunkInterface, const Vector3i a_RelPos, const cChunk & a_Chunk) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_BlockToReplace) const override
 	{
-		return ((a_Position.y > 0) && (a_Chunk.GetBlock(a_Position.addedY(-1)) == BlockType::Farmland));
+		const auto BelowPos = a_Position.addedY(-1);
+		return (cChunkDef::IsValidHeight(BelowPos) && (a_Chunk.GetBlock(BelowPos) == BlockType::Farmland));
 	}
 
 
@@ -212,8 +213,8 @@ private:
 
 private:
 
-	// https://minecraft.gamepedia.com/Pumpkin_Seeds#Breaking
-	// https://minecraft.gamepedia.com/Melon_Seeds#Breaking
+	// https://minecraft.wiki/w/Pumpkin_Seeds#Breaking
+	// https://minecraft.wiki/w/Melon_Seeds#Breaking
 	/** The array describes how many seed may be dropped at which age. The inner arrays describe the probability to drop 0, 1, 2, 3 seeds.
 	The outer describes the age of the stem. */
 	static constexpr std::array<std::array<double, 4>, 8> m_AgeSeedDropProbability

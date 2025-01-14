@@ -53,7 +53,8 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		if (a_Position.y <= 0)
+		const auto BelowPos = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(BelowPos))
 		{
 			return false;
 		}

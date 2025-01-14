@@ -3,7 +3,7 @@
 #include "BlockHandler.h"
 
 
-class cBlockVineHandler final :
+class cBlockVinesHandler final :
 	public cBlockHandler
 {
 	using Super = cBlockHandler;
@@ -215,7 +215,7 @@ private:
 
 		// Vine cannot grow down if at the bottom:
 		auto GrowPos = a_RelPos.addedY(-1);
-		if (!cChunkDef::IsValidHeight(GrowPos.y))
+		if (!cChunkDef::IsValidHeight(GrowPos))
 		{
 			return;
 		}
@@ -226,7 +226,7 @@ private:
 		if (cBlockAirHandler::IsBlockAir(DestBlock))
 		{
 			auto WorldPos = a_Chunk.RelativeToAbsolute(GrowPos);
-			if (!a_PluginInterface.CallHookBlockSpread(WorldPos.x, WorldPos.y, WorldPos.z, ssVineSpread))
+			if (!a_PluginInterface.CallHookBlockSpread(WorldPos, ssVineSpread))
 			{
 				a_Chunk.UnboundedRelSetBlock(GrowPos, a_Chunk.GetBlock(a_RelPos));
 			}

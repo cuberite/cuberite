@@ -217,7 +217,7 @@ static void testPastingCompletelyInside()
 				TEST_EQUAL_MSG(
 					pbaA.block({x, y, z}).first,
 					expected[z][y][x],
-					Printf("{%d, %d, %d}, exp %s, got %s", x, y, z, expected[z][y][x].c_str(), pbaA.block({x, y, z}).first.c_str()).c_str()
+					fmt::format(FMT_STRING("{{{}, {}, {}}}, exp {}, got {}"), x, y, z, expected[z][y][x], pbaA.block({x, y, z}).first)
 				);
 			}
 		}
@@ -282,7 +282,7 @@ static void testPastingPositiveOverflow()
 				TEST_EQUAL_MSG(
 					pbaA.block({x, y, z}).first,
 					expected[z][y][x],
-					Printf("{%d, %d, %d}, exp %s, got %s", x, y, z, expected[z][y][x].c_str(), pbaA.block({x, y, z}).first.c_str()).c_str()
+					fmt::format(FMT_STRING("{{{}, {}, {}}}, exp {}, got {}"), x, y, z, expected[z][y][x], pbaA.block({x, y, z}).first)
 				);
 			}
 		}
@@ -347,7 +347,7 @@ static void testPastingNegativeOverflow()
 				TEST_EQUAL_MSG(
 					pbaA.block({x, y, z}).first,
 					expected[z][y][x],
-					Printf("{%d, %d, %d}, exp %s, got %s", x, y, z, expected[z][y][x].c_str(), pbaA.block({x, y, z}).first.c_str()).c_str()
+					fmt::format(FMT_STRING("{{{}, {}, {}}}, exp {}, got {}"), x, y, z, expected[z][y][x], pbaA.block({x, y, z}).first)
 				);
 			}
 		}
@@ -412,7 +412,7 @@ static void testPastingMixedOverflow()
 				TEST_EQUAL_MSG(
 					pbaA.block({x, y, z}).first,
 					expected[z][y][x],
-					Printf("{%d, %d, %d}, exp %s, got %s", x, y, z, expected[z][y][x].c_str(), pbaA.block({x, y, z}).first.c_str()).c_str()
+					fmt::format(FMT_STRING("{{{}, {}, {}}}, exp {}, got {}"), x, y, z, expected[z][y][x], pbaA.block({x, y, z}).first)
 				);
 			}
 		}

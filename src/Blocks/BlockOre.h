@@ -1,7 +1,8 @@
 
 #pragma once
 
-#include "BlockHandler.h"
+#include "Blocks/BlockHandler.h"
+#include "Items/ItemHandler.h"
 
 
 
@@ -96,6 +97,11 @@ private:
 		if (Player->GetEquippedItem().m_Enchantments.GetLevel(cEnchantments::enchSilkTouch) != 0)
 		{
 			// Don't drop XP when the ore is mined with the Silk Touch enchantment
+			return;
+		}
+
+		if (!Player->GetEquippedItem().GetHandler().CanHarvestBlock(m_BlockType))
+		{
 			return;
 		}
 

@@ -7,7 +7,7 @@
 
 
 
-class cItemEmptyMapHandler:
+class cItemEmptyMapHandler final:
 	public cItemHandler
 {
 	using Super = cItemHandler;
@@ -16,10 +16,7 @@ class cItemEmptyMapHandler:
 
 public:
 
-	cItemEmptyMapHandler():
-		Super(Item::Map)
-	{
-	}
+	using Super::Super;
 
 
 
@@ -32,7 +29,7 @@ public:
 		const cItem & a_HeldItem,
 		const Vector3i a_ClickedBlockPos,
 		eBlockFace a_ClickedBlockFace
-	) override
+	) const override
 	{
 		UNUSED(a_HeldItem);
 		UNUSED(a_ClickedBlockFace);

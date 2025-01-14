@@ -10,7 +10,7 @@
 
 
 cSheep::cSheep(int a_Color) :
-	Super("Sheep", mtSheep, "entity.sheep.hurt", "entity.sheep.death", "entity.sheep.ambient", 0.6, 1.3),
+	Super("Sheep", mtSheep, "entity.sheep.hurt", "entity.sheep.death", "entity.sheep.ambient", 0.9f, 1.3f),
 	m_IsSheared(false),
 	m_WoolColor(a_Color),
 	m_TimeToStopEating(-1)
@@ -40,7 +40,6 @@ void cSheep::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 	if (!m_IsSheared)
 	{
-
 		a_Drops.emplace_back(GetItemFromColor(m_WoolColor));
 	}
 
@@ -126,7 +125,7 @@ void cSheep::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			if (m_World->GetBlock(Pos).Type() == BlockType::GrassBlock)
 			{
-				m_World->BroadcastEntityStatus(*this, esSheepEating);
+				m_World->BroadcastEntityAnimation(*this, EntityAnimation::SheepEatsGrass);
 				m_TimeToStopEating = 40;
 			}
 		}
@@ -210,6 +209,7 @@ unsigned char cSheep::GenerateNaturalRandomColor(void)
 
 Item cSheep::GetItemFromColor(int a_Color)
 {
+	// TODO(12xx12): replace number with enum constant
 	switch (a_Color)
 	{
 		case 0: return Item::WhiteWool;

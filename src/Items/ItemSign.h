@@ -73,7 +73,7 @@ private:
 		}
 
 		// After successfully placing the sign, open the sign editor for the player:
-		a_Player.GetClientHandle()->SendEditSign(a_PlacePosition.x, a_PlacePosition.y, a_PlacePosition.z);
+		a_Player.GetClientHandle()->SendEditSign(a_PlacePosition);
 		return true;
 	}
 

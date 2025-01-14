@@ -90,12 +90,12 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 	// However, we don't confuse animation with the underlying state of the world, so emulate by delaying 1 tick
 	// (Probably why vanilla has so many dupe glitches with sand and pistons lolol)
 
-	a_World.ScheduleTask(1, [a_BlockPos](cWorld & World)
+	a_World.ScheduleTask(1_tick, [a_BlockPos](cWorld & World)
 		{
 
 			auto Self = World.GetBlock(a_BlockPos);
 
-			if (!IsBlockPiston(Self))
+			if (!IsBlockPiston(Self) && !IsSticky(Self))
 			{
 				// Ensure we operate on a piston to avoid spurious behaviour
 				// Note that the scheduled task may result in the block type of a_BlockPos changing
@@ -159,7 +159,7 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 		a_World.BroadcastBlockAction(a_BlockPos, PistonRetractAction, DirectionByte, Self.Type());
 	}
 
-	a_World.ScheduleTask(1, [a_BlockPos](cWorld & World)
+	a_World.ScheduleTask(1_tick, [a_BlockPos](cWorld & World)
 	{
 		auto Self = World.GetBlock(a_BlockPos);
 
@@ -275,6 +275,12 @@ bool cBlockPistonHandler::CanPushBlock(
 	Vector3iSet & a_BlocksPushed, const Vector3i & a_PushDir
 )
 {
+	if (!cChunkDef::IsValidHeight(a_BlockPos))
+	{
+		// Can't push a void block.
+		return false;
+	}
+
 	const static std::array<Vector3i, 6> pushingDirs =
 	{
 			Vector3i(-1,  0,  0),
@@ -286,11 +292,6 @@ bool cBlockPistonHandler::CanPushBlock(
 	};
 
 	auto BlockToCheck = a_World.GetBlock(a_BlockPos);
-
-	if (!cChunkDef::IsValidHeight(a_BlockPos.y))
-	{
-		return !a_RequirePushable;
-	}
 
 	if (cBlockAirHandler::IsBlockAir(BlockToCheck))
 	{
@@ -357,7 +358,7 @@ void cBlockPistonHandler::OnBroken(
 
 	const auto Extension = a_BlockPos + GetExtensionDirection(a_OldBlock);
 	if (
-		cChunkDef::IsValidHeight(Extension.y) &&
+		cChunkDef::IsValidHeight(Extension) &&
 		(a_ChunkInterface.GetBlock(Extension).Type() == BlockType::PistonHead)
 	)
 	{
@@ -382,7 +383,7 @@ void cBlockPistonHeadHandler::OnBroken(
 {
 	UNUSED(a_Digger);
 	const auto Base = a_BlockPos - cBlockPistonHandler::GetExtensionDirection(a_OldBlock);
-	if (!cChunkDef::IsValidHeight(Base.y))
+	if (!cChunkDef::IsValidHeight(Base))
 	{
 		return;
 	}

@@ -34,14 +34,11 @@ namespace CommandBlockHandler
 
 		a_Chunk.DoWithBlockEntityAt(a_Position, [](cBlockEntity & a_BlockEntity)
 		{
-			switch (a_BlockEntity.GetBlockType())
-			{
-				case BlockType::CommandBlock:
-				case BlockType::ChainCommandBlock:
-				case BlockType::RepeatingCommandBlock:
-					break;
-				default: return false;
-			}
+			ASSERT(
+				(a_BlockEntity.GetBlockType() == BlockType::CommandBlock) ||
+				(a_BlockEntity.GetBlockType() == BlockType::ChainCommandBlock) ||
+				(a_BlockEntity.GetBlockType() == BlockType::RepeatingCommandBlock)
+			);
 
 			static_cast<cCommandBlockEntity &>(a_BlockEntity).Activate();
 			return false;

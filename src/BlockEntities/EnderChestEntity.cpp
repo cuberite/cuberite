@@ -28,7 +28,7 @@ cEnderChestEntity::cEnderChestEntity(BlockState a_Block, Vector3i a_Pos, cWorld 
 void cEnderChestEntity::SendTo(cClientHandle & a_Client)
 {
 	// Send a dummy "number of players with chest open" packet to make the chest visible:
-	a_Client.SendBlockAction(m_Pos.x, m_Pos.y, m_Pos.z, 1, 0, m_Block.Type());
+	a_Client.SendBlockAction(m_Pos, 1, 0, m_Block.Type());
 }
 
 
@@ -62,7 +62,7 @@ bool cEnderChestEntity::UsedBy(cPlayer * a_Player)
 		return false;
 	}
 
-	a_Player->GetStatManager().AddValue(Statistic::OpenEnderchest);
+	a_Player->GetStatistics().Custom[CustomStatistic::OpenEnderchest]++;
 
 	// If the window is not created, open it anew:
 	cWindow * Window = GetWindow();

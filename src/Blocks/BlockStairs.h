@@ -2,7 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
 
 
 
@@ -179,9 +179,6 @@ private:
 		return a_Block;
 	}
 	*/
-
-
-
 
 	virtual ColourID GetMapBaseColourID() const override
 	{

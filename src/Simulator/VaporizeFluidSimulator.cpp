@@ -6,12 +6,27 @@
 #include "Globals.h"
 
 #include "VaporizeFluidSimulator.h"
-
+#include "BlockType.h"
 #include "../OpaqueWorld.h"
 #include "../Chunk.h"
 #include "../World.h"
 #include "../Blocks/BroadcastInterface.h"
 #include "../Blocks/BlockFluid.h"
+
+
+
+
+
+void cVaporizeFluidSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk)
+{
+	// Nothing needed
+
+	UNUSED(a_Dt);
+	UNUSED(a_ChunkX);
+	UNUSED(a_ChunkZ);
+	UNUSED(a_Chunk);
+}
+
 
 
 
@@ -29,16 +44,3 @@ void cVaporizeFluidSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, Bl
 		);
 	}
 }
-
-
-
-
-
-void cVaporizeFluidSimulator::Simulate(float a_Dt)
-{
-	// Nothing needed
-}
-
-
-
-

@@ -9,7 +9,7 @@
 
 
 cZombiePigman::cZombiePigman(void) :
-	Super("ZombiePigman", mtZombiePigman, "entity.zombie_pig.hurt", "entity.zombie_pig.death", "entity.zombie_pig.ambient", 0.6, 1.8)
+	Super("ZombiePigman", mtZombiePigman, "entity.zombie_pig.hurt", "entity.zombie_pig.death", "entity.zombie_pig.ambient", 0.6f, 1.95f)
 {
 }
 
@@ -38,16 +38,6 @@ void cZombiePigman::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 
 
 
-void cZombiePigman::SpawnOn(cClientHandle & a_ClientHandle)
-{
-	Super::SpawnOn(a_ClientHandle);
-	a_ClientHandle.SendEntityEquipment(*this, 0, cItem(Item::GoldenSword));
-}
-
-
-
-
-
 void cZombiePigman::KilledBy(TakeDamageInfo & a_TDI)
 {
 	Super::KilledBy(a_TDI);
@@ -62,3 +52,9 @@ void cZombiePigman::KilledBy(TakeDamageInfo & a_TDI)
 
 
 
+
+void cZombiePigman::SpawnOn(cClientHandle & a_ClientHandle)
+{
+	Super::SpawnOn(a_ClientHandle);
+	a_ClientHandle.SendEntityEquipment(*this, 0, cItem(Item::GoldenSword));
+}

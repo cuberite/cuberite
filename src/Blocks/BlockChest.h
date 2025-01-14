@@ -3,7 +3,7 @@
 
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
 
 
 
@@ -167,7 +167,3 @@ private:
 		return 13;
 	}
 } ;
-
-
-
-

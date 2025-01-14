@@ -7,7 +7,6 @@
 #include "BlockPluginInterface.h"
 #include "BlockAir.h"
 #include "BlockAnvil.h"
-#include "BlockBanner.h"
 #include "BlockBed.h"
 #include "BlockBigFlower.h"
 #include "BlockBookShelf.h"
@@ -33,7 +32,7 @@
 #include "BlockDropSpenser.h"
 #include "BlockEnchantingTable.h"
 #include "BlockEndPortalFrame.h"
-#include "BlockEnderchest.h"
+#include "BlockEnderChest.h"
 #include "BlockEntity.h"
 #include "BlockFarmland.h"
 #include "BlockFence.h"
@@ -78,7 +77,7 @@
 #include "BlockPumpkin.h"
 #include "BlockQuartz.h"
 #include "BlockRail.h"
-#include "BlockRedstone.h"
+#include "BlockRedstoneWire.h"
 #include "BlockRedstoneLamp.h"
 #include "BlockRedstoneOre.h"
 #include "BlockRedstoneRepeater.h"
@@ -91,16 +90,18 @@
 #include "BlockSnow.h"
 #include "BlockSponge.h"
 #include "BlockStairs.h"
+#include "BlockStandingBanner.h"
 #include "BlockStems.h"
 #include "BlockStone.h"
-#include "BlockSugarcane.h"
+#include "BlockSugarCane.h"
 #include "BlockTNT.h"
 #include "BlockTallGrass.h"
 #include "BlockTorch.h"
 #include "BlockTrapdoor.h"
 #include "BlockTripwire.h"
 #include "BlockTripwireHook.h"
-#include "BlockVine.h"
+#include "BlockVines.h"
+#include "BlockWallBanner.h"
 #include "BlockWallSign.h"
 #include "BlockCraftingTable.h"
 
@@ -1331,7 +1332,7 @@ void cBlockHandler::OnNeighborChanged(cChunkInterface & a_ChunkInterface, Vector
 
 void cBlockHandler::NeighborChanged(cChunkInterface & a_ChunkInterface, Vector3i a_NeighborPos, eBlockFace a_WhichNeighbor)
 {
-	if (!cChunkDef::IsValidHeight(a_NeighborPos.y))
+	if (!cChunkDef::IsValidHeight(a_NeighborPos))
 	{
 		return;
 	}
@@ -1463,7 +1464,7 @@ unsigned char cBlockHandler::ToolFortuneLevel(const cItem * a_Tool)
 char cBlockHandler::FortuneDiscreteRandom(char a_MinDrop, char a_DefaultMax, unsigned char a_BonusMax, char a_DropCap)
 {
 	// First sample the discrete random distribution.
-	char DropNum = GetRandomProvider().RandInt<char>(a_MinDrop, a_DefaultMax + a_BonusMax);
+	char DropNum = GetRandomProvider().RandInt<char>(a_MinDrop, static_cast<char>(a_DefaultMax + a_BonusMax));
 
 	// Then clamp to within range (clamp instead of min incase of overflow):
 	return std::clamp<char>(DropNum, a_MinDrop, a_DropCap);

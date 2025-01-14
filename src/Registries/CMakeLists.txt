@@ -4,9 +4,9 @@ target_sources(
 	BlockStates.cpp
 	BlockItemConverter.cpp
 
+	BlockItemConverter.h
 	BlockStates.h
 	BlockTypes.h
-    BlockItemConverter.h
+	CustomStatistics.h
 	Items.h
-	Statistics.h
 )

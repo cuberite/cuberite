@@ -105,7 +105,7 @@ static int DoWithBlockEntityAt(lua_State * tolua_S)
 	}
 	if (!FnRef.IsValid())
 	{
-		return L.ApiParamError("Expected a valid callback function for parameter %i", OffsetIndex);
+		return L.ApiParamError(fmt::format(FMT_STRING("Expected a valid callback function for parameter {}"), OffsetIndex));
 	}
 
 	// Call the DoWith function:
@@ -159,7 +159,7 @@ static int ForEachInBox(lua_State * tolua_S)
 	L.GetStackValues(1, Self, Box, FnRef);
 	if ((Self == nullptr) || (Box == nullptr))
 	{
-		return L.ApiParamError("Invalid world (%p) or boundingbox (%p)", static_cast<void *>(Self), static_cast<void *>(Box));
+		return L.ApiParamError(fmt::format(FMT_STRING("Invalid world ({}) or boundingbox ({})"), fmt::ptr(Self), fmt::ptr(Box)));
 	}
 	if (!FnRef.IsValid())
 	{
@@ -747,7 +747,7 @@ static int tolua_cWorld_FastSetBlock(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
@@ -903,7 +903,7 @@ static int tolua_cWorld_GetBlock(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		L.Push(Block::Air::Air());
 		return 1;
@@ -959,7 +959,7 @@ static int tolua_cWorld_GetBlockBlockLight(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
@@ -1016,7 +1016,7 @@ static int tolua_cWorld_GetBlockInfo(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
@@ -1085,7 +1085,7 @@ static int tolua_cWorld_GetBlockMeta(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		L.Push(0);
 		return 1;
@@ -1141,7 +1141,7 @@ static int tolua_cWorld_GetBlockSkyLight(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
@@ -1198,7 +1198,7 @@ static int tolua_cWorld_GetBlockTypeMeta(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		L.Push(Block::Air::Air());
 		return 2;
@@ -1472,7 +1472,7 @@ static int tolua_cWorld_SetBlock(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
 	}
 
-	if (!cChunkDef::IsValidHeight(Position.y))
+	if (!cChunkDef::IsValidHeight(Position))
 	{
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
@@ -1514,7 +1514,7 @@ static int tolua_cWorld_SetSignLines(lua_State * tolua_S)
 	}
 
 	// Call the function:
-	bool res = Self->SetSignLines(BlockX, BlockY, BlockZ, Line1, Line2, Line3, Line4);
+	bool res = Self->SetSignLines({BlockX, BlockY, BlockZ}, Line1, Line2, Line3, Line4);
 
 	// Push the returned values:
 	L.Push(res);
@@ -1633,7 +1633,7 @@ static int tolua_cWorld_SpawnSplitExperienceOrbs(lua_State* tolua_S)
 
 static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
 {
-	/* Exported manually, because tolua would require the out-only param a_Height to be used when calling
+	/* Exported manually because we don't export optional<T>
 	Function signature: world:TryGetHeight(a_World, a_BlockX, a_BlockZ) -> IsValid, Height
 	*/
 
@@ -1660,14 +1660,46 @@ static int tolua_cWorld_TryGetHeight(lua_State * tolua_S)
 	}
 
 	// Call the implementation:
-	int Height = 0;
-	bool res = self->TryGetHeight(BlockX, BlockZ, Height);
-	L.Push(res);
-	if (res)
+	auto Height = self->GetHeight(BlockX, BlockZ);
+	L.Push(Height.has_value());
+	if (Height.has_value())
 	{
-		L.Push(Height);
+		L.Push(Height.value());
 		return 2;
 	}
+	return 1;
+}
+
+
+
+
+
+static int tolua_cWorld_GetHeight(lua_State * tolua_S)
+{
+	// Signature: world:GetHeight(a_World, a_BlockX, a_BlockZ) -> Height
+
+	// Check params:
+	cLuaState L(tolua_S);
+	if (
+		!L.CheckParamSelf("cWorld") ||
+		!L.CheckParamNumber(2, 3) ||
+		!L.CheckParamEnd(4)
+		)
+	{
+		return 0;
+	}
+
+	// Get params:
+	cWorld * self = nullptr;
+	int BlockX = 0;
+	int BlockZ = 0;
+	L.GetStackValues(1, self, BlockX, BlockZ);
+
+	// Call the implementation:
+	L.LogStackTrace();
+	FLOGWARN("cWorld:GetHeight is DEPRECATED, use TryGetHeight instead");
+	auto Height = self->GetHeight(BlockX, BlockZ);
+	L.Push(Height.value_or(0));
 	return 1;
 }
 
@@ -1729,6 +1761,7 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "GetBlockMeta",                 tolua_cWorld_GetBlockMeta);
 			tolua_function(tolua_S, "GetBlockSkyLight",             tolua_cWorld_GetBlockSkyLight);
 			tolua_function(tolua_S, "GetBlockTypeMeta",             tolua_cWorld_GetBlockTypeMeta);
+			tolua_function(tolua_S, "GetHeight",                    tolua_cWorld_GetHeight);
 			tolua_function(tolua_S, "GetSignLines",                 tolua_cWorld_GetSignLines);
 			tolua_function(tolua_S, "GetTimeOfDay",                 tolua_cWorld_GetTimeOfDay);
 			tolua_function(tolua_S, "GetWorldAge",                  tolua_cWorld_GetWorldAge);

@@ -23,14 +23,15 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		if (a_Position.y <= 0)
+		const auto BasePos = a_Position.addedY(-1);
+		if (!cChunkDef::IsValidHeight(BasePos))
 		{
 			return false;
 		}
 
 		// TODO: Cannot be at too much daylight
 
-		switch (a_Chunk.GetBlock(a_Position.addedY(-1)).Type())
+		switch (a_Chunk.GetBlock(BasePos).Type())
 		{
 			case BlockType::AcaciaLeaves:
 			case BlockType::Air:

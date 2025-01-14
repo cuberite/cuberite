@@ -2065,7 +2065,7 @@ float cBlockInfo::GetBlockHeight(BlockState a_Block)
 	// Block heights:
 	switch (a_Block.Type())
 	{
-
+		// case E_BLOCK_FARMLAND:         return 0.9375;  // prevents trampling for mobs (#2015) and older clients (MC-85162)
 			// Fences
 		case BlockType::AcaciaFence:
 		case BlockType::BirchFence:

@@ -7,7 +7,7 @@
 #include "../Chunk.h"
 #include "Defines.h"
 #include "Entities/Player.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
 #include "ChunkInterface.h"
 #include "World.h"
 

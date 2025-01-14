@@ -8,19 +8,19 @@
 
 
 
-class cItemChorusFruitHandler:
+class cItemChorusFruitHandler final:
 	public cItemFoodHandler
 {
 	using Super = cItemFoodHandler;
 
 public:
 
-	cItemChorusFruitHandler():
-		Super(Item::ChorusFruit, FoodInfo(4, 2.4))
+	constexpr cItemChorusFruitHandler(Item a_ItemType) :
+		Super(a_ItemType, FoodInfo(4, 2.4))
 	{
 	}
 
-	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) override
+	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) const override
 	{
 		cItemHandler::EatItem(a_Player, a_Item);
 

@@ -33,10 +33,7 @@ namespace NoteBlockHandler
 
 		a_Chunk.DoWithBlockEntityAt(a_Position, [](cBlockEntity & a_BlockEntity)
 		{
-			if (a_BlockEntity.GetBlockType() != BlockType::NoteBlock)
-			{
-				return false;
-			}
+			ASSERT(a_BlockEntity.GetBlockType() == BlockType::NoteBlock);
 
 			static_cast<cNoteEntity &>(a_BlockEntity).MakeSound();
 			return false;

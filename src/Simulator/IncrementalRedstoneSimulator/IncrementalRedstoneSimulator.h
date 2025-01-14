@@ -26,7 +26,6 @@ private:
 
 	void ProcessWorkItem(cChunk & Chunk, cChunk & TickingSource, const Vector3i Position);
 
-	virtual void Simulate(float Dt) override {}
 	virtual void SimulateChunk(std::chrono::milliseconds Dt, int ChunkX, int ChunkZ, cChunk * Chunk) override;
 	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block) override;
 	virtual cRedstoneSimulatorChunkData * CreateChunkData() override;

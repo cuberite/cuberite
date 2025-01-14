@@ -9,7 +9,7 @@
 
 
 cMooshroom::cMooshroom(void) :
-	Super("Mooshroom", mtMooshroom, "entity.cow.hurt", "entity.cow.death", "entity.cow.ambient", 0.9, 1.3)
+	Super("Mooshroom", mtMooshroom, "entity.cow.hurt", "entity.cow.death", "entity.cow.ambient", 0.9f, 1.4f)
 {
 }
 

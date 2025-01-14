@@ -120,7 +120,7 @@ private:
 		// Check if it's fuel:
 		BlockState Self = 0;
 		if (
-			!cChunkDef::IsValidHeight(Pos.y) ||
+			!cChunkDef::IsValidHeight(Pos) ||
 			!a_Chunk.UnboundedRelGetBlock(Pos, Self) ||
 			!cFireSimulator::IsFuel(Self)
 		)
@@ -143,7 +143,7 @@ private:
 		{
 			auto NeighborPos = Pos + CrossCord;
 			if (
-				cChunkDef::IsValidHeight(NeighborPos.y) &&
+				cChunkDef::IsValidHeight(NeighborPos) &&
 				a_Chunk.UnboundedRelGetBlock(NeighborPos, Self) &&
 				IsBlockAir(Self)
 			)

@@ -51,9 +51,9 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		if ((a_Position.y <= 0) || (a_Position.y >= cChunkDef::Height - 1))
+		if (!cChunkDef::IsValidHeight(a_Position.addedY(-1)) || !cChunkDef::IsValidHeight(a_Position.addedY(1)))
 		{
-			return false;  // In case someone places a portal with meta 1 or 2 at boundaries, and server tries to get invalid coords at Y - 1 or Y + 1.
+			return false;  // Must be 1 away from the boundary, there will always be another portal or an obsidian between the portal block and the boundary.
 		}
 
 		switch (Block::NetherPortal::Axis(a_Chunk.GetBlock(a_Position)))

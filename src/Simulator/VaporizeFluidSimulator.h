@@ -23,15 +23,11 @@ class cVaporizeFluidSimulator:
 
 public:
 
-	using Super::cFluidSimulator;
+	using Super::Super;
 
 private:
 
-	virtual void Simulate(float a_Dt) override;
+	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
 	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block) override;
 	virtual cFluidSimulatorData * CreateChunkData(void) override { return nullptr; }
 } ;
-
-
-
-

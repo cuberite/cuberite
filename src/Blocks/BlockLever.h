@@ -5,7 +5,7 @@
 #include "Blocks/BlockStairs.h"
 #include "ChunkDef.h"
 #include "Defines.h"
-#include "Mixins.h"
+#include "Mixins/Mixins.h"
 #include "BlockSlab.h"
 
 

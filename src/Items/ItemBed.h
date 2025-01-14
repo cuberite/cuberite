@@ -25,7 +25,11 @@ public:
 		const auto Rotation = RotationToBlockFace(a_Player.GetYaw());
 		const auto HeadPosition = a_PlacePosition + cBlockBedHandler::BlockFaceToDirection(Rotation);
 		auto & World = *a_Player.GetWorld();
-		auto BlockToReplace = World.GetBlock(a_PlacePosition);
+		BlockState BlockToReplace;
+		if (World.GetBlock(a_PlacePosition, BlockToReplace))
+		{
+			return false;
+		}
 
 		// Vanilla only allows beds to be placed into air.
 		// Check if there is empty space for the "head" block:
