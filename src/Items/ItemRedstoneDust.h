@@ -17,6 +17,12 @@ public:
 	using Super::Super;
 
 
+	virtual bool IsPlaceable(void) const override
+	{
+		return true;
+	}
+
+
 
 
 

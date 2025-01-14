@@ -175,8 +175,7 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		auto Self = a_Chunk.GetBlock(a_Position);
-		auto SupportRelPos = AddFaceDirection(a_Position, GetBlockFace(Self), true);
+		auto SupportRelPos = AddFaceDirection(a_Position, GetBlockFace(a_Self), true);
 		if (!cChunkDef::IsValidHeight(SupportRelPos.y))
 		{
 			return false;
