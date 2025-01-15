@@ -1,4 +1,5 @@
 
+
 // Item.h
 
 // Declares the cItem class representing an item (in the inventory sense)
@@ -13,6 +14,8 @@
 #include "Enchantments.h"
 #include "WorldStorage/FireworksSerializer.h"
 #include "Color.h"
+#include "Registries/Items.h"
+#include "Protocol/Palettes/Upgrade.h"
 
 
 
@@ -41,7 +44,7 @@ public:
 
 	/** Creates an item of the specified type, by default 1 piece with no damage and no enchantments */
 	cItem(
-		short a_ItemType,
+		enum Item a_ItemType,
 		char a_ItemCount = 1,
 		short a_ItemDamage = 0,
 		const AString & a_Enchantments = "",
@@ -61,14 +64,13 @@ public:
 	/** Empties the item and frees up any dynamic storage used by the internals. */
 	void Empty(void);
 
-	/** Empties the item and frees up any dynamic storage used by the internals.
-	TODO: What is the usage difference? Merge with Empty()? */
-	void Clear(void);
+	// Deprecated - for compatibility with old plugins
+	void Clear(void) { Empty(); }
 
 	/** Returns true if the item represents an empty stack - either the type is invalid, or count is zero. */
 	bool IsEmpty(void) const
 	{
-		return ((m_ItemType <= 0) || (m_ItemCount <= 0));
+		return ((m_ItemType == Item::Air) || (m_ItemCount <= 0));
 	}
 
 	/* Returns true if this itemstack can stack with the specified stack (types match, enchantments etc.)
@@ -135,7 +137,7 @@ public:
 	/** Returns true if the specified item type is enchantable.
 	If FromBook is true, the function is used in the anvil inventory with book enchantments.
 	So it checks the "only book enchantments" too. Example: You can only enchant a hoe with a book. */
-	static bool IsEnchantable(short a_ItemType, bool a_FromBook = false);  // tolua_export
+	static bool IsEnchantable(Item a_ItemType, bool a_FromBook = false);  // tolua_export
 
 	/** Returns the enchantability of the item. When the item hasn't a enchantability, it will returns 0 */
 	unsigned GetEnchantability();  // tolua_export
@@ -160,7 +162,7 @@ public:
 
 	// tolua_begin
 
-	short          m_ItemType;
+	Item           m_ItemType;
 	char           m_ItemCount;
 	short          m_ItemDamage;
 	cEnchantments  m_Enchantments;
@@ -230,20 +232,15 @@ public:
 
 	cItem * Get   (int a_Idx);
 	void    Set   (int a_Idx, const cItem & a_Item);
-	void    Add   (const cItem & a_Item) {push_back(a_Item); }
-	void    Add   (short a_ItemType) { emplace_back(a_ItemType); }
-	void    Add   (short a_ItemType, char a_ItemCount) { emplace_back(a_ItemType, a_ItemCount); }
+	void    Add   (const cItem & a_Item) { push_back(a_Item); }
+	void    Add   (enum Item a_ItemType) { emplace_back(a_ItemType); }
+	void    Add   (enum Item a_ItemType, char a_ItemCount) { emplace_back(a_ItemType, a_ItemCount); }
 	void    Delete(int a_Idx);
 	void    Clear (void) {clear(); }
 	size_t  Size  (void) const { return size(); }
-	void    Set   (int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDamage);
+	void    Set   (int a_Idx, Item a_Item, char a_ItemCount, short a_ItemDamage);
 	bool    Contains(const cItem & a_Item);
 	bool    ContainsType(const cItem & a_Item);
-
-	void    Add   (short a_ItemType, char a_ItemCount, short a_ItemDamage)
-	{
-		emplace_back(a_ItemType, a_ItemCount, a_ItemDamage);
-	}
 
 	/** Adds a copy of all items in a_ItemGrid. */
 	void AddItemGrid(const cItemGrid & a_ItemGrid);
@@ -264,3 +261,13 @@ public:
 	int   m_MaxAmount;
 	int   m_Weight;
 } ;
+
+template<> class fmt::formatter<Item> : public fmt::formatter<std::string_view>
+{
+public:
+	template <typename FormatContext>
+	auto format(const Item & a_Item, FormatContext & a_Ctx)
+	{
+		return fmt::format_to(a_Ctx.out(), "{}", NamespaceSerializer::From(a_Item));
+	}
+};

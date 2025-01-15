@@ -19,12 +19,12 @@ target_sources(
 	BlockCarpet.h
 	BlockCauldron.h
 	BlockChest.h
-	BlockCloth.h
 	BlockCobWeb.h
 	BlockCocoaPod.h
 	BlockCommandBlock.h
 	BlockComparator.h
 	BlockConcretePowder.h
+	BlockCraftingTable.h
 	BlockCrops.h
 	BlockDaylightSensor.h
 	BlockDeadBush.h
@@ -45,11 +45,13 @@ target_sources(
 	BlockFluid.h
 	BlockFurnace.h
 	BlockGlass.h
+	BlockGlassPane.h
 	BlockGlazedTerracotta.h
 	BlockGlowstone.h
 	BlockGrass.h
 	BlockGravel.h
 	BlockHandler.h
+	BlockHayBale.h
 	BlockHopper.h
 	BlockHugeMushroom.h
 	BlockIce.h
@@ -58,6 +60,7 @@ target_sources(
 	BlockLeaves.h
 	BlockLever.h
 	BlockLilypad.h
+	BlockLog.h
 	BlockMelon.h
 	BlockMobHead.h
 	BlockMobSpawner.h
@@ -74,6 +77,7 @@ target_sources(
 	BlockPlanks.h
 	BlockPlant.h
 	BlockPluginInterface.h
+	BlockPodzol.h
 	BlockPortal.h
 	BlockPressurePlate.h
 	BlockPumpkin.h
@@ -86,7 +90,6 @@ target_sources(
 	BlockSand.h
 	BlockSapling.h
 	BlockSeaLantern.h
-	BlockSideways.h
 	BlockSignPost.h
 	BlockSlab.h
 	BlockSlime.h
@@ -106,7 +109,7 @@ target_sources(
 	BlockVines.h
 	BlockWallBanner.h
 	BlockWallSign.h
-	BlockWorkbench.h
+	BlockWool.h
 	BroadcastInterface.h
 	ChunkInterface.h
 	GetHandlerCompileTimeTemplate.h

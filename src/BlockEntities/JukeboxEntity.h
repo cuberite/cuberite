@@ -19,16 +19,16 @@ class cJukeboxEntity :
 
 public:  // tolua_export
 
-	cJukeboxEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cJukeboxEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World);
 
 	// tolua_begin
 
-	int  GetRecord(void);
-	void SetRecord(int a_Record);
+	Item  GetRecord(void);
+	void SetRecord(Item a_Record);
 
 	/** Plays the specified Record. Return false if a_Record isn't a playable Record (E_ITEM_XXX_DISC).
 	If there is a record already playing, ejects it first. */
-	bool PlayRecord(int a_Record);
+	bool PlayRecord(Item a_Record);
 
 	/** Ejects the currently held record as a pickup. Return false when no record had been inserted. */
 	bool EjectRecord(void);
@@ -36,9 +36,32 @@ public:  // tolua_export
 	/** Is in the Jukebox a Record? */
 	bool IsPlayingRecord(void) const;
 
-	static bool IsRecordItem(int a_Item)
+	static bool IsRecordItem(Item a_Item)
 	{
-		return ((a_Item >= E_ITEM_FIRST_DISC) && (a_Item <= E_ITEM_LAST_DISC));
+		switch (a_Item)
+		{
+			case Item::MusicDiscBlocks:
+			case Item::MusicDiscCat:
+			case Item::MusicDiscChirp:
+			case Item::MusicDiscFar:
+			case Item::MusicDiscMall:
+			case Item::MusicDiscMellohi:
+			case Item::MusicDiscPigstep:
+			case Item::MusicDiscStal:
+			case Item::MusicDiscStrad:
+			case Item::MusicDiscWait:
+			case Item::MusicDiscWard:
+			case Item::MusicDisc11:
+			case Item::MusicDisc13:
+			case Item::MusicDisc5:
+			case Item::MusicDiscCreator:
+			case Item::MusicDiscCreatorMusicBox:
+			case Item::MusicDiscOtherside:
+			case Item::MusicDiscPrecipice:
+			case Item::MusicDiscRelic:
+				return true;
+			default: return false;
+		}
 	}
 
 	// tolua_end
@@ -51,5 +74,5 @@ public:  // tolua_export
 	virtual void SendTo(cClientHandle &) override {}
 
 private:
-	int m_Record;
+	Item m_Record;
 } ;  // tolua_end

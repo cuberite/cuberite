@@ -65,7 +65,7 @@ public:
 
 		// Checks if the biome at the origin position is allowed
 		auto Relative = cChunkDef::AbsoluteToRelative(Vector3i(a_OriginX, 1, a_OriginZ), {ChunkX, ChunkZ});
-		if (!m_PiecePool.IsBiomeAllowed(Biomes[Relative.x + cChunkDef::Width * Relative.z]))
+		if (!m_PiecePool.IsBiomeAllowed(Biomes[static_cast<size_t>(Relative.x + cChunkDef::Width * Relative.z)]))
 		{
 			return cStructurePtr();
 		}

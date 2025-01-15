@@ -204,6 +204,17 @@ return
 		]],
 		Functions =
 		{
+			GetBlock =
+			{
+				Returns =
+				{
+					{
+						Name = "Block",
+						Type = "number",
+					},
+				},
+				Notes = "Returns the block which is represented by this blockentity. This is the primary means of type-identification",
+			},
 			GetBlockType =
 			{
 				Returns =
@@ -800,21 +811,6 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 			Activate =
 			{
 				Notes = "Sets the block entity to dropspense an item in the next tick",
-			},
-			AddDropSpenserDir =
-			{
-				Params =
-				{
-					{
-						Name = "BlockPos",
-						Type = "Vector3i",
-					},
-					{
-						Name = "BlockMeta",
-						Type = "number",
-					},
-				},
-				Notes = "Adjusts the block coords to where the dropspenser items materialize",
 			},
 		},
 		Constants =

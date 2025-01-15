@@ -51,7 +51,9 @@
 #include "Logger.h"
 #include "ClientHandle.h"
 
-
+// temp
+#include "Protocol/Palettes/BlockMap.h"
+#include <fstream>
 
 
 
@@ -139,6 +141,28 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 		m_SettingsFilename = a_OverridesRepo.GetValue("Server","ConfigFile");
 	}
 
+	/*
+	auto & loadmap = *BlockMap::BlMap::GetMap();
+	auto & savemap = *BlockMap::BlMap::GetSaveMap();
+	loadmap.reserve(30000);
+	savemap.reserve(30000);
+	std::fstream f;
+	f.open("Protocol/Blocks.txt", std::ios::in);
+	ASSERT(!f.fail());
+	AString line;
+	while (std::getline(f, line))
+	{
+		auto pos = std::find(line.begin(), line.end(), '-');
+		size_t b = static_cast<size_t>(std::distance(line.begin(), pos)) + 1;
+		auto id = static_cast<ENUM_BLOCKS>(std::stoi(line, nullptr, 10));
+		auto strid = line.substr(b, std::string::npos);
+		loadmap[strid] = id;
+		savemap[id] = strid;
+	}
+	*/
+
+	// LOGD("%d hash tbl size", (*BlockMap::BlMap::GetMap()).size());
+
 	auto IniFile = std::make_unique<cIniFile>();
 	bool IsNewIniFile = !IniFile->ReadFile(m_SettingsFilename);
 
@@ -168,6 +192,8 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	m_WebAdmin = new cWebAdmin();
 	m_WebAdmin->Init();
 
+
+
 	LOGD("Loading settings...");
 	m_RankManager.reset(new cRankManager());
 	m_RankManager->Initialize(*m_MojangAPI);
@@ -182,6 +208,9 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOGD("Loading plugin manager...");
 	m_PluginManager = new cPluginManager(dd);
 	m_PluginManager->ReloadPluginsNow(*settingsRepo);
+	m_PluginManager->SetupNewCommands();
+
+
 
 	LOGD("Loading MonsterConfig...");
 	m_MonsterConfig = new cMonsterConfig;
@@ -923,6 +952,7 @@ int cRoot::GetPhysicalRAMUsage(void)
 
 void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 {
+	/*
 	int SumNumValid = 0;
 	int SumNumDirty = 0;
 	int SumNumInLighting = 0;
@@ -939,14 +969,19 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 		int NumInLighting = 0;
 		World.GetChunkStats(NumValid, NumDirty, NumInLighting);
 		a_Output.OutLn(fmt::format(FMT_STRING("World {}:"), World.GetName()));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Num loaded chunks: {}"), NumValid));
+		a_Output.OutLn(fmt::format(FMT_STRING(" Num loaded chunks: {}"), NumValid));
 		a_Output.OutLn(fmt::format(FMT_STRING("  Num dirty chunks: {}"), NumDirty));
 		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in lighting queue: {}"), NumInLighting));
 		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in generator queue: {}"), NumInGenerator));
 		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in storage load queue: {}"), NumInLoadQueue));
 		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in storage save queue: {}"), NumInSaveQueue));
 		int Mem = NumValid * static_cast<int>(sizeof(cChunk));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Memory used by chunks: {} KiB ({} MiB)"), (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024)));
+		a_Output.Out("  Memory used by chunks: %d KiB (%d MiB)", (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024));
+		a_Output.Out("  Per-chunk memory size breakdown:");
+		a_Output.Out("    block types:    %6zu bytes (%3zu KiB)", sizeof(cChunkDef::BlockStates), (sizeof(cChunkDef::BlockStates) + 1023) / 1024);
+		a_Output.Out("    block lighting: %6zu bytes (%3zu KiB)", 2 * sizeof(cChunkDef::LightNibbles), (2 * sizeof(cChunkDef::LightNibbles) + 1023) / 1024);
+		a_Output.Out("    heightmap:      %6zu bytes (%3zu KiB)", sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024);
+		a_Output.Out("    biomemap:       %6zu bytes (%3zu KiB)", sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024);
 		SumNumValid += NumValid;
 		SumNumDirty += NumDirty;
 		SumNumInLighting += NumInLighting;
@@ -965,6 +1000,7 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 	a_Output.OutLn(fmt::format(FMT_STRING("  block lighting: {:06} bytes ({:3} KiB)"), 2 * sizeof(cChunkDef::BlockNibbles), (2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024));
 	a_Output.OutLn(fmt::format(FMT_STRING("  heightmap:      {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024));
 	a_Output.OutLn(fmt::format(FMT_STRING("  biomemap:       {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024));
+	*/
 }
 
 

@@ -12,11 +12,11 @@
 
 
 
-ForEachSourceCallback::ForEachSourceCallback(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE CurrentBlock) :
+ForEachSourceCallback::ForEachSourceCallback(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_CurrentBlock) :
 	Power(0),
-	m_Chunk(Chunk),
-	m_Position(Position),
-	m_CurrentBlock(CurrentBlock)
+	m_Chunk(a_Chunk),
+	m_Position(a_Position),
+	m_CurrentBlock(a_CurrentBlock)
 {
 }
 
@@ -24,32 +24,32 @@ ForEachSourceCallback::ForEachSourceCallback(const cChunk & Chunk, const Vector3
 
 
 
-void ForEachSourceCallback::operator()(Vector3i Location)
+void ForEachSourceCallback::operator()(Vector3i a_Location)
 {
-	if (!cChunkDef::IsValidHeight(Location))
+	if (!cChunkDef::IsValidHeight(a_Location))
 	{
 		return;
 	}
 
-	const auto NeighbourChunk = m_Chunk.GetRelNeighborChunkAdjustCoords(Location);
+	const auto NeighbourChunk = m_Chunk.GetRelNeighborChunkAdjustCoords(a_Location);
 	if ((NeighbourChunk == nullptr) || !NeighbourChunk->IsValid())
 	{
 		return;
 	}
 
-	const auto PotentialSourceBlock = NeighbourChunk->GetBlock(Location);
+	const auto PotentialSourceBlock = NeighbourChunk->GetBlock(a_Location);
 	const auto NeighbourRelativeQueryPosition = cIncrementalRedstoneSimulatorChunkData::RebaseRelativePosition(m_Chunk, *NeighbourChunk, m_Position);
 
 	if (!cBlockInfo::IsTransparent(PotentialSourceBlock))
 	{
-		Power = std::max(Power, QueryLinkedPower(*NeighbourChunk, NeighbourRelativeQueryPosition, m_CurrentBlock, Location));
+		Power = std::max(Power, QueryLinkedPower(*NeighbourChunk, NeighbourRelativeQueryPosition, m_CurrentBlock, a_Location));
 	}
 	else
 	{
 		Power = std::max(
 			Power,
 			RedstoneHandler::GetPowerDeliveredToPosition(
-				*NeighbourChunk, Location, PotentialSourceBlock,
+				*NeighbourChunk, a_Location, PotentialSourceBlock,
 				NeighbourRelativeQueryPosition, m_CurrentBlock, false
 			)
 		);
@@ -88,7 +88,7 @@ void ForEachSourceCallback::CheckIndirectPower()
 
 
 
-PowerLevel ForEachSourceCallback::QueryLinkedPower(const cChunk & Chunk, const Vector3i QueryPosition, const BLOCKTYPE QueryBlock, const Vector3i SolidBlockPosition)
+PowerLevel ForEachSourceCallback::QueryLinkedPower(const cChunk & Chunk, const Vector3i QueryPosition, const BlockState QueryBlock, const Vector3i SolidBlockPosition)
 {
 	PowerLevel Power = 0;
 

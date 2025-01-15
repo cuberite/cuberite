@@ -88,7 +88,7 @@ public:
 	std::unordered_set<Vector3i, VectorHasher<int>> AlwaysTickedPositions;
 
 	/** Structure storing an observer's last seen block. */
-	std::unordered_map<Vector3i, std::pair<BLOCKTYPE, NIBBLETYPE>, VectorHasher<int>> ObserverCache;
+	std::unordered_map<Vector3i, BlockState, VectorHasher<int>> ObserverCache;
 
 	/** Structure storing position of mechanism + it's delay ticks (countdown) & if to power on. */
 	std::unordered_map<Vector3i, std::pair<int, bool>, VectorHasher<int>> m_MechanismDelays;

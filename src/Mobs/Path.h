@@ -48,8 +48,7 @@ struct cPathCell
 	cPathCell * m_Parent;  // Cell's parent, as defined in regular A*.
 	bool m_IsSolid;	   // Is the cell an air or a solid? Partial solids are considered solids. If m_IsSpecial is true, this is always true.
 	bool m_IsSpecial;  // The cell is special - it acts as "solid" or "air" depending on direction, e.g. door or top of fence.
-	BLOCKTYPE m_BlockType;
-	NIBBLETYPE m_BlockMeta;
+	BlockState m_Block;
 };
 
 
@@ -196,8 +195,8 @@ private:
 	/* High level world queries */
 	bool IsWalkable(const Vector3i & a_Location, const Vector3i & a_Source);
 	bool BodyFitsIn(const Vector3i & a_Location, const Vector3i & a_Source);
-	bool BlockTypeIsSpecial(BLOCKTYPE a_Type);
-	bool SpecialIsSolidFromThisDirection(BLOCKTYPE a_Type, NIBBLETYPE a_Meta,  const Vector3i & a_Direction);
+	bool BlockTypeIsSpecial(BlockState a_Block);
+	bool SpecialIsSolidFromThisDirection(BlockState a_Block, const Vector3i & a_Direction);
 	bool HasSolidBelow(const Vector3i & a_Location);
 	#ifdef COMPILING_PATHFIND_DEBUGGER
 	#include "../path_irrlicht.cpp"
