@@ -102,7 +102,7 @@ void cSimulator::Simulate(float a_Dt)
 
 
 
-void cSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
+void cSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block)
 {
 	ASSERT(a_Chunk.IsValid());
 
@@ -113,7 +113,7 @@ void cSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block
 
 
 
-void cSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BLOCKTYPE a_Block)
+void cSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BlockState a_Block)
 {
 	ASSERT(a_Chunk.IsValid());
 

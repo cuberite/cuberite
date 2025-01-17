@@ -8,7 +8,7 @@
 #include "Protocol/MojangAPI.h"
 #include "RankManager.h"
 #include "ChunkDef.h"
-
+#include "Protocol/Palettes/BlockMap.h"
 
 
 
@@ -66,6 +66,8 @@ public:
 
 	/** Interrupts the server and restarts it, as if "/restart" was typed in the console. */
 	static void Restart();
+
+	BlockMap::cBlockMap * GetBlockMap(void) const { return m_BlockMap; }
 
 	// tolua_begin
 	cServer * GetServer(void) { return m_Server; }
@@ -217,6 +219,7 @@ private:
 
 	cServer *        m_Server;
 	cMonsterConfig * m_MonsterConfig;
+	BlockMap::cBlockMap * m_BlockMap;
 
 	cCraftingRecipes * m_CraftingRecipes;
 	std::unique_ptr<cRecipeMapper> m_RecipeMapper;

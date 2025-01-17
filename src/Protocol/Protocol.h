@@ -15,6 +15,7 @@
 #include "../ByteBuffer.h"
 #include "../EffectID.h"
 #include "../World.h"
+//#include "../ClientHandle.h"
 
 
 
@@ -34,7 +35,7 @@ class cPacketizer;
 struct StatisticsManager;
 
 
-
+static const int CompressionThreshold = 128;  // After how large a packet should we compress it.
 
 
 class cProtocol
@@ -56,14 +57,24 @@ public:
 	enum ePacketType
 	{
 		pktAttachEntity = 0,
+		pktCustomPayload,
+		pktCommnadTree,
+		pktLightUpdate,
+		pktPlayerActionResponse,
+		pktRenderDistanceCenter,
 		pktBlockAction,
 		pktBlockBreakAnim,
 		pktBlockChange,
 		pktBlockChanges,
 		pktBossBar,
+		pktWorldBorder,
 		pktCameraSetTo,
 		pktChatRaw,
 		pktCollectEntity,
+		pktConfigurationReady,
+		pktConfigurationCustomPayload,
+		pktConfigurationDynamicRegistries,
+		pktConfigurationTags,
 		pktDestroyEntity,
 		pktDifficulty,
 		pktDisconnectDuringLogin,
@@ -98,6 +109,7 @@ public:
 		pktPlayerAbilities,
 		pktPlayerList,
 		pktPlayerListHeaderFooter,
+		pktPlayerLstRemove,
 		pktPlayerMoveLook,
 		pktPluginMessage,
 		pktRemoveEntityEffect,
@@ -106,6 +118,8 @@ public:
 		pktScoreboardObjective,
 		pktSpawnObject,
 		pktSoundEffect,
+		pktSetCursorItem,
+		pktSelectKnownPacks,
 		pktSoundParticleEffect,
 		pktSpawnExperienceOrb,
 		pktSpawnGlobalEntity,
@@ -175,6 +189,7 @@ public:
 		FireworkInfo,
 		FireworkBoostedEntityId,
 		FireworkFromCrossbow,
+		FrozenTicks,
 
 		ItemFrameItem,
 		ItemFrameRotation,
@@ -306,7 +321,21 @@ public:
 
 		TNTPrimedFuseTime
 	};
-
+	enum class Hand	 //  Used by the book update packet  //  A better, more uniqie name should be used instead
+	{
+		MAIN_HAND,
+		OFF_HAND
+	};
+	enum class PlayerActionResponses
+	{
+		START_DESTROY_BLOCK,
+		ABORT_DESTROY_BLOCK,
+		STOP_DESTROY_BLOCK,
+		DROP_ALL_ITEMS,
+		DROP_ITEM,
+		RELEASE_USE_ITEM,
+		SWAP_HELD_ITEMS
+	};
 	enum class EntityMetadataType
 	{
 		Byte,
@@ -330,6 +359,8 @@ public:
 		Pose
 	};
 
+
+
 	/** The protocol version number, received from the client in the Handshake packet. */
 	enum class Version
 	{
@@ -351,7 +382,39 @@ public:
 		v1_14_1 = 480,
 		v1_14_2 = 485,
 		v1_14_3 = 490,
-		v1_14_4 = 498
+		v1_14_4 = 498,
+		v1_15   = 573,
+		v1_15_1 = 575,
+		v1_15_2 = 578,
+		v1_16   = 735,
+		v1_16_1 = 736,
+		v1_16_2 = 751,
+		v1_16_3 = 753,
+		v1_16_4 = 754,
+		// v1_16_5 = 754,
+		v1_17   = 755,
+		v1_17_1 = 756,
+		v1_18   = 757,
+		// v1_18_1 = 757,
+		v1_18_2 = 758,
+		v1_19   = 759,
+		v1_19_1 = 760,
+		// v1_19_2 = 760,
+		v1_19_3 = 761,
+		v1_19_4 = 762,
+		v1_20   = 763,
+		// v1_20_1 = 763,
+		v1_20_2 = 764,
+		v1_20_3 = 765,
+		// v1_20_4 = 765,
+		v1_20_5 = 766,
+		//  v1_20_6 = 766,
+		v1_21 = 767,
+		// v1_21_1 = 767,
+		v1_21_2 = 768,
+		// v1_21_3 = 768
+		v1_21_4 = 769,
+		Latest = v1_21_4,
 	};
 
 	enum State
@@ -359,6 +422,17 @@ public:
 		Status = 1,
 		Login = 2,
 		Game = 3,
+		Configuration = 4,
+	};
+
+	enum class PlayerListAction : std::uint8_t
+	{
+		AddPlayer = 1,
+		InitializeChat = 2,
+		UpdateGameMode = 4,
+		UpdateListed = 8,
+		UpdateLatency = 16,
+		UpdateDisplayName = 32,
 	};
 
 	/** Called by cClientHandle to process data, when the client sends some.
@@ -371,10 +445,11 @@ public:
 	virtual void DataPrepared(ContiguousByteBuffer & a_Data) = 0;
 
 	// Sending stuff to clients (alphabetically sorted):
+	virtual void SendAcknowledgeBlockChange     (int a_SequenceId) = 0;
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;
-	virtual void SendBlockAction                (Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) = 0;
+	virtual void SendBlockAction                (Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BlockState a_Block) = 0;
 	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage) = 0;
-	virtual void SendBlockChange                (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
+	virtual void SendBlockChange                (Vector3i a_BlockPos, BlockState a_Block) = 0;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) = 0;
 	virtual void SendBossBarAdd                 (UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) = 0;
 	virtual void SendBossBarRemove              (UInt32 a_UniqueID) = 0;
@@ -388,9 +463,11 @@ public:
 	virtual void SendChatRaw                    (const AString & a_MessageRaw, eChatType a_Type) = 0;
 	virtual void SendChunkData                  (ContiguousByteBufferView a_ChunkData) = 0;
 	virtual void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) = 0;
+	virtual void SendCommandTree                (void) = 0;
 	virtual void SendDestroyEntity              (const cEntity & a_Entity) = 0;
 	virtual void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) = 0;
 	virtual void SendDisconnect                 (const AString & a_Reason) = 0;
+	virtual void SendDynamicRegistries          (void) = 0;
 	virtual void SendEditSign                   (Vector3i a_BlockPos) = 0;  ///< Request the client to open up the sign editor for the sign (1.6+)
 	virtual void SendEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration) = 0;
 	virtual void SendEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation) = 0;
@@ -402,12 +479,14 @@ public:
 	virtual void SendEntityProperties           (const cEntity & a_Entity) = 0;
 	virtual void SendEntityVelocity             (const cEntity & a_Entity) = 0;
 	virtual void SendExplosion                  (Vector3f a_Position, float a_Power) = 0;
+	virtual void SendFinishConfiguration        (void) = 0;
 	virtual void SendGameMode                   (eGameMode a_GameMode) = 0;
 	virtual void SendHealth                     (void) = 0;
 	virtual void SendHeldItemChange             (int a_ItemIndex) = 0;
 	virtual void SendHideTitle                  (void) = 0;
 	virtual void SendInventorySlot              (char a_WindowID, short a_SlotNum, const cItem & a_Item) = 0;
 	virtual void SendKeepAlive                  (UInt32 a_PingID) = 0;
+	virtual void SendSelectKnownPacks           (void) = 0;
 	virtual void SendLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) = 0;
 	virtual void SendLogin                      (const cPlayer & a_Player, const cWorld & a_World) = 0;
 	virtual void SendLoginSuccess               (void) = 0;
@@ -416,7 +495,9 @@ public:
 	virtual void SendPlayerAbilities            (void) = 0;
 	virtual void SendParticleEffect             (const AString & a_SoundName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount) = 0;
 	virtual void SendParticleEffect             (const AString & a_SoundName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) = 0;
+	virtual void SendPlayerActionResponse       (Vector3i a_blockpos, int a_state_id, cProtocol::PlayerActionResponses a_action, bool a_IsApproved) = 0;
 	virtual void SendPlayerListAddPlayer        (const cPlayer & a_Player) = 0;
+	virtual void SendPlayerListInitChat         (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerListHeaderFooter     (const cCompositeChat & a_Header, const cCompositeChat & a_Footer) = 0;
 	virtual void SendPlayerListRemovePlayer     (const cPlayer & a_Player) = 0;
 	virtual void SendPlayerListUpdateGameMode   (const cPlayer & a_Player) = 0;
@@ -432,6 +513,7 @@ public:
 	virtual void SendResetTitle                 (void) = 0;
 	virtual void SendResourcePack               (const AString & a_ResourcePackUrl) = 0;
 	virtual void SendRespawn                    (eDimension a_Dimension) = 0;
+	virtual void SendRenderDistanceCenter       (cChunkCoords a_chunk) = 0;
 	virtual void SendExperience                 (void) = 0;
 	virtual void SendExperienceOrb              (const cExpOrb & a_ExpOrb) = 0;
 	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) = 0;
@@ -446,7 +528,8 @@ public:
 	virtual void SendSpawnEntity                (const cEntity & a_Entity) = 0;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) = 0;
 	virtual void SendStatistics                 (const StatisticsManager & a_Manager) = 0;
-	virtual void SendTabCompletionResults       (const AStringVector & a_Results) = 0;
+	virtual void SendTabCompletionResults       (const AStringVector & a_Results, UInt32 CompletionId) = 0;
+	virtual void SendTags                       (void) = 0;
 	virtual void SendThunderbolt                (Vector3i a_Origin) = 0;
 	virtual void SendTitleTimes                 (int a_FadeInTicks, int a_DisplayTicks, int a_FadeOutTicks) = 0;
 	virtual void SendTimeUpdate                 (cTickTimeLong a_WorldAge, cTickTimeLong a_WorldDate, bool a_DoDaylightCycle) = 0;
@@ -456,20 +539,34 @@ public:
 	virtual void SendUpdateSign                 (Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4) = 0;
 	virtual void SendUnlockRecipe               (UInt32 a_RecipeID) = 0;
 	virtual void SendInitRecipes                (UInt32 a_RecipeID) = 0;
+	virtual void SendInitialChunksComing        () = 0;
 	virtual void SendWeather                    (eWeather a_Weather) = 0;
-	virtual void SendWholeInventory             (const cWindow    & a_Window) = 0;
+	virtual void SendGameStateChange            (eGameStateReason a_Reason, float a_Value) = 0;
+	virtual void SendWholeInventory             (const cWindow    & a_Window, const cItem & a_CursorStack) = 0;
 	virtual void SendWindowClose                (const cWindow    & a_Window) = 0;
 	virtual void SendWindowOpen                 (const cWindow & a_Window) = 0;
 	virtual void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value) = 0;
 
+
 	/** Returns the ServerID used for authentication through session.minecraft.net */
 	virtual AString GetAuthServerID(void) = 0;
+
+	virtual State GetCurrentState(void) const = 0;
+
+	/** In case the protocol does not support the given parser it returns -1 */
+	virtual Int32 GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const { return -1;}
+
+	virtual UInt32 GetProtocolSoundID(const AString & a_SoundName) const { return 1;}
 
 protected:
 
 	friend class cPacketizer;
 
 	cClientHandle * m_Client;
+
+	bool m_CompressionEnabled = false;
+
+	bool m_IsConfigReadySent = false;  // only used in 1.20.2+ Basically used as a hack
 
 	/** Provides synchronization for sending the entire packet at once.
 	Each SendXYZ() function must acquire this CS in order to send the whole packet at once.

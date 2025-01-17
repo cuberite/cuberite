@@ -2769,45 +2769,6 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 				},
 				Notes = "Sets the block at the specified coords, replaces the block entities for the previous block type, creates a new block entity for the new block, if appropriate, and wakes up the simulators. This is the preferred way to set blocks, as opposed to FastSetBlock(), which is only to be used under special circumstances.",
 			},
-			SetBlockMeta =
-			{
-				{
-					Params =
-					{
-						{
-							Name = "BlockX",
-							Type = "number",
-						},
-						{
-							Name = "BlockY",
-							Type = "number",
-						},
-						{
-							Name = "BlockZ",
-							Type = "number",
-						},
-						{
-							Name = "BlockMeta",
-							Type = "number",
-						},
-					},
-					Notes = "Sets the meta for the block at the specified coords. Any call to SetBlockMeta will not generate a simulator update (water, lava, redstone), consider using SetBlock instead.",
-				},
-				{
-					Params =
-					{
-						{
-							Name = "BlockCoords",
-							Type = "Vector3i",
-						},
-						{
-							Name = "BlockMeta",
-							Type = "number",
-						},
-					},
-					Notes = "Sets the meta for the block at the specified coords. Any call to SetBlockMeta will not generate a simulator update (water, lava, redstone), consider using SetBlock instead.",
-				},
-			},
 			SetChunkAlwaysTicked =
 			{
 				Params =

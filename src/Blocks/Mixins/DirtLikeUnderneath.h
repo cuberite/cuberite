@@ -2,6 +2,7 @@
 #pragma once
 
 #include "../../Chunk.h"
+#include "AllTags/BlockTags.h"
 
 /** Mixin to ensure the block has a dirt-like block underneath. */
 template <class Base>
@@ -13,7 +14,7 @@ public:
 
 	using Super::Super;
 
-	constexpr cDirtLikeUnderneath(BLOCKTYPE a_BlockType):
+	constexpr cDirtLikeUnderneath(BlockState a_BlockType):
 		Base(a_BlockType)
 	{
 	}
@@ -24,9 +25,9 @@ protected:
 
 protected:
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Block) const override
 	{
-		if (!Super::CanBeAt(a_Chunk, a_Position, a_Meta))
+		if (!Super::CanBeAt(a_Chunk, a_Position, a_Block))
 		{
 			return false;
 		}
@@ -37,6 +38,6 @@ protected:
 			return false;
 		}
 
-		return IsBlockTypeOfDirt(a_Chunk.GetBlock(BelowPos));
+		return BlockTags::Dirt(a_Chunk.GetBlock(BelowPos).Type());
 	}
 };

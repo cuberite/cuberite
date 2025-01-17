@@ -7,7 +7,8 @@
 class cWorld;
 
 
-enum Direction
+
+enum class FluidDirection
 {
 	X_PLUS,
 	X_MINUS,
@@ -41,7 +42,7 @@ class cFluidSimulator:
 
 public:
 
-	cFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid);
+	cFluidSimulator(cWorld & a_World, BlockType a_Fluid, unsigned char a_StationaryFlowValue);
 
 	/** Returns a unit vector in the direction the fluid is flowing or a zero-vector if not flowing. */
 	virtual Vector3f GetFlowingDirection(Vector3i a_Pos);
@@ -49,24 +50,23 @@ public:
 	/** Creates a ChunkData object for the simulator to use. The simulator returns the correct object type. */
 	virtual cFluidSimulatorData * CreateChunkData(void) = 0;
 
-	bool IsFluidBlock          (BLOCKTYPE a_BlockType) const { return (a_BlockType == m_FluidBlock); }
-	bool IsStationaryFluidBlock(BLOCKTYPE a_BlockType) const { return (a_BlockType == m_StationaryFluidBlock); }
-	bool IsAnyFluidBlock       (BLOCKTYPE a_BlockType) const { return ((a_BlockType == m_FluidBlock) || (a_BlockType == m_StationaryFluidBlock)); }
+	bool IsFluidBlock      (BlockType a_Block) const  { return (a_Block == m_FluidBlock); }
+	bool IsFluidStationary (BlockState a_Block) const;
 
-	static bool CanWashAway(BLOCKTYPE a_BlockType);
+	static bool CanWashAway(BlockState a_Block);
 
-	bool IsSolidBlock      (BLOCKTYPE a_BlockType);
-	bool IsPassableForFluid(BLOCKTYPE a_BlockType);
+	bool IsSolidBlock      (BlockState a_Block);
+	bool IsPassableForFluid(BlockState a_Block);
 
 	/** Returns true if a_Meta1 is a higher fluid than a_Meta2. Takes source blocks into account. */
-	bool IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2);
+	bool IsHigherMeta(unsigned char a_Falloff1, unsigned char a_Falloff2);
 
 protected:
 
-	bool IsAllowedBlock(BLOCKTYPE a_BlockType);
+	bool IsAllowedBlock(BlockState a_Block);
 
-	BLOCKTYPE m_FluidBlock;            // The fluid block type that needs simulating
-	BLOCKTYPE m_StationaryFluidBlock;  // The fluid block type that indicates no simulation is needed
+	BlockType m_FluidBlock;
+	unsigned char m_StationaryFalloffValue;
 };
 
 

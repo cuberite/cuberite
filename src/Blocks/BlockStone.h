@@ -17,26 +17,22 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// Convert stone to cobblestone, unless using silk-touch:
-		if (
-			(a_BlockMeta == E_META_STONE_STONE) &&
-			!ToolHasSilkTouch(a_Tool)
-		)
+		if (!ToolHasSilkTouch(a_Tool))
 		{
-			return cItem(E_BLOCK_COBBLESTONE, 1, 0);
+			return cItem(Item::Cobblestone);
 		}
-		return cItem(m_BlockType, 1, a_BlockMeta);
+		return cItem(Item::Stone);
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 11;
 	}
 };

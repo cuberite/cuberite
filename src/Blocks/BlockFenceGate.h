@@ -9,13 +9,59 @@
 
 
 class cBlockFenceGateHandler final :
-	public cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x02, 0x03, 0x00, 0x01>>
+	public cBlockHandler
 {
-	using Super = cClearMetaOnDrop<cYawRotator<cBlockHandler, 0x03, 0x02, 0x03, 0x00, 0x01>>;
+	using Super = cBlockHandler;
 
 public:
 
 	using Super::Super;
+
+	static inline bool IsFenceGate(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::AcaciaFenceGate:
+			case BlockType::BirchFenceGate:
+			case BlockType::CrimsonFenceGate:
+			case BlockType::DarkOakFenceGate:
+			case BlockType::JungleFenceGate:
+			case BlockType::OakFenceGate:
+			case BlockType::SpruceFenceGate:
+			case BlockType::WarpedFenceGate:
+			case BlockType::BambooFenceGate:
+			case BlockType::CherryFenceGate:
+			case BlockType::MangroveFenceGate:
+				return true;
+			default: return false;
+		}
+	}
+
+
+
+#define TOGGLE(FenceGateType) \
+	a_ChunkInterface.SetBlock(a_Pos, FenceGateType::FenceGateType(FenceGateType::Facing(Self), FenceGateType::InWall(Self), !FenceGateType::Open(Self), !FenceGateType::Powered(Self))); break
+
+	static void Toggle(cChunkInterface & a_ChunkInterface, Vector3i a_Pos)
+	{
+		using namespace Block;
+		auto Self = a_ChunkInterface.GetBlock(a_Pos);
+		switch (Self.Type())
+		{
+			case BlockType::AcaciaFenceGate:   TOGGLE(AcaciaFenceGate);
+			case BlockType::BirchFenceGate:    TOGGLE(BirchFenceGate);
+			case BlockType::CrimsonFenceGate:  TOGGLE(CrimsonFenceGate);
+			case BlockType::DarkOakFenceGate:  TOGGLE(DarkOakFenceGate);
+			case BlockType::JungleFenceGate:   TOGGLE(JungleFenceGate);
+			case BlockType::OakFenceGate:      TOGGLE(OakFenceGate);
+			case BlockType::SpruceFenceGate:   TOGGLE(SpruceFenceGate);
+			case BlockType::WarpedFenceGate:   TOGGLE(WarpedFenceGate);
+			case BlockType::BambooFenceGate:   TOGGLE(BambooFenceGate);
+			case BlockType::CherryFenceGate:   TOGGLE(CherryFenceGate);
+			case BlockType::MangroveFenceGate: TOGGLE(MangroveFenceGate);
+			default: break;
+		}
+	}
 
 private:
 
@@ -28,20 +74,8 @@ private:
 		const Vector3i a_CursorPos
 	) const override
 	{
-		NIBBLETYPE OldMetaData = a_ChunkInterface.GetBlockMeta(a_BlockPos);
-		NIBBLETYPE NewMetaData = YawToMetaData(a_Player.GetYaw());
-		OldMetaData ^= 4;  // Toggle the gate
 
-		if ((OldMetaData & 1) == (NewMetaData & 1))
-		{
-			// Standing in front of the gate - apply new direction
-			a_ChunkInterface.SetBlockMeta(a_BlockPos, (OldMetaData & 4) | (NewMetaData & 3));
-		}
-		else
-		{
-			// Standing aside - use last direction
-			a_ChunkInterface.SetBlockMeta(a_BlockPos, OldMetaData);
-		}
+		Toggle(a_ChunkInterface, a_BlockPos);
 		a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_FENCE_GATE_OPEN, a_BlockPos, 0, a_Player.GetClientHandle());
 		return true;
 	}
@@ -74,17 +108,22 @@ private:
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		switch (m_BlockType)
 		{
-			case E_BLOCK_OAK_FENCE_GATE: return 13;
-			case E_BLOCK_SPRUCE_FENCE_GATE: return 34;
-			case E_BLOCK_BIRCH_FENCE_GATE: return 2;
-			case E_BLOCK_JUNGLE_FENCE_GATE: return 10;
-			case E_BLOCK_DARK_OAK_FENCE_GATE: return 26;
-			case E_BLOCK_ACACIA_FENCE_GATE: return 15;
+			case BlockType::AcaciaFenceGate:  return 15;
+			case BlockType::BirchFenceGate:   return 2;
+			case BlockType::CrimsonFenceGate: return 35;
+			case BlockType::DarkOakFenceGate: return 26;
+			case BlockType::JungleFenceGate:  return 10;
+			case BlockType::OakFenceGate:     return 13;
+			case BlockType::SpruceFenceGate:  return 34;
+			case BlockType::WarpedFenceGate:  return 56;
+			case BlockType::BambooFenceGate:
+			case BlockType::CherryFenceGate:
+			case BlockType::MangroveFenceGate:
+			case BlockType::PaleOakFence:     return 0;
 			default:
 			{
 				ASSERT(!"Unhandled blocktype in fence gate handler!");

@@ -77,6 +77,8 @@ public:
 
 	virtual ~cWorld() override;
 
+	virtual void FlushPendingBlockChanges() override;
+
 	// tolua_begin
 
 	/** Get whether saving chunks is enabled */
@@ -150,7 +152,7 @@ public:
 	// Implemented in Broadcaster.cpp
 	// (Please keep these alpha-sorted)
 	virtual void BroadcastAttachEntity       (const cEntity & a_Entity, const cEntity & a_Vehicle) override;
-	virtual void BroadcastBlockAction        (Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
+	virtual void BroadcastBlockAction        (Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BlockState a_BlockType, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
 	virtual void BroadcastBlockBreakAnimation(UInt32 a_EntityID, Vector3i a_BlockPos, Int8 a_Stage, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastBlockEntity        (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr) override;  ///< If there is a block entity at the specified coods, sends it to all clients except a_Exclude
 	virtual void BroadcastBossBarUpdateHealth(const cEntity & a_Entity, UInt32 a_UniqueID, float a_FractionFilled) override;
@@ -178,6 +180,7 @@ public:
 	void         BroadcastEntityProperties           (const cEntity & a_Entity);
 	virtual void BroadcastEntityVelocity             (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastEntityAnimation            (const cEntity & a_Entity, EntityAnimation a_Animation, const cClientHandle * a_Exclude = nullptr) override;  // tolua_export
+	virtual void BroadcastGameStateChange            (eGameStateReason a_Reason, float a_Value = 0, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastLeashEntity                (const cEntity & a_Entity, const cEntity & a_EntityLeashedTo) override;
 	virtual void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
 	virtual void BroadcastParticleEffect             (const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data, const cClientHandle * a_Exclude = nullptr) override;  // Exported in ManualBindings_World.cpp
@@ -217,8 +220,8 @@ public:
 
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,
-		const cChunkDef::BlockNibbles & a_BlockLight,
-		const cChunkDef::BlockNibbles & a_SkyLight
+		const cChunkDef::LightNibbles & a_BlockLight,
+		const cChunkDef::LightNibbles & a_SkyLight
 	);
 
 	/** Calls the callback with the chunk's data, if available (with ChunkCS locked).
@@ -347,53 +350,37 @@ public:
 
 	/** Sets the block at the specified coords to the specified value.
 	Full processing, incl. updating neighbors, is performed. */
-	void SetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void SetBlock(Vector3i a_BlockPos, BlockState a_Block);
 
 	/** Sets the block at the specified coords to the specified value.
 	The replacement doesn't trigger block updates, nor wake up simulators.
 	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block) */
-	void FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	void FastSetBlock(Vector3i a_BlockPos, BlockState a_Block)
 	{
-		m_ChunkMap.FastSetBlock(a_BlockPos, a_BlockType, a_BlockMeta);
+		m_ChunkMap.FastSetBlock(a_BlockPos, a_Block);
 	}
 
-	/** Returns the block type at the specified position.
-	Returns 0 if the chunk is not valid. */
-	BLOCKTYPE GetBlock(Vector3i a_BlockPos) const
+	/** Returns the block type at the specified position. */
+	BlockState GetBlock(Vector3i a_BlockPos) const
 	{
 		return m_ChunkMap.GetBlock(a_BlockPos);
 	}
 
-	/** Returns the block meta at the specified position.
-	Returns 0 if the chunk is not valid. */
-	NIBBLETYPE GetBlockMeta(Vector3i a_BlockPos) const
-	{
-		return m_ChunkMap.GetBlockMeta(a_BlockPos);
-	}
-
-	/** Sets the meta for the specified block, while keeping the blocktype.
-	Ignored if the chunk is invalid. */
-	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_MetaData);
+	bool GetBlock(Vector3i a_BlockPos, BlockState & a_Block) const;
 
 	/** Returns the sky light value at the specified block position.
 	The sky light is "raw" - not affected by time-of-day.
 	Returns 0 if chunk not valid. */
-	NIBBLETYPE GetBlockSkyLight(Vector3i a_BlockPos) const;
+	LIGHTTYPE GetBlockSkyLight(Vector3i a_BlockPos) const;
 
 	/** Returns the block-light value at the specified block position.
 	Returns 0 if chunk not valid. */
-	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos) const;
-
-	/** Retrieves the block type and meta at the specified coords.
-	Stores the result into a_BlockType and a_BlockMeta.
-	Returns true if successful, false if chunk not present.
-	TODO: Export in ManualBindings_World.cpp. */
-	bool GetBlockTypeMeta(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
+	LIGHTTYPE GetBlockBlockLight(Vector3i a_BlockPos) const;
 
 	/** Queries the whole block specification from the world.
 	Returns true if all block info was retrieved successfully, false if not (invalid chunk / bad position).
 	Exported in ManualBindings_World.cpp. */
-	bool GetBlockInfo(Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
+	bool GetBlockInfo(Vector3i a_BlockPos, BlockState & a_Block, LIGHTTYPE & a_SkyLight, LIGHTTYPE & a_BlockLight) const;
 
 	// TODO: NIBBLETYPE GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);
 
@@ -445,32 +432,32 @@ public:
 
 	/** Spawns an falling block entity at the given position.
 	Returns the UniqueID of the spawned falling block, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnFallingBlock(Vector3d a_Pos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	UInt32 SpawnFallingBlock(Vector3d a_Pos, BlockState a_Block);
 
 	/** Spawns an falling block entity at the given position.
 	Returns the UniqueID of the spawned falling block, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnFallingBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	UInt32 SpawnFallingBlock(Vector3i a_BlockPos, BlockState a_Block)
 	{
 		// When creating from a block position (Vector3i), move the spawn point to the middle of the block by adding (0.5, 0, 0.5)
-		return SpawnFallingBlock(Vector3d(0.5, 0, 0.5) + a_BlockPos, a_BlockType, a_BlockMeta);
+		return SpawnFallingBlock(Vector3d(0.5, 0, 0.5) + a_BlockPos, a_Block);
 	}
 
 	/** OBSOLETE, use the Vector3-based overload instead.
 	Spawns an falling block entity at the given position.
 	Returns the UniqueID of the spawned falling block, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnFallingBlock(int a_X, int a_Y, int a_Z, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+	UInt32 SpawnFallingBlock(int a_X, int a_Y, int a_Z, BlockState a_Block)
 	{
-		return SpawnFallingBlock(Vector3i{a_X, a_Y, a_Z}, a_BlockType, a_BlockMeta);
+		return SpawnFallingBlock(Vector3i{a_X, a_Y, a_Z}, a_Block);
 	}
 
 	/** Spawns an minecart at the given coordinates.
 	Returns the UniqueID of the spawned minecart, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnMinecart(Vector3d a_Pos, int a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1);
+	UInt32 SpawnMinecart(Vector3d a_Pos, Item a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1);
 
 	/** OBSOLETE, use the Vector3d-based overload instead.
 	Spawns an minecart at the given coordinates.
 	Returns the UniqueID of the spawned minecart, or cEntity::INVALID_ID on failure. */
-	UInt32 SpawnMinecart(double a_X, double a_Y, double a_Z, int a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1)
+	UInt32 SpawnMinecart(double a_X, double a_Y, double a_Z, Item a_MinecartType, const cItem & a_Content = cItem(), int a_BlockHeight = 1)
 	{
 		return SpawnMinecart({a_X, a_Y, a_Z}, a_MinecartType, a_Content, a_BlockHeight);
 	}
@@ -535,7 +522,7 @@ public:
 	/** Replaces the specified block with another, and calls the OnPlaced block handler.
 	The OnBroken block handler is called for the replaced block. Wakes up the simulators.
 	If the chunk for any of the blocks is not loaded, the set operation is ignored silently. */
-	void PlaceBlock(const Vector3i a_Position, const BLOCKTYPE a_BlockType, const NIBBLETYPE a_BlockMeta);
+	void PlaceBlock(const Vector3i a_Position, const BlockState a_Block);
 
 	/** Retrieves block types of the specified blocks. If a chunk is not loaded, doesn't modify the block. Returns true if all blocks were read. */
 	bool GetBlocks(sSetBlockVector & a_Blocks, bool a_ContinueOnFailure);
@@ -657,7 +644,7 @@ public:
 	/** Grows the plant at the specified position by at most a_NumStages.
 	The block's Grow handler is invoked.
 	Returns the number of stages the plant has grown, 0 if not a plant. */
-	int GrowPlantAt(Vector3i a_BlockPos, int a_NumStages = 1);
+	int GrowPlantAt(Vector3i a_BlockPos, char a_NumStages = 1);
 
 	/** Grows the plant at the specified block to its ripe stage.
 	Returns true if grown, false if not (invalid chunk, non-growable block, already ripe). */
@@ -886,7 +873,7 @@ public:
 	void TabCompleteUserName(const AString & a_Text, AStringVector & a_Results);
 
 	/** Get the current darkness level based on the time */
-	NIBBLETYPE GetSkyDarkness() { return m_SkyDarkness; }
+	LIGHTTYPE GetSkyDarkness() { return m_SkyDarkness; }
 
 	/** Increments (a_AlwaysTicked == true) or decrements (false) the m_AlwaysTicked counter for the specified chunk.
 	If the m_AlwaysTicked counter is greater than zero, the chunk is ticked in the tick-thread regardless of
@@ -1001,7 +988,7 @@ private:
 	std::chrono::milliseconds m_LastSave;  // The last WorldAge in which save-all was triggerred.
 	std::map<cMonster::eFamily, cTickTimeLong> m_LastSpawnMonster;  // The last WorldAge (in ticks) in which a monster was spawned (for each megatype of monster)  // MG TODO : find a way to optimize without creating unmaintenability (if mob IDs are becoming unrowed)
 
-	NIBBLETYPE m_SkyDarkness;
+	LIGHTTYPE m_SkyDarkness;
 
 	eGameMode m_GameMode;
 	bool m_bEnabledPVP;
@@ -1037,6 +1024,7 @@ private:
 	int m_MaxSunnyTicks, m_MinSunnyTicks;
 	int m_MaxRainTicks,  m_MinRainTicks;
 	int m_MaxThunderStormTicks, m_MinThunderStormTicks;
+	float m_RainGradient, m_ThunderGradient;
 
 	int  m_MaxCactusHeight;
 	int  m_MaxSugarcaneHeight;
@@ -1154,7 +1142,7 @@ private:
 	eWeather ChooseNewWeather(void);
 
 	/** Creates a new fluid simulator, loads its settings from the inifile (a_FluidName section) */
-	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BLOCKTYPE a_SimulateBlock, BLOCKTYPE a_StationaryBlock);
+	cFluidSimulator * InitializeFluidSimulator(cIniFile & a_IniFile, const char * a_FluidName, BlockType a_Block);
 
 	/** Creates a new redstone simulator. */
 	cRedstoneSimulator * InitializeRedstoneSimulator(cIniFile & a_IniFile);
@@ -1165,5 +1153,5 @@ private:
 	/** Checks if the sapling at the specified block coord is a part of a large-tree sapling (2x2).
 	If so, adjusts the coords so that they point to the northwest (XM ZM) corner of the sapling area and returns true.
 	Returns false if not a part of large-tree sapling. */
-	bool GetLargeTreeAdjustment(Vector3i & a_BlockPos, NIBBLETYPE a_SaplingMeta);
+	bool GetLargeTreeAdjustment(Vector3i & a_BlockPos, BlockState a_Block);
 };  // tolua_export
