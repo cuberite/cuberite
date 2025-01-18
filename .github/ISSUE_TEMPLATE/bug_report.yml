@@ -1,0 +1,80 @@
+name: Bug Report
+description: File a bug report.
+title: "[Bug]: "
+labels: ["bug"]
+projects: ["Cuberite"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: cuberite-commit
+    attributes:
+      label: Cuberite Commit ID of your version
+      description: "Commit ID"
+      placeholder: "commit ID here"
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behaviour
+    attributes:
+      label: Expected behavior
+      description: Expected behaviour
+      placeholder: Expected behaviour here
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behaviour
+    attributes:
+      label: Actual behaviour
+      description: Actual behaviour
+      placeholder: Actual behaviour here
+    validations:
+      required: true
+  - type: textarea
+    id: steps-reproduce
+    attributes:
+      label: Steps to reproduce the behaviour
+      description: Step-by-step instructions to reproduce the bug.
+      placeholder: Step 1. Do thing X, Step 2. Do thing Y, Step ....
+    validations:
+      required: true
+  - type: dropdown
+    id: client-version
+    attributes:
+      label: Version
+      description: Which Minecraft version are you connecting with? 
+      options:
+        - 1.12.2
+        - 1.12.1
+        - 1.12
+        - 1.11.1 (1.11.2)
+        - 1.11
+        - 1.10.X
+        - 1.9.4 (1.9.3)
+        - 1.9.2
+        - 1.9.1
+        - 1.9
+        - 1.8.X
+      multiple: true
+    validations:
+      required: true
+  - type: dropdown
+    id: OS
+    attributes:
+      label: On which OS does the issue appear?
+      multiple: true
+      options:
+        - Windows
+        - Linux
+        - macOS
+        - BSD
+    validations:
+        required: true
+  - type: textarea
+    id: server-log
+    attributes:
+      label: Server log
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
