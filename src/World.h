@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <functional>
 #include <optional>
 
 #include "Simulator/SimulatorManager.h"

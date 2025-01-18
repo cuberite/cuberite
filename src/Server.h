@@ -22,6 +22,8 @@
 	#pragma warning(disable:4702)
 #endif
 
+#include <functional>
+
 #include "mbedTLS++/RsaPrivateKey.h"
 
 #ifdef _MSC_VER
