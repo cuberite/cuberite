@@ -19,7 +19,7 @@ Here is a list of *frequently asked questions*
 </details>
 
 <details>
-<summary>Can I install java plugins</summary>
+<summary>Can I install Java plugins</summary>
 
 > No.\
 > cuberite support lua plugins and currently only support those. You can't install java plugin no matter how hard you try.
@@ -27,5 +27,5 @@ Here is a list of *frequently asked questions*
 
 ---
 
-If you still have questions, you can come and ask it directly on our [discord](https://discord.gg/76w5J6M) or
+If you still have questions, you can come and ask it directly on our [Discord](https://discord.gg/76w5J6M) or
 [Forum](https://forum.cuberite.org/). In any case, please be patient. We answer when we have time
