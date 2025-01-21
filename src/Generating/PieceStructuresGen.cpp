@@ -63,7 +63,7 @@ public:
 
 
 
-	AString GetName() const { return m_Name; };
+	AString GetName() const { return m_Name; }
 
 
 
