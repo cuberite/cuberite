@@ -199,7 +199,7 @@ void cComposableGenerator::Generate(cChunkDesc & a_ChunkDesc)
 
 
 
-Vector3i cComposableGenerator::GetNearestStructure(AString a_Structure, Vector3i a_Position)
+Vector3i cComposableGenerator::GetNearestStructure(const AString & a_Structure, Vector3i a_Position)
 {
 	for (const std::unique_ptr<cFinishGen> & Finisher : m_FinishGens)
 	{
