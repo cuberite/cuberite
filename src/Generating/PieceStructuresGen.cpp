@@ -175,7 +175,7 @@ bool cPieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaLevel, 
 
 
 
-Vector3i cPieceStructuresGen::GetNearestStructure(const AString a_Structure, Vector3i a_Position)
+Vector3i cPieceStructuresGen::GetNearestStructure(const AString & a_Structure, Vector3i a_Position)
 {
 	for (auto & Gen : m_Gens)
 	{

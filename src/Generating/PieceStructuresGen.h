@@ -39,7 +39,7 @@ public:
 	/** Returns the BlockCoordinates of the nearest queried structure.
 	Needs to filter all the gens part of the PieceStructuresGen to find the right
 	structure category. */
-	Vector3i GetNearestStructure(const AString a_Structure, Vector3i a_Position);
+	Vector3i GetNearestStructure(const AString & a_Structure, Vector3i a_Position);
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;

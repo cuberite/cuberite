@@ -130,7 +130,7 @@ void cGridStructGen::SetGeneratorParams(const AStringMap & a_GeneratorParams)
 
 
 
-Vector3i cGridStructGen::GetNearestStructure(const AString a_StructureName, Vector3i a_StartPos)
+Vector3i cGridStructGen::GetNearestStructure(const AString & a_StructureName, Vector3i a_StartPos)
 {
 	cStructurePtrs Structures;
 	cChunkCoords origin = cChunkDef::BlockToChunk(a_StartPos);

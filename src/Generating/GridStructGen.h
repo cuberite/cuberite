@@ -96,7 +96,7 @@ public:
 
 	/** Gets the nearest structure from the current position
 	By reaching a GridStructGen, we expect that the type of structure has been filtered down */
-	Vector3i GetNearestStructure(const AString a_StructureName, Vector3i a_StartPos);
+	Vector3i GetNearestStructure(const AString & a_StructureName, Vector3i a_StartPos);
 
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;

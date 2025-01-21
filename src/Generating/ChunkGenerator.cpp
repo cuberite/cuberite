@@ -79,7 +79,7 @@ EMCSBiome cChunkGenerator::GetBiomeAt(int a_BlockX, int a_BlockZ)
 
 
 
-Vector3i cChunkGenerator::GetNearestStructure(const AString, Vector3i)
+Vector3i cChunkGenerator::GetNearestStructure(const AString &, Vector3i)
 {
 	// log the fact that we are stuck in the chunk generator
 	LOGD("Using chunk generator to find nearest structure."
