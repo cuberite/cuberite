@@ -101,6 +101,9 @@ src/AllFiles.lst
 *.idb
 .vs/
 
+# win build
+VS2017-x64/*
+
 # cmake output folders and files
 ZERO_CHECK.dir/
 Debug/
