@@ -23,29 +23,30 @@
 #include "../BlockEntities/EnchantingTableEntity.h"
 #include "../BlockEntities/EnderChestEntity.h"
 #include "../BlockEntities/EndPortalEntity.h"
+#include "../BlockEntities/FlowerPotEntity.h"
 #include "../BlockEntities/FurnaceEntity.h"
 #include "../BlockEntities/HopperEntity.h"
 #include "../BlockEntities/JukeboxEntity.h"
+#include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/MobSpawnerEntity.h"
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/SignEntity.h"
-#include "../BlockEntities/MobHeadEntity.h"
-#include "../BlockEntities/FlowerPotEntity.h"
 
 #include "../Entities/Entity.h"
-#include "../Entities/EnderCrystal.h"
-#include "../Entities/FallingBlock.h"
-#include "../Entities/Boat.h"
-#include "../Entities/Minecart.h"
-#include "../Entities/Pickup.h"
 #include "../Entities/ArrowEntity.h"
-#include "../Entities/SplashPotionEntity.h"
-#include "../Entities/TNTEntity.h"
+#include "../Entities/Boat.h"
+#include "../Entities/EnderCrystal.h"
 #include "../Entities/ExpOrb.h"
+#include "../Entities/FallingBlock.h"
 #include "../Entities/HangingEntity.h"
 #include "../Entities/ItemFrame.h"
 #include "../Entities/LeashKnot.h"
+#include "../Entities/Minecart.h"
 #include "../Entities/Painting.h"
+#include "../Entities/Pickup.h"
+#include "../Entities/SplashPotionEntity.h"
+#include "../Entities/ThrownEnderEyeEntity.h"
+#include "../Entities/TNTEntity.h"
 
 #include "../Mobs/IncludeAllMonsters.h"
 
@@ -1032,6 +1033,10 @@ public:
 
 	void AddProjectileEntity(cProjectileEntity * a_Projectile)
 	{
+		// TODO: Make EnderEye saveable between server changes
+		// (this save data breaks in 1.8, is there a version that actually saves EnderEye pos/data???)
+		if (a_Projectile->GetProjectileKind()
+			== cProjectileEntity::pkEnderEye) return;
 		mWriter.BeginCompound("");
 			AddBasicEntity(a_Projectile, a_Projectile->GetMCAClassName());
 			mWriter.AddByte("inGround", a_Projectile->IsInGround() ? 1 : 0);
