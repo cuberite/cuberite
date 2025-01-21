@@ -3,6 +3,7 @@
 
 #include "../Defines.h"
 #include "../Scoreboard.h"
+#include "../Registries/SoundEvent.h"
 
 // fwd:
 class cClientHandle;
@@ -58,6 +59,7 @@ public:
 	virtual void BroadcastScoreUpdate                (const AString & a_Objective, const AString & a_PlayerName, cObjective::Score a_Score, Byte a_Mode) = 0;
 	virtual void BroadcastDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) = 0;
 	virtual void BroadcastSoundEffect                (const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = nullptr) = 0;
+	virtual void BroadcastSoundEffect                (const SoundEvent a_SoundEvent, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastSoundParticleEffect        (const EffectID a_EffectID, Vector3i a_SrcPos, int a_Data, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastSpawnEntity                (cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastThunderbolt                (Vector3i a_BlockPos, const cClientHandle * a_Exclude = nullptr) = 0;
