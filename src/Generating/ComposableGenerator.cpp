@@ -214,6 +214,22 @@ Vector3i cComposableGenerator::GetNearestStructure(AString a_Structure, Vector3i
 
 
 
+Vector3i cComposableGenerator::GetNearestStructure(AString a_Structure, Vector3i a_Position)
+{
+	for (const std::unique_ptr<cFinishGen> & Finisher : m_FinishGens)
+	{
+		if (cPieceStructuresGen * GridStructGen = dynamic_cast<cPieceStructuresGen *>(Finisher.get()))
+		{
+			return GridStructGen->GetNearestStructure(a_Structure, a_Position);
+		}
+	}
+	return a_Position;
+}
+
+
+
+
+
 void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDimension a_Dimension)
 {
 	switch (a_Dimension)

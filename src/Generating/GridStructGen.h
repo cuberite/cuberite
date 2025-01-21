@@ -150,7 +150,7 @@ protected:
 	around their gridpoint intersects the chunk. */
 	void GetStructuresForChunk(int a_ChunkX, int a_ChunkZ, cStructurePtrs & a_Structures);
 
-	/**	Returns all structures that may intersect the given chunk or a "radius" beyond.
+	/** Returns all structures that may intersect the given chunk or a "radius" beyond.
 	The structures are considered as intersecting iff their bounding box
 	(defined by m_MaxStructureSize) around their gridpoint intersects the chunk. */
 	void GetStructuresForChunk(int a_ChunkX, int a_ChunkZ, cStructurePtrs & a_Structures, int a_Radius);

@@ -145,7 +145,7 @@ Vector3i cGridStructGen::GetNearestStructure(AString a_StructureName, Vector3i a
 			(*itr)->m_OriginX + (*itr)->m_GridX * m_GridSizeX, 0,
 			(*itr)->m_OriginZ + (*itr)->m_GridZ * m_GridSizeZ);
 		double sqrDist = (a_StartPos - structurePos).SqrLength();
-		if (sqrDist < minDist && sqrDist > 0)
+		if ((sqrDist < minDist) && (sqrDist > 0))
 		{
 			minDist = sqrDist;
 			nearest = structurePos;
