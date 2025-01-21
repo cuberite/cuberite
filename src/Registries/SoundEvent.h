@@ -3,6 +3,6 @@ enum class SoundEvent
 {
 	// Ender Eye
 	EnderEyeCustomSurvive,
-    EnderEyeDeath,
+	EnderEyeDeath,
 	EnderEyeLaunch,
 };
