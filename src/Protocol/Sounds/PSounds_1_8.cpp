@@ -1,3 +1,5 @@
+#include "Globals.h"
+
 #include "../Protocol_1_8.h"
 
 
