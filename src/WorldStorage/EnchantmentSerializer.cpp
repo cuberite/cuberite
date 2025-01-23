@@ -33,7 +33,7 @@ void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const c
 	if (a_NBT.GetType(a_EnchListTagIdx) != TAG_List)
 	{
 		LOGWARNING("%s: Invalid EnchListTag type: exp %d, got %d. Enchantments not parsed",
-			__FUNCTION__, TAG_List, a_NBT.GetType(a_EnchListTagIdx)
+			__FUNCTION__, static_cast<UInt32>(TAG_List), static_cast<UInt32>(a_NBT.GetType(a_EnchListTagIdx))
 		);
 		ASSERT(!"Bad EnchListTag type");
 		return;
@@ -43,7 +43,7 @@ void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const c
 	if (a_NBT.GetChildrenType(a_EnchListTagIdx) != TAG_Compound)
 	{
 		LOGWARNING("%s: Invalid NBT list children type: exp %d, got %d. Enchantments not parsed",
-			__FUNCTION__, TAG_Compound, a_NBT.GetChildrenType(a_EnchListTagIdx)
+			__FUNCTION__, static_cast<UInt32>(TAG_Compound), static_cast<UInt32>(a_NBT.GetChildrenType(a_EnchListTagIdx))
 		);
 		ASSERT(!"Bad EnchListTag children type");
 		return;

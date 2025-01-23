@@ -134,6 +134,8 @@ public:
 		pktWindowProperty
 	};
 
+	auto format_as(ePacketType f) { return fmt::underlying(f); }
+
 	enum class EntityMetadata
 	{
 		EntityFlags,
@@ -353,7 +355,7 @@ public:
 		v1_14_3 = 490,
 		v1_14_4 = 498
 	};
-
+	auto format_as(Version f) { return fmt::underlying(f); }
 	enum State
 	{
 		Status = 1,
