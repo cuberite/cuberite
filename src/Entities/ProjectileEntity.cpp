@@ -286,7 +286,7 @@ std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(
 		}
 	}
 
-	LOGWARNING("%s: Unknown projectile kind: %d", __FUNCTION__, a_Kind);
+	LOGWARNING("%s: Unknown projectile kind: %d", __FUNCTION__, static_cast<UInt32>(a_Kind));
 	return nullptr;
 }
 
@@ -302,7 +302,7 @@ void cProjectileEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 
 	// DEBUG:
 	FLOGD("Projectile {0}: pos {1:.02f}, hit solid block at face {2}",
-		m_UniqueID, a_HitPos, a_HitFace
+		m_UniqueID, a_HitPos, static_cast<UInt32>(a_HitFace)
 	);
 
 	m_IsInGround = true;

@@ -135,5 +135,5 @@ AString cPacketizer::PacketTypeToStr(cProtocol::ePacketType a_PacketType)
 		case cProtocol::pktWindowOpen:             return "pktWindowOpen";
 		case cProtocol::pktWindowProperty:         return "pktWindowProperty";
 	}
-	return fmt::format(FMT_STRING("Unknown packet type: 0x{:02x}"), a_PacketType);
+	return fmt::format(FMT_STRING("Unknown packet type: 0x{:02x}"), static_cast<UInt32>(a_PacketType));
 }

@@ -73,7 +73,7 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 	}
 
 	ASSERT(!"Unknown protocol version");
-	return fmt::format(FMT_STRING("Unknown protocol ({})"), a_ProtocolVersion);
+	return fmt::format(FMT_STRING("Unknown protocol ({})"), static_cast<UInt32>(a_ProtocolVersion));
 }
 
 

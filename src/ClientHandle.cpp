@@ -1094,7 +1094,7 @@ void cClientHandle::HandleAnvilItemName(const AString & a_ItemName)
 void cClientHandle::HandleLeftClick(Vector3i a_BlockPos, eBlockFace a_BlockFace, UInt8 a_Status)
 {
 	FLOGD("HandleLeftClick: {0}; Face: {1}; Stat: {2}",
-		a_BlockPos, a_BlockFace, a_Status
+		a_BlockPos, static_cast<UInt32>(a_BlockFace), a_Status
 	);
 
 	m_NumBlockChangeInteractionsThisTick++;
@@ -1438,7 +1438,7 @@ void cClientHandle::HandleRightClick(Vector3i a_BlockPos, eBlockFace a_BlockFace
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	const cItem & HeldItem = a_UsedMainHand ? m_Player->GetEquippedItem() : m_Player->GetInventory().GetShieldSlot();
 
-	FLOGD("HandleRightClick: {0}, face {1}, Cursor {2}, Hand: {3}, HeldItem: {4}", a_BlockPos, a_BlockFace, a_CursorPos, a_UsedMainHand, ItemToFullString(HeldItem));
+	FLOGD("HandleRightClick: {0}, face {1}, Cursor {2}, Hand: {3}, HeldItem: {4}", a_BlockPos, static_cast<UInt32>(a_BlockFace), a_CursorPos, a_UsedMainHand, ItemToFullString(HeldItem));
 
 	if (!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockPos, a_BlockFace, a_CursorPos) && IsWithinReach(a_BlockPos) && !m_Player->IsFrozen())
 	{

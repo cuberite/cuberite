@@ -782,7 +782,7 @@ void cProtocol_1_8_0::SendKeepAlive(UInt32 a_PingID)
 	// Drop the packet if the protocol is not in the Game state yet (caused a client crash):
 	if (m_State != 3)
 	{
-		LOGWARNING("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class prevented the packet.", m_State);
+		LOGWARNING("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class prevented the packet.", static_cast<UInt32>(m_State));
 		return;
 	}
 
@@ -1965,7 +1965,7 @@ UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType) const
 		case pktWindowProperty:         return 0x31;
 		default:
 		{
-			LOG("Unhandled outgoing packet type: %s (0x%02x)", cPacketizer::PacketTypeToStr(a_PacketType), a_PacketType);
+			LOG("Unhandled outgoing packet type: %s (0x%02x)", cPacketizer::PacketTypeToStr(a_PacketType), static_cast<UInt32>(a_PacketType));
 			ASSERT(!"Unhandled outgoing packet type");
 			return 0;
 		}
@@ -3087,7 +3087,7 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 		m_CommLogFile.Write(fmt::format(
 			FMT_STRING("Outgoing packet: type {} (translated to 0x{:02x}), length {} (0x{:04x}), state {}. Payload (incl. type):\n{}\n"),
 			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
-			PacketData.size(), PacketData.size(), m_State, Hex
+			PacketData.size(), PacketData.size(), static_cast<UInt32>(m_State), Hex
 		));
 		/*
 		// Useful for debugging a new protocol:
@@ -4161,14 +4161,14 @@ void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
 		CreateHexDump(PacketDataHex, PacketData.data(), PacketData.size(), 16);
 		m_CommLogFile.Write(fmt::format(
 			FMT_STRING("Next incoming packet is type {0} (0x{0:x}), length {1} (0x{1:x}) at state {2}. Payload:\n{3}\n"),
-			PacketType, a_Buffer.GetUsedSpace(), m_State, PacketDataHex
+			PacketType, a_Buffer.GetUsedSpace(), static_cast<UInt32>(m_State), PacketDataHex
 		));
 	}
 
 	if (!HandlePacket(a_Buffer, PacketType))
 	{
 		// Unknown packet, already been reported, but without the length. Log the length here:
-		LOGWARNING("Unhandled packet: type 0x%x, state %d, length %u", PacketType, m_State, a_Buffer.GetUsedSpace());
+		LOGWARNING("Unhandled packet: type 0x%x, state %d, length %u", PacketType, static_cast<UInt32>(m_State), a_Buffer.GetUsedSpace());
 
 #ifndef NDEBUG
 		// Dump the packet contents into the log:
@@ -4195,7 +4195,7 @@ void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
 	{
 		// Read more or less than packet length, report as error
 		LOGWARNING("Protocol 1.8: Wrong number of bytes read for packet 0x%x, state %d. Read %zu bytes, packet contained %u bytes",
-			PacketType, m_State, a_Buffer.GetUsedSpace() - a_Buffer.GetReadableSpace(), a_Buffer.GetUsedSpace()
+			PacketType, static_cast<UInt32>(m_State), a_Buffer.GetUsedSpace() - a_Buffer.GetReadableSpace(), a_Buffer.GetUsedSpace()
 		);
 
 		// Put a message in the comm log:

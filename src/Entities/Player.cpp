@@ -1316,7 +1316,7 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 {
 	if ((a_GameMode < gmMin) || (a_GameMode >= gmMax))
 	{
-		LOGWARNING("%s: Setting invalid gamemode: %d", GetName().c_str(), a_GameMode);
+		LOGWARNING("%s: Setting invalid gamemode: %d", GetName().c_str(), static_cast<UInt32>(a_GameMode));
 		return;
 	}
 

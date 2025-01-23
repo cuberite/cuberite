@@ -195,7 +195,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 		}
 		default:
 		{
-			LOGWARNING("SlotArea: Unhandled click action: %d (%s)", a_ClickAction, ClickActionToString(a_ClickAction));
+			LOGWARNING("SlotArea: Unhandled click action: %d (%s)", static_cast<UInt32>(a_ClickAction), ClickActionToString(a_ClickAction));
 			m_ParentWindow.BroadcastWholeWindow();
 			return;
 		}
@@ -2561,7 +2561,7 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 	cItem & DraggingItem = a_Player.GetDraggingItem();
 	if ((a_ClickAction != caRightClick) && (a_ClickAction != caLeftClick))
 	{
-		LOGWARNING("SlotArea: Unhandled click action: %d (%s)", a_ClickAction, ClickActionToString(a_ClickAction));
+		LOGWARNING("SlotArea: Unhandled click action: %d (%s)", static_cast<UInt32>(a_ClickAction), ClickActionToString(a_ClickAction));
 		m_ParentWindow.BroadcastWholeWindow();
 		return;
 	}

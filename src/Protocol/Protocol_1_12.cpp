@@ -1334,7 +1334,7 @@ void cProtocol_1_12_2::SendKeepAlive(UInt32 a_PingID)
 	// Drop the packet if the protocol is not in the Game state yet (caused a client crash):
 	if (m_State != 3)
 	{
-		LOGWARNING("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class prevented the packet.", m_State);
+		LOGWARNING("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class prevented the packet.", static_cast<UInt32>(m_State));
 		return;
 	}
 
