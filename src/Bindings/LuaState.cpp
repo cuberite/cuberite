@@ -35,14 +35,10 @@ extern "C"
 
 
 // fwd: "SQLite/lsqlite3.cpp"
-extern "C"
-{
-	int luaopen_lsqlite3(lua_State * L);
-}
+int luaopen_lsqlite3(lua_State * L);
 
 // fwd: "LuaExpat/lxplib.cpp":
 int luaopen_lxp(lua_State * L);
-
 
 
 
