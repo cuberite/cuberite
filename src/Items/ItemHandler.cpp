@@ -86,6 +86,7 @@
 #include "ItemThrowable.h"
 #include "ItemTorch.h"
 #include "ItemTrapdoor.h"
+#include "ItemTripwire.h"
 #include "ItemTripwireHook.h"
 #include "ItemVines.h"
 #include "ItemWool.h"
@@ -956,7 +957,7 @@ namespace
 	constexpr cUnimplementedItemHandler     ItemStonecutterHandler                     (Item::Stonecutter);
 	constexpr cItemSpawnEggHandler          ItemStraySpawnEggHandler                   (Item::StraySpawnEgg);
 	constexpr cItemSpawnEggHandler          ItemStriderSpawnEggHandler                 (Item::StriderSpawnEgg);
-	constexpr cSimplePlaceableItemHandler   ItemStringHandler                          (Item::String);
+	constexpr cItemTripwireHandler          ItemStringHandler                          (Item::String);
 	constexpr cUnimplementedItemHandler     ItemStrippedAcaciaLogHandler               (Item::StrippedAcaciaLog);
 	constexpr cUnimplementedItemHandler     ItemStrippedAcaciaWoodHandler              (Item::StrippedAcaciaWood);
 	constexpr cUnimplementedItemHandler     ItemStrippedBirchLogHandler                (Item::StrippedBirchLog);

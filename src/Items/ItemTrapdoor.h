@@ -40,16 +40,20 @@ private:
 					// Trapdoor is placed on a higher half of a vertical block.
 					IsBottom = true;
 				}
-				DestFacing = MirrorBlockFaceY(a_ClickedBlockFace);
+				DestFacing = a_ClickedBlockFace;
 				break;
 			}
 			case BLOCK_FACE_YM:
+			{
+				DestFacing = RotationToBlockFace(a_Player.GetYaw());
+				break;
+			}
+			case BLOCK_FACE_YP:
 			{
 				IsBottom = true;
 				DestFacing = RotationToBlockFace(a_Player.GetYaw());
 				break;
 			}
-			case BLOCK_FACE_YP: break;
 		}
 
 		if (DestFacing == BLOCK_FACE_NONE)

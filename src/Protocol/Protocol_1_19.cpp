@@ -577,6 +577,17 @@ void cProtocol_1_19::SendSpawnMob(const cMonster & a_Mob)
 
 
 
+void cProtocol_1_19::SendPaintingSpawn(const cPainting & a_Painting)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	LOGWARNING("Paintings not implemented in 1.19+");
+	return;
+}
+
+
+
+
+
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
 void cProtocol_1_19::HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer)
 {

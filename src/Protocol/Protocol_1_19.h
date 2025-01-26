@@ -27,6 +27,7 @@ protected:
 	virtual void    SendRespawn(eDimension a_Dimension) override;
 	virtual void    SendSpawnMob(const cMonster & a_Mob) override;
 	virtual void    SendSoundEffect(const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch) override;
+	virtual void    SendPaintingSpawn(const cPainting & a_Painting) override;
 
 	virtual void    HandlePacketLoginEncryptionResponse(cByteBuffer & a_ByteBuffer) override;
 	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;

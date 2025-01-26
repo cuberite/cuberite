@@ -401,6 +401,16 @@ void cProtocol_1_16::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type)
 
 
 
+void cProtocol_1_16::SendThunderbolt(Vector3i a_Origin)
+{
+	LOGWARNING("Thunderbolts not implemented in 1.16+");
+	return;
+}
+
+
+
+
+
 UInt32 cProtocol_1_16::GetProtocolMobType(eMonsterType a_MobType) const
 {
 	switch (a_MobType)

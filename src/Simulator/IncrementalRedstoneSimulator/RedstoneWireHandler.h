@@ -277,23 +277,104 @@ namespace RedstoneWireHandler
 		return Power;
 	}
 
+#define CHECK_WIRE test_block.Type() == BlockType::RedstoneWire
+
+#define CALC_SIDE(Dir) (a_Chunk.UnboundedRelGetBlock(AddFaceDirection(a_Position, eBlockFace::Dir), test_block) && CHECK_WIRE) || \
+			(cBlockInfo::IsTransparent(test_block.Type()) && a_Chunk.UnboundedRelGetBlock(AddFaceDirection(a_Position.addedY(-1), eBlockFace::Dir), test_block) && CHECK_WIRE)
+
+
 	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BlockState a_Block, const PowerLevel a_Power)
 	{
+		using namespace Block::RedstoneWire;
 		LOGREDSTONE("Evaluating dusty the wire (%d %d %d) %i", a_Position.x, a_Position.y, a_Position.z, a_Power);
 
-		if (Block::RedstoneWire::Power(a_Block) == a_Power)
+		// TODO: optimize this function somehow as it called every tick
+
+		// All cheking here is purely for visuals. Does not affect how redstone will work
+
+		// Auto is necessary here, as the compiler cannot deduce the type of the vars as enums
+		auto east = East::None;
+		auto north = North::None;
+		auto south = South::None;
+		auto west = West::None;
+		BlockState test_block;
+		// Checks sorround blocks for wires
+		if (CALC_SIDE(BLOCK_FACE_EAST))
 		{
+			east = East::Side;
+		}
+		if (CALC_SIDE(BLOCK_FACE_NORTH))
+		{
+			north = North::Side;
+		}
+		if (CALC_SIDE(BLOCK_FACE_SOUTH))
+		{
+			south = South::Side;
+		}
+		if (CALC_SIDE(BLOCK_FACE_WEST))
+		{
+			west = West::Side;
+		}
+
+		auto new_pos = a_Position.addedY(1);
+		if (a_Chunk.UnboundedRelGetBlock(new_pos, test_block) && cBlockInfo::IsTransparent(test_block.Type()))
+		{
+			if (a_Chunk.UnboundedRelGetBlock(AddFaceDirection(new_pos, eBlockFace::BLOCK_FACE_EAST), test_block) && CHECK_WIRE)
+			{
+				east = East::Up;
+			}
+			if (a_Chunk.UnboundedRelGetBlock(AddFaceDirection(new_pos, eBlockFace::BLOCK_FACE_NORTH), test_block) && CHECK_WIRE)
+			{
+				north = North::Up;
+			}
+			if (a_Chunk.UnboundedRelGetBlock(AddFaceDirection(new_pos, eBlockFace::BLOCK_FACE_SOUTH), test_block) && CHECK_WIRE)
+			{
+				south = South::Up;
+			}
+			if (a_Chunk.UnboundedRelGetBlock(AddFaceDirection(new_pos, eBlockFace::BLOCK_FACE_WEST), test_block) && CHECK_WIRE)
+			{
+				west = West::Up;
+			}
+		}
+
+		// Makes sure the the wire is straight if its connected to only one side
+		if ((east == East::None) && (west == West::None))
+		{
+			if ((north != North::Up) && (south != South::None))
+			{
+				north = North::Side;
+			}
+			if ((south != South::Up) && (north != North::None))
+			{
+				south = South::Side;
+			}
+		}
+
+		if ((north == North::None) && (south == South::None))
+		{
+			if ((west != West::Up) && (east != East::None))
+			{
+				west = West::Side;
+			}
+			if ((east != East::Up) && (west != West::None))
+			{
+				east = East::Side;
+			}
+		}
+
+		if ((Power(a_Block) == a_Power) && (East(a_Block) == east) && (North(a_Block) == north) && (South(a_Block) == south) && (West(a_Block) == west))
+		{
+			// Everything is the same
 			return;
 		}
 
-		using namespace Block;
-		a_Chunk.FastSetBlock(a_Position, RedstoneWire::RedstoneWire
+		a_Chunk.FastSetBlock(a_Position, RedstoneWire
 		(
-			RedstoneWire::East(a_Block),
-			RedstoneWire::North(a_Block),
+			east,
+			north,
 			a_Power,
-			RedstoneWire::South(a_Block),
-			RedstoneWire::West(a_Block)
+			south,
+			west
 		));
 
 		// Notify all positions, sans YP, to update:
