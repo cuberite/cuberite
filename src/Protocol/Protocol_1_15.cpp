@@ -230,19 +230,19 @@ void cProtocol_1_15::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Dat
 
 void cProtocol_1_15::SendPaintingSpawn(const cPainting & a_Painting)
 {
-		ASSERT(m_State == 3);  // In game mode?
-		double PosX = a_Painting.GetPosX();
-		double PosY = a_Painting.GetPosY();
-		double PosZ = a_Painting.GetPosZ();
+	ASSERT(m_State == 3);  // In game mode?
+	double PosX = a_Painting.GetPosX();
+	double PosY = a_Painting.GetPosY();
+	double PosZ = a_Painting.GetPosZ();
 
-		cPacketizer Pkt(*this, pktSpawnPainting);
-		Pkt.WriteVarInt32(a_Painting.GetUniqueID());
-		// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
-		Pkt.WriteBEUInt64(0);
-		Pkt.WriteBEUInt64(a_Painting.GetUniqueID());
-		Pkt.WriteVarInt32(a_Painting.GetPaintingId());
-		Pkt.WriteXYZPosition64(static_cast<Int32>(PosX), static_cast<Int32>(PosY), static_cast<Int32>(PosZ));
-		Pkt.WriteBEInt8(static_cast<Int8>(a_Painting.GetProtocolFacing()));
+	cPacketizer Pkt(*this, pktSpawnPainting);
+	Pkt.WriteVarInt32(a_Painting.GetUniqueID());
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_Painting.GetUniqueID());
+	Pkt.WriteVarInt32(a_Painting.GetPaintingId());
+	Pkt.WriteXYZPosition64(static_cast<Int32>(PosX), static_cast<Int32>(PosY), static_cast<Int32>(PosZ));
+	Pkt.WriteBEInt8(static_cast<Int8>(a_Painting.GetProtocolFacing()));
 }
 
 

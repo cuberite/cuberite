@@ -25,7 +25,7 @@ namespace TripwireHookHandler
 				return 0;
 			}
 
-			if (a_Block.Type() == BlockType::Tripwire)
+			if (Other.Type() == BlockType::Tripwire)
 			{
 				if (FoundActivated)
 				{
@@ -44,9 +44,9 @@ namespace TripwireHookHandler
 
 				continue;
 			}
-			else if (a_Block.Type() == BlockType::TripwireHook)
+			else if (Other.Type() == BlockType::TripwireHook)
 			{
-				if (ReverseBlockFace(Block::TripwireHook::Facing(a_Block)) == FaceToGoTowards)
+				if (ReverseBlockFace(Block::TripwireHook::Facing(Other)) == FaceToGoTowards)
 				{
 					// Other hook facing in opposite direction - circuit completed!
 					return FoundActivated ? 15 : 1;
@@ -87,7 +87,7 @@ namespace TripwireHookHandler
 			IsAttached = true;
 			IsPowered = true;
 		}
-		else
+		else if (PowerLevel != 0)
 		{
 			UNREACHABLE("Unexpected tripwire hook power level!");
 		}

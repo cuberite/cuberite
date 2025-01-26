@@ -8,11 +8,11 @@
 
 
 class cItemWoolHandler final :
-	public cItemHandler
+	public cSimplePlaceableItemHandler
 {
 public:
 	constexpr cItemWoolHandler(Item a_ItemType)
-		: cItemHandler(a_ItemType)
+		: cSimplePlaceableItemHandler(a_ItemType)
 	{
 
 	}

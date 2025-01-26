@@ -141,6 +141,25 @@ private:
 
 
 
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool = nullptr) const override
+	{
+		UNUSED(a_Tool);
+		auto BlockType = a_Block.Type();
+		Item to_drop;
+		switch (BlockType)
+		{
+			case BlockType::WallTorch: to_drop = Item::Torch; break;
+			case BlockType::RedstoneWallTorch: to_drop = Item::RedstoneTorch; break;
+			case BlockType::SoulWallTorch: to_drop = Item::SoulTorch; break;
+			default: to_drop = BlockItemConverter::FromBlock(BlockType);
+		}
+		return cItems(to_drop);
+	}
+
+
+
+
+
 	virtual ColourID GetMapBaseColourID() const override
 	{
 		return 0;

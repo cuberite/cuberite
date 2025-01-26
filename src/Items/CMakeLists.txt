@@ -80,6 +80,7 @@ target_sources(
 	ItemTorch.h
 	ItemTrapdoor.h
 	ItemTripwireHook.h
+	ItemTripwire.h
 	ItemVines.h
 	ItemWool.h
 	SimplePlaceableItemHandler.h
