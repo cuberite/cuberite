@@ -1085,13 +1085,13 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_ZM)
 				if (Waterlogged) return 22046;
 				else return 22047;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XP)
 				if (Waterlogged) return 22048;
 				else return 22049;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM)
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
 				if (Waterlogged) return 22050;
 				else return 22051;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XM)
 				if (Waterlogged) return 22052;
 				else return 22053;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP)
@@ -3115,13 +3115,13 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_ZM)
 				if (Open) return 19421;
 				else return 19422;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XP)
 				if (Open) return 19423;
 				else return 19424;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM)
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
 				if (Open) return 19425;
 				else return 19426;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XM)
 				if (Open) return 19427;
 				else return 19428;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP)
@@ -4568,9 +4568,9 @@ namespace Block
 		constexpr BlockState BlackShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13671;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13672;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13673;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13674;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13672;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13673;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13674;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13675;
 			else return 13676;
 		}
@@ -5621,9 +5621,9 @@ namespace Block
 		constexpr BlockState BlueShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13647;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13648;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13649;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13650;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13648;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13649;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13650;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13651;
 			else return 13652;
 		}
@@ -6881,9 +6881,9 @@ namespace Block
 		constexpr BlockState BrownShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13653;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13654;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13655;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13656;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13654;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13655;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13656;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13657;
 			else return 13658;
 		}
@@ -8064,16 +8064,16 @@ namespace Block
 		{
 			if (Conditional)
 				if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13540;
-				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13541;
-				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13542;
-				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13543;
+				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13541;
+				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13542;
+				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13543;
 				else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13544;
 				else return 13545;
 			else
 				if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13546;
-				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13547;
-				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13548;
-				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13549;
+				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13547;
+				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13548;
+				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13549;
 				else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13550;
 				else return 13551;
 		}
@@ -11465,16 +11465,16 @@ namespace Block
 		{
 			if (Conditional)
 				if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8680;
-				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8681;
-				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 8682;
-				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 8683;
+				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 8681;
+				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8682;
+				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 8683;
 				else if (Facing == eBlockFace::BLOCK_FACE_YP) return 8684;
 				else return 8685;
 			else
 				if (Facing == eBlockFace::BLOCK_FACE_ZM) return 8686;
-				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8687;
-				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 8688;
-				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 8689;
+				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 8687;
+				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 8688;
+				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 8689;
 				else if (Facing == eBlockFace::BLOCK_FACE_YP) return 8690;
 				else return 8691;
 		}
@@ -13481,9 +13481,9 @@ namespace Block
 		constexpr BlockState CyanShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13635;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13636;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13637;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13638;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13636;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13637;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13638;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13639;
 			else return 13640;
 		}
@@ -17538,13 +17538,13 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_ZM)
 				if (Triggered) return 566;
 				else return 567;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XP)
 				if (Triggered) return 568;
 				else return 569;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM)
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
 				if (Triggered) return 570;
 				else return 571;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XM)
 				if (Triggered) return 572;
 				else return 573;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP)
@@ -17650,13 +17650,13 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_ZM)
 				if (Triggered) return 10143;
 				else return 10144;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XP)
 				if (Triggered) return 10145;
 				else return 10146;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM)
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
 				if (Triggered) return 10147;
 				else return 10148;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XM)
 				if (Triggered) return 10149;
 				else return 10150;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP)
@@ -17729,9 +17729,9 @@ namespace Block
 		constexpr BlockState EndRod(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13347;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13348;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13349;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13350;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13348;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13349;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13350;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13351;
 			else return 13352;
 		}
@@ -21536,9 +21536,9 @@ namespace Block
 		constexpr BlockState GrayShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13623;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13624;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13625;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13626;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13624;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13625;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13626;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13627;
 			else return 13628;
 		}
@@ -21805,9 +21805,9 @@ namespace Block
 		constexpr BlockState GreenShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13659;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13660;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13661;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13662;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13660;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13661;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13662;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13663;
 			else return 13664;
 		}
@@ -22031,16 +22031,16 @@ namespace Block
 		constexpr BlockState Hopper(const bool Enabled, const eBlockFace Facing)
 		{
 			if (Enabled)
-				if (Facing == eBlockFace::BLOCK_FACE_ZM) return 10024;
-				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 10025;
-				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 10026;
-				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 10027;
+				if (Facing == eBlockFace::BLOCK_FACE_YM) return 10024;
+				else if (Facing == eBlockFace::BLOCK_FACE_ZM) return 10025;
+				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 10026;
+				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 10027;
 				else return 10028;
 			else
-				if (Facing == eBlockFace::BLOCK_FACE_ZM) return 10029;
-				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 10030;
-				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 10031;
-				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 10032;
+				if (Facing == eBlockFace::BLOCK_FACE_YM) return 10029;
+				else if (Facing == eBlockFace::BLOCK_FACE_ZM) return 10030;
+				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 10031;
+				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 10032;
 				else return 10033;
 		}
 		BlockState Hopper();
@@ -23685,13 +23685,13 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_ZM)
 				if (Waterlogged) return 22058;
 				else return 22059;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XP)
 				if (Waterlogged) return 22060;
 				else return 22061;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM)
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
 				if (Waterlogged) return 22062;
 				else return 22063;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XM)
 				if (Waterlogged) return 22064;
 				else return 22065;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP)
@@ -24054,9 +24054,9 @@ namespace Block
 		constexpr BlockState LightBlueShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13599;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13600;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13601;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13602;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13600;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13601;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13602;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13603;
 			else return 13604;
 		}
@@ -24323,9 +24323,9 @@ namespace Block
 		constexpr BlockState LightGrayShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13629;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13630;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13631;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13632;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13630;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13631;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13632;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13633;
 			else return 13634;
 		}
@@ -24474,21 +24474,21 @@ namespace Block
 				else
 					if (Waterlogged) return 25739;
 					else return 25740;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XP)
 				if (Powered)
 					if (Waterlogged) return 25741;
 					else return 25742;
 				else
 					if (Waterlogged) return 25743;
 					else return 25744;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM)
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
 				if (Powered)
 					if (Waterlogged) return 25745;
 					else return 25746;
 				else
 					if (Waterlogged) return 25747;
 					else return 25748;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XM)
 				if (Powered)
 					if (Waterlogged) return 25749;
 					else return 25750;
@@ -24697,9 +24697,9 @@ namespace Block
 		constexpr BlockState LimeShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13611;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13612;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13613;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13614;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13612;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13613;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13614;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13615;
 			else return 13616;
 		}
@@ -24985,9 +24985,9 @@ namespace Block
 		constexpr BlockState MagentaShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13593;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13594;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13595;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13596;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13594;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13595;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13596;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13597;
 			else return 13598;
 		}
@@ -26195,13 +26195,13 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_ZM)
 				if (Waterlogged) return 22070;
 				else return 22071;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XP)
 				if (Waterlogged) return 22072;
 				else return 22073;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM)
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
 				if (Waterlogged) return 22074;
 				else return 22075;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XM)
 				if (Waterlogged) return 22076;
 				else return 22077;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP)
@@ -27762,13 +27762,13 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_ZM)
 				if (Type == Type::Normal) return 2106;
 				else return 2107;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XP)
 				if (Type == Type::Normal) return 2108;
 				else return 2109;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM)
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
 				if (Type == Type::Normal) return 2110;
 				else return 2111;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XM)
 				if (Type == Type::Normal) return 2112;
 				else return 2113;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP)
@@ -32381,13 +32381,13 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_ZM)
 				if (Powered) return 13563;
 				else return 13564;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XP)
 				if (Powered) return 13565;
 				else return 13566;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM)
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
 				if (Powered) return 13567;
 				else return 13568;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XM)
 				if (Powered) return 13569;
 				else return 13570;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP)
@@ -32585,9 +32585,9 @@ namespace Block
 		constexpr BlockState OrangeShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13587;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13588;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13589;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13590;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13588;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13589;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13590;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13591;
 			else return 13592;
 		}
@@ -34833,9 +34833,9 @@ namespace Block
 		constexpr BlockState PinkShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13617;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13618;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13619;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13620;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13618;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13619;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13620;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13621;
 			else return 13622;
 		}
@@ -34962,16 +34962,16 @@ namespace Block
 		{
 			if (Extended)
 				if (Facing == eBlockFace::BLOCK_FACE_ZM) return 2054;
-				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 2055;
-				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 2056;
-				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 2057;
+				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 2055;
+				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 2056;
+				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 2057;
 				else if (Facing == eBlockFace::BLOCK_FACE_YP) return 2058;
 				else return 2059;
 			else
 				if (Facing == eBlockFace::BLOCK_FACE_ZM) return 2060;
-				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 2061;
-				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 2062;
-				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 2063;
+				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 2061;
+				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 2062;
+				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 2063;
 				else if (Facing == eBlockFace::BLOCK_FACE_YP) return 2064;
 				else return 2065;
 		}
@@ -34995,21 +34995,21 @@ namespace Block
 				else
 					if (Type == Type::Normal) return 2068;
 					else return 2069;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XP)
 				if (Short)
 					if (Type == Type::Normal) return 2070;
 					else return 2071;
 				else
 					if (Type == Type::Normal) return 2072;
 					else return 2073;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM)
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
 				if (Short)
 					if (Type == Type::Normal) return 2074;
 					else return 2075;
 				else
 					if (Type == Type::Normal) return 2076;
 					else return 2077;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XM)
 				if (Short)
 					if (Type == Type::Normal) return 2078;
 					else return 2079;
@@ -40320,9 +40320,9 @@ namespace Block
 		constexpr BlockState PurpleShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13641;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13642;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13643;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13644;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13642;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13643;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13644;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13645;
 			else return 13646;
 		}
@@ -42728,9 +42728,9 @@ namespace Block
 		constexpr BlockState RedShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13665;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13666;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13667;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13668;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13666;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13667;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13668;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13669;
 			else return 13670;
 		}
@@ -44969,16 +44969,16 @@ namespace Block
 		{
 			if (Conditional)
 				if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13528;
-				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13529;
-				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13530;
-				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13531;
+				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13529;
+				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13530;
+				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13531;
 				else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13532;
 				else return 13533;
 			else
 				if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13534;
-				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13535;
-				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13536;
-				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13537;
+				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13535;
+				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13536;
+				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13537;
 				else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13538;
 				else return 13539;
 		}
@@ -47400,9 +47400,9 @@ namespace Block
 		constexpr BlockState ShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13575;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13576;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13577;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13578;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13576;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13577;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13578;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13579;
 			else return 13580;
 		}
@@ -47487,13 +47487,13 @@ namespace Block
 			if (Facing == eBlockFace::BLOCK_FACE_ZM)
 				if (Waterlogged) return 22082;
 				else return 22083;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XP)
 				if (Waterlogged) return 22084;
 				else return 22085;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM)
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP)
 				if (Waterlogged) return 22086;
 				else return 22087;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP)
+			else if (Facing == eBlockFace::BLOCK_FACE_XM)
 				if (Waterlogged) return 22088;
 				else return 22089;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP)
@@ -49358,16 +49358,16 @@ namespace Block
 		{
 			if (Extended)
 				if (Facing == eBlockFace::BLOCK_FACE_ZM) return 2035;
-				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 2036;
-				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 2037;
-				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 2038;
+				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 2036;
+				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 2037;
+				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 2038;
 				else if (Facing == eBlockFace::BLOCK_FACE_YP) return 2039;
 				else return 2040;
 			else
 				if (Facing == eBlockFace::BLOCK_FACE_ZM) return 2041;
-				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 2042;
-				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 2043;
-				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 2044;
+				else if (Facing == eBlockFace::BLOCK_FACE_XP) return 2042;
+				else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 2043;
+				else if (Facing == eBlockFace::BLOCK_FACE_XM) return 2044;
 				else if (Facing == eBlockFace::BLOCK_FACE_YP) return 2045;
 				else return 2046;
 		}
@@ -56927,9 +56927,9 @@ namespace Block
 		constexpr BlockState WhiteShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13581;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13582;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13583;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13584;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13582;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13583;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13584;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13585;
 			else return 13586;
 		}
@@ -57274,9 +57274,9 @@ namespace Block
 		constexpr BlockState YellowShulkerBox(const eBlockFace Facing)
 		{
 			if (Facing == eBlockFace::BLOCK_FACE_ZM) return 13605;
-			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13606;
-			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13607;
-			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13608;
+			else if (Facing == eBlockFace::BLOCK_FACE_XP) return 13606;
+			else if (Facing == eBlockFace::BLOCK_FACE_ZP) return 13607;
+			else if (Facing == eBlockFace::BLOCK_FACE_XM) return 13608;
 			else if (Facing == eBlockFace::BLOCK_FACE_YP) return 13609;
 			else return 13610;
 		}

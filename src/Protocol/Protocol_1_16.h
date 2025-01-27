@@ -20,7 +20,6 @@ protected:
 	virtual void SendLoginSuccess(void) override;
 	virtual void SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
 	virtual void SendRespawn(eDimension a_Dimension) override;
-	virtual void HandlePacketUseItem(cByteBuffer & a_ByteBuffer) override;
 	virtual void SendChatRaw(const AString & a_MessageRaw, eChatType a_Type) override;
 	virtual void SendThunderbolt(Vector3i a_Origin) override;
 

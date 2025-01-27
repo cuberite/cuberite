@@ -343,24 +343,6 @@ void cProtocol_1_16::SendRespawn(eDimension a_Dimension)
 
 
 
-void cProtocol_1_16::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
-{
-	#define MAIN_HAND 0
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
-	HANDLE_READ(a_ByteBuffer, ReadXZYPosition64, Vector3i, BlockPos);
-	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Direction);
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Xoffset);
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Yoffset);
-	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Zoffset);
-	HANDLE_READ(a_ByteBuffer, ReadBool, bool, bl);
-
-	m_Client->HandleUseItem(Hand == MAIN_HAND);
-}
-
-
-
-
-
 cProtocol::Version cProtocol_1_16::GetProtocolVersion() const
 {
 	return Version::v1_16;

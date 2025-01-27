@@ -425,6 +425,20 @@ void cProtocol_1_21::SendSelectKnownPacks()
 
 
 
+void cProtocol_1_21::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Sequence);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Yaw);
+	HANDLE_READ(a_ByteBuffer, ReadBEFloat, float, Pitch);
+	m_Client->HandleUseItem(Hand == MAIN_HAND);
+	m_Client->SendAcknowledgeBlockChange(Sequence);
+}
+
+
+
+
+
 UInt32 cProtocol_1_21::GetProtocolBlockType(BlockState a_Block) const
 {
 	return Palette_1_21::From(a_Block);
@@ -842,7 +856,7 @@ bool cProtocol_1_21_2::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x08: HandlePacketPlayerSession(a_ByteBuffer); return true;
 				case 0x09: /* AcknowledgeChunksC2SPacket */ return false;
 				case 0x0A: HandlePacketClientStatus(a_ByteBuffer); return true;
-				case 0x0B: /* ClientTickEnd */ return false;
+				case 0x0B: /* ClientTickEnd */ return true;
 				case 0x0C: HandlePacketClientSettings(a_ByteBuffer); return true;
 				case 0x0D: HandlePacketTabComplete(a_ByteBuffer); return true;
 				case 0x0E: /* AcknowledgeReconfigurationC2SPacket */ return false;
@@ -1515,6 +1529,9 @@ void cProtocol_1_21_2::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 	m_Client->HandleRightClick({BlockX, BlockY, BlockZ}, FaceIntToBlockFace(Face), {FloorC(CursorX * 16), FloorC(CursorY * 16), FloorC(CursorZ * 16)}, Hand == 0);
 	m_Client->SendAcknowledgeBlockChange(Sequence);
 }
+
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////

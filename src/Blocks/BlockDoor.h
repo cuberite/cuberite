@@ -158,7 +158,7 @@ public:
 		}
 	}
 
-	/** Returns true iff the door at the specified coords is open.
+	/** Returns true if the door at the specified coords is open.
 	The coords may point to either the top part or the bottom part of the door. */
 	static bool IsOpen(cChunkInterface & a_ChunkInterface, const Vector3i a_BlockPos)
 	{
@@ -328,7 +328,7 @@ public:
 			case BlockType::PaleOakDoor:  DoorBlock = SETPOWERED(PaleOakDoor); break;
 			default: return;
 		}
-		a_ChunkInterface.SetBlock(a_BlockPos, DoorBlock);
+		a_ChunkInterface.FastSetBlock(a_BlockPos, DoorBlock);
 	}
 
 private:

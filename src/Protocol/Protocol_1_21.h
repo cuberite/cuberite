@@ -14,6 +14,8 @@ public:
 	using Super::Super;
 
 protected:
+	virtual void HandlePacketUseItem(cByteBuffer & a_ByteBuffer) override;
+
 	virtual void SendDynamicRegistries() override;
 	virtual void SendSelectKnownPacks() override;
 	virtual void SendUpdateBlockEntity(cBlockEntity & a_BlockEntity) override;

@@ -1090,6 +1090,18 @@ void cProtocol_1_20_2::SendRespawn(eDimension a_Dimension)
 
 
 
+void cProtocol_1_20_2::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	cPacketizer Pkt(*this, pktUnloadChunk);
+	Pkt.WriteBEInt32(a_ChunkZ);
+	Pkt.WriteBEInt32(a_ChunkX);
+}
+
+
+
+
+
 void cProtocol_1_20_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 {
 

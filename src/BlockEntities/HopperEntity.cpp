@@ -150,7 +150,7 @@ void cHopperEntity::OpenNewWindow(void)
 
 bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, const cTickTimeLong a_CurrentTick)
 {
-	if (m_Pos.y >= cChunkDef::Height)
+	if (!cChunkDef::IsValidHeight(m_Pos))
 	{
 		// This hopper is at the top of the world, no more blocks above
 		return false;
@@ -183,7 +183,9 @@ bool cHopperEntity::MoveItemsIn(cChunk & a_Chunk, const cTickTimeLong a_CurrentT
 		case BlockType::Dropper:
 		case BlockType::Hopper:
 		{
-			Res = MoveItemsFromGrid(*static_cast<cBlockEntityWithItems *>(a_Chunk.GetBlockEntity(this->GetPos().addedY(1))));
+			auto block = a_Chunk.GetBlockEntity(this->GetPos().addedY(1));
+			ASSERT(block != nullptr);
+			Res = MoveItemsFromGrid(*dynamic_cast<cBlockEntityWithItems *>(block));
 			break;
 		}
 		default: break;
@@ -370,7 +372,7 @@ bool cHopperEntity::MoveItemsOut(cChunk & a_Chunk, const cTickTimeLong a_Current
 bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 {
 	const auto ConnectedBlockEntity = a_Chunk.GetBlockEntityRel(GetRelPos().addedY(1));
-
+	ASSERT(ConnectedBlockEntity != nullptr);
 	if (ConnectedBlockEntity == nullptr)
 	{
 		return false;
@@ -394,6 +396,7 @@ bool cHopperEntity::MoveItemsFromChest(cChunk & a_Chunk)
 bool cHopperEntity::MoveItemsFromFurnace(cChunk & a_Chunk)
 {
 	auto furnace = static_cast<cFurnaceEntity *>(a_Chunk.GetBlockEntity(m_Pos.addedY(1)));
+	ASSERT(furnace != nullptr);
 	if (furnace == nullptr)
 	{
 		FLOGWARNING("{0}: A furnace entity was not found where expected, at {1}", __FUNCTION__, m_Pos.addedY(1));

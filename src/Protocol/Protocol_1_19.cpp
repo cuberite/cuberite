@@ -924,6 +924,18 @@ void cProtocol_1_19::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 
 
 
+void cProtocol_1_19::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Hand);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt, Int32, Sequence);
+	m_Client->HandleUseItem(Hand == MAIN_HAND);
+	m_Client->SendAcknowledgeBlockChange(Sequence);
+}
+
+
+
+
+
 void cProtocol_1_19::HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer)
 {
 	UInt32 ToSetEff1 = 0, ToSetEff2 = 0;
