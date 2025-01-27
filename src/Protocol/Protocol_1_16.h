@@ -22,6 +22,7 @@ protected:
 	virtual void SendRespawn(eDimension a_Dimension) override;
 	virtual void SendChatRaw(const AString & a_MessageRaw, eChatType a_Type) override;
 	virtual void SendThunderbolt(Vector3i a_Origin) override;
+	virtual void HandlePacketPlayerAbilities(cByteBuffer & a_ByteBuffer) override;
 
 
 	virtual int GetProtocolParticleID(const AString & a_ParticleName) const override;

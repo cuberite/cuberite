@@ -393,6 +393,24 @@ void cProtocol_1_16::SendThunderbolt(Vector3i a_Origin)
 
 
 
+void cProtocol_1_16::HandlePacketPlayerAbilities(cByteBuffer & a_ByteBuffer)
+{
+	HANDLE_READ(a_ByteBuffer, ReadBEUInt8, UInt8, Flags);
+
+	// Convert the bitfield into individual boolean flags:
+	bool IsFlying = false;
+	if ((Flags & 2) != 0)
+	{
+		IsFlying = true;
+	}
+
+	m_Client->HandlePlayerAbilities(IsFlying, 0, 0);
+}
+
+
+
+
+
 UInt32 cProtocol_1_16::GetProtocolMobType(eMonsterType a_MobType) const
 {
 	switch (a_MobType)
