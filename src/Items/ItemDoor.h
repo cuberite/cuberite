@@ -66,7 +66,7 @@ public:
 		// Check the block that will get replaced by the door:
 		{
 			BlockState UpperReplacedBlock;
-			if (World.GetBlock(UpperBlockPosition, UpperReplacedBlock))
+			if (!World.GetBlock(UpperBlockPosition, UpperReplacedBlock))
 			{
 				return false;
 			}
@@ -78,7 +78,7 @@ public:
 		}
 
 		// Get the coords of the neighboring blocks:
-		auto Facing = RotationToBlockFace(a_Player.GetYaw());
+		auto Facing = RotationToBlockFace(a_Player.GetYaw(), true);
 		Vector3i RelDirToOutside = cBlockDoorHandler::GetRelativeDirectionToOutside(World.GetBlock(a_PlacePosition));
 		Vector3i LeftNeighborPos = RelDirToOutside;
 		LeftNeighborPos.TurnCW();

@@ -45,7 +45,7 @@ public:
 
 		// Can only transform dirt or grass blocks:
 		BlockState BlockBelow;
-		if (a_World->GetBlock(a_ClickedBlockPos, BlockBelow))
+		if (!a_World->GetBlock(a_ClickedBlockPos, BlockBelow))
 		{
 			return false;
 		}

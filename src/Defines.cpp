@@ -201,7 +201,7 @@ AString BlockFaceToString(eBlockFace a_BlockFace)
 
 
 
-/** Here so core plugin can initialize, ore wise useless and deprecated */
+/** Here so core plugin can initialize, otherwise useless and deprecated */
 bool IsValidItem(Item a_ItemType)
 {
 	return true;

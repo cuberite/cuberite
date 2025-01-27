@@ -49,6 +49,7 @@ protected:
 	virtual void    SendPluginMessage(const AString & a_Channel, const ContiguousByteBufferView a_Message) override;
 	virtual void    SendPlayerSpawn(const cPlayer & a_Player) override;
 	virtual void    SendRespawn(eDimension a_Dimension) override;
+	virtual void    SendUnloadChunk(int a_ChunkX, int a_ChunkZ) override;
 	virtual void    SendFinishConfiguration() override;
 	virtual void    SendDynamicRegistries() override;
 

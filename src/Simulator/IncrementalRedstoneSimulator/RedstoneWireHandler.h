@@ -290,7 +290,7 @@ namespace RedstoneWireHandler
 
 		// TODO: optimize this function somehow as it called every tick
 
-		// All cheking here is purely for visuals. Does not affect how redstone will work
+		// All cheking here is purely for visuals. Does not affect how redstone will work. (Probably)
 
 		// Auto is necessary here, as the compiler cannot deduce the type of the vars as enums
 		auto east = East::None;
@@ -337,7 +337,7 @@ namespace RedstoneWireHandler
 			}
 		}
 
-		// Makes sure the the wire is straight if its connected to only one side
+		// Makes sure the wire is straight if it's connected to only one side
 		if ((east == East::None) && (west == West::None))
 		{
 			if ((north != North::Up) && (south != South::None))

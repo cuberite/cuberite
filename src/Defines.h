@@ -19,6 +19,10 @@ constexpr inline const int TPS = 20;
 
 
 
+constexpr auto MAIN_HAND = 0;  // Temporary
+
+
+
 
 // tolua_begin
 
