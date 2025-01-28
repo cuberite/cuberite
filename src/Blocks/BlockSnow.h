@@ -20,7 +20,7 @@ private:
 
 	enum
 	{
-		FullBlockLayers = 7  // Meta value of a full-height snow block.
+		FullBlockLayers = 8  // Meta value of a full-height snow block.
 	};
 
 	virtual bool DoesIgnoreBuildCollision(const cWorld & a_World, const cItem & a_HeldItem, Vector3i a_Position, BlockState a_ClickedBlock, eBlockFace a_ClickedBlockFace, bool a_ClickedDirectly) const override

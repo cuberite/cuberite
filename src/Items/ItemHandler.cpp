@@ -15,6 +15,7 @@
 #include "ItemAxe.h"
 #include "ItemBanner.h"
 #include "ItemBed.h"
+#include "ItemCocoaBeans.h"
 #include "ItemBigFlower.h"
 #include "ItemBoat.h"
 #include "ItemBottle.h"
@@ -235,7 +236,7 @@ namespace
 	constexpr cItemFoodSeedsHandler         ItemCarrotHandler                          (Item::Carrot, cItemHandler::FoodInfo(3, 6.6));
 	constexpr cDefaultItemHandler           ItemCarrotOnAStickHandler                  (Item::CarrotOnAStick);
 	constexpr cUnimplementedItemHandler     ItemCartographyTableHandler                (Item::CartographyTable);
-	constexpr cUnimplementedItemHandler     ItemCarvedPumpkinHandler                   (Item::CarvedPumpkin);
+	constexpr cItemPumpkinHandler           ItemCarvedPumpkinHandler                   (Item::CarvedPumpkin);
 	constexpr cItemSpawnEggHandler          ItemCatSpawnEggHandler                     (Item::CatSpawnEgg);
 	constexpr cSimplePlaceableItemHandler   ItemCauldronHandler                        (Item::Cauldron);
 	constexpr cItemSpawnEggHandler          ItemCaveSpiderSpawnEggHandler              (Item::CaveSpiderSpawnEgg);
@@ -272,7 +273,7 @@ namespace
 	constexpr cItemStairsHandler            ItemCobblestoneStairsHandler               (Item::CobblestoneStairs);
 	constexpr cUnimplementedItemHandler     ItemCobblestoneWallHandler                 (Item::CobblestoneWall);
 	constexpr cSimplePlaceableItemHandler   ItemCobwebHandler                          (Item::Cobweb);
-	constexpr cDefaultItemHandler           ItemCocoaBeansHandler                      (Item::CocoaBeans);
+	constexpr cCocoaBeansHandler            ItemCocoaBeansHandler                      (Item::CocoaBeans);
 	constexpr cUnimplementedItemHandler     ItemCodBucketHandler                       (Item::CodBucket);
 	constexpr cItemRawFishHandler           ItemCodHandler                             (Item::Cod);
 	constexpr cItemSpawnEggHandler          ItemCodSpawnEggHandler                     (Item::CodSpawnEgg);
@@ -800,7 +801,7 @@ namespace
 	constexpr cUnimplementedItemHandler     ItemPufferfishBucketHandler                (Item::PufferfishBucket);
 	constexpr cUnimplementedItemHandler     ItemPufferfishHandler                      (Item::Pufferfish);
 	constexpr cItemSpawnEggHandler          ItemPufferfishSpawnEggHandler              (Item::PufferfishSpawnEgg);
-	constexpr cItemPumpkinHandler           ItemPumpkinHandler                         (Item::Pumpkin);
+	constexpr cSimplePlaceableItemHandler   ItemPumpkinHandler                         (Item::Pumpkin);
 	constexpr cItemSimpleFoodHandler        ItemPumpkinPieHandler                      (Item::PumpkinPie, cItemHandler::FoodInfo(8, 4.8));
 	constexpr cItemSimpleSeedsHandler       ItemPumpkinSeedsHandler                    (Item::PumpkinSeeds);
 	constexpr cItemBannerHandler            ItemPurpleBannerHandler                    (Item::PurpleBanner);
@@ -915,7 +916,7 @@ namespace
 	constexpr cUnimplementedItemHandler     ItemSoulLanternHandler                     (Item::SoulLantern);
 	constexpr cSimplePlaceableItemHandler   ItemSoulSandHandler                        (Item::SoulSand);
 	constexpr cUnimplementedItemHandler     ItemSoulSoilHandler                        (Item::SoulSoil);
-	constexpr cUnimplementedItemHandler     ItemSoulTorchHandler                       (Item::SoulTorch);
+	constexpr cItemTorchHandler             ItemSoulTorchHandler                       (Item::SoulTorch);
 	constexpr cSimplePlaceableItemHandler   ItemSpawnerHandler                         (Item::Spawner);
 	constexpr cUnimplementedItemHandler     ItemSpectralArrowHandler                   (Item::SpectralArrow);
 	constexpr cItemSpiderEyeHandler         ItemSpiderEyeHandler                       (Item::SpiderEye);
@@ -1294,7 +1295,7 @@ namespace
 	constexpr cSimplePlaceableItemHandler   ItemPackedMudHandler                         (Item::PackedMud);
 	constexpr cSimplePlaceableItemHandler   ItemPearlescentFroglightHandler              (Item::PearlescentFroglight);
 	constexpr cItemSpawnEggHandler          ItemPiglinBruteSpawnEggHandler               (Item::PiglinBruteSpawnEgg);
-	constexpr cSimplePlaceableItemHandler   ItemPiglinHeadHandler                        (Item::PiglinHead);
+	constexpr cItemMobHeadHandler           ItemPiglinHeadHandler                        (Item::PiglinHead);
 	constexpr cSimplePlaceableItemHandler   ItemPinkCandleHandler                        (Item::PinkCandle);
 	constexpr cSimplePlaceableItemHandler   ItemPinkPetalsHandler                        (Item::PinkPetals);
 	constexpr cSimplePlaceableItemHandler   ItemPitcherPlantHandler                      (Item::PitcherPlant);

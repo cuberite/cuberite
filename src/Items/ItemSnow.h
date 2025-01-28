@@ -25,13 +25,13 @@ private:
 		// Check if incrementing existing snow height:
 		if (OldBlock.Type() == BlockType::Snow)
 		{
-			ASSERT(LayerCount < 7);  // BlockSnow.h ensures that if we replace a snow layer, it won't be at max height.
+			ASSERT(LayerCount < 8);  // BlockSnow.h ensures that if we replace a snow layer, it won't be at max height.
 			LayerCount++;
 		}
 		else
 		{
 			// First time placement:
-			LayerCount = 0;
+			LayerCount = 1;
 		}
 
 		return a_Player.PlaceBlock(a_PlacePosition, Block::Snow::Snow(LayerCount));

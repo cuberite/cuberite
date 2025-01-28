@@ -26,12 +26,12 @@ private:
 		auto BlockToReplace = a_Player.GetWorld()->GetBlock(a_PlacePosition);
 		if (BlockToReplace.Type() == BlockType::Vine)
 		{
-			if (cBlockVinesHandler::IsAttachedTo(BlockToReplace, a_ClickedBlockFace))
+			if (cBlockVinesHandler::IsAttachedTo(BlockToReplace, ReverseBlockFace(a_ClickedBlockFace)))
 			{
 				// There is already a vine at that rotation
 				return false;
 			}
-			switch (a_ClickedBlockFace)
+			switch (ReverseBlockFace(a_ClickedBlockFace))
 			{
 				//                                      East                         North                        South                        Up                        West
 				case BLOCK_FACE_XM: BlockToReplace = Vine::Vine(Vine::East(BlockToReplace), Vine::North(BlockToReplace), Vine::South(BlockToReplace), Vine::Up(BlockToReplace), true);                       break;
@@ -44,9 +44,9 @@ private:
 		}
 		else
 		{
-			switch (a_ClickedBlockFace)
+			switch (ReverseBlockFace(a_ClickedBlockFace))
 			{
-				//                                       East   North  South  Up     West
+				//                                              East        North       South        Up        West
 				case BLOCK_FACE_XM: BlockToReplace = Vine::Vine(false, false, false, false, true); break;
 				case BLOCK_FACE_XP: BlockToReplace = Vine::Vine(true,  false, false, false, false); break;
 				case BLOCK_FACE_YP: BlockToReplace = Vine::Vine(false, false, false, true,  false); break;

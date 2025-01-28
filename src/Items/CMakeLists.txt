@@ -85,4 +85,5 @@ target_sources(
 	ItemWool.h
 	SimplePlaceableItemHandler.h
 	ItemWood.h
+	ItemCocoaBeans.h
 )

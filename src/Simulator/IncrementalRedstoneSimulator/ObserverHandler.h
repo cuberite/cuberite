@@ -46,7 +46,7 @@ namespace ObserverHandler
 
 	static PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block, Vector3i a_QueryPosition, BlockState a_QueryBlock, bool IsLinked)
 	{
-		return (IsOn(a_QueryBlock) && (a_QueryPosition == (a_Position + cBlockObserverHandler::GetSignalOutputOffset(a_Block)))) ? 15 : 0;
+		return (IsOn(a_Block) && (a_QueryPosition == (a_Position + cBlockObserverHandler::GetSignalOutputOffset(a_Block)))) ? 15 : 0;
 	}
 
 	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BlockState a_Block, const PowerLevel Power)
@@ -67,6 +67,8 @@ namespace ObserverHandler
 			// Schedule power-on 1 tick in the future
 			Data.m_MechanismDelays[a_Position] = std::make_pair(1, true);
 
+			cChunkInterface ChunkInterface(a_Chunk.GetWorld()->GetChunkMap());
+			cBlockObserverHandler::Toggle(ChunkInterface, cChunkDef::RelativeToAbsolute(a_Position, a_Chunk.GetPos()));
 			return;
 		}
 
@@ -79,9 +81,6 @@ namespace ObserverHandler
 			return;
 		}
 
-		cChunkInterface ChunkInterface(a_Chunk.GetWorld()->GetChunkMap());
-		cBlockObserverHandler::Toggle(ChunkInterface, a_Position);
-
 		if (ShouldPowerOn)
 		{
 			// Remain on for 1 tick before resetting
@@ -91,6 +90,8 @@ namespace ObserverHandler
 		{
 			// We've reset. Erase delay data in preparation for detecting further updates
 			Data.m_MechanismDelays.erase(a_Position);
+			cChunkInterface ChunkInterface(a_Chunk.GetWorld()->GetChunkMap());
+			cBlockObserverHandler::Toggle(ChunkInterface, cChunkDef::RelativeToAbsolute(a_Position, a_Chunk.GetPos()));
 		}
 
 		UpdateAdjustedRelative(a_Chunk, CurrentlyTicking, a_Position, cBlockObserverHandler::GetSignalOutputOffset(a_Block));
