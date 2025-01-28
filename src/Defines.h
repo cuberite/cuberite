@@ -657,9 +657,9 @@ bool IsValidItem(Item a_ItemType);
 
 eBlockFace RotationToBlockFace(double a_Rotation, bool a_Inverse = false);
 
-unsigned char RotationToFineFace(double a_Rotation);
+unsigned char RotationToFineFace(double a_Rotation, bool a_Invert = false);
 
-eBlockFace DisplacementYawToFacing(Vector3d a_Rotation, Vector3d a_EyePos, double a_Yaw);
+eBlockFace DisplacementYawToFacing(Vector3d a_PlacePosition, Vector3d a_EyePosition, double a_Yaw);
 
 /** Translates a dimension string to dimension enum. Takes either a number or a dimension alias (built-in). Returns dimOverworld on failure */
 extern eDimension StringToDimension(const AString & a_DimensionString);

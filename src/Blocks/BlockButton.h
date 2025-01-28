@@ -23,6 +23,38 @@ public:
 
 	using Super::Super;
 
+	enum class UnifiedButtonFace : std::uint8_t
+	{
+		Floor,
+		Wall,
+		Ceiling
+	};
+
+#define GET_BUTTON_FACE(Button) return static_cast<UnifiedButtonFace>(Block::Button::Face(a_Button));
+
+	static UnifiedButtonFace GetButtonFace(BlockState a_Button)
+	{
+		switch (a_Button.Type())
+		{
+			case BlockType::AcaciaButton:             GET_BUTTON_FACE(AcaciaButton)
+			case BlockType::BirchButton:              GET_BUTTON_FACE(BirchButton)
+			case BlockType::CrimsonButton:            GET_BUTTON_FACE(CrimsonButton)
+			case BlockType::DarkOakButton:            GET_BUTTON_FACE(DarkOakButton)
+			case BlockType::JungleButton:             GET_BUTTON_FACE(JungleButton)
+			case BlockType::OakButton:                GET_BUTTON_FACE(OakButton)
+			case BlockType::PolishedBlackstoneButton: GET_BUTTON_FACE(PolishedBlackstoneButton)
+			case BlockType::SpruceButton:             GET_BUTTON_FACE(SpruceButton)
+			case BlockType::StoneButton:              GET_BUTTON_FACE(StoneButton)
+			case BlockType::WarpedButton:             GET_BUTTON_FACE(WarpedButton)
+			case BlockType::BambooButton:             GET_BUTTON_FACE(BambooButton)
+			case BlockType::CherryButton:             GET_BUTTON_FACE(CherryButton)
+			case BlockType::MangroveButton:           GET_BUTTON_FACE(MangroveButton)
+			case BlockType::PaleOakButton:            GET_BUTTON_FACE(PaleOakButton)
+			default: UNREACHABLE("Invalid button type");
+		}
+	}
+
+
 	static bool IsButton(BlockState a_Block)
 	{
 		switch (a_Block.Type())
@@ -155,7 +187,7 @@ private:
 		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect(SoundToPlay, a_BlockPos, 0.5f, 0.6f, a_Player.GetClientHandle());
 
 		// Queue a button reset (unpress)
-		QueueButtonRelease(*a_Player.GetWorld(), a_BlockPos, Self);
+		QueueButtonRelease(*a_Player.GetWorld(), a_BlockPos, a_ChunkInterface.GetBlock(a_BlockPos));
 
 		return true;
 	}
@@ -175,13 +207,23 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		auto SupportRelPos = AddFaceDirection(a_Position, GetBlockFace(a_Self), true);
+		eBlockFace to_check = eBlockFace::BLOCK_FACE_NONE;
+		switch (GetButtonFace(a_Self))
+		{
+			case UnifiedButtonFace::Floor:  to_check = eBlockFace::BLOCK_FACE_YP; break;
+			case UnifiedButtonFace::Wall: to_check = GetBlockFace(a_Self); break;
+			case UnifiedButtonFace::Ceiling: to_check = eBlockFace::BLOCK_FACE_YM; break;
+		}
+		auto SupportRelPos = AddFaceDirection(a_Position, to_check, true);
 		if (!cChunkDef::IsValidHeight(SupportRelPos.y))
 		{
 			return false;
 		}
 		BlockState SupportBlock = 0;
-		a_Chunk.UnboundedRelGetBlock(SupportRelPos, SupportBlock);
+		if (!a_Chunk.UnboundedRelGetBlock(SupportRelPos, SupportBlock))
+		{
+			return false;
+		}
 		eBlockFace Face = GetBlockFace(SupportBlock);
 		// upside down slabs
 		if (cBlockSlabHandler::IsAnySlabType(SupportBlock))

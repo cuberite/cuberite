@@ -23,9 +23,10 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Self) const override
 	{
+		ASSERT(a_Self.Type() == BlockType::Cocoa);
 		// Check that we're attached to a jungle log block:
-		eBlockFace BlockFace = Block::Cocoa::Facing(a_Chunk.GetBlock(a_Position));
-		auto LogPos = AddFaceDirection(a_Position, BlockFace, true);
+		eBlockFace BlockFace = Block::Cocoa::Facing(a_Self);
+		auto LogPos = AddFaceDirection(a_Position, BlockFace, false);
 		BlockState LogBlock;
 		if (!a_Chunk.UnboundedRelGetBlock(LogPos, LogBlock))
 		{

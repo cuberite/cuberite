@@ -258,87 +258,96 @@ eBlockFace RotationToBlockFace(double a_Rotation, bool a_Inverse)
 
 
 
-unsigned char RotationToFineFace(double a_Rotation)
+unsigned char RotationToFineFace(double a_Rotation, bool a_Invert)
 {
+	unsigned char ret = 0;
 	if ((a_Rotation >= - 11.25f) && (a_Rotation < 11.25f))
 	{
 		// South
-		return 8;
+		ret = 8;
 	}
 	else if ((a_Rotation >= 11.25f) && (a_Rotation < 33.75f))
 	{
 		// SouthSouthWest
-		return 9;
+		ret = 9;
 	}
 	else if ((a_Rotation >= 23.75f) && (a_Rotation < 56.25f))
 	{
 		// SouthWest
-		return 10;
+		ret = 10;
 	}
 	else if ((a_Rotation >= 56.25f) && (a_Rotation < 78.75f))
 	{
 		// WestSouthWest
-		return 11;
+		ret = 11;
 	}
 	else if ((a_Rotation >= 78.75f) && (a_Rotation < 101.25f))
 	{
 		// West
-		return 12;
+		ret = 12;
 	}
 	else if ((a_Rotation >= 101.25f) && (a_Rotation < 123.75f))
 	{
 		// WestNorthWest
-		return 13;
+		ret = 13;
 	}
 	else if ((a_Rotation >= 123.75f) && (a_Rotation < 146.25f))
 	{
 		// NorthWest
-		return 14;
+		ret = 14;
 	}
 	else if ((a_Rotation >= 146.25f) && (a_Rotation < 168.75f))
 	{
 		// NorthNorthWest
-		return 15;
+		ret = 15;
 	}
 	else if ((a_Rotation >= -168.75f) && (a_Rotation < -146.25f))
 	{
 		// NorthNorthEast
-		return 1;
+		ret = 1;
 	}
 	else if ((a_Rotation >= -146.25f) && (a_Rotation < -123.75f))
 	{
 		// NorthEast
-		return 2;
+		ret = 2;
 	}
 	else if ((a_Rotation >= -123.75f) && (a_Rotation < -101.25f))
 	{
 		// EastNorthEast
-		return 3;
+		ret = 3;
 	}
 	else if ((a_Rotation >= -101.25) && (a_Rotation < -78.75f))
 	{
 		// East
-		return 4;
+		ret = 4;
 	}
 	else if ((a_Rotation >= -78.75) && (a_Rotation < -56.25f))
 	{
 		// EastSouthEast
-		return 5;
+		ret = 5;
 	}
 	else if ((a_Rotation >= -56.25f) && (a_Rotation < -33.75f))
 	{
 		// SouthEast
-		return 6;
+		ret = 6;
 	}
 	else if ((a_Rotation >= -33.75f) && (a_Rotation < -11.25f))
 	{
 		// SouthSouthEast
-		return 7;
+		ret = 7;
 	}
 	else  // degrees jumping from 180 to -180
 	{
 		// North
-		return 0;
+		ret = 0;
+	}
+	if (a_Invert)
+	{
+		return (ret + 8) % 16;
+	}
+	else
+	{
+		return ret;
 	}
 }
 

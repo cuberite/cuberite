@@ -22,7 +22,7 @@ public:
 	inline static Vector3i GetSignalOutputOffset(BlockState a_Block)
 	{
 		using namespace Block;
-		switch (Observer::Facing(a_Block))
+		switch (ReverseBlockFace(Observer::Facing(a_Block)))
 		{
 			case BLOCK_FACE_XM:   return { -1, 0, 0 };
 			case BLOCK_FACE_XP:   return { 1, 0, 0 };
@@ -38,6 +38,7 @@ public:
 	{
 		using namespace Block;
 		auto Self = a_ChunkInterface.GetBlock(a_Position);
-		a_ChunkInterface.FastSetBlock(a_Position, Observer::Observer(Observer::Facing(Self), Observer::Powered(Self)));
+		ASSERT(Self.Type() == BlockType::Observer);
+		a_ChunkInterface.FastSetBlock(a_Position, Observer::Observer(Observer::Facing(Self), !Observer::Powered(Self)));
 	}
 };

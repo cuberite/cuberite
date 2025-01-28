@@ -56,7 +56,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 	{
 		case Item::Bucket:
 		{
-			FLOGD("Dispensing empty bucket in slot {}}; DispBlock is \"{}\".", a_SlotNum, DispBlock);
+			FLOGD("Dispensing empty bucket in slot {}; DispBlock is \"{}\".", a_SlotNum, DispBlock);
 			switch (DispBlock.Type())
 			{
 				case BlockType::Water:
@@ -89,7 +89,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 			FLOGD("Dispensing water bucket in slot {}; DispBlock is \"{}\".", a_SlotNum, DispBlock);
 			if (EmptyLiquidBucket(DispBlock, a_SlotNum))
 			{
-				DispChunk->SetBlock(DispRelCoord, Block::Air::Air());
+				DispChunk->SetBlock(DispRelCoord, Block::Water::Water());
 			}
 			else
 			{
