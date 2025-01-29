@@ -273,7 +273,7 @@ void cProtocol_1_20::SendEditSign(Vector3i a_BlockPos)
 void cProtocol_1_20::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 {
 	Vector3i Position;
-	if (!a_ByteBuffer.ReadXYZPosition64(Position))
+	if (!a_ByteBuffer.ReadXZYPosition64(Position))
 	{
 		return;
 	}
@@ -769,7 +769,7 @@ bool cProtocol_1_20_2::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x29: /* select villager trade */ return false;
 				case 0x2A: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 				case 0x2B: HandlePacketSlotSelect(a_ByteBuffer); return true;
-				case 0x2C: /* update command block */ return false;
+				case 0x2C: HandlePacketCommandBlockUpdate(a_ByteBuffer); return true;
 				case 0x2D: /* update minecart command block */ return false;
 				case 0x2E: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 				case 0x2F: /* Update jigsaw block */ return false;
@@ -1437,7 +1437,7 @@ bool cProtocol_1_20_3::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x2A: /* select villager trade */ return false;
 		case 0x2B: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 		case 0x2C: HandlePacketSlotSelect(a_ByteBuffer); return true;
-		case 0x2D: /* update command block */ return false;
+		case 0x2D: HandlePacketCommandBlockUpdate(a_ByteBuffer); return true;
 		case 0x2E: /* update minecart command block */ return false;
 		case 0x2F: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 		case 0x30: /* Update jigsaw block */ return false;
@@ -2086,7 +2086,7 @@ bool cProtocol_1_20_5::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 				case 0x2D: /* select villager trade */ return false;
 				case 0x2E: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 				case 0x2F: HandlePacketSlotSelect(a_ByteBuffer); return true;
-				case 0x30: /* update command block */ return false;
+				case 0x30: HandlePacketCommandBlockUpdate(a_ByteBuffer); return true;
 				case 0x31: /* update minecart command block */ return false;
 				case 0x32: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 				case 0x33: /* Update jigsaw block */ return false;

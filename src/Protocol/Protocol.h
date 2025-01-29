@@ -360,7 +360,6 @@ public:
 	};
 
 
-
 	/** The protocol version number, received from the client in the Handshake packet. */
 	enum class Version
 	{

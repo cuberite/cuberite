@@ -1217,7 +1217,7 @@ bool cProtocol_1_15::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x21: /* select villager trade */ return false;
 		case 0x22: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 		case 0x23: HandlePacketSlotSelect(a_ByteBuffer); return true;
-		case 0x24: /* update command block */ return false;
+		case 0x24: HandlePacketCommandBlockUpdate(a_ByteBuffer); return true;
 		case 0x25: /* update minecart command block */ return false;
 		case 0x26: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 		case 0x27: /* Update jigsaw block */ return false;

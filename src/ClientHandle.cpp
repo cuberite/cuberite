@@ -1046,7 +1046,7 @@ void cClientHandle::HandleBeaconSelection(unsigned a_PrimaryEffect, unsigned a_S
 
 
 
-void cClientHandle::HandleCommandBlockBlockChange(Vector3i a_BlockPos, const AString & a_NewCommand)
+void cClientHandle::HandleCommandBlockBlockChange(Vector3i a_BlockPos, const AString & a_NewCommand, CommandBlockType a_Type, bool a_TrackOutput, bool a_Conditional, bool a_AlwaysActive)
 {
 	if (a_NewCommand.empty())
 	{

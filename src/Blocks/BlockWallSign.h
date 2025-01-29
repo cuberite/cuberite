@@ -92,7 +92,7 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		auto NeighborPos = a_Position + GetOffsetBehindTheSign(a_Chunk.GetBlock(a_Position));
+		auto NeighborPos = a_Position + GetOffsetBehindTheSign(a_Self);
 		BlockState Neighbor;
 		if (!a_Chunk.UnboundedRelGetBlock(NeighborPos, Neighbor))
 		{

@@ -92,7 +92,7 @@ public:  // tolua_export
 	and the results are passed to MCS running in offline mode. */
 	void SetProperties(const Json::Value & a_Properties) { m_Properties = a_Properties; }
 
-	/** Generates an UUID based on the player name provided.
+		/** Generates an UUID based on the player name provided.
 	This is used for the offline (non-auth) mode, when there's no UUID source.
 	Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same. */
 	static cUUID GenerateOfflineUUID(const AString & a_Username);  // Exported in ManualBindings.cpp
@@ -336,7 +336,7 @@ public:  // tolua_export
 
 	/** Called when the protocol receives a message, indicating that the player set a new
 	command in the command block UI, for a block-based commandblock. */
-	void HandleCommandBlockBlockChange(Vector3i a_BlockPos, const AString & a_NewCommand);
+	void HandleCommandBlockBlockChange(Vector3i a_BlockPos, const AString & a_NewCommand, CommandBlockType a_Type = CommandBlockType::Sequence, bool a_TrackOutput = true, bool a_Conditional = false, bool a_AlwaysActive = false);
 
 	/** Called when the protocol receives a message, indicating that the player set a new
 	command in the command block UI, for an entity-based commandblock (minecart?). */

@@ -210,7 +210,7 @@ bool cProtocol_1_19::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x25: /* select villager trade */ return false;
 		case 0x26: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 		case 0x27: HandlePacketSlotSelect(a_ByteBuffer); return true;
-		case 0x28: /* update command block */ return false;
+		case 0x28: HandlePacketCommandBlockUpdate(a_ByteBuffer); return true;
 		case 0x29: /* update minecart command block */ return false;
 		case 0x2A: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 		case 0x2B: /* Update jigsaw block */ return false;
@@ -1777,7 +1777,7 @@ bool cProtocol_1_19_1::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x26: /* select villager trade */ return false;
 		case 0x27: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 		case 0x28: HandlePacketSlotSelect(a_ByteBuffer); return true;
-		case 0x29: /* update command block */ return false;
+		case 0x29: HandlePacketCommandBlockUpdate(a_ByteBuffer); return true;
 		case 0x2A: /* update minecart command block */ return false;
 		case 0x2B: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 		case 0x2C: /* Update jigsaw block */ return false;
@@ -2087,7 +2087,7 @@ bool cProtocol_1_19_3::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x26: /* select villager trade */ return false;
 		case 0x27: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 		case 0x28: HandlePacketSlotSelect(a_ByteBuffer); return true;
-		case 0x29: /* update command block */ return false;
+		case 0x29: HandlePacketCommandBlockUpdate(a_ByteBuffer); return true;
 		case 0x2A: /* update minecart command block */ return false;
 		case 0x2B: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 		case 0x2C: /* Update jigsaw block */ return false;
@@ -2800,7 +2800,7 @@ bool cProtocol_1_19_4::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketT
 		case 0x26: /* select villager trade */ return false;
 		case 0x27: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 		case 0x28: HandlePacketSlotSelect(a_ByteBuffer); return true;
-		case 0x29: /* update command block */ return false;
+		case 0x29: HandlePacketCommandBlockUpdate(a_ByteBuffer); return true;
 		case 0x2A: /* update minecart command block */ return false;
 		case 0x2B: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 		case 0x2C: /* Update jigsaw block */ return false;

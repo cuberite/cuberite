@@ -467,6 +467,16 @@ enum class BossBarDivisionType
 
 // tolua_end
 
+enum class CommandBlockType
+{
+	Sequence,
+	Auto,
+	Redstone
+};
+
+
+
+
 
 enum class eGameStateReason
 {
