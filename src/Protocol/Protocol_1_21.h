@@ -53,6 +53,7 @@ protected:
 	virtual void SendDynamicRegistries() override;
 	virtual void SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendRespawn(eDimension a_Dimension) override;
+	virtual void SendUpdateBlockEntity(cBlockEntity & a_BlockEntity) override;
 
 	virtual void HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketClientSettings(cByteBuffer & a_ByteBuffer) override;

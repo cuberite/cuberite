@@ -66,7 +66,7 @@ namespace TripwireHookHandler
 		UNUSED(a_QueryBlock);
 		UNUSED(a_QueryPosition);
 
-		return (GetPowerLevel(a_Chunk, a_Position, a_Block) ? 15 : 0);
+		return (GetPowerLevel(a_Chunk, a_Position, a_Block) == 15 ? 15 : 0);
 	}
 
 	static void Update(cChunk & a_Chunk, cChunk & CurrentlyTicking, Vector3i a_Position, BlockState a_Block, const PowerLevel Power)
@@ -78,12 +78,10 @@ namespace TripwireHookHandler
 		bool IsPowered = false;
 		if (PowerLevel == 1)
 		{
-			// Connected but not activated, AND away the highest bit
 			IsAttached = true;
 		}
 		else if (PowerLevel == 15)
 		{
-			// Connected and activated, set the 3rd and 4th highest bits
 			IsAttached = true;
 			IsPowered = true;
 		}

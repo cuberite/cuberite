@@ -206,6 +206,7 @@ protected:
 	virtual void HandlePacketChatMessage            (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketClientSettings         (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketClientStatus           (cByteBuffer & a_ByteBuffer);
+	virtual void HandlePacketCommandBlockUpdate     (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketEntityAction           (cByteBuffer & a_ByteBuffer);
 	virtual void HandlePacketKeepAlive              (cByteBuffer & a_ByteBuffer);

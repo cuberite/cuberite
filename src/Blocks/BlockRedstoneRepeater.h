@@ -50,7 +50,7 @@ public:
 	inline static Vector3i GetRearCoordinateOffset(BlockState a_Block)
 	{
 		auto Facing = Block::Repeater::Facing(a_Block);
-		switch (Facing)
+		switch (ReverseBlockFace(Facing))
 		{
 			case eBlockFace::BLOCK_FACE_ZM: return { 0, 0, 1 };
 			case eBlockFace::BLOCK_FACE_XP: return { -1, 0, 0 };

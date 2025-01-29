@@ -2678,6 +2678,16 @@ void cProtocol_1_8_0::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 
 
 
+void cProtocol_1_8_0::HandlePacketCommandBlockUpdate(cByteBuffer & a_ByteBuffer)
+{
+	// Used in 1.13+
+	return;
+}
+
+
+
+
+
 void cProtocol_1_8_0::HandlePacketCreativeInventoryAction(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadBEInt16, Int16, SlotNum);

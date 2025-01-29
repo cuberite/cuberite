@@ -2696,12 +2696,12 @@ bool cWorld::SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, co
 {
 	return DoWithBlockEntityAt({ a_BlockX, a_BlockY, a_BlockZ }, [&](cBlockEntity & a_BlockEntity)
 	{
-		if (cBlockCommandBlockHandler::IsBlockCommandBlock(a_BlockEntity.GetBlock()))
+		if (!cBlockCommandBlockHandler::IsBlockCommandBlock(a_BlockEntity.GetBlock()))
 		{
 			return false;
 		}
 
-		static_cast<cCommandBlockEntity &>(a_BlockEntity).SetCommand(a_Command);
+		dynamic_cast<cCommandBlockEntity &>(a_BlockEntity).SetCommand(a_Command);
 		return true;
 	});
 }

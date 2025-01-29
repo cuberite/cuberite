@@ -12,6 +12,7 @@
 #include "../ChatColor.h"
 #include "../World.h"
 #include "../ClientHandle.h"
+#include "../Entities/Player.h"
 
 
 
@@ -31,14 +32,7 @@ cCommandBlockEntity::cCommandBlockEntity(BlockState a_Block, Vector3i a_Pos, cWo
 
 bool cCommandBlockEntity::UsedBy(cPlayer * a_Player)
 {
-	// Nothing to do
-	UNUSED(a_Player);
-
-	auto empty = [](cBlockEntity & a_BlockEntity)
-	{
-		return false;
-	};
-	m_World->DoWithBlockEntityAt(m_Pos, empty);  // Necessary to make sure an update block entity packet is sent
+	a_Player->GetClientHandle()->SendUpdateBlockEntity(*this);  // Necessary to send an empty block entity update to enable the command block GUI
 	return true;
 }
 

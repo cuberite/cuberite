@@ -209,6 +209,23 @@ void cProtocol_1_13::SendCommandTree()
 
 
 
+void cProtocol_1_13::HandlePacketCommandBlockUpdate(cByteBuffer & a_ByteBuffer)
+{
+	Vector3i command_block_pos;
+	if (!a_ByteBuffer.ReadXZYPosition64(command_block_pos))
+	{
+		return;
+	}
+	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString,    Command);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32,    Type);
+	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32,    Flags);
+	m_Client->HandleCommandBlockBlockChange(command_block_pos, Command, static_cast<CommandBlockType>(Type), Flags & 0x01, Flags & 0x02, Flags & 0x04);
+}
+
+
+
+
+
 void cProtocol_1_13::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32,      UInt32,     CompletionId);
@@ -844,6 +861,7 @@ bool cProtocol_1_13::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x28: HandlePacketSpectate(a_ByteBuffer); return true;
 		case 0x29: HandlePacketBlockPlace(a_ByteBuffer); return true;
 		case 0x2a: HandlePacketUseItem(a_ByteBuffer); return true;
+		case 0x22: HandlePacketCommandBlockUpdate(a_ByteBuffer); return true;
 	}
 
 	return Super::HandlePacket(a_ByteBuffer, a_PacketType);

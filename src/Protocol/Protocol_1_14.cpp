@@ -1002,6 +1002,7 @@ bool cProtocol_1_14::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x26: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
 		case 0x2C: HandlePacketBlockPlace(a_ByteBuffer); return true;
 		case 0x2D: HandlePacketUseItem(a_ByteBuffer); return true;
+		case 0x24: HandlePacketCommandBlockUpdate(a_ByteBuffer); return true;
 
 		default: break;
 	}
