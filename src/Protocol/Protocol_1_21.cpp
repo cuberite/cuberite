@@ -1536,10 +1536,8 @@ void cProtocol_1_21_2::HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer)
 
 
 
-void cProtocol_1_21_2::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+UInt32 cProtocol_1_21_2::GetBlockEntityID(const cBlockEntity & a_BlockEntity) const
 {
-	ASSERT(m_State == 3);  // In game mode?
-
 	Byte Action;
 
 	auto type = a_BlockEntity.GetBlockType();
@@ -1555,15 +1553,15 @@ void cProtocol_1_21_2::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	{
 		Action = 8;
 	}
-	else if (BlockTags::StandingSigns(type))
+	else if (BlockTags::Signs(type))
 	{
 		Action = 7;
 	}
 	else if (BlockTags::FlowerPots(type))
 	{
-		return;  // temp fix
+		return static_cast<UInt32>(-1);  // temp fix
 	}
-	else 	// TODO: skulls
+	else  // TODO: skulls
 	{
 		switch (a_BlockEntity.GetBlockType())
 		{
@@ -1571,22 +1569,22 @@ void cProtocol_1_21_2::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 			case BlockType::Barrel:                Action = 27; break;
 			case BlockType::Beacon:                Action = 15; break;
 			// case BlockType::Bed:                   Action = 25; break;
-			case BlockType::Beehive:               Action = 34; break;
-			case BlockType::Bell:                  Action = 31; break;
-			case BlockType::BlastFurnace:          Action = 29; break;
+			case BlockType::Beehive:               Action = 34; break;  // not impl
+			case BlockType::Bell:                  Action = 31; break;  // not impl
+			case BlockType::BlastFurnace:          Action = 29; break;  // not impl
 			case BlockType::BrewingStand:          Action = 12; break;
 			// case BlockType::BrushableBlock:        Action = 40; break;
-			case BlockType::CalibratedSculkSensor: Action = 36; break;
-			case BlockType::Campfire:              Action = 33; break;
+			case BlockType::CalibratedSculkSensor: Action = 36; break;  // not impl
+			case BlockType::Campfire:              Action = 33; break;  // not impl
 			case BlockType::Chest:                 Action = 1; break;
-			case BlockType::ChiseledBookshelf:     Action = 39; break;
+			case BlockType::ChiseledBookshelf:     Action = 39; break;  // not impl
 			case BlockType::CommandBlock:          Action = 23; break;
 			case BlockType::Comparator:            Action = 19; break;
-			case BlockType::Conduit:               Action = 26; break;
-			case BlockType::Crafter:               Action = 42; break;
-			case BlockType::CreakingHeart:         Action = 10; break;
+			case BlockType::Conduit:               Action = 26; break;  // not impl
+			case BlockType::Crafter:               Action = 42; break;  // not impl
+			case BlockType::CreakingHeart:         Action = 10; break;  // not impl
 			case BlockType::DaylightDetector:      Action = 17; break;
-			case BlockType::DecoratedPot:          Action = 41; break;
+			case BlockType::DecoratedPot:          Action = 41; break;  // not impl
 			case BlockType::Dispenser:             Action = 5; break;
 			case BlockType::Dropper:               Action = 6; break;
 			case BlockType::EnchantingTable:       Action = 13; break;
@@ -1596,31 +1594,47 @@ void cProtocol_1_21_2::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 			case BlockType::Furnace:               Action = 0; break;
 			// case BlockType::HangingSign:           Action = 8; break;
 			case BlockType::Hopper:                Action = 18; break;
-			case BlockType::Jigsaw:                Action = 32; break;
+			case BlockType::Jigsaw:                Action = 32; break;  // not impl
 			case BlockType::Jukebox:               Action = 4; break;
-			case BlockType::Lectern:               Action = 30; break;
+			case BlockType::Lectern:               Action = 30; break;  // not impl
 			// case BlockType::MobSpawner:            Action = 9; break;
 			case BlockType::Piston:                Action = 11; break;
-			case BlockType::SculkCatalyst:         Action = 37; break;
-			case BlockType::SculkSensor:           Action = 35; break;
-			case BlockType::SculkShrieker:         Action = 38; break;
-			case BlockType::ShulkerBox:            Action = 24; break;
+			case BlockType::SculkCatalyst:         Action = 37; break;  // not impl
+			case BlockType::SculkSensor:           Action = 35; break;  // not impl
+			case BlockType::SculkShrieker:         Action = 38; break;  // not impl
+			case BlockType::ShulkerBox:            Action = 24; break;  // not impl
 			// case BlockType::Sign:                  Action = 7; break;
 			// case BlockType::Skull:                 Action = 16; break;
-			case BlockType::Smoker:                Action = 28; break;
-			case BlockType::StructureBlock:        Action = 21; break;
+			case BlockType::Smoker:                Action = 28; break;  // not impl
+			case BlockType::StructureBlock:        Action = 21; break;  // not impl
 			case BlockType::TrappedChest:          Action = 2; break;
-			case BlockType::TrialSpawner:          Action = 43; break;
-			case BlockType::Vault:                 Action = 44; break;
+			case BlockType::TrialSpawner:          Action = 43; break;  // not impl
+			case BlockType::Vault:                 Action = 44; break;  // not impl
 
 			default: UNREACHABLE("Unknown block entity");  // Block entities change between versions
 		}
 	}
+	return Action;
+}
 
+
+
+
+
+void cProtocol_1_21_2::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	UInt32 Type = GetBlockEntityID(a_BlockEntity);
+
+	if (Type == static_cast<UInt32>(-1))
+	{
+		return;
+	}
 
 	cPacketizer Pkt(*this, pktUpdateBlockEntity);
 	Pkt.WriteXZYPosition64(a_BlockEntity.GetPosX(), a_BlockEntity.GetPosY(), a_BlockEntity.GetPosZ());
-	Pkt.WriteVarInt32(Action);
+	Pkt.WriteVarInt32(Type);
 
 	cFastNBTWriter Writer(true);
 	WriteBlockEntity(Writer, a_BlockEntity);

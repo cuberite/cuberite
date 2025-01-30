@@ -248,7 +248,7 @@ protected:
 	virtual void SendPacket(cPacketizer & a_Packet) override;
 
 	/** Writes the block entity data for the specified block entity into the packet. */
-	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const;
+	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const override;
 
 	/** Writes the metadata for the specified entity, not including the terminating 0x7f. */
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const;

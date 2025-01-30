@@ -65,6 +65,7 @@ protected:
 	virtual Item GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
 	virtual UInt8  GetProtocolEntityType(const cEntity & a_Entity) const override;
+	virtual UInt32 GetBlockEntityID(const cBlockEntity & a_BlockEntity) const override;
 
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
 	virtual Version GetProtocolVersion() const override;
