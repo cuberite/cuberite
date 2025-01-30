@@ -297,6 +297,10 @@ public:  // tolua_export
 
 	// tolua_end
 
+	void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const { m_Protocol->WriteBlockEntity(a_Writer, a_BlockEntity);}
+
+	virtual UInt32 GetBlockEntityID(const cBlockEntity & a_BlockEntity) const { return m_Protocol->GetBlockEntityID(a_BlockEntity); }
+
 	/** Add the Forge mod list to the server ping response. */
 	void ForgeAugmentServerListPing(Json::Value & a_Response)
 	{

@@ -15,6 +15,7 @@
 #include "../ByteBuffer.h"
 #include "../EffectID.h"
 #include "../World.h"
+#include "../WorldStorage/FastNBT.h"
 //#include "../ClientHandle.h"
 
 
@@ -546,6 +547,9 @@ public:
 	virtual void SendWindowOpen                 (const cWindow & a_Window) = 0;
 	virtual void SendWindowProperty             (const cWindow & a_Window, size_t a_Property, short a_Value) = 0;
 
+	/** Writes the block entity data for the specified block entity into the packet.
+	*   Needs to be here so ChunkDataSerializer can access it. */
+	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const = 0;
 
 	/** Returns the ServerID used for authentication through session.minecraft.net */
 	virtual AString GetAuthServerID(void) = 0;
@@ -557,6 +561,7 @@ public:
 
 	virtual UInt32 GetProtocolSoundID(const AString & a_SoundName) const { return 1;}
 
+	virtual UInt32 GetBlockEntityID(const cBlockEntity & a_BlockEntity) const { return 0;}
 protected:
 
 	friend class cPacketizer;

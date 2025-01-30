@@ -38,6 +38,11 @@ public:
 		return m_Protocol;
 	}
 
+	auto & operator->() const
+	{
+		return m_Protocol;
+	}
+
 	/** Directs incoming protocol data along the correct pathway, depending on the state of the version recognition process.
 	The protocol modifies the provided buffer in-place. */
 	void HandleIncomingData(cClientHandle & a_Client, ContiguousByteBuffer & a_Data);

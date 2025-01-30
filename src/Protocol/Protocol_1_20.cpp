@@ -15,6 +15,8 @@
 #include "Palettes/Palette_1_20.h"
 #include "UI/HorseWindow.h"
 #include "../Entities/Entity.h"
+#include "AllTags/BlockTags.h"
+#include "BlockEntities/SignEntity.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -308,6 +310,43 @@ void cProtocol_1_20::SendRespawn(eDimension a_Dimension)
 	Pkt.WriteBEInt8(0x3);   // keep player attributes
 	Pkt.WriteBool(false);  // optional last death pos
 	Pkt.WriteVarInt32(0);
+}
+
+
+
+
+
+void cProtocol_1_20::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
+{
+	auto type = a_BlockEntity.GetBlockType();
+	if (BlockTags::Signs(type))
+	{
+		const auto & sign = dynamic_cast<const cSignEntity &>(a_BlockEntity);
+		a_Writer.BeginCompound("front_text");
+			a_Writer.AddString("color", "black");
+			a_Writer.AddByte("has_glowing_text", false);
+			a_Writer.BeginList("messages", eTagType::TAG_String);
+				a_Writer.AddString("", JsonUtils::SerializeSingleValueJsonObject("text", sign.GetLine(0)));
+				a_Writer.AddString("", JsonUtils::SerializeSingleValueJsonObject("text", sign.GetLine(1)));
+				a_Writer.AddString("", JsonUtils::SerializeSingleValueJsonObject("text", sign.GetLine(2)));
+				a_Writer.AddString("", JsonUtils::SerializeSingleValueJsonObject("text", sign.GetLine(3)));
+			a_Writer.EndList();
+		a_Writer.EndCompound();
+		a_Writer.AddByte("is_waxed", false);
+	}
+	else
+	{
+		return Super::WriteBlockEntity(a_Writer, a_BlockEntity);
+	}
+	/*
+	switch (type)
+	{
+		default: return Super::WriteBlockEntity(a_Writer, a_BlockEntity);
+	}
+	*/
+	a_Writer.AddInt("x", a_BlockEntity.GetPosX());
+	a_Writer.AddInt("y", a_BlockEntity.GetPosY());
+	a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
 }
 
 
