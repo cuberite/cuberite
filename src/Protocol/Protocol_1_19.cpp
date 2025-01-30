@@ -943,13 +943,13 @@ void cProtocol_1_19::HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer)
 	if (HasEffect1)
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, Effect1);
-		ToSetEff1 = Effect1;
+		ToSetEff1 = Effect1 + 1;
 	}
 	HANDLE_READ(a_ByteBuffer, ReadBool, bool, HasEffect2);
 	if (HasEffect2)
 	{
 		HANDLE_READ(a_ByteBuffer, ReadVarInt32, UInt32, Effect2);
-		ToSetEff2 = Effect2;
+		ToSetEff2 = Effect2 + 1;
 	}
 	m_Client->HandleBeaconSelection(ToSetEff1, ToSetEff2);
 }
