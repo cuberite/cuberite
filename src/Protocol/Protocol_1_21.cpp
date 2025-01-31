@@ -1573,7 +1573,8 @@ UInt32 cProtocol_1_21_2::GetBlockEntityID(const cBlockEntity & a_BlockEntity) co
 			case BlockType::Bell:                  Action = 31; break;  // not impl
 			case BlockType::BlastFurnace:          Action = 29; break;  // not impl
 			case BlockType::BrewingStand:          Action = 12; break;
-			// case BlockType::BrushableBlock:        Action = 40; break;
+			case BlockType::SuspiciousGravel:
+			case BlockType::SuspiciousSand:        Action = 40; break;
 			case BlockType::CalibratedSculkSensor: Action = 36; break;  // not impl
 			case BlockType::Campfire:              Action = 33; break;  // not impl
 			case BlockType::Chest:                 Action = 1; break;
@@ -1597,13 +1598,15 @@ UInt32 cProtocol_1_21_2::GetBlockEntityID(const cBlockEntity & a_BlockEntity) co
 			case BlockType::Jigsaw:                Action = 32; break;  // not impl
 			case BlockType::Jukebox:               Action = 4; break;
 			case BlockType::Lectern:               Action = 30; break;  // not impl
-			// case BlockType::MobSpawner:            Action = 9; break;
+			case BlockType::Spawner:               Action = 9; break;
 			case BlockType::Piston:                Action = 11; break;
 			case BlockType::SculkCatalyst:         Action = 37; break;  // not impl
 			case BlockType::SculkSensor:           Action = 35; break;  // not impl
 			case BlockType::SculkShrieker:         Action = 38; break;  // not impl
 			case BlockType::ShulkerBox:            Action = 24; break;  // not impl
 			// case BlockType::Sign:                  Action = 7; break;
+			case BlockType::PlayerWallHead:
+			case BlockType::PlayerHead:             Action = 16; break;
 			// case BlockType::Skull:                 Action = 16; break;
 			case BlockType::Smoker:                Action = 28; break;  // not impl
 			case BlockType::StructureBlock:        Action = 21; break;  // not impl

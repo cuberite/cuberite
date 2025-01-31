@@ -3509,6 +3509,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 		}
 		default:
 		{
+			LOGWARN(fmt::format(FMT_STRING("Unhandled block entity {}"), NamespaceSerializer::From(a_BlockEntity.GetBlockType())));
 			return;
 		}
 	}

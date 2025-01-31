@@ -71,6 +71,7 @@ protected:
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const override;
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const override;
+	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const override;
 };
 
 
