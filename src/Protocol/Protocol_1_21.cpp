@@ -1556,7 +1556,7 @@ UInt32 cProtocol_1_21_2::GetBlockEntityID(const cBlockEntity & a_BlockEntity) co
 	{
 		Action = 7;
 	}
-	else if (BlockTags::FlowerPots(type))
+	else if (BlockTags::FlowerPots(type) || (type == BlockType::NoteBlock))
 	{
 		return static_cast<UInt32>(-1);  // temp fix
 	}
