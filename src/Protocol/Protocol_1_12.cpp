@@ -404,7 +404,7 @@ void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 				{
 					a_Pkt.WriteBEUInt8(MINECART_BLOCK_ID_META);
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-					int Content = MinecartContent.m_ItemType;
+					int Content = PaletteUpgrade::ToItem(MinecartContent.m_ItemType).first;
 					Content |= MinecartContent.m_ItemDamage << 8;
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
 
@@ -452,6 +452,7 @@ void cProtocol_1_12::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 					a_Pkt.WriteBEUInt8(POTION_THROWN);  // Potion item which was thrown
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
 					WriteItem(a_Pkt, static_cast<const cSplashPotionEntity &>(Projectile).GetItem());
+					break;
 				}
 				default:
 				{
@@ -611,9 +612,10 @@ void cProtocol_1_12::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
 			a_Pkt.WriteBEUInt8(ENDERMAN_CARRIED_BLOCK);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BLOCKID);
+			auto NumericBlock = PaletteUpgrade::ToBlock(Enderman.GetCarriedBlock());
 			UInt32 Carried = 0;
-			Carried |= static_cast<UInt32>(Enderman.GetCarriedBlock() << 4);
-			Carried |= Enderman.GetCarriedMeta();
+			Carried |= static_cast<UInt32>(NumericBlock.first << 4);
+			Carried |= static_cast<UInt32>(NumericBlock.second);
 			a_Pkt.WriteVarInt32(Carried);
 
 			a_Pkt.WriteBEUInt8(ENDERMAN_SCREAMING);

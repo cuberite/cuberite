@@ -9,9 +9,9 @@
 
 
 class cItemPumpkinHandler final:
-	public cItemHandler
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 
@@ -30,7 +30,7 @@ private:
 		}
 
 		// No golem at these coords, place the block normally:
-		return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_PUMPKIN, cBlockPumpkinHandler::YawToMetaData(a_Player.GetYaw()));
+		return a_Player.PlaceBlock(a_PlacePosition, Block::CarvedPumpkin::CarvedPumpkin(RotationToBlockFace(a_Player.GetYaw())));
 	}
 
 
@@ -50,10 +50,10 @@ private:
 		auto & World = *a_Player.GetWorld();
 
 		// Decide which golem to try spawning based on the block below the placed pumpkin:
-		switch (World.GetBlock(a_PumpkinPos.addedY(-1)))
+		switch (World.GetBlock(a_PumpkinPos.addedY(-1)).Type())
 		{
-			case E_BLOCK_SNOW_BLOCK: return TrySpawnSnowGolem(World, a_Player, a_PumpkinPos);
-			case E_BLOCK_IRON_BLOCK: return TrySpawnIronGolem(World, a_Player, a_PumpkinPos);
+			case BlockType::SnowBlock: return TrySpawnSnowGolem(World, a_Player, a_PumpkinPos);
+			case BlockType::IronBlock: return TrySpawnIronGolem(World, a_Player, a_PumpkinPos);
 			default:
 			{
 				// No golem here:
@@ -72,10 +72,10 @@ private:
 	bool TrySpawnSnowGolem(cWorld & a_World, cPlayer & a_Player, const Vector3i a_PumpkinPos) const
 	{
 		ASSERT(a_PumpkinPos.y > 1);
-		ASSERT(a_World.GetBlock(a_PumpkinPos.addedY(-1)) == E_BLOCK_SNOW_BLOCK);
+		ASSERT(a_World.GetBlock(a_PumpkinPos.addedY(-1)).Type() == BlockType::SnowBlock);
 
 		// Need one more snow block 2 blocks below the pumpkin:
-		if (a_World.GetBlock(a_PumpkinPos.addedY(-2)) != E_BLOCK_SNOW_BLOCK)
+		if (a_World.GetBlock(a_PumpkinPos.addedY(-2)).Type() != BlockType::SnowBlock)
 		{
 			return false;
 		}
@@ -84,9 +84,9 @@ private:
 		if (
 			!a_Player.PlaceBlocks(
 			{
-				{ a_PumpkinPos,            E_BLOCK_AIR, 0 },  // Head
-				{ a_PumpkinPos.addedY(-1), E_BLOCK_AIR, 0 },  // Torso
-				{ a_PumpkinPos.addedY(-2), E_BLOCK_AIR, 0 }	  // Legs
+				{ a_PumpkinPos,            Block::Air::Air() },  // Head
+				{ a_PumpkinPos.addedY(-1), Block::Air::Air() },  // Torso
+				{ a_PumpkinPos.addedY(-2), Block::Air::Air() }	  // Legs
 			})
 		)
 		{
@@ -109,27 +109,27 @@ private:
 	bool TrySpawnIronGolem(cWorld & a_World, cPlayer & a_Player, const Vector3i a_PumpkinPos) const
 	{
 		ASSERT(a_PumpkinPos.y > 1);
-		ASSERT(a_World.GetBlock(a_PumpkinPos.addedY(-1)) == E_BLOCK_IRON_BLOCK);
+		ASSERT(a_World.GetBlock(a_PumpkinPos.addedY(-1)).Type() == BlockType::IronBlock);
 
 		// Need one more iron block 2 blocks below the pumpkin:
-		if (a_World.GetBlock(a_PumpkinPos.addedY(-2)) != E_BLOCK_IRON_BLOCK)
+		if (a_World.GetBlock(a_PumpkinPos.addedY(-2)).Type() != BlockType::IronBlock)
 		{
 			return false;
 		}
 
 		// Check the two arm directions (X, Z) using a loop over two sets of offset vectors:
 		auto BodyPos = a_PumpkinPos.addedY(-1);
-		static const Vector3i ArmOffsets[] =
+		static const std::array<Vector3i, 2> ArmOffsets =
 		{
-			{1, 0, 0},
-			{0, 0, 1},
+			Vector3i(1, 0, 0),
+			Vector3i(0, 0, 1)
 		};
-		for (size_t i = 0; i < ARRAYCOUNT(ArmOffsets); i++)
+		for (const auto & Offset : ArmOffsets)
 		{
 			// If the arm blocks don't match, bail out of this loop repetition:
 			if (
-				(a_World.GetBlock(BodyPos + ArmOffsets[i]) != E_BLOCK_IRON_BLOCK) ||
-				(a_World.GetBlock(BodyPos - ArmOffsets[i]) != E_BLOCK_IRON_BLOCK)
+				(a_World.GetBlock(BodyPos + Offset).Type() != BlockType::IronBlock) ||
+				(a_World.GetBlock(BodyPos - Offset).Type() != BlockType::IronBlock)
 			)
 			{
 				continue;
@@ -139,11 +139,11 @@ private:
 			if (
 				!a_Player.PlaceBlocks(
 				{
-					{ a_PumpkinPos,            E_BLOCK_AIR, 0 },  // Head
-					{ BodyPos,                 E_BLOCK_AIR, 0 },  // Torso
-					{ BodyPos.addedY(-1),      E_BLOCK_AIR, 0 },  // Legs
-					{ BodyPos + ArmOffsets[i], E_BLOCK_AIR, 0 },  // Arm
-					{ BodyPos - ArmOffsets[i], E_BLOCK_AIR, 0 }   // Arm
+					{ a_PumpkinPos,       Block::Air::Air() },  // Head
+					{ BodyPos,            Block::Air::Air() },  // Torso
+					{ BodyPos.addedY(-1), Block::Air::Air() },  // Legs
+					{ BodyPos + Offset,   Block::Air::Air() },  // Arm
+					{ BodyPos - Offset,   Block::Air::Air() }   // Arm
 				})
 			)
 			{

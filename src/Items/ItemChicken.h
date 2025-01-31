@@ -7,14 +7,14 @@
 
 
 
-class cItemRawChickenHandler final:
+class cItemChickenHandler final:
 	public cItemFoodHandler
 {
 	using Super = cItemFoodHandler;
 
 public:
 
-	constexpr cItemRawChickenHandler(int a_ItemType):
+	constexpr cItemChickenHandler(Item a_ItemType):
 		Super(a_ItemType, FoodInfo(2, 1.2))
 	{
 	}

@@ -22,6 +22,8 @@
 #include "../EffectID.h"
 #include "../ClientHandle.h"
 #include "../Mobs/Horse.h"
+#include "../Blocks/BlockAnvil.h"
+#include "BlockInfo.h"
 
 
 
@@ -123,7 +125,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 	{
 		case caRightClick:
 		{
-			if (DraggingItem.m_ItemType <= 0)  // Empty-handed?
+			if (DraggingItem.m_ItemType == Item::Air)  // Empty-handed?
 			{
 				DraggingItem = Slot.CopyOne();  // Obtain copy of slot to preserve lore, enchantments, etc.
 
@@ -135,7 +137,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 					Slot.Empty();
 				}
 			}
-			else if ((Slot.m_ItemType <= 0) || DraggingItem.IsEqual(Slot))
+			else if ((Slot.m_ItemType == Item::Air) || DraggingItem.IsEqual(Slot))
 			{
 				// Drop one item in slot
 				if ((DraggingItem.m_ItemCount > 0) && (Slot.m_ItemCount < Slot.GetMaxStackSize()))
@@ -761,6 +763,8 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 
 void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Player)
 {
+	ASSERT("UNCOMMENT THIS");
+	/*
 	switch (a_Result.m_ItemType)
 	{
 		case E_BLOCK_WORKBENCH:         a_Player.AwardAchievement(CustomStatistic::AchBuildWorkBench);      break;
@@ -768,13 +772,14 @@ void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Play
 		case E_BLOCK_CAKE:              a_Player.AwardAchievement(CustomStatistic::AchBakeCake);            break;
 		case E_BLOCK_ENCHANTMENT_TABLE: a_Player.AwardAchievement(CustomStatistic::AchEnchantments);        break;
 		case E_BLOCK_BOOKCASE:          a_Player.AwardAchievement(CustomStatistic::AchBookcase);            break;
-		case E_ITEM_WOODEN_PICKAXE:     a_Player.AwardAchievement(CustomStatistic::AchBuildPickaxe);        break;
-		case E_ITEM_WOODEN_SWORD:       a_Player.AwardAchievement(CustomStatistic::AchBuildSword);          break;
-		case E_ITEM_STONE_PICKAXE:      a_Player.AwardAchievement(CustomStatistic::AchBuildBetterPickaxe);  break;
-		case E_ITEM_WOODEN_HOE:         a_Player.AwardAchievement(CustomStatistic::AchBuildHoe);            break;
-		case E_ITEM_BREAD:              a_Player.AwardAchievement(CustomStatistic::AchMakeBread);           break;
+		case Item::WOODEN_PICKAXE:     a_Player.AwardAchievement(CustomStatistic::AchBuildPickaxe);        break;
+		case Item::WOODEN_SWORD:       a_Player.AwardAchievement(CustomStatistic::AchBuildSword);          break;
+		case Item::STONE_PICKAXE:      a_Player.AwardAchievement(CustomStatistic::AchBuildBetterPickaxe);  break;
+		case Item::WOODEN_HOE:         a_Player.AwardAchievement(CustomStatistic::AchBuildHoe);            break;
+		case Item::BREAD:              a_Player.AwardAchievement(CustomStatistic::AchMakeBread);           break;
 		default: break;
 	}
+	*/
 }
 
 
@@ -1063,30 +1068,36 @@ void cSlotAreaAnvil::OnTakeResult(cPlayer & a_Player)
 
 	const Vector3i BlockPos = static_cast<cAnvilWindow &>(m_ParentWindow).GetBlockPos();
 
-	BLOCKTYPE Block;
-	NIBBLETYPE BlockMeta;
+	BlockState Self;
 
-	if (
-		a_Player.GetWorld()->GetBlockTypeMeta(BlockPos, Block, BlockMeta) &&
-		!a_Player.IsGameModeCreative() && (Block == E_BLOCK_ANVIL) &&
-		GetRandomProvider().RandBool(0.12)
-	)
+	if (a_Player.GetWorld()->GetBlock(BlockPos, Self) && !a_Player.IsGameModeCreative() && IsBlockAnvil(Self) && GetRandomProvider().RandBool(0.12))
 	{
-		NIBBLETYPE Orientation = BlockMeta & 0x3;
-		NIBBLETYPE AnvilDamage = BlockMeta >> 2;
-		++AnvilDamage;
+		using namespace Block;
 
-		if (AnvilDamage > 2)
+		auto Orientation = cBlockAnvilHandler::GetFacing(Self);
+
+		switch (Self.Type())
 		{
-			// Anvil will break
-			a_Player.GetWorld()->SetBlock(BlockPos, E_BLOCK_AIR, 0);
-			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_BREAK, BlockPos, 0);
-			a_Player.CloseWindow(false);
-		}
-		else
-		{
-			a_Player.GetWorld()->SetBlockMeta(BlockPos, static_cast<NIBBLETYPE>(Orientation | (AnvilDamage << 2)));
-			a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, BlockPos, 0);
+			case BlockType::Anvil:
+			{
+				a_Player.GetWorld()->SetBlock(BlockPos, ChippedAnvil::ChippedAnvil(Orientation));
+				a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_USE, BlockPos, 0);
+				break;
+			}
+			case BlockType::ChippedAnvil:
+			{
+				a_Player.GetWorld()->SetBlock(BlockPos, DamagedAnvil::DamagedAnvil(Orientation));
+				break;
+			}
+			case BlockType::DamagedAnvil:
+			{
+				// Anvil will break
+				a_Player.GetWorld()->SetBlock(BlockPos, Air::Air());
+				a_Player.GetWorld()->BroadcastSoundParticleEffect(EffectID::SFX_RANDOM_ANVIL_BREAK, BlockPos, 0);
+				a_Player.CloseWindow(false);
+				break;
+			}
+			default: break;
 		}
 	}
 	else
@@ -1154,7 +1165,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		if (Target.IsDamageable() && Target.GetHandler().CanRepairWithRawMaterial(Sacrifice.m_ItemType))
 		{
 			// Tool and armor repair with special item (iron / gold / diamond / ...)
-			int DamageDiff = std::min(static_cast<int>(Target.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
+			char DamageDiff = static_cast<char>(std::min(static_cast<int>(Target.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4));
 			if (DamageDiff <= 0)
 			{
 				// No enchantment
@@ -1172,7 +1183,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			{
 				Output.m_ItemDamage -= static_cast<char>(DamageDiff);
 				NeedExp += std::max(1, DamageDiff / 100) + static_cast<int>(Target.m_Enchantments.Count());
-				DamageDiff = std::min(static_cast<int>(Output.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4);
+				DamageDiff = static_cast<char>(std::min(static_cast<int>(Output.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4));
 
 				++NumItemsConsumed;
 			}
@@ -1180,7 +1191,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		}
 		else  // Combining tools / armour
 		{
-			const bool IsEnchantBook = (Sacrifice.m_ItemType == E_ITEM_ENCHANTED_BOOK);
+			const bool IsEnchantBook = (Sacrifice.m_ItemType == Item::EnchantedBook);
 
 			// No result if we can't combine the items
 			if (!IsEnchantBook && (!Target.IsSameType(Sacrifice) || !Target.IsDamageable()))
@@ -1194,7 +1205,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			}
 
 			// Can we repair with sacrifice tool / armour?
-			if (Target.IsDamageable() && !IsEnchantBook && (Target.m_ItemDamage!=0))
+			if (Target.IsDamageable() && !IsEnchantBook && (Target.m_ItemDamage != 0))
 			{
 				// Durability = MaxDamage - m_ItemDamage = how far from broken
 				const short TargetDurability = Target.GetMaxDamage() - Target.m_ItemDamage;
@@ -1311,21 +1322,16 @@ cSlotAreaBeacon::~cSlotAreaBeacon()
 
 
 
-bool cSlotAreaBeacon::IsPlaceableItem(short a_ItemType)
+bool cSlotAreaBeacon::IsPlaceableItem(Item a_ItemType)
 {
 	switch (a_ItemType)
 	{
-		case E_ITEM_EMERALD:
-		case E_ITEM_DIAMOND:
-		case E_ITEM_GOLD:
-		case E_ITEM_IRON:
-		{
+		case Item::Emerald:
+		case Item::Diamond:
+		case Item::GoldIngot:
+		case Item::IronIngot:
 			return true;
-		}
-		default:
-		{
-			return false;
-		}
+		default: return false;
 	}
 }
 
@@ -1413,7 +1419,7 @@ void cSlotAreaBeacon::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_
 	}
 	else if (DraggingItem.m_ItemCount == 1)
 	{
-		if (!IsPlaceableItem(DraggingItem.m_ItemCount))
+		if (!IsPlaceableItem(DraggingItem.m_ItemType))
 		{
 			return;
 		}
@@ -1566,7 +1572,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 	if (a_SlotNum == 1)
 	{
 		// Lapis slot can have a full stack handle it normally, also check for empty hand
-		if ((DraggingItem.IsEmpty()) || ((DraggingItem.m_ItemType == E_ITEM_DYE) && (DraggingItem.m_ItemDamage == E_META_DYE_BLUE)))
+		if ((DraggingItem.IsEmpty()) || (DraggingItem.m_ItemType == Item::LapisLazuli))
 		{
 			return cSlotArea::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
 		}
@@ -1616,7 +1622,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 
 void cSlotAreaEnchanting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_Apply, bool a_KeepEmptySlots, bool a_BackFill)
 {
-	if ((a_ItemStack.m_ItemType == E_ITEM_DYE) && (a_ItemStack.m_ItemDamage == E_META_DYE_BLUE))
+	if (a_ItemStack.m_ItemType == Item::LapisLazuli)
 	{
 		// It's lapis, put it in the lapis spot.
 		const cItem * Slot = GetSlot(1, a_Player);
@@ -1806,8 +1812,8 @@ unsigned cSlotAreaEnchanting::GetBookshelvesCount(cWorld & a_World)
 	for (size_t i = 0; i < ARRAYCOUNT(CheckCoords); i++)
 	{
 		if (
-			(Area.GetRelBlockType(CheckCoords[i].m_AirX, CheckCoords[i].m_AirY, CheckCoords[i].m_AirZ) == E_BLOCK_AIR) &&  // There's air in the checkspot
-			(Area.GetRelBlockType(CheckCoords[i].m_BookX, CheckCoords[i].m_BookY, CheckCoords[i].m_BookZ) == E_BLOCK_BOOKCASE)  // There's bookcase in the wanted place
+			IsBlockAir(Area.GetRelBlock({CheckCoords[i].m_AirX, CheckCoords[i].m_AirY, CheckCoords[i].m_AirZ}).Type()) &&  // There's air in the checkspot
+			(Area.GetRelBlock({CheckCoords[i].m_BookX, CheckCoords[i].m_BookY, CheckCoords[i].m_BookZ}).Type() == BlockType::Bookshelf)  // There's Bookshelf in the wanted place
 		)
 		{
 			Bookshelves++;
@@ -2116,8 +2122,8 @@ void cSlotAreaFurnace::HandleSmeltItem(const cItem & a_Result, cPlayer & a_Playe
 	/** TODO 2014-05-12 xdot: Figure out when to call this method. */
 	switch (a_Result.m_ItemType)
 	{
-		case E_ITEM_IRON:        a_Player.AwardAchievement(CustomStatistic::AchAcquireIron); break;
-		case E_ITEM_COOKED_FISH: a_Player.AwardAchievement(CustomStatistic::AchCookFish);    break;
+		case Item::IronIngot:    a_Player.AwardAchievement(CustomStatistic::AchAcquireIron); break;
+		case Item::CookedSalmon: a_Player.AwardAchievement(CustomStatistic::AchCookFish);    break;
 		default: break;
 	}
 }
@@ -2589,7 +2595,7 @@ bool cSlotAreaArmor::CanPlaceArmorInSlot(int a_SlotNum, const cItem & a_Item)
 {
 	switch (a_SlotNum)
 	{
-		case 0:  return (ItemCategory::IsHelmet(a_Item.m_ItemType) || (a_Item.m_ItemType == E_BLOCK_PUMPKIN));
+		case 0:  return (ItemCategory::IsHelmet(a_Item.m_ItemType) || (a_Item.m_ItemType == Item::CarvedPumpkin));
 		case 1:  return ItemCategory::IsChestPlate(a_Item.m_ItemType);
 		case 2:  return ItemCategory::IsLeggings(a_Item.m_ItemType);
 		case 3:  return ItemCategory::IsBoots(a_Item.m_ItemType);
@@ -2810,7 +2816,7 @@ void cSlotAreaHorse::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 			{
 				case SaddleSlot:
 				{
-					if (DraggingItem.m_ItemType != E_ITEM_SADDLE)
+					if (DraggingItem.m_ItemType != Item::Saddle)
 					{
 						return;
 					}
@@ -2826,6 +2832,7 @@ void cSlotAreaHorse::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 				}
 				default: break;
 			}
+			break;
 		}
 		default: break;
 	}
@@ -2883,7 +2890,7 @@ void cSlotAreaHorse::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bo
 		}
 		--a_ItemStack.m_ItemCount;
 	}
-	else if ((a_ItemStack.m_ItemType == E_ITEM_SADDLE) && !m_Horse.IsSaddled())
+	else if ((a_ItemStack.m_ItemType == Item::Saddle) && !m_Horse.IsSaddled())
 	{
 		if (a_ShouldApply)
 		{

@@ -450,25 +450,104 @@ void cProtocol_1_11_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	Byte Action;
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case E_BLOCK_CHEST:
-		case E_BLOCK_ENCHANTMENT_TABLE:
-		case E_BLOCK_END_PORTAL:
-		case E_BLOCK_TRAPPED_CHEST:
-		{
-			// The ones with a action of 0 is just a workaround to send the block entities to a client.
-			// Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
-			Action = 0;
-			break;
-		}
+		case BlockType::EnchantingTable:   Action = 0;  break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
+		case BlockType::EndPortal:         Action = 0;  break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
 
-		case E_BLOCK_MOB_SPAWNER:       Action = 1;  break;  // Update mob spawner spinny mob thing
-		case E_BLOCK_COMMAND_BLOCK:     Action = 2;  break;  // Update command block text
-		case E_BLOCK_BEACON:            Action = 3;  break;  // Update beacon entity
-		case E_BLOCK_HEAD:              Action = 4;  break;  // Update mobhead entity
-		case E_BLOCK_FLOWER_POT:        Action = 5;  break;  // Update flower pot
-		case E_BLOCK_WALL_BANNER:
-		case E_BLOCK_STANDING_BANNER:   Action = 6;  break;  // Update banner
-		case E_BLOCK_BED:               Action = 11; break;  // Update bed color (new!)
+		case BlockType::Spawner:           Action = 1;  break;  // Update mob spawner spinny mob thing
+		case BlockType::CommandBlock:
+		case BlockType::ChainCommandBlock:
+		case BlockType::RepeatingCommandBlock: Action = 2;  break;  // Update command block text
+		case BlockType::Beacon:            Action = 3;  break;  // Update beacon entity
+		case BlockType::CreeperHead:
+		case BlockType::CreeperWallHead:
+		case BlockType::DragonHead:
+		case BlockType::DragonWallHead:
+		case BlockType::PlayerHead:
+		case BlockType::PlayerWallHead:
+		case BlockType::SkeletonSkull:
+		case BlockType::SkeletonWallSkull:
+		case BlockType::WitherSkeletonSkull:
+		case BlockType::WitherSkeletonWallSkull:
+		case BlockType::ZombieHead:
+		case BlockType::ZombieWallHead:    Action = 4;  break;  // Update mobhead entity
+		case BlockType::PottedAcaciaSapling:
+		case BlockType::PottedAzureBluet:
+		case BlockType::PottedBamboo:
+		case BlockType::PottedBirchSapling:
+		case BlockType::PottedBlueOrchid:
+		case BlockType::PottedBrownMushroom:
+		case BlockType::PottedCactus:
+		case BlockType::PottedCornflower:
+		case BlockType::PottedCrimsonRoots:
+		case BlockType::PottedCrimsonFungus:
+		case BlockType::PottedDandelion:
+		case BlockType::PottedDarkOakSapling:
+		case BlockType::PottedDeadBush:
+		case BlockType::PottedFern:
+		case BlockType::PottedJungleSapling:
+		case BlockType::PottedLilyOfTheValley:
+		case BlockType::PottedOakSapling:
+		case BlockType::PottedOrangeTulip:
+		case BlockType::PottedOxeyeDaisy:
+		case BlockType::PottedPinkTulip:
+		case BlockType::PottedPoppy:
+		case BlockType::PottedRedMushroom:
+		case BlockType::PottedRedTulip:
+		case BlockType::PottedSpruceSapling:
+		case BlockType::PottedWarpedFungus:
+		case BlockType::PottedWarpedRoots:
+		case BlockType::PottedWhiteTulip:
+		case BlockType::PottedWitherRose:
+		case BlockType::PottedAllium:      Action = 5;  break;  // Update flower pot
+		case BlockType::BlackBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BrownBanner:
+		case BlockType::CyanBanner:
+		case BlockType::GrayBanner:
+		case BlockType::GreenBanner:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LimeBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::OrangeBanner:
+		case BlockType::PinkBanner:
+		case BlockType::PurpleBanner:
+		case BlockType::RedBanner:
+		case BlockType::WhiteBanner:
+		case BlockType::YellowBanner:
+
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueWallBanner:
+		case BlockType::BrownWallBanner:
+		case BlockType::CyanWallBanner:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenWallBanner:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaWallBanner:
+		case BlockType::OrangeWallBanner:
+		case BlockType::PinkWallBanner:
+		case BlockType::PurpleWallBanner:
+		case BlockType::RedWallBanner:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowWallBanner:  Action = 6;  break;  // Update banner
+		case BlockType::BlackBed:
+		case BlockType::BlueBed:
+		case BlockType::BrownBed:
+		case BlockType::CyanBed:
+		case BlockType::GrayBed:
+		case BlockType::GreenBed:
+		case BlockType::LightBlueBed:
+		case BlockType::LightGrayBed:
+		case BlockType::LimeBed:
+		case BlockType::MagentaBed:
+		case BlockType::OrangeBed:
+		case BlockType::PinkBed:
+		case BlockType::PurpleBed:
+		case BlockType::RedBed:
+		case BlockType::WhiteBed:
+		case BlockType::YellowBed:          Action = 11; break;  // Update bed color (new!)
 
 		default: return;  // Block entities change between versions
 	}
@@ -598,13 +677,28 @@ void cProtocol_1_11_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockE
 {
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case E_BLOCK_BED:
+		case BlockType::BlackBed:
+		case BlockType::BlueBed:
+		case BlockType::BrownBed:
+		case BlockType::CyanBed:
+		case BlockType::GrayBed:
+		case BlockType::GreenBed:
+		case BlockType::LightBlueBed:
+		case BlockType::LightGrayBed:
+		case BlockType::LimeBed:
+		case BlockType::MagentaBed:
+		case BlockType::OrangeBed:
+		case BlockType::PinkBed:
+		case BlockType::PurpleBed:
+		case BlockType::RedBed:
+		case BlockType::WhiteBed:
+		case BlockType::YellowBed:
 		{
 			auto & BedEntity = static_cast<const cBedEntity &>(a_BlockEntity);
 			a_Writer.AddInt("color", BedEntity.GetColor());  // New: multicoloured beds
 			break;
 		}
-		case E_BLOCK_MOB_SPAWNER:
+		case BlockType::Spawner:
 		{
 			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
 			a_Writer.BeginCompound("SpawnData");
@@ -715,7 +809,7 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 				{
 					a_Pkt.WriteBEUInt8(MINECART_BLOCK_ID_META);
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-					int Content = MinecartContent.m_ItemType;
+					int Content = PaletteUpgrade::ToItem(MinecartContent.m_ItemType).first;
 					Content |= MinecartContent.m_ItemDamage << 8;
 					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
 
@@ -763,6 +857,7 @@ void cProtocol_1_11_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 					a_Pkt.WriteBEUInt8(POTION_THROWN);  // Potion item which was thrown
 					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
 					WriteItem(a_Pkt, static_cast<const cSplashPotionEntity &>(Projectile).GetItem());
+					break;
 				}
 				default:
 				{
@@ -922,9 +1017,10 @@ void cProtocol_1_11_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_
 			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
 			a_Pkt.WriteBEUInt8(ENDERMAN_CARRIED_BLOCK);
 			a_Pkt.WriteBEUInt8(METADATA_TYPE_BLOCKID);
+			auto NumericBlock = PaletteUpgrade::ToBlock(Enderman.GetCarriedBlock());
 			UInt32 Carried = 0;
-			Carried |= static_cast<UInt32>(Enderman.GetCarriedBlock() << 4);
-			Carried |= Enderman.GetCarriedMeta();
+			Carried |= static_cast<UInt32>(NumericBlock.first << 4);
+			Carried |= static_cast<UInt32>(NumericBlock.second);
 			a_Pkt.WriteVarInt32(Carried);
 
 			a_Pkt.WriteBEUInt8(ENDERMAN_SCREAMING);

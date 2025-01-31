@@ -14,7 +14,7 @@ class cEndPortalEntity :
 
 public:
 
-	cEndPortalEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cEndPortalEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World);
 
 private:
 

@@ -60,26 +60,26 @@ protected:
 
 	/** Handles physics on normal rails
 	For each tick, slow down on flat rails, speed up or slow down on ascending / descending rails (depending on direction), and turn on curved rails. */
-	void HandleRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt);
+	void HandleRailPhysics(BlockState a_Rail, std::chrono::milliseconds a_Dt);
 
 	/** Handles powered rail physics
 		Each tick, speed up or slow down cart, depending on metadata of rail (powered or not)
 	*/
-	void HandlePoweredRailPhysics(NIBBLETYPE a_RailMeta);
+	void HandlePoweredRailPhysics(BlockState a_Rail);
 
 	/** Handles detector rail activation
 		Activates detector rails when a minecart is on them. Calls HandleRailPhysics() for physics simulations
 	*/
-	void HandleDetectorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt);
+	void HandleDetectorRailPhysics(BlockState a_Rail, std::chrono::milliseconds a_Dt);
 
 	/** Handles activator rails */
-	virtual void HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt);
+	virtual void HandleActivatorRailPhysics(BlockState a_Rail, std::chrono::milliseconds a_Dt);
 
 	/** Snaps a mincecart to a rail's axis, resetting its speed
 		For curved rails, it changes the cart's direction as well as snapping it to axis */
-	void SnapToRail(NIBBLETYPE a_RailMeta);
+	void SnapToRail(BlockState a_Rail);
 	/** Tests if a solid block is in front of a cart, and stops the cart (and returns true) if so; returns false if no obstruction */
-	bool TestBlockCollision(NIBBLETYPE a_RailMeta);
+	bool TestBlockCollision(BlockState a_Block);
 	/** Tests if there is a block at the specified position which is impassable to minecarts */
 	bool IsSolidBlockAtPosition(Vector3i a_Offset);
 	/** Tests if a solid block is at a specific offset of the minecart position */
@@ -88,7 +88,7 @@ protected:
 	bool IsBlockCollisionAtOffset(Vector3i a_Offset);
 
 	/** Tests if this mincecart's bounding box is intersecting another entity's bounding box (collision) and pushes mincecart away if necessary */
-	bool TestEntityCollision(NIBBLETYPE a_RailMeta);
+	bool TestEntityCollision(BlockState a_Rail);
 } ;
 
 
@@ -228,7 +228,7 @@ private:
 	bool m_isTNTFused = false;
 
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
-	void HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::chrono::milliseconds a_Dt) override;
+	void HandleActivatorRailPhysics(BlockState a_Rail, std::chrono::milliseconds a_Dt) override;
 } ;
 
 

@@ -1,16 +1,18 @@
 #include "Globals.h"
 
 #include "FluidSimulator.h"
-#include "../World.h"
+#include "World.h"
+#include "Chunk.h"
+#include "Blocks/BlockFluid.h"
+#include "BlockInfo.h"
 
 
 
 
-
-cFluidSimulator::cFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid) :
+cFluidSimulator::cFluidSimulator(cWorld & a_World, BlockType a_Fluid, unsigned char a_StationaryFlowValue) :
 	Super(a_World),
 	m_FluidBlock(a_Fluid),
-	m_StationaryFluidBlock(a_StationaryFluid)
+	m_StationaryFalloffValue(a_StationaryFlowValue)
 {
 }
 
@@ -18,49 +20,73 @@ cFluidSimulator::cFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE 
 
 
 
-bool cFluidSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
+bool cFluidSimulator::IsAllowedBlock(BlockState a_Block)
 {
-	return ((a_BlockType == m_FluidBlock) || (a_BlockType == m_StationaryFluidBlock));
+	return (a_Block.Type() == m_FluidBlock);
 }
 
 
 
 
 
-bool cFluidSimulator::CanWashAway(BLOCKTYPE a_BlockType)
+bool cFluidSimulator::IsFluidStationary(BlockState a_Block) const
 {
-	switch (a_BlockType)
+	return cBlockFluidHandler::GetFalloff(a_Block) == m_StationaryFalloffValue;
+}
+
+
+
+
+
+bool cFluidSimulator::CanWashAway(BlockState a_Block)
+{
+	switch (a_Block.Type())
 	{
-		case E_BLOCK_ACTIVATOR_RAIL:
-		case E_BLOCK_ACTIVE_COMPARATOR:
-		case E_BLOCK_BEETROOTS:
-		case E_BLOCK_BIG_FLOWER:
-		case E_BLOCK_BROWN_MUSHROOM:
-		case E_BLOCK_CACTUS:
-		case E_BLOCK_CARROTS:
-		case E_BLOCK_COBWEB:
-		case E_BLOCK_CROPS:
-		case E_BLOCK_DEAD_BUSH:
-		case E_BLOCK_DETECTOR_RAIL:
-		case E_BLOCK_INACTIVE_COMPARATOR:
-		case E_BLOCK_LILY_PAD:
-		case E_BLOCK_POTATOES:
-		case E_BLOCK_POWERED_RAIL:
-		case E_BLOCK_RAIL:
-		case E_BLOCK_REDSTONE_REPEATER_OFF:
-		case E_BLOCK_REDSTONE_REPEATER_ON:
-		case E_BLOCK_REDSTONE_TORCH_OFF:
-		case E_BLOCK_REDSTONE_TORCH_ON:
-		case E_BLOCK_REDSTONE_WIRE:
-		case E_BLOCK_RED_MUSHROOM:
-		case E_BLOCK_RED_ROSE:
-		case E_BLOCK_SNOW:
-		case E_BLOCK_SUGARCANE:
-		case E_BLOCK_TALL_GRASS:
-		case E_BLOCK_TORCH:
-		case E_BLOCK_TRIPWIRE:
-		case E_BLOCK_TRIPWIRE_HOOK:
-		case E_BLOCK_YELLOW_FLOWER:
+		case BlockType::ActivatorRail:
+		case BlockType::AzureBluet:
+		case BlockType::Allium:
+		case BlockType::Beetroots:
+		case BlockType::BlueOrchid:
+		case BlockType::BrownMushroom:
+		case BlockType::Cactus:
+		case BlockType::Carrots:
+		case BlockType::Cobweb:
+		case BlockType::Comparator:
+		case BlockType::Cornflower:
+		case BlockType::DeadBush:
+		case BlockType::DetectorRail:
+		case BlockType::ShortGrass:
+		case BlockType::LargeFern:
+		case BlockType::Lilac:
+		case BlockType::LilyOfTheValley:
+		case BlockType::LilyPad:
+		case BlockType::OrangeTulip:
+		case BlockType::OxeyeDaisy:
+		case BlockType::Peony:
+		case BlockType::PinkTulip:
+		case BlockType::Potatoes:
+		case BlockType::Poppy:
+		case BlockType::PoweredRail:
+		case BlockType::Rail:
+		case BlockType::RedTulip:
+		case BlockType::Repeater:
+		case BlockType::RedstoneWire:
+		case BlockType::RedstoneTorch:
+		case BlockType::RedstoneWallTorch:
+		case BlockType::RedMushroom:
+		case BlockType::RoseBush:
+		case BlockType::Snow:
+		case BlockType::SoulTorch:
+		case BlockType::SoulWallTorch:
+		case BlockType::SugarCane:
+		case BlockType::Sunflower:
+		case BlockType::TallGrass:
+		case BlockType::Tripwire:
+		case BlockType::TripwireHook:
+		case BlockType::Torch:
+		case BlockType::WallTorch:
+		case BlockType::Wheat:
+		case BlockType::WhiteTulip:
 		{
 			return true;
 		}
@@ -75,22 +101,22 @@ bool cFluidSimulator::CanWashAway(BLOCKTYPE a_BlockType)
 
 
 
-bool cFluidSimulator::IsSolidBlock(BLOCKTYPE a_BlockType)
+bool cFluidSimulator::IsSolidBlock(BlockState a_Block)
 {
-	return !IsPassableForFluid(a_BlockType);
+	return !IsPassableForFluid(a_Block);
 }
 
 
 
 
 
-bool cFluidSimulator::IsPassableForFluid(BLOCKTYPE a_BlockType)
+bool cFluidSimulator::IsPassableForFluid(BlockState a_Block)
 {
 	return (
-		(a_BlockType == E_BLOCK_AIR) ||
-		(a_BlockType == E_BLOCK_FIRE) ||
-		IsAllowedBlock(a_BlockType) ||
-		CanWashAway(a_BlockType)
+		IsBlockAir(a_Block) ||
+		(a_Block.Type() == BlockType::Fire) ||
+		IsAllowedBlock(a_Block) ||
+		CanWashAway(a_Block)
 	);
 }
 
@@ -98,32 +124,32 @@ bool cFluidSimulator::IsPassableForFluid(BLOCKTYPE a_BlockType)
 
 
 
-bool cFluidSimulator::IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2)
+bool cFluidSimulator::IsHigherMeta(unsigned char a_Falloff1, unsigned char a_Falloff2)
 {
-	if (a_Meta1 == 0)
+	if (a_Falloff1 == 0)
 	{
 		// Source block is higher than anything, even itself.
 		return true;
 	}
-	if ((a_Meta1 & 0x08) != 0)
+	if (a_Falloff1 >= 8)
 	{
 		// Falling fluid is higher than anything, including self
 		return true;
 	}
 
-	if (a_Meta2 == 0)
+	if (a_Falloff2 == 0)
 	{
 		// Second block is a source and first block isn't
 		return false;
 	}
-	if ((a_Meta2 & 0x08) != 0)
+	if (a_Falloff2 >= 8)
 	{
 		// Second block is falling and the first one is neither a source nor falling
 		return false;
 	}
 
 	// All special cases have been handled, now it's just a raw comparison:
-	return (a_Meta1 < a_Meta2);
+	return (a_Falloff1 < a_Falloff2);
 }
 
 
@@ -137,20 +163,22 @@ Vector3f cFluidSimulator::GetFlowingDirection(Vector3i a_Pos)
 		return {};
 	}
 
+	auto Self = m_World.GetBlock(a_Pos);
+
 	if (!IsAllowedBlock(m_World.GetBlock(a_Pos)))  // No Fluid -> No Flowing direction :D
 	{
 		return {};
 	}
 
-	const auto HeightFromMeta = [](NIBBLETYPE a_BlockMeta) -> NIBBLETYPE
-		{
-			// Falling water blocks are always full height (0)
-			return ((a_BlockMeta & 0x08) != 0) ? 0 : a_BlockMeta;
-		};
+	const auto HeightFromMeta = [](BlockState a_Block) -> unsigned char
+	{
+		// Falling water blocks are always full height (0)
+		auto Falloff = cBlockFluidHandler::GetFalloff(a_Block);
+		return (Falloff >= 8) ? 0 : Falloff;
+	};
 
-	auto BlockMeta = m_World.GetBlockMeta(a_Pos);
-	NIBBLETYPE CentralPoint = HeightFromMeta(BlockMeta);
-	NIBBLETYPE LevelPoint[4];
+	auto CentralPoint = HeightFromMeta(Self);
+	std::array<unsigned char, 4> LevelPoint;
 
 	// blocks around the checking pos
 	std::array<Vector3i, 4> Offsets
@@ -167,7 +195,7 @@ Vector3f cFluidSimulator::GetFlowingDirection(Vector3i a_Pos)
 	{
 		if (IsAllowedBlock(m_World.GetBlock(a_Pos + Offsets[i])))
 		{
-			LevelPoint[i] = HeightFromMeta(m_World.GetBlockMeta(Offsets[i]));
+			LevelPoint[i] = HeightFromMeta(m_World.GetBlock(Offsets[i]));
 		}
 		else
 		{
@@ -182,7 +210,7 @@ Vector3f cFluidSimulator::GetFlowingDirection(Vector3i a_Pos)
 	Direction.x = (LevelPoint[0] - LevelPoint[2]) / 2.0f;
 	Direction.z = (LevelPoint[1] - LevelPoint[3]) / 2.0f;
 
-	if ((BlockMeta & 0x08) != 0)  // Test falling bit
+	if (cBlockFluidHandler::GetFalloff(Self) >= 8)  // Test falling bit
 	{
 		Direction.y = -1.0f;
 	}

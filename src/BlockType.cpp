@@ -2,11 +2,11 @@
 
 // Implements the helper functions for converting Block Type string to int etc.
 
+
 #include "Globals.h"
 #include "IniFile.h"
 #include "Item.h"
 #include "Mobs/Monster.h"
-
 
 
 
@@ -22,7 +22,7 @@ class cBlockIDMap
 		}
 	} ;
 
-	typedef std::map<AString, std::pair<short, short>, Comparator> ItemMap;
+	using ItemMap = std::map<AString, std::pair<short, short>, Comparator>;
 
 public:
 
@@ -60,54 +60,6 @@ public:
 			return -1;
 		}
 		return itr->second.first;
-	}
-
-
-	bool ResolveItem(const AString & a_ItemName, cItem & a_Item)
-	{
-		// Split into parts divided by either ':' or '^'
-		AStringVector Split = StringSplitAndTrim(a_ItemName, ":^");
-		if (Split.empty())
-		{
-			return false;
-		}
-
-		ItemMap::iterator itr = m_Map.find(Split[0]);
-		if (itr != m_Map.end())
-		{
-			// Resolved as a string, assign the type and the default damage / count
-			a_Item.m_ItemType = itr->second.first;
-			a_Item.m_ItemDamage = itr->second.second;
-			if (a_Item.m_ItemDamage == -1)
-			{
-				a_Item.m_ItemDamage = 0;
-			}
-		}
-		else
-		{
-			// Not a resolvable string, try pure numbers: "45:6", "45^6" etc.
-			if (!StringToInteger(Split[0], a_Item.m_ItemType))
-			{
-				// Parsing the number failed
-				return false;
-			}
-		}
-
-		// Parse the damage, if present:
-		if (Split.size() < 2)
-		{
-			// Not present, set the item as valid and return success:
-			a_Item.m_ItemCount = 1;
-			return true;
-		}
-
-		if (!StringToInteger(Split[1], a_Item.m_ItemDamage))
-		{
-			// Parsing the number failed
-			return false;
-		}
-		a_Item.m_ItemCount = 1;
-		return true;
 	}
 
 
@@ -228,12 +180,8 @@ int BlockStringToType(const AString & a_BlockTypeString)
 bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item)
 {
 	AString ItemName = TrimString(a_ItemTypeString);
-	if (ItemName.substr(0, 10) == "minecraft:")
-	{
-		ItemName = ItemName.substr(10);
-	}
-
-	return GetBlockIDMap().ResolveItem(ItemName, a_Item);
+	a_Item = cItem(NamespaceSerializer::ToItem(NamespaceSerializer::SplitNamespacedID(ItemName).second));
+	return true;
 }
 
 
@@ -242,7 +190,7 @@ bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item)
 
 AString ItemToString(const cItem & a_Item)
 {
-	return GetBlockIDMap().Desolve(a_Item.m_ItemType, a_Item.m_ItemDamage);
+	return AString(NamespaceSerializer::From(a_Item.m_ItemType));
 }
 
 
@@ -251,7 +199,7 @@ AString ItemToString(const cItem & a_Item)
 
 AString ItemTypeToString(short a_ItemType)
 {
-	return GetBlockIDMap().Desolve(a_ItemType, -1);
+	return AString(NamespaceSerializer::From(PaletteUpgrade::FromItem(a_ItemType, 0)));
 }
 
 

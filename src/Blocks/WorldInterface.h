@@ -101,4 +101,6 @@ public:
 	/** Wakes up the simulators for the specified block */
 	virtual void WakeUpSimulators(Vector3i a_Block) = 0;
 
+	virtual void FlushPendingBlockChanges() = 0;
+
 };

@@ -56,7 +56,7 @@ AStringVector StringSplit(const AString & str, const AString & delim)
 	while ((cutAt = str.find_first_of(delim, Prev)) != str.npos)
 	{
 		results.push_back(str.substr(Prev, cutAt - Prev));
-		Prev = cutAt + 1;
+		Prev = cutAt + delim.length();
 	}
 	if (Prev < str.length())
 	{

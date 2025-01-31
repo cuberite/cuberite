@@ -65,7 +65,7 @@ bool cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cWither::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	AddRandomDropItem(a_Drops, 1, 1, E_ITEM_NETHER_STAR);
+	AddRandomDropItem(a_Drops, 1, 1, Item::NetherStar);
 }
 
 
