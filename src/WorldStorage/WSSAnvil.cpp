@@ -1340,7 +1340,7 @@ OwnedBlockEntity cWSSAnvil::LoadBrewingstandFromNBT(const cParsedNBT & a_NBT, in
 	int Fuel = a_NBT.FindChildByName(a_TagIdx, "Fuel");
 	if (Fuel >= 0)
 	{
-		Int16 tb = a_NBT.GetShort(Fuel);
+		Int16 tb = a_NBT.GetByte(Fuel);
 		Brewingstand->SetRemainingFuel(tb);
 	}
 

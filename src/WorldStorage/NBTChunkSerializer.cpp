@@ -492,12 +492,12 @@ public:
 	void AddBrewingstandEntity(cBrewingstandEntity * a_Brewingstand)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_Brewingstand, "minecraft:brewingstand");
+			AddBasicTileEntity(a_Brewingstand, "minecraft:brewing_stand");
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Brewingstand->GetContents());
 			mWriter.EndList();
 			mWriter.AddShort("BrewTime", a_Brewingstand->GetTimeBrewed());
-			mWriter.AddShort("Fuel", a_Brewingstand->GetRemainingFuel());
+			mWriter.AddByte("Fuel", static_cast<unsigned char>(a_Brewingstand->GetRemainingFuel()));
 		mWriter.EndCompound();
 	}
 

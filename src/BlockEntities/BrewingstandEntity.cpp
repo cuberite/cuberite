@@ -192,6 +192,11 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 	ASSERT(a_ItemGrid == &m_Contents);
 
+	if ((a_SlotNum == 0) || (a_SlotNum == 1) || (a_SlotNum == 2))
+	{
+		m_World->FastSetBlock(m_Pos, Block::BrewingStand::BrewingStand(!m_Contents.GetSlot(0).IsEmpty(), !m_Contents.GetSlot(1).IsEmpty(), !m_Contents.GetSlot(2).IsEmpty()));
+	}
+
 	// Check for fuel
 	if (m_RemainingFuel <= 0)
 	{
@@ -269,7 +274,6 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		}
 		return;
 	}
-
 	// Start brewing process, if not running
 	if (!m_IsBrewing)
 	{

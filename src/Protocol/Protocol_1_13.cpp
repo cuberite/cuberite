@@ -508,6 +508,7 @@ void cProtocol_1_13::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEnt
 		case BlockType::EnderChest:
 		case BlockType::Dropper:
 		case BlockType::Dispenser:
+		case BlockType::EndPortal:
 		{
 			break;
 		}
