@@ -2783,6 +2783,61 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 
 
 
+std::string_view NamespaceSerializer::From(cEntityEffect::eType a_ID)
+{
+	switch (a_ID)
+	{
+		case cEntityEffect::eType::effSpeed:            return "speed";
+		case cEntityEffect::eType::effSlowness:         return "slowness";
+		case cEntityEffect::eType::effHaste:            return "haste";
+		case cEntityEffect::eType::effMiningFatigue:    return "mining_fatigue";
+		case cEntityEffect::eType::effStrength:         return "strength";
+		case cEntityEffect::eType::effInstantHealth:    return "instant_health";
+		case cEntityEffect::eType::effInstantDamage:    return "instant_damage";
+		case cEntityEffect::eType::effJumpBoost:        return "jump_boost";
+		case cEntityEffect::eType::effNausea:           return "nausea";
+		case cEntityEffect::eType::effRegeneration:     return "regeneration";
+		case cEntityEffect::eType::effResistance:       return "resistance";
+		case cEntityEffect::eType::effFireResistance:   return "fire_resistance";
+		case cEntityEffect::eType::effWaterBreathing:   return "water_breathing";
+		case cEntityEffect::eType::effInvisibility:     return "invisibility";
+		case cEntityEffect::eType::effBlindness:        return "blindness";
+		case cEntityEffect::eType::effNightVision:      return "night_vision";
+		case cEntityEffect::eType::effHunger:           return "hunger";
+		case cEntityEffect::eType::effWeakness:         return "weakness";
+		case cEntityEffect::eType::effPoison:           return "poison";
+		case cEntityEffect::eType::effWither:           return "wither";
+		case cEntityEffect::eType::effHealthBoost:      return "health_boost";
+		case cEntityEffect::eType::effAbsorption:       return "absorption";
+		case cEntityEffect::eType::effSaturation:       return "saturation";
+		/*
+		case cEntityEffect::eType::effGlowing:          return "glowing";
+		case cEntityEffect::eType::effLevitation:       return "levitation";
+		case cEntityEffect::eType::effLuck:             return "luck";
+		case cEntityEffect::eType::effUnluck:           return "unluck";
+		*/
+		case cEntityEffect::eType::effSlowFalling:      return "slow_falling";
+		case cEntityEffect::eType::effConduitPower:     return "conduit_power";
+		case cEntityEffect::eType::effDolphinsGrace:    return "dolphins_grace";
+		case cEntityEffect::eType::effBadOmen:          return "bad_omen";
+		case cEntityEffect::eType::effHeroOfTheVillage: return "hero_of_the_village";
+		/*
+		case cEntityEffect::eType::effDarkness:         return "darkness";
+		case cEntityEffect::eType::effTrialOmen:        return "trial_omen";
+		case cEntityEffect::eType::effRaidOmen:         return "raid_omen";
+		case cEntityEffect::eType::effWindCharged:      return "wind_charged";
+		case cEntityEffect::eType::effWeaving:          return "weaving";
+		case cEntityEffect::eType::effOozing:           return "oozing";
+		case cEntityEffect::eType::effInfested:         return "infested";
+		*/
+	}
+	UNREACHABLE("Unknown effect type");
+}
+
+
+
+
+
 BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 {
 	static const std::unordered_map<std::string_view, BlockType> BlockTypes
@@ -5774,6 +5829,69 @@ eMonsterType NamespaceSerializer::ToMonsterType(const std::string_view a_ID)
 	{
 		FLOGWARNING("Tried to read unknown monster type {}, returning cow", a_ID);
 		return mtCow;
+	}
+}
+
+
+
+
+
+cEntityEffect::eType NamespaceSerializer::ToEntityEffect(std::string_view a_ID)
+{
+	static const std::unordered_map<std::string_view, cEntityEffect::eType> EffectTypes
+	{
+		{ "speed",               cEntityEffect::eType::effSpeed},
+		{ "slowness",            cEntityEffect::eType::effSlowness},
+		{ "haste",               cEntityEffect::eType::effHaste},
+		{ "mining_fatigue",      cEntityEffect::eType::effMiningFatigue},
+		{ "strength",            cEntityEffect::eType::effStrength},
+		{ "instant_health",      cEntityEffect::eType::effInstantHealth},
+		{ "instant_damage",      cEntityEffect::eType::effInstantDamage},
+		{ "jump_boost",          cEntityEffect::eType::effJumpBoost},
+		{ "nausea",              cEntityEffect::eType::effNausea},
+		{ "regeneration",        cEntityEffect::eType::effRegeneration},
+		{ "resistance",          cEntityEffect::eType::effResistance},
+		{ "fire_resistance",     cEntityEffect::eType::effFireResistance},
+		{ "water_breathing",     cEntityEffect::eType::effWaterBreathing},
+		{ "invisibility",        cEntityEffect::eType::effInvisibility},
+		{ "blindness",           cEntityEffect::eType::effBlindness},
+		{ "night_vision",        cEntityEffect::eType::effNightVision},
+		{ "hunger",              cEntityEffect::eType::effHunger},
+		{ "weakness",            cEntityEffect::eType::effWeakness},
+		{ "poison",              cEntityEffect::eType::effPoison},
+		{ "wither",              cEntityEffect::eType::effWither},
+		{ "health_boost",        cEntityEffect::eType::effHealthBoost},
+		{ "absorption",          cEntityEffect::eType::effAbsorption},
+		{ "saturation",          cEntityEffect::eType::effSaturation},
+		/*
+		{ "glowing",             cEntityEffect::eType::effGlowing},
+		{ "levitation",          cEntityEffect::eType::effLevitation},
+		{ "luck",                cEntityEffect::eType::effLuck},
+		{ "unluck",              cEntityEffect::eType::effUnluck},
+		*/
+		{ "slow_falling",        cEntityEffect::eType::effSlowFalling},
+		{ "conduit_power",       cEntityEffect::eType::effConduitPower},
+		{ "dolphins_grace",      cEntityEffect::eType::effDolphinsGrace},
+		{ "bad_omen",            cEntityEffect::eType::effBadOmen},
+		{ "hero_of_the_village", cEntityEffect::eType::effHeroOfTheVillage},
+		/*
+		{ "darkness",            cEntityEffect::eType::effDarkness},
+		{ "trial_omen",          cEntityEffect::eType::effTrialOmen},
+		{ "raid_omen",           cEntityEffect::eType::effRaidOmen},
+		{ "wind_charged",        cEntityEffect::eType::effWindCharged},
+		{ "weaving",             cEntityEffect::eType::effWeaving},
+		{ "oozing",              cEntityEffect::eType::effOozing},
+		{ "infested",            cEntityEffect::eType::effInfested},
+		*/
+	};
+	try
+	{
+		return EffectTypes.at(a_ID);
+	}
+	catch (...)
+	{
+		FLOGWARNING("Tried to read unknown effect type {}, returning effNoEffect", a_ID);
+		return cEntityEffect::eType::effNoEffect;
 	}
 }
 
