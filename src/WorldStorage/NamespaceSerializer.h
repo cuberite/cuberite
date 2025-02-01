@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Defines.h"
+#include "Entities/EntityEffect.h"
 #include "Mobs/MonsterTypes.h"
 #include "Registries/CustomStatistics.h"
 #include "Registries/BlockTypes.h"
@@ -22,11 +23,13 @@ namespace NamespaceSerializer
 	std::string_view From(CustomStatistic a_ID);
 	std::string_view From(eMonsterType a_ID);
 	std::string_view From(Item a_ID);
+	std::string_view From(cEntityEffect::eType a_ID);
 
 	BlockType ToBlockType(std::string_view a_ID);
 	CustomStatistic ToCustomStatistic(std::string_view a_ID);
 	Item ToItem(std::string_view a_ID);
 	eMonsterType ToMonsterType(std::string_view a_ID);
+	cEntityEffect::eType ToEntityEffect(std::string_view a_ID);
 
 	std::pair<Namespace, std::string_view> SplitNamespacedID(std::string_view ID);
 

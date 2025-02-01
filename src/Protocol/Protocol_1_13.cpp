@@ -491,7 +491,7 @@ void cProtocol_1_13::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEnt
 		}
 		case BlockType::Spawner:
 		{
-			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
+			auto & MobSpawnerEntity = dynamic_cast<const cMobSpawnerEntity &>(a_BlockEntity);
 			a_Writer.AddInt("x", a_BlockEntity.GetPosX());
 			a_Writer.AddInt("y", a_BlockEntity.GetPosY());
 			a_Writer.AddInt("z", a_BlockEntity.GetPosZ());
@@ -509,6 +509,23 @@ void cProtocol_1_13::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEnt
 		case BlockType::Dropper:
 		case BlockType::Dispenser:
 		case BlockType::EndPortal:
+
+		case BlockType::BlackBed:
+		case BlockType::WhiteBed:
+		case BlockType::LightGrayBed:
+		case BlockType::GrayBed:
+		case BlockType::BrownBed:
+		case BlockType::RedBed:
+		case BlockType::OrangeBed:
+		case BlockType::YellowBed:
+		case BlockType::LimeBed:
+		case BlockType::GreenBed:
+		case BlockType::CyanBed:
+		case BlockType::LightBlueBed:
+		case BlockType::BlueBed:
+		case BlockType::PurpleBed:
+		case BlockType::MagentaBed:
+		case BlockType::PinkBed:
 		{
 			break;
 		}

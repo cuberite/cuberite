@@ -41,5 +41,6 @@ public:  // tolua_export
 	virtual void SendTo(cClientHandle & a_Client) override;
 private:
 
+	// TODO: remove or replace this field
 	short m_Color;
 };  // tolua_export

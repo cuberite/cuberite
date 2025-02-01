@@ -1219,7 +1219,7 @@ bool cWSSAnvil::CheckBlockEntityType(const cParsedNBT & a_NBT, int a_TagIdx, con
 
 OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_TagIdx, BlockState a_Block, Vector3i a_Pos)
 {
-	static const AStringVector expectedTypes({"Banner", "minecraft:standingbanner","minecraft:wallbanner"});  // TODO(12xx12): update list
+	static const AStringVector expectedTypes({"Banner", "minecraft:standingbanner","minecraft:wallbanner","minecraft:banner"});
 	if (!CheckBlockEntityType(a_NBT, a_TagIdx, expectedTypes, a_Pos))
 	{
 		return nullptr;
@@ -1228,15 +1228,9 @@ OwnedBlockEntity cWSSAnvil::LoadBannerFromNBT(const cParsedNBT & a_NBT, int a_Ta
 	unsigned char Color = 15;
 	AString CustomName;
 
-	// Reads base color from NBT
-	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Base");
-	if (CurrentLine >= 0)
-	{
-		Color = static_cast<unsigned char>(a_NBT.GetInt(CurrentLine));
-		return std::make_unique<cBannerEntity>(a_Block, a_Pos, m_World, Color);
-	}
+	// TODO: read banner patterns
 
-	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "CustomName");
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "CustomName");
 	if ((CurrentLine >= 0) && (a_NBT.GetType(CurrentLine) == TAG_String))
 	{
 		CustomName = a_NBT.GetString(CurrentLine);
@@ -1262,22 +1256,16 @@ OwnedBlockEntity cWSSAnvil::LoadBeaconFromNBT(const cParsedNBT & a_NBT, int a_Ta
 
 	auto Beacon = std::make_unique<cBeaconEntity>(a_Block, a_Pos, m_World);
 
-	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Levels");
+	int CurrentLine = a_NBT.FindChildByName(a_TagIdx, "primary_effect");
 	if (CurrentLine >= 0)
 	{
-		Beacon->SetBeaconLevel(static_cast<char>(a_NBT.GetInt(CurrentLine)));
+		Beacon->SetPrimaryEffect(NamespaceSerializer::ToEntityEffect(a_NBT.GetString(CurrentLine).substr(10, std::string::npos)));
 	}
 
-	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Primary");
+	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "secondary_effect");
 	if (CurrentLine >= 0)
 	{
-		Beacon->SetPrimaryEffect(static_cast<cEntityEffect::eType>(a_NBT.GetInt(CurrentLine)));
-	}
-
-	CurrentLine = a_NBT.FindChildByName(a_TagIdx, "Secondary");
-	if (CurrentLine >= 0)
-	{
-		Beacon->SetSecondaryEffect(static_cast<cEntityEffect::eType>(a_NBT.GetInt(CurrentLine)));
+		Beacon->SetSecondaryEffect(NamespaceSerializer::ToEntityEffect(a_NBT.GetString(CurrentLine).substr(10, std::string::npos)));
 	}
 
 	// We are better than mojang, we load / save the beacon inventory!
@@ -1303,16 +1291,7 @@ OwnedBlockEntity cWSSAnvil::LoadBedFromNBT(const cParsedNBT & a_NBT, int a_TagId
 		return nullptr;
 	}
 
-	// Use color red as default
-	short Color = E_META_WOOL_RED;
-
-	int ColorIDx = a_NBT.FindChildByName(a_TagIdx, "color");
-	if (ColorIDx >= 0)
-	{
-		Color = static_cast<short>(a_NBT.GetInt(ColorIDx));
-	}
-
-	return std::make_unique<cBedEntity>(a_Block, a_Pos, m_World, Color);
+	return std::make_unique<cBedEntity>(a_Block, a_Pos, m_World);
 }
 
 

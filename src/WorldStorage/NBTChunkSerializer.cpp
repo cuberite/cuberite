@@ -448,7 +448,6 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_Entity,"minecraft:banner");
-			mWriter.AddInt("Base", static_cast<int>(a_Entity->GetBaseColor()));
 			if (!a_Entity->GetCustomName().empty())
 			{
 				mWriter.AddString("CustomName", a_Entity->GetCustomName());
@@ -464,9 +463,8 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_Entity, "minecraft:beacon");
-			mWriter.AddInt("Levels", a_Entity->GetBeaconLevel());
-			mWriter.AddInt("Primary", static_cast<int>(a_Entity->GetPrimaryEffect()));
-			mWriter.AddInt("Secondary", static_cast<int>(a_Entity->GetSecondaryEffect()));
+			mWriter.AddString("primary_effect", "minecraft:" + AString(NamespaceSerializer::From(a_Entity->GetPrimaryEffect())));
+			mWriter.AddString("secondary_effect", "minecraft:" + AString(NamespaceSerializer::From(a_Entity->GetSecondaryEffect())));
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
@@ -481,7 +479,6 @@ public:
 	{
 		mWriter.BeginCompound("");
 		AddBasicTileEntity(a_Entity, "minecraft:bed");
-		mWriter.AddInt("color", a_Entity->GetColor());
 		mWriter.EndCompound();
 	}
 
