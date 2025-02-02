@@ -463,8 +463,14 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_Entity, "minecraft:beacon");
-			mWriter.AddString("primary_effect", "minecraft:" + AString(NamespaceSerializer::From(a_Entity->GetPrimaryEffect())));
-			mWriter.AddString("secondary_effect", "minecraft:" + AString(NamespaceSerializer::From(a_Entity->GetSecondaryEffect())));
+			if (a_Entity->GetPrimaryEffect() != cEntityEffect::effNoEffect)
+			{
+				mWriter.AddString("primary_effect", "minecraft:" + AString(NamespaceSerializer::From(a_Entity->GetPrimaryEffect())));
+			}
+			if (a_Entity->GetSecondaryEffect() != cEntityEffect::effNoEffect)
+			{
+				mWriter.AddString("secondary_effect", "minecraft:" + AString(NamespaceSerializer::From(a_Entity->GetSecondaryEffect())));
+			}
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();

@@ -633,7 +633,11 @@ bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT 
 			}
 		}  // for itr - LevelSections[]
 
-		memset(&Data.HeightMap, 0, 256);  // temp
+		// Load the Height maps, if it fails, recalculate it:
+		if (!LoadHeightMapFromNBT(Data.HeightMap, a_NBT, a_NBT.FindChildByName(Level, "Heightmaps")))
+		{
+			Data.UpdateHeightMap();
+		}
 		memset(&Data.BiomeMap, 0, 1024);  // temp
 
 		// Load the entities from NBT:
@@ -810,34 +814,20 @@ bool cWSSAnvil::LoadBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cPar
 
 bool cWSSAnvil::LoadHeightMapFromNBT(cChunkDef::HeightMap & a_HeightMap, const cParsedNBT & a_NBT, const int a_TagIdx)
 {
-	if (
-		(a_TagIdx < 0) ||
-		(a_NBT.GetType(a_TagIdx) != TAG_IntArray) ||
-		(a_NBT.GetDataLength(a_TagIdx) != (4 * std::size(a_HeightMap)))
-	)
+	if (a_TagIdx < 0)
 	{
 		return false;
 	}
-
-	const auto * const HeightData = a_NBT.GetData(a_TagIdx);
-	for (int RelZ = 0; RelZ < cChunkDef::Width; RelZ++)
+	/*
+	int WorldSurface = a_NBT.FindChildByName(a_TagIdx, "WORLD_SURFACE");
+	if ((WorldSurface > 0) && (a_NBT.GetType(WorldSurface) == eTagType::TAG_LongArray))
 	{
-		for (int RelX = 0; RelX < cChunkDef::Width; RelX++)
-		{
-			const int Index = 4 * (RelX + RelZ * cChunkDef::Width);
-			const int Height = NetworkBufToHost<Int32>(HeightData + Index);
-
-			if (Height > std::numeric_limits<HEIGHTTYPE>::max())
-			{
-				// Invalid data:
-				return false;
-			}
-
-			cChunkDef::SetHeight(a_HeightMap, RelX, RelZ, static_cast<HEIGHTTYPE>(Height));
-		}
+		// auto WorldSurfaceData = a_NBT.GetData(WorldSurface);
+		// TODO: implement height map loading
+		return false;
 	}
-
-	return true;
+	*/
+	return false;
 }
 
 
