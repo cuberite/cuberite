@@ -695,25 +695,27 @@ public:
 
 
 
-	void AddMobHeadEntity(const cMobHeadEntity * a_MobHead)
+	void AddMobHeadEntity(cMobHeadEntity * a_MobHead)
 	{
-		if (a_MobHead->GetType() != Item::PlayerHead)
+		mWriter.BeginCompound("");
+		AddBasicTileEntity(a_MobHead, "minecraft:skull");
+		if (a_MobHead->GetType() == Item::PlayerHead)
 		{
-			return;
+			mWriter.BeginCompound("profile");
+				mWriter.AddIntArray("id", reinterpret_cast<const Int32 *>(a_MobHead->GetOwnerUUID().ToRaw().data()), 4);
+				mWriter.AddString("name", a_MobHead->GetOwnerName());
+				mWriter.BeginList("properties", TAG_Compound);
+					mWriter.BeginCompound("");
+						mWriter.AddString("name", "textures");
+						if (!a_MobHead->GetOwnerTextureSignature().empty())
+						{
+							mWriter.AddString("signature", a_MobHead->GetOwnerTextureSignature());
+						}
+						mWriter.AddString("value", a_MobHead->GetOwnerTexture());
+					mWriter.EndCompound();
+				mWriter.EndList();
+			mWriter.EndCompound();
 		}
-		mWriter.BeginCompound("profile");
-			mWriter.AddIntArray("id", reinterpret_cast<const Int32 *>(a_MobHead->GetOwnerUUID().ToRaw().data()), 4);
-			mWriter.AddString("name", a_MobHead->GetOwnerName());
-			mWriter.BeginList("properties", TAG_Compound);
-				mWriter.BeginCompound("");
-					mWriter.AddString("name", "textures");
-					if (!a_MobHead->GetOwnerTextureSignature().empty())
-					{
-						mWriter.AddString("signature", a_MobHead->GetOwnerTextureSignature());
-					}
-					mWriter.AddString("value", a_MobHead->GetOwnerTexture());
-				mWriter.EndCompound();
-			mWriter.EndList();
 		mWriter.EndCompound();
 	}
 
