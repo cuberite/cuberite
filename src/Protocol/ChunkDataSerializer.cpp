@@ -164,7 +164,7 @@ cChunkDataSerializer::cChunkDataSerializer(const eDimension a_Dimension) :
 
 
 
-void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const std::vector<cBlockEntity *> & a_BlockEntities, const ClientHandles & a_SendTo)
+void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const std::vector<cBlockEntity *> & a_BlockEntities, const cChunkDef::HeightMap & a_SurfaceHeightMap, const ClientHandles & a_SendTo)
 {
 	for (const auto & Client : a_SendTo)
 	{
@@ -172,14 +172,14 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 		{
 			case cProtocol::Version::v1_8_0:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v47);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v47);
 				continue;
 			}
 			case cProtocol::Version::v1_9_0:
 			case cProtocol::Version::v1_9_1:
 			case cProtocol::Version::v1_9_2:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v107);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v107);
 				continue;
 			}
 			case cProtocol::Version::v1_9_4:
@@ -190,18 +190,18 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 			case cProtocol::Version::v1_12_1:
 			case cProtocol::Version::v1_12_2:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v110);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v110);
 				continue;
 			}
 			case cProtocol::Version::v1_13:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v393);  // This version didn't last very long xD
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v393);  // This version didn't last very long xD
 				continue;
 			}
 			case cProtocol::Version::v1_13_1:
 			case cProtocol::Version::v1_13_2:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v401);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v401);
 				continue;
 			}
 			case cProtocol::Version::v1_14:
@@ -210,94 +210,94 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 			case cProtocol::Version::v1_14_3:
 			case cProtocol::Version::v1_14_4:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v477);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v477);
 				continue;
 			}
 			case cProtocol::Version::v1_15:
 			case cProtocol::Version::v1_15_1:
 			case cProtocol::Version::v1_15_2:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v573);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v573);
 				continue;
 			}
 			case cProtocol::Version::v1_16:
 			case cProtocol::Version::v1_16_1:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v735);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v735);
 				continue;
 			}
 			case cProtocol::Version::v1_16_2:
 			case cProtocol::Version::v1_16_3:
 			case cProtocol::Version::v1_16_4:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v751);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v751);
 				continue;
 			}
 			case cProtocol::Version::v1_17:
 			case cProtocol::Version::v1_17_1:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v755);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v755);
 				continue;
 			}
 			case cProtocol::Version::v1_18:
 			case cProtocol::Version::v1_18_2:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v757);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v757);
 				continue;
 			}
 			case cProtocol::Version::v1_19:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v759);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v759);
 				continue;
 			}
 			case cProtocol::Version::v1_19_1:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v760);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v760);
 				continue;
 			}
 			case cProtocol::Version::v1_19_3:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v761);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v761);
 				continue;
 			}
 			case cProtocol::Version::v1_19_4:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v762);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v762);
 				continue;
 			}
 			case cProtocol::Version::v1_20:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v763);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v763);
 				continue;
 			}
 			case cProtocol::Version::v1_20_2:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v764);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v764);
 				continue;
 			}
 			case cProtocol::Version::v1_20_3:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v765);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v765);
 				continue;
 			}
 			case cProtocol::Version::v1_20_5:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v766);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v766);
 				continue;
 			}
 			case cProtocol::Version::v1_21:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v767);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v767);
 				continue;
 			}
 			case cProtocol::Version::v1_21_2:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v768);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v768);
 				continue;
 			}
 			case cProtocol::Version::v1_21_4:
 			{
-				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, CacheVersion::v769);
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v769);
 				continue;
 			}
 		}
@@ -315,7 +315,7 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 
 
 
-inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_Client, const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const std::vector<cBlockEntity *> & a_BlockEntities, const CacheVersion a_CacheVersion)
+inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_Client, const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const std::vector<cBlockEntity *> & a_BlockEntities, const cChunkDef::HeightMap & a_SurfaceHeightMap, const CacheVersion a_CacheVersion)
 {
 	auto & Cache = m_Cache[static_cast<size_t>(a_CacheVersion)];
 	if (Cache.Engaged)
@@ -410,27 +410,27 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 		case CacheVersion::v764:
 		case CacheVersion::v765:
 		{
-			Serialize764<&Palette764>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_Client, 0x25);
+			Serialize764<&Palette764>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_Client, a_SurfaceHeightMap, 0x25);
 			break;
 		}
 		case CacheVersion::v766:
 		{
-			Serialize764<&Palette766>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_Client, 0x27);
+			Serialize764<&Palette766>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_Client, a_SurfaceHeightMap, 0x27);
 			break;
 		}
 		case CacheVersion::v767:
 		{
-			Serialize764<&Palette767>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_Client, 0x27);
+			Serialize764<&Palette767>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_Client, a_SurfaceHeightMap, 0x27);
 			break;
 		}
 		case CacheVersion::v768:
 		{
-			Serialize764<&Palette768>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_Client, 0x28);
+			Serialize764<&Palette768>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_Client, a_SurfaceHeightMap, 0x28);
 			break;
 		}
 		case CacheVersion::v769:  // TODO: fix palette
 		{
-			Serialize764<&Palette768>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_Client, 0x28);
+			Serialize764<&Palette768>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_Client, a_SurfaceHeightMap, 0x28);
 			break;
 		}
 	}
@@ -1243,7 +1243,7 @@ inline void cChunkDataSerializer::Serialize763(const int a_ChunkX, const int a_C
 
 
 template <auto Palette>
-inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const std::vector<cBlockEntity *> & a_BlockEntities, const ClientHandles::value_type & a_Client, UInt32 a_packet_id)
+inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const std::vector<cBlockEntity *> & a_BlockEntities, const ClientHandles::value_type & a_Client, const cChunkDef::HeightMap & a_SurfaceHeightMap, UInt32 a_packet_id)
 {
 	// This function returns the fully compressed packet (including packet
 	// size), not the raw packet! Below variables tagged static because of
@@ -1251,24 +1251,28 @@ inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_C
 
 	static constexpr UInt8 BitsPerEntry = 15;
 	static constexpr UInt8 EntriesPerLong = 64 / BitsPerEntry;
-	// static int Longs = CeilC<int, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);
-	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockData::SectionBlockCount / EntriesPerLong);  //  (ChunkBlockData::SectionBlockCount * BitsPerEntry) / 8 / 8;
-
-	// const auto Bitmask = GetSectionBitmask2(a_BlockData2, a_LightData);
+	static size_t ChunkSectionDataArraySize = CeilC<size_t, float>(ChunkBlockData::SectionBlockCount / static_cast<float>(EntriesPerLong));
 
 	// Create the packet:
 	m_Packet.WriteVarInt32(a_packet_id);
 	m_Packet.WriteBEInt32(a_ChunkX);
 	m_Packet.WriteBEInt32(a_ChunkZ);
 
-
 	{
 		cFastNBTWriter Writer = cFastNBTWriter(true);
-		// TODO: client works fine without?
-		// std::array<Int64, 36> Longz = {};
-		// Writer.AddLongArray("MOTION_BLOCKING", Longz.data(), Longz.size());
+		// TODO: MOTION_BLOCKING height map
+		constexpr UInt16 DimensionHeight = 256;
+		const UInt8 BitsPerHeightMapEntry = CeilC<UInt8, double>(log2(DimensionHeight + 1));
+		const UInt8 HeightMapEntriesPerLong = 64 / BitsPerHeightMapEntry;
+		constexpr UInt32 HeightMapSize = cChunkDef::Width * cChunkDef::Width;
+		const size_t HeightMapLongs = CeilC<size_t, double>(static_cast<float>(HeightMapSize) / HeightMapEntriesPerLong);
+
+		UInt64 * ws = new UInt64[HeightMapLongs];
+		WriteHeightMap(ws, a_SurfaceHeightMap, BitsPerHeightMapEntry, true);
+		Writer.AddLongArray("WORLD_SURFACE", reinterpret_cast<Int64 *>(ws), HeightMapLongs);
 		Writer.Finish();
 		m_Packet.Write(Writer.GetResult().data(), Writer.GetResult().size());
+		delete[] ws;
 	}
 
 
@@ -1287,8 +1291,6 @@ inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_C
 	for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 	{
 		const auto Blocks = a_BlockData.GetSection(Y);
-		// const auto BlockLights = a_LightData.GetBlockLightSection(Y);
-		// const auto SkyLights = a_LightData.GetSkyLightSection(Y);
 		m_Packet.WriteBEInt16(4096);
 		m_Packet.WriteBEUInt8(BitsPerEntry);
 		m_Packet.WriteVarInt32(static_cast<UInt32>(ChunkSectionDataArraySize));
@@ -1380,20 +1382,14 @@ inline void cChunkDataSerializer::WriteBlockSectionSeamless2(const ChunkBlockDat
 	UInt64 Buffer = 0;  // A buffer to compose multiple smaller bitsizes into one 64-bit number
 	unsigned char BitIndex = 0;  // The bit-position in Buffer that represents where to write next
 
-	// const bool BlocksExist = a_Blocks != nullptr;
-	// const bool MetasExist = a_Metas != nullptr;
-
 	for (size_t Index = 0; Index != ChunkBlockData::SectionBlockCount; Index++)
 	{
 		const auto v2 = a_Blocks == nullptr ? 0 : Palette((*a_Blocks)[Index]);
 
-		const auto Value = v2;  // Palette(BlockType, BlockMeta);
+		const auto Value = v2;
 
 		// The _signed_ count of bits in Value left to write
 		const auto Remaining = static_cast<char>(a_BitsPerEntry - (64 - BitIndex));
-
-		// Write as much as possible of Value, starting from BitIndex, into Buffer:
-		// Buffer |= static_cast<UInt64>(Value) << BitIndex;
 
 		if (Remaining >= 0)
 		{
@@ -1436,6 +1432,83 @@ inline void cChunkDataSerializer::WriteBlockSectionSeamless2(const ChunkBlockDat
 			m_Packet.WriteBEUInt64(Buffer);
 			BitIndex = 0;
 			Buffer = 0;
+		}
+	}
+
+	static_assert((ChunkBlockData::SectionBlockCount % 64) == 0, "Section must fit wholly into a 64-bit long array");
+	ASSERT(BitIndex == 0);
+	ASSERT(Buffer == 0);
+}
+
+
+
+
+
+inline void cChunkDataSerializer::WriteHeightMap(UInt64 * a_Array, const cChunkDef::HeightMap & a_HeightMap, const UInt8 a_BitsPerEntry, bool padding)
+{
+	// https://wiki.vg/Chunk_Format#Data_structure
+
+	// We shift a UInt64 by a_BitsPerEntry, the latter cannot be too big:
+	ASSERT(a_BitsPerEntry < 64);
+
+	UInt64 Buffer = 0;  // A buffer to compose multiple smaller bitsizes into one 64-bit number
+	unsigned char BitIndex = 0;  // The bit-position in Buffer that represents where to write next
+
+	size_t long_index = 0;
+
+	size_t array_len = a_HeightMap.size();
+
+	for (size_t Index = 0; Index != array_len; Index++)
+	{
+		const auto Value = a_HeightMap[Index];
+
+		// The _signed_ count of bits in Value left to write
+		const auto Remaining = static_cast<char>(a_BitsPerEntry - (64 - BitIndex));
+
+		if (Remaining >= 0)
+		{
+			if (padding)
+			{
+				// There were some bits remaining: we've filled the buffer. Flush it:
+				a_Array[long_index] = Buffer;
+				Buffer = 0;
+				BitIndex = 0;
+				long_index++;
+
+				// Write as much as possible of Value, starting from BitIndex, into Buffer:
+				Buffer |= static_cast<UInt64>(Value) << BitIndex;
+
+				// It fit, excellent.
+				BitIndex += a_BitsPerEntry;
+			}
+			else
+			{
+				// Write as much as possible of Value, starting from BitIndex, into Buffer:
+				Buffer |= static_cast<UInt64>(Value) << BitIndex;
+
+				// There were some bits remaining: we've filled the buffer. Flush it:
+				a_Array[long_index] = Buffer;
+				long_index++;
+
+				// And write the remaining bits, setting the new BitIndex:
+				Buffer = static_cast<UInt64>(Value >> (a_BitsPerEntry - Remaining));
+				BitIndex = static_cast<unsigned char>(Remaining);
+			}
+		}
+		else
+		{
+			// Write as much as possible of Value, starting from BitIndex, into Buffer:
+			Buffer |= static_cast<UInt64>(Value) << BitIndex;
+
+			// It fit, excellent.
+			BitIndex += a_BitsPerEntry;
+		}
+		if (((Index + 1) == array_len) && padding)
+		{
+			a_Array[long_index] = Buffer;
+			BitIndex = 0;
+			Buffer = 0;
+			long_index++;
 		}
 	}
 
