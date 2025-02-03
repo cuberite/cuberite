@@ -4,9 +4,9 @@
 
 
 /**
- * Custom linking from "modern" SoundEvent enums to 1.8 sounds
- * Because no subtitles exist, close sounding sounds are used (just in case)
- */
+* Custom linking from "modern" SoundEvent enums to 1.8 sounds
+* Because no subtitles exist, close sounding sounds are used (just in case)
+*/
 AString cProtocol_1_8_0::GetProtocolSoundEffectAsString(SoundEvent a_SoundEvent) const
 {
 	switch (a_SoundEvent)
