@@ -72,6 +72,11 @@ public:
 			{
 				a_World->BroadcastSoundEffect(eSoundEvent::ItemFirechargeUse, FirePos, 1.0f, 1.04f);
 			}
+			else
+			{
+				// 1.8 doesn't play, we need to handle it here
+				a_World->BroadcastSoundEffect(eSoundEvent::ItemFlintsteelUse, FirePos, 1.0f, 1.04f);
+			}
 		}
 
 		return false;

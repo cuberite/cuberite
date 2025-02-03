@@ -73,6 +73,7 @@ protected:
 	virtual unsigned char GetProtocolEntityAnimation(EntityAnimation a_Animation) const override;
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
+	virtual AString GetProtocolSoundEffectAsString(eSoundEvent a_SoundEvent) const override;
 	virtual Version GetProtocolVersion() const override;
 
 	virtual bool HandlePacket                       (cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;

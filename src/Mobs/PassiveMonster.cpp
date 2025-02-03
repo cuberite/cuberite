@@ -16,6 +16,10 @@ cPassiveMonster::cPassiveMonster(const AString & a_ConfigName, eMonsterType a_Mo
 	m_EMPersonality = PASSIVE;
 }
 
+
+
+
+
 cPassiveMonster::cPassiveMonster(
 	const AString & a_ConfigName, eMonsterType a_MobType,
 	const eSoundEvent a_SoundHurt, const eSoundEvent a_SoundDeath,

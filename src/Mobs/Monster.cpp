@@ -132,6 +132,10 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	m_AmbientSoundTimer = GetRandomProvider().RandInt(0, 100);
 }
 
+
+
+
+
 cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const eSoundEvent a_SoundHurt, const eSoundEvent a_SoundDeath, const eSoundEvent a_SoundAmbient, float a_Width, float a_Height) :
 	Super(etMonster, a_Width, a_Height),
 	m_EMState(IDLE),
@@ -441,10 +445,12 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		if (ShouldPlaySound)
 		{
 			auto SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
-			if (!m_SoundAmbientString.empty()) {
+			if (!m_SoundAmbientString.empty())
+			{
 				m_World->BroadcastSoundEffect(m_SoundAmbientString, GetPosition(), 1.0f, SoundPitchMultiplier * 1.0f);
-			} else {
-				
+			}
+			else
+			{
 				m_World->BroadcastSoundEffect(m_SoundAmbient, GetPosition(), 1.0f, SoundPitchMultiplier * 1.0f);
 			}
 		}
@@ -647,7 +653,9 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 		if (!m_SoundHurtString.empty())
 		{
 			m_World->BroadcastSoundEffect(m_SoundHurtString, GetPosition(), 1.0f, 0.8f);
-		} else {
+		}
+		else
+		{
 			m_World->BroadcastSoundEffect(m_SoundHurt, GetPosition(), 1.0f, 0.8f);
 		}
 	}

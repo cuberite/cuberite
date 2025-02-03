@@ -56,6 +56,7 @@ enum class eSoundEvent
 	ItemPickup,
 	ItemHoeTill,
 	ItemFirechargeUse,
+	ItemFlintsteelUse,
 	ItemChorusfruitTeleport,
 
 	// Entity Items

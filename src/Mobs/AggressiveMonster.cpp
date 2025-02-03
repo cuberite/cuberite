@@ -17,6 +17,10 @@ cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterTyp
 	m_EMPersonality = AGGRESSIVE;
 }
 
+
+
+
+
 cAggressiveMonster::cAggressiveMonster(
 	const AString & a_ConfigName, eMonsterType a_MobType,
 	const eSoundEvent a_SoundHurt, const eSoundEvent a_SoundDeath,

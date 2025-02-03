@@ -64,6 +64,8 @@ AString cProtocol_1_8_0::GetProtocolSoundEffectAsString(eSoundEvent a_SoundEvent
 		case eSoundEvent::ItemPickup:               return "random.pop";
 		case eSoundEvent::ItemHoeTill:              return "dig.grass";
 		case eSoundEvent::ItemFirechargeUse:        return "item.fireCharge.use";
+		case eSoundEvent::ItemFlintsteelUse:        return "fire.ignite";
+
 		case eSoundEvent::ItemChorusfruitTeleport:  return "mob.endermen.portal";
 
 		// Entity Items
