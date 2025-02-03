@@ -18,4 +18,13 @@ enum class SoundEvent
 
 	EntityGhastWarn,
 	EntityGhastShoot,
+
+	EntityCreeperPrimed,
+
+	// Blocks
+	BlockChestOpen,
+	BlockChestClose,
+
+	// Items
+	ItemHoeTill,
 };
