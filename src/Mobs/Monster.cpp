@@ -434,14 +434,19 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	BroadcastMovementUpdate();
 
 	// Ambient mob sounds
-	if (!m_SoundAmbientString.empty() && (--m_AmbientSoundTimer <= 0))
+	if (--m_AmbientSoundTimer <= 0)
 	{
 		auto & Random = GetRandomProvider();
 		auto ShouldPlaySound = Random.RandBool();
 		if (ShouldPlaySound)
 		{
 			auto SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
-			m_World->BroadcastSoundEffect(m_SoundAmbientString, GetPosition(), 1.0f, SoundPitchMultiplier * 1.0f);
+			if (!m_SoundAmbientString.empty()) {
+				m_World->BroadcastSoundEffect(m_SoundAmbientString, GetPosition(), 1.0f, SoundPitchMultiplier * 1.0f);
+			} else {
+				
+				m_World->BroadcastSoundEffect(m_SoundAmbient, GetPosition(), 1.0f, SoundPitchMultiplier * 1.0f);
+			}
 		}
 		m_AmbientSoundTimer = 100;
 	}
@@ -637,9 +642,14 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	if (!m_SoundHurtString.empty() && (m_Health > 0))
+	if (m_Health > 0)
 	{
-		m_World->BroadcastSoundEffect(m_SoundHurtString, GetPosition(), 1.0f, 0.8f);
+		if (!m_SoundHurtString.empty())
+		{
+			m_World->BroadcastSoundEffect(m_SoundHurtString, GetPosition(), 1.0f, 0.8f);
+		} else {
+			m_World->BroadcastSoundEffect(m_SoundHurt, GetPosition(), 1.0f, 0.8f);
+		}
 	}
 
 	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPawn())
@@ -663,9 +673,13 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 {
 	Super::KilledBy(a_TDI);
-	if (m_SoundHurtString != "")
+	if (m_SoundDeathString != "")
 	{
 		m_World->BroadcastSoundEffect(m_SoundDeathString, GetPosition(), 1.0f, 0.8f);
+	}
+	else
+	{
+		m_World->BroadcastSoundEffect(m_SoundDeath, GetPosition(), 1.0f, 0.8f);
 	}
 
 	if (IsTame())
