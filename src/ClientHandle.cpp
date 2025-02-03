@@ -3077,7 +3077,7 @@ void cClientHandle::SendSoundEffect(const AString & a_SoundName, double a_X, dou
 
 void cClientHandle::SendSoundEffect(const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch)
 {
-	FLOGD("SendSoundEffect with String \"{0}\" is deprecated, use version with SoundEvent enum.", a_SoundName);
+	// FLOGD("SendSoundEffect with String \"{0}\" is deprecated, use version with SoundEvent enum.", a_SoundName);
 	// m_Protocol->SendSoundEffect(a_SoundName, a_Position, a_Volume, a_Pitch);
 }
 

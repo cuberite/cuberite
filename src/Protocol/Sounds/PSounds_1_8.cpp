@@ -14,6 +14,14 @@ AString cProtocol_1_8_0::GetProtocolSoundEffectAsString(SoundEvent a_SoundEvent)
 
 		// Explosions
 		case SoundEvent::EntityGenericExplode:   return "random.explode";
+
+		// Mobs
+		case SoundEvent::EntityHorseAngry:       return "mob.horse.angry";
+		case SoundEvent::EntityHorseSaddle:      return "mob.horse.leather";
+		case SoundEvent::EntityHorseArmor:       return "mob.horse.armor";
+		case SoundEvent::EntityGhastWarn:        return "mob.ghast.charge";
+		case SoundEvent::EntityBlazeShoot:       // Sounds like Ghast Fireball
+		case SoundEvent::EntityGhastShoot:       return "mob.ghast.fireball";
 	}
 	return AString();
 }

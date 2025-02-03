@@ -8,4 +8,14 @@ enum class SoundEvent
 
 	// Explosions
 	EntityGenericExplode,
+
+	// Mobs
+	EntityBlazeShoot,
+
+	EntityHorseAngry,
+	EntityHorseSaddle,
+	EntityHorseArmor,
+
+	EntityGhastWarn,
+	EntityGhastShoot,
 };
