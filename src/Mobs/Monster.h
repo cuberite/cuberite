@@ -4,6 +4,7 @@
 #include "../Entities/Pawn.h"
 #include "../UUID.h"
 #include "MonsterTypes.h"
+#include "../Registries/SoundEvent.h"
 #include "PathFinder.h"
 
 
