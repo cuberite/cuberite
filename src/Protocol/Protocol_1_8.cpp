@@ -1406,7 +1406,7 @@ void cProtocol_1_8_0::SendSoundEffect(const AString & a_SoundName, Vector3d a_Or
 
 
 
-void cProtocol_1_8_0::SendSoundEffect(SoundEvent a_SoundEvent, Vector3d a_Origin, float a_Volume, float a_Pitch)
+void cProtocol_1_8_0::SendSoundEffect(eSoundEvent a_SoundEvent, Vector3d a_Origin, float a_Volume, float a_Pitch)
 {
 	AString soundName = GetProtocolSoundEffectAsString(a_SoundEvent);
 	if (soundName.empty())
@@ -1414,6 +1414,7 @@ void cProtocol_1_8_0::SendSoundEffect(SoundEvent a_SoundEvent, Vector3d a_Origin
 		FLOGD("SoundEvent enum {0} is missing a related sound effect.", a_SoundEvent);
 		return;
 	}
+	FLOGD("SoundEvent enum {0} is playing {1}.", a_SoundEvent, soundName);
 
 	ASSERT(m_State == 3);  // In game mode?
 

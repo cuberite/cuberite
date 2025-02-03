@@ -73,7 +73,7 @@ void cBlaze::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			auto FireChargePtr = FireCharge.get();
 			FireChargePtr->Initialize(std::move(FireCharge), *m_World);
 
-			m_World->BroadcastSoundEffect(SoundEvent::EntityBlazeShoot, GetPosition(), 4.0f, 1.0f);
+			m_World->BroadcastSoundEffect(eSoundEvent::EntityBlazeShoot, GetPosition(), 4.0f, 1.0f);
 		}
 	}
 

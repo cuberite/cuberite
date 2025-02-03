@@ -553,7 +553,7 @@ void cWorld::BroadcastSoundEffect(const AString & a_SoundName, Vector3d a_Positi
 
 
 
-void cWorld::BroadcastSoundEffect(const SoundEvent a_SoundEvent, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
+void cWorld::BroadcastSoundEffect(const eSoundEvent a_SoundEvent, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
 {
 	ForClientsWithChunkAtPos(a_Position, *this, a_Exclude, [&](cClientHandle & a_Client)
 	{

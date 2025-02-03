@@ -1,5 +1,5 @@
 # pragma once
-enum class SoundEvent
+enum class eSoundEvent
 {
 	// Weather
 	LightningboltThunder,

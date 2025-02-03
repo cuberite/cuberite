@@ -72,7 +72,7 @@ void cHorse::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, GetPosition().Floor(), int(SmokeDirection::NORTH_EAST));
 				m_World->BroadcastSoundParticleEffect(EffectID::PARTICLE_SMOKE, GetPosition().Floor(), int(SmokeDirection::NORTH_WEST));
 
-				m_World->BroadcastSoundEffect(SoundEvent::EntityHorseAngry, GetPosition(), 1.0f, 1.0f);
+				m_World->BroadcastSoundEffect(eSoundEvent::EntityHorseAngry, GetPosition(), 1.0f, 1.0f);
 				m_Attachee->Detach();
 				MetadataDirty = true;
 				m_bIsRearing = true;
@@ -184,7 +184,7 @@ void cHorse::OnRightClicked(cPlayer & a_Player)
 	{
 		m_bIsRearing = true;
 		m_RearTickCount = 0;
-		m_World->BroadcastSoundEffect(SoundEvent::EntityHorseAngry, GetPosition(), 1.0f, 0.8f);
+		m_World->BroadcastSoundEffect(eSoundEvent::EntityHorseAngry, GetPosition(), 1.0f, 0.8f);
 	}
 }
 
@@ -196,7 +196,7 @@ void cHorse::SetHorseSaddle(cItem a_Saddle)
 {
 	if (a_Saddle.m_ItemType == E_ITEM_SADDLE)
 	{
-		m_World->BroadcastSoundEffect(SoundEvent::EntityHorseSaddle, GetPosition(), 1.0f, 0.8f);
+		m_World->BroadcastSoundEffect(eSoundEvent::EntityHorseSaddle, GetPosition(), 1.0f, 0.8f);
 	}
 	else if (!a_Saddle.IsEmpty())
 	{
@@ -215,7 +215,7 @@ void cHorse::SetHorseArmor(cItem a_Armor)
 {
 	if (ItemCategory::IsHorseArmor(a_Armor.m_ItemType))
 	{
-		m_World->BroadcastSoundEffect(SoundEvent::EntityHorseArmor, GetPosition(), 1.0f, 0.8f);
+		m_World->BroadcastSoundEffect(eSoundEvent::EntityHorseArmor, GetPosition(), 1.0f, 0.8f);
 	}
 	else if (!a_Armor.IsEmpty())
 	{
