@@ -5,4 +5,7 @@ enum class SoundEvent
 	EnderEyeCustomSurvive,
 	EnderEyeDeath,
 	EnderEyeLaunch,
+
+	// Explosions
+	EntityGenericExplode,
 };

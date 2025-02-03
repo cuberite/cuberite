@@ -2683,7 +2683,7 @@ void cClientHandle::SendExplosion(const Vector3f a_Position, const float a_Power
 	const auto SoundPitchMultiplier = 1.0f + (Random.RandReal() - Random.RandReal()) * 0.2f;
 
 	// Sound:
-	SendSoundEffect("entity.generic.explode", a_Position, 4.0f, SoundPitchMultiplier * 0.7f);
+	SendSoundEffect(SoundEvent::EntityGenericExplode, a_Position, 4.0f, SoundPitchMultiplier * 0.7f);
 
 	const auto ParticleFormula = a_Power * 0.33f;
 	auto Spread = ParticleFormula * 0.5f;
@@ -3077,9 +3077,8 @@ void cClientHandle::SendSoundEffect(const AString & a_SoundName, double a_X, dou
 
 void cClientHandle::SendSoundEffect(const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch)
 {
-	// Do we depricate?
-	// LOG("SendSoundEffect with String is deprecated, use version with SoundEvent enum.");
-	m_Protocol->SendSoundEffect(a_SoundName, a_Position, a_Volume, a_Pitch);
+	FLOGD("SendSoundEffect with String \"{0}\" is deprecated, use version with SoundEvent enum.", a_SoundName);
+	// m_Protocol->SendSoundEffect(a_SoundName, a_Position, a_Volume, a_Pitch);
 }
 
 
