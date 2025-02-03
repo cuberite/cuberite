@@ -11,7 +11,7 @@
 
 
 cCreeper::cCreeper(void) :
-	Super("Creeper", mtCreeper, "entity.creeper.hurt", "entity.creeper.death", "entity.creeper.ambient", 0.6f, 1.7f),
+	Super("Creeper", mtCreeper, eSoundEvent::EntityCreeperHurt, eSoundEvent::EntityCreeperDeath, eSoundEvent::NullValue, 0.6f, 1.7f),
 	m_bIsBlowing(false),
 	m_bIsCharged(false),
 	m_BurnedWithFlintAndSteel(false),

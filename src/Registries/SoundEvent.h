@@ -1,6 +1,7 @@
 # pragma once
 enum class eSoundEvent
 {
+	NullValue,
 	// Weather
 	LightningboltThunder,
 
@@ -8,19 +9,36 @@ enum class eSoundEvent
 	EntityGenericExplode,
 
 	// Mobs
+	EntityBlazeAmbient,
+	EntityBlazeHurt,
+	EntityBlazeDeath,
 	EntityBlazeShoot,
 
+	EntityHorseAmbient,
+	EntityHorseHurt,
+	EntityHorseDeath,
 	EntityHorseAngry,
 	EntityHorseSaddle,
 	EntityHorseArmor,
 
+	EntityGhastAmbient,
+	EntityGhastHurt,
+	EntityGhastDeath,
 	EntityGhastWarn,
 	EntityGhastShoot,
 
+	EntityCreeperHurt,
+	EntityCreeperDeath,
 	EntityCreeperPrimed,
 
+	EntityZombievillagerAmbient,
+	EntityZombievillagerHurt,
+	EntityZombievillagerDeath,
 	EntityZombievillagerCure,
 
+	EntitySheepAmbient,
+	EntitySheepHurt,
+	EntitySheepDeath,
 	EntitySheepShear,
 
 	// Blocks
