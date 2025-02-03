@@ -1,6 +1,6 @@
 #include "BlockTags.h"
 
-namespace BlockTags
+namespace nBlockTags
 {
 	bool AcaciaLogs(BlockType a_block)
 	{

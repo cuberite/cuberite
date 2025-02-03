@@ -237,7 +237,7 @@ private:
 			case BLOCK_FACE_YP:
 			case BLOCK_FACE_NONE: return;
 			case BLOCK_FACE_XM:
-			NewState = BlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedX(-1)).Type());
+			NewState = nBlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedX(-1)).Type());
 			switch (m_BlockType)
 			{
 				case BlockType::OakFence: GET_FENCE_XM(OakFence, NewState)
@@ -256,7 +256,7 @@ private:
 			}
 			break;
 			case BLOCK_FACE_XP:
-			NewState = BlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedX(1)).Type());
+			NewState = nBlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedX(1)).Type());
 			switch (m_BlockType)
 			{
 				case BlockType::OakFence: GET_FENCE_XP(OakFence, NewState)
@@ -275,7 +275,7 @@ private:
 			}
 			break;
 			case BLOCK_FACE_ZM:
-			NewState = BlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedZ(-1)).Type());
+			NewState = nBlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedZ(-1)).Type());
 			switch (m_BlockType)
 			{
 				case BlockType::OakFence: GET_FENCE_ZM(OakFence, NewState)
@@ -294,7 +294,7 @@ private:
 			}
 			break;
 			case BLOCK_FACE_ZP:
-			NewState = BlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedZ(1)).Type());
+			NewState = nBlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedZ(1)).Type());
 			switch (m_BlockType)
 			{
 				case BlockType::OakFence: GET_FENCE_ZP(OakFence, NewState)

@@ -14,10 +14,10 @@ class cItemFenceHandler final :
 		bool north = false, south = false, west = false, east = false;
 #define GET_DIR(FenceType) \
 	{ \
-		north = BlockTags::Fences(a_Player.GetWorld()->GetBlock(a_PlacePosition.addedZ(-1)).Type()); \
-		south = BlockTags::Fences(a_Player.GetWorld()->GetBlock(a_PlacePosition.addedZ(1)).Type()); \
-		west = BlockTags::Fences(a_Player.GetWorld()->GetBlock(a_PlacePosition.addedX(-1)).Type()); \
-		east = BlockTags::Fences(a_Player.GetWorld()->GetBlock(a_PlacePosition.addedX(1)).Type()); \
+		north = nBlockTags::Fences(a_Player.GetWorld()->GetBlock(a_PlacePosition.addedZ(-1)).Type()); \
+		south = nBlockTags::Fences(a_Player.GetWorld()->GetBlock(a_PlacePosition.addedZ(1)).Type()); \
+		west = nBlockTags::Fences(a_Player.GetWorld()->GetBlock(a_PlacePosition.addedX(-1)).Type()); \
+		east = nBlockTags::Fences(a_Player.GetWorld()->GetBlock(a_PlacePosition.addedX(1)).Type()); \
 		break; \
 	}
 

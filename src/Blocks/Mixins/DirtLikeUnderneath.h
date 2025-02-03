@@ -38,6 +38,6 @@ protected:
 			return false;
 		}
 
-		return BlockTags::Dirt(a_Chunk.GetBlock(BelowPos).Type());
+		return nBlockTags::Dirt(a_Chunk.GetBlock(BelowPos).Type());
 	}
 };

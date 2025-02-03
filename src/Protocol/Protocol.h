@@ -59,7 +59,7 @@ public:
 	{
 		pktAttachEntity = 0,
 		pktCustomPayload,
-		pktCommnadTree,
+		pktCommandTree,
 		pktLightUpdate,
 		pktPlayerActionResponse,
 		pktRenderDistanceCenter,

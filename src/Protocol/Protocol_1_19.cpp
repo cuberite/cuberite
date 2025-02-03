@@ -60,7 +60,7 @@ UInt32 cProtocol_1_19::GetPacketID(ePacketType a_PacketType) const
 			//  chat preview 0x0C
 			//  clear title 0x0D
 			//  command suggestions here 0x0E
-		case cProtocol::pktCommnadTree:          return 0x0F;
+		case cProtocol::pktCommandTree:          return 0x0F;
 		case cProtocol::pktWindowClose:          return 0x10;
 		case cProtocol::pktWindowItems:          return 0x11;  //  Inventory packet
 		case cProtocol::pktWindowProperty:       return 0x12;  //  ScreenHandlerPropertyUpdateS2CPacket
@@ -1469,7 +1469,7 @@ UInt32 cProtocol_1_19_1::GetPacketID(ePacketType a_PacketType) const
 			//  chat preview 0x0C
 			//  clear title 0x0D
 			//  command suggestions here 0x0E
-		case cProtocol::pktCommnadTree:          return 0x0F;
+		case cProtocol::pktCommandTree:          return 0x0F;
 		case cProtocol::pktWindowClose:          return 0x10;
 		case cProtocol::pktWindowItems:          return 0x11;  //  Inventory packet
 		case cProtocol::pktWindowProperty:       return 0x12;  //  ScreenHandlerPropertyUpdateS2CPacket
@@ -1892,7 +1892,7 @@ UInt32 cProtocol_1_19_3::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktDifficulty:           return 0x0B;
 			//  clear title 0x0C
 			//  command suggestions here 0x0D
-		case cProtocol::pktCommnadTree:          return 0x0E;
+		case cProtocol::pktCommandTree:          return 0x0E;
 		case cProtocol::pktWindowClose:          return 0x0F;
 		case cProtocol::pktWindowItems:          return 0x10;  //  Inventory packet
 		case cProtocol::pktWindowProperty:       return 0x11;  //  ScreenHandlerPropertyUpdateS2CPacket
@@ -2644,7 +2644,7 @@ UInt32 cProtocol_1_19_4::GetPacketID(ePacketType a_PacketType) const
 			//  ChunkBiomeDataS2CPacket 0x0D
 			//  clear title 0x0E
 			//  command suggestions here 0x0F
-		case cProtocol::pktCommnadTree:          return 0x10;
+		case cProtocol::pktCommandTree:          return 0x10;
 		case cProtocol::pktWindowClose:          return 0x11;
 		case cProtocol::pktWindowItems:          return 0x12;  //  Inventory packet
 		case cProtocol::pktWindowProperty:       return 0x13;  //  ScreenHandlerPropertyUpdateS2CPacket

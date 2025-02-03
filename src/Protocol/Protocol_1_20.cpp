@@ -319,7 +319,7 @@ void cProtocol_1_20::SendRespawn(eDimension a_Dimension)
 void cProtocol_1_20::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
 {
 	auto type = a_BlockEntity.GetBlockType();
-	if (BlockTags::Signs(type))
+	if (nBlockTags::Signs(type))
 	{
 		const auto & sign = dynamic_cast<const cSignEntity &>(a_BlockEntity);
 		a_Writer.BeginCompound("front_text");
@@ -549,7 +549,7 @@ UInt32 cProtocol_1_20_2::GetPacketID(ePacketType a_PacketType) const
 		//  ChunkBiomeDataS2CPacket 0x0E
 		//  clear title 0x0F
 		//  command suggestions here 0x10
-		case cProtocol::pktCommnadTree:          return 0x11;
+		case cProtocol::pktCommandTree:          return 0x11;
 		case cProtocol::pktWindowClose:          return 0x12;
 		case cProtocol::pktWindowItems:          return 0x13;  //  Inventory packet
 		case cProtocol::pktWindowProperty:       return 0x14;  //  ScreenHandlerPropertyUpdateS2CPacket
@@ -1311,7 +1311,7 @@ UInt32 cProtocol_1_20_3::GetPacketID(ePacketType a_PacketType) const
 		//  ChunkBiomeDataS2CPacket 0x0E
 		//  clear title 0x0F
 		//  command suggestions here 0x10
-		case cProtocol::pktCommnadTree:          return 0x11;
+		case cProtocol::pktCommandTree:          return 0x11;
 		case cProtocol::pktWindowClose:          return 0x12;
 		case cProtocol::pktWindowItems:          return 0x13;  //  Inventory packet
 		case cProtocol::pktWindowProperty:       return 0x14;  //  ScreenHandlerPropertyUpdateS2CPacket
@@ -2069,7 +2069,7 @@ UInt32 cProtocol_1_20_5::GetPacketID(ePacketType a_PacketType) const
 		// ChunkBiomeDataS2CPacket 0x0E
 		// clear title 0x0F
 		// command suggestions here 0x10
-		case cProtocol::pktCommnadTree:          return 0x11;
+		case cProtocol::pktCommandTree:          return 0x11;
 		case cProtocol::pktWindowClose:          return 0x12;
 		case cProtocol::pktWindowItems:          return 0x13;  //  Inventory packet
 		case cProtocol::pktWindowProperty:       return 0x14;  //  ScreenHandlerPropertyUpdateS2CPacket

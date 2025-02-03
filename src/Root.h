@@ -9,6 +9,7 @@
 #include "RankManager.h"
 #include "ChunkDef.h"
 #include "Protocol/Palettes/BlockMap.h"
+#include <AllTags/TagManager.h>
 
 
 
@@ -68,7 +69,7 @@ public:
 	static void Restart();
 
 	BlockMap::cBlockMap * GetBlockMap(void) const { return m_BlockMap; }
-
+	TagManager * GetTagManager(void) const { return m_TagManager; }
 	// tolua_begin
 	cServer * GetServer(void) { return m_Server; }
 	cWorld *  GetDefaultWorld(void);
@@ -220,6 +221,7 @@ private:
 	cServer *        m_Server;
 	cMonsterConfig * m_MonsterConfig;
 	BlockMap::cBlockMap * m_BlockMap;
+	TagManager * m_TagManager;
 
 	cCraftingRecipes * m_CraftingRecipes;
 	std::unique_ptr<cRecipeMapper> m_RecipeMapper;

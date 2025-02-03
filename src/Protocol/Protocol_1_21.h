@@ -88,6 +88,8 @@ protected:
 	virtual void SendSelectKnownPacks() override;
 	// virtual void SendDynamicRegistries() override;
 
+	virtual void SendTags(void) override;
+
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 
 	virtual UInt32 GetProtocolBlockType(BlockState a_Block) const override;

@@ -50,6 +50,7 @@
 #include "OverridesSettingsRepository.h"
 #include "Logger.h"
 #include "ClientHandle.h"
+#include "AllTags/AbstractTag.h"
 
 // temp
 #include "Protocol/Palettes/BlockMap.h"
@@ -173,7 +174,8 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	m_WebAdmin = new cWebAdmin();
 	m_WebAdmin->Init();
 
-
+	m_TagManager = new TagManager();
+	m_TagManager->SetupTags();
 
 	LOGD("Loading settings...");
 	m_RankManager.reset(new cRankManager());
@@ -254,8 +256,9 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOGD("Stopping plugin manager...");
 	delete m_PluginManager; m_PluginManager = nullptr;
 
-	LOGD("Unloading block palettes");
+	LOGD("Unloading block palettes and tags");
 	delete m_BlockMap; m_BlockMap = nullptr;
+	delete m_TagManager; m_TagManager = nullptr;
 
 	LOG("Cleaning up...");
 	delete m_Server; m_Server = nullptr;

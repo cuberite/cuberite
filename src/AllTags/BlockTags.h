@@ -2,7 +2,7 @@
 
 #include "Globals.h"
 
-namespace BlockTags
+namespace nBlockTags
 {
 	bool AcaciaLogs(BlockType a_block);
 	bool Air(BlockType a_block);

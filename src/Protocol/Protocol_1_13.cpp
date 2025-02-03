@@ -160,7 +160,7 @@ void cProtocol_1_13::SendCommandTree()
 #define NEW_COMMAND_TREE 1
 #if NEW_COMMAND_TREE
 	{
-		cPacketizer Pkt(*this, pktCommnadTree);
+		cPacketizer Pkt(*this, pktCommandTree);
 		cRoot::Get()->GetPluginManager()->GetRootCommandNode()->WriteCommandTree(Pkt, *this);
 	}
 #else
@@ -726,7 +726,7 @@ UInt32 cProtocol_1_13::GetPacketID(ePacketType a_PacketType) const
 		case pktCameraSetTo:            return 0x3c;
 		case pktChatRaw:                return 0x0e;
 		case pktCollectEntity:          return 0x4f;
-		case pktCommnadTree:            return 0x11;
+		case pktCommandTree:            return 0x11;
 		case pktDestroyEntity:          return 0x35;
 		case pktDisconnectDuringGame:   return 0x1b;
 		case pktEditSign:               return 0x2c;

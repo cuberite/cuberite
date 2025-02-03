@@ -7,6 +7,7 @@
 namespace Palette_1_21_4
 {
 	UInt32 From(BlockState Block);
+	UInt32 From(BlockType);
 	UInt32 From(Item ID);
 	UInt32 From(CustomStatistic ID);
 	Item ToItem(UInt32 ID);

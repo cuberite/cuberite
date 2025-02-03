@@ -65,23 +65,23 @@ void cProtocol_1_21::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	Byte Action;
 
 	auto type = a_BlockEntity.GetBlockType();
-	if (BlockTags::Banners(type))
+	if (nBlockTags::Banners(type))
 	{
 		Action = 19;
 	}
-	else if (BlockTags::Beds(type))
+	else if (nBlockTags::Beds(type))
 	{
 		Action = 24;
 	}
-	else if (BlockTags::AllHangingSigns(type))
+	else if (nBlockTags::AllHangingSigns(type))
 	{
 		Action = 8;
 	}
-	else if (BlockTags::StandingSigns(type))
+	else if (nBlockTags::StandingSigns(type))
 	{
 		Action = 7;
 	}
-	else if (BlockTags::FlowerPots(type))
+	else if (nBlockTags::FlowerPots(type))
 	{
 		return;  // temp fix
 	}
@@ -650,7 +650,7 @@ UInt32 cProtocol_1_21_2::GetPacketID(ePacketType a_PacketType) const
 			//  ChunkBiomeDataS2CPacket 0x0E
 			//  clear title 0x0F
 			//  command suggestions here 0x10
-		case cProtocol::pktCommnadTree:          return 0x11;
+		case cProtocol::pktCommandTree:          return 0x11;
 		case cProtocol::pktWindowClose:          return 0x12;
 		case cProtocol::pktWindowItems:          return 0x13;  //  Inventory packet
 		case cProtocol::pktWindowProperty:       return 0x14;  //  ScreenHandlerPropertyUpdateS2CPacket
@@ -1541,23 +1541,23 @@ UInt32 cProtocol_1_21_2::GetBlockEntityID(const cBlockEntity & a_BlockEntity) co
 	Byte Action;
 
 	auto type = a_BlockEntity.GetBlockType();
-	if (BlockTags::Banners(type))
+	if (nBlockTags::Banners(type))
 	{
 		Action = 20;
 	}
-	else if (BlockTags::Beds(type))
+	else if (nBlockTags::Beds(type))
 	{
 		Action = 25;
 	}
-	else if (BlockTags::AllHangingSigns(type))
+	else if (nBlockTags::AllHangingSigns(type))
 	{
 		Action = 8;
 	}
-	else if (BlockTags::Signs(type))
+	else if (nBlockTags::Signs(type))
 	{
 		Action = 7;
 	}
-	else if (BlockTags::FlowerPots(type) || (type == BlockType::NoteBlock))
+	else if (nBlockTags::FlowerPots(type) || (type == BlockType::NoteBlock))
 	{
 		return static_cast<UInt32>(-1);  // temp fix
 	}
@@ -1961,4 +1961,31 @@ UInt8 cProtocol_1_21_4::GetProtocolEntityType(const cEntity & a_Entity) const
 Item cProtocol_1_21_4::GetItemFromProtocolID(UInt32 a_ProtocolID) const
 {
 	return Palette_1_21_4::ToItem(a_ProtocolID);
+}
+
+
+
+
+
+void cProtocol_1_21_4::SendTags(void)
+{
+	{
+		cPacketizer Pkt(*this, pktConfigurationTags);
+		Pkt.WriteVarInt32(3);
+		cRoot::Get()->GetTagManager()->GetItemTags().WriteTags<&Palette_1_21_4::From>(Pkt);
+		cRoot::Get()->GetTagManager()->GetBlockTags().WriteTags<&Palette_1_21_4::From>(Pkt);
+		Pkt.WriteString("minecraft:worldgen/biome");
+		Pkt.WriteVarInt32(3);
+			Pkt.WriteString("minecraft:is_badlands");
+			Pkt.WriteVarInt32(1);
+				Pkt.WriteVarInt32(1);
+			Pkt.WriteString("minecraft:is_savanna");
+			Pkt.WriteVarInt32(1);
+				Pkt.WriteVarInt32(2);
+			Pkt.WriteString("minecraft:is_jungle");
+			Pkt.WriteVarInt32(1);
+				Pkt.WriteVarInt32(3);
+			// indent -- Has to be here so CheckBasicStyle does not fail
+		// indent
+	}
 }
