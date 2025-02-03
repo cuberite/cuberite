@@ -1,6 +1,9 @@
 # pragma once
 enum class SoundEvent
 {
+	// Weather
+	LightningboltThunder,
+
 	// Explosions
 	EntityGenericExplode,
 
@@ -24,6 +27,12 @@ enum class SoundEvent
 	BlockChestOpen,
 	BlockChestClose,
 	BlockLeverClick,
+	BlockDispenserFail,
+	BlockDispenserDispense,
+	BlockPistonExtend,
+	BlockPistonContract,
+	BlockWoodbtnClickon,
+	BlockBrewingstandBrew,
 
 	// Items
 	ItemPickup,
@@ -41,5 +50,8 @@ enum class SoundEvent
 	LeashknotPlace,
 	LeashknotBreak,
 	ArrowHit,
+	ArrowShoot,
 	ExporbPickup,
+	FishingbobberSplash,
+	TntPrimed,
 };
