@@ -18,7 +18,7 @@ AString cProtocol_1_8_0::GetProtocolSoundEffectAsString(SoundEvent a_SoundEvent)
 		case SoundEvent::EntityGhastWarn:        return "mob.ghast.charge";
 		case SoundEvent::EntityBlazeShoot:       // Like Ghast Fireball
 		case SoundEvent::EntityGhastShoot:       return "mob.ghast.fireball";
-		case SoundEvent::EntityCreeperPrimed     return "creeper.primed";
+		case SoundEvent::EntityCreeperPrimed:    return "creeper.primed";
 
 		// Blocks
 		case SoundEvent::BlockChestOpen:         return "random.chestopen";
