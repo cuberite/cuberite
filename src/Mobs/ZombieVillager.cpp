@@ -56,7 +56,7 @@ void cZombieVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_ConversionTime == 0)
 	{
-		m_World->BroadcastSoundEffect("entity.zombie_villager.cure", GetPosition(), 1.0f, 1.0f);
+		m_World->BroadcastSoundEffect(SoundEvent::EntityZombievillagerCure, GetPosition(), 1.0f, 1.0f);
 		Destroy();
 		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtVillager, false);
 	}

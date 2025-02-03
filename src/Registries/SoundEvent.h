@@ -16,13 +16,20 @@ enum class SoundEvent
 
 	EntityCreeperPrimed,
 
+	EntityZombievillagerCure,
+
+	EntitySheepShear,
+
 	// Blocks
 	BlockChestOpen,
 	BlockChestClose,
+	BlockLeverClick,
 
 	// Items
+	ItemPickup,
 	ItemHoeTill,
 	ItemFirechargeUse,
+	ItemChorusfruitTeleport,
 
 	// Entity Items
 	EnderEyeCustomSurvive,
@@ -31,4 +38,8 @@ enum class SoundEvent
 	SplashPotionThrow,
 	PaintingBreak,
 	PaintingPlace,
+	LeashknotPlace,
+	LeashknotBreak,
+	ArrowHit,
+	ExporbPickup,
 };
