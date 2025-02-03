@@ -1409,9 +1409,12 @@ void cProtocol_1_8_0::SendSoundEffect(const AString & a_SoundName, Vector3d a_Or
 void cProtocol_1_8_0::SendSoundEffect(eSoundEvent a_SoundEvent, Vector3d a_Origin, float a_Volume, float a_Pitch)
 {
 	AString soundName = GetProtocolSoundEffectAsString(a_SoundEvent);
-	if (soundName.empty() && (a_SoundEvent != eSoundEvent::NullValue))
+	if (soundName.empty())
 	{
-		FLOGD("SoundEvent enum {0} is missing a related sound effect.", a_SoundEvent);
+		if (a_SoundEvent != eSoundEvent::NullValue)
+		{
+			FLOGD("SoundEvent enum {0} is missing a related sound effect.", a_SoundEvent);
+		}
 		return;
 	}
 	FLOGD("SoundEvent enum {0} is playing {1}.", a_SoundEvent, soundName);
