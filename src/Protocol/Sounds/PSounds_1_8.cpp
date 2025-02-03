@@ -7,20 +7,16 @@ AString cProtocol_1_8_0::GetProtocolSoundEffectAsString(SoundEvent a_SoundEvent)
 {
 	switch (a_SoundEvent)
 	{
-		// Ender Eye
-		case SoundEvent::EnderEyeCustomSurvive:  return "random.pop";  // not part of the 1.21.4 sound list
-		case SoundEvent::EnderEyeDeath:          return "dig.glass";
-		case SoundEvent::EnderEyeLaunch:         return "random.bow";
-
 		// Explosions
 		case SoundEvent::EntityGenericExplode:   return "random.explode";
 
 		// Mobs
 		case SoundEvent::EntityHorseAngry:       return "mob.horse.angry";
+		case SoundEvent::PaintingPlace:          // Entity Item Borrow
 		case SoundEvent::EntityHorseSaddle:      return "mob.horse.leather";
 		case SoundEvent::EntityHorseArmor:       return "mob.horse.armor";
 		case SoundEvent::EntityGhastWarn:        return "mob.ghast.charge";
-		case SoundEvent::EntityBlazeShoot:       // Sounds like Ghast Fireball
+		case SoundEvent::EntityBlazeShoot:       // Like Ghast Fireball
 		case SoundEvent::EntityGhastShoot:       return "mob.ghast.fireball";
 		case SoundEvent::EntityCreeperPrimed     return "creeper.primed";
 
@@ -30,6 +26,14 @@ AString cProtocol_1_8_0::GetProtocolSoundEffectAsString(SoundEvent a_SoundEvent)
 
 		// Items
 		case SoundEvent::ItemHoeTill:            return "dig.grass";
+		case SoundEvent::ItemFirechargeUse:      return "item.fireCharge.use";
+
+		// Entity Items
+		case SoundEvent::PaintingBreak:          // Borrow Random Pop
+		case SoundEvent::EnderEyeCustomSurvive:  return "random.pop";  // not part of the 1.21.4 sound list
+		case SoundEvent::EnderEyeDeath:          return "dig.glass";
+		case SoundEvent::EnderEyeLaunch:         // ThrowSounds
+		case SoundEvent::SplashPotionThrow:      return "random.bow";
 	}
 	return AString();
 }

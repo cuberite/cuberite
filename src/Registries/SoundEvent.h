@@ -1,11 +1,6 @@
 # pragma once
 enum class SoundEvent
 {
-	// Ender Eye
-	EnderEyeCustomSurvive,
-	EnderEyeDeath,
-	EnderEyeLaunch,
-
 	// Explosions
 	EntityGenericExplode,
 
@@ -27,4 +22,13 @@ enum class SoundEvent
 
 	// Items
 	ItemHoeTill,
+	ItemFirechargeUse,
+
+	// Entity Items
+	EnderEyeCustomSurvive,
+	EnderEyeDeath,
+	EnderEyeLaunch,
+	SplashPotionThrow,
+	PaintingBreak,
+	PaintingPlace,
 };
