@@ -51,12 +51,12 @@ AString cProtocol_1_8_0::GetProtocolSoundEffectAsString(eSoundEvent a_SoundEvent
 		// Blocks
 		case eSoundEvent::BlockChestOpen:              return "random.chestopen";
 		case eSoundEvent::BlockChestClose:             return "random.chestclosed";
-		case eSoundEvent::BlockDispenserFail:
-		case eSoundEvent::BlockDispenserDispense:
-		case eSoundEvent::BlockWoodbtnClickon:
+		case eSoundEvent::BlockDispenserFail:          // Random.Click
+		case eSoundEvent::BlockDispenserDispense:      // Random.Click
 		case eSoundEvent::BlockLeverClick:             return "random.click";
-		case eSoundEvent::BlockPistonExtend:           return "tile.piston.in";
-		case eSoundEvent::BlockPistonContract:         return "tile.piston.out";
+		case eSoundEvent::BlockWoodbtnClickon:         return "random.wood_click";
+		case eSoundEvent::BlockPistonExtend:           return "tile.piston.out";
+		case eSoundEvent::BlockPistonContract:         return "tile.piston.in";
 		case eSoundEvent::BlockBrewingstandBrew:       return "mob.zombie.unfect";
 
 		// Items

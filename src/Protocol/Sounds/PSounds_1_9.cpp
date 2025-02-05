@@ -4,81 +4,80 @@
 
 
 /**
-* Custom linking from "modern" SoundEvent enums to 1.8 sounds
-* Because no subtitles exist, close sounding sounds are used (just in case)
+* Custom linking from "modern" SoundEvent enums to 1.9 sounds
 */
 AString cProtocol_1_9_0::GetProtocolSoundEffectAsString(eSoundEvent a_SoundEvent) const
 {
-	/*
 	switch (a_SoundEvent)
 	{
+		case eSoundEvent::NullValue:                   return "";
 		// Weather
-		case eSoundEvent::LightningboltThunder:     return "ambient.weather.thunder";
+		case eSoundEvent::LightningboltThunder:        return "entity.lightning.thunder";
 		// Explosions
-		case eSoundEvent::EntityGenericExplode:     return "random.explode";
+		case eSoundEvent::EntityGenericExplode:        return "entity.generic.explode";
 
 		// Mobs
-		case eSoundEvent::EntityHorseAmbient:          return "mob.horse.idle";
-		case eSoundEvent::EntityHorseHurt:             return "mob.horse.hit";
-		case eSoundEvent::EntityHorseDeath:            return "mob.horse.death";
-		case eSoundEvent::EntityHorseAngry:            return "mob.horse.angry";
+		case eSoundEvent::EntityHorseAmbient:          return "entity.horse.ambient";
+		case eSoundEvent::EntityHorseHurt:             return "entity.horse.hurt";
+		case eSoundEvent::EntityHorseDeath:            return "entity.horse.death";
+		case eSoundEvent::EntityHorseAngry:            return "entity.horse.angry";
 		case eSoundEvent::PaintingPlace:               // Entity Item Borrow
-		case eSoundEvent::EntityHorseSaddle:           return "mob.horse.leather";
-		case eSoundEvent::EntityHorseArmor:            return "mob.horse.armor";
-		case eSoundEvent::EntityGhastAmbient:          return "mob.ghast.moan";
-		case eSoundEvent::EntityGhastHurt:             return "mob.ghast.scream";
-		case eSoundEvent::EntityGhastDeath:            return "mob.ghast.death";
-		case eSoundEvent::EntityGhastWarn:             return "mob.ghast.charge";
-		case eSoundEvent::EntityBlazeShoot:            // Like Ghast Fireball
-		case eSoundEvent::EntityGhastShoot:            return "mob.ghast.fireball";
-		case eSoundEvent::EntityBlazeAmbient:          return "mob.blaze.breathe";
-		case eSoundEvent::EntityBlazeHurt:             return "mob.blaze.hit";
-		case eSoundEvent::EntityBlazeDeath:            return "mob.blaze.death";
-		case eSoundEvent::EntityCreeperHurt:           return "mob.creeper.say";
-		case eSoundEvent::EntityCreeperDeath:          return "mob.creeper.death";
-		case eSoundEvent::TntPrimed:
-		case eSoundEvent::EntityCreeperPrimed:         return "creeper.primed";
-		case eSoundEvent::EntityZombievillagerAmbient: return "mob.zombie.say";
-		case eSoundEvent::EntityZombievillagerHurt:    return "mob.zombie.hurt";
-		case eSoundEvent::EntityZombievillagerDeath:   return "mob.zombie.death";
-		case eSoundEvent::EntityZombievillagerCure:    return "mob.zombie.remedy";
+		case eSoundEvent::EntityHorseSaddle:           return "entity.horse.saddle";
+		case eSoundEvent::EntityHorseArmor:            return "entity.horse.armor";
+		case eSoundEvent::EntityBlazeAmbient:          return "entity.blaze.ambient";
+		case eSoundEvent::EntityBlazeHurt:             return "entity.blaze.hurt";
+		case eSoundEvent::EntityBlazeDeath:            return "entity.blaze.death";
+		case eSoundEvent::EntityBlazeShoot:            return "entity.blaze.shoot";
+		case eSoundEvent::EntityGhastAmbient:          return "entity.ghast.ambient";
+		case eSoundEvent::EntityGhastHurt:             return "entity.ghast.hurt";
+		case eSoundEvent::EntityGhastDeath:            return "entity.ghast.death";
+		case eSoundEvent::EntityGhastShoot:            return "entity.ghast.shoot";
+		case eSoundEvent::EntityGhastWarn:             return "entity.ghast.warn";
+		case eSoundEvent::EntityCreeperHurt:           return "entity.creeper.hurt";
+		case eSoundEvent::EntityCreeperDeath:          return "entity.creeper.death";
+		case eSoundEvent::EntityCreeperPrimed:         return "entity.creeper.primed";
+		case eSoundEvent::TntPrimed:                   return "entity.tnt.primed";
+		case eSoundEvent::EntityZombievillagerAmbient: return "entity.zombie.ambient";
+		case eSoundEvent::EntityZombievillagerHurt:    return "entity.zombie.hurt";
+		case eSoundEvent::EntityZombievillagerDeath:   return "entity.zombie.death";
+		case eSoundEvent::EntityZombievillagerCure:    return "entity.zombie.cure";
 		case eSoundEvent::LeashknotBreak:              // Entity Item
-		case eSoundEvent::EntitySheepShear:            return "mob.sheep.shear";
-		case eSoundEvent::EntitySheepHurt:             // Uses Ambient
-		case eSoundEvent::EntitySheepDeath:            // Uses Ambient
-		case eSoundEvent::EntitySheepAmbient:          return "mob.sheep.say";
+		case eSoundEvent::EntitySheepShear:            return "entity.sheep.shear";
+		case eSoundEvent::EntitySheepAmbient:          return "entity.sheep.ambient";
+		case eSoundEvent::EntitySheepHurt:             return "entity.sheep.hurt";
+		case eSoundEvent::EntitySheepDeath:            return "entity.sheep.death";
 
 		// Blocks
-		case eSoundEvent::BlockChestOpen:           return "random.chestopen";
-		case eSoundEvent::BlockChestClose:          return "random.chestclosed";
-		case eSoundEvent::BlockDispenserFail:
-		case eSoundEvent::BlockDispenserDispense:
-		case eSoundEvent::BlockWoodbtnClickon:
-		case eSoundEvent::BlockLeverClick:          return "random.click";
-		case eSoundEvent::BlockPistonExtend:        return "tile.piston.in";
-		case eSoundEvent::BlockPistonContract:      return "tile.piston.out";
-		case eSoundEvent::BlockBrewingstandBrew:    return "mob.zombie.unfect";
+		case eSoundEvent::BlockChestOpen:              return "block.chest.open";
+		case eSoundEvent::BlockChestClose:             return "block.chest.close";
+		case eSoundEvent::BlockDispenserFail:          return "block.dispenser.fail";
+		case eSoundEvent::BlockDispenserDispense:      return "block.dispenser.dispense";
+		case eSoundEvent::BlockWoodbtnClickon:         return "block.wood_button.click_on";
+		case eSoundEvent::BlockLeverClick:             return "block.lever.click";
+		case eSoundEvent::BlockPistonExtend:           return "block.piston.extend";
+		case eSoundEvent::BlockPistonContract:         return "block.piston.contract";
+		case eSoundEvent::BlockBrewingstandBrew:       return "entity.zombie.unfect";
 
 		// Items
-		case eSoundEvent::PaintingBreak:            // Entity Item
-		case eSoundEvent::EnderEyeCustomSurvive:    // Entity Item (custom)
-		case eSoundEvent::ItemPickup:               return "random.pop";
-		case eSoundEvent::ItemHoeTill:              return "dig.grass";
-		case eSoundEvent::ItemFirechargeUse:        return "item.fireCharge.use";
-		case eSoundEvent::ItemFlintsteelUse:        return "fire.ignite";
+		case eSoundEvent::PaintingBreak:               // Entity Item
+		case eSoundEvent::EnderEyeCustomSurvive:       // Entity Item (custom)
+		case eSoundEvent::ItemPickup:                  return "entity.item.pickup";
+		case eSoundEvent::ItemHoeTill:                 return "block.grass.break";
+		case eSoundEvent::ItemFirechargeUse:           return "item.firecharge.use";
+		// Client probably already handles the following; need to test
+		case eSoundEvent::ItemFlintsteelUse:           return "";
 
-		case eSoundEvent::ItemChorusfruitTeleport:  return "mob.endermen.portal";
+		case eSoundEvent::ItemChorusfruitTeleport:     return "entity.shulker.teleport";
 
 		// Entity Items
-		case eSoundEvent::EnderEyeDeath:            return "dig.glass";
-		case eSoundEvent::ArrowShoot:               // ThrowSounds
-		case eSoundEvent::EnderEyeLaunch:           // ThrowSounds
-		case eSoundEvent::SplashPotionThrow:        return "random.bow";
-		case eSoundEvent::LeashknotPlace:           return "step.grass";
-		case eSoundEvent::ArrowHit:                 return "random.bowhit";
-		case eSoundEvent::ExporbPickup:             return "random.orb";
-		case eSoundEvent::FishingbobberSplash:      return "random.splash";
+		case eSoundEvent::EnderEyeDeath:               return "entity.splash_potion.break";
+		case eSoundEvent::ArrowShoot:                  return "entity.arrow.shoot";
+		case eSoundEvent::EnderEyeLaunch:              return "entity.endereye.launch";
+		case eSoundEvent::SplashPotionThrow:           return "entity.splash_potion.throw";
+		case eSoundEvent::LeashknotPlace:              return "block.grass.hit";
+		case eSoundEvent::ArrowHit:                    return "entity.arrow.hit";
+		case eSoundEvent::ExporbPickup:                return "entity.experience_orb.pickup";
+		case eSoundEvent::FishingbobberSplash:         return "entity.bobber.splash";
 	}
-	*/
 	return AString();
 }

@@ -56,6 +56,7 @@ public:
 	virtual void SendPlayerPermissionLevel() override;
 	virtual void SendPlayerSpawn          (const cPlayer & a_Player) override;
 	virtual void SendSoundEffect          (const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch) override;
+	virtual void SendSoundEffect          (const eSoundEvent a_SoundEvent, Vector3d a_Origin, float a_Volume, float a_Pitch) override;
 	virtual void SendSpawnMob             (const cMonster & a_Mob) override;
 	virtual void SendThunderbolt          (Vector3i a_Origin) override;
 	virtual void SendUnleashEntity        (const cEntity & a_Entity) override;

@@ -1413,11 +1413,11 @@ void cProtocol_1_8_0::SendSoundEffect(eSoundEvent a_SoundEvent, Vector3d a_Origi
 	{
 		if (a_SoundEvent != eSoundEvent::NullValue)
 		{
-			FLOGD("SoundEvent enum {0} is missing a related sound effect.", a_SoundEvent);
+			FLOGD("SoundEvent enum {0} is missing a related sound effect using {1}.", a_SoundEvent, GetProtocolVersion());
 		}
 		return;
 	}
-	FLOGD("SoundEvent enum {0} is playing {1}.", a_SoundEvent, soundName);
+	FLOGD("SoundEvent enum {0} is playing {1} using {2}.", a_SoundEvent, soundName, GetProtocolVersion());
 
 	ASSERT(m_State == 3);  // In game mode?
 
