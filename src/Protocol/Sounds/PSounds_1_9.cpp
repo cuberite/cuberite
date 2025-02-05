@@ -56,15 +56,17 @@ AString cProtocol_1_9_0::GetProtocolSoundEffectAsString(eSoundEvent a_SoundEvent
 		case eSoundEvent::BlockLeverClick:             return "block.lever.click";
 		case eSoundEvent::BlockPistonExtend:           return "block.piston.extend";
 		case eSoundEvent::BlockPistonContract:         return "block.piston.contract";
-		case eSoundEvent::BlockBrewingstandBrew:       return "entity.zombie.unfect";
+		case eSoundEvent::BlockBrewingstandBrew:       return "entity.player.levelup";
 
 		// Items
 		case eSoundEvent::PaintingBreak:               // Entity Item
 		case eSoundEvent::EnderEyeCustomSurvive:       // Entity Item (custom)
 		case eSoundEvent::ItemPickup:                  return "entity.item.pickup";
-		case eSoundEvent::ItemHoeTill:                 return "block.grass.break";
+		
 		case eSoundEvent::ItemFirechargeUse:           return "item.firecharge.use";
-		// Client probably already handles the following; need to test
+
+		// Silenced Items (client covers these sounds)
+		case eSoundEvent::ItemHoeTill:                 return "";
 		case eSoundEvent::ItemFlintsteelUse:           return "";
 
 		case eSoundEvent::ItemChorusfruitTeleport:     return "entity.shulker.teleport";
