@@ -21,7 +21,6 @@ AString cProtocol_1_9_0::GetProtocolSoundEffectAsString(eSoundEvent a_SoundEvent
 		case eSoundEvent::EntityHorseHurt:             return "entity.horse.hurt";
 		case eSoundEvent::EntityHorseDeath:            return "entity.horse.death";
 		case eSoundEvent::EntityHorseAngry:            return "entity.horse.angry";
-		case eSoundEvent::PaintingPlace:               // Entity Item Borrow
 		case eSoundEvent::EntityHorseSaddle:           return "entity.horse.saddle";
 		case eSoundEvent::EntityHorseArmor:            return "entity.horse.armor";
 		case eSoundEvent::EntityBlazeAmbient:          return "entity.blaze.ambient";
@@ -41,7 +40,6 @@ AString cProtocol_1_9_0::GetProtocolSoundEffectAsString(eSoundEvent a_SoundEvent
 		case eSoundEvent::EntityZombievillagerHurt:    return "entity.zombie.hurt";
 		case eSoundEvent::EntityZombievillagerDeath:   return "entity.zombie.death";
 		case eSoundEvent::EntityZombievillagerCure:    return "entity.zombie.cure";
-		case eSoundEvent::LeashknotBreak:              // Entity Item
 		case eSoundEvent::EntitySheepShear:            return "entity.sheep.shear";
 		case eSoundEvent::EntitySheepAmbient:          return "entity.sheep.ambient";
 		case eSoundEvent::EntitySheepHurt:             return "entity.sheep.hurt";
@@ -56,10 +54,9 @@ AString cProtocol_1_9_0::GetProtocolSoundEffectAsString(eSoundEvent a_SoundEvent
 		case eSoundEvent::BlockLeverClick:             return "block.lever.click";
 		case eSoundEvent::BlockPistonExtend:           return "block.piston.extend";
 		case eSoundEvent::BlockPistonContract:         return "block.piston.contract";
-		case eSoundEvent::BlockBrewingstandBrew:       return "entity.player.levelup";
+		case eSoundEvent::BlockBrewingstandBrew:       return "block.brewing_stand.brew";
 
 		// Items
-		case eSoundEvent::PaintingBreak:               // Entity Item
 		case eSoundEvent::EnderEyeCustomSurvive:       // Entity Item (custom)
 		case eSoundEvent::ItemPickup:                  return "entity.item.pickup";
 		
@@ -76,10 +73,13 @@ AString cProtocol_1_9_0::GetProtocolSoundEffectAsString(eSoundEvent a_SoundEvent
 		case eSoundEvent::ArrowShoot:                  return "entity.arrow.shoot";
 		case eSoundEvent::EnderEyeLaunch:              return "entity.endereye.launch";
 		case eSoundEvent::SplashPotionThrow:           return "entity.splash_potion.throw";
-		case eSoundEvent::LeashknotPlace:              return "block.grass.hit";
 		case eSoundEvent::ArrowHit:                    return "entity.arrow.hit";
 		case eSoundEvent::ExporbPickup:                return "entity.experience_orb.pickup";
 		case eSoundEvent::FishingbobberSplash:         return "entity.bobber.splash";
+		case eSoundEvent::LeashknotBreak:              return "entity.leashknot.break";
+		case eSoundEvent::LeashknotPlace:              return "entity.leashknot.place";
+		case eSoundEvent::PaintingPlace:               return "entity.painting.place";
+		case eSoundEvent::PaintingBreak:               return "entity.painting.break";
 	}
 	return AString();
 }
