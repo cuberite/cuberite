@@ -37,6 +37,7 @@ Implements the 1.13 protocol classes:
 #include "BlockEntities/MobSpawnerEntity.h"
 #include "Entities/FallingBlock.h"
 #include "Entities/Floater.h"
+#include "fmt/format.h"
 
 #include "Palettes/Palette_1_13.h"
 #include "Palettes/Palette_1_13_1.h"

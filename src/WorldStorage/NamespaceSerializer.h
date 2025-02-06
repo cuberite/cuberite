@@ -6,6 +6,7 @@
 #include "Mobs/MonsterTypes.h"
 #include "Registries/CustomStatistics.h"
 #include "Registries/BlockTypes.h"
+#include "Registries/Fluids.h"
 #include "Registries/Items.h"
 
 namespace NamespaceSerializer
@@ -25,14 +26,17 @@ namespace NamespaceSerializer
 	std::string_view From(eEntityType a_ID);
 	std::string_view From(Item a_ID);
 	std::string_view From(cEntityEffect::eType a_ID);
+	std::string_view From(FluidType a_ID);
 
 	BlockType ToBlockType(std::string_view a_ID);
 	CustomStatistic ToCustomStatistic(std::string_view a_ID);
 	Item ToItem(std::string_view a_ID);
 	eEntityType ToEntityType(std::string_view a_ID);
 	cEntityEffect::eType ToEntityEffect(std::string_view a_ID);
+	FluidType ToFluidType(std::string_view a_ID);
 
-	std::pair<Namespace, std::string_view> SplitNamespacedID(std::string_view ID);
+	std::pair<Namespace, std::string_view>
+	SplitNamespacedID(std::string_view ID);
 
 	// Examples: Input: "wolf" -> Output: "Wolf", Input: "iron_golem" -> Output: "Iron Golem"
 	AString Prettify(AString a_ID);

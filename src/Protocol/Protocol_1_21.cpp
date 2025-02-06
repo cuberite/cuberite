@@ -2299,9 +2299,10 @@ void cProtocol_1_21_4::SendTags(void)
 {
 	{
 		cPacketizer Pkt(*this, pktConfigurationTags);
-		Pkt.WriteVarInt32(3);
+		Pkt.WriteVarInt32(4);
 		cRoot::Get()->GetTagManager()->GetItemTags().WriteTags<&Palette_1_21_4::From>(Pkt);
 		cRoot::Get()->GetTagManager()->GetBlockTags().WriteTags<&Palette_1_21_4::From>(Pkt);
+		cRoot::Get()->GetTagManager()->GetFluidTags().WriteTags<&Palette_1_21_4::From>(Pkt);
 		Pkt.WriteString("minecraft:worldgen/biome");
 		Pkt.WriteVarInt32(3);
 			Pkt.WriteString("minecraft:is_badlands");

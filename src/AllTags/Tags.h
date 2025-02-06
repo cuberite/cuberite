@@ -337,7 +337,11 @@ enum class BlockTags
 	Mineable_Pickaxe,
 	Mineable_Shovel,
 };
-
+enum class FluidTags
+{
+	Lava,
+	Water,
+};
 
 namespace TagTranslation
 {
@@ -493,6 +497,7 @@ namespace TagTranslation
 			case ItemTags::Enchantable_Vanishing:     return "enchantable\\vanishing";
 			case ItemTags::Enchantable_Weapon:        return "enchantable\\weapon";
 		}
+		UNREACHABLE("Unknown item tag");
 	}
 	inline std::string_view GetBlock(BlockTags a_Block)
 	{
@@ -683,5 +688,15 @@ namespace TagTranslation
 			case BlockTags::Mineable_Pickaxe:               return "mineable\\pickaxe";
 			case BlockTags::Mineable_Shovel:                return "mineable\\shovel";
 		}
+		UNREACHABLE("Unknown Block Tag");
+	}
+	inline std::string_view GetFluid(FluidTags a_Fluid)
+	{
+		switch (a_Fluid)
+		{
+			case FluidTags::Lava:  return "lava";
+			case FluidTags::Water: return "water";
+		}
+		UNREACHABLE("Unknown fluid tag");
 	}
 }

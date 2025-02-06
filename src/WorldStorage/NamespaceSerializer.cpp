@@ -2838,6 +2838,23 @@ std::string_view NamespaceSerializer::From(cEntityEffect::eType a_ID)
 
 
 
+std::string_view NamespaceSerializer::From(FluidType a_ID)
+{
+	switch (a_ID)
+	{
+		case FluidType::Empty:        return "empty";
+		case FluidType::FlowingLava:  return "flowing_lava";
+		case FluidType::FlowingWater: return "flowing_water";
+		case FluidType::Lava:         return "lava";
+		case FluidType::Water:        return "water";
+	}
+	UNREACHABLE("Unknown fluid type");
+}
+
+
+
+
+
 BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 {
 	static const std::unordered_map<std::string_view, BlockType> BlockTypes
@@ -5892,6 +5909,31 @@ cEntityEffect::eType NamespaceSerializer::ToEntityEffect(std::string_view a_ID)
 	{
 		FLOGWARNING("Tried to read unknown effect type {}, returning effNoEffect", a_ID);
 		return cEntityEffect::eType::effNoEffect;
+	}
+}
+
+
+
+
+
+FluidType NamespaceSerializer::ToFluidType(std::string_view a_ID)
+{
+	static const std::unordered_map<std::string_view, FluidType> FluidTypes
+	{
+		{ "empty",         FluidType::Empty},
+		{ "flowing_lava",  FluidType::FlowingLava},
+		{ "flowing_water", FluidType::FlowingWater},
+		{ "lava",          FluidType::Lava},
+		{ "water",         FluidType::Water},
+	};
+	try
+	{
+		return FluidTypes.at(a_ID);
+	}
+	catch (...)
+	{
+		FLOGWARNING("Tried to read unknown fluid type {}, returning Empty", a_ID);
+		return FluidType::Empty;
 	}
 }
 

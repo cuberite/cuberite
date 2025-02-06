@@ -4,6 +4,7 @@
 #include "BlockType.h"
 #include "BlockMap.h"
 #include "Root.h"
+#include "fmt/format.h"
 
 namespace Palette_1_21_4
 {
@@ -11,6 +12,20 @@ namespace Palette_1_21_4
 	{
 		return cRoot::Get()->GetBlockMap()->GetProtocolBlockId(cProtocol::Version::v1_21_4, Block);
 	}
+	UInt32 From(FluidType a_Fluid)
+	{
+		switch (a_Fluid)
+		{
+			case FluidType::Empty:        return 0;
+			case FluidType::FlowingLava:  return 3;
+			case FluidType::FlowingWater: return 1;
+			case FluidType::Lava:         return 4;
+			case FluidType::Water:        return 2;
+		}
+		LOGWARN(fmt::format(FMT_STRING("Unknown fluid type {}"), static_cast<UInt32>(a_Fluid)));
+		return 0;
+	}
+
 	UInt32 From(const BlockType Block)
 	{
 		switch (Block)
