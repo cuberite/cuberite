@@ -36,10 +36,10 @@ AString cProtocol_1_9_0::GetProtocolSoundEffectAsString(eSoundEvent a_SoundEvent
 		case eSoundEvent::EntityCreeperDeath:          return "entity.creeper.death";
 		case eSoundEvent::EntityCreeperPrimed:         return "entity.creeper.primed";
 		case eSoundEvent::TntPrimed:                   return "entity.tnt.primed";
-		case eSoundEvent::EntityZombievillagerAmbient: return "entity.zombie.ambient";
-		case eSoundEvent::EntityZombievillagerHurt:    return "entity.zombie.hurt";
-		case eSoundEvent::EntityZombievillagerDeath:   return "entity.zombie.death";
-		case eSoundEvent::EntityZombievillagerCure:    return "entity.zombie.cure";
+		case eSoundEvent::EntityZombievillagerAmbient: return "entity.zombie_villager.ambient";
+		case eSoundEvent::EntityZombievillagerHurt:    return "entity.zombie_villager.hurt";
+		case eSoundEvent::EntityZombievillagerDeath:   return "entity.zombie_villager.death";
+		case eSoundEvent::EntityZombievillagerCure:    return "entity.zombie_villager.cure";
 		case eSoundEvent::EntitySheepShear:            return "entity.sheep.shear";
 		case eSoundEvent::EntitySheepAmbient:          return "entity.sheep.ambient";
 		case eSoundEvent::EntitySheepHurt:             return "entity.sheep.hurt";
@@ -66,7 +66,7 @@ AString cProtocol_1_9_0::GetProtocolSoundEffectAsString(eSoundEvent a_SoundEvent
 		case eSoundEvent::ItemHoeTill:                 return "";
 		case eSoundEvent::ItemFlintsteelUse:           return "";
 
-		case eSoundEvent::ItemChorusfruitTeleport:     return "entity.shulker.teleport";
+		case eSoundEvent::ItemChorusfruitTeleport:     return "item.chorus_fruit.teleport";
 
 		// Entity Items
 		case eSoundEvent::EnderEyeDeath:               return "entity.splash_potion.break";

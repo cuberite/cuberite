@@ -53,6 +53,7 @@ protected:
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
 	virtual UInt32 GetProtocolItemType(short a_ItemID, short a_ItemDamage) const;
 	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
+	virtual AString GetProtocolSoundEffectAsString(eSoundEvent a_SoundEvent) const override;
 	virtual UInt32 GetProtocolStatisticType(CustomStatistic a_Statistic) const;
 	virtual Version GetProtocolVersion() const override;
 
