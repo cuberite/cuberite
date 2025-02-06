@@ -45,7 +45,7 @@ void cLeashKnot::TiePlayersLeashedMobs(cPlayer & a_Player, bool a_ShouldBroadcas
 	a_Player.GetWorld()->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8, -4), [&](cEntity & a_Entity)
 		{
 			// If the entity is not a monster skip it
-			if (a_Entity.GetEntityType() != cEntity::eEntityType::etMonster)
+			if (!a_Entity.IsMob())
 			{
 				return false;
 			}

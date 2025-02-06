@@ -10,7 +10,7 @@
 
 
 cEnderDragon::cEnderDragon(void) :
-	Super("EnderDragon", mtEnderDragon, "entity.enderdragon.hurt", "entity.enderdragon.death", "entity.enderdragon.ambient", 16, 8)
+	Super("EnderDragon", etEnderDragon, "entity.enderdragon.hurt", "entity.enderdragon.death", "entity.enderdragon.ambient", 16, 8)
 {
 }
 

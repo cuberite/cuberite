@@ -16,7 +16,7 @@ class cItemThrowableHandler:
 
 public:
 
-	constexpr cItemThrowableHandler(Item a_ItemType, cProjectileEntity::eKind a_ProjectileKind, double a_SpeedCoeff):
+	constexpr cItemThrowableHandler(Item a_ItemType, eEntityType a_ProjectileKind, double a_SpeedCoeff):
 		Super(a_ItemType),
 		m_ProjectileKind(a_ProjectileKind),
 		m_SpeedCoeff(a_SpeedCoeff)
@@ -60,7 +60,7 @@ public:
 protected:
 
 	/** The kind of projectile to create when shooting */
-	cProjectileEntity::eKind m_ProjectileKind;
+	eEntityType m_ProjectileKind;
 
 	/** The speed multiplier (to the player's normalized look vector) to set for the new projectile. */
 	double m_SpeedCoeff;
@@ -80,7 +80,7 @@ class cItemEggHandler final:
 public:
 
 	constexpr cItemEggHandler(Item a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkEgg, 30)
+		Super(a_ItemType, etEgg, 30)
 	{
 	}
 } ;
@@ -96,7 +96,7 @@ class cItemSnowballHandler final:
 public:
 
 	constexpr cItemSnowballHandler(Item a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkSnowball, 30)
+		Super(a_ItemType, etSnowball, 30)
 	{
 	}
 } ;
@@ -113,7 +113,7 @@ class cItemEnderPearlHandler final:
 public:
 
 	constexpr cItemEnderPearlHandler(Item a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkEnderPearl, 30)
+		Super(a_ItemType, etEnderPearl, 30)
 	{
 	}
 } ;
@@ -130,7 +130,7 @@ class cItemBottleOEnchantingHandler final :
 public:
 
 	constexpr cItemBottleOEnchantingHandler(Item a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkExpBottle, 14)
+		Super(a_ItemType, etExperienceBottle, 14)
 	{
 	}
 };
@@ -147,7 +147,7 @@ class cItemFireworkHandler final:
 public:
 
 	constexpr cItemFireworkHandler(Item a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkFirework, 0)
+		Super(a_ItemType, etFireworkRocket, 0)
 	{
 	}
 

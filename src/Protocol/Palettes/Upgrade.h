@@ -1,4 +1,4 @@
-//#pragma once
+#pragma once
 
 #include "ChunkDef.h"
 #include "BlockState.h"

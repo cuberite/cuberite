@@ -27,7 +27,7 @@ public:  // tolua_export
 	Returns the UniqueID of the spawned projectile, or cEntity::INVALID_ID on failure. */
 	UInt32 SpawnProjectileFromDispenser(
 		Vector3i a_BlockPos,
-		cProjectileEntity::eKind a_Kind,
+		eEntityType a_Kind,
 		const Vector3d & a_Speed,
 		const cItem * a_Item = nullptr
 	);
@@ -38,7 +38,7 @@ public:  // tolua_export
 	Returns the UniqueID of the spawned projectile, or cEntity::INVALID_ID on failure. */
 	UInt32 SpawnProjectileFromDispenser(
 		int a_BlockX, int a_BlockY, int a_BlockZ,
-		cProjectileEntity::eKind a_Kind,
+		eEntityType a_Kind,
 		const Vector3d & a_Speed,
 		const cItem * a_Item = nullptr
 	)

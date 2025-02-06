@@ -8,7 +8,7 @@
 
 
 cGiant::cGiant(void) :
-	Super("Giant", mtGiant, "entity.zombie.hurt", "entity.zombie.death", "entity.zombie.ambient", 3.6f, 12)
+	Super("Giant", etGiant, "entity.zombie.hurt", "entity.zombie.death", "entity.zombie.ambient", 3.6f, 12)
 {
 
 }

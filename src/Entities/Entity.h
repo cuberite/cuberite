@@ -4,9 +4,7 @@
 #include "../BoundingBox.h"
 #include "../Item.h"
 #include "../OSSupport/AtomicUniquePtr.h"
-
-
-
+#include "../Mobs/MonsterTypes.h"
 
 
 // Place this macro in the public section of each cEntity descendant class and you're done :)
@@ -69,8 +67,6 @@ struct TakeDamageInfo
 
 
 
-
-
 // tolua_begin
 class cEntity
 {
@@ -84,28 +80,6 @@ protected:
 	};
 
 public:
-
-	enum eEntityType
-	{
-		etEntity,  // For all other types
-		etEnderCrystal,
-		etPlayer,
-		etPickup,
-		etMonster,
-		etFallingBlock,
-		etMinecart,
-		etBoat,
-		etTNT,
-		etProjectile,
-		etExpOrb,
-		etFloater,
-		etItemFrame,
-		etPainting,
-		etLeashKnot,
-
-		// Common variations
-		etMob = etMonster,  // DEPRECATED, use etMonster instead!
-	} ;
 
 	// tolua_end
 
@@ -156,18 +130,18 @@ public:
 	eEntityType GetEntityType(void) const { return m_EntityType; }
 
 	bool IsArrow       (void) const { return IsA("cArrowEntity");              }
-	bool IsEnderCrystal(void) const { return (m_EntityType == etEnderCrystal); }
+	bool IsEnderCrystal(void) const { return (m_EntityType == etEndCrystal);   }
 	bool IsPlayer      (void) const { return (m_EntityType == etPlayer);       }
-	bool IsPickup      (void) const { return (m_EntityType == etPickup);       }
-	bool IsMob         (void) const { return (m_EntityType == etMonster);      }
+	bool IsPickup      (void) const { return (m_EntityType == etItem);         }
+	virtual bool IsMob       (void) const { return false; }
+	virtual bool IsBoat      (void) const { return false; }
+	virtual bool IsProjectile(void) const { return false; }
 	bool IsPawn        (void) const { return (IsMob() || IsPlayer());          }
 	bool IsFallingBlock(void) const { return (m_EntityType == etFallingBlock); }
 	bool IsMinecart    (void) const { return (m_EntityType == etMinecart);     }
-	bool IsBoat        (void) const { return (m_EntityType == etBoat);         }
-	bool IsTNT         (void) const { return (m_EntityType == etTNT);          }
-	bool IsProjectile  (void) const { return (m_EntityType == etProjectile);   }
-	bool IsExpOrb      (void) const { return (m_EntityType == etExpOrb);       }
-	bool IsFloater     (void) const { return (m_EntityType == etFloater);      }
+	bool IsTNT         (void) const { return (m_EntityType == etTnt);          }
+	bool IsExpOrb      (void) const { return (m_EntityType == etExperienceOrb);}
+	bool IsFloater     (void) const { return (m_EntityType == etFishingBobber);}
 	bool IsItemFrame   (void) const { return (m_EntityType == etItemFrame);    }
 	bool IsLeashKnot   (void) const { return (m_EntityType == etLeashKnot);    }
 	bool IsPainting    (void) const { return (m_EntityType == etPainting);     }
@@ -451,6 +425,8 @@ public:
 	{
 		return (m_WorldChangeInfo.m_NewWorld != nullptr);
 	}
+
+	void SetOnGround(bool a_OnGround) { m_bOnGround = a_OnGround; };
 
 	/** Updates clients of changes in the entity. */
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);

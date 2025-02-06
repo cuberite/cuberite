@@ -12,7 +12,7 @@
 
 
 cWolf::cWolf(void) :
-	Super("Wolf", mtWolf, "entity.wolf.hurt", "entity.wolf.death", "entity.wolf.ambient", 0.6f, 0.85f),
+	Super("Wolf", etWolf, "entity.wolf.hurt", "entity.wolf.death", "entity.wolf.ambient", 0.6f, 0.85f),
 	m_IsSitting(false),
 	m_IsTame(false),
 	m_IsBegging(false),
@@ -145,7 +145,7 @@ void cWolf::ReceiveNearbyFightInfo(const cUUID & a_PlayerID, cPawn * a_Opponent,
 		return;  // Our owner has hurt himself, avoid attacking them.
 	}
 
-	if (a_Opponent->IsMob() && static_cast<cMonster *>(a_Opponent)->GetMobType() == mtWolf)
+	if (a_Opponent->IsMob() && static_cast<cMonster *>(a_Opponent)->GetEntityType() == etWolf)
 	{
 		cWolf * Wolf = static_cast<cWolf *>(a_Opponent);
 		if (Wolf->GetOwnerUUID() == GetOwnerUUID())
@@ -334,10 +334,10 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			case Item::ZombiePigmanSpawnEgg:
 			case Item::ZombieVillagerSpawnEgg:
 			{
-				eMonsterType MonsterType = cItemSpawnEggHandler::ItemToMonsterType(EquippedItem.m_ItemType);
+				auto MonsterType = cItemSpawnEggHandler::ItemToMonsterType(EquippedItem.m_ItemType);
 				if (
-					(MonsterType == m_MobType) &&
-					(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID))  // Spawning succeeded
+					(MonsterType == m_EntityType) &&
+					(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_EntityType, true) != cEntity::INVALID_ID))  // Spawning succeeded
 				{
 					if (!a_Player.IsGameModeCreative())
 					{

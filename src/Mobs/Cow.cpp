@@ -9,7 +9,7 @@
 
 
 cCow::cCow(void) :
-	Super("Cow", mtCow, "entity.cow.hurt", "entity.cow.death", "entity.cow.ambient", 0.9f, 1.4f)
+	Super("Cow", etCow, "entity.cow.hurt", "entity.cow.death", "entity.cow.ambient", 0.9f, 1.4f)
 {
 }
 

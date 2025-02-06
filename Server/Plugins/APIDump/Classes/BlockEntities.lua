@@ -767,8 +767,8 @@ World:ForEachChestInChunk(Player:GetChunkX(), Player:GetChunkZ(),
 						Type = "number",
 					},
 					{
-						Name = "Kind",
-						Type = "cProjectileEntity#eKind",
+						Name = "Type",
+						Type = "number",
 					},
 					{
 						Name = "Speed",

@@ -9,7 +9,7 @@
 cMagmaCube::cMagmaCube(int a_Size) :
 	Super(
 		"MagmaCube",
-		mtMagmaCube,
+		etMagmaCube,
 		fmt::format(FMT_STRING("entity.{}magmacube.hurt"),  GetSizeName(a_Size)),
 		fmt::format(FMT_STRING("entity.{}magmacube.death"), GetSizeName(a_Size)),
 		"",

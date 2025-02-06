@@ -9,7 +9,7 @@
 
 
 cBee::cBee(void) :
-	Super("Bee", mtBee, "entity.bee.hurt", "entity.bee.death", "entity.bee.ambient", 0.5f, 0.9f)
+	Super("Bee", etBee, "entity.bee.hurt", "entity.bee.death", "entity.bee.ambient", 0.5f, 0.9f)
 {
 	SetMaxHealth(10.0f);
 	SetGravity(-2.0f);

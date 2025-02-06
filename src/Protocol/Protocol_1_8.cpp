@@ -452,7 +452,7 @@ void cProtocol_1_8_0::SendDestroyEntity(const cEntity & a_Entity)
 	}
 
 	const auto & Mob = static_cast<const cMonster &>(a_Entity);
-	if ((Mob.GetMobType() == mtEnderDragon) || (Mob.GetMobType() == mtWither))
+	if ((Mob.GetEntityType() == etEnderDragon) || (Mob.GetEntityType() == etWither))
 	{
 		SendBossBarRemove(Mob.GetUniqueID());
 	}
@@ -1492,7 +1492,7 @@ void cProtocol_1_8_0::SendSoundParticleEffect(const EffectID a_EffectID, Vector3
 void cProtocol_1_8_0::SendSpawnEntity(const cEntity & a_Entity)
 {
 	Int32 EntityData = /* Default: velocity present flag */ 1;
-	const auto EntityType = GetProtocolEntityType(a_Entity);
+	const auto EntityType = GetProtocolEntityType(a_Entity.GetEntityType());
 
 	if (a_Entity.IsMinecart())
 	{
@@ -1517,10 +1517,9 @@ void cProtocol_1_8_0::SendSpawnEntity(const cEntity & a_Entity)
 	}
 	else if (a_Entity.IsProjectile())
 	{
-		using PType = cProjectileEntity::eKind;
 		const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
 
-		if (Projectile.GetProjectileKind() == PType::pkArrow)
+		if (Projectile.GetEntityType() == etArrow)
 		{
 			const auto & Arrow = static_cast<const cArrowEntity &>(Projectile);
 			EntityData = static_cast<Int32>(Arrow.GetCreatorUniqueID() + 1);
@@ -1538,7 +1537,7 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	const auto MobType = GetProtocolMobType(a_Mob.GetMobType());
+	const auto MobType = GetProtocolEntityType(a_Mob.GetEntityType());
 
 	// If the type is not valid in this protocol bail out:
 	if (MobType == 0)
@@ -2197,64 +2196,6 @@ signed char cProtocol_1_8_0::GetProtocolEntityStatus(const EntityAnimation a_Ani
 		case EntityAnimation::WolfTamingSucceeds: return 7;
 		case EntityAnimation::ZombieVillagerCureFinishes: return 16;
 		default: return -1;
-	}
-}
-
-
-
-
-
-UInt32 cProtocol_1_8_0::GetProtocolMobType(const eMonsterType a_MobType) const
-{
-	switch (a_MobType)
-	{
-		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
-		case mtInvalidType:           return 53;
-		case mtBat:                   return 65;
-		case mtBlaze:                 return 61;
-		case mtCaveSpider:            return 59;
-		case mtChicken:               return 93;
-		case mtCow:                   return 92;
-		case mtCreeper:               return 50;
-		case mtEnderDragon:           return 63;
-		case mtEnderman:              return 58;
-		case mtEndermite:             return 67;
-		case mtGhast:                 return 56;
-		case mtGiant:                 return 53;
-		case mtGuardian:              return 68;
-		case mtHorse:                 return 100;
-		case mtIronGolem:             return 99;
-		case mtMagmaCube:             return 62;
-		case mtMooshroom:             return 96;
-		case mtOcelot:                return 98;
-		case mtPig:                   return 90;
-		case mtRabbit:                return 101;
-		case mtSheep:                 return 91;
-		case mtSilverfish:            return 60;
-		case mtSkeleton:              return 51;
-		case mtSlime:                 return 55;
-		case mtSnowGolem:             return 97;
-		case mtSpider:                return 52;
-		case mtSquid:                 return 94;
-		case mtVillager:              return 120;
-		case mtWitch:                 return 66;
-		case mtWither:                return 64;
-		case mtWitherSkeleton:        return 51;
-		case mtWolf:                  return 95;
-		case mtZombie:                return 54;
-		case mtZombiePigman:          return 57;
-		case mtZombieVillager:        return 27;
-
-		// Mobs that get replaced with another because they were added later
-		case mtCat:                   return GetProtocolMobType(mtOcelot);
-		case mtDonkey:                return GetProtocolMobType(mtHorse);
-		case mtMule:                  return GetProtocolMobType(mtHorse);
-		case mtSkeletonHorse:         return GetProtocolMobType(mtHorse);
-		case mtZombieHorse:           return GetProtocolMobType(mtHorse);
-		case mtStray:                 return GetProtocolMobType(mtSkeleton);
-		case mtHusk:                  return GetProtocolMobType(mtZombie);
-
-		default:                      return 0;
 	}
 }
 
@@ -3523,7 +3464,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 
 
 
-void cProtocol_1_8_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
+void cProtocol_1_8_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity, bool a_WriteCommon) const
 {
 	// Common metadata:
 	Byte Flags = 0;
@@ -3553,121 +3494,6 @@ void cProtocol_1_8_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 	}
 	a_Pkt.WriteBEUInt8(0);  // Byte(0) + index 0
 	a_Pkt.WriteBEUInt8(Flags);
-
-	switch (a_Entity.GetEntityType())
-	{
-		case cEntity::etPlayer:
-		{
-			auto & Player = static_cast<const cPlayer &>(a_Entity);
-
-			// Player name:
-			a_Pkt.WriteBEUInt8(0x82);
-			a_Pkt.WriteString(Player.GetName());
-
-			// Player health:
-			a_Pkt.WriteBEUInt8(0x66);
-			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
-
-			// Skin flags:
-			a_Pkt.WriteBEUInt8(0x0A);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
-
-			break;
-		}
-		case cEntity::etPickup:
-		{
-			a_Pkt.WriteBEUInt8((5 << 5) | 10);  // Slot(5) + index 10
-			WriteItem(a_Pkt, static_cast<const cPickup &>(a_Entity).GetItem());
-			break;
-		}
-		case cEntity::etMinecart:
-		{
-			a_Pkt.WriteBEUInt8(0x51);
-
-			// The following expression makes Minecarts shake more with less health or higher damage taken
-			// It gets half the maximum health, and takes it away from the current health minus the half health:
-			/*
-			Health: 5 | 3 - (5 - 3) = 1 (shake power)
-			Health: 3 | 3 - (3 - 3) = 3
-			Health: 1 | 3 - (1 - 3) = 5
-			*/
-			auto & Minecart = static_cast<const cMinecart &>(a_Entity);
-			a_Pkt.WriteBEInt32(static_cast<Int32>((((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * Minecart.LastDamage()) * 4));
-			a_Pkt.WriteBEUInt8(0x52);
-			a_Pkt.WriteBEInt32(1);  // Shaking direction, doesn't seem to affect anything
-			a_Pkt.WriteBEUInt8(0x73);
-			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));  // Damage taken / shake effect multiplyer
-
-			if (Minecart.GetPayload() == cMinecart::mpNone)
-			{
-				auto & RideableMinecart = static_cast<const cRideableMinecart &>(Minecart);
-				const cItem & MinecartContent = RideableMinecart.GetContent();
-				if (!MinecartContent.IsEmpty())
-				{
-					a_Pkt.WriteBEUInt8(0x54);
-					auto Content = PaletteUpgrade::ToItem(MinecartContent.m_ItemType).first;
-					Content |= MinecartContent.m_ItemDamage << 8;
-					a_Pkt.WriteBEInt32(Content);
-					a_Pkt.WriteBEUInt8(0x55);
-					a_Pkt.WriteBEInt32(RideableMinecart.GetBlockHeight());
-					a_Pkt.WriteBEUInt8(0x56);
-					a_Pkt.WriteBEUInt8(1);
-				}
-			}
-			else if (Minecart.GetPayload() == cMinecart::mpFurnace)
-			{
-				a_Pkt.WriteBEUInt8(0x10);
-				a_Pkt.WriteBEUInt8(static_cast<const cMinecartWithFurnace &>(Minecart).IsFueled() ? 1 : 0);
-			}
-			break;
-		}  // case etMinecart
-
-		case cEntity::etProjectile:
-		{
-			auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
-			switch (Projectile.GetProjectileKind())
-			{
-				case cProjectileEntity::pkArrow:
-				{
-					a_Pkt.WriteBEUInt8(0x10);
-					a_Pkt.WriteBEUInt8(static_cast<const cArrowEntity &>(Projectile).IsCritical() ? 1 : 0);
-					break;
-				}
-				case cProjectileEntity::pkFirework:
-				{
-					a_Pkt.WriteBEUInt8(0xa8);
-					WriteItem(a_Pkt, static_cast<const cFireworkEntity &>(Projectile).GetItem());
-					break;
-				}
-				default:
-				{
-					break;
-				}
-			}
-			break;
-		}  // case etProjectile
-
-		case cEntity::etMonster:
-		{
-			WriteMobMetadata(a_Pkt, static_cast<const cMonster &>(a_Entity));
-			break;
-		}
-
-		case cEntity::etItemFrame:
-		{
-			auto & Frame = static_cast<const cItemFrame &>(a_Entity);
-			a_Pkt.WriteBEUInt8(0xa8);
-			WriteItem(a_Pkt, Frame.GetItem());
-			a_Pkt.WriteBEUInt8(0x09);
-			a_Pkt.WriteBEUInt8(Frame.GetItemRotation());
-			break;
-		}  // case etItemFrame
-
-		default:
-		{
-			break;
-		}
-	}
 }
 
 
@@ -3796,333 +3622,6 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 
 
 
-void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const
-{
-	// Living Enitiy Metadata
-	if (a_Mob.HasCustomName())
-	{
-		a_Pkt.WriteBEUInt8(0x82);
-		a_Pkt.WriteString(a_Mob.GetCustomName());
-
-		a_Pkt.WriteBEUInt8(0x03);
-		a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
-	}
-
-	a_Pkt.WriteBEUInt8(0x66);
-	a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
-
-	switch (a_Mob.GetMobType())
-	{
-		case mtBat:
-		{
-			auto & Bat = static_cast<const cBat &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(Bat.IsHanging() ? 1 : 0);
-			break;
-		}  // case mtBat
-
-		case mtChicken:
-		{
-			auto & Chicken = static_cast<const cChicken &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Chicken.IsBaby() ? -1 : (Chicken.IsInLoveCooldown() ? 1 : 0));
-			break;
-		}  // case mtChicken
-
-		case mtCow:
-		{
-			auto & Cow = static_cast<const cCow &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Cow.IsBaby() ? -1 : (Cow.IsInLoveCooldown() ? 1 : 0));
-			break;
-		}  // case mtCow
-
-		case mtCreeper:
-		{
-			auto & Creeper = static_cast<const cCreeper &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(Creeper.IsBlowing() ? 1 : 255);
-			a_Pkt.WriteBEUInt8(0x11);
-			a_Pkt.WriteBEUInt8(Creeper.IsCharged() ? 1 : 0);
-			break;
-		}  // case mtCreeper
-
-		case mtEnderman:
-		{
-			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x30);
-			auto NumericBlock = PaletteUpgrade::ToBlock(Enderman.GetCarriedBlock());
-			a_Pkt.WriteBEInt16(static_cast<Byte>(NumericBlock.first));
-			a_Pkt.WriteBEUInt8(0x11);
-			a_Pkt.WriteBEUInt8(static_cast<Byte>(NumericBlock.second));
-			a_Pkt.WriteBEUInt8(0x12);
-			a_Pkt.WriteBEUInt8(Enderman.IsScreaming() ? 1 : 0);
-			break;
-		}  // case mtEnderman
-
-		case mtGhast:
-		{
-			auto & Ghast = static_cast<const cGhast &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(Ghast.IsCharging());
-			break;
-		}  // case mtGhast
-
-		case mtHorse:
-		{
-			auto & Horse = static_cast<const cHorse &>(a_Mob);
-			int Flags = 0;
-			if (Horse.IsTame())
-			{
-				Flags |= 0x02;
-			}
-			if (Horse.IsSaddled())
-			{
-				Flags |= 0x04;
-			}
-			if (Horse.IsChested())
-			{
-				Flags |= 0x08;
-			}
-			if (Horse.IsEating())
-			{
-				Flags |= 0x20;
-			}
-			if (Horse.IsRearing())
-			{
-				Flags |= 0x40;
-			}
-			if (Horse.IsMthOpen())
-			{
-				Flags |= 0x80;
-			}
-			a_Pkt.WriteBEUInt8(0x50);  // Int at index 16
-			a_Pkt.WriteBEInt32(Flags);
-			a_Pkt.WriteBEUInt8(0x13);  // Byte at index 19
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Horse.GetHorseType()));
-			a_Pkt.WriteBEUInt8(0x54);  // Int at index 20
-			int Appearance = 0;
-			Appearance = Horse.GetHorseColor();
-			Appearance |= Horse.GetHorseStyle() << 8;
-			a_Pkt.WriteBEInt32(Appearance);
-			a_Pkt.WriteBEUInt8(0x56);  // Int at index 22
-			a_Pkt.WriteBEInt32(Horse.GetHorseArmour());
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Horse.IsBaby() ? -1 : (Horse.IsInLoveCooldown() ? 1 : 0));
-			break;
-		}  // case mtHorse
-
-		case mtMagmaCube:
-		{
-			auto & MagmaCube = static_cast<const cMagmaCube &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(MagmaCube.GetSize()));
-			break;
-		}  // case mtMagmaCube
-
-		case mtOcelot:
-		{
-			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Ocelot.IsBaby() ? -1 : (Ocelot.IsInLoveCooldown() ? 1 : 0));
-			break;
-		}  // case mtOcelot
-
-		case mtPig:
-		{
-			auto & Pig = static_cast<const cPig &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Pig.IsBaby() ? -1 : (Pig.IsInLoveCooldown() ? 1 : 0));
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(Pig.IsSaddled() ? 1 : 0);
-			break;
-		}  // case mtPig
-
-		case mtSheep:
-		{
-			auto & Sheep = static_cast<const cSheep &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Sheep.IsBaby() ? -1 : (Sheep.IsInLoveCooldown() ? 1 : 0));
-
-			a_Pkt.WriteBEUInt8(0x10);
-			Byte SheepMetadata = 0;
-			SheepMetadata = static_cast<Byte>(Sheep.GetFurColor());
-			if (Sheep.IsSheared())
-			{
-				SheepMetadata |= 0x10;
-			}
-			a_Pkt.WriteBEUInt8(SheepMetadata);
-			break;
-		}  // case mtSheep
-
-		case mtRabbit:
-		{
-			auto & Rabbit = static_cast<const cRabbit &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x12);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Rabbit.GetRabbitType()));
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Rabbit.IsBaby() ? -1 : (Rabbit.IsInLoveCooldown() ? 1 : 0));
-			break;
-		}  // case mtRabbit
-
-		case mtSlime:
-		{
-			auto & Slime = static_cast<const cSlime &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Slime.GetSize()));
-			break;
-		}  // case mtSlime
-
-		case mtSkeleton:
-		case mtStray:
-		{
-			a_Pkt.WriteBEUInt8(0x0d);
-			a_Pkt.WriteBEUInt8(0);  // Is normal skeleton
-			break;
-		}
-
-		case mtVillager:
-		{
-			auto & Villager = static_cast<const cVillager &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x50);
-			a_Pkt.WriteBEInt32(Villager.GetVilType());
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Villager.IsBaby() ? -1 : 0);
-			break;
-		}  // case mtVillager
-
-		case mtWitch:
-		{
-			auto & Witch = static_cast<const cWitch &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x15);
-			a_Pkt.WriteBEUInt8(Witch.IsAngry() ? 1 : 0);
-			break;
-		}  // case mtWitch
-
-		case mtWither:
-		{
-			auto & Wither = static_cast<const cWither &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x54);  // Int at index 20
-			a_Pkt.WriteBEInt32(static_cast<Int32>(Wither.GetWitherInvulnerableTicks()));
-			a_Pkt.WriteBEUInt8(0x66);  // Float at index 6
-			a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
-			break;
-		}  // case mtWither
-
-		case mtWitherSkeleton:
-		{
-			a_Pkt.WriteBEUInt8(0x0d);
-			a_Pkt.WriteBEUInt8(1);  // Is wither skeleton
-			break;
-		}  // case mtWitherSkeleton
-
-		case mtWolf:
-		{
-			auto & Wolf = static_cast<const cWolf &>(a_Mob);
-			Byte WolfStatus = 0;
-			if (Wolf.IsSitting())
-			{
-				WolfStatus |= 0x1;
-			}
-			if (Wolf.IsAngry())
-			{
-				WolfStatus |= 0x2;
-			}
-			if (Wolf.IsTame())
-			{
-				WolfStatus |= 0x4;
-			}
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(WolfStatus);
-
-			a_Pkt.WriteBEUInt8(0x72);
-			a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
-			a_Pkt.WriteBEUInt8(0x13);
-			a_Pkt.WriteBEUInt8(Wolf.IsBegging() ? 1 : 0);
-			a_Pkt.WriteBEUInt8(0x14);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Wolf.GetCollarColor()));
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Wolf.IsBaby() ? -1 : 0);
-			break;
-		}  // case mtWolf
-
-		case mtHusk:
-		case mtZombie:
-		{
-			auto & Zombie = static_cast<const cZombie &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Zombie.IsBaby() ? 1 : -1);
-			a_Pkt.WriteBEUInt8(0x0d);
-			a_Pkt.WriteBEUInt8(0);
-			a_Pkt.WriteBEUInt8(0x0e);
-			a_Pkt.WriteBEUInt8(0);
-			break;
-		}  // case mtZombie
-
-		case mtZombiePigman:
-		{
-			auto & ZombiePigman = static_cast<const cZombiePigman &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(ZombiePigman.IsBaby() ? 1 : -1);
-			break;
-		}  // case mtZombiePigman
-
-		case mtZombieVillager:
-		{
-			auto & ZombieVillager = reinterpret_cast<const cZombieVillager &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(ZombieVillager.IsBaby() ? 1 : -1);
-			a_Pkt.WriteBEUInt8(0x0d);
-			a_Pkt.WriteBEUInt8(1);
-			a_Pkt.WriteBEUInt8(0x0e);
-			a_Pkt.WriteBEUInt8((ZombieVillager.ConversionTime() == -1) ? 0 : 1);
-			break;
-		}  // case mtZombieVillager
-
-		case mtBlaze:
-		case mtElderGuardian:
-		case mtGuardian:
-		{
-			// TODO: Mobs with extra fields that aren't implemented
-			break;
-		}
-
-		case mtCat:
-
-
-		case mtDonkey:
-		case mtMule:
-		case mtSkeletonHorse:
-		case mtZombieHorse:
-		{
-			// Todo: Mobs not added yet. Grouped ones have the same metadata
-			ASSERT(!"cProtocol_1_8::WriteMobMetadata: received unimplemented type");
-			break;
-		}
-
-		case mtCaveSpider:
-		case mtEnderDragon:
-		case mtGiant:
-		case mtIronGolem:
-		case mtMooshroom:
-		case mtSilverfish:
-		case mtEndermite:
-		case mtSnowGolem:
-		case mtSpider:
-		case mtSquid:
-		{
-			// Allowed mobs without additional metadata
-			break;
-		}
-
-		default: UNREACHABLE("cProtocol_1_8::WriteMobMetadata: received mob of invalid type");
-	}  // switch (a_Mob.GetType())
-}
-
-
-
-
-
 void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousByteBufferView a_Data)
 {
 	// Write the incoming data into the comm log file:
@@ -4243,48 +3742,79 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousBy
 
 
 
-UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity) const
+UInt8 cProtocol_1_8_0::GetProtocolEntityType(eEntityType a_Type) const
 {
-	using Type = cEntity::eEntityType;
+	using Type = eEntityType;
 
-	switch (a_Entity.GetEntityType())
+	switch (a_Type)
 	{
-		case Type::etEnderCrystal: return 51;
-		case Type::etPickup: return 2;
+		case Type::etEndCrystal: return 51;
+		case Type::etItem: return 2;
 		case Type::etFallingBlock: return 70;
 		case Type::etMinecart: return 10;
-		case Type::etBoat: return 1;
-		case Type::etTNT: return 50;
-		case Type::etProjectile:
-		{
-			using PType = cProjectileEntity::eKind;
-			const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
-
-			switch (Projectile.GetProjectileKind())
-			{
-				case PType::pkArrow: return 60;
-				case PType::pkSnowball: return 61;
-				case PType::pkEgg: return 62;
-				case PType::pkGhastFireball: return 63;
-				case PType::pkFireCharge: return 64;
-				case PType::pkEnderPearl: return 65;
-				case PType::pkExpBottle: return 75;
-				case PType::pkSplashPotion: return 73;
-				case PType::pkFirework: return 76;
-				case PType::pkWitherSkull: return 66;
-			}
-			break;
-		}
-		case Type::etFloater: return 90;
+		case Type::etOakBoat: return 1;
+		case Type::etTnt: return 50;
+		case Type::etArrow: return 60;
+		case Type::etSnowball: return 61;
+		case Type::etEgg: return 62;
+		case Type::etFireball: return 63;
+		case Type::etSmallFireball: return 64;
+		case Type::etEnderPearl: return 65;
+		case Type::etExperienceBottle: return 75;
+		case Type::etPotion: return 73;
+		case Type::etFireworkRocket: return 76;
+		case Type::etWitherSkull: return 66;
+		case Type::etFishingBobber: return 90;
 		case Type::etItemFrame: return 71;
 		case Type::etLeashKnot: return 77;
 
 		// Non-objects must not be sent
-		case Type::etEntity:
 		case Type::etPlayer:
-		case Type::etMonster:
-		case Type::etExpOrb:
+		case Type::etExperienceOrb:
 		case Type::etPainting: break;
+		case Type::etBat:                   return 65;
+		case Type::etBlaze:                 return 61;
+		case Type::etCaveSpider:            return 59;
+		case Type::etChicken:               return 93;
+		case Type::etCow:                   return 92;
+		case Type::etCreeper:               return 50;
+		case Type::etEnderDragon:           return 63;
+		case Type::etEnderman:              return 58;
+		case Type::etEndermite:             return 67;
+		case Type::etGhast:                 return 56;
+		case Type::etGiant:                 return 53;
+		case Type::etGuardian:              return 68;
+		case Type::etHorse:                 return 100;
+		case Type::etIronGolem:             return 99;
+		case Type::etMagmaCube:             return 62;
+		case Type::etMooshroom:             return 96;
+		case Type::etOcelot:                return 98;
+		case Type::etPig:                   return 90;
+		case Type::etRabbit:                return 101;
+		case Type::etSheep:                 return 91;
+		case Type::etSilverfish:            return 60;
+		case Type::etSkeleton:              return 51;
+		case Type::etSlime:                 return 55;
+		case Type::etSnowGolem:             return 97;
+		case Type::etSpider:                return 52;
+		case Type::etSquid:                 return 94;
+		case Type::etVillager:              return 120;
+		case Type::etWitch:                 return 66;
+		case Type::etWither:                return 64;
+		case Type::etWitherSkeleton:        return 51;
+		case Type::etWolf:                  return 95;
+		case Type::etZombie:                return 54;
+		case Type::etZombifiedPiglin:       return 57;
+		case Type::etZombieVillager:        return 27;
+
+		// Mobs that get replaced with another because they were added later
+		case Type::etCat:                   return GetProtocolEntityType(Type::etOcelot);
+		case Type::etDonkey:                return GetProtocolEntityType(Type::etHorse);
+		case Type::etMule:                  return GetProtocolEntityType(Type::etHorse);
+		case Type::etSkeletonHorse:         return GetProtocolEntityType(Type::etHorse);
+		case Type::etZombieHorse:           return GetProtocolEntityType(Type::etHorse);
+		case Type::etStray:                 return GetProtocolEntityType(Type::etSkeleton);
+		case Type::etHusk:                  return GetProtocolEntityType(Type::etZombie);
 	}
 	UNREACHABLE("Unhandled entity kind");
 }

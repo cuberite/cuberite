@@ -1666,8 +1666,8 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 		return;
 	}
 
-	eMonsterType RandomMob = GetRandomMob(a_ChunkDesc);
-	if (RandomMob == mtInvalidType)
+	auto RandomMob = GetRandomMob(a_ChunkDesc);
+	if (RandomMob == etInvalid)
 	{
 		// No mobs here. Don't send an error, because if the biome was a desert it would return mtInvalidType as well.
 		return;
@@ -1696,7 +1696,7 @@ void cFinishGenPassiveMobs::GenFinish(cChunkDesc & a_ChunkDesc)
 
 
 
-bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, Vector3i a_RelPos, eMonsterType AnimalToSpawn)
+bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, Vector3i a_RelPos, eEntityType AnimalToSpawn)
 {
 	if (!cChunkDef::IsValidRelPos(a_RelPos))
 	{
@@ -1708,12 +1708,12 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, Vector3i a
 	auto BlockUnderFeet = a_ChunkDesc.GetBlock(a_RelPos.addedY(-1));
 
 	// Check block below (opaque, grass, water), and above (air)
-	if ((AnimalToSpawn == mtSquid) && (BlockAtFeet.Type() != BlockType::Water))
+	if ((AnimalToSpawn == etSquid) && (BlockAtFeet.Type() != BlockType::Water))
 	{
 		return false;
 	}
 	if (
-		(AnimalToSpawn != mtSquid) &&
+		(AnimalToSpawn != etSquid) &&
 		(!cBlockAirHandler::IsBlockAir(BlockAtHead)) &&
 		(!cBlockAirHandler::IsBlockAir(BlockAtFeet)) &&
 		(!cBlockInfo::IsTransparent(BlockUnderFeet))
@@ -1723,12 +1723,12 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, Vector3i a
 	}
 	if (
 		(BlockUnderFeet.Type() != BlockType::GrassBlock) &&
-		((AnimalToSpawn == mtWolf) || (AnimalToSpawn == mtRabbit) || (AnimalToSpawn == mtCow) || (AnimalToSpawn == mtSheep) || (AnimalToSpawn == mtChicken) || (AnimalToSpawn == mtPig))
+		((AnimalToSpawn == etWolf) || (AnimalToSpawn == etRabbit) || (AnimalToSpawn == etCow) || (AnimalToSpawn == etSheep) || (AnimalToSpawn == etChicken) || (AnimalToSpawn == etPig))
 	)
 	{
 		return false;
 	}
-	if ((AnimalToSpawn == mtMooshroom) && (BlockUnderFeet.Type() != BlockType::Mycelium))
+	if ((AnimalToSpawn == etMooshroom) && (BlockUnderFeet.Type() != BlockType::Mycelium))
 	{
 		return false;
 	}
@@ -1748,9 +1748,9 @@ bool cFinishGenPassiveMobs::TrySpawnAnimals(cChunkDesc & a_ChunkDesc, Vector3i a
 
 
 
-eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
+eEntityType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 {
-	std::vector<eMonsterType> ListOfSpawnables;
+	std::vector<eEntityType> ListOfSpawnables;
 	int chunkX = a_ChunkDesc.GetChunkX();
 	int chunkZ = a_ChunkDesc.GetChunkZ();
 	int x = (m_Noise.IntNoise2DInt(chunkX, chunkZ + 10) / 7) % cChunkDef::Width;
@@ -1766,7 +1766,7 @@ eMonsterType cFinishGenPassiveMobs::GetRandomMob(cChunkDesc & a_ChunkDesc)
 
 	if (ListOfSpawnables.empty())
 	{
-		return mtInvalidType;
+		return etInvalid;
 	}
 
 	auto RandMob = (static_cast<size_t>(m_Noise.IntNoise2DInt(chunkX - chunkZ + 2, chunkX + 5) / 7) % ListOfSpawnables.size());

@@ -11,7 +11,7 @@
 
 
 cHorse::cHorse(int Type, int Color, int Style, int TameTimes) :
-	Super("Horse", mtHorse, "entity.horse.hurt", "entity.horse.death", "entity.horse.ambient", 1.4f, 1.6f),
+	Super("Horse", etHorse, "entity.horse.hurt", "entity.horse.death", "entity.horse.ambient", 1.4f, 1.6f),
 	cEntityWindowOwner(this),
 	m_bHasChest(false),
 	m_bIsEating(false),

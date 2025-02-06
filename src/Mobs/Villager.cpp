@@ -15,7 +15,7 @@
 
 
 cVillager::cVillager(eVillagerType VillagerType) :
-	Super("Villager", mtVillager, "entity.villager.hurt", "entity.villager.death", "entity.villager.ambient", 0.6f, 1.95f),
+	Super("Villager", etVillager, "entity.villager.hurt", "entity.villager.death", "entity.villager.ambient", 0.6f, 1.95f),
 	m_ActionCountDown(-1),
 	m_Type(VillagerType),
 	m_FarmerAction(faIdling),
@@ -45,7 +45,7 @@ bool cVillager::DoTakeDamage(TakeDamageInfo & a_TDI)
 	if (a_TDI.DamageType == dtLightning)
 	{
 		Destroy();
-		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtWitch, false);
+		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), etWitch, false);
 		return true;
 	}
 	return true;
@@ -85,10 +85,10 @@ void cVillager::KilledBy(TakeDamageInfo & a_TDI)
 	// TODO: 0% chance on Easy, 50% chance on Normal and 100% chance on Hard
 	if (GetRandomProvider().RandBool(0.5) && (a_TDI.Attacker != nullptr) && (a_TDI.Attacker->IsMob()))
 	{
-		eMonsterType MonsterType = (static_cast<cMonster *>(a_TDI.Attacker)->GetMobType());
-		if ((MonsterType == mtZombie) || (MonsterType == mtZombieVillager))
+		eEntityType MonsterType = a_TDI.Attacker->GetEntityType();
+		if ((MonsterType == etZombie) || (MonsterType == etZombieVillager))
 		{
-			m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtZombieVillager, false);
+			m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), etZombieVillager, false);
 		}
 	}
 }

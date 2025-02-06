@@ -536,7 +536,7 @@ function OnAllChunksAvailable()</pre> All return values from the callbacks are i
 					},
 					{
 						Name = "ProjectileKind",
-						Type = "cProjectileEntity#eKind",
+						Type = "number",
 					},
 					{
 						Name = "Creator",

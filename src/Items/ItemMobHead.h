@@ -334,7 +334,7 @@ public:
 
 		// Spawn the wither:
 		Vector3d WitherPos = CenterHeadPos - RelHeadPos + a_BlockPos + Vector3d(0.5, -2, 0.5);
-		a_Player.GetWorld()->SpawnMob(WitherPos.x, WitherPos.y, WitherPos.z, mtWither, false);
+		a_Player.GetWorld()->SpawnMob(WitherPos.x, WitherPos.y, WitherPos.z, etWither, false);
 		AwardSpawnWitherAchievement(a_Player.GetWorld(), CenterHeadPos - RelHeadPos + a_BlockPos);
 		return true;
 	}

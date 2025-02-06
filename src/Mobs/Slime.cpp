@@ -11,7 +11,7 @@
 
 cSlime::cSlime(int a_Size) :
 	Super("Slime",
-		mtSlime,
+		etSlime,
 		fmt::format(FMT_STRING("entity.{}slime.hurt"),  GetSizeName(a_Size)),
 		fmt::format(FMT_STRING("entity.{}slime.death"), GetSizeName(a_Size)),
 		"",

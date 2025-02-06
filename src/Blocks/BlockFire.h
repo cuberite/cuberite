@@ -159,8 +159,8 @@ private:
 			{
 				switch (a_Scratch.Dir)
 				{
-					case Block::NetherPortal::Axis::X: a_ChunkInterface.SetBlock(X, Height, Width, Block::NetherPortal::NetherPortal(a_Scratch.Dir)); break;
-					case Block::NetherPortal::Axis::Z: a_ChunkInterface.SetBlock(Width, Height, Z, Block::NetherPortal::NetherPortal(a_Scratch.Dir)); break;
+					case Block::NetherPortal::Axis::Z: a_ChunkInterface.SetBlock(X, Height, Width, Block::NetherPortal::NetherPortal(a_Scratch.Dir)); break;
+					case Block::NetherPortal::Axis::X: a_ChunkInterface.SetBlock(Width, Height, Z, Block::NetherPortal::NetherPortal(a_Scratch.Dir)); break;
 				}
 			}
 		}

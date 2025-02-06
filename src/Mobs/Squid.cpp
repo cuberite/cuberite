@@ -9,7 +9,7 @@
 
 
 cSquid::cSquid(void) :
-	Super("Squid", mtSquid, "entity.squid.hurt", "entity.squid.death", "entity.squid.ambient", 0.8f, 0.8f)
+	Super("Squid", etSquid, "entity.squid.hurt", "entity.squid.death", "entity.squid.ambient", 0.8f, 0.8f)
 {
 }
 

@@ -75,7 +75,7 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				}
 
 				// we only push other mobs, boats and minecarts
-				if ((a_Entity.GetEntityType() != etMonster) && (a_Entity.GetEntityType() != etMinecart) && (a_Entity.GetEntityType() != etBoat))
+				if (!a_Entity.IsMob() && !a_Entity.IsMinecart() && !a_Entity.IsBoat())
 				{
 					return false;
 				}

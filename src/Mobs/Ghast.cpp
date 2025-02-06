@@ -9,7 +9,7 @@
 
 
 cGhast::cGhast(void) :
-	Super("Ghast", mtGhast, "entity.ghast.hurt", "entity.ghast.death", "entity.ghast.ambient", 4, 4),
+	Super("Ghast", etGhast, "entity.ghast.hurt", "entity.ghast.death", "entity.ghast.ambient", 4, 4),
 	m_IsCharging(false),
 	m_FlightCooldown(5),
 	m_TicksUntilShot(10)

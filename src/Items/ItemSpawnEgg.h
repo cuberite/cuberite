@@ -41,7 +41,7 @@ public:
 
 		auto MonsterType = ItemToMonsterType(a_HeldItem.m_ItemType);
 		if (
-			(MonsterType != mtInvalidType) &&  // Valid monster type
+			(MonsterType != eEntityType::etInvalid) &&  // Valid monster type
 			(a_World->SpawnMob(PlacementPos.x + 0.5, PlacementPos.y, PlacementPos.z + 0.5, MonsterType, false) != cEntity::INVALID_ID))  // Spawning succeeded
 		{
 			if (!a_Player->IsGameModeCreative())
@@ -61,92 +61,94 @@ public:
 
 	/** Converts the Spawn egg item damage to the monster type to spawn.
 	Returns mtInvalidType for invalid damage values. */
-	static eMonsterType ItemToMonsterType(const cItem & a_Item)
+	static eEntityType ItemToMonsterType(const cItem & a_Item)
 	{
+		using ET = eEntityType;
+
 		switch (a_Item.m_ItemType)
 		{
-			case Item::AllaySpawnEgg:           return mtAllay;
-			case Item::ArmadilloSpawnEgg:       return mtArmadillo;
-			case Item::AxolotlSpawnEgg:         return mtAxolotl;
-			case Item::BatSpawnEgg:             return mtBat;
-			case Item::BeeSpawnEgg:             return mtBee;
-			case Item::BlazeSpawnEgg:           return mtBlaze;
-			case Item::BoggedSpawnEgg:          return mtBogged;
-			case Item::BreezeSpawnEgg:          return mtBreeze;
-			case Item::CamelSpawnEgg:           return mtCamel;
-			case Item::CatSpawnEgg:             return mtCat;
-			case Item::CaveSpiderSpawnEgg:      return mtCaveSpider;
-			case Item::ChickenSpawnEgg:         return mtChicken;
-			case Item::CodSpawnEgg:             return mtCod;
-			case Item::CowSpawnEgg:             return mtCow;
-			case Item::CreakingSpawnEgg:        return mtCreaking;
-			case Item::CreeperSpawnEgg:         return mtCreeper;
-			case Item::DolphinSpawnEgg:         return mtDolphin;
-			case Item::DonkeySpawnEgg:          return mtDonkey;
-			case Item::DrownedSpawnEgg:         return mtDrowned;
-			case Item::ElderGuardianSpawnEgg:   return mtElderGuardian;
-			case Item::EnderDragonSpawnEgg:     return mtEnderDragon;
-			case Item::EndermanSpawnEgg:        return mtEnderman;
-			case Item::EndermiteSpawnEgg:       return mtEndermite;
-			case Item::EvokerSpawnEgg:          return mtEvoker;
-			case Item::FoxSpawnEgg:             return mtFox;
-			case Item::FrogSpawnEgg:            return mtFrog;
-			case Item::GhastSpawnEgg:           return mtGhast;
-			case Item::GlowSquidSpawnEgg:       return mtGlowSquid;
-			case Item::GoatSpawnEgg:            return mtGoat;
-			case Item::GuardianSpawnEgg:        return mtGuardian;
-			case Item::HoglinSpawnEgg:          return mtHoglin;
-			case Item::HorseSpawnEgg:           return mtHorse;
-			case Item::HuskSpawnEgg:            return mtHusk;
-			case Item::IronGolemSpawnEgg:       return mtIronGolem;
-			case Item::LlamaSpawnEgg:           return mtLlama;
-			case Item::MagmaCubeSpawnEgg:       return mtMagmaCube;
-			case Item::MooshroomSpawnEgg:       return mtMooshroom;
-			case Item::MuleSpawnEgg:            return mtMule;
-			case Item::OcelotSpawnEgg:          return mtOcelot;
-			case Item::PandaSpawnEgg:           return mtPanda;
-			case Item::ParrotSpawnEgg:          return mtParrot;
-			case Item::PhantomSpawnEgg:         return mtPhantom;
-			case Item::PigSpawnEgg:             return mtPig;
-			case Item::PiglinBruteSpawnEgg:     return mtPiglinBrute;
-			case Item::PiglinSpawnEgg:          return mtPiglin;
-			case Item::PillagerSpawnEgg:        return mtPillager;
-			case Item::PolarBearSpawnEgg:       return mtPolarBear;
-			case Item::PufferfishSpawnEgg:      return mtPufferfish;
-			case Item::RabbitSpawnEgg:          return mtRabbit;
-			case Item::RavagerSpawnEgg:         return mtRavager;
-			case Item::SalmonSpawnEgg:          return mtSalmon;
-			case Item::SheepSpawnEgg:           return mtSheep;
-			case Item::ShulkerSpawnEgg:         return mtShulker;
-			case Item::SilverfishSpawnEgg:      return mtSilverfish;
-			case Item::SkeletonHorseSpawnEgg:   return mtSkeletonHorse;
-			case Item::SkeletonSpawnEgg:        return mtSkeleton;
-			case Item::SlimeSpawnEgg:           return mtSlime;
-			case Item::SnifferSpawnEgg:         return mtSniffer;
-			case Item::SnowGolemSpawnEgg:       return mtSnowGolem;
-			case Item::SpiderSpawnEgg:          return mtSpider;
-			case Item::SquidSpawnEgg:           return mtSquid;
-			case Item::StraySpawnEgg:           return mtStray;
-			case Item::StriderSpawnEgg:         return mtStrider;
-			case Item::TadpoleSpawnEgg:         return mtTadpole;
-			case Item::TraderLlamaSpawnEgg:     return mtTraderLlama;
-			case Item::TropicalFishSpawnEgg:    return mtTropicalFish;
-			case Item::TurtleSpawnEgg:          return mtTurtle;
-			case Item::VexSpawnEgg:             return mtVex;
-			case Item::VillagerSpawnEgg:        return mtVillager;
-			case Item::VindicatorSpawnEgg:      return mtVindicator;
-			case Item::WanderingTraderSpawnEgg: return mtWanderingTrader;
-			case Item::WardenSpawnEgg:          return mtWarden;
-			case Item::WitchSpawnEgg:           return mtWitch;
-			case Item::WitherSkeletonSpawnEgg:  return mtWitherSkeleton;
-			case Item::WitherSpawnEgg:          return mtWither;
-			case Item::WolfSpawnEgg:            return mtWolf;
-			case Item::ZoglinSpawnEgg:          return mtZoglin;
-			case Item::ZombieHorseSpawnEgg:     return mtZombieHorse;
-			case Item::ZombieSpawnEgg:          return mtZombie;
-			case Item::ZombieVillagerSpawnEgg:  return mtZombieVillager;
-			case Item::ZombifiedPiglinSpawnEgg: return mtZombifiedPiglin;
-			default: return mtInvalidType;
+			case Item::AllaySpawnEgg:           return ET::etAllay;
+			case Item::ArmadilloSpawnEgg:       return ET::etArmadillo;
+			case Item::AxolotlSpawnEgg:         return ET::etAxolotl;
+			case Item::BatSpawnEgg:             return ET::etBat;
+			case Item::BeeSpawnEgg:             return ET::etBee;
+			case Item::BlazeSpawnEgg:           return ET::etBlaze;
+			case Item::BoggedSpawnEgg:          return ET::etBogged;
+			case Item::BreezeSpawnEgg:          return ET::etBreeze;
+			case Item::CamelSpawnEgg:           return ET::etCamel;
+			case Item::CatSpawnEgg:             return ET::etCat;
+			case Item::CaveSpiderSpawnEgg:      return ET::etCaveSpider;
+			case Item::ChickenSpawnEgg:         return ET::etChicken;
+			case Item::CodSpawnEgg:             return ET::etCod;
+			case Item::CowSpawnEgg:             return ET::etCow;
+			case Item::CreakingSpawnEgg:        return ET::etCreaking;
+			case Item::CreeperSpawnEgg:         return ET::etCreeper;
+			case Item::DolphinSpawnEgg:         return ET::etDolphin;
+			case Item::DonkeySpawnEgg:          return ET::etDonkey;
+			case Item::DrownedSpawnEgg:         return ET::etDrowned;
+			case Item::ElderGuardianSpawnEgg:   return ET::etElderGuardian;
+			case Item::EnderDragonSpawnEgg:     return ET::etEnderDragon;
+			case Item::EndermanSpawnEgg:        return ET::etEnderman;
+			case Item::EndermiteSpawnEgg:       return ET::etEndermite;
+			case Item::EvokerSpawnEgg:          return ET::etEvoker;
+			case Item::FoxSpawnEgg:             return ET::etFox;
+			case Item::FrogSpawnEgg:            return ET::etFrog;
+			case Item::GhastSpawnEgg:           return ET::etGhast;
+			case Item::GlowSquidSpawnEgg:       return ET::etGlowSquid;
+			case Item::GoatSpawnEgg:            return ET::etGoat;
+			case Item::GuardianSpawnEgg:        return ET::etGuardian;
+			case Item::HoglinSpawnEgg:          return ET::etHoglin;
+			case Item::HorseSpawnEgg:           return ET::etHorse;
+			case Item::HuskSpawnEgg:            return ET::etHusk;
+			case Item::IronGolemSpawnEgg:       return ET::etIronGolem;
+			case Item::LlamaSpawnEgg:           return ET::etLlama;
+			case Item::MagmaCubeSpawnEgg:       return ET::etMagmaCube;
+			case Item::MooshroomSpawnEgg:       return ET::etMooshroom;
+			case Item::MuleSpawnEgg:            return ET::etMule;
+			case Item::OcelotSpawnEgg:          return ET::etOcelot;
+			case Item::PandaSpawnEgg:           return ET::etPanda;
+			case Item::ParrotSpawnEgg:          return ET::etParrot;
+			case Item::PhantomSpawnEgg:         return ET::etPhantom;
+			case Item::PigSpawnEgg:             return ET::etPig;
+			case Item::PiglinBruteSpawnEgg:     return ET::etPiglinBrute;
+			case Item::PiglinSpawnEgg:          return ET::etPiglin;
+			case Item::PillagerSpawnEgg:        return ET::etPillager;
+			case Item::PolarBearSpawnEgg:       return ET::etPolarBear;
+			case Item::PufferfishSpawnEgg:      return ET::etPufferfish;
+			case Item::RabbitSpawnEgg:          return ET::etRabbit;
+			case Item::RavagerSpawnEgg:         return ET::etRavager;
+			case Item::SalmonSpawnEgg:          return ET::etSalmon;
+			case Item::SheepSpawnEgg:           return ET::etSheep;
+			case Item::ShulkerSpawnEgg:         return ET::etShulker;
+			case Item::SilverfishSpawnEgg:      return ET::etSilverfish;
+			case Item::SkeletonHorseSpawnEgg:   return ET::etSkeletonHorse;
+			case Item::SkeletonSpawnEgg:        return ET::etSkeleton;
+			case Item::SlimeSpawnEgg:           return ET::etSlime;
+			case Item::SnifferSpawnEgg:         return ET::etSniffer;
+			case Item::SnowGolemSpawnEgg:       return ET::etSnowGolem;
+			case Item::SpiderSpawnEgg:          return ET::etSpider;
+			case Item::SquidSpawnEgg:           return ET::etSquid;
+			case Item::StraySpawnEgg:           return ET::etStray;
+			case Item::StriderSpawnEgg:         return ET::etStrider;
+			case Item::TadpoleSpawnEgg:         return ET::etTadpole;
+			case Item::TraderLlamaSpawnEgg:     return ET::etTraderLlama;
+			case Item::TropicalFishSpawnEgg:    return ET::etTropicalFish;
+			case Item::TurtleSpawnEgg:          return ET::etTurtle;
+			case Item::VexSpawnEgg:             return ET::etVex;
+			case Item::VillagerSpawnEgg:        return ET::etVillager;
+			case Item::VindicatorSpawnEgg:      return ET::etVindicator;
+			case Item::WanderingTraderSpawnEgg: return ET::etWanderingTrader;
+			case Item::WardenSpawnEgg:          return ET::etWarden;
+			case Item::WitchSpawnEgg:           return ET::etWitch;
+			case Item::WitherSkeletonSpawnEgg:  return ET::etWitherSkeleton;
+			case Item::WitherSpawnEgg:          return ET::etWither;
+			case Item::WolfSpawnEgg:            return ET::etWolf;
+			case Item::ZoglinSpawnEgg:          return ET::etZoglin;
+			case Item::ZombieHorseSpawnEgg:     return ET::etZombieHorse;
+			case Item::ZombieSpawnEgg:          return ET::etZombie;
+			case Item::ZombieVillagerSpawnEgg:  return ET::etZombieVillager;
+			case Item::ZombifiedPiglinSpawnEgg: return ET::etZombifiedPiglin;
+			default: return ET::etInvalid;
 		}
 	}
 

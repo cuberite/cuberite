@@ -95,7 +95,7 @@ private:
 
 		// Spawn the golem:
 		auto GolemPos = Vector3d(a_PumpkinPos) + Vector3d(0.5, -2, 0.5);
-		a_World.SpawnMob(GolemPos.x, GolemPos.y, GolemPos.z, mtSnowGolem, false);
+		a_World.SpawnMob(GolemPos.x, GolemPos.y, GolemPos.z, etSnowGolem, false);
 		return true;
 	}
 
@@ -152,7 +152,7 @@ private:
 
 			// Spawn the golem:
 			auto GolemPos = Vector3d(a_PumpkinPos) + Vector3d(0.5, -2, 0.5);
-			a_World.SpawnMob(GolemPos.x, GolemPos.y, GolemPos.z, mtIronGolem, false);
+			a_World.SpawnMob(GolemPos.x, GolemPos.y, GolemPos.z, etIronGolem, false);
 			return true;
 		}  // for i - ArmOffsets[]
 

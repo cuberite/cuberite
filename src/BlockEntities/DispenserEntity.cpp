@@ -181,7 +181,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case Item::FireCharge:
 		{
-			if (SpawnProjectileFromDispenser(DispAbsCoord, cProjectileEntity::pkFireCharge, GetShootVector(Self) * 20) != cEntity::INVALID_ID)
+			if (SpawnProjectileFromDispenser(DispAbsCoord, etSmallFireball, GetShootVector(Self) * 20) != cEntity::INVALID_ID)
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
@@ -190,7 +190,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case Item::Arrow:
 		{
-			if (SpawnProjectileFromDispenser(DispAbsCoord, cProjectileEntity::pkArrow, GetShootVector(Self) * 30 + Vector3d(0, 1, 0)) != cEntity::INVALID_ID)
+			if (SpawnProjectileFromDispenser(DispAbsCoord, etArrow, GetShootVector(Self) * 30 + Vector3d(0, 1, 0)) != cEntity::INVALID_ID)
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
@@ -199,7 +199,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case Item::Snowball:
 		{
-			if (SpawnProjectileFromDispenser(DispAbsCoord, cProjectileEntity::pkSnowball, GetShootVector(Self) * 20 + Vector3d(0, 1, 0)) != cEntity::INVALID_ID)
+			if (SpawnProjectileFromDispenser(DispAbsCoord, etSnowball, GetShootVector(Self) * 20 + Vector3d(0, 1, 0)) != cEntity::INVALID_ID)
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
@@ -208,7 +208,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case Item::Egg:
 		{
-			if (SpawnProjectileFromDispenser(DispAbsCoord, cProjectileEntity::pkEgg, GetShootVector(Self) * 20 + Vector3d(0, 1, 0)) != cEntity::INVALID_ID)
+			if (SpawnProjectileFromDispenser(DispAbsCoord, etEgg, GetShootVector(Self) * 20 + Vector3d(0, 1, 0)) != cEntity::INVALID_ID)
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
@@ -217,7 +217,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case Item::ExperienceBottle:
 		{
-			if (SpawnProjectileFromDispenser(DispAbsCoord, cProjectileEntity::pkExpBottle, GetShootVector(Self) * 20 + Vector3d(0, 1, 0)) != cEntity::INVALID_ID)
+			if (SpawnProjectileFromDispenser(DispAbsCoord, etExperienceBottle, GetShootVector(Self) * 20 + Vector3d(0, 1, 0)) != cEntity::INVALID_ID)
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
@@ -226,7 +226,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case Item::Potion:
 		{
-			if (SpawnProjectileFromDispenser(DispAbsCoord, cProjectileEntity::pkSplashPotion, GetShootVector(Self) * 20 + Vector3d(0, 1, 0), &SlotItem) != cEntity::INVALID_ID)
+			if (SpawnProjectileFromDispenser(DispAbsCoord, etPotion, GetShootVector(Self) * 20 + Vector3d(0, 1, 0), &SlotItem) != cEntity::INVALID_ID)
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
@@ -280,7 +280,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 		case Item::FireworkRocket:
 		{
-			if (SpawnProjectileFromDispenser(DispAbsCoord, cProjectileEntity::pkFirework, GetShootVector(Self) * 20 + Vector3d(0, 1, 0), &SlotItem) != cEntity::INVALID_ID)
+			if (SpawnProjectileFromDispenser(DispAbsCoord, etFireworkRocket, GetShootVector(Self) * 20 + Vector3d(0, 1, 0), &SlotItem) != cEntity::INVALID_ID)
 			{
 				m_Contents.ChangeSlotCount(a_SlotNum, -1);
 			}
@@ -299,7 +299,7 @@ void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
 
 
 
-UInt32 cDispenserEntity::SpawnProjectileFromDispenser(Vector3i a_BlockPos, cProjectileEntity::eKind a_Kind, const Vector3d & a_ShootVector, const cItem * a_Item)
+UInt32 cDispenserEntity::SpawnProjectileFromDispenser(Vector3i a_BlockPos, eEntityType a_Kind, const Vector3d & a_ShootVector, const cItem * a_Item)
 {
 	return m_World->CreateProjectile(Vector3d(0.5, 0.5, 0.5) + a_BlockPos,
 		a_Kind, nullptr, a_Item, &a_ShootVector

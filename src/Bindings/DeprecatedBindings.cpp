@@ -277,7 +277,7 @@ static int tolua_AllToLua_StringToMobType00(lua_State* tolua_S)
 	#endif
 	{
 		const AString a_MobString = tolua_tocppstring(LuaState, 1, nullptr);
-		eMonsterType MobType = cMonster::StringToMobType(a_MobString);
+		auto MobType = cMonster::StringToMobType(a_MobString);
 		tolua_pushnumber(LuaState, static_cast<lua_Number>(MobType));
 		tolua_pushcppstring(LuaState, a_MobString);
 	}

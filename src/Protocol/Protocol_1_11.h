@@ -41,14 +41,12 @@ protected:
 	virtual void SendUpdateBlockEntity(cBlockEntity & a_BlockEntity) override;
 
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
-	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
 	virtual Version GetProtocolVersion() const override;
 
 	virtual void HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer) override;
 
 	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const override;
-	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
-	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const override;
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity, bool a_WriteCommon = true) const override;
 };
 
 

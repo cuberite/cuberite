@@ -11,7 +11,7 @@
 
 
 cThrownEnderPearlEntity::cThrownEnderPearlEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
-	Super(pkEnderPearl, a_Creator, a_Pos, a_Speed, 0.25f, 0.25f)
+	Super(etEnderPearl, a_Creator, a_Pos, a_Speed, 0.25f, 0.25f)
 {
 }
 
@@ -69,7 +69,7 @@ void cThrownEnderPearlEntity::TeleportCreator(Vector3d a_HitPos)
 		if (Random.RandBool(0.05))
 		{
 			Vector3d PlayerPosition = a_Entity.GetPosition();
-			m_World->SpawnMob(PlayerPosition.x, PlayerPosition.y, PlayerPosition.z, mtEndermite);
+			m_World->SpawnMob(PlayerPosition.x, PlayerPosition.y, PlayerPosition.z, etEndermite);
 		}
 
 

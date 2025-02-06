@@ -96,7 +96,7 @@ protected:
 // cPickup:
 
 cPickup::cPickup(Vector3d a_Pos, const cItem & a_Item, bool IsPlayerCreated, Vector3f a_Speed, int a_LifetimeTicks, bool a_CanCombine):
-	Super(etPickup, a_Pos, 0.25f, 0.25f),
+	Super(etItem, a_Pos, 0.25f, 0.25f),
 	m_Timer(0),
 	m_Item(a_Item),
 	m_bCollected(false),
@@ -237,7 +237,7 @@ bool cPickup::CollectedBy(cEntity & a_Dest)
 	{
 
 		auto & Mob = static_cast<cMonster &>(a_Dest);
-		if (Mob.GetMobType() == mtVillager)
+		if (Mob.GetEntityType() == etVillager)
 		{
 			// Villagers only pickup food
 			if (!ItemCategory::IsVillagerFood(m_Item.m_ItemType))

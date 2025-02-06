@@ -47,7 +47,7 @@ public:
 			}
 			default:
 			{
-				LOGD("Used minecart on an unsuitable block %d (%s)", "MISSING FUNCTION TO CONVERT BLOCK TO STRING!!", "Missing function for BlockState -> String");
+				LOGD("Used minecart on an unsuitable block %s", NamespaceSerializer::From(Block.Type()));
 				return false;
 			}
 		}

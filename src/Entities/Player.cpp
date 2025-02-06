@@ -859,7 +859,7 @@ void cPlayer::NotifyNearbyWolves(cPawn * a_Opponent, bool a_IsPlayerInvolved)
 			if (a_Entity.IsMob())
 			{
 				auto & Mob = static_cast<cMonster&>(a_Entity);
-				if (Mob.GetMobType() == mtWolf)
+				if (Mob.GetEntityType() == etWolf)
 				{
 					auto & Wolf = static_cast<cWolf&>(Mob);
 					Wolf.ReceiveNearbyFightInfo(GetUUID(), a_Opponent, a_IsPlayerInvolved);
@@ -934,7 +934,7 @@ void cPlayer::Killed(const cEntity & a_Victim, eDamageType a_DamageType)
 			AwardAchievement(CustomStatistic::AchKillEnemy);
 		}
 
-		if ((Monster.GetMobType() == eMonsterType::mtSkeleton) && (a_DamageType == eDamageType::dtRangedAttack))
+		if ((Monster.GetEntityType() == etSkeleton) && (a_DamageType == eDamageType::dtRangedAttack))
 		{
 			const double DistX = GetPosX() - Monster.GetPosX();
 			const double DistZ = GetPosZ() - Monster.GetPosZ();
@@ -1942,7 +1942,7 @@ void cPlayer::OpenHorseInventory()
 
 	auto & Mob = static_cast<cMonster &>(*m_AttachedTo);
 
-	if (Mob.GetMobType() != mtHorse)
+	if (Mob.GetEntityType() != etHorse)
 	{
 		return;
 	}
@@ -2316,20 +2316,19 @@ void cPlayer::UpdateMovementStats(const Vector3d & a_DeltaPos, bool a_PreviousIs
 	{
 		switch (m_AttachedTo->GetEntityType())
 		{
-			case cEntity::etMinecart: m_Stats.Custom[CustomStatistic::MinecartOneCm] += Value; break;
-			case cEntity::etBoat:     m_Stats.Custom[CustomStatistic::BoatOneCm]     += Value; break;
-			case cEntity::etMonster:
-			{
-				cMonster * Monster = static_cast<cMonster *>(m_AttachedTo);
-				switch (Monster->GetMobType())
-				{
-					case mtPig:   m_Stats.Custom[CustomStatistic::PigOneCm]   += Value; break;
-					case mtHorse: m_Stats.Custom[CustomStatistic::HorseOneCm] += Value; break;
-					default: break;
-				}
-				break;
-			}
+			case etMinecart: m_Stats.Custom[CustomStatistic::MinecartOneCm] += Value; break;
+			case etOakBoat:  m_Stats.Custom[CustomStatistic::BoatOneCm]     += Value; break;
 			default: break;
+		}
+		if (m_AttachedTo->IsMob())
+		{
+			cMonster * Monster = static_cast<cMonster *>(m_AttachedTo);
+			switch (Monster->GetEntityType())
+			{
+				case etPig:   m_Stats.Custom[CustomStatistic::PigOneCm]   += Value; break;
+				case etHorse: m_Stats.Custom[CustomStatistic::HorseOneCm] += Value; break;
+				default: break;
+			}
 		}
 	}
 }

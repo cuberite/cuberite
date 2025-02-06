@@ -1302,82 +1302,82 @@ std::string_view NamespaceSerializer::From(const CustomStatistic a_ID)
 
 
 
-std::string_view NamespaceSerializer::From(const eMonsterType a_ID)
+std::string_view NamespaceSerializer::From(const eEntityType a_ID)
 {
 	switch (a_ID)
 	{
-		case mtBat:            return "bat";
-		case mtBlaze:          return "blaze";
-		case mtCat:            return "cat";
-		case mtCaveSpider:     return "cave_spider";
-		case mtChicken:        return "chicken";
-		case mtCod:            return "cod";
-		case mtCow:            return "cow";
-		case mtCreeper:        return "creeper";
-		case mtCreaking:       return "creaking";
-		case mtDolphin:        return "dolphin";
-		case mtDonkey:         return "donkey";
-		case mtDrowned:        return "drowned";
-		case mtElderGuardian:  return "elder_guardian";
-		case mtEnderDragon:    return "ender_dragon";
-		case mtEnderman:       return "enderman";
-		case mtEndermite:      return "endermite";
-		case mtEvoker:         return "evoker";
-		case mtFox:            return "fox";
-		case mtGhast:          return "ghast";
-		case mtGiant:          return "giant";
-		case mtGuardian:       return "guardian";
-		case mtHorse:          return "horse";
-		case mtHoglin:         return "hoglin";
-		case mtHusk:           return "husk";
-		case mtIllusioner:     return "illusioner";
-		case mtIronGolem:      return "iron_golem";
-		case mtLlama:          return "llama";
-		case mtMagmaCube:      return "magma_cube";
-		case mtMooshroom:      return "mooshroom";
-		case mtMule:           return "mule";
-		case mtOcelot:         return "ocelot";
-		case mtPanda:          return "panda";
-		case mtParrot:         return "parrot";
-		case mtPhantom:        return "phantom";
-		case mtPig:            return "pig";
-		case mtPiglin:         return "piglin";
-		case mtPiglinBrute:    return "piglin_brute";
-		case mtPillager:       return "pillager";
-		case mtPolarBear:      return "polar_bear";
-		case mtPufferfish:     return "pufferfish";
-		case mtRabbit:         return "rabbit";
-		case mtRavager:        return "ravager";
-		case mtSalmon:         return "salmon";
-		case mtSheep:          return "sheep";
-		case mtShulker:        return "shulker";
-		case mtSilverfish:     return "silverfish";
-		case mtSkeleton:       return "skeleton";
-		case mtSkeletonHorse:  return "skeleton_horse";
-		case mtSlime:          return "slime";
-		case mtSnowGolem:      return "snow_golem";
-		case mtSpider:         return "spider";
-		case mtSquid:          return "squid";
-		case mtStray:          return "stray";
-		case mtStrider:        return "strider";
-		case mtTraderLlama:    return "trader_llama";
-		case mtTropicalFish:   return "tropical_fish";
-		case mtTurtle:         return "turtle";
-		case mtVex:            return "vex";
-		case mtVillager:       return "villager";
-		case mtVindicator:     return "vindicator";
-		case mtWanderingTrader:return "wandering_trader";
-		case mtWitch:          return "witch";
-		case mtWither:         return "wither";
-		case mtWitherSkeleton: return "wither_skeleton";
-		case mtWolf:           return "wolf";
-		case mtZoglin:         return "zoglin";
-		case mtZombie:         return "zombie";
-		case mtZombieHorse:    return "zombie_horse";
-		case mtZombiePigman:   return "zombified_piglin";
-		case mtZombieVillager: return "zombie_villager";
-		case mtBee:            return "bee";
-		case mtInvalidType:    break;
+		case etBat:            return "bat";
+		case etBlaze:          return "blaze";
+		case etCat:            return "cat";
+		case etCaveSpider:     return "cave_spider";
+		case etChicken:        return "chicken";
+		case etCod:            return "cod";
+		case etCow:            return "cow";
+		case etCreeper:        return "creeper";
+		case etCreaking:       return "creaking";
+		case etDolphin:        return "dolphin";
+		case etDonkey:         return "donkey";
+		case etDrowned:        return "drowned";
+		case etElderGuardian:  return "elder_guardian";
+		case etEnderDragon:    return "ender_dragon";
+		case etEnderman:       return "enderman";
+		case etEndermite:      return "endermite";
+		case etEvoker:         return "evoker";
+		case etFox:            return "fox";
+		case etGhast:          return "ghast";
+		case etGiant:          return "giant";
+		case etGuardian:       return "guardian";
+		case etHorse:          return "horse";
+		case etHoglin:         return "hoglin";
+		case etHusk:           return "husk";
+		case etIllusioner:     return "illusioner";
+		case etIronGolem:      return "iron_golem";
+		case etLlama:          return "llama";
+		case etMagmaCube:      return "magma_cube";
+		case etMooshroom:      return "mooshroom";
+		case etMule:           return "mule";
+		case etOcelot:         return "ocelot";
+		case etPanda:          return "panda";
+		case etParrot:         return "parrot";
+		case etPhantom:        return "phantom";
+		case etPig:            return "pig";
+		case etPiglin:         return "piglin";
+		case etPiglinBrute:    return "piglin_brute";
+		case etPillager:       return "pillager";
+		case etPolarBear:      return "polar_bear";
+		case etPufferfish:     return "pufferfish";
+		case etRabbit:         return "rabbit";
+		case etRavager:        return "ravager";
+		case etSalmon:         return "salmon";
+		case etSheep:          return "sheep";
+		case etShulker:        return "shulker";
+		case etSilverfish:     return "silverfish";
+		case etSkeleton:       return "skeleton";
+		case etSkeletonHorse:  return "skeleton_horse";
+		case etSlime:          return "slime";
+		case etSnowGolem:      return "snow_golem";
+		case etSpider:         return "spider";
+		case etSquid:          return "squid";
+		case etStray:          return "stray";
+		case etStrider:        return "strider";
+		case etTraderLlama:    return "trader_llama";
+		case etTropicalFish:   return "tropical_fish";
+		case etTurtle:         return "turtle";
+		case etVex:            return "vex";
+		case etVillager:       return "villager";
+		case etVindicator:     return "vindicator";
+		case etWanderingTrader:return "wandering_trader";
+		case etWitch:          return "witch";
+		case etWither:         return "wither";
+		case etWitherSkeleton: return "wither_skeleton";
+		case etWolf:           return "wolf";
+		case etZoglin:         return "zoglin";
+		case etZombie:         return "zombie";
+		case etZombieHorse:    return "zombie_horse";
+		case etZombifiedPiglin:return "zombified_piglin";
+		case etZombieVillager: return "zombie_villager";
+		case etBee:            return "bee";
+		case etInvalid:    break;
 	}
 	UNREACHABLE("Tried to save unknown monster type");
 }
@@ -5706,120 +5706,120 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 
 
 
-eMonsterType NamespaceSerializer::ToMonsterType(const std::string_view a_ID)
+eEntityType NamespaceSerializer::ToEntityType(const std::string_view a_ID)
 {
-	static const std::unordered_map<std::string_view, eMonsterType> MonsterTypes
+	static const std::unordered_map<std::string_view, eEntityType> MonsterTypes
 	{
-		{ "bat",              mtBat },
-		{ "blaze",            mtBlaze },
-		{ "bee",              mtBee},
-		{ "cat",              mtCat },
-		{ "cave_spider",      mtCaveSpider },
-		{ "chicken",          mtChicken },
-		{ "cod",              mtCod },
-		{ "cow",              mtCow },
-		{ "creaking",         mtCreaking},
-		{ "creeper",          mtCreeper },
-		{ "dolphin",          mtDolphin },
-		{ "donkey",           mtDonkey },
-		{ "drowned",          mtDrowned },
-		{ "elder_guardian",   mtElderGuardian },
-		{ "ender_dragon",     mtEnderDragon },
-		{ "enderman",         mtEnderman },
-		{ "endermite",        mtEndermite },
-		{ "evoker",           mtEvoker },
-		{ "fox",              mtFox },
-		{ "ghast",            mtGhast },
-		{ "giant",            mtGiant },
-		{ "guardian",         mtGuardian },
-		{ "horse",            mtHorse },
-		{ "hoglin",           mtHoglin },
-		{ "husk",             mtHusk },
-		{ "illusioner",       mtIllusioner },
-		{ "iron_golem",       mtIronGolem },
-		{ "llama",            mtLlama },
-		{ "magma_cube",       mtMagmaCube },
-		{ "mooshroom",        mtMooshroom },
-		{ "mule",             mtMule },
-		{ "ocelot",           mtOcelot },
-		{ "panda",            mtPanda },
-		{ "parrot",           mtParrot },
-		{ "phantom",          mtPhantom },
-		{ "pig",              mtPig },
-		{ "piglin",           mtPiglin },
-		{ "piglin_brute",     mtPiglinBrute },
-		{ "pillager",         mtPillager },
-		{ "polar_bear",       mtPolarBear },
-		{ "pufferfish",       mtPufferfish },
-		{ "rabbit",           mtRabbit },
-		{ "ravager",          mtRavager },
-		{ "salmon",           mtSalmon },
-		{ "sheep",            mtSheep },
-		{ "shulker",          mtShulker },
-		{ "silverfish",       mtSilverfish },
-		{ "skeleton",         mtSkeleton },
-		{ "skeleton_horse",   mtSkeletonHorse },
-		{ "slime",            mtSlime },
-		{ "snow_golem",       mtSnowGolem },
-		{ "spider",           mtSpider },
-		{ "squid",            mtSquid },
-		{ "stray",            mtStray },
-		{ "strider",          mtStrider },
-		{ "trader_llama",     mtTraderLlama },
-		{ "tropical_fish",    mtTropicalFish },
-		{ "turtle",           mtTurtle },
-		{ "vex",              mtVex },
-		{ "villager",         mtVillager },
-		{ "vindicator",       mtVindicator },
-		{ "wandering_trader", mtWanderingTrader },
-		{ "witch",            mtWitch },
-		{ "wither",           mtWither },
-		{ "wither_skeleton",  mtWitherSkeleton },
-		{ "wolf",             mtWolf },
-		{ "zoglin",           mtZoglin },
-		{ "zombie",           mtZombie },
-		{ "zombie_horse",     mtZombieHorse },
-		{ "zombified_piglin", mtZombiePigman },
-		{ "zombie_villager",  mtZombieVillager },
+		{ "bat",              etBat },
+		{ "blaze",            etBlaze },
+		{ "bee",              etBee},
+		{ "cat",              etCat },
+		{ "cave_spider",      etCaveSpider },
+		{ "chicken",          etChicken },
+		{ "cod",              etCod },
+		{ "cow",              etCow },
+		{ "creaking",         etCreaking},
+		{ "creeper",          etCreeper },
+		{ "dolphin",          etDolphin },
+		{ "donkey",           etDonkey },
+		{ "drowned",          etDrowned },
+		{ "elder_guardian",   etElderGuardian },
+		{ "ender_dragon",     etEnderDragon },
+		{ "enderman",         etEnderman },
+		{ "endermite",        etEndermite },
+		{ "evoker",           etEvoker },
+		{ "fox",              etFox },
+		{ "ghast",            etGhast },
+		{ "giant",            etGiant },
+		{ "guardian",         etGuardian },
+		{ "horse",            etHorse },
+		{ "hoglin",           etHoglin },
+		{ "husk",             etHusk },
+		{ "illusioner",       etIllusioner },
+		{ "iron_golem",       etIronGolem },
+		{ "llama",            etLlama },
+		{ "magma_cube",       etMagmaCube },
+		{ "mooshroom",        etMooshroom },
+		{ "mule",             etMule },
+		{ "ocelot",           etOcelot },
+		{ "panda",            etPanda },
+		{ "parrot",           etParrot },
+		{ "phantom",          etPhantom },
+		{ "pig",              etPig },
+		{ "piglin",           etPiglin },
+		{ "piglin_brute",     etPiglinBrute },
+		{ "pillager",         etPillager },
+		{ "polar_bear",       etPolarBear },
+		{ "pufferfish",       etPufferfish },
+		{ "rabbit",           etRabbit },
+		{ "ravager",          etRavager },
+		{ "salmon",           etSalmon },
+		{ "sheep",            etSheep },
+		{ "shulker",          etShulker },
+		{ "silverfish",       etSilverfish },
+		{ "skeleton",         etSkeleton },
+		{ "skeleton_horse",   etSkeletonHorse },
+		{ "slime",            etSlime },
+		{ "snow_golem",       etSnowGolem },
+		{ "spider",           etSpider },
+		{ "squid",            etSquid },
+		{ "stray",            etStray },
+		{ "strider",          etStrider },
+		{ "trader_llama",     etTraderLlama },
+		{ "tropical_fish",    etTropicalFish },
+		{ "turtle",           etTurtle },
+		{ "vex",              etVex },
+		{ "villager",         etVillager },
+		{ "vindicator",       etVindicator },
+		{ "wandering_trader", etWanderingTrader },
+		{ "witch",            etWitch },
+		{ "wither",           etWither },
+		{ "wither_skeleton",  etWitherSkeleton },
+		{ "wolf",             etWolf },
+		{ "zoglin",           etZoglin },
+		{ "zombie",           etZombie },
+		{ "zombie_horse",     etZombieHorse },
+		{ "zombified_piglin", etZombifiedPiglin },
+		{ "zombie_villager",  etZombieVillager },
 
-		{ "snowman",          mtSnowGolem },
-		{ "villager_golem",   mtIronGolem },
-		{ "zombie_pigman",    mtZombiePigman },
+		{ "snowman",          etSnowGolem },
+		{ "villager_golem",   etIronGolem },
+		{ "zombie_pigman",    etZombifiedPiglin },
 
 		// Old names:
-		{ "Bat",            mtBat },
-		{ "Blaze",          mtBlaze },
-		{ "CaveSpider",     mtCaveSpider },
-		{ "Chicken",        mtChicken },
-		{ "Cow",            mtCow },
-		{ "Creeper",        mtCreeper },
-		{ "EnderDragon",    mtEnderDragon },
-		{ "Enderman",       mtEnderman },
-		{ "Ghast",          mtGhast },
-		{ "Giant",          mtGiant },
-		{ "Guardian",       mtGuardian },
-		{ "Horse",          mtHorse },
-		{ "VillagerGolem",  mtIronGolem },
-		{ "LavaSlime",      mtMagmaCube },
-		{ "MushroomCow",    mtMooshroom },
-		{ "Ozelot",         mtOcelot },
-		{ "Pig",            mtPig },
-		{ "Rabbit",         mtRabbit },
-		{ "Sheep",          mtSheep },
-		{ "Silverfish",     mtSilverfish },
-		{ "Skeleton",       mtSkeleton },
-		{ "Slime",          mtSlime },
-		{ "SnowMan",        mtSnowGolem },
-		{ "Spider",         mtSpider },
-		{ "Squid",          mtSquid },
-		{ "Villager",       mtVillager },
-		{ "Witch",          mtWitch },
-		{ "WitherBoss",     mtWither },
-		{ "WitherSkeleton", mtWitherSkeleton },
-		{ "Wolf",           mtWolf },
-		{ "Zombie",         mtZombie },
-		{ "PigZombie",      mtZombiePigman },
-		{ "ZombieVillager", mtZombieVillager }
+		{ "Bat",            etBat },
+		{ "Blaze",          etBlaze },
+		{ "CaveSpider",     etCaveSpider },
+		{ "Chicken",        etChicken },
+		{ "Cow",            etCow },
+		{ "Creeper",        etCreeper },
+		{ "EnderDragon",    etEnderDragon },
+		{ "Enderman",       etEnderman },
+		{ "Ghast",          etGhast },
+		{ "Giant",          etGiant },
+		{ "Guardian",       etGuardian },
+		{ "Horse",          etHorse },
+		{ "VillagerGolem",  etIronGolem },
+		{ "LavaSlime",      etMagmaCube },
+		{ "MushroomCow",    etMooshroom },
+		{ "Ozelot",         etOcelot },
+		{ "Pig",            etPig },
+		{ "Rabbit",         etRabbit },
+		{ "Sheep",          etSheep },
+		{ "Silverfish",     etSilverfish },
+		{ "Skeleton",       etSkeleton },
+		{ "Slime",          etSlime },
+		{ "SnowMan",        etSnowGolem },
+		{ "Spider",         etSpider },
+		{ "Squid",          etSquid },
+		{ "Villager",       etVillager },
+		{ "Witch",          etWitch },
+		{ "WitherBoss",     etWither },
+		{ "WitherSkeleton", etWitherSkeleton },
+		{ "Wolf",           etWolf },
+		{ "Zombie",         etZombie },
+		{ "PigZombie",      etZombifiedPiglin },
+		{ "ZombieVillager", etZombieVillager }
 	};
 	try
 	{
@@ -5828,7 +5828,7 @@ eMonsterType NamespaceSerializer::ToMonsterType(const std::string_view a_ID)
 	catch (...)
 	{
 		FLOGWARNING("Tried to read unknown monster type {}, returning cow", a_ID);
-		return mtCow;
+		return etCow;
 	}
 }
 

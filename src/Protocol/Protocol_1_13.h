@@ -54,7 +54,7 @@ protected:
 	virtual UInt32 GetProtocolBlockType(BlockState a_Block) const;
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
 	virtual UInt32 GetProtocolItemType(Item a_ItemID) const;
-	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
+	virtual UInt8 GetProtocolEntityType(eEntityType a_Type) const override;
 	virtual UInt32 GetProtocolStatisticType(CustomStatistic a_Statistic) const;
 	virtual Version GetProtocolVersion() const override;
 
@@ -68,9 +68,8 @@ protected:
 
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) const override;
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, EntityMetadata a_Metadata, EntityMetadataType a_FieldType) const;
-	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity, bool a_WriteCommon = true) const override;
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const override;
-	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const override;
 	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const override;
 };
 

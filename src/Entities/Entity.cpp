@@ -468,13 +468,13 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			if (IsMob())
 			{
 				cMonster * Monster = static_cast<cMonster *>(this);
-				switch (Monster->GetMobType())
+				switch (Monster->GetEntityType())
 				{
-					case mtSkeleton:
-					case mtWither:
-					case mtZombie:
-					case mtZombiePigman:
-					case mtZombieVillager:
+					case etSkeleton:
+					case etWither:
+					case etZombie:
+					case etZombifiedPiglin:
+					case etZombieVillager:
 					{
 						MagicalCriticalHit = true;
 						a_TDI.FinalDamage += 2.5f * SmiteLevel;
@@ -489,12 +489,12 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			if (IsMob())
 			{
 				cMonster * Monster = static_cast<cMonster *>(this);
-				switch (Monster->GetMobType())
+				switch (Monster->GetEntityType())
 				{
-					case mtSpider:
-					case mtCaveSpider:
-					case mtSilverfish:
-					case mtEndermite:
+					case etSpider:
+					case etCaveSpider:
+					case etSilverfish:
+					case etEndermite:
 					{
 						MagicalCriticalHit = true;
 						a_TDI.FinalDamage += 2.5f * BaneOfArthropodsLevel;
@@ -529,11 +529,11 @@ bool cEntity::DoTakeDamage(TakeDamageInfo & a_TDI)
 			else if (IsMob() && !IsInWater())
 			{
 				cMonster * Monster = static_cast<cMonster *>(this);
-				switch (Monster->GetMobType())
+				switch (Monster->GetEntityType())
 				{
-					case mtGhast:
-					case mtZombiePigman:
-					case mtMagmaCube:
+					case etGhast:
+					case etZombifiedPiglin:
+					case etMagmaCube:
 					{
 						break;
 					}
@@ -2389,7 +2389,7 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 		}
 		else
 		{
-			Name = NamespaceSerializer::PrettifyEntityName(AString(NamespaceSerializer::From(Monster->GetMobType())), Monster->IsTame());
+			Name = NamespaceSerializer::PrettifyEntityName(AString(NamespaceSerializer::From(Monster->GetEntityType())), Monster->IsTame());
 		}
 	}
 	else
@@ -2455,7 +2455,7 @@ void cEntity::BroadcastDeathMessage(TakeDamageInfo & a_TDI)
 		}
 		else
 		{
-			AString KillerName = NamespaceSerializer::PrettifyEntityName(AString(NamespaceSerializer::From(Monster->GetMobType())), Monster->IsTame());
+			AString KillerName = NamespaceSerializer::PrettifyEntityName(AString(NamespaceSerializer::From(Monster->GetEntityType())), Monster->IsTame());
 			DeathMessage = fmt::format(FMT_STRING("{0} was killed by a {1}"), Name, KillerName);
 		}
 

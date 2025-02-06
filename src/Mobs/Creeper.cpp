@@ -11,7 +11,7 @@
 
 // looks like creepers no longer have ambient sounds
 cCreeper::cCreeper(void) :
-	Super("Creeper", mtCreeper, "entity.creeper.hurt", "entity.creeper.death", "", 0.6f, 1.7f),
+	Super("Creeper", etCreeper, "entity.creeper.hurt", "entity.creeper.death", "", 0.6f, 1.7f),
 	m_bIsBlowing(false),
 	m_bIsCharged(false),
 	m_BurnedWithFlintAndSteel(false),
@@ -85,7 +85,7 @@ void cCreeper::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 			{
 				return (
 					a_Entity.IsMob() &&
-					((static_cast<cMonster &>(a_Entity)).GetMobType() == mtSkeleton)
+					((static_cast<cMonster &>(a_Entity)).GetEntityType() == etSkeleton)
 				);
 			};
 

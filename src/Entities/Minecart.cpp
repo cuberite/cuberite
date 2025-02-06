@@ -131,9 +131,9 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cMinecart:
 
-cMinecart::cMinecart(ePayload a_Payload, Vector3d a_Pos):
-	Super(etMinecart, a_Pos, 0.98f, 0.7f),
-	m_Payload(a_Payload),
+cMinecart::cMinecart(eEntityType a_MineCartType, Vector3d a_Pos):
+	Super(a_MineCartType, a_Pos, 0.98f, 0.7f),
+	m_Payload(mpNone),
 	m_LastDamage(0),
 	m_DetectorRailPosition(0, 0, 0),
 	m_bIsOnDetectorRail(false)
@@ -183,7 +183,7 @@ void cMinecart::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	if (m_bIsOnDetectorRail && !Vector3i(POSX_TOINT, POSY_TOINT, POSZ_TOINT).Equals(m_DetectorRailPosition))
 	{
 		// Check if the rail is still there
-		if (m_World->GetBlock(m_DetectorRailPosition) == E_BLOCK_DETECTOR_RAIL)
+		if (m_World->GetBlock(m_DetectorRailPosition).Type() == BlockType::DetectorRail)
 		{
 			m_World->SetBlock(m_DetectorRailPosition, m_World->GetBlock(m_DetectorRailPosition));
 		}
@@ -1343,7 +1343,7 @@ void cMinecart::ApplyAcceleration(Vector3d a_ForwardDirection, double a_Accelera
 // cRideableMinecart:
 
 cRideableMinecart::cRideableMinecart(Vector3d a_Pos, const cItem & a_Content, int a_ContentHeight):
-	Super(mpNone, a_Pos),
+	Super(etMinecart, a_Pos),
 	m_Content(a_Content),
 	m_ContentHeight(a_ContentHeight)
 {
@@ -1397,7 +1397,7 @@ void cRideableMinecart::OnRightClicked(cPlayer & a_Player)
 // cMinecartWithChest:
 
 cMinecartWithChest::cMinecartWithChest(Vector3d a_Pos):
-	Super(mpChest, a_Pos),
+	Super(etChestMinecart, a_Pos),
 	cEntityWindowOwner(this),
 	m_Contents(ContentsWidth, ContentsHeight)
 {
@@ -1470,7 +1470,7 @@ void cMinecartWithChest::OpenNewWindow()
 // cMinecartWithFurnace:
 
 cMinecartWithFurnace::cMinecartWithFurnace(Vector3d a_Pos):
-	Super(mpFurnace, a_Pos),
+	Super(etFurnaceMinecart, a_Pos),
 	m_FueledTimeLeft(-1),
 	m_IsFueled(false)
 {
@@ -1546,7 +1546,7 @@ void cMinecartWithFurnace::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk
 // cMinecartWithTNT:
 
 cMinecartWithTNT::cMinecartWithTNT(Vector3d a_Pos):
-	Super(mpTNT, a_Pos)
+	Super(etTnt, a_Pos)
 {
 }
 
@@ -1610,7 +1610,7 @@ void cMinecartWithTNT::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 // cMinecartWithHopper:
 
 cMinecartWithHopper::cMinecartWithHopper(Vector3d a_Pos):
-	Super(mpHopper, a_Pos)
+	Super(etHopperMinecart, a_Pos)
 {
 }
 

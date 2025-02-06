@@ -11,16 +11,16 @@
 
 
 
-cMobSpawner::cMobSpawner(cMonster::eFamily a_MonsterFamily, const std::set<eMonsterType>& a_AllowedTypes) :
+cMobSpawner::cMobSpawner(cMonster::eFamily a_MonsterFamily, const std::set<eEntityType>& a_AllowedTypes) :
 	m_MonsterFamily(a_MonsterFamily),
 	m_NewPack(true),
-	m_MobType(mtInvalidType)
+	m_MobType(etInvalid)
 {
-	for (std::set<eMonsterType>::const_iterator itr = a_AllowedTypes.begin(); itr != a_AllowedTypes.end(); ++itr)
+	for (auto a_AllowedType : a_AllowedTypes)
 	{
-		if (cMonster::FamilyFromType(*itr) == a_MonsterFamily)
+		if (cMonster::FamilyFromType(a_AllowedType) == a_MonsterFamily)
 		{
-			m_AllowedTypes.insert(*itr);
+			m_AllowedTypes.insert(a_AllowedType);
 		}
 	}
 }
@@ -47,11 +47,11 @@ bool cMobSpawner::CheckPackCenter(BlockState a_Block)
 
 
 
-eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
+eEntityType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 {
-	std::vector<eMonsterType> AllowedMobs;
+	std::vector<eEntityType> AllowedMobs;
 
-	for (eMonsterType MobType : GetAllowedMobTypes(a_Biome))
+	for (eEntityType MobType : GetAllowedMobTypes(a_Biome))
 	{
 		auto itr = m_AllowedTypes.find(MobType);
 		if (itr != m_AllowedTypes.end())
@@ -63,7 +63,7 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 	// Pick a random mob from the options:
 	if (AllowedMobs.empty())
 	{
-		return mtInvalidType;
+		return etInvalid;
 	}
 
 	return AllowedMobs[GetRandomProvider().RandInt(AllowedMobs.size() - 1)];
@@ -73,7 +73,7 @@ eMonsterType cMobSpawner::ChooseMobType(EMCSBiome a_Biome)
 
 
 
-bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType a_MobType, EMCSBiome a_Biome, bool a_DisableSolidBelowCheck)
+bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eEntityType a_MobType, EMCSBiome a_Biome, bool a_DisableSolidBelowCheck)
 {
 	if ((a_RelPos.y >= cChunkDef::Height - 1) || (a_RelPos.y <= 0))
 	{
@@ -97,7 +97,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 
 	switch (a_MobType)
 	{
-		case mtBat:
+		case etBat:
 		{
 			return
 			(
@@ -109,7 +109,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
-		case mtBlaze:
+		case etBlaze:
 		{
 			return
 			(
@@ -120,7 +120,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
-		case mtCaveSpider:
+		case etCaveSpider:
 		{
 			return
 			(
@@ -132,12 +132,12 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
-		case mtChicken:
-		case mtCow:
-		case mtPig:
-		case mtHorse:
-		case mtRabbit:
-		case mtSheep:
+		case etChicken:
+		case etCow:
+		case etPig:
+		case etHorse:
+		case etRabbit:
+		case etSheep:
 		{
 			return
 			(
@@ -148,9 +148,9 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
-		case mtCreeper:
-		case mtSkeleton:
-		case mtZombie:
+		case etCreeper:
+		case etSkeleton:
+		case etZombie:
 		{
 			return
 			(
@@ -163,7 +163,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
-		case mtEnderman:
+		case etEnderman:
 		{
 			if (a_RelPos.y < 250)
 			{
@@ -185,7 +185,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			break;
 		}
 
-		case mtGhast:
+		case etGhast:
 		{
 			return
 			(
@@ -195,7 +195,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
-		case mtGuardian:
+		case etGuardian:
 		{
 			return
 			(
@@ -206,8 +206,8 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
-		case mtMagmaCube:
-		case mtSlime:
+		case etMagmaCube:
+		case etSlime:
 		{
 			const int AMOUNT_MOON_PHASES = 8;
 			auto maxLight = Random.RandInt(0, 7);
@@ -238,7 +238,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
-		case mtMooshroom:
+		case etMooshroom:
 		{
 			return
 				(
@@ -252,7 +252,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
-		case mtOcelot:
+		case etOcelot:
 		{
 			return (
 				IsBlockAir(TargetBlock) &&
@@ -265,7 +265,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
-		case mtSpider:
+		case etSpider:
 		{
 			bool CanSpawn = true;
 			bool HasFloor = false;
@@ -291,7 +291,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			return CanSpawn && HasFloor && (SkyLight <= 7) && (BlockLight <= 7);
 		}
 
-		case mtSquid:
+		case etSquid:
 		{
 			return (
 				(TargetBlock.Type() == BlockType::Water) &&
@@ -300,7 +300,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
-		case mtWitherSkeleton:
+		case etWitherSkeleton:
 		{
 			return (
 				IsBlockAir(TargetBlock) &&
@@ -312,7 +312,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
-		case mtWolf:
+		case etWolf:
 		{
 			return (
 				(TargetBlock.Type() == BlockType::GrassBlock) &&
@@ -331,7 +331,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 			);
 		}
 
-		case mtZombiePigman:
+		case etZombifiedPiglin:
 		{
 			return (
 				IsBlockAir(TargetBlock) &&
@@ -353,9 +353,9 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 
 
 
-std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
+std::set<eEntityType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 {
-	std::set<eMonsterType> ListOfSpawnables;
+	std::set<eEntityType> ListOfSpawnables;
 	// Check biomes first to get a list of animals
 	switch (a_Biome)
 	{
@@ -363,7 +363,7 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 		case biMushroomIsland:
 		case biMushroomShore:
 		{
-			ListOfSpawnables.insert(mtMooshroom);
+			ListOfSpawnables.insert(etMooshroom);
 			return ListOfSpawnables;
 		}
 
@@ -374,7 +374,7 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 		case biRiver:
 		case biDeepOcean:
 		{
-			ListOfSpawnables.insert(mtGuardian);
+			ListOfSpawnables.insert(etGuardian);
 			break;
 		}
 
@@ -385,7 +385,7 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 		case biJungleM:
 		case biJungleEdgeM:
 		{
-			ListOfSpawnables.insert(mtOcelot);
+			ListOfSpawnables.insert(etOcelot);
 			break;
 		}
 
@@ -397,14 +397,14 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 		case biSavannaM:
 		case biSavannaPlateauM:
 		{
-			ListOfSpawnables.insert(mtHorse);
+			ListOfSpawnables.insert(etHorse);
 			break;
 		}
 
 		// Add wolves in forest biomes
 		case biForest:
 		{
-			ListOfSpawnables.insert(mtWolf);
+			ListOfSpawnables.insert(etWolf);
 			break;
 		}
 
@@ -418,8 +418,8 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 		case biMegaTaiga:
 		case biMegaTaigaHills:
 		{
-			ListOfSpawnables.insert(mtWolf);
-			ListOfSpawnables.insert(mtRabbit);
+			ListOfSpawnables.insert(etWolf);
+			ListOfSpawnables.insert(etRabbit);
 			break;
 		}
 
@@ -429,7 +429,7 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 		case biDesertM:
 		case biFlowerForest:
 		{
-			ListOfSpawnables.insert(mtRabbit);
+			ListOfSpawnables.insert(etRabbit);
 			break;
 		}
 
@@ -449,27 +449,27 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 		(a_Biome != biOcean) &&
 		(a_Biome != biDeepOcean))
 	{
-		ListOfSpawnables.insert(mtSheep);
-		ListOfSpawnables.insert(mtPig);
-		ListOfSpawnables.insert(mtCow);
-		ListOfSpawnables.insert(mtChicken);
-		ListOfSpawnables.insert(mtEnderman);
-		ListOfSpawnables.insert(mtSlime);
+		ListOfSpawnables.insert(etSheep);
+		ListOfSpawnables.insert(etPig);
+		ListOfSpawnables.insert(etCow);
+		ListOfSpawnables.insert(etChicken);
+		ListOfSpawnables.insert(etEnderman);
+		ListOfSpawnables.insert(etSlime);
 	}
 
-	ListOfSpawnables.insert(mtBat);
-	ListOfSpawnables.insert(mtSpider);
-	ListOfSpawnables.insert(mtZombie);
-	ListOfSpawnables.insert(mtSkeleton);
-	ListOfSpawnables.insert(mtCreeper);
-	ListOfSpawnables.insert(mtSquid);
+	ListOfSpawnables.insert(etBat);
+	ListOfSpawnables.insert(etSpider);
+	ListOfSpawnables.insert(etZombie);
+	ListOfSpawnables.insert(etSkeleton);
+	ListOfSpawnables.insert(etCreeper);
+	ListOfSpawnables.insert(etSquid);
 
 	// Nether
-	ListOfSpawnables.insert(mtBlaze);
-	ListOfSpawnables.insert(mtGhast);
-	ListOfSpawnables.insert(mtMagmaCube);
-	ListOfSpawnables.insert(mtWitherSkeleton);
-	ListOfSpawnables.insert(mtZombiePigman);
+	ListOfSpawnables.insert(etBlaze);
+	ListOfSpawnables.insert(etGhast);
+	ListOfSpawnables.insert(etMagmaCube);
+	ListOfSpawnables.insert(etWitherSkeleton);
+	ListOfSpawnables.insert(etZombifiedPiglin);
 
 	return ListOfSpawnables;
 }
@@ -500,19 +500,19 @@ cMonster * cMobSpawner::TryToSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, EMCS
 	if (m_NewPack)
 	{
 		m_MobType = ChooseMobType(a_Biome);
-		if (m_MobType == mtInvalidType)
+		if (m_MobType == etInvalid)
 		{
 			return nullptr;
 		}
-		if (m_MobType == mtWitherSkeleton)
+		if (m_MobType == etWitherSkeleton)
 		{
 			a_MaxPackSize = 5;
 		}
-		else if (m_MobType == mtWolf)
+		else if (m_MobType == etWolf)
 		{
 			a_MaxPackSize = 8;
 		}
-		else if (m_MobType == mtGhast)
+		else if (m_MobType == etGhast)
 		{
 			a_MaxPackSize = 1;
 		}

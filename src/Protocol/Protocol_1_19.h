@@ -40,9 +40,8 @@ protected:
 	virtual void    HandlePacketWindowClick(cByteBuffer & a_ByteBuffer) override;
 	virtual void    HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer) override;
 
-	virtual UInt32  GetProtocolMobType(eMonsterType a_MobType) const override;
 	virtual int     GetProtocolParticleID(const AString & a_ParticleName) const override;
-	virtual UInt8   GetProtocolEntityType(const cEntity & a_Entity) const override;
+	virtual UInt8   GetProtocolEntityType(eEntityType a_Type) const override;
 	virtual Int32   GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const override;
 	virtual UInt32  GetProtocolBlockType(BlockState a_Block) const override;
 	virtual UInt32  GetProtocolItemType(Item a_ItemID) const override;
@@ -91,7 +90,7 @@ public:
 
 protected:
 	virtual UInt32  GetPacketID(ePacketType a_PacketType) const override;
-	virtual void    WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
+	virtual void    WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity, bool a_WriteCommon = true) const override;
 	virtual void    WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const override;
 
 	virtual void    SendChatRaw(const AString & a_MessageRaw, eChatType a_Type) override;
@@ -125,7 +124,7 @@ public:
 
 protected:
 	virtual UInt32  GetPacketID(ePacketType a_PacketType) const override;
-	virtual void    WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
+	virtual void    WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity, bool a_WriteCommon = true) const override;
 	virtual void    WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const override;
 
 	virtual void    SendLogin(const cPlayer & a_Player, const cWorld & a_World) override;
@@ -135,8 +134,7 @@ protected:
 	virtual bool    HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 	virtual void    HandlePacketPlayerSession(cByteBuffer & a_ByteBuffer) override;
 
-	virtual UInt32  GetProtocolMobType(eMonsterType a_MobType) const override;
-	virtual UInt8   GetProtocolEntityType(const cEntity & a_Entity) const override;
+	virtual UInt8   GetProtocolEntityType(eEntityType a_Type) const override;
 	virtual Int32   GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const override;
 
 	virtual Version GetProtocolVersion() const override;

@@ -56,7 +56,7 @@ protected:
 	/** Applies an acceleration to the minecart parallel to a_ForwardDirection but without allowing backward speed. */
 	void ApplyAcceleration(Vector3d a_ForwardDirection, double a_Acceleration);
 
-	cMinecart(ePayload a_Payload, Vector3d a_Pos);
+	cMinecart(eEntityType a_MineCartType, Vector3d a_Pos);
 
 	/** Handles physics on normal rails
 	For each tick, slow down on flat rails, speed up or slow down on ascending / descending rails (depending on direction), and turn on curved rails. */

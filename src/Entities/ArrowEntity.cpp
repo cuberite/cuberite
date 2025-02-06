@@ -10,7 +10,7 @@
 
 
 cArrowEntity::cArrowEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
-	Super(pkArrow, a_Creator, a_Pos, a_Speed, 0.5f, 0.5f),
+	Super(etArrow, a_Creator, a_Pos, a_Speed, 0.5f, 0.5f),
 	m_PickupState(psNoPickup),
 	m_DamageCoeff(2),
 	m_IsCritical(false),

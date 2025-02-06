@@ -107,7 +107,7 @@ public:
 
 	virtual bool IsPlaceable(void) const override
 	{
-		FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
+		// FLOGERROR("{}: Unimplemented item handler called for item {}", __FUNCTION__, m_ItemType);
 		// ASSERT(!"Unimplemented item handler called!");
 		return false;
 	}

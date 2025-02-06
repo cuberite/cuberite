@@ -63,8 +63,7 @@ protected:
 	virtual UInt32 GetProtocolBlockType(BlockState a_Block) const override;
 	virtual UInt32 GetProtocolItemType(Item a_ItemID) const override;
 	virtual Item GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
-	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
-	virtual UInt8  GetProtocolEntityType(const cEntity & a_Entity) const override;
+	virtual UInt8  GetProtocolEntityType(eEntityType a_Type) const override;
 	virtual UInt32 GetBlockEntityID(const cBlockEntity & a_BlockEntity) const override;
 
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
@@ -91,12 +90,14 @@ protected:
 	virtual void SendTags(void) override;
 
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
+	virtual void HandlePacketVehicleMove(cByteBuffer & a_ByteBuffer) override;
+	virtual void HandlePacketClientTickEnd(cByteBuffer & a_ByteBuffer);
 
 	virtual UInt32 GetProtocolBlockType(BlockState a_Block) const override;
 	virtual UInt32 GetProtocolItemType(Item a_ItemID) const override;
-	virtual Item GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
-	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
-	virtual UInt8 GetProtocolEntityType(const cEntity & a_Entity) const override;
+	virtual Item   GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
+	virtual UInt8  GetProtocolEntityType(eEntityType a_Type) const override;
+	virtual UInt8  GetEntityMetadataID(EntityMetadata a_Metadata) const override;
 
 	virtual Version GetProtocolVersion() const override;
 };

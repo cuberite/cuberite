@@ -26,9 +26,8 @@ protected:
 	virtual void      SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void      SendMapData(const cMap & a_Map, int a_DataStartX, int a_DataStartY) override;
 
-	virtual UInt32    GetProtocolMobType(eMonsterType a_MobType) const override;
 	virtual int       GetProtocolParticleID(const AString & a_ParticleName) const override;
-	virtual UInt8     GetProtocolEntityType(const cEntity & a_Entity) const override;
+	virtual UInt8     GetProtocolEntityType(eEntityType a_Type) const override;
 
 	virtual UInt8     GetEntityMetadataID(EntityMetadata a_Metadata) const override;
 

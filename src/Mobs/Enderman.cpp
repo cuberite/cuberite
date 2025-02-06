@@ -79,7 +79,7 @@ protected:
 
 
 cEnderman::cEnderman(void) :
-	Super("Enderman", mtEnderman, "entity.endermen.hurt", "entity.endermen.death", "entity.endermen.ambient", 0.6f, 2.9f),
+	Super("Enderman", etEnderman, "entity.endermen.hurt", "entity.endermen.death", "entity.endermen.ambient", 0.6f, 2.9f),
 	m_bIsScreaming(false),
 	m_CarriedBlock(Block::Air::Air())
 {
@@ -150,7 +150,7 @@ void cEnderman::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_EMState != CHASING)
 	{
-		cMonster * EndermiteFound = GetMonsterOfTypeInSight(mtEndermite, 64);
+		cMonster * EndermiteFound = GetMonsterOfTypeInSight(etEndermite, 64);
 		if (EndermiteFound != nullptr)
 		{
 			SetTarget(EndermiteFound);

@@ -999,8 +999,8 @@ void cWorld::InitializeAndLoadMobSpawningValues(cIniFile & a_IniFile)
 	AStringVector SplitList = StringSplitAndTrim(AllMonsters, ",");
 	for (AStringVector::const_iterator itr = SplitList.begin(), end = SplitList.end(); itr != end; ++itr)
 	{
-		eMonsterType ToAdd = cMonster::StringToMobType(*itr);
-		if (ToAdd != mtInvalidType)
+		auto ToAdd = cMonster::StringToMobType(*itr);
+		if (ToAdd != etInvalid)
 		{
 			m_AllowedMobs.insert(ToAdd);
 			LOGD("Allowed mob: %s", itr->c_str());
@@ -1280,7 +1280,7 @@ void cWorld::TickMobs(std::chrono::milliseconds a_Dt)
 			// Destroy far hostile mobs except if last target was a player
 			else if ((Monster.GetMobFamily() == cMonster::eFamily::mfHostile) && !Monster.WasLastTargetAPlayer())
 			{
-				if (Monster.GetMobType() != eMonsterType::mtWolf)
+				if (Monster.GetEntityType() != etWolf)
 				{
 					Monster.Destroy();
 				}
@@ -2991,7 +2991,7 @@ bool cWorld::IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ)
 
 
 
-UInt32 cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType, bool a_Baby)
+UInt32 cWorld::SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eEntityType a_MonsterType, bool a_Baby)
 {
 	auto Monster = cMonster::NewMonsterFromType(a_MonsterType);
 	if (Monster == nullptr)
@@ -3042,7 +3042,7 @@ UInt32 cWorld::SpawnMobFinalize(std::unique_ptr<cMonster> a_Monster)
 
 
 
-UInt32 cWorld::CreateProjectile(Vector3d a_Pos, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
+UInt32 cWorld::CreateProjectile(Vector3d a_Pos, eEntityType a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
 {
 	auto Projectile = cProjectileEntity::Create(a_Kind, a_Creator, a_Pos, a_Item, a_Speed);
 	if (Projectile == nullptr)
@@ -3063,7 +3063,7 @@ UInt32 cWorld::CreateProjectile(Vector3d a_Pos, cProjectileEntity::eKind a_Kind,
 
 
 
-UInt32 cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
+UInt32 cWorld::CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, eEntityType a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed)
 {
 	return CreateProjectile({a_PosX, a_PosY, a_PosZ}, a_Kind, a_Creator, a_Item, a_Speed);
 }

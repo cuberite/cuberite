@@ -9,7 +9,7 @@
 
 
 cMooshroom::cMooshroom(void) :
-	Super("Mooshroom", mtMooshroom, "entity.cow.hurt", "entity.cow.death", "entity.cow.ambient", 0.9f, 1.4f)
+	Super("Mooshroom", etMooshroom, "entity.cow.hurt", "entity.cow.death", "entity.cow.ambient", 0.9f, 1.4f)
 {
 }
 
@@ -67,7 +67,7 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 			cItems Drops;
 			Drops.emplace_back(Item::RedMushroom, 5);
 			m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
-			m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtCow, false);
+			m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), etCow, false);
 			Destroy();
 		} break;
 		default:

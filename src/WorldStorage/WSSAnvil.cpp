@@ -1683,8 +1683,8 @@ OwnedBlockEntity cWSSAnvil::LoadMobSpawnerFromNBT(const cParsedNBT & a_NBT, int 
 			return nullptr;
 		}
 
-		eMonsterType MonsterType = NamespaceSerializer::ToMonsterType(StatInfo.second);
-		if (MonsterType != eMonsterType::mtInvalidType)
+		auto MonsterType = NamespaceSerializer::ToEntityType(StatInfo.second);
+		if (MonsterType != etInvalid)
 		{
 			MobSpawner->SetEntity(MonsterType);
 		}
@@ -1951,79 +1951,79 @@ void cWSSAnvil::LoadEntityFromNBT(cEntityList & a_Entities, const cParsedNBT & a
 		return;
 	}
 
-	switch (NamespaceSerializer::ToMonsterType(StatInfo.second))
+	switch (NamespaceSerializer::ToEntityType(StatInfo.second))
 	{
-		case mtBat:             return LoadBatFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtBlaze:           return LoadBlazeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtCat:             return LoadCatFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtCaveSpider:      return LoadCaveSpiderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtChicken:         return LoadChickenFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtCod:             return LoadCodFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtCow:             return LoadCowFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtCreeper:         return LoadCreeperFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtDolphin:         return LoadDolphinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtDonkey:          return LoadDonkeyFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtDrowned:         return LoadDrownedFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtElderGuardian:   return LoadElderGuardianFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtEnderDragon:     return LoadEnderDragonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtEnderman:        return LoadEndermanFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtEndermite:       return LoadEndermiteFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtEvoker:          return LoadEvokerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtFox:             return LoadFoxFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtGhast:           return LoadGhastFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtGiant:           return LoadGiantFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtGuardian:        return LoadGuardianFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtHorse:           return LoadHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtHoglin:          return LoadHoglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtHusk:            return LoadHuskFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtIllusioner:      return LoadIllusionerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtIronGolem:       return LoadIronGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtLlama:           return LoadLlamaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtMagmaCube:       return LoadMagmaCubeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtMooshroom:       return LoadMooshroomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtMule:            return LoadMuleFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtOcelot:          return LoadOcelotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPanda:           return LoadPandaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtParrot:          return LoadParrotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPhantom:         return LoadPhantomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPig:             return LoadPigFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPiglin:          return LoadPiglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPiglinBrute:     return LoadPiglinBruteFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPillager:        return LoadPillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPolarBear:       return LoadPolarBearFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtPufferfish:      return LoadPufferfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtRabbit:          return LoadRabbitFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtRavager:         return LoadRavagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSalmon:          return LoadSalmonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSheep:           return LoadSheepFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtShulker:         return LoadShulkerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSilverfish:      return LoadSilverfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSkeleton:        return LoadSkeletonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSkeletonHorse:   return LoadSkeletonHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSlime:           return LoadSlimeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSnowGolem:       return LoadSnowGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSpider:          return LoadSpiderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtSquid:           return LoadSquidFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtStray:           return LoadStrayFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtStrider:         return LoadStriderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtTraderLlama:     return LoadTraderLlamaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtTropicalFish:    return LoadTropicalFishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtTurtle:          return LoadTurtleFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtVex:             return LoadVexFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtVillager:        return LoadVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtVindicator:      return LoadVindicatorFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtWanderingTrader: return LoadWanderingTraderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtWitch:           return LoadWitchFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtWither:          return LoadWitherFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtWitherSkeleton:  return LoadWitherSkeletonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtWolf:            return LoadWolfFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtZoglin:          return LoadZoglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtZombie:          return LoadZombieFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtZombieHorse:     return LoadZombieHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtZombifiedPiglin: return LoadZombifiedPiglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtZombieVillager:  return LoadZombieVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
-		case mtBee:             break;  // TODO: implement bee nbt
-		case mtInvalidType:     break;
+		case etBat:             return LoadBatFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etBlaze:           return LoadBlazeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etCat:             return LoadCatFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etCaveSpider:      return LoadCaveSpiderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etChicken:         return LoadChickenFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etCod:             return LoadCodFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etCow:             return LoadCowFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etCreeper:         return LoadCreeperFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etDolphin:         return LoadDolphinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etDonkey:          return LoadDonkeyFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etDrowned:         return LoadDrownedFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etElderGuardian:   return LoadElderGuardianFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etEnderDragon:     return LoadEnderDragonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etEnderman:        return LoadEndermanFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etEndermite:       return LoadEndermiteFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etEvoker:          return LoadEvokerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etFox:             return LoadFoxFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etGhast:           return LoadGhastFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etGiant:           return LoadGiantFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etGuardian:        return LoadGuardianFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etHorse:           return LoadHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etHoglin:          return LoadHoglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etHusk:            return LoadHuskFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etIllusioner:      return LoadIllusionerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etIronGolem:       return LoadIronGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etLlama:           return LoadLlamaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etMagmaCube:       return LoadMagmaCubeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etMooshroom:       return LoadMooshroomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etMule:            return LoadMuleFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etOcelot:          return LoadOcelotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etPanda:           return LoadPandaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etParrot:          return LoadParrotFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etPhantom:         return LoadPhantomFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etPig:             return LoadPigFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etPiglin:          return LoadPiglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etPiglinBrute:     return LoadPiglinBruteFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etPillager:        return LoadPillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etPolarBear:       return LoadPolarBearFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etPufferfish:      return LoadPufferfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etRabbit:          return LoadRabbitFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etRavager:         return LoadRavagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etSalmon:          return LoadSalmonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etSheep:           return LoadSheepFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etShulker:         return LoadShulkerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etSilverfish:      return LoadSilverfishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etSkeleton:        return LoadSkeletonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etSkeletonHorse:   return LoadSkeletonHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etSlime:           return LoadSlimeFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etSnowGolem:       return LoadSnowGolemFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etSpider:          return LoadSpiderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etSquid:           return LoadSquidFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etStray:           return LoadStrayFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etStrider:         return LoadStriderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etTraderLlama:     return LoadTraderLlamaFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etTropicalFish:    return LoadTropicalFishFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etTurtle:          return LoadTurtleFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etVex:             return LoadVexFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etVillager:        return LoadVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etVindicator:      return LoadVindicatorFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etWanderingTrader: return LoadWanderingTraderFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etWitch:           return LoadWitchFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etWither:          return LoadWitherFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etWitherSkeleton:  return LoadWitherSkeletonFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etWolf:            return LoadWolfFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etZoglin:          return LoadZoglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etZombie:          return LoadZombieFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etZombieHorse:     return LoadZombieHorseFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etZombifiedPiglin: return LoadZombifiedPiglinFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etZombieVillager:  return LoadZombieVillagerFromNBT(a_Entities, a_NBT, a_EntityTagIdx);
+		case etBee:             break;  // TODO: implement bee nbt
+		case etInvalid:     break;
 	}
 }
 

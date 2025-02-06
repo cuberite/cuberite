@@ -434,11 +434,11 @@ protected:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
 	/** Returns false if an animal cannot spawn at given coords, else adds it to the chunk's entity list and returns true */
-	bool TrySpawnAnimals(cChunkDesc & a_ChunkDesc, Vector3i a_RelPos, eMonsterType AnimalToSpawn);
+	bool TrySpawnAnimals(cChunkDesc & a_ChunkDesc, Vector3i a_RelPos, eEntityType AnimalToSpawn);
 
 	/** Picks a random animal from biome-dependant list for a random position in the chunk.
 	Returns the chosen mob type, or mtInvalid if no mob chosen. */
-	eMonsterType GetRandomMob(cChunkDesc & a_ChunkDesc);
+	eEntityType GetRandomMob(cChunkDesc & a_ChunkDesc);
 } ;
 
 

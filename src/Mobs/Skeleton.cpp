@@ -10,7 +10,7 @@
 
 
 cSkeleton::cSkeleton(void) :
-	Super("Skeleton", mtSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", "entity.skeleton.ambient", 0.6f, 1.99f),
+	Super("Skeleton", etSkeleton, "entity.skeleton.hurt", "entity.skeleton.death", "entity.skeleton.ambient", 0.6f, 1.99f),
 	m_ChargingBow(false)
 {
 }

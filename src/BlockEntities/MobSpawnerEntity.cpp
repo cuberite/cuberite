@@ -15,7 +15,7 @@
 
 cMobSpawnerEntity::cMobSpawnerEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
 	Super(a_Block, a_Pos, a_World),
-	m_Entity(mtPig),
+	m_Entity(etPig),
 	m_SpawnDelay(100),
 	m_IsActive(false)
 {
@@ -87,8 +87,8 @@ bool cMobSpawnerEntity::UsedBy(cPlayer * a_Player)
 		case Item::ZombiePigmanSpawnEgg:
 		case Item::ZombieVillagerSpawnEgg:
 		{
-			eMonsterType MonsterType = cItemSpawnEggHandler::ItemToMonsterType(a_Player->GetEquippedItem());
-			if (MonsterType == eMonsterType::mtInvalidType)
+			auto MonsterType = cItemSpawnEggHandler::ItemToMonsterType(a_Player->GetEquippedItem());
+			if (MonsterType == etInvalid)
 			{
 				return false;
 			}
@@ -256,7 +256,7 @@ int cMobSpawnerEntity::GetNearbyPlayersNum(void)
 
 
 
-int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
+int cMobSpawnerEntity::GetNearbyMonsterNum(eEntityType a_EntityType)
 {
 	int NumEntities = 0;
 
@@ -268,7 +268,7 @@ int cMobSpawnerEntity::GetNearbyMonsterNum(eMonsterType a_EntityType)
 		}
 
 		auto & Mob = static_cast<cMonster &>(a_Entity);
-		if (Mob.GetMobType() == m_Entity)
+		if (Mob.GetEntityType() == m_Entity)
 		{
 			NumEntities++;
 		}

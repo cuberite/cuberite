@@ -10,7 +10,7 @@
 
 
 cPig::cPig(void) :
-	Super("Pig", mtPig, "entity.pig.hurt", "entity.pig.death", "entity.pig.ambient", 0.9f, 0.9f),
+	Super("Pig", etPig, "entity.pig.hurt", "entity.pig.death", "entity.pig.ambient", 0.9f, 0.9f),
 	m_bIsSaddled(false)
 {
 }
@@ -120,7 +120,7 @@ bool cPig::DoTakeDamage(TakeDamageInfo & a_TDI)
 	if (a_TDI.DamageType == dtLightning)
 	{
 		Destroy();
-		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtZombiePigman, false);
+		// TODO: m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), etZombiePigman, false);
 		return true;
 	}
 	return true;

@@ -89,7 +89,7 @@ protected:
 	virtual void SendInitialChunksComing() override;
 
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const override;
-	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity, bool a_WriteCommon = true) const override;
 	virtual Int32   GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const override;
 
 	virtual Version GetProtocolVersion() const override;
@@ -126,8 +126,7 @@ protected:
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) const override;
 	virtual Version GetProtocolVersion() const override;
 
-	virtual UInt32    GetProtocolMobType(eMonsterType a_MobType) const override;
 	virtual int       GetProtocolParticleID(const AString & a_ParticleName) const override;
-	virtual UInt8     GetProtocolEntityType(const cEntity & a_Entity) const override;
+	virtual UInt8     GetProtocolEntityType(eEntityType a_Type) const override;
 	virtual Int32     GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const override;
 };

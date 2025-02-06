@@ -851,7 +851,7 @@ public:
 	bool IsBlockDirectlyWatered(int a_BlockX, int a_BlockY, int a_BlockZ);  // tolua_export
 
 	/** Spawns a mob of the specified type. Returns the mob's UniqueID if recognized and spawned, cEntity::INVALID_ID otherwise */
-	virtual UInt32 SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType, bool a_Baby = false) override;  // tolua_export
+	virtual UInt32 SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eEntityType a_MonsterType, bool a_Baby = false) override;  // tolua_export
 
 	/** Wraps cEntity::Initialize, doing Monster-specific things before spawning the monster.
 	Takes ownership of the given Monster reference. */
@@ -859,12 +859,12 @@ public:
 
 	/** Creates a projectile of the specified type. Returns the projectile's UniqueID if successful, cEntity::INVALID_ID otherwise
 	Item parameter is currently used for Fireworks to correctly set entity metadata based on item metadata. */
-	UInt32 CreateProjectile(Vector3d a_Pos, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = nullptr);  // tolua_export
+	UInt32 CreateProjectile(Vector3d a_Pos, eEntityType a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = nullptr);  // tolua_export
 
 	/** OBSOLETE, use the Vector3d-based overload instead.
 	Creates a projectile of the specified type. Returns the projectile's UniqueID if successful, cEntity::INVALID_ID otherwise
 	Item parameter is currently used for Fireworks to correctly set entity metadata based on item metadata. */
-	UInt32 CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, cProjectileEntity::eKind a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = nullptr);  // tolua_export
+	UInt32 CreateProjectile(double a_PosX, double a_PosY, double a_PosZ, eEntityType a_Kind, cEntity * a_Creator, const cItem * a_Item, const Vector3d * a_Speed = nullptr);  // tolua_export
 
 	/** Returns a random number in range [0 .. a_Range]. */
 	int GetTickRandomNumber(int a_Range);
@@ -1017,7 +1017,7 @@ private:
 	cChunkMap m_ChunkMap;
 
 	bool m_bAnimals;
-	std::set<eMonsterType> m_AllowedMobs;
+	std::set<eEntityType> m_AllowedMobs;
 
 	eWeather m_Weather;
 	int m_WeatherInterval;

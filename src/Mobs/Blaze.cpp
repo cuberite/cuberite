@@ -9,7 +9,7 @@
 
 
 cBlaze::cBlaze(void) :
-	Super("Blaze", mtBlaze, "entity.blaze.hurt", "entity.blaze.death", "entity.blaze.ambient", 0.6f, 1.8f),
+	Super("Blaze", etBlaze, "entity.blaze.hurt", "entity.blaze.death", "entity.blaze.ambient", 0.6f, 1.8f),
 	m_IsCharging(false),
 	m_ChargeTimer(0)
 {

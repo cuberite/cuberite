@@ -13,7 +13,7 @@
 
 
 cSilverfish::cSilverfish() :
-	Super("Silverfish", mtSilverfish, "entity.silverfish.hurt", "entity.silverfish.death", "entity.silverfish.ambient", 0.4f, 0.3f)
+	Super("Silverfish", etSilverfish, "entity.silverfish.hurt", "entity.silverfish.death", "entity.silverfish.ambient", 0.4f, 0.3f)
 {
 }
 

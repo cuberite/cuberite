@@ -47,7 +47,7 @@ protected:
 
 
 cBoat::cBoat(Vector3d a_Pos, eMaterial a_Material) :
-	Super(etBoat, a_Pos, 1.375f, 0.5625f),
+	Super(etOakBoat, a_Pos, 1.375f, 0.5625f),
 	m_LastDamage(0), m_ForwardDirection(0),
 	m_DamageTaken(0.0f), m_Material(a_Material),
 	m_RightPaddleUsed(false), m_LeftPaddleUsed(false)

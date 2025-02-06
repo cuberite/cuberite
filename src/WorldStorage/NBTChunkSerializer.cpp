@@ -50,7 +50,7 @@
 #include "../Entities/Painting.h"
 
 #include "../Mobs/IncludeAllMonsters.h"
-
+#include "../Mobs/MonsterTypes.h"
 #include "../Protocol/Palettes/Upgrade.h"
 #include <Protocol/Palettes/BlockMap.h>
 
@@ -163,26 +163,35 @@ public:
 		mIsTagOpen = true;
 		mHasHadEntity = true;
 
-		switch (a_Entity->GetEntityType())
+		if (a_Entity->IsMob())
 		{
-			case cEntity::etBoat:         AddBoatEntity        (static_cast<cBoat *>            (a_Entity)); break;
-			case cEntity::etEnderCrystal: AddEnderCrystalEntity(static_cast<cEnderCrystal *>    (a_Entity)); break;
-			case cEntity::etFallingBlock: AddFallingBlockEntity(static_cast<cFallingBlock *>    (a_Entity)); break;
-			case cEntity::etMinecart:     AddMinecartEntity    (static_cast<cMinecart *>        (a_Entity)); break;
-			case cEntity::etMonster:      AddMonsterEntity     (static_cast<cMonster *>         (a_Entity)); break;
-			case cEntity::etPickup:       AddPickupEntity      (static_cast<cPickup *>          (a_Entity)); break;
-			case cEntity::etProjectile:   AddProjectileEntity  (static_cast<cProjectileEntity *>(a_Entity)); break;
-			case cEntity::etTNT:          AddTNTEntity         (static_cast<cTNTEntity *>       (a_Entity)); break;
-			case cEntity::etExpOrb:       AddExpOrbEntity      (static_cast<cExpOrb *>          (a_Entity)); break;
-			case cEntity::etItemFrame:    AddItemFrameEntity   (static_cast<cItemFrame *>       (a_Entity)); break;
-			case cEntity::etLeashKnot:    AddLeashKnotEntity   (static_cast<cLeashKnot *>       (a_Entity)); break;
-			case cEntity::etPainting:     AddPaintingEntity    (static_cast<cPainting *>        (a_Entity)); break;
-			case cEntity::etPlayer: return;  // Players aren't saved into the world
-			case cEntity::etFloater: return;  // Floaters aren't saved either
-			default:
+			AddMonsterEntity(dynamic_cast<cMonster *> (a_Entity));
+		}
+		else if (a_Entity->IsProjectile())
+		{
+			AddProjectileEntity(dynamic_cast<cProjectileEntity *>(a_Entity));
+		}
+		else
+		{
+			switch (a_Entity->GetEntityType())
 			{
-				ASSERT(!"Unhandled entity type is being saved");
-				break;
+				case etOakBoat:         AddBoatEntity        (static_cast<cBoat *>            (a_Entity)); break;
+				case etEndCrystal:      AddEnderCrystalEntity(static_cast<cEnderCrystal *>    (a_Entity)); break;
+				case etFallingBlock: AddFallingBlockEntity(static_cast<cFallingBlock *>    (a_Entity)); break;
+				case etMinecart:     AddMinecartEntity    (static_cast<cMinecart *>        (a_Entity)); break;
+				case etItem:       AddPickupEntity      (static_cast<cPickup *>          (a_Entity)); break;
+				case etTnt:          AddTNTEntity         (static_cast<cTNTEntity *>       (a_Entity)); break;
+				case etExperienceOrb:       AddExpOrbEntity      (static_cast<cExpOrb *>          (a_Entity)); break;
+				case etItemFrame:    AddItemFrameEntity   (static_cast<cItemFrame *>       (a_Entity)); break;
+				case etLeashKnot:    AddLeashKnotEntity   (static_cast<cLeashKnot *>       (a_Entity)); break;
+				case etPainting:     AddPaintingEntity    (static_cast<cPainting *>        (a_Entity)); break;
+				case etPlayer:        return;  // Players aren't saved into the world
+				case etFishingBobber: return;  // Floaters aren't saved either
+				default:
+				{
+					ASSERT(!"Unhandled entity type is being saved");
+					break;
+				}
 			}
 		}
 	}
@@ -631,7 +640,7 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_MobSpawner, "minecraft:mob_spawner");
-			mWriter.AddString("EntityId", NamespaceSerializer::From(a_MobSpawner->GetEntity()));
+			// mWriter.AddString("EntityId", NamespaceSerializer::From(a_MobSpawner->GetEntity()));
 			mWriter.AddShort("SpawnCount", a_MobSpawner->GetSpawnCount());
 			mWriter.AddShort("SpawnRange", a_MobSpawner->GetSpawnRange());
 			mWriter.AddShort("Delay", a_MobSpawner->GetSpawnDelay());
@@ -857,7 +866,7 @@ public:
 	void AddMonsterEntity(cMonster * a_Monster)
 	{
 		mWriter.BeginCompound("");
-			AddBasicEntity(a_Monster, NamespaceSerializer::From(a_Monster->GetMobType()));
+			AddBasicEntity(a_Monster, NamespaceSerializer::From(a_Monster->GetEntityType()));
 			mWriter.BeginList("DropChances", TAG_Float);
 				mWriter.AddFloat("", a_Monster->GetDropChanceWeapon());
 				mWriter.AddFloat("", a_Monster->GetDropChanceHelmet());
@@ -895,21 +904,21 @@ public:
 				}
 			}
 
-			switch (a_Monster->GetMobType())
+			switch (a_Monster->GetEntityType())
 			{
-				case mtBat:
+				case etBat:
 				{
 					mWriter.AddByte("BatFlags", static_cast<const cBat *>(a_Monster)->IsHanging());
 					break;
 				}
-				case mtCreeper:
+				case etCreeper:
 				{
 					const cCreeper *Creeper = static_cast<const cCreeper *>(a_Monster);
 					mWriter.AddByte("powered", Creeper->IsCharged());
 					mWriter.AddByte("ignited", Creeper->IsBlowing());
 					break;
 				}
-				case mtEnderman:
+				case etEnderman:
 				{
 					const cEnderman *Enderman = static_cast<const cEnderman *>(a_Monster);
 					auto NumericBlock = PaletteUpgrade::ToBlock(Enderman->GetCarriedBlock());
@@ -917,7 +926,7 @@ public:
 					mWriter.AddShort("carriedData", static_cast<Int16>(NumericBlock.second));
 					break;
 				}
-				case mtHorse:
+				case etHorse:
 				{
 					const cHorse *Horse = static_cast<const cHorse *>(a_Monster);
 					mWriter.AddByte("ChestedHorse",   Horse->IsChested()? 1 : 0);
@@ -931,12 +940,12 @@ public:
 					mWriter.AddInt ("Age",            Horse->GetAge());
 					break;
 				}
-				case mtMagmaCube:
+				case etMagmaCube:
 				{
 					mWriter.AddInt("Size", static_cast<const cMagmaCube *>(a_Monster)->GetSize());
 					break;
 				}
-				case mtOcelot:
+				case etOcelot:
 				{
 					const auto *Ocelot = static_cast<const cOcelot *>(a_Monster);
 					if (!Ocelot->GetOwnerName().empty())
@@ -952,12 +961,12 @@ public:
 					mWriter.AddInt("Age", Ocelot->GetAge());
 					break;
 				}
-				case mtPig:
+				case etPig:
 				{
 					mWriter.AddInt("Age", static_cast<const cPig *>(a_Monster)->GetAge());
 					break;
 				}
-				case mtRabbit:
+				case etRabbit:
 				{
 					const cRabbit * Rabbit = static_cast<const cRabbit *>(a_Monster);
 					mWriter.AddInt("RabbitType", static_cast<Int32>(Rabbit->GetRabbitType()));
@@ -965,7 +974,7 @@ public:
 					mWriter.AddInt("Age", Rabbit->GetAge());
 					break;
 				}
-				case mtSheep:
+				case etSheep:
 				{
 					const cSheep *Sheep = static_cast<const cSheep *>(a_Monster);
 					mWriter.AddByte("Sheared", Sheep->IsSheared()? 1 : 0);
@@ -973,12 +982,12 @@ public:
 					mWriter.AddInt ("Age",     Sheep->GetAge());
 					break;
 				}
-				case mtSlime:
+				case etSlime:
 				{
 					mWriter.AddInt("Size", static_cast<const cSlime *>(a_Monster)->GetSize());
 					break;
 				}
-				case mtVillager:
+				case etVillager:
 				{
 					const cVillager *Villager = static_cast<const cVillager *>(a_Monster);
 					mWriter.AddInt("Profession", Villager->GetVilType());
@@ -988,12 +997,12 @@ public:
 					mWriter.EndList();
 					break;
 				}
-				case mtWither:
+				case etWither:
 				{
 					mWriter.AddInt("Invul", static_cast<Int32>(static_cast<const cWither *>(a_Monster)->GetWitherInvulnerableTicks()));
 					break;
 				}
-				case mtWolf:
+				case etWolf:
 				{
 					const cWolf *Wolf = static_cast<const cWolf *>(a_Monster);
 					if (!Wolf->GetOwnerName().empty())
@@ -1010,17 +1019,17 @@ public:
 					mWriter.AddInt ("Age",         Wolf->GetAge());
 					break;
 				}
-				case mtZombie:
+				case etZombie:
 				{
 					mWriter.AddInt("Age", static_cast<const cZombie *>(a_Monster)->GetAge());
 					break;
 				}
-				case mtZombiePigman:
+				case etZombifiedPiglin:
 				{
 					mWriter.AddInt("Age", static_cast<const cZombiePigman *>(a_Monster)->GetAge());
 					break;
 				}
-				case mtZombieVillager:
+				case etZombieVillager:
 				{
 					const cZombieVillager *ZombieVillager = reinterpret_cast<const cZombieVillager *>(a_Monster);
 					mWriter.AddInt("Profession",     ZombieVillager->GetProfession());
@@ -1028,70 +1037,70 @@ public:
 					mWriter.AddInt("Age",            ZombieVillager->GetAge());
 					break;
 				}
-				case mtBlaze:
-				case mtCaveSpider:
-				case mtChicken:
-				case mtCow:
-				case mtEnderDragon:
-				case mtGhast:
-				case mtGiant:
-				case mtGuardian:
-				case mtIronGolem:
-				case mtMooshroom:
-				case mtSilverfish:
-				case mtSkeleton:
-				case mtSnowGolem:
-				case mtSpider:
-				case mtSquid:
-				case mtWitch:
-				case mtWitherSkeleton:
+				case etBlaze:
+				case etCaveSpider:
+				case etChicken:
+				case etCow:
+				case etEnderDragon:
+				case etGhast:
+				case etGiant:
+				case etGuardian:
+				case etIronGolem:
+				case etMooshroom:
+				case etSilverfish:
+				case etSkeleton:
+				case etSnowGolem:
+				case etSpider:
+				case etSquid:
+				case etWitch:
+				case etWitherSkeleton:
 				{
 					// Other mobs have no special tags.
 					break;
 				}
-				case mtCat:
-				case mtCod:
-				case mtDolphin:
-				case mtDonkey:
-				case mtDrowned:
-				case mtElderGuardian:
-				case mtEndermite:
-				case mtEvoker:
-				case mtFox:
-				case mtHoglin:
-				case mtHusk:
-				case mtIllusioner:
-				case mtLlama:
-				case mtMule:
-				case mtPanda:
-				case mtParrot:
-				case mtPhantom:
-				case mtPiglin:
-				case mtPiglinBrute:
-				case mtPillager:
-				case mtPolarBear:
-				case mtPufferfish:
-				case mtRavager:
-				case mtSalmon:
-				case mtShulker:
-				case mtSkeletonHorse:
-				case mtStray:
-				case mtStrider:
-				case mtTraderLlama:
-				case mtTropicalFish:
-				case mtTurtle:
-				case mtVex:
-				case mtVindicator:
-				case mtWanderingTrader:
-				case mtZoglin:
-				case mtZombieHorse:
-				case mtBee:
+				case etCat:
+				case etCod:
+				case etDolphin:
+				case etDonkey:
+				case etDrowned:
+				case etElderGuardian:
+				case etEndermite:
+				case etEvoker:
+				case etFox:
+				case etHoglin:
+				case etHusk:
+				case etIllusioner:
+				case etLlama:
+				case etMule:
+				case etPanda:
+				case etParrot:
+				case etPhantom:
+				case etPiglin:
+				case etPiglinBrute:
+				case etPillager:
+				case etPolarBear:
+				case etPufferfish:
+				case etRavager:
+				case etSalmon:
+				case etShulker:
+				case etSkeletonHorse:
+				case etStray:
+				case etStrider:
+				case etTraderLlama:
+				case etTropicalFish:
+				case etTurtle:
+				case etVex:
+				case etVindicator:
+				case etWanderingTrader:
+				case etZoglin:
+				case etZombieHorse:
+				case etBee:
 				{
 					// All the entities not added
-					LOGD("Saving unimplemented entity type: %d", NamespaceSerializer::From(a_Monster->GetMobType()));
+					LOGD("Saving unimplemented entity type: %d", NamespaceSerializer::From(a_Monster->GetEntityType()));
 					break;
 				}
-				case mtInvalidType:
+				case etInvalid:
 				{
 					ASSERT(!"NBTChunkSerializer::SerializerCollector::AddMonsterEntity: Recieved mob of invalid type");
 					break;
@@ -1123,9 +1132,9 @@ public:
 			AddBasicEntity(a_Projectile, a_Projectile->GetMCAClassName());
 			mWriter.AddByte("inGround", a_Projectile->IsInGround() ? 1 : 0);
 
-			switch (a_Projectile->GetProjectileKind())
+			switch (a_Projectile->GetEntityType())
 			{
-				case cProjectileEntity::pkArrow:
+				case etArrow:
 				{
 					cArrowEntity * Arrow = static_cast<cArrowEntity *>(a_Projectile);
 
@@ -1136,7 +1145,7 @@ public:
 					mWriter.AddDouble("damage", Arrow->GetDamageCoeff());
 					break;
 				}
-				case cProjectileEntity::pkSplashPotion:
+				case etPotion:
 				{
 					cSplashPotionEntity * Potion = static_cast<cSplashPotionEntity *>(a_Projectile);
 
@@ -1147,15 +1156,15 @@ public:
 					mWriter.AddInt("PotionName",                Potion->GetPotionColor());
 					break;
 				}
-				case cProjectileEntity::pkGhastFireball:
+				case etFireball:
 				{
 					mWriter.AddInt("ExplosionPower", 1);
 					break;
 				}
-				case cProjectileEntity::pkFireCharge:
-				case cProjectileEntity::pkWitherSkull:
-				case cProjectileEntity::pkEnderPearl:
-				case cProjectileEntity::pkSnowball:
+				case etSmallFireball:
+				case etWitherSkull:
+				case etEnderPearl:
+				case etSnowball:
 				{
 					break;
 				}

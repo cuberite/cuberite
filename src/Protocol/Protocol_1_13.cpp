@@ -40,9 +40,7 @@ Implements the 1.13 protocol classes:
 
 #include "Palettes/Palette_1_13.h"
 #include "Palettes/Palette_1_13_1.h"
-
-
-
+#include "Registries/BlockItemConverter.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -285,7 +283,7 @@ void cProtocol_1_13::SendStatistics(const StatisticsManager & a_Manager)
 void cProtocol_1_13::SendSpawnEntity(const cEntity & a_Entity)
 {
 	Int32 EntityData = /* Default: velocity present flag */ 1;
-	const auto EntityType = GetProtocolEntityType(a_Entity);
+	const auto EntityType = GetProtocolEntityType(a_Entity.GetEntityType());
 
 	if (a_Entity.IsMinecart())
 	{
@@ -310,10 +308,9 @@ void cProtocol_1_13::SendSpawnEntity(const cEntity & a_Entity)
 	}
 	else if (a_Entity.IsProjectile())
 	{
-		using PType = cProjectileEntity::eKind;
 		const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
 
-		if (Projectile.GetProjectileKind() == PType::pkArrow)
+		if (EntityType == etArrow)
 		{
 			const auto & Arrow = static_cast<const cArrowEntity &>(Projectile);
 			EntityData = static_cast<Int32>(Arrow.GetCreatorUniqueID() + 1);
@@ -557,9 +554,10 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadata a_Metadata) const
 		case EntityMetadata::EntityFlags:                           return 0;
 		case EntityMetadata::EntityAir:                             return 1;
 		case EntityMetadata::EntityCustomName:                      return 2;
-		case EntityMetadata::EntityCustomNameVisible:               return 3;
+		case EntityMetadata::EntityNameVisible:                     return 3;
 		case EntityMetadata::EntitySilent:                          return 4;
 		case EntityMetadata::EntityNoGravity:                       return 5;
+		/*
 		case EntityMetadata::PotionThrown:                          return Entity;
 		case EntityMetadata::FallingBlockPosition:                  return Entity;
 		case EntityMetadata::AreaEffectCloudRadius:                 return Entity;
@@ -666,6 +664,7 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadata a_Metadata) const
 		case EntityMetadata::AreaEffectCloudParticleParameter1:
 		case EntityMetadata::AreaEffectCloudParticleParameter2:
 		case EntityMetadata::ZombieUnusedWasType: break;
+		*/
 
 		default:
 			break;
@@ -815,70 +814,71 @@ UInt32 cProtocol_1_13::GetProtocolItemType(Item a_ItemID) const
 
 
 
-UInt32 cProtocol_1_13::GetProtocolMobType(eMonsterType a_MobType) const
+UInt8 cProtocol_1_13::GetProtocolEntityType(eEntityType a_Type) const
 {
-	switch (a_MobType)
+	using Type = eEntityType;
+
+	switch (a_Type)
 	{
 		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
-		case mtInvalidType:           return 27;
-		case mtBat:                   return 3;
-		case mtCat:                   return 48;
-		case mtBlaze:                 return 4;
-		case mtCaveSpider:            return 6;
-		case mtChicken:               return 7;
-		case mtCod:                   return 8;
-		case mtCow:                   return 9;
-		case mtCreeper:               return 10;
-		case mtDonkey:                return 11;
-		case mtDolphin:               return 12;
-		case mtDrowned:               return 14;
-		case mtElderGuardian:         return 15;
-		case mtEnderDragon:           return 17;
-		case mtEnderman:              return 18;
-		case mtEndermite:             return 19;
-		case mtEvoker:                return 21;
-		case mtGhast:                 return 26;
-		case mtGiant:                 return 27;
-		case mtGuardian:              return 28;
-		case mtHorse:                 return 29;
-		case mtHusk:                  return 30;
-		case mtIllusioner:            return 31;
-		case mtIronGolem:             return 80;
-		case mtLlama:                 return 36;
-		case mtMagmaCube:             return 38;
-		case mtMule:                  return 46;
-		case mtMooshroom:             return 47;
-		case mtOcelot:                return 48;
-		case mtParrot:                return 50;
-		case mtPhantom:               return 90;
-		case mtPig:                   return 51;
-		case mtPufferfish:            return 52;
-		case mtPolarBear:             return 54;
-		case mtRabbit:                return 56;
-		case mtSalmon:                return 57;
-		case mtSheep:                 return 58;
-		case mtShulker:               return 59;
-		case mtSilverfish:            return 61;
-		case mtSkeleton:              return 62;
-		case mtSkeletonHorse:         return 63;
-		case mtSlime:                 return 64;
-		case mtSnowGolem:             return 66;
-		case mtSpider:                return 69;
-		case mtSquid:                 return 70;
-		case mtStray:                 return 71;
-		case mtTropicalFish:          return 72;
-		case mtTurtle:                return 73;
-		case mtVex:                   return 78;
-		case mtVillager:              return 79;
-		case mtVindicator:            return 81;
-		case mtWitch:                 return 82;
-		case mtWither:                return 83;
-		case mtWitherSkeleton:        return 84;
-		case mtWolf:                  return 86;
-		case mtZombie:                return 87;
-		case mtZombiePigman:          return 53;
-		case mtZombieHorse:           return 88;
-		case mtZombieVillager:        return 89;
+		case Type::etBat:                   return 3;
+		case Type::etCat:                   return 48;
+		case Type::etBlaze:                 return 4;
+		case Type::etCaveSpider:            return 6;
+		case Type::etChicken:               return 7;
+		case Type::etCod:                   return 8;
+		case Type::etCow:                   return 9;
+		case Type::etCreeper:               return 10;
+		case Type::etDonkey:                return 11;
+		case Type::etDolphin:               return 12;
+		case Type::etDrowned:               return 14;
+		case Type::etElderGuardian:         return 15;
+		case Type::etEnderDragon:           return 17;
+		case Type::etEnderman:              return 18;
+		case Type::etEndermite:             return 19;
+		case Type::etEvoker:                return 21;
+		case Type::etGhast:                 return 26;
+		case Type::etGiant:                 return 27;
+		case Type::etGuardian:              return 28;
+		case Type::etHorse:                 return 29;
+		case Type::etHusk:                  return 30;
+		case Type::etIllusioner:            return 31;
+		case Type::etIronGolem:             return 80;
+		case Type::etLlama:                 return 36;
+		case Type::etMagmaCube:             return 38;
+		case Type::etMule:                  return 46;
+		case Type::etMooshroom:             return 47;
+		case Type::etOcelot:                return 48;
+		case Type::etParrot:                return 50;
+		case Type::etPhantom:               return 90;
+		case Type::etPig:                   return 51;
+		case Type::etPufferfish:            return 52;
+		case Type::etPolarBear:             return 54;
+		case Type::etRabbit:                return 56;
+		case Type::etSalmon:                return 57;
+		case Type::etSheep:                 return 58;
+		case Type::etShulker:               return 59;
+		case Type::etSilverfish:            return 61;
+		case Type::etSkeleton:              return 62;
+		case Type::etSkeletonHorse:         return 63;
+		case Type::etSlime:                 return 64;
+		case Type::etSnowGolem:             return 66;
+		case Type::etSpider:                return 69;
+		case Type::etSquid:                 return 70;
+		case Type::etStray:                 return 71;
+		case Type::etTropicalFish:          return 72;
+		case Type::etTurtle:                return 73;
+		case Type::etVex:                   return 78;
+		case Type::etVillager:              return 79;
+		case Type::etVindicator:            return 81;
+		case Type::etWitch:                 return 82;
+		case Type::etWither:                return 83;
+		case Type::etWitherSkeleton:        return 84;
+		case Type::etWolf:                  return 86;
+		case Type::etZombie:                return 87;
+		case Type::etZombifiedPiglin:       return 53;
+		case Type::etZombieHorse:           return 88;
+		case Type::etZombieVillager:        return 89;
 		default:                      return 0;
 	}
 }
@@ -1089,37 +1089,58 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetada
 
 
 
-void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
+void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity, bool a_WriteCommon) const
 {
-	// Common metadata:
-	Int8 Flags = 0;
-	if (a_Entity.IsOnFire())
-	{
-		Flags |= 0x01;
-	}
-	if (a_Entity.IsCrouched())
-	{
-		Flags |= 0x02;
-	}
-	if (a_Entity.IsSprinting())
-	{
-		Flags |= 0x08;
-	}
-	if (a_Entity.IsRclking())
-	{
-		Flags |= 0x10;
-	}
-	if (a_Entity.IsInvisible())
-	{
-		Flags |= 0x20;
-	}
+	using ET = eEntityType;
 
-	WriteEntityMetadata(a_Pkt, EntityMetadata::EntityFlags, EntityMetadataType::Byte);
-	a_Pkt.WriteBEInt8(Flags);
+	// To make sure don't write duplicate data when this method id called as a base method.
+	if (a_WriteCommon)
+	{
+		// Living Enitiy Metadata
+		if (a_Entity.IsMob())
+		{
+			auto & a_Mob = dynamic_cast<const cMonster &>(a_Entity);
+			if (a_Mob.HasCustomName())
+			{
+				WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::OptChat);
+				a_Pkt.WriteBool(true);
+				a_Pkt.WriteString(a_Mob.GetCustomName());
+
+				WriteEntityMetadata(a_Pkt, EntityMetadata::EntityNameVisible, EntityMetadataType::Boolean);
+				a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
+			}
+		}
+
+		// Common metadata:
+		Int8 Flags = 0;
+		if (a_Entity.IsOnFire())
+		{
+			Flags |= 0x01;
+		}
+		if (a_Entity.IsCrouched())
+		{
+			Flags |= 0x02;
+		}
+		if (a_Entity.IsSprinting())
+		{
+			Flags |= 0x08;
+		}
+		if (a_Entity.IsRclking())
+		{
+			Flags |= 0x10;
+		}
+		if (a_Entity.IsInvisible())
+		{
+			Flags |= 0x20;
+		}
+
+		WriteEntityMetadata(a_Pkt, EntityMetadata::EntityFlags, EntityMetadataType::Byte);
+		a_Pkt.WriteBEInt8(Flags);
+	}
 
 	switch (a_Entity.GetEntityType())
 	{
-		case cEntity::etPlayer:
+		case etPlayer:
 		{
 			auto & Player = static_cast<const cPlayer &>(a_Entity);
 
@@ -1132,22 +1153,22 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
 			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerDisplayedSkinParts, EntityMetadataType::Byte);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerPlayerModelParts, EntityMetadataType::Byte);
 			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerMainHand, EntityMetadataType::Byte);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerMainArm, EntityMetadataType::Byte);
 			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
 			break;
 		}
-		case cEntity::etPickup:
+		case etItem:
 		{
-			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemItem, EntityMetadataType::Item);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemFrameItemStack, EntityMetadataType::Item);
 			WriteItem(a_Pkt, static_cast<const cPickup &>(a_Entity).GetItem());
 			break;
 		}
-		case cEntity::etMinecart:
+		case etMinecart:
 		{
-			WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShakingPower, EntityMetadataType::VarInt);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::VehicleDamageWobbleTicks, EntityMetadataType::VarInt);
 
 			// The following expression makes Minecarts shake more with less health or higher damage taken
 			auto & Minecart = static_cast<const cMinecart &>(a_Entity);
@@ -1155,210 +1176,189 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			auto curHealth = a_Entity.GetHealth();
 			a_Pkt.WriteVarInt32(static_cast<UInt32>((maxHealth - curHealth) * Minecart.LastDamage() * 4));
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShakingDirection, EntityMetadataType::VarInt);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::VehicleDamageWobbleSide, EntityMetadataType::VarInt);
 			a_Pkt.WriteVarInt32(1);  // (doesn't seem to effect anything)
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShakingMultiplier, EntityMetadataType::Float);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::VehicleDamageWobbleStrength, EntityMetadataType::Float);
 			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));  // or damage taken
 
-			if (Minecart.GetPayload() == cMinecart::mpNone)
+			auto & RideableMinecart = static_cast<const cRideableMinecart &>(Minecart);
+			const cItem & MinecartContent = RideableMinecart.GetContent();
+			if (!MinecartContent.IsEmpty())
 			{
-				auto & RideableMinecart = static_cast<const cRideableMinecart &>(Minecart);
-				const cItem & MinecartContent = RideableMinecart.GetContent();
-				if (!MinecartContent.IsEmpty())
-				{
-					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockIDMeta, EntityMetadataType::VarInt);
-					int Content = PaletteUpgrade::ToItem(MinecartContent.m_ItemType).first;
-					Content |= MinecartContent.m_ItemDamage << 8;
-					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
+				WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractMinecartCustomBlockId, EntityMetadataType::VarInt);
+				auto block = BlockState::BlockState(BlockItemConverter::FromItem(MinecartContent.m_ItemType));
+				a_Pkt.WriteVarInt32(static_cast<UInt32>(GetProtocolBlockType(block)));
 
-					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockY, EntityMetadataType::VarInt);
-					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
+				WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractMinecartCustomBlockOffset, EntityMetadataType::VarInt);
+				a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
 
-					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShowBlock, EntityMetadataType::Boolean);
-					a_Pkt.WriteBool(true);
-				}
+				WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractMinecartCustomBlockPresent, EntityMetadataType::Boolean);
+				a_Pkt.WriteBool(true);
 			}
-			else if (Minecart.GetPayload() == cMinecart::mpFurnace)
-			{
-				WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartFurnacePowered, EntityMetadataType::Boolean);
-				a_Pkt.WriteBool(static_cast<const cMinecartWithFurnace &>(Minecart).IsFueled());
-			}
+
 			break;
 		}  // case etMinecart
 
-		case cEntity::etProjectile:
+		case etChestMinecart:
+		case etTntMinecart:
+		case etCommandBlockMinecart:
+		case etHopperMinecart:
+		case etSpawnerMinecart:  // TODO: fix the rest of minecarts
 		{
-			auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
-			switch (Projectile.GetProjectileKind())
-			{
-				case cProjectileEntity::pkArrow:
-				{
-					WriteEntityMetadata(a_Pkt, EntityMetadata::ArrowFlags, EntityMetadataType::Byte);
-					a_Pkt.WriteBEInt8(static_cast<const cArrowEntity &>(Projectile).IsCritical() ? 1 : 0);
-					break;
-				}
-				case cProjectileEntity::pkFirework:
-				{
-					// TODO
-					break;
-				}
-				case cProjectileEntity::pkSplashPotion:
-				{
-					// TODO
-					break;
-				}
-				default:
-				{
-					break;
-				}
-			}
-			break;
-		}  // case etProjectile
+			WriteEntityMetadata(a_Pkt, EntityMetadata::VehicleDamageWobbleTicks, EntityMetadataType::VarInt);
 
-		case cEntity::etMonster:
-		{
-			WriteMobMetadata(a_Pkt, static_cast<const cMonster &>(a_Entity));
+			// The following expression makes Minecarts shake more with less health or higher damage taken
+			auto & Minecart = static_cast<const cMinecart &>(a_Entity);
+			auto maxHealth = a_Entity.GetMaxHealth();
+			auto curHealth = a_Entity.GetHealth();
+			a_Pkt.WriteVarInt32(static_cast<UInt32>((maxHealth - curHealth) * Minecart.LastDamage() * 4));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::VehicleDamageWobbleSide, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(1);  // (doesn't seem to effect anything)
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::VehicleDamageWobbleStrength, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));  // or damage taken
 			break;
 		}
 
-		case cEntity::etBoat:
+		case etFurnaceMinecart:
+		{
+			WriteEntityMetadata(a_Pkt, EntityMetadata::VehicleDamageWobbleTicks, EntityMetadataType::VarInt);
+
+			// The following expression makes Minecarts shake more with less health or higher damage taken
+			auto & Minecart = static_cast<const cMinecart &>(a_Entity);
+			auto maxHealth = a_Entity.GetMaxHealth();
+			auto curHealth = a_Entity.GetHealth();
+			a_Pkt.WriteVarInt32(static_cast<UInt32>((maxHealth - curHealth) * Minecart.LastDamage() * 4));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::VehicleDamageWobbleSide, EntityMetadataType::VarInt);
+			a_Pkt.WriteVarInt32(1);  // (doesn't seem to effect anything)
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::VehicleDamageWobbleStrength, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));  // or damage taken
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::FurnaceMinecartLit, EntityMetadataType::Boolean);
+			a_Pkt.WriteBool(static_cast<const cMinecartWithFurnace &>(Minecart).IsFueled());
+			break;
+		}
+
+
+		case ET::etArrow:
+		{
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PersistentProjectileProjectileFlags, EntityMetadataType::Byte);
+			a_Pkt.WriteBEInt8(static_cast<const cArrowEntity &>(a_Entity).IsCritical() ? 1 : 0);
+			break;
+		}
+		case ET::etFireworkRocket:
+		{
+			// TODO
+			break;
+		}
+		case ET::etPotion:
+		{
+			// TODO
+			break;
+		}
+
+		case etOakBoat:
 		{
 			auto & Boat = static_cast<const cBoat &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatLastHitTime, EntityMetadataType::VarInt);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::VehicleDamageWobbleTicks, EntityMetadataType::VarInt);
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetLastDamage()));
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatForwardDirection, EntityMetadataType::VarInt);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::VehicleDamageWobbleSide, EntityMetadataType::VarInt);
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetForwardDirection()));
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatDamageTaken, EntityMetadataType::Float);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::VehicleDamageWobbleStrength, EntityMetadataType::Float);
 			a_Pkt.WriteBEFloat(Boat.GetDamageTaken());
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatType, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
+			// WriteEntityMetadata(a_Pkt, EntityMetadata::BoatType, EntityMetadataType::VarInt);
+			// a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatRightPaddleTurning, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractBoatRightPaddleMoving, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Boat.IsRightPaddleUsed());
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatLeftPaddleTurning, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractBoatLeftPaddleMoving, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(static_cast<bool>(Boat.IsLeftPaddleUsed()));
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatSplashTimer, EntityMetadataType::VarInt);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractBoatBubbleWobbleTicks, EntityMetadataType::VarInt);
 			a_Pkt.WriteVarInt32(0);
 
 			break;
 		}  // case etBoat
 
-		case cEntity::etItemFrame:
+		case etItemFrame:
 		{
 			const auto & Frame = static_cast<const cItemFrame &>(a_Entity);
-			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemFrameItem, EntityMetadataType::Item);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemFrameItemStack, EntityMetadataType::Item);
 			WriteItem(a_Pkt, Frame.GetItem());
 			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemFrameRotation, EntityMetadataType::VarInt);
 			a_Pkt.WriteVarInt32(Frame.GetItemRotation());
 			break;
 		}  // case etItemFrame
 
-		case cEntity::etEnderCrystal:
+		case etEndCrystal:
 		{
 			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
 			if (EnderCrystal.DisplaysBeam())
 			{
-				WriteEntityMetadata(a_Pkt, EntityMetadata::EnderCrystalBeamTarget, EntityMetadataType::OptPosition);
+				WriteEntityMetadata(a_Pkt, EntityMetadata::EndCrystalBeamTarget, EntityMetadataType::OptPosition);
 				a_Pkt.WriteBool(true);  // Dont do a second check if it should display the beam
 				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
 			}
-			WriteEntityMetadata(a_Pkt, EntityMetadata::EnderCrystalShowBottom, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::EndCrystalShowBottom, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
 			break;
 		}  // case etEnderCrystal
-
-		default:
+		case ET::etBat:
 		{
-			break;
-		}
-	}
-}
+			auto & Bat = static_cast<const cBat &>(a_Entity);
 
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
 
-
-
-
-void cProtocol_1_13::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
-{
-	if (a_Item.IsEmpty())
-	{
-		a_Pkt.WriteBEInt16(-1);
-		return;
-	}
-
-	// Normal item
-	a_Pkt.WriteBEInt16(static_cast<Int16>(GetProtocolItemType(a_Item.m_ItemType)));
-	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
-
-	// TODO: NBT
-	a_Pkt.WriteBEInt8(0);
-}
-
-
-
-
-
-void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const
-{
-	// Living Enitiy Metadata
-	if (a_Mob.HasCustomName())
-	{
-		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
-		WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::OptChat);
-		a_Pkt.WriteBool(true);
-		a_Pkt.WriteString(a_Mob.GetCustomName());
-
-		WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomNameVisible, EntityMetadataType::Boolean);
-		a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
-	}
-
-	WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
-	a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
-
-	switch (a_Mob.GetMobType())
-	{
-		case mtBat:
-		{
-			auto & Bat = static_cast<const cBat &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BatHanging, EntityMetadataType::Byte);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::BatBatFlags, EntityMetadataType::Byte);
 			a_Pkt.WriteBEInt8(Bat.IsHanging() ? 1 : 0);
 			break;
 		}  // case mtBat
 
-		case mtChicken:
+		case ET::etChicken:
 		{
-			auto & Chicken = static_cast<const cChicken &>(a_Mob);
+			auto & Chicken = static_cast<const cChicken &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PassiveChild, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Chicken.IsBaby());
 			break;
 		}  // case mtChicken
 
-		case mtCow:
+		case ET::etCow:
 		{
-			auto & Cow = static_cast<const cCow &>(a_Mob);
+			auto & Cow = static_cast<const cCow &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PassiveChild, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Cow.IsBaby());
 			break;
 		}  // case mtCow
 
-		case mtCreeper:
+		case ET::etCreeper:
 		{
-			auto & Creeper = static_cast<const cCreeper &>(a_Mob);
+			auto & Creeper = static_cast<const cCreeper &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::CreeperState, EntityMetadataType::VarInt);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::CreeperFuseSpeed, EntityMetadataType::VarInt);
 			a_Pkt.WriteVarInt32(Creeper.IsBlowing() ? 1 : static_cast<UInt32>(-1));  // (idle or "blowing")
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::CreeperPowered, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::CreeperCharged, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Creeper.IsCharged());
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::CreeperIgnited, EntityMetadataType::Boolean);
@@ -1366,36 +1366,42 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			break;
 		}  // case mtCreeper
 
-		case mtEnderman:
+		case ET::etEnderman:
 		{
-			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
-			WriteEntityMetadata(a_Pkt, EntityMetadata::EndermanCarriedBlock, EntityMetadataType::OptBlockID);
-			auto NumericBlock = PaletteUpgrade::ToBlock(Enderman.GetCarriedBlock());
-			UInt32 Carried = 0;
-			Carried |= static_cast<UInt32>(NumericBlock.first << 4);
-			Carried |= static_cast<UInt32>(NumericBlock.second);
-			a_Pkt.WriteVarInt32(Carried);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::EndermanScreaming, EntityMetadataType::Boolean);
+			auto & Enderman = static_cast<const cEnderman &>(a_Entity);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::EndermanCarriedBlock, EntityMetadataType::OptBlockID);
+			auto Block = GetProtocolBlockType(Enderman.GetCarriedBlock());
+			a_Pkt.WriteVarInt32(Block);
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::EndermanAngry, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Enderman.IsScreaming());
 			break;
 		}  // case mtEnderman
 
-		case mtGhast:
+		case ET::etGhast:
 		{
-			auto & Ghast = static_cast<const cGhast &>(a_Mob);
+			auto & Ghast = static_cast<const cGhast &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::GhastAttacking, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::GhastShooting, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Ghast.IsCharging());
 			break;
 		}  // case mtGhast
 
-		case mtHorse:
+		case ET::etHorse:
 		{
 			// XXX This behaves incorrectly with different varients; horses have different entity IDs now
 
 			// Abstract horse
-			auto & Horse = static_cast<const cHorse &>(a_Mob);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			auto & Horse = static_cast<const cHorse &>(a_Entity);
 
 			Int8 Flags = 0;
 			if (Horse.IsTame())
@@ -1422,7 +1428,7 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			{
 				Flags |= 0x40;
 			}
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractHorseFlags, EntityMetadataType::Byte);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractHorseHorseFlags, EntityMetadataType::Byte);
 			a_Pkt.WriteBEInt8(Flags);
 
 			// Regular horses
@@ -1432,28 +1438,34 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			WriteEntityMetadata(a_Pkt, EntityMetadata::HorseVariant, EntityMetadataType::VarInt);
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Appearance));  // Color / style
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::HorseArmour, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Horse.GetHorseArmour()));
+			// WriteEntityMetadata(a_Pkt, EntityMetadata::HorseArmour, EntityMetadataType::VarInt);
+			// a_Pkt.WriteVarInt32(static_cast<UInt32>(Horse.GetHorseArmour()));
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PassiveChild, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Horse.IsBaby());
 			break;
 		}  // case mtHorse
 
-		case mtMagmaCube:
+		case ET::etMagmaCube:
 		{
-			auto & MagmaCube = static_cast<const cMagmaCube &>(a_Mob);
+			auto & MagmaCube = static_cast<const cMagmaCube &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::SlimeSize, EntityMetadataType::VarInt);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::SlimeSlimeSize, EntityMetadataType::VarInt);
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(MagmaCube.GetSize()));
 			break;
 		}  // case mtMagmaCube
 
-		case mtOcelot:
+		case ET::etOcelot:
 		{
-			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
+			auto & Ocelot = static_cast<const cOcelot &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PassiveChild, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Ocelot.IsBaby());
 
 			Int8 OcelotStatus = 0;
@@ -1465,46 +1477,55 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			{
 				OcelotStatus |= 0x4;
 			}
-			WriteEntityMetadata(a_Pkt, EntityMetadata::TameableAnimalFlags, EntityMetadataType::Byte);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::TameableTameableFlags, EntityMetadataType::Byte);
 			a_Pkt.WriteBEInt8(OcelotStatus);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::OcelotType, EntityMetadataType::Byte);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::OcelotTrusting, EntityMetadataType::Byte);
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Ocelot.GetOcelotType()));
 
 			break;
 		}  // case mtOcelot
 
-		case mtPig:
+		case ET::etPig:
 		{
-			auto & Pig = static_cast<const cPig &>(a_Mob);
+			auto & Pig = static_cast<const cPig &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PassiveChild, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Pig.IsBaby());
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::PigHasSaddle, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PigSaddled, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Pig.IsSaddled());
 
 			// PIG_TOTAL_CARROT_ON_A_STICK_BOOST in 1.11.1 only
 			break;
 		}  // case mtPig
 
-		case mtRabbit:
+		case ET::etRabbit:
 		{
-			auto & Rabbit = static_cast<const cRabbit &>(a_Mob);
+			auto & Rabbit = static_cast<const cRabbit &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PassiveChild, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Rabbit.IsBaby());
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::RabbitType, EntityMetadataType::VarInt);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::RabbitRabbitType, EntityMetadataType::VarInt);
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Rabbit.GetRabbitType()));
 			break;
 		}  // case mtRabbit
 
-		case mtSheep:
+		case ET::etSheep:
 		{
-			auto & Sheep = static_cast<const cSheep &>(a_Mob);
+			auto & Sheep = static_cast<const cSheep &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PassiveChild, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Sheep.IsBaby());
 
 			Int8 SheepMetadata = 0;
@@ -1513,68 +1534,80 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			{
 				SheepMetadata |= 0x10;
 			}
-			WriteEntityMetadata(a_Pkt, EntityMetadata::SheepFlags, EntityMetadataType::Byte);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::SheepColor, EntityMetadataType::Byte);
 			a_Pkt.WriteBEInt8(SheepMetadata);
 			break;
 		}  // case mtSheep
 
-		case mtSkeleton:
+		case ET::etSkeleton:
 		{
-			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
-			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingActiveHand, EntityMetadataType::Byte);
-			a_Pkt.WriteBEUInt8(Skeleton.IsChargingBow() ? 0x01 : 0x00);
+			auto & Skeleton = static_cast<const cSkeleton &>(a_Entity);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractSkeletonArmsSwinging, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Skeleton.IsChargingBow());
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingLivingFlags, EntityMetadataType::Byte);
+			a_Pkt.WriteBEUInt8(Skeleton.IsChargingBow() ? 0x01 : 0x00);
 			break;
 		}  // case mtSkeleton
 
-		case mtSlime:
+		case ET::etSlime:
 		{
-			auto & Slime = static_cast<const cSlime &>(a_Mob);
+			auto & Slime = static_cast<const cSlime &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::SlimeSize, EntityMetadataType::VarInt);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::SlimeSlimeSize, EntityMetadataType::VarInt);
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Slime.GetSize()));
 			break;
 		}  // case mtSlime
 
-		case mtVillager:
+		case ET::etVillager:
 		{
-			auto & Villager = static_cast<const cVillager &>(a_Mob);
+			auto & Villager = static_cast<const cVillager &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PassiveChild, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Villager.IsBaby());
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::VillagerProfession, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Villager.GetVilType()));
 			break;
 		}  // case mtVillager
 
-		case mtWitch:
+		case ET::etWitch:
 		{
-			auto & Witch = static_cast<const cWitch &>(a_Mob);
+			auto & Witch = static_cast<const cWitch &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::WitchAggresive, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Witch.IsAngry());
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::MobMobFlags, EntityMetadataType::Byte);
+			a_Pkt.WriteBool(Witch.IsAngry() << 2);
 			break;
 		}  // case mtWitch
 
-		case mtWither:
+		case ET::etWither:
 		{
-			auto & Wither = static_cast<const cWither &>(a_Mob);
+			auto & Wither = static_cast<const cWither &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::WitherInvulnerableTimer, EntityMetadataType::VarInt);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::WitherInvulTimer, EntityMetadataType::VarInt);
 			a_Pkt.WriteVarInt32(Wither.GetWitherInvulnerableTicks());
 
 			// TODO: Use boss bar packet for health
 			break;
 		}  // case mtWither
 
-		case mtWolf:
+		case ET::etWolf:
 		{
-			auto & Wolf = static_cast<const cWolf &>(a_Mob);
+			auto & Wolf = static_cast<const cWolf &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PassiveChild, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Wolf.IsBaby());
 
 			Int8 WolfStatus = 0;
@@ -1590,123 +1623,149 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 			{
 				WolfStatus |= 0x4;
 			}
-			WriteEntityMetadata(a_Pkt, EntityMetadata::TameableAnimalFlags, EntityMetadataType::Byte);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::TameableTameableFlags, EntityMetadataType::Byte);
 			a_Pkt.WriteBEInt8(WolfStatus);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::WolfDamageTaken, EntityMetadataType::Float);
-			a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));  // TODO Not use the current health
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::WolfBegging, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Wolf.IsBegging());
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::WolfCollarColour, EntityMetadataType::VarInt);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::WolfCollarColor, EntityMetadataType::VarInt);
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Wolf.GetCollarColor()));
 			break;
 		}  // case mtWolf
 
-		case mtZombie:
+		case ET::etZombie:
 		{
 			// XXX Zombies were also split into new sublcasses; this doesn't handle that.
 
-			auto & Zombie = static_cast<const cZombie &>(a_Mob);
+			auto & Zombie = static_cast<const cZombie &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::ZombieIsBaby, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::ZombieBaby, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Zombie.IsBaby());
 			break;
 		}  // case mtZombie
 
-		case mtZombiePigman:
+		case ET::etZombifiedPiglin:
 		{
-			auto & ZombiePigman = static_cast<const cZombiePigman &>(a_Mob);
+			auto & ZombiePigman = static_cast<const cZombiePigman &>(a_Entity);
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
+			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
+
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PassiveChild, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(ZombiePigman.IsBaby());
 			break;
 		}  // case mtZombiePigman
 
-		case mtBlaze:
-		case mtEnderDragon:
-		case mtIronGolem:
-		case mtSnowGolem:
-		case mtSpider:
-		case mtZombieVillager:
+		case ET::etBlaze:
+		case ET::etEnderDragon:
+		case ET::etIronGolem:
+		case ET::etSnowGolem:
+		case ET::etSpider:
+		case ET::etZombieVillager:
 
-		case mtElderGuardian:
-		case mtGuardian:
+		case ET::etElderGuardian:
+		case ET::etGuardian:
 		{
 			// TODO: Mobs with extra fields that aren't implemented
 			break;
 		}
 
-		case mtCat:
+		case ET::etCat:
 
-		case mtCod:
+		case ET::etCod:
 
-		case mtDolphin:
+		case ET::etDolphin:
 
-		case mtDonkey:
+		case ET::etDonkey:
 
-		case mtDrowned:
+		case ET::etDrowned:
 
-		case mtEvoker:
+		case ET::etEvoker:
 
-		case mtIllusioner:
+		case ET::etIllusioner:
 
-		case mtLlama:
+		case ET::etLlama:
 
-		case mtMule:
+		case ET::etMule:
 
-		case mtParrot:
+		case ET::etParrot:
 
-		case mtPhantom:
+		case ET::etPhantom:
 
-		case mtPolarBear:
+		case ET::etPolarBear:
 
-		case mtPufferfish:
+		case ET::etPufferfish:
 
-		case mtSalmon:
+		case ET::etSalmon:
 
-		case mtShulker:
+		case ET::etShulker:
 
-		case mtStray:
+		case ET::etStray:
 
-		case mtSkeletonHorse:
-		case mtZombieHorse:
+		case ET::etSkeletonHorse:
+		case ET::etZombieHorse:
 
-		case mtTropicalFish:
+		case ET::etTropicalFish:
 
-		case mtTurtle:
+		case ET::etTurtle:
 
-		case mtVex:
+		case ET::etVex:
 
-		case mtVindicator:
+		case ET::etVindicator:
 
-		case mtHusk:
+		case ET::etHusk:
 		{
 			// Todo: Mobs not added yet. Grouped ones have the same metadata
 			ASSERT(!"cProtocol_1_13::WriteMobMetadata: received unimplemented type");
 			break;
 		}
 
-		case mtMooshroom:
-		case mtCaveSpider:
+		case ET::etMooshroom:
+		case ET::etCaveSpider:
 		{
 			// Not mentioned on http://wiki.vg/Entities
 			break;
 		}
 
-		case mtEndermite:
-		case mtGiant:
-		case mtSilverfish:
-		case mtSquid:
-		case mtWitherSkeleton:
+		case ET::etEndermite:
+		case ET::etGiant:
+		case ET::etSilverfish:
+		case ET::etSquid:
+		case ET::etWitherSkeleton:
 		{
 			// Mobs with no extra fields
 			break;
 		}
 
-		default: UNREACHABLE("cProtocol_1_13::WriteMobMetadata: received mob of invalid type");
-	}  // switch (a_Mob.GetType())
+		default:
+		{
+			break;
+		}
+	}
+}
+
+
+
+
+
+void cProtocol_1_13::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
+{
+	if (a_Item.IsEmpty())
+	{
+		a_Pkt.WriteBEInt16(-1);
+		return;
+	}
+
+	// Normal item
+	a_Pkt.WriteBEInt16(static_cast<Int16>(GetProtocolItemType(a_Item.m_ItemType)));
+	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
+
+	// TODO: NBT
+	a_Pkt.WriteBEInt8(0);
 }
 
 

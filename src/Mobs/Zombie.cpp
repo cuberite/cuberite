@@ -10,7 +10,7 @@
 
 
 cZombie::cZombie() :
-	Super("Zombie", mtZombie, "entity.zombie.hurt", "entity.zombie.death", "entity.zombie.ambient", 0.6f, 1.95f)
+	Super("Zombie", etZombie, "entity.zombie.hurt", "entity.zombie.death", "entity.zombie.ambient", 0.6f, 1.95f)
 {
 }
 

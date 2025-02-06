@@ -9,7 +9,7 @@
 
 
 cWitherSkeleton::cWitherSkeleton(void) :
-	Super("WitherSkeleton", mtWitherSkeleton, "entity.wither_skeleton.hurt", "entity.wither_skeleton.death", "entity.wither_skeleton.ambient", 0.7f, 2.4f)
+	Super("WitherSkeleton", etWitherSkeleton, "entity.wither_skeleton.hurt", "entity.wither_skeleton.death", "entity.wither_skeleton.ambient", 0.7f, 2.4f)
 {
 }
 

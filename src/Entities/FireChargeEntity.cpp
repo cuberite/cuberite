@@ -8,7 +8,7 @@
 
 
 cFireChargeEntity::cFireChargeEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
-	Super(pkFireCharge, a_Creator, a_Pos, 0.3125f, 0.3125f)
+	Super(etSmallFireball, a_Creator, a_Pos, 0.3125f, 0.3125f)
 {
 	SetSpeed(a_Speed);
 	SetGravity(0);

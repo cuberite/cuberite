@@ -975,33 +975,37 @@ void cLuaState::Push(cEntity * a_Entity)
 	{
 		const char * ClassName = [&]
 			{
+				if (a_Entity->IsMob())
+				{
+					// Don't push specific mob types, as those are not exported in the API:
+					return "cMonster";
+				}
+				else if (a_Entity->IsProjectile())
+				{
+					// Push the specific projectile type:
+					return a_Entity->GetClass();
+				}
 				switch (a_Entity->GetEntityType())
 				{
-					case cEntity::etBoat:         return "cBoat";
-					case cEntity::etExpOrb:       return "cExpOrb";
-					case cEntity::etFallingBlock: return "cFallingBlock";
-					case cEntity::etFloater:      return "cFloater";
-					case cEntity::etItemFrame:    return "cItemFrame";
-					case cEntity::etLeashKnot:    return "cLeashKnot";
-					case cEntity::etPainting:     return "cPainting";
-					case cEntity::etPickup:       return "cPickup";
-					case cEntity::etPlayer:       return "cPlayer";
-					case cEntity::etTNT:          return "cTNTEntity";
+					case etOakBoat:      return "cBoat";
+					case etExperienceOrb:return "cExpOrb";
+					case etFallingBlock: return "cFallingBlock";
+					case etFishingBobber:return "cFloater";
+					case etItemFrame:    return "cItemFrame";
+					case etLeashKnot:    return "cLeashKnot";
+					case etPainting:     return "cPainting";
+					case etItem:         return "cPickup";
+					case etPlayer:       return "cPlayer";
+					case etTnt:          return "cTNTEntity";
 
-					case cEntity::etMonster:
-					{
-						// Don't push specific mob types, as those are not exported in the API:
-						return "cMonster";
-					}
-					case cEntity::etProjectile:
-					{
-						// Push the specific projectile type:
-						return a_Entity->GetClass();
-					}
-
-					case cEntity::etEntity:
-					case cEntity::etEnderCrystal:
-					case cEntity::etMinecart:
+					case etEndCrystal:
+					case etMinecart:
+					case etFurnaceMinecart:
+					case etTntMinecart:
+					case etChestMinecart:
+					case etCommandBlockMinecart:
+					case etHopperMinecart:
+					case etSpawnerMinecart:
 					{
 						// Push the generic entity class type:
 						return "cEntity";

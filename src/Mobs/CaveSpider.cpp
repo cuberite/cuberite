@@ -8,7 +8,7 @@
 
 
 cCaveSpider::cCaveSpider(void) :
-	Super("CaveSpider", mtCaveSpider, "entity.spider.hurt", "entity.spider.death", "entity.spider.ambient", 0.7f, 0.5f)
+	Super("CaveSpider", etCaveSpider, "entity.spider.hurt", "entity.spider.death", "entity.spider.ambient", 0.7f, 0.5f)
 {
 }
 

@@ -661,7 +661,7 @@ void cProtocol_1_20_2::SendPlayerSpawn(const cPlayer & a_Player)
 	cPacketizer Pkt(*this, pktSpawnOtherPlayer);
 	Pkt.WriteVarInt32(a_Player.GetUniqueID());
 	Pkt.WriteUUID(a_Player.GetUUID());
-	Pkt.WriteVarInt32(128);  // TEMP FIX!!! MUST BE CHANGED TO WORK FOR EVERY VERSION
+	Pkt.WriteVarInt32(GetProtocolEntityType(etPlayer));
 	Vector3d LastSentPos = a_Player.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);
 	Pkt.WriteBEDouble(LastSentPos.y + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
@@ -1719,47 +1719,69 @@ void cProtocol_1_20_3::WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMeta
 
 
 
-void cProtocol_1_20_3::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
+void cProtocol_1_20_3::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity, bool a_WriteCommon) const
 {
-	// Common metadata:
-	Int8 Flags = 0;
-	if (a_Entity.IsOnFire())
+	if (a_WriteCommon)
 	{
-		Flags |= 0x01;
-	}
-	if (a_Entity.IsCrouched())
-	{
-		Flags |= 0x02;
-	}
-	if (a_Entity.IsSprinting())
-	{
-		Flags |= 0x08;
-	}
-	if (a_Entity.IsRclking())
-	{
-		Flags |= 0x10;
-	}
-	if (a_Entity.IsInvisible())
-	{
-		Flags |= 0x20;
-	}
-	/*
-	if (a_Entity.IsGlowing())
-	{
-		Flags |= 0x40;
-	}
-	*/
-	if (a_Entity.IsElytraFlying())
-	{
-		Flags |= 0x80;
-	}
+		// Living Entity Metadata
+		if (a_Entity.IsMob())
+		{
+			auto & a_Mob = dynamic_cast<const cMonster &>(a_Entity);
+			if (a_Mob.HasCustomName())
+			{
+				WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::OptChat);
+				a_Pkt.WriteBool(true);
 
-	WriteEntityMetadata(a_Pkt, EntityMetadata::EntityFlags, EntityMetadataType::Byte);
-	a_Pkt.WriteBEInt8(Flags);
+				cFastNBTWriter Writer(true);
+				Writer.AddString("text", a_Mob.GetCustomName());
+				Writer.Finish();
+				a_Pkt.WriteBuf(Writer.GetResult());
+
+				WriteEntityMetadata(a_Pkt, EntityMetadata::EntityNameVisible, EntityMetadataType::Boolean);
+				a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
+			}
+		}
+
+		// Common metadata:
+		Int8 Flags = 0;
+		if (a_Entity.IsOnFire())
+		{
+			Flags |= 0x01;
+		}
+		if (a_Entity.IsCrouched())
+		{
+			Flags |= 0x02;
+		}
+		if (a_Entity.IsSprinting())
+		{
+			Flags |= 0x08;
+		}
+		if (a_Entity.IsRclking())
+		{
+			Flags |= 0x10;
+		}
+		if (a_Entity.IsInvisible())
+		{
+			Flags |= 0x20;
+		}
+		/*
+		if (a_Entity.IsGlowing())
+		{
+			Flags |= 0x40;
+		}
+		*/
+		if (a_Entity.IsElytraFlying())
+		{
+			Flags |= 0x80;
+		}
+
+		WriteEntityMetadata(a_Pkt, EntityMetadata::EntityFlags, EntityMetadataType::Byte);
+		a_Pkt.WriteBEInt8(Flags);
+	}
 
 	switch (a_Entity.GetEntityType())
 	{
-		case cEntity::etPlayer:
+		case etPlayer:
 		{
 			auto & Player = static_cast<const cPlayer &>(a_Entity);
 
@@ -1777,17 +1799,17 @@ void cProtocol_1_20_3::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
 			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerDisplayedSkinParts, EntityMetadataType::Byte);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerPlayerModelParts, EntityMetadataType::Byte);
 			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerMainHand, EntityMetadataType::Byte);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerMainArm, EntityMetadataType::Byte);
 			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
 			break;
 		}
 
 		default:
 		{
-			Super::WriteEntityMetadata(a_Pkt, a_Entity);
+			Super::WriteEntityMetadata(a_Pkt, a_Entity, false);
 		}
 	}
 }
@@ -2548,101 +2570,6 @@ void cProtocol_1_20_5::SendRespawn(eDimension a_Dimension)
 
 
 
-UInt32 cProtocol_1_20_5::GetProtocolMobType(eMonsterType a_MobType) const
-{
-	switch (a_MobType)
-	{
-		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
-		case mtInvalidType:           return 46;
-		case mtAllay: return 0;
-		case mtArmadillo: return 2;
-		case mtAxolotl: return 5;
-		case mtBat: return 6;
-		case mtBee: return 7;
-		case mtBlaze: return 8;
-		case mtBogged: return 11;
-		case mtBreeze: return 12;
-		case mtCamel: return 14;
-		case mtCat: return 15;
-		case mtCaveSpider: return 16;
-		case mtChicken: return 19;
-		case mtCod: return 20;
-		case mtCow: return 22;
-		case mtCreeper: return 23;
-		case mtDolphin: return 24;
-		case mtDonkey: return 25;
-		case mtDrowned: return 27;
-		case mtElderGuardian: return 29;
-		case mtEnderDragon: return 31;
-		case mtEnderman: return 33;
-		case mtEndermite: return 34;
-		case mtEvoker: return 35;
-		case mtFox: return 42;
-		case mtFrog: return 43;
-		case mtGhast: return 45;
-		case mtGiant: return 46;
-		case mtGlowSquid: return 48;
-		case mtGoat: return 49;
-		case mtGuardian: return 50;
-		case mtHoglin: return 51;
-		case mtHorse: return 53;
-		case mtHusk: return 54;
-		case mtIllusioner: return 55;
-		case mtLlama: return 65;
-		case mtMagmaCube: return 67;
-		case mtMooshroom: return 70;
-		case mtMule: return 71;
-		case mtOcelot: return 72;
-		case mtPanda: return 74;
-		case mtParrot: return 75;
-		case mtPhantom: return 76;
-		case mtPig: return 77;
-		case mtPiglin: return 78;
-		case mtPiglinBrute: return 79;
-		case mtPillager: return 80;
-		case mtPolarBear: return 81;
-		case mtPufferfish: return 83;
-		case mtRabbit: return 84;
-		case mtRavager: return 85;
-		case mtSalmon: return 86;
-		case mtSheep: return 87;
-		case mtShulker: return 88;
-		case mtSilverfish: return 90;
-		case mtSkeleton: return 91;
-		case mtSkeletonHorse: return 92;
-		case mtSlime: return 93;
-		case mtSniffer: return 95;
-		case mtSpider: return 100;
-		case mtSquid: return 101;
-		case mtStray: return 102;
-		case mtStrider: return 103;
-		case mtTadpole: return 104;
-		case mtTraderLlama: return 108;
-		case mtTropicalFish: return 110;
-		case mtTurtle: return 111;
-		case mtVex: return 112;
-		case mtVillager: return 113;
-		case mtVindicator: return 114;
-		case mtWanderingTrader: return 115;
-		case mtWarden: return 116;
-		case mtWitch: return 118;
-		case mtWither: return 119;
-		case mtWitherSkeleton: return 120;
-		case mtWolf: return 122;
-		case mtZoglin: return 123;
-		case mtZombie: return 124;
-		case mtZombieHorse: return 125;
-		case mtZombieVillager: return 126;
-		case mtZombifiedPiglin: return 127;
-
-		default:                      return 0;
-	}
-}
-
-
-
-
-
 int cProtocol_1_20_5::GetProtocolParticleID(const AString & a_ParticleName) const
 {
 	static const std::unordered_map<AString, int> ParticleMap
@@ -2776,48 +2703,140 @@ int cProtocol_1_20_5::GetProtocolParticleID(const AString & a_ParticleName) cons
 
 
 
-UInt8 cProtocol_1_20_5::GetProtocolEntityType(const cEntity & a_Entity) const
+UInt8 cProtocol_1_20_5::GetProtocolEntityType(eEntityType a_Type) const
 {
-	using Type = cEntity::eEntityType;
+	using Type = eEntityType;
 
-	switch (a_Entity.GetEntityType())
+	switch (a_Type)
 	{
-		case Type::etEnderCrystal: return 30;
-		case Type::etPickup: return 58;
-		case Type::etFallingBlock: return 40;
-		case Type::etMinecart: return 69;
-		case Type::etBoat: return 10;
-		case Type::etTNT: return 106;
-		case Type::etProjectile:
-		{
-			using PType = cProjectileEntity::eKind;
-			const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
-
-			switch (Projectile.GetProjectileKind())
-			{
-				case PType::pkArrow: return 4;
-				case PType::pkSnowball: return 67;
-				case PType::pkEgg: return 28;
-				case PType::pkGhastFireball: return 62;
-				case PType::pkFireCharge: return 94;
-				case PType::pkEnderPearl: return 32;
-				case PType::pkExpBottle: return 37;
-				case PType::pkSplashPotion: return 82;
-				case PType::pkFirework: return 41;
-				case PType::pkWitherSkull: return 121;
-			}
-			break;
-		}
-		case Type::etFloater: return 129;
-		case Type::etItemFrame: return 60;
-		case Type::etLeashKnot: return 63;
-
-		// Non-objects must not be sent
-		case Type::etEntity:
-		case Type::etPlayer:
-		case Type::etMonster:
-		case Type::etExpOrb:
-		case Type::etPainting: break;
+		case Type::etAllay:                return 0;
+		case Type::etAreaEffectCloud:      return 1;
+		case Type::etArmadillo:            return 2;
+		case Type::etArmorStand:           return 3;
+		case Type::etArrow:                return 4;
+		case Type::etAxolotl:              return 5;
+		case Type::etBat:                  return 6;
+		case Type::etBee:                  return 7;
+		case Type::etBlaze:                return 8;
+		case Type::etBlockDisplay:         return 9;
+		case Type::etBogged:               return 11;
+		case Type::etBreeze:               return 12;
+		case Type::etBreezeWindCharge:     return 13;
+		case Type::etCamel:                return 14;
+		case Type::etCat:                  return 15;
+		case Type::etCaveSpider:           return 16;
+		case Type::etChestMinecart:        return 18;
+		case Type::etChicken:              return 19;
+		case Type::etCod:                  return 20;
+		case Type::etCommandBlockMinecart: return 21;
+		case Type::etCow:                  return 22;
+		case Type::etCreeper:              return 23;
+		case Type::etDolphin:              return 24;
+		case Type::etDonkey:               return 25;
+		case Type::etDragonFireball:       return 26;
+		case Type::etDrowned:              return 27;
+		case Type::etEgg:                  return 28;
+		case Type::etElderGuardian:        return 29;
+		case Type::etEndCrystal:           return 30;
+		case Type::etEnderDragon:          return 31;
+		case Type::etEnderPearl:           return 32;
+		case Type::etEnderman:             return 33;
+		case Type::etEndermite:            return 34;
+		case Type::etEvoker:               return 35;
+		case Type::etEvokerFangs:          return 36;
+		case Type::etExperienceBottle:     return 37;
+		case Type::etExperienceOrb:        return 38;
+		case Type::etEyeOfEnder:           return 39;
+		case Type::etFallingBlock:         return 40;
+		case Type::etFireball:             return 62;
+		case Type::etFireworkRocket:       return 41;
+		case Type::etFishingBobber:        return 129;
+		case Type::etFox:                  return 42;
+		case Type::etFrog:                 return 43;
+		case Type::etFurnaceMinecart:      return 44;
+		case Type::etGhast:                return 45;
+		case Type::etGiant:                return 46;
+		case Type::etGlowItemFrame:        return 47;
+		case Type::etGlowSquid:            return 48;
+		case Type::etGoat:                 return 49;
+		case Type::etGuardian:             return 50;
+		case Type::etHoglin:               return 51;
+		case Type::etHopperMinecart:       return 52;
+		case Type::etHorse:                return 53;
+		case Type::etHusk:                 return 54;
+		case Type::etIllusioner:           return 55;
+		case Type::etInteraction:          return 56;
+		case Type::etIronGolem:            return 57;
+		case Type::etItem:                 return 58;
+		case Type::etItemDisplay:          return 59;
+		case Type::etItemFrame:            return 60;
+		case Type::etLeashKnot:            return 63;
+		case Type::etLightningBolt:        return 64;
+		case Type::etLlama:                return 65;
+		case Type::etLlamaSpit:            return 66;
+		case Type::etMagmaCube:            return 67;
+		case Type::etMarker:               return 68;
+		case Type::etMinecart:             return 69;
+		case Type::etMooshroom:            return 70;
+		case Type::etMule:                 return 71;
+		case Type::etOcelot:               return 72;
+		case Type::etOminousItemSpawner:   return 61;
+		case Type::etPainting:             return 73;
+		case Type::etPanda:                return 74;
+		case Type::etParrot:               return 75;
+		case Type::etPhantom:              return 76;
+		case Type::etPig:                  return 77;
+		case Type::etPiglin:               return 78;
+		case Type::etPiglinBrute:          return 79;
+		case Type::etPillager:             return 80;
+		case Type::etPlayer:               return 128;
+		case Type::etPolarBear:            return 81;
+		case Type::etPotion:               return 82;
+		case Type::etPufferfish:           return 83;
+		case Type::etRabbit:               return 84;
+		case Type::etRavager:              return 85;
+		case Type::etSalmon:               return 86;
+		case Type::etSheep:                return 87;
+		case Type::etShulker:              return 88;
+		case Type::etShulkerBullet:        return 89;
+		case Type::etSilverfish:           return 90;
+		case Type::etSkeleton:             return 91;
+		case Type::etSkeletonHorse:        return 92;
+		case Type::etSlime:                return 93;
+		case Type::etSmallFireball:        return 94;
+		case Type::etSniffer:              return 95;
+		case Type::etSnowGolem:            return 96;
+		case Type::etSnowball:             return 97;
+		case Type::etSpawnerMinecart:      return 98;
+		case Type::etSpectralArrow:        return 99;
+		case Type::etSpider:               return 100;
+		case Type::etSquid:                return 101;
+		case Type::etStray:                return 102;
+		case Type::etStrider:              return 103;
+		case Type::etTadpole:              return 104;
+		case Type::etTextDisplay:          return 105;
+		case Type::etTnt:                  return 106;
+		case Type::etTntMinecart:          return 107;
+		case Type::etTraderLlama:          return 108;
+		case Type::etTrident:              return 109;
+		case Type::etTropicalFish:         return 110;
+		case Type::etTurtle:               return 111;
+		case Type::etVex:                  return 112;
+		case Type::etVillager:             return 113;
+		case Type::etVindicator:           return 114;
+		case Type::etWanderingTrader:      return 115;
+		case Type::etWarden:               return 116;
+		case Type::etWindCharge:           return 117;
+		case Type::etWitch:                return 118;
+		case Type::etWither:               return 119;
+		case Type::etWitherSkeleton:       return 120;
+		case Type::etWitherSkull:          return 121;
+		case Type::etWolf:                 return 122;
+		case Type::etZoglin:               return 123;
+		case Type::etZombie:               return 124;
+		case Type::etZombieHorse:          return 125;
+		case Type::etZombieVillager:       return 126;
+		case Type::etZombifiedPiglin:      return 127;
 	}
 	UNREACHABLE("Unhandled entity kind");
 }

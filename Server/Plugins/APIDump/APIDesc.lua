@@ -3470,7 +3470,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					{
 						{
 							Name = "EntityType",
-							Type = "cEntity#eEntityType",
+							Type = "number",
 						},
 					},
 					Notes = "Returns the type of the entity, one of the {{cEntity#eEntityType|etXXX}} constants. Note that to check specific entity type, you should use one of the IsXXX functions instead of comparing the value returned by this call.",
@@ -4665,78 +4665,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				INVALID_ID =
 				{
 					Notes = "Special value of an entity ID, indicating a failure. Used primarily in functions that create entities when the entity cannot be created.",
-				},
-				etBoat =
-				{
-					Notes = "The entity is a {{cBoat}}",
-				},
-				etEnderCrystal =
-				{
-					Notes = "The entity is a {{cEnderCrystal}}",
-				},
-				etEntity =
-				{
-					Notes = "No further specialization available",
-				},
-				etExpOrb =
-				{
-					Notes = "The entity is a {{cExpOrb}}",
-				},
-				etFallingBlock =
-				{
-					Notes = "The entity is a {{cFallingBlock}}",
-				},
-				etFloater =
-				{
-					Notes = "The entity is a fishing rod floater",
-				},
-				etItemFrame =
-				{
-					Notes = "The entity is an item frame",
-				},
-				etLeashKnot =
-				{
-					Notes = "The entity is a leash knot",
-				},
-				etMinecart =
-				{
-					Notes = "The entity is a {{cMinecart}} descendant",
-				},
-				etMob =
-				{
-					Notes = "The entity is a {{cMonster}} descendant",
-				},
-				etMonster =
-				{
-					Notes = "The entity is a {{cMonster}} descendant",
-				},
-				etPainting =
-				{
-					Notes = "The entity is a {{cPainting}}",
-				},
-				etPickup =
-				{
-					Notes = "The entity is a {{cPickup}}",
-				},
-				etPlayer =
-				{
-					Notes = "The entity is a {{cPlayer}}",
-				},
-				etProjectile =
-				{
-					Notes = "The entity is a {{cProjectileEntity}} descendant",
-				},
-				etTNT =
-				{
-					Notes = "The entity is a {{cTNTEntity}}",
-				},
-			},
-			ConstantGroups =
-			{
-				eEntityType =
-				{
-					Include = "et.*",
-					TextBefore = "The following constants are used to distinguish between different entity types:",
 				},
 			},
 		},
@@ -9168,17 +9096,6 @@ a_Player:OpenWindow(Window);
 						},
 					},
 					Notes = "Returns this mob's family ({{cMonster#eFamily|mfXXX}} constant)",
-				},
-				GetMobType =
-				{
-					Returns =
-					{
-						{
-							Name = "MobType",
-							Type = "eMonsterType",
-						},
-					},
-					Notes = "Returns the type of this mob ({{Globals#eMonsterType|mtXXX}} constant)",
 				},
 				GetRelativeWalkSpeed =
 				{
@@ -18026,339 +17943,614 @@ end
 				},
 
 				-- eMonsterType:
-				mtAllay =
+				etAllay =
 				{
 					Notes = "",
 				},
-				mtArmadillo =
+				etArmadillo =
 				{
 					Notes = "",
 				},
-				mtAxolotl =
+				etAxolotl =
 				{
 					Notes = "",
 				},
-				mtBat =
+				etBat =
 				{
 					Notes = "",
 				},
-				mtBee =
+				etBee =
 				{
 					Notes = "",
 				},
-				mtBlaze =
+				etBlaze =
 				{
 					Notes = "",
 				},
-				mtBogged =
+				etBogged =
 				{
 					Notes = "",
 				},
-				mtBreeze =
+				etBreeze =
 				{
 					Notes = "",
 				},
-				mtCreaking =
+				etCreaking =
 				{
 					Notes = "",
 				},
-				mtCamel =
+				etCamel =
 				{
 					Notes = "",
 				},
-				mtCaveSpider =
+				etCaveSpider =
 				{
 					Notes = "",
 				},
-				mtCat =
+				etCat =
 				{
 					Notes = "",
 				},
-				mtChicken =
+				etChicken =
 				{
 					Notes = "",
 				},
-				mtCod =
+				etCod =
 				{
 					Notes = "",
 				},
-				mtCow =
+				etCow =
 				{
 					Notes = "",
 				},
-				mtCreeper =
+				etCreeper =
 				{
 					Notes = "",
 				},
-				mtDolphin =
+				etDolphin =
 				{
 					Notes = "",
 				},
-				mtDonkey =
+				etDonkey =
 				{
 					Notes = "",
 				},
-				mtDrowned =
+				etDrowned =
 				{
 					Notes = "",
 				},
-				mtElderGuardian =
+				etElderGuardian =
 				{
 					Notes = "",
 				},
-				mtEnderDragon =
+				etEnderDragon =
 				{
 					Notes = "",
 				},
-				mtEnderman =
+				etEnderman =
 				{
 					Notes = "",
 				},
-				mtEndermite =
+				etEndermite =
 				{
 					Notes = "",
 				},
-				mtEvoker =
+				etEvoker =
 				{
 					Notes = "",
 				},
-				mtFox =
+				etFox =
 				{
 					Notes = "",
 				},
-				mtFrog =
+				etFrog =
 				{
 					Notes = "",
 				},
-				mtGhast =
+				etGhast =
 				{
 					Notes = "",
 				},
-				mtGiant =
+				etGiant =
 				{
 					Notes = "",
 				},
-				mtGlowSquid =
+				etGlowSquid =
 				{
 					Notes = "",
 				},
-				mtGoat =
+				etGoat =
 				{
 					Notes = "",
 				},
-				mtHoglin =
+				etHoglin =
 				{
 					Notes = "",
 				},
-				mtHorse =
+				etHorse =
 				{
 					Notes = "",
 				},
-				mtHusk =
+				etHusk =
 				{
 					Notes = "",
 				},
-				mtIllusioner =
+				etIllusioner =
 				{
 					Notes = "",
 				},
-				mtInvalidType =
+				etInvalid =
 				{
 					Notes = "Invalid monster type. Returned when monster type not recognized",
 				},
-				mtIronGolem =
+				etIronGolem =
 				{
 					Notes = "",
 				},
-				mtLlama =
+				etLlama =
 				{
 					Notes = "",
 				},
-				mtMagmaCube =
+				etMagmaCube =
 				{
 					Notes = "",
 				},
-				mtMooshroom =
+				etMooshroom =
 				{
 					Notes = "",
 				},
-				mtMule =
+				etMule =
 				{
 					Notes = "",
 				},
-				mtOcelot =
+				etOcelot =
 				{
 					Notes = "",
 				},
-				mtPanda =
+				etPanda =
 				{
 					Notes = "",
 				},
-				mtParrot =
+				etParrot =
 				{
 					Notes = "",
 				},
-				mtPhantom =
+				etPhantom =
 				{
 					Notes = "",
 				},
-				mtPig =
+				etPig =
 				{
 					Notes = "",
 				},
-				mtPiglin =
+				etPiglin =
 				{
 					Notes = "",
 				},
-				mtPiglinBrute =
+				etPiglinBrute =
 				{
 					Notes = "",
 				},
-				mtPillager =
+				etPillager =
 				{
 					Notes = "",
 				},
-				mtPolarBear =
+				etPolarBear =
 				{
 					Notes = "",
 				},
-				mtPufferfish =
+				etPufferfish =
 				{
 					Notes = "",
 				},
-				mtRavager =
+				etRavager =
 				{
 					Notes = "",
 				},
-				mtSalmon =
+				etSalmon =
 				{
 					Notes = "",
 				},
-				mtSheep =
+				etSheep =
 				{
 					Notes = "",
 				},
-				mtShulker =
+				etShulker =
 				{
 					Notes = "",
 				},
-				mtSilverfish =
+				etSilverfish =
 				{
 					Notes = "",
 				},
-				mtSkeleton =
+				etSkeleton =
 				{
 					Notes = "",
 				},
-				mtSkeletonHorse =
+				etSkeletonHorse =
 				{
 					Notes = "",
 				},
-				mtSlime =
+				etSlime =
 				{
 					Notes = "",
 				},
-				mtSniffer =
+				etSniffer =
 				{
 					Notes = "",
 				},
-				mtStray =
+				etStray =
 				{
 					Notes = "",
 				},
-				mtStrider =
+				etStrider =
 				{
 					Notes = "",
 				},
-				mtSnowGolem =
+				etSnowGolem =
 				{
 					Notes = "",
 				},
-				mtSpider =
+				etSpider =
 				{
 					Notes = "",
 				},
-				mtTadpole =
+				etTadpole =
 				{
 					Notes = "",
 				},
-				mtSquid =
+				etSquid =
 				{
 					Notes = "",
 				},
-				mtTraderLlama =
+				etTraderLlama =
 				{
 					Notes = "",
 				},
-				mtTropicalFish =
+				etTropicalFish =
 				{
 					Notes = "",
 				},
-				mtTurtle =
+				etTurtle =
 				{
 					Notes = "",
 				},
-				mtVex =
+				etVex =
 				{
 					Notes = "",
 				},
-				mtVillager =
+				etVillager =
 				{
 					Notes = "",
 				},
-				mtVindicator =
+				etVindicator =
 				{
 					Notes = "",
 				},
-				mtWanderingTrader =
+				etWanderingTrader =
 				{
 					Notes = "",
 				},
-				mtWarden =
+				etWarden =
 				{
 					Notes = "",
 				},
-				mtWitch =
+				etWitch =
 				{
 					Notes = "",
 				},
-				mtWither =
+				etWither =
 				{
 					Notes = "",
 				},
-				mtWitherSkeleton =
+				etWitherSkeleton =
 				{
 					Notes = "",
 				},
-				mtWolf =
+				etWolf =
 				{
 					Notes = "",
 				},
-				mtZoglin =
+				etZoglin =
 				{
 					Notes = "",
 				},
-				mtZombie =
+				etZombie =
 				{
 					Notes = "",
 				},
-				mtZombieHorse =
+				etZombieHorse =
 				{
 					Notes = "",
 				},
-				mtZombiePigman =
+				etZombifiedPiglin =
 				{
 					Notes = "",
 				},
-				mtZombifiedPiglin =
+				etZombifiedPiglin =
 				{
 					Notes = "",
 				},
-				mtZombieVillager =
+				etZombieVillager =
 				{
 					Notes = "",
 				},
-
+				etAcaciaBoat =
+				{
+					Notes = "",
+				},
+				etAcaciaChestBoat =
+				{
+					Notes = "",
+				},
+				etAreaEffectCloud =
+				{
+					Notes = "",
+				},
+				etArmorStand =
+				{
+					Notes = "",
+				},
+				etArrow =
+				{
+					Notes = "",
+				},
+				etBambooChestRaft =
+				{
+					Notes = "",
+				},
+				etBambooRaft =
+				{
+					Notes = "",
+				},
+				etBirchBoat =
+				{
+					Notes = "",
+				},
+				etBirchChestBoat =
+				{
+					Notes = "",
+				},
+				etBlockDisplay =
+				{
+					Notes = "",
+				},
+				etBreezeWindCharge =
+				{
+					Notes = "",
+				},
+				etCherryBoat =
+				{
+					Notes = "",
+				},
+				etCherryChestBoat =
+				{
+					Notes = "",
+				},
+				etChestMinecart =
+				{
+					Notes = "",
+				},
+				etCommandBlockMinecart =
+				{
+					Notes = "",
+				},
+				etDarkOakBoat =
+				{
+					Notes = "",
+				},
+				etDarkOakChestBoat =
+				{
+					Notes = "",
+				},
+				etDragonFireball =
+				{
+					Notes = "",
+				},
+				etEgg =
+				{
+					Notes = "",
+				},
+				etEndCrystal =
+				{
+					Notes = "",
+				},
+				etEnderPearl =
+				{
+					Notes = "",
+				},
+				etEvokerFangs =
+				{
+					Notes = "",
+				},
+				etExperienceBottle =
+				{
+					Notes = "",
+				},
+				etExperienceOrb =
+				{
+					Notes = "",
+				},
+				etEyeOfEnder =
+				{
+					Notes = "",
+				},
+				etFallingBlock =
+				{
+					Notes = "",
+				},
+				etFireball =
+				{
+					Notes = "",
+				},
+				etFireworkRocket =
+				{
+					Notes = "",
+				},
+				etFishingBobber =
+				{
+					Notes = "",
+				},
+				etFurnaceMinecart =
+				{
+					Notes = "",
+				},
+				etGlowItemFrame =
+				{
+					Notes = "",
+				},
+				etGuardian =
+				{
+					Notes = "",
+				},
+				etHopperMinecart =
+				{
+					Notes = "",
+				},
+				etInteraction =
+				{
+					Notes = "",
+				},
+				etItem =
+				{
+					Notes = "",
+				},
+				etItemDisplay =
+				{
+					Notes = "",
+				},
+				etItemFrame =
+				{
+					Notes = "",
+				},
+				etJungleBoat =
+				{
+					Notes = "",
+				},
+				etJungleChestBoat =
+				{
+					Notes = "",
+				},
+				etLeashKnot =
+				{
+					Notes = "",
+				},
+				etLightningBolt =
+				{
+					Notes = "",
+				},
+				etLlamaSpit =
+				{
+					Notes = "",
+				},
+				etMangroveBoat =
+				{
+					Notes = "",
+				},
+				etMangroveChestBoat =
+				{
+					Notes = "",
+				},
+				etMarker =
+				{
+					Notes = "",
+				},
+				etMinecart =
+				{
+					Notes = "",
+				},
+				etOakBoat =
+				{
+					Notes = "",
+				},
+				etOakChestBoat =
+				{
+					Notes = "",
+				},
+				etOminousItemSpawner =
+				{
+					Notes = "",
+				},
+				etPainting =
+				{
+					Notes = "",
+				},
+				etPaleOakBoat =
+				{
+					Notes = "",
+				},
+				etPaleOakChestBoat =
+				{
+					Notes = "",
+				},
+				etPlayer =
+				{
+					Notes = "",
+				},
+				etPotion =
+				{
+					Notes = "",
+				},
+				etRabbit =
+				{
+					Notes = "",
+				},
+				etShulkerBullet =
+				{
+					Notes = "",
+				},
+				etSmallFireball =
+				{
+					Notes = "",
+				},
+				etSnowball =
+				{
+					Notes = "",
+				},
+				etSpawnerMinecart =
+				{
+					Notes = "",
+				},
+				etSpectralArrow =
+				{
+					Notes = "",
+				},
+				etSpruceBoat =
+				{
+					Notes = "",
+				},
+				etSpruceChestBoat =
+				{
+					Notes = "",
+				},
+				etTextDisplay =
+				{
+					Notes = "",
+				},
+				etTnt =
+				{
+					Notes = "",
+				},
+				etTntMinecart =
+				{
+					Notes = "",
+				},
+				etTrident =
+				{
+					Notes = "",
+				},
+				etWindCharge =
+				{
+					Notes = "",
+				},
+				etWitherSkull =
+				{
+					Notes = "",
+				},
+				etWitherSkeleton =
+				{
+					Notes = ""
+				},
 				-- eMessageType:
 				mtCustom =
 				{
@@ -18419,10 +18611,6 @@ end
 				mtWarning =
 				{
 					Notes = "Something concerning (i.e. reload) is about to happen",
-				},
-				mtWitherSkeleton =
-				{
-					Notes = ""
 				},
 				SKULL_TYPE_CREEPER =
 				{

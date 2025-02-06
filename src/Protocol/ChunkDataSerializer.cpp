@@ -15,7 +15,6 @@
 #include "Palettes/Palette_1_19.h"
 #include "Palettes/Palette_1_20.h"
 #include "Palettes/Palette_1_21.h"
-#include "Palettes/Palette_1_21_2.h"
 #include "Palettes/Palette_1_21_4.h"
 namespace
 {
@@ -144,7 +143,8 @@ namespace
 
 	auto Palette768(const BlockState a_Block)
 	{
-		return Palette_1_21_2::From(a_Block);
+		// return Palette_1_21_2::From(a_Block);
+		return 0;
 	}
 
 	auto Palette769(const BlockState a_Block)

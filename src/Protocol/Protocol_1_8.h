@@ -170,12 +170,11 @@ protected:
 	Returns -1 if the protocol version doesn't support this animation. */
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const;
 
-	/** Converts an entity to a protocol-specific entity type.
-	Only entities that the Send Spawn Entity packet supports are valid inputs to this method */
-	virtual UInt8 GetProtocolEntityType(const cEntity & a_Entity) const;
+	/** Converts an entity to a protocol-specific entity type. */
+	virtual UInt8 GetProtocolEntityType(eEntityType a_Type) const;
 
 	/** Converts eMonsterType to protocol-specific mob types */
-	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const;
+	// virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const;
 
 	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
 	virtual int GetProtocolParticleID(const AString & a_ParticleName) const;
@@ -251,7 +250,7 @@ protected:
 	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const override;
 
 	/** Writes the metadata for the specified entity, not including the terminating 0x7f. */
-	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const;
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity, bool a_WriteCommon = true) const;
 
 	/** Writes the entity properties for the specified entity, including the Count field. */
 	virtual void WriteEntityProperties(cPacketizer & a_Pkt, const cEntity & a_Entity) const;
@@ -260,7 +259,7 @@ protected:
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const;
 
 	/** Writes the mob-specific metadata for the specified mob */
-	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const;
+	// virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const;
 
 	void StartEncryption(const Byte * a_Key);
 

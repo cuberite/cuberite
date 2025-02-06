@@ -65,15 +65,15 @@ public:
 		int MobType = (a_Noise.IntNoise3DInt(a_OriginX, m_FloorHeight, a_OriginZ) / 7) % 100;
 		if (MobType <= 25)
 		{
-			m_MonsterType = mtSkeleton;
+			m_MonsterType = etSkeleton;
 		}
 		else if (MobType <= 50)
 		{
-			m_MonsterType = mtSpider;
+			m_MonsterType = etSpider;
 		}
 		else
 		{
-			m_MonsterType = mtZombie;
+			m_MonsterType = etZombie;
 		}
 	}
 
@@ -95,7 +95,7 @@ protected:
 	Vector3i m_Chest2;
 
 	/** The monster type for the mobspawner entity. */
-	eMonsterType m_MonsterType;
+	eEntityType m_MonsterType;
 
 
 	/** Decodes the position index along the room walls into a proper 2D position for a chest.

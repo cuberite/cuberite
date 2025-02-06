@@ -42,7 +42,7 @@ private:
 			return;
 		}
 		auto WorldPos = a_Chunk.RelativeToAbsolute(a_Position);
-		a_WorldInterface.SpawnMob(WorldPos.x, WorldPos.y, WorldPos.z, mtZombiePigman, false);
+		a_WorldInterface.SpawnMob(WorldPos.x, WorldPos.y, WorldPos.z, etZombifiedPiglin, false);
 	}
 
 

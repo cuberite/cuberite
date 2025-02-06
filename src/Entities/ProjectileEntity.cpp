@@ -218,9 +218,8 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cProjectileEntity:
 
-cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, float a_Width, float a_Height):
-	Super(etProjectile, a_Pos, a_Width, a_Height),
-	m_ProjectileKind(a_Kind),
+cProjectileEntity::cProjectileEntity(eEntityType e_Type, cEntity * a_Creator, Vector3d a_Pos, float a_Width, float a_Height):
+	Super(e_Type, a_Pos, a_Width, a_Height),
 	m_CreatorData(
 		((a_Creator != nullptr) ? a_Creator->GetUniqueID() : cEntity::INVALID_ID),
 		((a_Creator != nullptr) ? (a_Creator->IsPlayer() ? static_cast<cPlayer *>(a_Creator)->GetName() : "") : ""),
@@ -236,8 +235,8 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d
 
 
 
-cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed, float a_Width, float a_Height):
-	cProjectileEntity(a_Kind, a_Creator, a_Pos, a_Width, a_Height)
+cProjectileEntity::cProjectileEntity(eEntityType e_Type, cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed, float a_Width, float a_Height):
+	cProjectileEntity(e_Type, a_Creator, a_Pos, a_Width, a_Height)
 {
 	SetSpeed(a_Speed);
 	SetYawFromSpeed();
@@ -249,7 +248,7 @@ cProjectileEntity::cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d
 
 
 std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(
-	eKind a_Kind,
+	eEntityType a_Kind,
 	cEntity * a_Creator,
 	Vector3d a_Pos,
 	const cItem * a_Item,
@@ -264,16 +263,16 @@ std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(
 
 	switch (a_Kind)
 	{
-		case pkArrow:         return std::make_unique<cArrowEntity>           (a_Creator, a_Pos, Speed);
-		case pkEgg:           return std::make_unique<cThrownEggEntity>       (a_Creator, a_Pos, Speed);
-		case pkEnderPearl:    return std::make_unique<cThrownEnderPearlEntity>(a_Creator, a_Pos, Speed);
-		case pkSnowball:      return std::make_unique<cThrownSnowballEntity>  (a_Creator, a_Pos, Speed);
-		case pkGhastFireball: return std::make_unique<cGhastFireballEntity>   (a_Creator, a_Pos, Speed);
-		case pkFireCharge:    return std::make_unique<cFireChargeEntity>      (a_Creator, a_Pos, Speed);
-		case pkExpBottle:     return std::make_unique<cExpBottleEntity>       (a_Creator, a_Pos, Speed);
-		case pkSplashPotion:  return std::make_unique<cSplashPotionEntity>    (a_Creator, a_Pos, Speed, *a_Item);
-		case pkWitherSkull:   return std::make_unique<cWitherSkullEntity>     (a_Creator, a_Pos, Speed);
-		case pkFirework:
+		case etArrow:         return std::make_unique<cArrowEntity>           (a_Creator, a_Pos, Speed);
+		case etEgg:           return std::make_unique<cThrownEggEntity>       (a_Creator, a_Pos, Speed);
+		case etEnderPearl:    return std::make_unique<cThrownEnderPearlEntity>(a_Creator, a_Pos, Speed);
+		case etSnowball:      return std::make_unique<cThrownSnowballEntity>  (a_Creator, a_Pos, Speed);
+		case etGhast:         return std::make_unique<cGhastFireballEntity>   (a_Creator, a_Pos, Speed);
+		case etSmallFireball: return std::make_unique<cFireChargeEntity>      (a_Creator, a_Pos, Speed);
+		case etExperienceBottle:return std::make_unique<cExpBottleEntity>     (a_Creator, a_Pos, Speed);
+		case etPotion:        return std::make_unique<cSplashPotionEntity>    (a_Creator, a_Pos, Speed, *a_Item);
+		case etWitherSkull:   return std::make_unique<cWitherSkullEntity>     (a_Creator, a_Pos, Speed);
+		case etFireworkRocket:
 		{
 			ASSERT(a_Item != nullptr);
 			if (a_Item->m_FireworkItem.m_Colours.empty())
@@ -334,18 +333,18 @@ void cProjectileEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 
 AString cProjectileEntity::GetMCAClassName(void) const
 {
-	switch (m_ProjectileKind)
+	switch (m_EntityType)
 	{
-		case pkArrow:         return "Arrow";
-		case pkSnowball:      return "Snowball";
-		case pkEgg:           return "Egg";
-		case pkGhastFireball: return "Fireball";
-		case pkFireCharge:    return "SmallFireball";
-		case pkEnderPearl:    return "ThrownEnderpearl";
-		case pkExpBottle:     return "ThrownExpBottle";
-		case pkSplashPotion:  return "SplashPotion";
-		case pkWitherSkull:   return "WitherSkull";
-		case pkFirework:      return "Firework";
+		case etArrow:         return "Arrow";
+		case etSnowball:      return "Snowball";
+		case etEgg:           return "Egg";
+		case etFireball:      return "Fireball";
+		case etSmallFireball: return "SmallFireball";
+		case etEnderPearl:    return "ThrownEnderpearl";
+		case etExperienceBottle:return "ThrownExpBottle";
+		case etPotion:        return "SplashPotion";
+		case etWitherSkull:   return "WitherSkull";
+		case etFireworkRocket:return "Firework";
 	}
 	UNREACHABLE("Unsupported projectile kind");
 }
