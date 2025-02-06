@@ -239,13 +239,13 @@ private:
 				case eBlockFace::BLOCK_FACE_YP:
 					return cBlockStairsHandler::IsStairsTopHalf(SupportBlock);
 				case eBlockFace::BLOCK_FACE_XP:
-					return (cBlockStairsHandler::GetRotation(SupportBlock) == E_BLOCK_STAIRS_XP);
+					return (cBlockStairsHandler::GetRotation(SupportBlock) == BLOCK_FACE_XP);
 				case eBlockFace::BLOCK_FACE_XM:
-					return (cBlockStairsHandler::GetRotation(SupportBlock) == E_BLOCK_STAIRS_XM);
+					return (cBlockStairsHandler::GetRotation(SupportBlock) == BLOCK_FACE_XM);
 				case eBlockFace::BLOCK_FACE_ZP:
-					return (cBlockStairsHandler::GetRotation(SupportBlock) == E_BLOCK_STAIRS_ZP);
+					return (cBlockStairsHandler::GetRotation(SupportBlock) == BLOCK_FACE_ZP);
 				case eBlockFace::BLOCK_FACE_ZM:
-					return (cBlockStairsHandler::GetRotation(SupportBlock) == E_BLOCK_STAIRS_ZM);
+					return (cBlockStairsHandler::GetRotation(SupportBlock) == BLOCK_FACE_ZM);
 				default:
 				{
 					return false;

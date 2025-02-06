@@ -227,7 +227,7 @@ void cFireworkItem::FadeColoursFromString(const AString & a_String, cFireworkIte
 
 
 
-
+// TODO: remove this function
 int cFireworkItem::GetVanillaColourCodeFromDye(unsigned char a_DyeMeta)
 {
 	/*
@@ -236,6 +236,7 @@ int cFireworkItem::GetVanillaColourCodeFromDye(unsigned char a_DyeMeta)
 	Therefore, here is a list of numbers gotten via the Protocol Proxy
 	*/
 
+	/*
 	switch (a_DyeMeta)
 	{
 		case E_META_DYE_BLACK: return 0x1E1B1B;
@@ -256,4 +257,6 @@ int cFireworkItem::GetVanillaColourCodeFromDye(unsigned char a_DyeMeta)
 		case E_META_DYE_WHITE: return 0xF0F0F0;
 		default: ASSERT(!"Unhandled dye meta whilst trying to get colour code for fireworks!"); return 0;
 	}
+	*/
+	return 0;
 }

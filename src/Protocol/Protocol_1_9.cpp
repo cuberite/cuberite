@@ -1605,7 +1605,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		return;
 	}
 
-	if ((ItemType == E_ITEM_POTION) && ((a_Item.m_ItemDamage & 0x4000) != 0))
+	if ((a_Item.m_ItemType == Item::Potion) && ((a_Item.m_ItemDamage & 0x4000) != 0))
 	{
 		// Ugly special case for splash potion ids which changed in 1.9; this can be removed when the new 1.9 ids are implemented
 		a_Pkt.WriteBEInt16(438);  // minecraft:splash_potion
@@ -1616,7 +1616,8 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		a_Pkt.WriteBEInt16(ItemType);
 	}
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
-	if ((ItemType == E_ITEM_POTION) || (ItemType == E_ITEM_SPAWN_EGG))
+	// TODO: Check for spawn eggs properly
+	if ((a_Item.m_ItemType == Item::Potion) /* || ((a_Item.m_ItemType == Item::SpawnEgg) */)
 	{
 		// These items lost their metadata; if it is sent they don't render correctly.
 		a_Pkt.WriteBEInt16(0);

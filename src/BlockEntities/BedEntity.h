@@ -20,7 +20,7 @@ class cBedEntity :
 
 public:  // tolua_export
 
-	cBedEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World, short a_Color = E_META_WOOL_RED);
+	cBedEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World, short a_Color = 0);
 
 	// tolua_begin
 

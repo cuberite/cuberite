@@ -12,6 +12,7 @@
 #include "../EffectID.h"
 #include "../Mobs/Monster.h"
 #include "../Protocol/Palettes/Upgrade.h"
+#include "../AllTags/BlockTags.h"
 
 
 
@@ -506,19 +507,22 @@ void cPawn::HandleFarmlandTrampling(const double a_FallHeight, const BlockState 
 
 	// Check if the foot is "inside" a farmland - for 1.10.1 and newer clients
 	// If it isn't, check if the block below is a farmland - for mobs and older clients
-	if (a_BlockAtFoot != E_BLOCK_FARMLAND)
+	auto BlockAtFoot = a_BlockAtFoot.Type();
+	if (BlockAtFoot != BlockType::Farmland)
 	{
 		// These are probably the only blocks which:
 		// - can be placed on a farmland and shouldn't destroy it
 		// - will stop the player from falling down further
 		// - are less than 1 block high
-		if ((a_BlockAtFoot == E_BLOCK_HEAD) || (a_BlockAtFoot == E_BLOCK_FLOWER_POT))
+
+		// TODO: check if BlockAtFoot is a mob head if so return here
+		if ((BlockTags::FlowerPots(BlockAtFoot)))
 		{
 			return;
 		}
 
 		// Finally, check whether the block below is farmland
-		if (a_BlockBelow != E_BLOCK_FARMLAND)
+		if (BlockAtFoot != BlockType::Farmland)
 		{
 			return;
 		}

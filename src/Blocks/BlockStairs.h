@@ -159,7 +159,7 @@ public:
 		return IsBlockStairs(a_Block);
 	}
 
-	static inline ENUM_BLOCK_META GetRotation(BlockState a_Block)
+	static inline eBlockFace GetRotation(BlockState a_Block)
 	{
 		UNREACHABLE("unimplemented");
 	}

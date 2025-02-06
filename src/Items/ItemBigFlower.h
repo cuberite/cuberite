@@ -40,9 +40,9 @@ public:
 
 		using namespace Block;
 
-		switch (a_HeldItem.m_ItemDamage)
+		switch (a_HeldItem.m_ItemType)
 		{
-			case E_META_BIG_FLOWER_SUNFLOWER:
+			case Item::Sunflower:
 			{
 				return a_Player.PlaceBlocks(
 				{
@@ -50,7 +50,7 @@ public:
 					{ TopPos,          Sunflower::Sunflower(Sunflower::Half::Upper) }
 				});
 			}
-			case E_META_BIG_FLOWER_LILAC:
+			case Item::Lilac:
 			{
 				return a_Player.PlaceBlocks(
 				{
@@ -58,7 +58,7 @@ public:
 					{ TopPos,           Lilac::Lilac(Lilac::Half::Upper) }
 				});
 			}
-			case E_META_BIG_FLOWER_DOUBLE_TALL_GRASS:
+			case Item::TallGrass:
 			{
 				return a_Player.PlaceBlocks(
 				{
@@ -66,7 +66,7 @@ public:
 					{ TopPos,          TallGrass::TallGrass(TallGrass::Half::Upper) }
 				});
 			}
-			case E_META_BIG_FLOWER_LARGE_FERN:
+			case Item::LargeFern:
 			{
 				return a_Player.PlaceBlocks(
 				{
@@ -74,7 +74,7 @@ public:
 					{ TopPos,          LargeFern::LargeFern(LargeFern::Half::Upper) }
 				});
 			}
-			case E_META_BIG_FLOWER_ROSE_BUSH:
+			case Item::RoseBush:
 			{
 				return a_Player.PlaceBlocks(
 				{
@@ -82,7 +82,7 @@ public:
 					{ TopPos,          RoseBush::RoseBush(RoseBush::Half::Upper) }
 				});
 			}
-			case E_META_BIG_FLOWER_PEONY:
+			case Item::Peony:
 			{
 				return a_Player.PlaceBlocks(
 				{

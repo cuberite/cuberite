@@ -87,8 +87,6 @@ public:
 		- If dimensions are valid, create the portal.
 		*/
 
-		static_assert((E_META_END_PORTAL_FRAME_ZM - E_META_END_PORTAL_FRAME_XM) == 1, "Should be going clockwise");
-
 		const int MIN_PORTAL_WIDTH = 3;
 		const int MAX_PORTAL_WIDTH = 4;
 

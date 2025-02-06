@@ -105,23 +105,23 @@ protected:
 		if (a_PosIdx < a_SizeX)
 		{
 			// Return a coord on the ZM side of the room:
-			return Vector3i(m_StartX + a_PosIdx + 1, E_META_CHEST_FACING_ZP, m_StartZ + 1);
+			return Vector3i(m_StartX + a_PosIdx + 1, 3, m_StartZ + 1);
 		}
 		a_PosIdx -= a_SizeX;
 		if (a_PosIdx < a_SizeZ)
 		{
 			// Return a coord on the XP side of the room:
-			return Vector3i(m_EndX - 1, E_META_CHEST_FACING_XM, m_StartZ + a_PosIdx + 1);
+			return Vector3i(m_EndX - 1, 4, m_StartZ + a_PosIdx + 1);
 		}
 		a_PosIdx -= a_SizeZ;
 		if (a_PosIdx < a_SizeX)
 		{
 			// Return a coord on the ZP side of the room:
-			return Vector3i(m_StartX + a_PosIdx + 1, E_META_CHEST_FACING_ZM, m_StartZ + 1);
+			return Vector3i(m_StartX + a_PosIdx + 1, 2, m_StartZ + 1);
 		}
 		a_PosIdx -= a_SizeX;
 		// Return a coord on the XM side of the room:
-		return Vector3i(m_StartX + 1, E_META_CHEST_FACING_XP, m_StartZ + a_PosIdx + 1);
+		return Vector3i(m_StartX + 1, 5, m_StartZ + a_PosIdx + 1);
 	}
 
 

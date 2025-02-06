@@ -17,7 +17,7 @@ cWolf::cWolf(void) :
 	m_IsTame(false),
 	m_IsBegging(false),
 	m_IsAngry(false),
-	m_CollarColor(E_META_DYE_ORANGE),
+	m_CollarColor(0),
 	m_NotificationCooldown(0)
 {
 }

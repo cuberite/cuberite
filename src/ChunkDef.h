@@ -47,8 +47,6 @@ typedef unsigned char LIGHTTYPE;
 
 /** The type used by the heightmap */
 typedef unsigned char HEIGHTTYPE;
-
-typedef unsigned int  NEWBLOCKTYPE;
 // tolua_end
 
 
@@ -142,9 +140,6 @@ public:
 	// typedef unsigned char BlockTypes[NumBlocks];
 	/** The type used for block type operations and storage, AXIS_ORDER ordering */
 	using BlockStates = BlockState[NumBlocks];
-
-	/** The type used for block type operations and storage, AXIS_ORDER ordering */
-	typedef NEWBLOCKTYPE BlockTypes2[NumBlocks];
 
 	/** The type used for block data in nibble format, AXIS_ORDER ordering */
 	using LightNibbles = LIGHTTYPE[NumBlocks / 2];
