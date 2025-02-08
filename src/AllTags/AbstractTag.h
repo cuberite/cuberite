@@ -62,7 +62,7 @@ namespace TagRegistry
 			}
 			if (values.empty())
 			{
-				LOGWARN(fmt::format(FMT_STRING("Empty values array in json file tags {}."), file_name));
+				// LOGWARN(fmt::format(FMT_STRING("Empty values array in json file tags {}."), file_name));
 				return;
 			}
 			for (const auto & value  : values)
