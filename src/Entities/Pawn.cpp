@@ -13,6 +13,7 @@
 #include "../Mobs/Monster.h"
 #include "../Protocol/Palettes/Upgrade.h"
 #include "../AllTags/BlockTags.h"
+#include "Root.h"
 
 
 
@@ -516,7 +517,7 @@ void cPawn::HandleFarmlandTrampling(const double a_FallHeight, const BlockState 
 		// - are less than 1 block high
 
 		// TODO: check if BlockAtFoot is a mob head if so return here
-		if ((BlockTags::FlowerPots(BlockAtFoot)))
+		if (cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::FlowerPots, BlockAtFoot))
 		{
 			return;
 		}

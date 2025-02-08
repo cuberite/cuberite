@@ -122,7 +122,7 @@ namespace TagRegistry
 		// TODO: optimize
 		[[nodiscard]] bool HasTag(TagEnum a_TagName, TagType a_ToQuery) const
 		{
-			AString TagName = EnumToString(a_TagName);
+			std::string_view TagName = EnumToString(a_TagName);
 			for (auto & tag : m_Tags)
 			{
 				if (tag.m_Name == TagName)
@@ -134,6 +134,7 @@ namespace TagRegistry
 							return true;
 						}
 					}
+					return false;
 				}
 			}
 			return false;
