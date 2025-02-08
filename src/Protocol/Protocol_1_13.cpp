@@ -541,6 +541,7 @@ void cProtocol_1_13::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEnt
 
 UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadata a_Metadata) const
 {
+	/*
 	const UInt8 Entity = 6;
 	const UInt8 Living = Entity + 5;
 	const UInt8 Insentient = Living + 1;
@@ -549,7 +550,7 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadata a_Metadata) const
 	const UInt8 ChestedHorse = AbstractHorse + 1;
 	const UInt8 TameableAnimal = Ageable + 2;
 	const UInt8 Minecart = Entity + 6;
-
+	*/
 	switch (a_Metadata)
 	{
 		case EntityMetadata::EntityFlags:                           return 0;

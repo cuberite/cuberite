@@ -539,6 +539,7 @@ UInt32 cProtocol_1_14::GetPacketID(ePacketType a_PacketType) const
 
 UInt8 cProtocol_1_14::GetEntityMetadataID(EntityMetadata a_Metadata) const
 {
+	/*
 	const UInt8 Entity = 7;
 	const UInt8 Living = Entity + 6;
 	const UInt8 Insentient = Living + 1;
@@ -548,6 +549,7 @@ UInt8 cProtocol_1_14::GetEntityMetadataID(EntityMetadata a_Metadata) const
 	const UInt8 TameableAnimal = Ageable + 2;
 	const UInt8 Minecart = Entity + 6;
 	const UInt8 RaidParticipent = Insentient + 1;
+	*/
 
 	switch (a_Metadata)
 	{

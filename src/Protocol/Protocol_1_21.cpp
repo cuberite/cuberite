@@ -1425,8 +1425,8 @@ void cProtocol_1_21_2::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 	bool Sneak =    (BitField & 0x20) != 0;
 	bool Sprint =   (BitField & 0x40) != 0;
 
-	double SidewaysVal = 0;
-	double ForwardVal = 0;
+	float SidewaysVal = 0;
+	float ForwardVal = 0;
 	ForwardVal += Forward ? 1.0 : 0;
 	ForwardVal += Backward ? -1.0 : 0;
 

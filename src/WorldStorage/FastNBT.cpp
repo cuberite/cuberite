@@ -163,12 +163,12 @@ cParsedNBT::cParsedNBT(cByteBuffer & a_Data, ContiguousByteBuffer & a_Bfr) :
 	m_Pos(0)
 {
 	// Hacky workaround
-	int pos = a_Data.GetReadPos();
+	size_t pos = a_Data.GetReadPos();
 	a_Data.ReadAll(a_Bfr);
 	m_Data = a_Bfr;
 	m_Error = Parse();
 	a_Data.ResetRead();
-	a_Data.SkipRead(static_cast<size_t>(pos) + (m_Pos == 0 ? 1 : m_Pos));
+	a_Data.SkipRead(pos + (m_Pos == 0 ? 1 : m_Pos));
 }
 
 
