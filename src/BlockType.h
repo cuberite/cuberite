@@ -298,7 +298,6 @@ enum ENUM_BLOCK_TYPE  // : unsigned char
 
 enum ENUM_ITEM_TYPE : short
 {
-	/*
 
 	E_ITEM_EMPTY = -1,
 
@@ -649,7 +648,7 @@ enum ENUM_ITEM_TYPE : short
 	E_ITEM_LAST_DISC = E_ITEM_LAST_DISC_PLUS_ONE - 1,  ///< Maximum disc itemtype number used
 
 	E_ITEM_LAST = E_ITEM_LAST_DISC,  ///< Maximum valid ItemType
-	*/
+
 };
 
 

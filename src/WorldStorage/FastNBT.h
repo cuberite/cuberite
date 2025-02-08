@@ -21,6 +21,7 @@ It directly outputs a string containing the serialized NBT data.
 
 #include <system_error>
 #include "../Endianness.h"
+#include "ByteBuffer.h"
 
 
 
@@ -154,6 +155,8 @@ class cParsedNBT
 {
 public:
 	cParsedNBT(ContiguousByteBufferView a_Data);
+
+	cParsedNBT(cByteBuffer & a_Data, ContiguousByteBuffer & a_Bfr);
 
 	bool IsValid(void) const { return (m_Error == eNBTParseError::npSuccess); }
 

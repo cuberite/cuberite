@@ -158,6 +158,23 @@ cParsedNBT::cParsedNBT(const ContiguousByteBufferView a_Data) :
 
 
 
+cParsedNBT::cParsedNBT(cByteBuffer & a_Data, ContiguousByteBuffer & a_Bfr) :
+	m_Data(a_Bfr),
+	m_Pos(0)
+{
+	// Hacky workaround
+	int pos = a_Data.GetReadPos();
+	a_Data.ReadAll(a_Bfr);
+	m_Data = a_Bfr;
+	m_Error = Parse();
+	a_Data.ResetRead();
+	a_Data.SkipRead(static_cast<size_t>(pos) + (m_Pos == 0 ? 1 : m_Pos));
+}
+
+
+
+
+
 eNBTParseError cParsedNBT::Parse(void)
 {
 	if (m_Data.size() < 3)

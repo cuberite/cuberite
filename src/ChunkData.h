@@ -62,12 +62,10 @@ public:
 	ChunkBlockData() : m_Blocks(DefaultValue) {}
 
 	static constexpr size_t SectionBlockCount = cChunkDef::SectionHeight * cChunkDef::Width * cChunkDef::Width;
-	static constexpr size_t SectionMetaCount = SectionBlockCount / 2;
 
 	static constexpr BlockState DefaultValue = Block::Air::Air();
 
 	using SectionType = BlockState[SectionBlockCount];
-	using SectionMetaType = unsigned char[SectionMetaCount];
 
 private:
 

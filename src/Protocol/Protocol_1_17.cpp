@@ -293,6 +293,7 @@ UInt8 cProtocol_1_17::GetEntityMetadataID(EntityMetadata a_Metadata) const
 		default:
 			break;
 	}
+	return 0;
 	UNREACHABLE("Retrieved invalid metadata for protocol");
 }
 

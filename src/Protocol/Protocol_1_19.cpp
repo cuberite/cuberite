@@ -1233,16 +1233,16 @@ void cProtocol_1_19::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 	HANDLE_READ(a_ByteBuffer, ReadBEUInt8,  UInt8,  Button);
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32,  UInt32,  Mode);
 	HANDLE_READ(a_ByteBuffer, ReadVarInt32,  UInt32,  ArrLen);
-	std::vector<std::pair<Int16, cItem>> items;
+	std::vector<std::pair<Int16, cItem>> Items;
 	for (UInt32 i = 0; i < ArrLen; ++i)
 	{
 		cItem Item;
 		HANDLE_READ(a_ByteBuffer, ReadBEInt16,  Int16,  CurrSlotNum);
-		ReadItem(a_ByteBuffer, Item, 1000000);  // HACK to make it work
-		items.emplace_back(CurrSlotNum, Item);
+		ReadItem(a_ByteBuffer, Item, 0);
+		Items.emplace_back(CurrSlotNum, Item);
 	}
-	cItem Item;
-	ReadItem(a_ByteBuffer, Item, 0);
+	cItem DraggedItem;
+	ReadItem(a_ByteBuffer, DraggedItem, 0);
 
 	/** The slot number that the client uses to indicate "outside the window". */
 	static const Int16 SLOT_NUM_OUTSIDE = -999;
@@ -1285,7 +1285,9 @@ void cProtocol_1_19::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 		}
 	}
 
-	m_Client->HandleWindowClick(WindowID, SlotNum, Action, Item);
+	bool IsEmpty = Items.empty();
+
+	m_Client->HandleWindowClick(WindowID, IsEmpty ? SlotNum : Items[0].first, Action, IsEmpty ? DraggedItem : Items[0].second);
 }
 
 

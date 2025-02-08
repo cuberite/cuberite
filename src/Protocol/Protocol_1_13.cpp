@@ -1925,6 +1925,8 @@ cProtocol::Version cProtocol_1_13_2::GetProtocolVersion() const
 
 bool cProtocol_1_13_2::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) const
 {
+	UNUSED(a_KeepRemainingBytes);
+
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBool, bool, Present);
 	if (!Present)
 	{
@@ -1943,14 +1945,19 @@ bool cProtocol_1_13_2::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size
 		a_Item.Empty();
 	}
 
-	ContiguousByteBuffer Metadata;
-	if (!a_ByteBuffer.ReadSome(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes) || Metadata.empty() || (Metadata[0] == std::byte(0)))
+	ContiguousByteBuffer bfr;
+	cParsedNBT nbt(a_ByteBuffer, bfr);
+	if (bfr.empty() || (bfr[0] == static_cast<std::byte>(0)))
 	{
 		// No metadata
 		return true;
 	}
+	if (!nbt.IsValid())
+	{
+		return false;
+	}
 
-	ParseItemMetadata(a_Item, Metadata);
+	ParseItemMetadata(a_Item, bfr);
 	return true;
 }
 
