@@ -932,9 +932,7 @@ public:
 					mWriter.AddByte("ChestedHorse",   Horse->IsChested()? 1 : 0);
 					mWriter.AddByte("EatingHaystack", Horse->IsEating()? 1 : 0);
 					mWriter.AddByte("Tame",           Horse->IsTame()? 1: 0);
-					mWriter.AddInt ("Type",           Horse->GetHorseType());
-					mWriter.AddInt ("Color",          Horse->GetHorseColor());
-					mWriter.AddInt ("Style",          Horse->GetHorseStyle());
+					mWriter.AddInt ("Variant",        Horse->GetHorseColor() | (Horse->GetHorseStyle() << 8));
 					mWriter.AddInt ("ArmorType",      Horse->GetHorseArmour());
 					mWriter.AddByte("Saddle",         Horse->IsSaddled()? 1 : 0);
 					mWriter.AddInt ("Age",            Horse->GetAge());
@@ -990,7 +988,6 @@ public:
 				case etVillager:
 				{
 					const cVillager *Villager = static_cast<const cVillager *>(a_Monster);
-					mWriter.AddInt("Profession", Villager->GetVilType());
 					mWriter.AddInt("Age",        Villager->GetAge());
 					mWriter.BeginList("Inventory", TAG_Compound);
 						AddItemGrid(Villager->GetInventory());
@@ -1032,7 +1029,6 @@ public:
 				case etZombieVillager:
 				{
 					const cZombieVillager *ZombieVillager = reinterpret_cast<const cZombieVillager *>(a_Monster);
-					mWriter.AddInt("Profession",     ZombieVillager->GetProfession());
 					mWriter.AddInt("ConversionTime", ZombieVillager->ConversionTime());
 					mWriter.AddInt("Age",            ZombieVillager->GetAge());
 					break;

@@ -101,17 +101,20 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor):
 		Writer.AddByte("raining", a_World->IsWeatherRain() ? 1 : 0);
 		Writer.AddByte("thundering", a_World->IsWeatherStorm() ? 1 : 0);
 		Writer.AddInt("GameType", static_cast<int>(a_World->GetGameMode()));
-		Writer.AddInt("generatorVersion", 1);
 		Writer.AddInt("SpawnX", a_World->GetSpawnX());
 		Writer.AddInt("SpawnY", a_World->GetSpawnY());
 		Writer.AddInt("SpawnZ", a_World->GetSpawnZ());
 		Writer.AddInt("version", 19133);
 		Writer.AddLong("DayTime", a_World->GetWorldDate().count());
 		Writer.AddLong("Time", a_World->GetWorldAge().count());
-		Writer.AddLong("SizeOnDisk", 0);
-		Writer.AddString("generatorName", "default");
-		Writer.AddString("generatorOptions", "");
 		Writer.AddString("LevelName", a_World->GetName());
+		Writer.AddInt("DataVersion", NamespaceSerializer::DataVersion());
+		Writer.BeginCompound("Version");
+			Writer.AddInt("Id", NamespaceSerializer::DataVersion());
+			Writer.AddString("Name", "1.21.4");
+			Writer.AddString("Series", "main");
+			Writer.AddByte("Snapshot", 0);
+		Writer.EndCompound();
 		Writer.EndCompound();
 		Writer.Finish();
 
@@ -2912,19 +2915,16 @@ void cWSSAnvil::LoadGuardianFromNBT(cEntityList & a_Entities, const cParsedNBT &
 
 void cWSSAnvil::LoadHorseFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	int TypeIdx  = a_NBT.FindChildByName(a_TagIdx, "Type");
-	int ColorIdx = a_NBT.FindChildByName(a_TagIdx, "Color");
-	int StyleIdx = a_NBT.FindChildByName(a_TagIdx, "Style");
-	if ((TypeIdx < 0) || (ColorIdx < 0) || (StyleIdx < 0))
+	int Variant = a_NBT.FindChildByName(a_TagIdx, "Variant");
+
+	if ((Variant < 0) )
 	{
 		return;
 	}
 
-	int Type = a_NBT.GetInt(TypeIdx);
-	int Color = a_NBT.GetInt(ColorIdx);
-	int Style = a_NBT.GetInt(StyleIdx);
+	int Type = a_NBT.GetInt(a_TagIdx);
 
-	std::unique_ptr<cHorse> Monster = std::make_unique<cHorse>(Type, Color, Style, 1);
+	std::unique_ptr<cHorse> Monster = std::make_unique<cHorse>(0, Type & 0xFF, Type >> 8, 1);
 
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
@@ -3553,15 +3553,8 @@ void cWSSAnvil::LoadVexFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT,
 
 void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "Profession");
-	if (TypeIdx < 0)
-	{
-		return;
-	}
-
-	int Type = a_NBT.GetInt(TypeIdx);
-
-	std::unique_ptr<cVillager> Monster = std::make_unique<cVillager>(cVillager::eVillagerType(Type));
+	
+	std::unique_ptr<cVillager> Monster = std::make_unique<cVillager>(cVillager::eVillagerType(0));
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;
@@ -3845,15 +3838,7 @@ void cWSSAnvil::LoadZombifiedPiglinFromNBT(cEntityList & a_Entities, const cPars
 
 void cWSSAnvil::LoadZombieVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	int ProfessionIdx = a_NBT.FindChildByName(a_TagIdx, "Profession");
-	if (ProfessionIdx < 0)
-	{
-		return;
-	}
-
-	cVillager::eVillagerType Profession = static_cast<cVillager::eVillagerType>(a_NBT.GetInt(ProfessionIdx));
-
-	std::unique_ptr<cZombieVillager> Monster = std::make_unique<cZombieVillager>(Profession);
+	std::unique_ptr<cZombieVillager> Monster = std::make_unique<cZombieVillager>(cVillager::eVillagerType::vtGeneric);
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{
 		return;

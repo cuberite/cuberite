@@ -10,7 +10,7 @@
 
 unsigned NamespaceSerializer::DataVersion()
 {
-	return 3953;
+	return 4189;
 }
 
 
