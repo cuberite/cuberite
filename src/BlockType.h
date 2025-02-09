@@ -8,7 +8,7 @@
 
 enum ENUM_BLOCK_TYPE  // : unsigned char
 {
-	/*
+
 	E_BLOCK_AIR = 0,
 	E_BLOCK_STONE = 1,
 	E_BLOCK_GRASS = 2,
@@ -287,9 +287,7 @@ enum ENUM_BLOCK_TYPE  // : unsigned char
 	E_BLOCK_RED_ROSE = E_BLOCK_FLOWER,
 	E_BLOCK_WOODEN_DOOR = E_BLOCK_OAK_DOOR,
 	E_BLOCK_FENCE_GATE = E_BLOCK_OAK_FENCE_GATE,
-	E_BLOCK_WOODEN_STAIRS = E_BLOCK_OAK_WOOD_STAIRS
-	*/
-	E_BLOCK_MAX_TYPE_ID = 252  // Temp here so deprecated bindings compile
+	E_BLOCK_WOODEN_STAIRS = E_BLOCK_OAK_WOOD_STAIRS,
 };
 
 
@@ -663,7 +661,6 @@ enum ENUM_BLOCK_META
 	////////////////////////////////////////////////////////////////////////////////
 	// Block metas:
 
-	/*
 
 	// E_BLOCK_ANVIL metas
 	E_BLOCK_ANVIL_Z = 0,
@@ -1134,8 +1131,6 @@ enum ENUM_BLOCK_META
 	E_META_WOOL_GREEN      = 13,
 	E_META_WOOL_RED        = 14,
 	E_META_WOOL_BLACK      = 15,
-
-	*/
 };
 
 
@@ -1151,7 +1146,6 @@ enum ENUM_ITEM_META : short
 	// Item metas:
 
 
-	/*
 
 	// E_ITEM_BANNER metas:
 	E_META_BANNER_BLACK      = 0,
@@ -1278,8 +1272,6 @@ enum ENUM_ITEM_META : short
 	E_META_SPAWN_EGG_IRON_GOLEM       = 99,
 	E_META_SPAWN_EGG_HORSE            = 100,
 	E_META_SPAWN_EGG_RABBIT           = 101,
-
-	*/
 } ;
 
 

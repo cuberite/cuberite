@@ -234,7 +234,15 @@ namespace RedstoneWireHandler
 		}
 
 		const auto & Data = DataForChunk(a_Chunk);
-		const auto Block = Data.WireStates.find(a_Position)->second;
+		const auto find_pos = Data.WireStates.find(a_Position);
+
+
+		if (find_pos == Data.WireStates.end())
+		{
+			LOGERROR("Cant find Redstone wire in WireStates");
+			return 0;
+		}
+		const auto Block = find_pos->second;
 
 		DoWithDirectionState(QueryOffset, Block, [a_QueryBlock, &Power](const auto Left, const auto Front, const auto Right)
 		{

@@ -440,33 +440,6 @@ void cProtocol_1_21::HandlePacketUseItem(cByteBuffer & a_ByteBuffer)
 
 
 
-UInt32 cProtocol_1_21::GetProtocolBlockType(BlockState a_Block) const
-{
-	return Palette_1_21::From(a_Block);
-}
-
-
-
-
-
-UInt32 cProtocol_1_21::GetProtocolItemType(Item a_ItemID) const
-{
-	return Palette_1_21::From(a_ItemID);
-}
-
-
-
-
-
-Item cProtocol_1_21::GetItemFromProtocolID(UInt32 a_ProtocolID) const
-{
-	return Palette_1_21::ToItem(a_ProtocolID);
-}
-
-
-
-
-
 UInt32 cProtocol_1_21::GetProtocolSoundID(const AString & a_SoundName) const
 {
 	return Palette_1_21::FromSound(a_SoundName);
@@ -478,33 +451,6 @@ UInt32 cProtocol_1_21::GetProtocolSoundID(const AString & a_SoundName) const
 cProtocol::Version cProtocol_1_21_2::GetProtocolVersion() const
 {
 	return Version::v1_21_2;
-}
-
-
-
-
-
-UInt32 cProtocol_1_21_2::GetProtocolBlockType(BlockState a_Block) const
-{
-	return 0;
-}
-
-
-
-
-
-UInt32 cProtocol_1_21_2::GetProtocolItemType(Item a_ItemID) const
-{
-	return 0;
-}
-
-
-
-
-
-Item cProtocol_1_21_2::GetItemFromProtocolID(UInt32 a_ProtocolID) const
-{
-	return Item::Air;
 }
 
 
@@ -2014,15 +1960,6 @@ UInt8 cProtocol_1_21_4::GetProtocolEntityType(eEntityType a_Type) const
 
 
 
-UInt32 cProtocol_1_21_4::GetProtocolItemType(Item a_ItemID) const
-{
-	return Palette_1_21_4::From(a_ItemID);
-}
-
-
-
-
-
 UInt8 cProtocol_1_21_4::GetEntityMetadataID(EntityMetadata a_Metadata) const
 {
 	switch (a_Metadata)
@@ -2271,24 +2208,6 @@ void cProtocol_1_21_4::HandlePacketVehicleMove(cByteBuffer & a_ByteBuffer)
 		Vehicle->SetPitch(pitch);
 		Vehicle->SetOnGround(OnGround);
 	}
-}
-
-
-
-
-
-UInt32 cProtocol_1_21_4::GetProtocolBlockType(BlockState a_Block) const
-{
-	return Palette_1_21_4::From(a_Block);
-}
-
-
-
-
-
-Item cProtocol_1_21_4::GetItemFromProtocolID(UInt32 a_ProtocolID) const
-{
-	return Palette_1_21_4::ToItem(a_ProtocolID);
 }
 
 

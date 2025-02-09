@@ -21,6 +21,8 @@ public:
 		UInt32 GetProtocolBlockId(cProtocol::Version a_target, BlockState a_block);
 		const BlockTypePalette & GetPalette(cProtocol::Version a_target) const;
 
+		void LoadAll();
+
 		bool IsVersionLoaded(cProtocol::Version a_Version) const
 		{
 			return m_PerVersionMap.count(a_Version) != 0;

@@ -683,24 +683,6 @@ UInt8 cProtocol_1_14::GetEntityMetadataID(EntityMetadata a_Metadata) const
 
 
 
-Item cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolID) const
-{
-	return Palette_1_14::ToItem(a_ProtocolID);
-}
-
-
-
-
-
-UInt32 cProtocol_1_14::GetProtocolBlockType(BlockState a_Block) const
-{
-	return Palette_1_14::From(a_Block);
-}
-
-
-
-
-
 signed char cProtocol_1_14::GetProtocolEntityStatus(EntityAnimation a_Animation) const
 {
 	switch (a_Animation)
@@ -823,15 +805,6 @@ UInt8 cProtocol_1_14::GetProtocolEntityType(eEntityType a_Type) const
 		case Type::etPainting: break;
 	}
 	UNREACHABLE("Unhandled entity kind");
-}
-
-
-
-
-
-UInt32 cProtocol_1_14::GetProtocolItemType(Item a_ItemID) const
-{
-	return Palette_1_14::From(a_ItemID);
 }
 
 

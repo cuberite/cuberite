@@ -43,10 +43,6 @@ protected:
 	virtual int     GetProtocolParticleID(const AString & a_ParticleName) const override;
 	virtual UInt8   GetProtocolEntityType(eEntityType a_Type) const override;
 	virtual Int32   GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const override;
-	virtual UInt32  GetProtocolBlockType(BlockState a_Block) const override;
-	virtual UInt32  GetProtocolItemType(Item a_ItemID) const override;
-	virtual Item    GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
-
 
 	virtual Version GetProtocolVersion() const override;
 };

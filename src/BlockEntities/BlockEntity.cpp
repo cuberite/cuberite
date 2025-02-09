@@ -138,7 +138,6 @@ OwnedBlockEntity cBlockEntity::CreateByBlockType(BlockState a_Block, const Vecto
 		case BlockType::EnchantingTable: return std::make_unique<cEnchantingTableEntity>(a_Block, a_Pos, a_World);
 		case BlockType::EnderChest:      return std::make_unique<cEnderChestEntity>     (a_Block, a_Pos, a_World);
 		case BlockType::EndPortal:       return std::make_unique<cEndPortalEntity>      (a_Block, a_Pos, a_World);
-		case BlockType::FlowerPot:       return std::make_unique<cFlowerPotEntity>      (a_Block, a_Pos, a_World);
 		case BlockType::Furnace:         return std::make_unique<cFurnaceEntity>        (a_Block, a_Pos, a_World);
 
 		case BlockType::CreeperHead:
@@ -159,37 +158,6 @@ OwnedBlockEntity cBlockEntity::CreateByBlockType(BlockState a_Block, const Vecto
 		case BlockType::Hopper:          return std::make_unique<cHopperEntity>    (a_Block, a_Pos, a_World);
 		case BlockType::Jukebox:         return std::make_unique<cJukeboxEntity>   (a_Block, a_Pos, a_World);
 		case BlockType::Spawner:         return std::make_unique<cMobSpawnerEntity>(a_Block, a_Pos, a_World);
-		case BlockType::NoteBlock:       return std::make_unique<cNoteEntity>      (a_Block, a_Pos, a_World);
-
-		case BlockType::PottedAcaciaSapling:
-		case BlockType::PottedAzureBluet:
-		case BlockType::PottedBamboo:
-		case BlockType::PottedBirchSapling:
-		case BlockType::PottedBlueOrchid:
-		case BlockType::PottedBrownMushroom:
-		case BlockType::PottedCactus:
-		case BlockType::PottedCornflower:
-		case BlockType::PottedCrimsonRoots:
-		case BlockType::PottedCrimsonFungus:
-		case BlockType::PottedDandelion:
-		case BlockType::PottedDarkOakSapling:
-		case BlockType::PottedDeadBush:
-		case BlockType::PottedFern:
-		case BlockType::PottedJungleSapling:
-		case BlockType::PottedLilyOfTheValley:
-		case BlockType::PottedOakSapling:
-		case BlockType::PottedOrangeTulip:
-		case BlockType::PottedOxeyeDaisy:
-		case BlockType::PottedPinkTulip:
-		case BlockType::PottedPoppy:
-		case BlockType::PottedRedMushroom:
-		case BlockType::PottedRedTulip:
-		case BlockType::PottedSpruceSapling:
-		case BlockType::PottedWarpedFungus:
-		case BlockType::PottedWarpedRoots:
-		case BlockType::PottedWhiteTulip:
-		case BlockType::PottedWitherRose:
-		case BlockType::PottedAllium:       return std::make_unique<cFlowerPotEntity>(a_Block, a_Pos, a_World);
 
 		case BlockType::AcaciaSign:
 		case BlockType::AcaciaWallSign:
@@ -301,7 +269,6 @@ bool cBlockEntity::IsBlockEntityBlockType(const BlockState a_Block)
 		case BlockType::EnchantingTable:
 		case BlockType::EnderChest:
 		case BlockType::EndPortal:
-		case BlockType::FlowerPot:
 		case BlockType::Furnace:
 
 		case BlockType::CreeperHead:
@@ -319,37 +286,6 @@ bool cBlockEntity::IsBlockEntityBlockType(const BlockState a_Block)
 
 		case BlockType::Hopper:
 		case BlockType::Jukebox:
-		case BlockType::NoteBlock:
-
-		case BlockType::PottedAcaciaSapling:
-		case BlockType::PottedAzureBluet:
-		case BlockType::PottedBamboo:
-		case BlockType::PottedBirchSapling:
-		case BlockType::PottedBlueOrchid:
-		case BlockType::PottedBrownMushroom:
-		case BlockType::PottedCactus:
-		case BlockType::PottedCornflower:
-		case BlockType::PottedCrimsonRoots:
-		case BlockType::PottedCrimsonFungus:
-		case BlockType::PottedDandelion:
-		case BlockType::PottedDarkOakSapling:
-		case BlockType::PottedDeadBush:
-		case BlockType::PottedFern:
-		case BlockType::PottedJungleSapling:
-		case BlockType::PottedLilyOfTheValley:
-		case BlockType::PottedOakSapling:
-		case BlockType::PottedOrangeTulip:
-		case BlockType::PottedOxeyeDaisy:
-		case BlockType::PottedPinkTulip:
-		case BlockType::PottedPoppy:
-		case BlockType::PottedRedMushroom:
-		case BlockType::PottedRedTulip:
-		case BlockType::PottedSpruceSapling:
-		case BlockType::PottedWarpedFungus:
-		case BlockType::PottedWarpedRoots:
-		case BlockType::PottedWhiteTulip:
-		case BlockType::PottedWitherRose:
-		case BlockType::PottedAllium:
 
 		case BlockType::AcaciaSign:
 		case BlockType::AcaciaWallSign:

@@ -8,6 +8,10 @@ namespace BlockMap
 {
 	void cBlockMap::AddVersion(cProtocol::Version a_Version)
 	{
+		if (a_Version < cProtocol::Version::v1_13)
+		{
+			return;
+		}
 		if (m_PerVersionMap.count(a_Version) != 0)
 		{
 			LOGWARNING(fmt::format(FMT_STRING("Tried to add version {} twice, ignoring"), cMultiVersionProtocol::GetVersionTextFromInt(a_Version)));
@@ -59,5 +63,23 @@ namespace BlockMap
 	const BlockTypePalette & cBlockMap::GetPalette(cProtocol::Version a_target) const
 	{
 		return m_PerVersionMap.at(a_target);
+	}
+
+
+
+
+
+	void cBlockMap::LoadAll()
+	{
+		using namespace std::filesystem;
+		auto dir = path("Protocol/");
+		directory_iterator end_itr(dir);
+		for (auto & version : end_itr)
+		{
+			if (version.is_directory())
+			{
+				AddVersion(cMultiVersionProtocol::GetVersionFromText(version.path().filename().string()));
+			}
+		}
 	}
 }

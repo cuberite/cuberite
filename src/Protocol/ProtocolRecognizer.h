@@ -25,6 +25,7 @@ public:
 
 	/** Translates protocol version number into protocol version text: 49 -> "1.4.4" */
 	static AString GetVersionTextFromInt(cProtocol::Version a_ProtocolVersion);
+	static cProtocol::Version GetVersionFromText(const AString & a_Version);
 
 	/** Returns if we contain a concrete protocol corresponding to the client's protocol version. */
 	bool VersionRecognitionSuccessful()

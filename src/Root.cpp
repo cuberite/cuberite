@@ -143,7 +143,11 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 
 	LOGD("Loading block palettes");
 	m_BlockMap = new BlockMap::cBlockMap();
-	m_BlockMap->AddVersion(cProtocol::Version::Latest);
+	m_BlockMap->LoadAll();
+
+	m_RegistriesMap = new RegistriesMap::cRegistryHandler();
+	m_RegistriesMap->LoadAll();
+
 
 	auto IniFile = std::make_unique<cIniFile>();
 	bool IsNewIniFile = !IniFile->ReadFile(m_SettingsFilename);
@@ -256,9 +260,10 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOGD("Stopping plugin manager...");
 	delete m_PluginManager; m_PluginManager = nullptr;
 
-	LOGD("Unloading block palettes and tags");
+	LOGD("Unloading block palettes, tags and registries");
 	delete m_BlockMap; m_BlockMap = nullptr;
 	delete m_TagManager; m_TagManager = nullptr;
+	delete m_RegistriesMap; m_RegistriesMap = nullptr;
 
 	LOG("Cleaning up...");
 	delete m_Server; m_Server = nullptr;

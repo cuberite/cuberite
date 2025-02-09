@@ -110,6 +110,67 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 
 
 
+cProtocol::Version cMultiVersionProtocol::GetVersionFromText(const AString & a_Version)
+{
+	using Ver = cProtocol::Version;
+	static const std::map<AString, Ver> version
+	{
+		{"1.8",    Ver::v1_8_0},
+		{"1.9",    Ver::v1_9_0},
+		{"1.9.1",  Ver::v1_9_1},
+		{"1.9.2",  Ver::v1_9_2},
+		{"1.9.4",  Ver::v1_9_4},
+		{"1.10",   Ver::v1_10_0},
+		{"1.11",   Ver::v1_11_0},
+		{"1.11.1", Ver::v1_11_1},
+		{"1.12",   Ver::v1_12},
+		{"1.12.1", Ver::v1_12_1},
+		{"1.12.2", Ver::v1_12_2},
+		{"1.13",   Ver::v1_13},
+		{"1.13.1", Ver::v1_13_1},
+		{"1.13.2", Ver::v1_13_2},
+		{"1.14",   Ver::v1_14},
+		{"1.14.1", Ver::v1_14_1},
+		{"1.14.2", Ver::v1_14_2},
+		{"1.14.3", Ver::v1_14_3},
+		{"1.14.4", Ver::v1_14_4},
+		{"1.15",   Ver::v1_15},
+		{"1.15.1", Ver::v1_15_1},
+		{"1.15.2", Ver::v1_15_2},
+		{"1.16",   Ver::v1_16},
+		{"1.16.1", Ver::v1_16_1},
+		{"1.16.2", Ver::v1_16_2},
+		{"1.16.3", Ver::v1_16_3},
+		{"1.16.4", Ver::v1_16_4},
+		{"1.17",   Ver::v1_17},
+		{"1.17.1", Ver::v1_17_1},
+		{"1.18",   Ver::v1_18},
+		{"1.18.2", Ver::v1_18_2},
+		{"1.19",   Ver::v1_19},
+		{"1.19.1", Ver::v1_19_1},
+		{"1.19.3", Ver::v1_19_3},
+		{"1.19.4", Ver::v1_19_4},
+		{"1.20",   Ver::v1_20},
+		{"1.20.2", Ver::v1_20_2},
+		{"1.20.3", Ver::v1_20_3},
+		{"1.20.5", Ver::v1_20_5},
+		{"1.21",   Ver::v1_21},
+		{"1.21.2", Ver::v1_21_2},
+		{"1.21.4", Ver::v1_21_4},
+	};
+	if (version.count(a_Version) == 0)
+	{
+		ASSERT(!"Unknown protocol version");
+		LOGWARN(fmt::format(FMT_STRING("Unknown protocol ({})"), a_Version));
+		return static_cast<Ver>(-1);
+	}
+	return version.at(a_Version);
+}
+
+
+
+
+
 void cMultiVersionProtocol::HandleIncomingDataInRecognitionStage(cClientHandle & a_Client, ContiguousByteBuffer & a_Data)
 {
 	// NOTE: If a new protocol is added or an old one is removed, adjust MCS_CLIENT_VERSIONS and MCS_PROTOCOL_VERSIONS macros in the header file

@@ -48,11 +48,8 @@ protected:
 
 	virtual UInt8 GetEntityMetadataID(EntityMetadata a_Metadata) const override;
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
-	virtual Item GetItemFromProtocolID(UInt32 a_ProtocolID) const override;
-	virtual UInt32 GetProtocolBlockType(BlockState a_Block) const override;
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
 	virtual UInt8 GetProtocolEntityType(eEntityType a_Type) const override;
-	virtual UInt32 GetProtocolItemType(Item a_ItemID) const override;
 	virtual int GetProtocolParticleID(const AString & a_ParticleName) const override;
 	virtual UInt32 GetProtocolStatisticType(CustomStatistic a_Statistic) const override;
 	virtual Version GetProtocolVersion() const override;

@@ -711,7 +711,7 @@ UInt8 cProtocol_1_13::GetEntityMetadataID(EntityMetadataType a_FieldType) const
 
 Item cProtocol_1_13::GetItemFromProtocolID(UInt32 a_ProtocolID) const
 {
-	return Palette_1_13::ToItem(a_ProtocolID);
+	return cRoot::Get()->GetRegistryMap()->ProtocolToItem(a_ProtocolID, GetProtocolVersion());
 }
 
 
@@ -787,7 +787,7 @@ UInt32 cProtocol_1_13::GetPacketID(ePacketType a_PacketType) const
 
 UInt32 cProtocol_1_13::GetProtocolBlockType(BlockState a_Block) const
 {
-	return Palette_1_13::From(a_Block);
+	return cRoot::Get()->GetBlockMap()->GetProtocolBlockId(GetProtocolVersion(), a_Block);
 }
 
 
@@ -809,7 +809,7 @@ signed char cProtocol_1_13::GetProtocolEntityStatus(const EntityAnimation a_Anim
 
 UInt32 cProtocol_1_13::GetProtocolItemType(Item a_ItemID) const
 {
-	return Palette_1_13::From(a_ItemID);
+	return cRoot::Get()->GetRegistryMap()->ItemToProtocol(a_ItemID, GetProtocolVersion());
 }
 
 
@@ -1861,33 +1861,6 @@ void cProtocol_1_13_1::SendBossBarUpdateFlags(UInt32 a_UniqueID, bool a_DarkenSk
 		}
 		Pkt.WriteBEUInt8(Flags);
 	}
-}
-
-
-
-
-
-Item cProtocol_1_13_1::GetItemFromProtocolID(UInt32 a_ProtocolID) const
-{
-	return Palette_1_13_1::ToItem(a_ProtocolID);
-}
-
-
-
-
-
-UInt32 cProtocol_1_13_1::GetProtocolBlockType(BlockState a_Block) const
-{
-	return Palette_1_13_1::From(a_Block);
-}
-
-
-
-
-
-UInt32 cProtocol_1_13_1::GetProtocolItemType(Item a_ItemID) const
-{
-	return Palette_1_13_1::From(a_ItemID);
 }
 
 

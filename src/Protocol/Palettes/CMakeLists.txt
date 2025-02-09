@@ -26,4 +26,6 @@ target_sources(
 	Palette_1_21_4.h
 	Upgrade.h
 	BlockMap.h
+
+	RegistriesMap.h
 )

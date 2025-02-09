@@ -353,33 +353,6 @@ void cProtocol_1_20::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEnt
 
 
 
-UInt32 cProtocol_1_20::GetProtocolBlockType(BlockState a_Block) const
-{
-	return Palette_1_20::From(a_Block);
-}
-
-
-
-
-
-UInt32 cProtocol_1_20::GetProtocolItemType(Item a_ItemID) const
-{
-	return Palette_1_20::From(a_ItemID);
-}
-
-
-
-
-
-Item cProtocol_1_20::GetItemFromProtocolID(UInt32 a_ProtocolID) const
-{
-	return Palette_1_20::ToItem(a_ProtocolID);
-}
-
-
-
-
-
 int cProtocol_1_20::GetProtocolParticleID(const AString & a_ParticleName) const
 {
 	static const std::unordered_map<AString, int> ParticleMap
