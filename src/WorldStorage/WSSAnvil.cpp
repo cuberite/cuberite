@@ -2917,7 +2917,7 @@ void cWSSAnvil::LoadHorseFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 {
 	int Variant = a_NBT.FindChildByName(a_TagIdx, "Variant");
 
-	if ((Variant < 0) )
+	if ((Variant < 0))
 	{
 		return;
 	}
@@ -3553,7 +3553,6 @@ void cWSSAnvil::LoadVexFromNBT(cEntityList &a_Entities, const cParsedNBT &a_NBT,
 
 void cWSSAnvil::LoadVillagerFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	
 	std::unique_ptr<cVillager> Monster = std::make_unique<cVillager>(cVillager::eVillagerType(0));
 	if (!LoadEntityBaseFromNBT(*Monster.get(), a_NBT, a_TagIdx))
 	{

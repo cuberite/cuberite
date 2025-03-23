@@ -79,7 +79,6 @@ public:
 protected:
 
 	virtual void SendSelectKnownPacks() override;
-	// virtual void SendDynamicRegistries() override;
 
 	virtual void SendTags(void) override;
 
@@ -90,5 +89,34 @@ protected:
 	virtual UInt8  GetProtocolEntityType(eEntityType a_Type) const override;
 	virtual UInt8  GetEntityMetadataID(EntityMetadata a_Metadata) const override;
 
+	virtual Version GetProtocolVersion() const override;
+};
+
+
+
+
+
+class cProtocol_1_21_5
+	: public cProtocol_1_21_4
+{
+	using Super = cProtocol_1_21_4;
+public:
+
+	using Super::Super;
+
+protected:
+
+	virtual void SendSelectKnownPacks() override;
+	virtual void SendExperienceOrb(const cExpOrb & a_ExpOrb) override;
+	virtual void SendDynamicRegistries() override;
+
+	virtual void SendTags(void) override;
+
+	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
+
+	// virtual UInt8  GetProtocolEntityType(eEntityType a_Type) const override;
+	// virtual UInt8  GetEntityMetadataID(EntityMetadata a_Metadata) const override;
+
+	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
 	virtual Version GetProtocolVersion() const override;
 };

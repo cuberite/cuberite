@@ -221,7 +221,9 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::BubbleCoralFan:                  return "bubble_coral_fan";
 		case BlockType::BubbleCoralWallFan:              return "bubble_coral_wall_fan";
 		case BlockType::BuddingAmethyst:                 return "budding_amethyst";
+		case BlockType::Bush:                            return "bush";
 		case BlockType::Cactus:                          return "cactus";
+		case BlockType::CactusFlower:                    return "cactus_flower";
 		case BlockType::Cake:                            return "cake";
 		case BlockType::Calcite:                         return "calcite";
 		case BlockType::CalibratedSculkSensor:           return "calibrated_sculk_sensor";
@@ -453,6 +455,7 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::FireCoralBlock:                  return "fire_coral_block";
 		case BlockType::FireCoralFan:                    return "fire_coral_fan";
 		case BlockType::FireCoralWallFan:                return "fire_coral_wall_fan";
+		case BlockType::FireflyBush:                     return "firefly_bush";
 		case BlockType::FletchingTable:                  return "fletching_table";
 		case BlockType::FlowerPot:                       return "flower_pot";
 		case BlockType::FloweringAzalea:                 return "flowering_azalea";
@@ -556,6 +559,7 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::LargeFern:                       return "large_fern";
 		case BlockType::Lava:                            return "lava";
 		case BlockType::LavaCauldron:                    return "lava_cauldron";
+		case BlockType::LeafLitter:                      return "leaf_litter";
 		case BlockType::Lectern:                         return "lectern";
 		case BlockType::Lever:                           return "lever";
 		case BlockType::Light:                           return "light";
@@ -938,6 +942,7 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::SeaLantern:                      return "sea_lantern";
 		case BlockType::SeaPickle:                       return "sea_pickle";
 		case BlockType::Seagrass:                        return "seagrass";
+		case BlockType::ShortDryGrass:                   return "short_dry_grass";
 		case BlockType::ShortGrass:                      return "short_grass";
 		case BlockType::Shroomlight:                     return "shroomlight";
 		case BlockType::ShulkerBox:                      return "shulker_box";
@@ -1031,10 +1036,13 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::SuspiciousGravel:                return "suspicious_gravel";
 		case BlockType::SuspiciousSand:                  return "suspicious_sand";
 		case BlockType::SweetBerryBush:                  return "sweet_berry_bush";
+		case BlockType::TallDryGrass:                    return "tall_dry_grass";
 		case BlockType::TallGrass:                       return "tall_grass";
 		case BlockType::TallSeagrass:                    return "tall_seagrass";
 		case BlockType::Target:                          return "target";
 		case BlockType::Terracotta:                      return "terracotta";
+		case BlockType::TestBlock:                       return "test_block";
+		case BlockType::TestInstanceBlock:               return "test_instance_block";
 		case BlockType::TintedGlass:                     return "tinted_glass";
 		case BlockType::Tnt:                             return "tnt";
 		case BlockType::Torch:                           return "torch";
@@ -1149,6 +1157,7 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::WhiteTulip:                      return "white_tulip";
 		case BlockType::WhiteWallBanner:                 return "white_wall_banner";
 		case BlockType::WhiteWool:                       return "white_wool";
+		case BlockType::Wildflowers:                     return "wildflowers";
 		case BlockType::WitherRose:                      return "wither_rose";
 		case BlockType::WitherSkeletonSkull:             return "wither_skeleton_skull";
 		case BlockType::WitherSkeletonWallSkull:         return "wither_skeleton_wall_skull";
@@ -1515,6 +1524,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::BlueConcrete:                       return "blue_concrete";
 		case Item::BlueConcretePowder:                 return "blue_concrete_powder";
 		case Item::BlueDye:                            return "blue_dye";
+		case Item::BlueEgg:                            return "blue_egg";
 		case Item::BlueGlazedTerracotta:               return "blue_glazed_terracotta";
 		case Item::BlueIce:                            return "blue_ice";
 		case Item::BlueOrchid:                         return "blue_orchid";
@@ -1554,6 +1564,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::BrownConcrete:                      return "brown_concrete";
 		case Item::BrownConcretePowder:                return "brown_concrete_powder";
 		case Item::BrownDye:                           return "brown_dye";
+		case Item::BrownEgg:                           return "brown_egg";
 		case Item::BrownGlazedTerracotta:              return "brown_glazed_terracotta";
 		case Item::BrownMushroom:                      return "brown_mushroom";
 		case Item::BrownMushroomBlock:                 return "brown_mushroom_block";
@@ -1570,7 +1581,9 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::BuddingAmethyst:                    return "budding_amethyst";
 		case Item::Bundle:                             return "bundle";
 		case Item::BurnPotterySherd:                   return "burn_pottery_sherd";
+		case Item::Bush:                               return "bush";
 		case Item::Cactus:                             return "cactus";
+		case Item::CactusFlower:                       return "cactus_flower";
 		case Item::Cake:                               return "cake";
 		case Item::Calcite:                            return "calcite";
 		case Item::CalibratedSculkSensor:              return "calibrated_sculk_sensor";
@@ -1863,6 +1876,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::FireCoral:                          return "fire_coral";
 		case Item::FireCoralBlock:                     return "fire_coral_block";
 		case Item::FireCoralFan:                       return "fire_coral_fan";
+		case Item::FireflyBush:                        return "firefly_bush";
 		case Item::FireworkRocket:                     return "firework_rocket";
 		case Item::FireworkStar:                       return "firework_star";
 		case Item::FishingRod:                         return "fishing_rod";
@@ -2034,6 +2048,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::LargeFern:                          return "large_fern";
 		case Item::LavaBucket:                         return "lava_bucket";
 		case Item::Lead:                               return "lead";
+		case Item::LeafLitter:                         return "leaf_litter";
 		case Item::Leather:                            return "leather";
 		case Item::LeatherBoots:                       return "leather_boots";
 		case Item::LeatherChestplate:                  return "leather_chestplate";
@@ -2483,6 +2498,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::SheepSpawnEgg:                      return "sheep_spawn_egg";
 		case Item::ShelterPotterySherd:                return "shelter_pottery_sherd";
 		case Item::Shield:                             return "shield";
+		case Item::ShortDryGrass:                      return "short_dry_grass";
 		case Item::ShortGrass:                         return "short_grass";
 		case Item::Shroomlight:                        return "shroomlight";
 		case Item::ShulkerBox:                         return "shulker_box";
@@ -2608,9 +2624,12 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::SweetBerries:                       return "sweet_berries";
 		case Item::TadpoleBucket:                      return "tadpole_bucket";
 		case Item::TadpoleSpawnEgg:                    return "tadpole_spawn_egg";
+		case Item::TallDryGrass:                       return "tall_dry_grass";
 		case Item::TallGrass:                          return "tall_grass";
 		case Item::Target:                             return "target";
 		case Item::Terracotta:                         return "terracotta";
+		case Item::TestBlock:                          return "test_block";
+		case Item::TestInstanceBlock:                  return "test_instance_block";
 		case Item::TideArmorTrimSmithingTemplate:      return "tide_armor_trim_smithing_template";
 		case Item::TintedGlass:                        return "tinted_glass";
 		case Item::TippedArrow:                        return "tipped_arrow";
@@ -2740,6 +2759,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::WhiteTulip:                         return "white_tulip";
 		case Item::WhiteWool:                          return "white_wool";
 		case Item::WildArmorTrimSmithingTemplate:      return "wild_armor_trim_smithing_template";
+		case Item::Wildflowers:                        return "wildflowers";
 		case Item::WindCharge:                         return "wind_charge";
 		case Item::WitchSpawnEgg:                      return "witch_spawn_egg";
 		case Item::WitherRose:                         return "wither_rose";
@@ -3007,7 +3027,9 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "bubble_coral_fan",                  BlockType::BubbleCoralFan },
 		{ "bubble_coral_wall_fan",             BlockType::BubbleCoralWallFan },
 		{ "budding_amethyst",                  BlockType::BuddingAmethyst },
+		{ "bush",                              BlockType::Bush },
 		{ "cactus",                            BlockType::Cactus },
+		{ "cactus_flower",                     BlockType::CactusFlower },
 		{ "cake",                              BlockType::Cake },
 		{ "calcite",                           BlockType::Calcite },
 		{ "calibrated_sculk_sensor",           BlockType::CalibratedSculkSensor },
@@ -3239,6 +3261,7 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "fire_coral_block",                  BlockType::FireCoralBlock },
 		{ "fire_coral_fan",                    BlockType::FireCoralFan },
 		{ "fire_coral_wall_fan",               BlockType::FireCoralWallFan },
+		{ "firefly_bush",                      BlockType::FireflyBush },
 		{ "fletching_table",                   BlockType::FletchingTable },
 		{ "flower_pot",                        BlockType::FlowerPot },
 		{ "flowering_azalea",                  BlockType::FloweringAzalea },
@@ -3342,6 +3365,7 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "large_fern",                        BlockType::LargeFern },
 		{ "lava",                              BlockType::Lava },
 		{ "lava_cauldron",                     BlockType::LavaCauldron },
+		{ "leaf_litter",                       BlockType::LeafLitter },
 		{ "lectern",                           BlockType::Lectern },
 		{ "lever",                             BlockType::Lever },
 		{ "light",                             BlockType::Light },
@@ -3724,6 +3748,7 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "sea_lantern",                       BlockType::SeaLantern },
 		{ "sea_pickle",                        BlockType::SeaPickle },
 		{ "seagrass",                          BlockType::Seagrass },
+		{ "short_dry_grass",                   BlockType::ShortDryGrass },
 		{ "short_grass",                       BlockType::ShortGrass },
 		{ "shroomlight",                       BlockType::Shroomlight },
 		{ "shulker_box",                       BlockType::ShulkerBox },
@@ -3817,10 +3842,13 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "suspicious_gravel",                 BlockType::SuspiciousGravel },
 		{ "suspicious_sand",                   BlockType::SuspiciousSand },
 		{ "sweet_berry_bush",                  BlockType::SweetBerryBush },
+		{ "tall_dry_grass",                    BlockType::TallDryGrass },
 		{ "tall_grass",                        BlockType::TallGrass },
 		{ "tall_seagrass",                     BlockType::TallSeagrass },
 		{ "target",                            BlockType::Target },
 		{ "terracotta",                        BlockType::Terracotta },
+		{ "test_block",                        BlockType::TestBlock },
+		{ "test_instance_block",               BlockType::TestInstanceBlock },
 		{ "tinted_glass",                      BlockType::TintedGlass },
 		{ "tnt",                               BlockType::Tnt },
 		{ "torch",                             BlockType::Torch },
@@ -3935,6 +3963,7 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "white_tulip",                       BlockType::WhiteTulip },
 		{ "white_wall_banner",                 BlockType::WhiteWallBanner },
 		{ "white_wool",                        BlockType::WhiteWool },
+		{ "wildflowers",                       BlockType::Wildflowers },
 		{ "wither_rose",                       BlockType::WitherRose },
 		{ "wither_skeleton_skull",             BlockType::WitherSkeletonSkull },
 		{ "wither_skeleton_wall_skull",        BlockType::WitherSkeletonWallSkull },
@@ -4256,6 +4285,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "blue_concrete",                         Item::BlueConcrete },
 		{ "blue_concrete_powder",                  Item::BlueConcretePowder },
 		{ "blue_dye",                              Item::BlueDye },
+		{ "blue_egg",                              Item::BlueEgg },
 		{ "blue_glazed_terracotta",                Item::BlueGlazedTerracotta },
 		{ "blue_ice",                              Item::BlueIce },
 		{ "blue_orchid",                           Item::BlueOrchid },
@@ -4295,6 +4325,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "brown_concrete",                        Item::BrownConcrete },
 		{ "brown_concrete_powder",                 Item::BrownConcretePowder },
 		{ "brown_dye",                             Item::BrownDye },
+		{ "brown_egg",                             Item::BrownEgg },
 		{ "brown_glazed_terracotta",               Item::BrownGlazedTerracotta },
 		{ "brown_mushroom",                        Item::BrownMushroom },
 		{ "brown_mushroom_block",                  Item::BrownMushroomBlock },
@@ -4311,7 +4342,9 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "budding_amethyst",                      Item::BuddingAmethyst },
 		{ "bundle",                                Item::Bundle },
 		{ "burn_pottery_sherd",                    Item::BurnPotterySherd },
+		{ "bush",                                  Item::Bush },
 		{ "cactus",                                Item::Cactus },
+		{ "cactus_flower",                         Item::CactusFlower },
 		{ "cake",                                  Item::Cake },
 		{ "calcite",                               Item::Calcite },
 		{ "calibrated_sculk_sensor",               Item::CalibratedSculkSensor },
@@ -4604,6 +4637,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "fire_coral",                            Item::FireCoral },
 		{ "fire_coral_block",                      Item::FireCoralBlock },
 		{ "fire_coral_fan",                        Item::FireCoralFan },
+		{ "firefly_bush",                          Item::FireflyBush },
 		{ "firework_rocket",                       Item::FireworkRocket },
 		{ "firework_star",                         Item::FireworkStar },
 		{ "fishing_rod",                           Item::FishingRod },
@@ -4775,6 +4809,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "large_fern",                            Item::LargeFern },
 		{ "lava_bucket",                           Item::LavaBucket },
 		{ "lead",                                  Item::Lead },
+		{ "leaf_litter",                           Item::LeafLitter },
 		{ "leather",                               Item::Leather },
 		{ "leather_boots",                         Item::LeatherBoots },
 		{ "leather_chestplate",                    Item::LeatherChestplate },
@@ -5224,6 +5259,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "sheep_spawn_egg",                       Item::SheepSpawnEgg },
 		{ "shelter_pottery_sherd",                 Item::ShelterPotterySherd },
 		{ "shield",                                Item::Shield },
+		{ "short_dry_grass",                       Item::ShortDryGrass },
 		{ "short_grass",                           Item::ShortGrass },
 		{ "shroomlight",                           Item::Shroomlight },
 		{ "shulker_box",                           Item::ShulkerBox },
@@ -5349,9 +5385,12 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "sweet_berries",                         Item::SweetBerries },
 		{ "tadpole_bucket",                        Item::TadpoleBucket },
 		{ "tadpole_spawn_egg",                     Item::TadpoleSpawnEgg },
+		{ "tall_dry_grass",                        Item::TallDryGrass },
 		{ "tall_grass",                            Item::TallGrass },
 		{ "target",                                Item::Target },
 		{ "terracotta",                            Item::Terracotta },
+		{ "test_block",                            Item::TestBlock },
+		{ "test_instance_block",                   Item::TestInstanceBlock },
 		{ "tide_armor_trim_smithing_template",     Item::TideArmorTrimSmithingTemplate },
 		{ "tinted_glass",                          Item::TintedGlass },
 		{ "tipped_arrow",                          Item::TippedArrow },
@@ -5481,6 +5520,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "white_tulip",                           Item::WhiteTulip },
 		{ "white_wool",                            Item::WhiteWool },
 		{ "wild_armor_trim_smithing_template",     Item::WildArmorTrimSmithingTemplate },
+		{ "wildflowers",                           Item::Wildflowers },
 		{ "wind_charge",                           Item::WindCharge },
 		{ "witch_spawn_egg",                       Item::WitchSpawnEgg },
 		{ "wither_rose",                           Item::WitherRose },

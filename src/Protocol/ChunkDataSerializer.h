@@ -48,7 +48,8 @@ class cChunkDataSerializer
 		v767,
 		v768,
 		v769,
-		Last = CacheVersion::v769
+		v770,
+		Last = CacheVersion::v770
 	};
 
 	/** A single cache entry containing the raw data, compressed data, and a validity flag. */
@@ -93,6 +94,8 @@ private:
 	inline void Serialize763(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, UInt32 a_packet_id);
 	template <auto Palette>
 	inline void Serialize764(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const std::vector<cBlockEntity *> & a_BlockEntities, const ClientHandles::value_type & a_Client, const cChunkDef::HeightMap & a_SurfaceHeightMap, UInt32 a_packet_id);
+	template <auto Palette>
+	inline void Serialize770(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const std::vector<cBlockEntity *> & a_BlockEntities, const ClientHandles::value_type & a_Client, const cChunkDef::HeightMap & a_SurfaceHeightMap, UInt32 a_packet_id);
 
 	template <auto Palette>
 	inline void WriteBlockSectionSeamless2(const ChunkBlockData::BlockArray * a_Blocks, const UInt8 a_BitsPerEntry, bool padding);

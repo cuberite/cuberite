@@ -407,7 +407,8 @@ void cCompositeChat::WriteAsNBT(cFastNBTWriter & a_Writer, bool a_ShouldUseChatP
 				a_Writer.AddString("text", a_Part.Text);
 				a_Writer.BeginCompound("click_event");
 				a_Writer.AddString("action", "open_url");
-				a_Writer.AddString("value", a_Part.Url);
+				a_Writer.AddString("value", a_Part.Url);  // kept for backward compatibility
+				a_Writer.AddString("url", a_Part.Url);  // added in 1.21.5
 				a_Writer.EndCompound();
 				AddChatPartStyle(a_Writer, a_Part.Style);
 			},
@@ -416,7 +417,8 @@ void cCompositeChat::WriteAsNBT(cFastNBTWriter & a_Writer, bool a_ShouldUseChatP
 				a_Writer.AddString("text", a_Part.Text);
 				a_Writer.BeginCompound("click_event");
 				a_Writer.AddString("action", "run_command");
-				a_Writer.AddString("value", a_Part.Command);
+				a_Writer.AddString("value", a_Part.Command);  // same as url
+				a_Writer.AddString("command", a_Part.Command);
 				a_Writer.EndCompound();
 				AddChatPartStyle(a_Writer, a_Part.Style);
 			},
@@ -425,7 +427,8 @@ void cCompositeChat::WriteAsNBT(cFastNBTWriter & a_Writer, bool a_ShouldUseChatP
 				a_Writer.AddString("text", a_Part.Text);
 				a_Writer.BeginCompound("click_event");
 				a_Writer.AddString("action", "suggest_command");
-				a_Writer.AddString("value", a_Part.Command);
+				a_Writer.AddString("value", a_Part.Command);  // same as url
+				a_Writer.AddString("command", a_Part.Command);
 				a_Writer.EndCompound();
 				AddChatPartStyle(a_Writer, a_Part.Style);
 			},
