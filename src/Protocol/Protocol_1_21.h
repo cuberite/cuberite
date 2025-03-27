@@ -114,8 +114,8 @@ protected:
 
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
 
-	// virtual UInt8  GetProtocolEntityType(eEntityType a_Type) const override;
-	// virtual UInt8  GetEntityMetadataID(EntityMetadata a_Metadata) const override;
+	virtual UInt8  GetProtocolEntityType(eEntityType a_Type) const override;
+	virtual UInt8  GetEntityMetadataID(EntityMetadata a_Metadata) const override;
 
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
 	virtual Version GetProtocolVersion() const override;

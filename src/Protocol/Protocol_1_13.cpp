@@ -1188,15 +1188,12 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			const cItem & MinecartContent = RideableMinecart.GetContent();
 			if (!MinecartContent.IsEmpty())
 			{
-				WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractMinecartCustomBlockId, EntityMetadataType::VarInt);
+				WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractMinecartCustomBlockState, EntityMetadataType::VarInt);
 				auto block = BlockState::BlockState(BlockItemConverter::FromItem(MinecartContent.m_ItemType));
 				a_Pkt.WriteVarInt32(static_cast<UInt32>(GetProtocolBlockType(block)));
 
-				WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractMinecartCustomBlockOffset, EntityMetadataType::VarInt);
+				WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractMinecartBlockOffset, EntityMetadataType::VarInt);
 				a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
-
-				WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractMinecartCustomBlockPresent, EntityMetadataType::Boolean);
-				a_Pkt.WriteBool(true);
 			}
 
 			break;
@@ -1498,8 +1495,9 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			WriteEntityMetadata(a_Pkt, EntityMetadata::PassiveChild, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Pig.IsBaby());
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::PigSaddled, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Pig.IsSaddled());
+			// TODO: fix
+			//  WriteEntityMetadata(a_Pkt, EntityMetadata::PigSaddled, EntityMetadataType::Boolean);
+			//  a_Pkt.WriteBool(Pig.IsSaddled());
 
 			// PIG_TOTAL_CARROT_ON_A_STICK_BOOST in 1.11.1 only
 			break;
@@ -1515,7 +1513,7 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			WriteEntityMetadata(a_Pkt, EntityMetadata::PassiveChild, EntityMetadataType::Boolean);
 			a_Pkt.WriteBool(Rabbit.IsBaby());
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::RabbitRabbitType, EntityMetadataType::VarInt);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::RabbitVariant, EntityMetadataType::VarInt);
 			a_Pkt.WriteVarInt32(static_cast<UInt32>(Rabbit.GetRabbitType()));
 			break;
 		}  // case mtRabbit

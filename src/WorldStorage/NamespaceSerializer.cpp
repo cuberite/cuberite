@@ -5794,7 +5794,7 @@ eEntityType NamespaceSerializer::ToEntityType(const std::string_view a_ID)
 		{ "chest_minecart",        etChestMinecart },
 		{ "chicken",               etChicken },
 		{ "cod",                   etCod },
-		{ "command_block_minecart",etCommandBlockMinecart },
+		{ "command_block_minecart", etCommandBlockMinecart },
 		{ "cow",                   etCow },
 		{ "creaking",              etCreaking },
 		{ "creeper",               etCreeper },

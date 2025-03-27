@@ -85,6 +85,7 @@ enum eEntityType
 	etJungleChestBoat,
 	etLeashKnot,
 	etLightningBolt,
+	etLingeringPotion,
 	etLlama,
 	etLlamaSpit,
 	etMagmaCube,
@@ -110,7 +111,6 @@ enum eEntityType
 	etPillager,
 	etPlayer,
 	etPolarBear,
-	etPotion,
 	etPufferfish,
 	etRabbit,
 	etRavager,
@@ -129,6 +129,7 @@ enum eEntityType
 	etSpawnerMinecart,
 	etSpectralArrow,
 	etSpider,
+	etSplashPotion,
 	etSpruceBoat,
 	etSpruceChestBoat,
 	etSquid,
@@ -158,5 +159,8 @@ enum eEntityType
 	etZombieHorse,
 	etZombieVillager,
 	etZombifiedPiglin,
+
+	// Compatibility with older versions
+	etPotion = etSplashPotion
 } ;
 // tolua_end
