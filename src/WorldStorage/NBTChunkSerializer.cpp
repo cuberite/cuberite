@@ -805,7 +805,7 @@ public:
 	void AddFallingBlockEntity(cFallingBlock * a_FallingBlock)
 	{
 		mWriter.BeginCompound("");
-			AddBasicEntity(a_FallingBlock, "FallingSand");
+			AddBasicEntity(a_FallingBlock, "falling_block");
 			auto BlockData = PaletteUpgrade::ToBlock(a_FallingBlock->GetBlock());
 			mWriter.AddInt("TileID", BlockData.first);
 			mWriter.AddByte("Data", static_cast<unsigned char>(BlockData.second));
