@@ -4,7 +4,7 @@ find_package(Threads REQUIRED)
 # Set include paths to the used libraries:
 include_directories(SYSTEM "../../lib")
 include_directories("../../src")
-
+include_directories(${PROJECT_SOURCE_DIR}/lib/mbedtls/include)
 
 function(flatten_files arg1)
 	set(res "")
@@ -77,7 +77,7 @@ add_executable(GrownBiomeGenVisualiser
 	${SHARED_OSS_HDR}
 )
 
-target_link_libraries(GrownBiomeGenVisualiser fmt::fmt Threads::Threads)
+target_link_libraries(GrownBiomeGenVisualiser fmt::fmt Threads::Threads mbedtls)
 set_target_properties(GrownBiomeGenVisualiser PROPERTIES FOLDER Tools)
 
 include(../../SetFlags.cmake)

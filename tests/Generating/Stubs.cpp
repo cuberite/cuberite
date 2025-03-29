@@ -269,15 +269,6 @@ bool cLuaState::GetStackValue(int, cUUID *&)
 
 
 
-bool cUUID::FromString(const AString&)
-{
-	return false;
-}
-
-
-
-
-
 void cEntity::SetPosition(const Vector3d & a_Position)
 {
 }
@@ -294,7 +285,7 @@ void cEntity::SetHealth(float a_NewHealth)
 
 
 
-cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
+cMonster::eFamily cMonster::FamilyFromType(eEntityType a_Type)
 {
 	return cMonster::mfAmbient;
 }
@@ -303,7 +294,7 @@ cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
 
 
 
-std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_Type)
+std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eEntityType a_Type)
 {
 	return nullptr;
 }
@@ -347,7 +338,7 @@ void cItemGrid::GenerateRandomLootWithBooks(const cLootProbab * a_LootProbabs, s
 
 
 
-std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
+std::set<eEntityType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 {
 	return {};
 }
@@ -388,7 +379,7 @@ void cItem::Empty()
 
 
 cEnderCrystal::cEnderCrystal(Vector3d a_Pos, bool a_ShowBottom):
-	Super(etEnderCrystal, a_Pos, 1.0, 1.0)
+	Super(eEntityType::etEndCrystal, a_Pos, 1.0, 1.0)
 {
 }
 
@@ -422,7 +413,7 @@ void cEnderCrystal::KilledBy(struct TakeDamageInfo & a_TakeDamageInfo)
 
 
 
-cEntity::cEntity(enum cEntity::eEntityType a_EntityType, class Vector3<double> a_Pos, float a_Height, float a_Width)
+cEntity::cEntity(enum eEntityType a_EntityType, class Vector3<double> a_Pos, float a_Height, float a_Width)
 {
 }
 
@@ -775,8 +766,8 @@ void cEntity::OnDetach()
 
 
 
-cPawn::cPawn(enum cEntity::eEntityType, float a_Width, float a_Height) :
-	cEntity(etMonster, Vector3d(), a_Height, a_Width)
+cPawn::cPawn(enum eEntityType a_Type, float a_Width, float a_Height) :
+	cEntity(a_Type, Vector3d(), a_Height, a_Width)
 {
 }
 
@@ -847,8 +838,8 @@ void cPawn::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 
 
-cMonster::cMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, float a_Width, float a_Height) :
-	cPawn(etMonster, a_Width, a_Height),
+cMonster::cMonster(const AString & a_StringA, enum eEntityType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, float a_Width, float a_Height) :
+	cPawn(a_MonsterType, a_Width, a_Height),
 	m_PathFinder(a_Width, a_Height)
 {
 }
@@ -996,7 +987,7 @@ void cMonster::InStateEscaping(std::chrono::milliseconds a_Dt ,class cChunk & a_
 
 
 
-cAggressiveMonster::cAggressiveMonster(const AString & a_StringA, enum eMonsterType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, float a_Width, float a_Height) :
+cAggressiveMonster::cAggressiveMonster(const AString & a_StringA, enum eEntityType a_MonsterType, const AString & a_StringB, const AString & a_StringC, const AString & a_StringD, float a_Width, float a_Height) :
 	cMonster(a_StringA, a_MonsterType, a_StringB, a_StringC, a_StringD, a_Width, a_Height)
 {
 }

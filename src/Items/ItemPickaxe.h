@@ -303,7 +303,6 @@ public:
 				case Item::GoldenPickaxe:  return 12.0f;
 				case Item::DiamondPickaxe: return 8.0f;
 				case Item::NetheritePickaxe: return 9.0f;
-				default: return 0.0f;
 			}
 		}
 		ASSERT(!"Something is wrong here... Maybe they are pickaxes out of a new material?");

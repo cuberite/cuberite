@@ -156,7 +156,9 @@ BlockState::BlockState(BlockType a_Type) : ID([&]
 		case BlockType::BubbleCoralFan:                  return BubbleCoralFan::BubbleCoralFan().ID;
 		case BlockType::BubbleCoralWallFan:              return BubbleCoralWallFan::BubbleCoralWallFan().ID;
 		case BlockType::BuddingAmethyst:                 return BuddingAmethyst::BuddingAmethyst().ID;
+		case BlockType::Bush:                            return Bush::Bush().ID;
 		case BlockType::Cactus:                          return Cactus::Cactus().ID;
+		case BlockType::CactusFlower:                    return CactusFlower::CactusFlower().ID;
 		case BlockType::Cake:                            return Cake::Cake().ID;
 		case BlockType::Calcite:                         return Calcite::Calcite().ID;
 		case BlockType::CalibratedSculkSensor:           return CalibratedSculkSensor::CalibratedSculkSensor().ID;
@@ -388,6 +390,7 @@ BlockState::BlockState(BlockType a_Type) : ID([&]
 		case BlockType::FireCoralBlock:                  return FireCoralBlock::FireCoralBlock().ID;
 		case BlockType::FireCoralFan:                    return FireCoralFan::FireCoralFan().ID;
 		case BlockType::FireCoralWallFan:                return FireCoralWallFan::FireCoralWallFan().ID;
+		case BlockType::FireflyBush:                     return FireflyBush::FireflyBush().ID;
 		case BlockType::FletchingTable:                  return FletchingTable::FletchingTable().ID;
 		case BlockType::FlowerPot:                       return FlowerPot::FlowerPot().ID;
 		case BlockType::FloweringAzalea:                 return FloweringAzalea::FloweringAzalea().ID;
@@ -491,6 +494,7 @@ BlockState::BlockState(BlockType a_Type) : ID([&]
 		case BlockType::LargeFern:                       return LargeFern::LargeFern().ID;
 		case BlockType::Lava:                            return Lava::Lava().ID;
 		case BlockType::LavaCauldron:                    return LavaCauldron::LavaCauldron().ID;
+		case BlockType::LeafLitter:                      return LeafLitter::LeafLitter().ID;
 		case BlockType::Lectern:                         return Lectern::Lectern().ID;
 		case BlockType::Lever:                           return Lever::Lever().ID;
 		case BlockType::Light:                           return Light::Light().ID;
@@ -873,6 +877,7 @@ BlockState::BlockState(BlockType a_Type) : ID([&]
 		case BlockType::SeaLantern:                      return SeaLantern::SeaLantern().ID;
 		case BlockType::SeaPickle:                       return SeaPickle::SeaPickle().ID;
 		case BlockType::Seagrass:                        return Seagrass::Seagrass().ID;
+		case BlockType::ShortDryGrass:                   return ShortDryGrass::ShortDryGrass().ID;
 		case BlockType::ShortGrass:                      return ShortGrass::ShortGrass().ID;
 		case BlockType::Shroomlight:                     return Shroomlight::Shroomlight().ID;
 		case BlockType::ShulkerBox:                      return ShulkerBox::ShulkerBox().ID;
@@ -966,10 +971,13 @@ BlockState::BlockState(BlockType a_Type) : ID([&]
 		case BlockType::SuspiciousGravel:                return SuspiciousGravel::SuspiciousGravel().ID;
 		case BlockType::SuspiciousSand:                  return SuspiciousSand::SuspiciousSand().ID;
 		case BlockType::SweetBerryBush:                  return SweetBerryBush::SweetBerryBush().ID;
+		case BlockType::TallDryGrass:                    return TallDryGrass::TallDryGrass().ID;
 		case BlockType::TallGrass:                       return TallGrass::TallGrass().ID;
 		case BlockType::TallSeagrass:                    return TallSeagrass::TallSeagrass().ID;
 		case BlockType::Target:                          return Target::Target().ID;
 		case BlockType::Terracotta:                      return Terracotta::Terracotta().ID;
+		case BlockType::TestBlock:                       return TestBlock::TestBlock().ID;
+		case BlockType::TestInstanceBlock:               return TestInstanceBlock::TestInstanceBlock().ID;
 		case BlockType::TintedGlass:                     return TintedGlass::TintedGlass().ID;
 		case BlockType::Tnt:                             return Tnt::Tnt().ID;
 		case BlockType::Torch:                           return Torch::Torch().ID;
@@ -1084,6 +1092,7 @@ BlockState::BlockState(BlockType a_Type) : ID([&]
 		case BlockType::WhiteTulip:                      return WhiteTulip::WhiteTulip().ID;
 		case BlockType::WhiteWallBanner:                 return WhiteWallBanner::WhiteWallBanner().ID;
 		case BlockType::WhiteWool:                       return WhiteWool::WhiteWool().ID;
+		case BlockType::Wildflowers:                     return Wildflowers::Wildflowers().ID;
 		case BlockType::WitherRose:                      return WitherRose::WitherRose().ID;
 		case BlockType::WitherSkeletonSkull:             return WitherSkeletonSkull::WitherSkeletonSkull().ID;
 		case BlockType::WitherSkeletonWallSkull:         return WitherSkeletonWallSkull::WitherSkeletonWallSkull().ID;

@@ -33,7 +33,7 @@ public:
 			for (auto itr = items.begin(), end = items.end(); itr != end; ++itr)
 			{
 				auto Item = NamespaceSerializer::ToItem(itr.name().substr(PrefixLength));
-				auto id = itr->get("protocol_id", Json::Value()).asInt();
+				auto id = itr->get("protocol_id", Json::Value()).asUInt();
 
 				m_ToProtocolItemMap[Item] = id;
 				m_ProtocolToItemMap[id] = Item;

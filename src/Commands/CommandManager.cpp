@@ -167,7 +167,7 @@ cCommandManager::cCommandNode::GetLiteralCommandNode(const AString & a_NodeName)
 {
 	for (auto & var : this->m_ChildrenNodes)
 	{
-		if ((var.m_Name.compare(a_NodeName) == 0) && (var.m_Type == eNodeType::Literal))
+		if ((var.m_Name == a_NodeName) && (var.m_Type == eNodeType::Literal))
 		{
 			return &var;
 		}

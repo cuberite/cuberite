@@ -426,7 +426,7 @@ public:
 		return (m_WorldChangeInfo.m_NewWorld != nullptr);
 	}
 
-	void SetOnGround(bool a_OnGround) { m_bOnGround = a_OnGround; };
+	void SetOnGround(bool a_OnGround) { m_bOnGround = a_OnGround; }
 
 	/** Updates clients of changes in the entity. */
 	virtual void BroadcastMovementUpdate(const cClientHandle * a_Exclude = nullptr);

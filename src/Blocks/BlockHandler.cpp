@@ -1293,6 +1293,16 @@ namespace
 	constexpr cDefaultBlockHandler                          BlockResinClumpHandler(BlockType::ResinClump);
 	constexpr cBlockLogHandler                              BlockStrippedPaleOakLogHandler(BlockType::StrippedPaleOakLog);
 	constexpr cDefaultBlockHandler                          BlockStrippedPaleOakWoodHandler(BlockType::StrippedPaleOakWood);
+	constexpr cDefaultBlockHandler                          BlockBushHandler(BlockType::Bush);
+	constexpr cDefaultBlockHandler                          BlockCactusFlowerHandler(BlockType::CactusFlower);
+	constexpr cDefaultBlockHandler                          BlockFireflyBushHandler(BlockType::FireflyBush);
+	constexpr cDefaultBlockHandler                          BlockLeafLitterHandler(BlockType::LeafLitter);
+	constexpr cDefaultBlockHandler                          BlockShortDryGrassHandler(BlockType::ShortDryGrass);
+	constexpr cDefaultBlockHandler                          BlockTallDryGrassHandler(BlockType::TallDryGrass);
+	constexpr cDefaultBlockHandler                          BlockTestBlockHandler(BlockType::TestBlock);
+	constexpr cDefaultBlockHandler                          BlockTestInstanceBlockHandler(BlockType::TestInstanceBlock);
+	constexpr cDefaultBlockHandler                          BlockWildflowersHandler(BlockType::Wildflowers);
+
 }
 
 
@@ -1628,7 +1638,9 @@ const cBlockHandler & cBlockHandler::For(BlockType a_BlockType)
 		case BlockType::BubbleCoralFan:                  return BlockBubbleCoralFanHandler;
 		case BlockType::BubbleCoralWallFan:              return BlockBubbleCoralWallFanHandler;
 		case BlockType::BuddingAmethyst:                 return BlockBuddingAmethystHandler;
+		case BlockType::Bush:                            return BlockBushHandler;
 		case BlockType::Cactus:                          return BlockCactusHandler;
+		case BlockType::CactusFlower:                    return BlockCactusFlowerHandler;
 		case BlockType::Cake:                            return BlockCakeHandler;
 		case BlockType::Calcite:                         return BlockCalciteHandler;
 		case BlockType::CalibratedSculkSensor:           return BlockCalibratedSculkSensorHandler;
@@ -1860,6 +1872,7 @@ const cBlockHandler & cBlockHandler::For(BlockType a_BlockType)
 		case BlockType::FireCoralBlock:                  return BlockFireCoralBlockHandler;
 		case BlockType::FireCoralFan:                    return BlockFireCoralFanHandler;
 		case BlockType::FireCoralWallFan:                return BlockFireCoralWallFanHandler;
+		case BlockType::FireflyBush:                     return BlockFireflyBushHandler;
 		case BlockType::FletchingTable:                  return BlockFletchingTableHandler;
 		case BlockType::FlowerPot:                       return BlockFlowerPotHandler;
 		case BlockType::FloweringAzalea:                 return BlockFloweringAzaleaHandler;
@@ -1963,6 +1976,7 @@ const cBlockHandler & cBlockHandler::For(BlockType a_BlockType)
 		case BlockType::LargeFern:                       return BlockLargeFernHandler;
 		case BlockType::Lava:                            return BlockLavaHandler;
 		case BlockType::LavaCauldron:                    return BlockLavaCauldronHandler;
+		case BlockType::LeafLitter:                      return BlockLeafLitterHandler;
 		case BlockType::Lectern:                         return BlockLecternHandler;
 		case BlockType::Lever:                           return BlockLeverHandler;
 		case BlockType::Light:                           return BlockLightHandler;
@@ -2345,6 +2359,7 @@ const cBlockHandler & cBlockHandler::For(BlockType a_BlockType)
 		case BlockType::SeaLantern:                      return BlockSeaLanternHandler;
 		case BlockType::SeaPickle:                       return BlockSeaPickleHandler;
 		case BlockType::Seagrass:                        return BlockSeagrassHandler;
+		case BlockType::ShortDryGrass:                   return BlockShortDryGrassHandler;
 		case BlockType::ShortGrass:                      return BlockShortGrassHandler;
 		case BlockType::Shroomlight:                     return BlockShroomlightHandler;
 		case BlockType::ShulkerBox:                      return BlockShulkerBoxHandler;
@@ -2438,10 +2453,13 @@ const cBlockHandler & cBlockHandler::For(BlockType a_BlockType)
 		case BlockType::SuspiciousGravel:                return BlockSuspiciousGravelHandler;
 		case BlockType::SuspiciousSand:                  return BlockSuspiciousSandHandler;
 		case BlockType::SweetBerryBush:                  return BlockSweetBerryBushHandler;
+		case BlockType::TallDryGrass:                    return BlockTallDryGrassHandler;
 		case BlockType::TallGrass:                       return BlockTallGrassHandler;
 		case BlockType::TallSeagrass:                    return BlockTallSeagrassHandler;
 		case BlockType::Target:                          return BlockTargetHandler;
 		case BlockType::Terracotta:                      return BlockTerracottaHandler;
+		case BlockType::TestBlock:                       return BlockTestBlockHandler;
+		case BlockType::TestInstanceBlock:               return BlockTestInstanceBlockHandler;
 		case BlockType::TintedGlass:                     return BlockTintedGlassHandler;
 		case BlockType::Tnt:                             return BlockTntHandler;
 		case BlockType::Torch:                           return BlockTorchHandler;
@@ -2556,6 +2574,7 @@ const cBlockHandler & cBlockHandler::For(BlockType a_BlockType)
 		case BlockType::WhiteTulip:                      return BlockWhiteTulipHandler;
 		case BlockType::WhiteWallBanner:                 return BlockWhiteWallBannerHandler;
 		case BlockType::WhiteWool:                       return BlockWhiteWoolHandler;
+		case BlockType::Wildflowers:                     return BlockWildflowersHandler;
 		case BlockType::WitherRose:                      return BlockWitherRoseHandler;
 		case BlockType::WitherSkeletonSkull:             return BlockWitherSkeletonSkullHandler;
 		case BlockType::WitherSkeletonWallSkull:         return BlockWitherSkeletonWallSkullHandler;

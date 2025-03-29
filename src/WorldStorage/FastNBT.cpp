@@ -5,6 +5,7 @@
 
 #include "Globals.h"
 #include "FastNBT.h"
+#include "ByteBuffer.h"
 
 
 

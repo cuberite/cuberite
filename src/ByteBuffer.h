@@ -54,7 +54,7 @@ public:
 	/** Returns the current data start index. For debugging purposes. */
 	size_t GetDataStart(void) const { return m_DataStart; }
 
-	size_t GetReadPos(void) const { return m_ReadPos; };
+	size_t GetReadPos(void) const { return m_ReadPos; }
 
 	/** Returns if the given value can fit in a protocol big-endian 8 bit integer. */
 	static bool CanBEInt8Represent(int a_Value);

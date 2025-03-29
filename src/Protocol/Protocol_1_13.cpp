@@ -38,7 +38,7 @@ Implements the 1.13 protocol classes:
 #include "Entities/FallingBlock.h"
 #include "Entities/Floater.h"
 #include "fmt/format.h"
-
+#include "BlockState.h"
 #include "Palettes/Palette_1_13.h"
 #include "Palettes/Palette_1_13_1.h"
 #include "Registries/BlockItemConverter.h"
@@ -1189,7 +1189,7 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			if (!MinecartContent.IsEmpty())
 			{
 				WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractMinecartCustomBlockState, EntityMetadataType::VarInt);
-				auto block = BlockState::BlockState(BlockItemConverter::FromItem(MinecartContent.m_ItemType));
+				auto block = BlockState(BlockItemConverter::FromItem(MinecartContent.m_ItemType));
 				a_Pkt.WriteVarInt32(static_cast<UInt32>(GetProtocolBlockType(block)));
 
 				WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractMinecartBlockOffset, EntityMetadataType::VarInt);
@@ -1582,7 +1582,7 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::MobMobFlags, EntityMetadataType::Byte);
-			a_Pkt.WriteBool(Witch.IsAngry() << 2);
+			a_Pkt.WriteBEInt8(static_cast<Int8>(Witch.IsAngry()) << 2);
 			break;
 		}  // case mtWitch
 

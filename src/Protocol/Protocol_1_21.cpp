@@ -1373,11 +1373,11 @@ void cProtocol_1_21_2::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 
 	float SidewaysVal = 0;
 	float ForwardVal = 0;
-	ForwardVal += Forward ? 1.0 : 0;
-	ForwardVal += Backward ? -1.0 : 0;
+	ForwardVal += Forward ? 1.0F : 0;
+	ForwardVal += Backward ? -1.0F : 0;
 
-	SidewaysVal += Left ? 1.0 : 0;
-	SidewaysVal += Right ? -1.0 : 0;
+	SidewaysVal += Left ? 1.0F : 0;
+	SidewaysVal += Right ? -1.0F : 0;
 	if (Sneak)
 	{
 		m_Client->HandleUnmount();

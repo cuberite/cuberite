@@ -182,7 +182,6 @@ public:
 					case Shape::NorthEast:
 					{
 						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
-						return a_Block;
 					}
 				}
 				break;
@@ -204,7 +203,6 @@ public:
 					case Shape::NorthEast:
 					{
 						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
-						return a_Block;
 					}
 				}
 				break;
@@ -226,7 +224,6 @@ public:
 					case Shape::NorthEast:
 					{
 						UNREACHABLE("Got unknown shape in cBlockRailHandler!");
-						return a_Block;
 					}
 				}
 				break;

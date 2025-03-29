@@ -136,7 +136,9 @@ namespace BlockItemConverter
 			case Item::BubbleCoralBlock:                   return BlockType::BubbleCoralBlock;
 			case Item::BubbleCoralFan:                     return BlockType::BubbleCoralFan;
 			case Item::BuddingAmethyst:                    return BlockType::BuddingAmethyst;
+			case Item::Bush:                               return BlockType::Bush;
 			case Item::Cactus:                             return BlockType::Cactus;
+			case Item::CactusFlower:                       return BlockType::CactusFlower;
 			case Item::Cake:                               return BlockType::Cake;
 			case Item::Calcite:                            return BlockType::Calcite;
 			case Item::CalibratedSculkSensor:              return BlockType::CalibratedSculkSensor;
@@ -343,6 +345,7 @@ namespace BlockItemConverter
 			case Item::FireCoral:                          return BlockType::FireCoral;
 			case Item::FireCoralBlock:                     return BlockType::FireCoralBlock;
 			case Item::FireCoralFan:                       return BlockType::FireCoralFan;
+			case Item::FireflyBush:                        return BlockType::FireflyBush;
 			case Item::FletchingTable:                     return BlockType::FletchingTable;
 			case Item::FlowerPot:                          return BlockType::FlowerPot;
 			case Item::FloweringAzalea:                    return BlockType::FloweringAzalea;
@@ -435,6 +438,7 @@ namespace BlockItemConverter
 			case Item::LapisOre:                           return BlockType::LapisOre;
 			case Item::LargeAmethystBud:                   return BlockType::LargeAmethystBud;
 			case Item::LargeFern:                          return BlockType::LargeFern;
+			case Item::LeafLitter:                         return BlockType::LeafLitter;
 			case Item::Lectern:                            return BlockType::Lectern;
 			case Item::Lever:                              return BlockType::Lever;
 			case Item::Light:                              return BlockType::Light;
@@ -745,6 +749,7 @@ namespace BlockItemConverter
 			case Item::SeaLantern:                         return BlockType::SeaLantern;
 			case Item::SeaPickle:                          return BlockType::SeaPickle;
 			case Item::Seagrass:                           return BlockType::Seagrass;
+			case Item::ShortDryGrass:                      return BlockType::ShortDryGrass;
 			case Item::ShortGrass:                         return BlockType::ShortGrass;
 			case Item::Shroomlight:                        return BlockType::Shroomlight;
 			case Item::ShulkerBox:                         return BlockType::ShulkerBox;
@@ -832,9 +837,12 @@ namespace BlockItemConverter
 			case Item::Sunflower:                          return BlockType::Sunflower;
 			case Item::SuspiciousGravel:                   return BlockType::SuspiciousGravel;
 			case Item::SuspiciousSand:                     return BlockType::SuspiciousSand;
+			case Item::TallDryGrass:                       return BlockType::TallDryGrass;
 			case Item::TallGrass:                          return BlockType::TallGrass;
 			case Item::Target:                             return BlockType::Target;
 			case Item::Terracotta:                         return BlockType::Terracotta;
+			case Item::TestBlock:                          return BlockType::TestBlock;
+			case Item::TestInstanceBlock:                  return BlockType::TestInstanceBlock;
 			case Item::TintedGlass:                        return BlockType::TintedGlass;
 			case Item::Tnt:                                return BlockType::Tnt;
 			case Item::Torch:                              return BlockType::Torch;
@@ -936,6 +944,7 @@ namespace BlockItemConverter
 			case Item::WhiteTerracotta:                    return BlockType::WhiteTerracotta;
 			case Item::WhiteTulip:                         return BlockType::WhiteTulip;
 			case Item::WhiteWool:                          return BlockType::WhiteWool;
+			case Item::Wildflowers:                        return BlockType::Wildflowers;
 			case Item::WitherRose:                         return BlockType::WitherRose;
 			case Item::WitherSkeletonSkull:                return BlockType::WitherSkeletonSkull;
 			case Item::YellowBanner:                       return BlockType::YellowBanner;
@@ -963,7 +972,7 @@ namespace BlockItemConverter
 	{
 		switch (a_Block)
 		{
-			case BlockType::AcaciaButton:                    return Item::AcaciaButton;
+						case BlockType::AcaciaButton:                    return Item::AcaciaButton;
 			case BlockType::AcaciaDoor:                      return Item::AcaciaDoor;
 			case BlockType::AcaciaFence:                     return Item::AcaciaFence;
 			case BlockType::AcaciaFenceGate:                 return Item::AcaciaFenceGate;
@@ -1091,7 +1100,9 @@ namespace BlockItemConverter
 			case BlockType::BubbleCoralBlock:                return Item::BubbleCoralBlock;
 			case BlockType::BubbleCoralFan:                  return Item::BubbleCoralFan;
 			case BlockType::BuddingAmethyst:                 return Item::BuddingAmethyst;
+			case BlockType::Bush:                            return Item::Bush;
 			case BlockType::Cactus:                          return Item::Cactus;
+			case BlockType::CactusFlower:                    return Item::CactusFlower;
 			case BlockType::Cake:                            return Item::Cake;
 			case BlockType::Calcite:                         return Item::Calcite;
 			case BlockType::CalibratedSculkSensor:           return Item::CalibratedSculkSensor;
@@ -1298,6 +1309,7 @@ namespace BlockItemConverter
 			case BlockType::FireCoral:                       return Item::FireCoral;
 			case BlockType::FireCoralBlock:                  return Item::FireCoralBlock;
 			case BlockType::FireCoralFan:                    return Item::FireCoralFan;
+			case BlockType::FireflyBush:                     return Item::FireflyBush;
 			case BlockType::FletchingTable:                  return Item::FletchingTable;
 			case BlockType::FlowerPot:                       return Item::FlowerPot;
 			case BlockType::FloweringAzalea:                 return Item::FloweringAzalea;
@@ -1390,6 +1402,7 @@ namespace BlockItemConverter
 			case BlockType::LapisOre:                        return Item::LapisOre;
 			case BlockType::LargeAmethystBud:                return Item::LargeAmethystBud;
 			case BlockType::LargeFern:                       return Item::LargeFern;
+			case BlockType::LeafLitter:                      return Item::LeafLitter;
 			case BlockType::Lectern:                         return Item::Lectern;
 			case BlockType::Lever:                           return Item::Lever;
 			case BlockType::Light:                           return Item::Light;
@@ -1700,6 +1713,7 @@ namespace BlockItemConverter
 			case BlockType::SeaLantern:                      return Item::SeaLantern;
 			case BlockType::SeaPickle:                       return Item::SeaPickle;
 			case BlockType::Seagrass:                        return Item::Seagrass;
+			case BlockType::ShortDryGrass:                   return Item::ShortDryGrass;
 			case BlockType::ShortGrass:                      return Item::ShortGrass;
 			case BlockType::Shroomlight:                     return Item::Shroomlight;
 			case BlockType::ShulkerBox:                      return Item::ShulkerBox;
@@ -1787,9 +1801,12 @@ namespace BlockItemConverter
 			case BlockType::Sunflower:                       return Item::Sunflower;
 			case BlockType::SuspiciousGravel:                return Item::SuspiciousGravel;
 			case BlockType::SuspiciousSand:                  return Item::SuspiciousSand;
+			case BlockType::TallDryGrass:                    return Item::TallDryGrass;
 			case BlockType::TallGrass:                       return Item::TallGrass;
 			case BlockType::Target:                          return Item::Target;
 			case BlockType::Terracotta:                      return Item::Terracotta;
+			case BlockType::TestBlock:                       return Item::TestBlock;
+			case BlockType::TestInstanceBlock:               return Item::TestInstanceBlock;
 			case BlockType::TintedGlass:                     return Item::TintedGlass;
 			case BlockType::Tnt:                             return Item::Tnt;
 			case BlockType::Torch:                           return Item::Torch;
@@ -1891,6 +1908,7 @@ namespace BlockItemConverter
 			case BlockType::WhiteTerracotta:                 return Item::WhiteTerracotta;
 			case BlockType::WhiteTulip:                      return Item::WhiteTulip;
 			case BlockType::WhiteWool:                       return Item::WhiteWool;
+			case BlockType::Wildflowers:                     return Item::Wildflowers;
 			case BlockType::WitherRose:                      return Item::WitherRose;
 			case BlockType::WitherSkeletonSkull:             return Item::WitherSkeletonSkull;
 			case BlockType::YellowBanner:                    return Item::YellowBanner;

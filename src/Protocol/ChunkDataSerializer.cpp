@@ -2,6 +2,7 @@
 #include "ChunkDataSerializer.h"
 #include "Protocol_1_8.h"
 #include "Protocol_1_9.h"
+#include "Root.h"
 #include "../ClientHandle.h"
 #include "../WorldStorage/FastNBT.h"
 #include "BlockEntities/BlockEntity.h"
@@ -91,11 +92,6 @@ namespace
 	auto Palette751(const BlockState a_Block)
 	{
 		return cRoot::Get()->GetBlockMap()->GetProtocolBlockId(cProtocol::Version::v1_16_2, a_Block);
-	}
-
-	auto Palette754(const BlockState a_Block)
-	{
-		return cRoot::Get()->GetBlockMap()->GetProtocolBlockId(cProtocol::Version::v1_16_4, a_Block);
 	}
 
 	auto Palette755(const BlockState a_Block)
@@ -1543,9 +1539,7 @@ inline void cChunkDataSerializer::WriteBlockSectionSeamless2(const ChunkBlockDat
 
 	for (size_t Index = 0; Index != ChunkBlockData::SectionBlockCount; Index++)
 	{
-		const auto v2 = a_Blocks == nullptr ? 0 : Palette((*a_Blocks)[Index]);
-
-		const auto Value = v2;
+		const auto Value = a_Blocks == nullptr ? 0 : Palette((*a_Blocks)[Index]);
 
 		// The _signed_ count of bits in Value left to write
 		const auto Remaining = static_cast<char>(a_BitsPerEntry - (64 - BitIndex));

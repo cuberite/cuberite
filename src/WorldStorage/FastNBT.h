@@ -21,7 +21,7 @@ It directly outputs a string containing the serialized NBT data.
 
 #include <system_error>
 #include "../Endianness.h"
-#include "ByteBuffer.h"
+#include "../ByteBuffer.h"
 
 
 

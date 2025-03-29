@@ -91,7 +91,7 @@ cMonster * cAggressiveMonster::GetMonsterOfTypeInSight(eEntityType a_MobType, un
 		return false;
 	};
 
-	cBoundingBox CheckZone(GetPosition().addedXZ(-a_SightDistance, -a_SightDistance), GetPosition().addedXZ(a_SightDistance, a_SightDistance));
+	cBoundingBox CheckZone(GetPosition().addedXZ(-static_cast<int>(a_SightDistance), -static_cast<int>(a_SightDistance)), GetPosition().addedXZ(a_SightDistance, a_SightDistance));
 	m_World->ForEachEntityInBox(CheckZone, Callback);
 	return FoundTarget;
 }
