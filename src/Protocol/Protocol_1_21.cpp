@@ -1369,7 +1369,7 @@ void cProtocol_1_21_2::HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer)
 	bool Right =    (BitField & 0x8) != 0;
 	bool Jump =     (BitField & 0x10) != 0;
 	bool Sneak =    (BitField & 0x20) != 0;
-	bool Sprint =   (BitField & 0x40) != 0;
+	// bool Sprint =   (BitField & 0x40) != 0;
 
 	float SidewaysVal = 0;
 	float ForwardVal = 0;
@@ -3039,5 +3039,6 @@ UInt8 cProtocol_1_21_5::GetProtocolEntityType(eEntityType a_Type) const
 		case eEntityType::etZombieHorse:          return 145;
 		case eEntityType::etZombieVillager:       return 146;
 		case eEntityType::etZombifiedPiglin:      return 147;
+		default: return 0;
 	}
 }

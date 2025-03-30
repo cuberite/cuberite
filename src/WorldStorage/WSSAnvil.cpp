@@ -108,9 +108,9 @@ cWSSAnvil::cWSSAnvil(cWorld * a_World, int a_CompressionFactor):
 		Writer.AddLong("DayTime", a_World->GetWorldDate().count());
 		Writer.AddLong("Time", a_World->GetWorldAge().count());
 		Writer.AddString("LevelName", a_World->GetName());
-		Writer.AddInt("DataVersion", NamespaceSerializer::DataVersion());
+		Writer.AddInt("DataVersion", static_cast<Int32>(NamespaceSerializer::DataVersion()));
 		Writer.BeginCompound("Version");
-			Writer.AddInt("Id", NamespaceSerializer::DataVersion());
+			Writer.AddInt("Id", static_cast<Int32>(NamespaceSerializer::DataVersion()));
 			Writer.AddString("Name", "1.21.4");
 			Writer.AddString("Series", "main");
 			Writer.AddByte("Snapshot", 0);

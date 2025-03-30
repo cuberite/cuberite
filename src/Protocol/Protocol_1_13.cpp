@@ -1582,7 +1582,7 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			a_Pkt.WriteBEFloat(static_cast<float>(a_Entity.GetHealth()));
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::MobMobFlags, EntityMetadataType::Byte);
-			a_Pkt.WriteBEInt8(static_cast<Int8>(Witch.IsAngry()) << 2);
+			a_Pkt.WriteBEInt8(static_cast<Int8>(Witch.IsAngry() << 2));
 			break;
 		}  // case mtWitch
 
