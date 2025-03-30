@@ -78,3 +78,31 @@ jobs:
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest --build-config ${{ matrix.build_type }}
+
+    - if: runner.os != 'Windows'
+      name: Docs
+      run: |
+           cd build/Server
+           touch apiCheckFailed.flag
+           ls -R .
+           ./Cuberite <<- EOF
+           load APIDump
+           api
+           apicheck
+           restart
+           stop
+           EOF
+           if [ -f ./NewlyUndocumented.lua ]; then
+                echo "ERROR: Newly undocumented API symbols found:"
+                cat ./NewlyUndocumented.lua
+                exit 1
+           fi
+           if [ -f ./DuplicateDocs.txt ]; then
+                echo "ERROR: API documentation has duplicate symbol warnings:"
+                cat ./DuplicateDocs.txt
+                exit 1
+            fi
+            if [ -f ./apiCheckFailed.flag ]; then
+                echo "ERROR: API check has failed with an unknown error"
+                exit 1
+            fi

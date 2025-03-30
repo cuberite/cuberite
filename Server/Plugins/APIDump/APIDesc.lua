@@ -18489,8 +18489,16 @@ end
 				},
 				etPotion =
 				{
-					Notes = "",
+					Notes = "Depracted. Use etSplashPotion instead",
 				},
+                etLingeringPotion =
+                {
+                    Notes = "",
+                },
+                etSplashPotion =
+                {
+                    Notes = "",
+                },
 				etRabbit =
 				{
 					Notes = "",
