@@ -72,7 +72,7 @@ void cMooshroom::OnRightClicked(cPlayer & a_Player)
 		} break;
 		default:
 		{
-			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, a_Player.GetEquippedItem().m_ItemType);
+			FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, NamespaceSerializer::From(a_Player.GetEquippedItem().m_ItemType));
 		}
 	}
 }

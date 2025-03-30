@@ -1,6 +1,7 @@
 
 #pragma once
 #include "Registries/Items.h"
+#include "WorldStorage/NamespaceSerializer.h"
 
 
 
@@ -73,7 +74,27 @@ enum eBlockFace : char
 } ;
 
 
-
+// Bindings gen does not like this code for some reason, otherwise it should work.
+/*
+template<> class fmt::formatter<eBlockFace> : public fmt::formatter<std::string_view>
+{
+public:
+	template <typename FormatContext>
+	auto format(const eBlockFace & a_block_face, FormatContext & a_Ctx) const
+	{
+		switch (a_block_face)
+		{
+			case BLOCK_FACE_NONE: return fmt::format_to(a_Ctx.out(), "{}", "BLOCK_FACE_NONE");
+			case BLOCK_FACE_XM:   return fmt::format_to(a_Ctx.out(), "{}", "BLOCK_FACE_XM");
+			case BLOCK_FACE_XP:   return fmt::format_to(a_Ctx.out(), "{}", "BLOCK_FACE_XP");
+			case BLOCK_FACE_YM:   return fmt::format_to(a_Ctx.out(), "{}", "BLOCK_FACE_YM");
+			case BLOCK_FACE_YP:   return fmt::format_to(a_Ctx.out(), "{}", "BLOCK_FACE_YP");
+			case BLOCK_FACE_ZM:   return fmt::format_to(a_Ctx.out(), "{}", "BLOCK_FACE_ZM");
+			case BLOCK_FACE_ZP:   return fmt::format_to(a_Ctx.out(), "{}", "BLOCK_FACE_ZP");
+		}
+	}
+};
+*/
 
 
 /** PlayerDigging status constants */

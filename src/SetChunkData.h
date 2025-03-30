@@ -2,6 +2,7 @@
 
 #include "ChunkData.h"
 #include "BlockEntities/BlockEntity.h"
+#include "Entities/Entity.h"
 
 
 

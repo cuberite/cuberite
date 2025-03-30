@@ -266,7 +266,7 @@ template<> class fmt::formatter<Item> : public fmt::formatter<std::string_view>
 {
 public:
 	template <typename FormatContext>
-	auto format(const Item & a_Item, FormatContext & a_Ctx)
+	auto format(const Item & a_Item, FormatContext & a_Ctx) const
 	{
 		return fmt::format_to(a_Ctx.out(), "{}", NamespaceSerializer::From(a_Item));
 	}

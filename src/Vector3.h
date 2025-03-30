@@ -416,14 +416,14 @@ class fmt::formatter<Vector3<What>> : public fmt::formatter<What>
 	using Super = fmt::formatter<What>;
 
 	template <typename FormatContext, size_t Len>
-	void Write(FormatContext & a_Ctx, const char (& a_Str)[Len])
+	void Write(FormatContext & a_Ctx, const char (& a_Str)[Len]) const
 	{
 		const auto Itr = std::copy_n(&a_Str[0], Len - 1, a_Ctx.out());
 		a_Ctx.advance_to(Itr);
 	}
 
 	template <typename FormatContext>
-	void Write(FormatContext & a_Ctx, const What & a_Arg)
+	void Write(FormatContext & a_Ctx, const What & a_Arg) const
 	{
 		const auto Itr = Super::format(a_Arg, a_Ctx);
 		a_Ctx.advance_to(Itr);
@@ -432,7 +432,7 @@ class fmt::formatter<Vector3<What>> : public fmt::formatter<What>
 public:
 
 	template <typename FormatContext>
-	auto format(const Vector3<What> & a_Vec, FormatContext & a_Ctx)
+	auto format(const Vector3<What> & a_Vec, FormatContext & a_Ctx) const
 	{
 		Write(a_Ctx, "{");
 		Write(a_Ctx, a_Vec.x);

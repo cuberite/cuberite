@@ -206,7 +206,8 @@ template class SizeChecker<UInt8, 1>;
 		std::string_view a_Format, eLogLevel, fmt::printf_args a_ArgList
 	)
 	{
-		fmt::vprintf(a_Format, a_ArgList);
+		fmt::basic_string_view<char> s(a_Format);
+		fmt::vfprintf(stdout, s, a_ArgList);
 		putchar('\n');
 		fflush(stdout);
 	}

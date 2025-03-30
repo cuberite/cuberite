@@ -48,7 +48,7 @@ template<> class fmt::formatter<BlockState> : public fmt::formatter<std::string_
 {
 public:
 	template <typename FormatContext>
-	auto format(const BlockState & a_Block, FormatContext & a_Ctx)
+	auto format(const BlockState & a_Block, FormatContext & a_Ctx) const
 	{
 		return fmt::format_to(a_Ctx.out(), "{}", NamespaceSerializer::From(a_Block.Type()));
 	}
@@ -58,8 +58,9 @@ template<> class fmt::formatter<BlockType> : public fmt::formatter<std::string_v
 {
 public:
 	template <typename FormatContext>
-	auto format(const BlockType & a_Block, FormatContext & a_Ctx)
+	auto format(const BlockType & a_Block, FormatContext & a_Ctx) const
 	{
 		return fmt::format_to(a_Ctx.out(), "{}", NamespaceSerializer::From(a_Block));
 	}
 };
+

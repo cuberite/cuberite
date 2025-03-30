@@ -129,7 +129,7 @@ int cManualBindings::vlua_do_error(lua_State * L, const char * a_pFormat, fmt::p
 
 	// Copied from luaL_error and modified
 	luaL_where(L, 1);
-	auto Msg = fmt::vsprintf(msg, a_ArgList);
+	auto Msg = fmt::vsprintf(fmt::detail::to_string_view(msg), a_ArgList);
 	lua_pushlstring(L, Msg.data(), Msg.size());
 	lua_concat(L, 2);
 	return lua_error(L);

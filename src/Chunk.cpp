@@ -437,7 +437,7 @@ void cChunk::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlock
 	if (a_DataTypes != cBlockArea::baBlocks)
 	{
 		LOGWARNING("cChunk::WriteBlockArea(): unsupported datatype request, can write only types + metas together (0x%x), requested 0x%x. Ignoring.",
-			cBlockArea::baBlocks, a_DataTypes & cBlockArea::baBlocks
+			static_cast<UInt32>(cBlockArea::baBlocks), static_cast<UInt32>(a_DataTypes & cBlockArea::baBlocks)
 		);
 		return;
 	}

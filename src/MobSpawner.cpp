@@ -342,7 +342,7 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eEntityType 
 
 		default:
 		{
-			LOGD("MG TODO: Write spawning rule for mob type %d", a_MobType);
+			LOGD("MG TODO: Write spawning rule for mob type %d", static_cast<UInt32>(a_MobType));
 			return false;
 		}
 	}

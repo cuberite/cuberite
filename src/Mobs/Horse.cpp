@@ -241,7 +241,7 @@ int cHorse::GetHorseArmour(void) const
 
 		default:
 		{
-			LOGWARN("cHorse::GetHorseArmour: Invalid armour item (%d)", m_Armor.m_ItemType);
+			LOGWARN("cHorse::GetHorseArmour: Invalid armour item (%d)", NamespaceSerializer::From(m_Armor.m_ItemType));
 			return 0;
 		}
 	}

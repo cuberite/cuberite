@@ -4310,7 +4310,7 @@ namespace PaletteUpgrade
 
 			default:
 			{
-				FLOGWARNING("Unknown block ID: {} - {}", Block, Block.ID);
+				FLOGWARNING("Unknown block ID: {}", Block.ID);
 				ASSERT(!"Unknown block ID:");
 				return { 0, 0 };
 			}

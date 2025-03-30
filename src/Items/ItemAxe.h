@@ -50,7 +50,7 @@ public:
 				case Item::NetheriteAxe: return 9.0f;
 				default:
 				{
-					FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, m_ItemType);
+					FLOGWARNING("{}: Item type not handled {}.", __FUNCTION__, NamespaceSerializer::From(m_ItemType));
 					return 1.0f;
 				}
 			}

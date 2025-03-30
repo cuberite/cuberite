@@ -358,7 +358,7 @@ public:
 			case BlockType::PottedMangrovePropagule:
 			case BlockType::PottedPaleOakSapling:
 			case BlockType::PottedTorchflower:  /* Flower pots aren't block entities anymore however, but old code thinks they are, so it tries to save them. This is to prevent crashes */
-				FLOGWARNING("Tried to save a flower pot {} as block entity ignoring. TODO: fix flower pots", a_Entity->GetBlockType()); break;
+				FLOGWARNING("Tried to save a flower pot {} as block entity ignoring. TODO: fix flower pots", NamespaceSerializer::From(a_Entity->GetBlockType())); break;
 			default:
 			{
 				FLOGERROR("{}: Got unintended block entity to save: {}", __FUNCTION__, a_Entity->GetBlockType());

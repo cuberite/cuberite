@@ -28,8 +28,11 @@ include("SetFlags.cmake")
 # Add build timestamp and details:
 include("CMake/StampBuild.cmake")
 
-# We need C++17 features:
-set(CMAKE_CXX_STANDARD 17)
+set(SELF_TEST ON)
+set(BUILD_TOOLS ON)
+
+# We need C++23 features:
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -53,6 +56,7 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIREC
 if(NOT WIN32)
 	target_compile_options(Cuberite PRIVATE -Wno-switch)
 	target_compile_options(Cuberite PRIVATE -Wno-switch-default)
+	target_compile_options(Cuberite PRIVATE -Wno-infinity-disabled)
 endif()
 
 # Enable PCH and jumbo builds on supporting CMake:

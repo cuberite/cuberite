@@ -1041,11 +1041,11 @@ OwnedBlockEntity cWSSAnvil::LoadBlockEntityFromNBT(const cParsedNBT & a_NBT, int
 			// All the other blocktypes should have no entities assigned to them. Report an error:
 			// Get the "id" tag:
 			int TagID = a_NBT.FindChildByName(a_Tag, "id");
-			auto NumericBlock = PaletteUpgrade::ToBlock(a_Block);
+			// auto NumericBlock = PaletteUpgrade::ToBlock(a_Block);
 			FLOGINFO("WorldLoader({0}): Block entity mismatch: block type {1}, type \"{2}\", at {3}; the entity will be lost.",
 				m_World->GetName(),
-				a_Block,
-				NumericBlock.first, (TagID >= 0) ? a_NBT.GetStringView(TagID) : "unknown",
+				a_Block.ID,
+				(TagID >= 0) ? a_NBT.GetStringView(TagID) : "unknown",
 				a_Pos
 			);
 			return nullptr;

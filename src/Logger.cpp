@@ -25,12 +25,12 @@ static void WriteLogOpener(fmt::memory_buffer & Buffer)
 #ifndef NDEBUG
 	const auto ThreadID = std::hash<std::thread::id>()(std::this_thread::get_id());
 	fmt::format_to(
-		Buffer, "[{0:04x}|{1:02d}:{2:02d}:{3:02d}] ",
+		std::back_inserter(Buffer), "[{0:04x}|{1:02d}:{2:02d}:{3:02d}] ",
 		ThreadID, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec
 	);
 #else
 	fmt::format_to(
-		Buffer, "[{0:02d}:{1:02d}:{2:02d}] ",
+		std::back_inserter(Buffer), "[{0:02d}:{1:02d}:{2:02d}] ",
 		timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec
 	);
 #endif
@@ -63,7 +63,7 @@ void cLogger::LogSimple(std::string_view a_Message, eLogLevel a_LogLevel)
 {
 	fmt::memory_buffer Buffer;
 	WriteLogOpener(Buffer);
-	fmt::format_to(Buffer, "{0}\n", a_Message);
+	fmt::format_to(std::back_inserter(Buffer), "{0}\n", a_Message);
 	LogLine(std::string_view(Buffer.data(), Buffer.size()), a_LogLevel);
 }
 
@@ -88,8 +88,8 @@ void cLogger::LogPrintf(std::string_view a_Format, eLogLevel a_LogLevel, fmt::pr
 {
 	fmt::memory_buffer Buffer;
 	WriteLogOpener(Buffer);
-	fmt::vprintf(Buffer, fmt::to_string_view(a_Format), a_ArgList);
-	fmt::format_to(Buffer, "\n");
+	// fmt::vprintf(fmt::detail::to_string_view(a_Format), a_ArgList);  // FIXXXXX
+	fmt::format_to(std::back_inserter(Buffer), "\n");
 
 	LogLine(std::string_view(Buffer.data(), Buffer.size()), a_LogLevel);
 }
@@ -102,8 +102,8 @@ void cLogger::LogFormat(std::string_view a_Format, eLogLevel a_LogLevel, fmt::fo
 {
 	fmt::memory_buffer Buffer;
 	WriteLogOpener(Buffer);
-	fmt::vformat_to(Buffer, a_Format, a_ArgList);
-	fmt::format_to(Buffer, "\n");
+	fmt::vformat_to(std::back_inserter(Buffer), a_Format, a_ArgList);
+	fmt::format_to(std::back_inserter(Buffer), "\n");
 
 	LogLine(std::string_view(Buffer.data(), Buffer.size()), a_LogLevel);
 }

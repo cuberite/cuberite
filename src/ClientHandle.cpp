@@ -1106,7 +1106,7 @@ void cClientHandle::HandleAnvilItemName(const AString & a_ItemName)
 void cClientHandle::HandleLeftClick(Vector3i a_BlockPos, eBlockFace a_BlockFace, UInt8 a_Status)
 {
 	FLOGD("HandleLeftClick: {0}; Face: {1}; Stat: {2}",
-		a_BlockPos, a_BlockFace, a_Status
+		a_BlockPos, static_cast<UInt32>(a_BlockFace), a_Status
 	);
 
 	m_NumBlockChangeInteractionsThisTick++;
@@ -1444,7 +1444,7 @@ void cClientHandle::HandleRightClick(Vector3i a_BlockPos, eBlockFace a_BlockFace
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
 	const cItem & HeldItem = a_UsedMainHand ? m_Player->GetEquippedItem() : m_Player->GetInventory().GetShieldSlot();
 
-	FLOGD("HandleRightClick: {0}, face {1}, Cursor {2}, Hand: {3}, HeldItem: {4}", a_BlockPos, a_BlockFace, a_CursorPos, a_UsedMainHand, ItemToFullString(HeldItem));
+	FLOGD("HandleRightClick: {0}, face {1}, Cursor {2}, Hand: {3}, HeldItem: {4}", a_BlockPos, static_cast<UInt32>(a_BlockFace), a_CursorPos, a_UsedMainHand, ItemToFullString(HeldItem));
 
 	if (!PlgMgr->CallHookPlayerRightClick(*m_Player, a_BlockPos, a_BlockFace, a_CursorPos) && IsWithinReach(a_BlockPos) && !m_Player->IsFrozen())
 	{
@@ -1667,7 +1667,7 @@ void cClientHandle::HandleSpectate(const cUUID & a_PlayerUUID)
 		return;
 	}
 
-	m_Player->GetWorld()->DoWithPlayerByUUID(a_PlayerUUID, [=](cPlayer & a_ToSpectate)
+	m_Player->GetWorld()->DoWithPlayerByUUID(a_PlayerUUID, [this](cPlayer & a_ToSpectate)
 	{
 		m_Player->TeleportToEntity(a_ToSpectate);
 		return true;
@@ -1799,7 +1799,7 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 	// If the player is a spectator, let him spectate
 	if (m_Player->IsGameModeSpectator() && a_IsLeftClick)
 	{
-		m_Player->GetWorld()->DoWithEntityByID(a_TargetEntityID, [=](cEntity & a_Entity)
+		m_Player->GetWorld()->DoWithEntityByID(a_TargetEntityID, [this](cEntity & a_Entity)
 		{
 			m_Player->SpectateEntity(&a_Entity);
 			return true;
@@ -1811,7 +1811,7 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 	if (!a_IsLeftClick)
 	{
 		cWorld * World = m_Player->GetWorld();
-		World->DoWithEntityByID(a_TargetEntityID, [=](cEntity & a_Entity)
+		World->DoWithEntityByID(a_TargetEntityID, [this](cEntity & a_Entity)
 			{
 				if (
 					cPluginManager::Get()->CallHookPlayerRightClickingEntity(*m_Player, a_Entity) ||
@@ -1837,7 +1837,7 @@ void cClientHandle::HandleUseEntity(UInt32 a_TargetEntityID, bool a_IsLeftClick)
 	}
 
 	// If it is a left click, attack the entity:
-	m_Player->GetWorld()->DoWithEntityByID(a_TargetEntityID, [=](cEntity & a_Entity)
+	m_Player->GetWorld()->DoWithEntityByID(a_TargetEntityID, [this](cEntity & a_Entity)
 		{
 			if (!a_Entity.GetWorld()->IsPVPEnabled())
 			{

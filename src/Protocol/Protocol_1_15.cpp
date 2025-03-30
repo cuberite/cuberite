@@ -347,7 +347,7 @@ void cProtocol_1_15::HandlePacketBookUpdate(cByteBuffer & a_ByteBuffer)
 	Hand handused = static_cast<Hand>(enumindex);
 
 
-	LOG("Book is signed: %d - Hand used: %d", signedbook, handused);
+	LOG("Book is signed: %d - Hand used: %d", signedbook, static_cast<UInt32>(handused));
 	LOG("PacketBookUpdate is not imlpemented fully");
 	return;
 }

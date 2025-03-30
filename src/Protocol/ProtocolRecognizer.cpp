@@ -104,7 +104,7 @@ AString cMultiVersionProtocol::GetVersionTextFromInt(cProtocol::Version a_Protoc
 	}
 
 	ASSERT(!"Unknown protocol version");
-	return fmt::format(FMT_STRING("Unknown protocol ({})"), a_ProtocolVersion);
+	return fmt::format(FMT_STRING("Unknown protocol ({})"), static_cast<UInt32>(a_ProtocolVersion));
 }
 
 
@@ -354,9 +354,9 @@ bool cMultiVersionProtocol::TryHandleHTTPRequest(cClientHandle & a_Client, Conti
 	// The request line, hastily decoded with the hope that it's encoded in US-ASCII.
 	const std::string_view Value(reinterpret_cast<const char *>(Buffer.data()), Buffer.size());
 
-	if (Value == u8"GET / HTTP")
+	if (Value == "GET / HTTP")
 	{
-		const auto Response = fmt::format(u8"HTTP/1.0 303 See Other\r\nLocation: {}\r\n\r\n", cRoot::Get()->GetServer()->GetCustomRedirectUrl());
+		const auto Response = fmt::format("HTTP/1.0 303 See Other\r\nLocation: {}\r\n\r\n", cRoot::Get()->GetServer()->GetCustomRedirectUrl());
 		a_Client.SendData({ reinterpret_cast<const std::byte *>(Response.data()), Response.size() });
 		a_Client.Destroy();
 		return true;
