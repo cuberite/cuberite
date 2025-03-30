@@ -1487,17 +1487,17 @@ namespace
 	constexpr cSimplePlaceableItemHandler   ItemStrippedPaleOakWoodHandler               (Item::StrippedPaleOakWood);
 	constexpr cUnimplementedItemHandler     ItemWhiteBundleHandler                       (Item::WhiteBundle);
 	constexpr cUnimplementedItemHandler     ItemYellowBundleHandler                      (Item::YellowBundle);
-    constexpr cUnimplementedItemHandler     ItemBlueEggHandler                           (Item::BlueEgg);
-    constexpr cUnimplementedItemHandler     ItemBrownEggHandler                          (Item::BrownEgg);
-    constexpr cSimplePlaceableItemHandler   ItemBushHandler                              (Item::Bush);
-    constexpr cSimplePlaceableItemHandler   ItemCactusFlowerHandler                      (Item::CactusFlower);
-    constexpr cSimplePlaceableItemHandler   ItemFireflyBushHandler                       (Item::FireflyBush);
-    constexpr cSimplePlaceableItemHandler   ItemLeafLitterHandler                        (Item::LeafLitter);
-    constexpr cSimplePlaceableItemHandler   ItemShortDryGrassHandler                     (Item::ShortDryGrass);
-    constexpr cSimplePlaceableItemHandler   ItemTallDryGrassHandler                      (Item::TallDryGrass);
-    constexpr cSimplePlaceableItemHandler   ItemTestBlockHandler                         (Item::TestBlock);
-    constexpr cSimplePlaceableItemHandler   ItemTestInstanceBlockHandler                 (Item::TestInstanceBlock);
-    constexpr cSimplePlaceableItemHandler   ItemWildflowersHandler                       (Item::Wildflowers);
+	constexpr cUnimplementedItemHandler     ItemBlueEggHandler                           (Item::BlueEgg);
+	constexpr cUnimplementedItemHandler     ItemBrownEggHandler                          (Item::BrownEgg);
+	constexpr cSimplePlaceableItemHandler   ItemBushHandler                              (Item::Bush);
+	constexpr cSimplePlaceableItemHandler   ItemCactusFlowerHandler                      (Item::CactusFlower);
+	constexpr cSimplePlaceableItemHandler   ItemFireflyBushHandler                       (Item::FireflyBush);
+	constexpr cSimplePlaceableItemHandler   ItemLeafLitterHandler                        (Item::LeafLitter);
+	constexpr cSimplePlaceableItemHandler   ItemShortDryGrassHandler                     (Item::ShortDryGrass);
+	constexpr cSimplePlaceableItemHandler   ItemTallDryGrassHandler                      (Item::TallDryGrass);
+	constexpr cSimplePlaceableItemHandler   ItemTestBlockHandler                         (Item::TestBlock);
+	constexpr cSimplePlaceableItemHandler   ItemTestInstanceBlockHandler                 (Item::TestInstanceBlock);
+	constexpr cSimplePlaceableItemHandler   ItemWildflowersHandler                       (Item::Wildflowers);
 }
 
 
