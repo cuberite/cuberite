@@ -84,7 +84,6 @@ jobs:
       run: |
            cd build/Server
            touch apiCheckFailed.flag
-           ls -R .
            ./Cuberite <<- EOF
            load APIDump
            api
