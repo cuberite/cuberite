@@ -88,7 +88,7 @@ void cLogger::LogPrintf(std::string_view a_Format, eLogLevel a_LogLevel, fmt::pr
 {
 	fmt::memory_buffer Buffer;
 	WriteLogOpener(Buffer);
-	// fmt::vprintf(fmt::detail::to_string_view(a_Format), a_ArgList);  // FIXXXXX
+	Buffer.append(fmt::vsprintf(fmt::string_view(a_Format), a_ArgList));
 	fmt::format_to(std::back_inserter(Buffer), "\n");
 
 	LogLine(std::string_view(Buffer.data(), Buffer.size()), a_LogLevel);
