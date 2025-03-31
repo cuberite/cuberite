@@ -408,9 +408,9 @@ void cMojangAPI::LoadCachesFromDisk(void)
 			SQLite::Statement stmt(db, "SELECT PlayerName, UUID, DateTime FROM PlayerNameToUUID");
 			while (stmt.executeStep())
 			{
-				AString PlayerName = stmt.getColumn(0);
-				AString StringUUID = stmt.getColumn(1);
-				Int64 DateTime     = stmt.getColumn(2);
+				AString PlayerName = stmt.getColumn(0).getString();
+				AString StringUUID = stmt.getColumn(1).getString();
+				Int64 DateTime     = stmt.getColumn(2).getInt64();
 
 				cUUID UUID;
 				if (!UUID.FromString(StringUUID))
@@ -426,11 +426,11 @@ void cMojangAPI::LoadCachesFromDisk(void)
 			SQLite::Statement stmt(db, "SELECT PlayerName, UUID, Textures, TexturesSignature, DateTime FROM UUIDToProfile");
 			while (stmt.executeStep())
 			{
-				AString PlayerName        = stmt.getColumn(0);
-				AString StringUUID        = stmt.getColumn(1);
-				AString Textures          = stmt.getColumn(2);
-				AString TexturesSignature = stmt.getColumn(2);
-				Int64 DateTime            = stmt.getColumn(4);
+				AString PlayerName        = stmt.getColumn(0).getString();
+				AString StringUUID        = stmt.getColumn(1).getString();
+				AString Textures          = stmt.getColumn(2).getString();
+				AString TexturesSignature = stmt.getColumn(2).getString();
+				Int64 DateTime            = stmt.getColumn(4).getInt64();
 
 				cUUID UUID;
 				if (!UUID.FromString(StringUUID))
@@ -480,7 +480,7 @@ void cMojangAPI::SaveCachesToDisk(void)
 				}
 				stmt.bind(1, Profile.m_PlayerName);
 				stmt.bind(2, Profile.m_UUID.ToShortString());
-				stmt.bind(3, Profile.m_DateTime);
+				stmt.bind(3, static_cast<int64_t>(Profile.m_DateTime));
 				stmt.exec();
 				stmt.reset();
 			}
@@ -502,7 +502,7 @@ void cMojangAPI::SaveCachesToDisk(void)
 				stmt.bind(2, Profile.m_PlayerName);
 				stmt.bind(3, Profile.m_Textures);
 				stmt.bind(4, Profile.m_TexturesSignature);
-				stmt.bind(5, Profile.m_DateTime);
+				stmt.bind(5, static_cast<int64_t>(Profile.m_DateTime));
 				stmt.exec();
 				stmt.reset();
 			}
