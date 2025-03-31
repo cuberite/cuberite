@@ -30,7 +30,7 @@ namespace BlockMap
 			LOGERROR(fmt::format(FMT_STRING("Failed to read block.json file for version {}. THIS VERSION WILL NOT WORK"), cMultiVersionProtocol::GetVersionTextFromInt(a_Version)));
 			return;
 		}
-		LOGD(fmt::format(FMT_STRING("Loading block palette for version {}"), cMultiVersionProtocol::GetVersionTextFromInt(a_Version)));
+		LOG(fmt::format(FMT_STRING("Loading block palette for version {}"), cMultiVersionProtocol::GetVersionTextFromInt(a_Version)));
 		const auto sz = std::filesystem::file_size(file_name);
 		std::string result(sz, '\0');
 		file.read(result.data(), static_cast<std::streamsize>(sz));

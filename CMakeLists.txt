@@ -28,9 +28,6 @@ include("SetFlags.cmake")
 # Add build timestamp and details:
 include("CMake/StampBuild.cmake")
 
-set(SELF_TEST ON)
-set(BUILD_TOOLS ON)
-
 # We need C++23 features:
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
