@@ -56,7 +56,7 @@ set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIREC
 if(NOT WIN32)
 	target_compile_options(Cuberite PRIVATE -Wno-switch)
 	target_compile_options(Cuberite PRIVATE -Wno-switch-default)
-	target_compile_options(Cuberite PRIVATE -Wno-infinity-disabled)
+	target_compile_options(Cuberite PRIVATE -Wno-nan-infinity-disabled)
 endif()
 
 # Enable PCH and jumbo builds on supporting CMake:
