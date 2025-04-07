@@ -72,9 +72,10 @@ void cSheep::OnRightClicked(cPlayer & a_Player)
 		m_World->SpawnItemPickups(Drops, GetPosX(), GetPosY(), GetPosZ(), 10);
 		m_World->BroadcastSoundEffect("entity.sheep.shear", GetPosition(), 1.0f, 1.0f);
 	}
-	else if (cItemDyeHandler::IsDye(EquippedItem) && (m_WoolColor != 15 - EquippedItem.m_ItemDamage))
+	else if (cItemDyeHandler::IsDye(EquippedItem) && (m_WoolColor != 15 - 0 /* EquippedItem.m_ItemDamage */))
 	{
-		m_WoolColor = 15 - EquippedItem.m_ItemDamage;
+		//  TODO: color component
+		m_WoolColor = 15 - 0;  //  EquippedItem.m_ItemDamage;
 		if (!a_Player.IsGameModeCreative())
 		{
 			a_Player.GetInventory().RemoveOneEquippedItem();

@@ -1640,6 +1640,238 @@ void cProtocol_1_21_2::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 
 
 
+void cProtocol_1_21_2::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	const auto ParticleID = GetProtocolParticleID(a_ParticleName);
+
+	cPacketizer Pkt(*this, pktParticleEffect);
+	Pkt.WriteVarInt32(static_cast<UInt32>(ParticleID));
+
+	Pkt.WriteBool(false);  // Long Distance
+	Pkt.WriteBool(false);  // Always Visible
+	Pkt.WriteBEDouble(a_Src.x);
+	Pkt.WriteBEDouble(a_Src.y);
+	Pkt.WriteBEDouble(a_Src.z);
+
+	Pkt.WriteBEFloat(a_Offset.x);
+	Pkt.WriteBEFloat(a_Offset.y);
+	Pkt.WriteBEFloat(a_Offset.z);
+
+	Pkt.WriteBEFloat(a_ParticleData);
+	Pkt.WriteBEInt32(a_ParticleAmount);
+}
+
+
+
+
+
+void cProtocol_1_21_2::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	return;
+	/*
+	const auto ParticleID = GetProtocolParticleID(a_ParticleName);
+
+	cPacketizer Pkt(*this, pktParticleEffect);
+	Pkt.WriteVarInt32(static_cast<UInt32>(ParticleID));
+
+	Pkt.WriteBool(false);  // Long Distance
+	Pkt.WriteBool(false);  // Always Visible
+	Pkt.WriteBEDouble(a_Src.x);
+	Pkt.WriteBEDouble(a_Src.y);
+	Pkt.WriteBEDouble(a_Src.z);
+
+	Pkt.WriteBEFloat(a_Offset.x);
+	Pkt.WriteBEFloat(a_Offset.y);
+	Pkt.WriteBEFloat(a_Offset.z);
+
+	Pkt.WriteBEFloat(a_ParticleData);
+	Pkt.WriteBEInt32(a_ParticleAmount);
+	*/
+	// TODO implement particle specific data
+}
+
+
+
+
+
+bool cProtocol_1_21_2::ReadComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+{
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, ProtocolCompID);
+	typedef DataComponentSerializer DCS;
+	static const std::map<UInt32, ReadCompFunc> ReadCompFuncs =
+	{
+		//  {0, &DCS::ReadCustomDataComponent},
+		{1, &DCS::ReadMaxStackSizeComponent},
+	{2, &DCS::ReadMaxDamageComponent},
+	{3, &DCS::ReadDamageComponent},
+	{4, &DCS::ReadUnbreakableComponent},
+	{5, &DCS::ReadCustomNameComponent},
+		/*
+		{6, &DCS::ReadItemNameComponent},
+		{7, &DCS::ReadItemModelComponent},
+		{8, &DCS::ReadLoreComponent},
+		{9, &DCS::ReadRarityComponent},
+		{10, &DCS::ReadEnchantmentsComponent},
+		{11, &DCS::ReadCanPlaceOnComponent},
+		{12, &DCS::ReadCanBreakComponent},
+		{13, &DCS::ReadAttributeModifiersComponent},
+		{14, &DCS::ReadCustomModelDataComponent},
+		{15, &DCS::ReadHideAdditionalTooltipComponent},
+		{16, &DCS::ReadHideTooltipComponent},
+		*/
+	{17, &DCS::ReadRepairCostComponent},
+		/*
+		{18, &DCS::ReadCreativeSlotLockComponent},
+		{19, &DCS::ReadEnchantmentGlintOverrideComponent},
+		{20, &DCS::ReadIntangibleProjectileComponent},
+		{21, &DCS::ReadFoodComponent},
+		{22, &DCS::ReadConsumableComponent},
+		{23, &DCS::ReadUseRemainderComponent},
+		{24, &DCS::ReadUseCooldownComponent},
+		{25, &DCS::ReadDamageResistantComponent},
+		{26, &DCS::ReadToolComponent},
+		{27, &DCS::ReadEnchantableComponent},
+		{28, &DCS::ReadEquippableComponent},
+		{29, &DCS::ReadRepairableComponent},
+		{30, &DCS::ReadGliderComponent},
+		{31, &DCS::ReadTooltipStyleComponent},
+		{32, &DCS::ReadDeathProtectionComponent},
+		{33, &DCS::ReadStoredEnchantmentsComponent},
+		{34, &DCS::ReadDyedColorComponent},
+		{35, &DCS::ReadMapColorComponent},
+		{36, &DCS::ReadMapIdComponent},
+		{37, &DCS::ReadMapDecorationsComponent},
+		{38, &DCS::ReadMapPostProcessingComponent},
+		{39, &DCS::ReadChargedProjectilesComponent},
+		{40, &DCS::ReadBundleContentsComponent},
+		{41, &DCS::ReadPotionContentsComponent},
+		{42, &DCS::ReadSuspiciousStewEffectsComponent},
+		{43, &DCS::ReadWritableBookContentComponent},
+		{44, &DCS::ReadWrittenBookContentComponent},
+		{45, &DCS::ReadTrimComponent},
+		{46, &DCS::ReadDebugStickStateComponent},
+		{47, &DCS::ReadEntityDataComponent},
+		{48, &DCS::ReadBucketEntityDataComponent},
+		{49, &DCS::ReadBlockEntityDataComponent},
+		{50, &DCS::ReadInstrumentComponent},
+		{51, &DCS::ReadOminousBottleAmplifierComponent},
+		{52, &DCS::ReadJukeboxPlayableComponent},
+		{53, &DCS::ReadRecipesComponent},
+		{54, &DCS::ReadLodestoneTrackerComponent},
+		{55, &DCS::ReadFireworkExplosionComponent},
+		{56, &DCS::ReadFireworksComponent},
+		{57, &DCS::ReadProfileComponent},
+		{58, &DCS::ReadNoteBlockSoundComponent},
+		{59, &DCS::ReadBannerPatternsComponent},
+		{60, &DCS::ReadBaseColorComponent},
+		{61, &DCS::ReadPotDecorationsComponent},
+		{62, &DCS::ReadContainerComponent},
+		{63, &DCS::ReadBlockStateComponent},
+		{64, &DCS::ReadBeesComponent},
+		{65, &DCS::ReadLockComponent},
+		{66, &DCS::ReadContainerLootComponent},
+		*/
+	};
+	const auto res = ReadCompFuncs.find(ProtocolCompID);
+	if (res == ReadCompFuncs.end())
+	{
+		LOGWARN(fmt::format("Data component with id {} not implemented", ProtocolCompID));
+		return false;
+	}
+	return (this->*res->second)(a_ByteBuffer, a_Result);
+}
+
+
+
+
+
+void cProtocol_1_21_2::WriteComponent(cPacketizer & a_Pkt, const DataComponents::DataComponent & a_Component) const
+{
+	// TODO: implement remaining components
+	std::visit(OverloadedVariantAccess
+	{
+		//  WRITE_DATA_COMPONENT(0, CustomDataComponent)
+	[this, &a_Pkt](const DataComponents::MaxStackSizeComponent & a_CompName) { a_Pkt.WriteVarInt32(1); WriteMaxStackSizeComponent (a_Pkt, a_CompName); },
+	WRITE_DATA_COMPONENT(2, MaxDamageComponent)
+	WRITE_DATA_COMPONENT(3, DamageComponent)
+	WRITE_DATA_COMPONENT(4, UnbreakableComponent)
+	WRITE_DATA_COMPONENT(5, CustomNameComponent)
+		/*
+		WRITE_DATA_COMPONENT(6, ItemNameComponent)
+		WRITE_DATA_COMPONENT(7, ItemModelComponent)
+		WRITE_DATA_COMPONENT(8, LoreComponent)
+		WRITE_DATA_COMPONENT(9, RarityComponent)
+		WRITE_DATA_COMPONENT(10, EnchantmentsComponent)
+		WRITE_DATA_COMPONENT(11, CanPlaceOnComponent)
+		WRITE_DATA_COMPONENT(12, CanBreakComponent)
+		WRITE_DATA_COMPONENT(13, AttributeModifiersComponent)
+		WRITE_DATA_COMPONENT(14, CustomModelDataComponent)
+		WRITE_DATA_COMPONENT(15, HideAdditionalTooltipComponent)
+		WRITE_DATA_COMPONENT(16, HideTooltipComponent)
+		*/
+	WRITE_DATA_COMPONENT(17, RepairCostComponent)
+		/*
+		WRITE_DATA_COMPONENT(18, CreativeSlotLockComponent)
+		WRITE_DATA_COMPONENT(19, EnchantmentGlintOverrideComponent)
+		WRITE_DATA_COMPONENT(20, IntangibleProjectileComponent)
+		WRITE_DATA_COMPONENT(21, FoodComponent)
+		WRITE_DATA_COMPONENT(22, ConsumableComponent)
+		WRITE_DATA_COMPONENT(23, UseRemainderComponent)
+		WRITE_DATA_COMPONENT(24, UseCooldownComponent)
+		WRITE_DATA_COMPONENT(25, DamageResistantComponent)
+		WRITE_DATA_COMPONENT(26, ToolComponent)
+		WRITE_DATA_COMPONENT(27, EnchantableComponent)
+		WRITE_DATA_COMPONENT(28, EquippableComponent)
+		WRITE_DATA_COMPONENT(29, RepairableComponent)
+		WRITE_DATA_COMPONENT(30, GliderComponent)
+		WRITE_DATA_COMPONENT(31, TooltipStyleComponent)
+		WRITE_DATA_COMPONENT(32, DeathProtectionComponent)
+		WRITE_DATA_COMPONENT(33, StoredEnchantmentsComponent)
+		WRITE_DATA_COMPONENT(34, DyedColorComponent)
+		WRITE_DATA_COMPONENT(35, MapColorComponent)
+		WRITE_DATA_COMPONENT(36, MapIdComponent)
+		WRITE_DATA_COMPONENT(37, MapDecorationsComponent)
+		WRITE_DATA_COMPONENT(38, MapPostProcessingComponent)
+		WRITE_DATA_COMPONENT(39, ChargedProjectilesComponent)
+		WRITE_DATA_COMPONENT(40, BundleContentsComponent)
+		WRITE_DATA_COMPONENT(41, PotionContentsComponent)
+		WRITE_DATA_COMPONENT(42, SuspiciousStewEffectsComponent)
+		WRITE_DATA_COMPONENT(43, WritableBookContentComponent)
+		WRITE_DATA_COMPONENT(44, WrittenBookContentComponent)
+		WRITE_DATA_COMPONENT(45, TrimComponent)
+		WRITE_DATA_COMPONENT(46, DebugStickStateComponent)
+		WRITE_DATA_COMPONENT(47, EntityDataComponent)
+		WRITE_DATA_COMPONENT(48, BucketEntityDataComponent)
+		WRITE_DATA_COMPONENT(49, BlockEntityDataComponent)
+		WRITE_DATA_COMPONENT(50, InstrumentComponent)
+		WRITE_DATA_COMPONENT(51, OminousBottleAmplifierComponent)
+		WRITE_DATA_COMPONENT(52, JukeboxPlayableComponent)
+		WRITE_DATA_COMPONENT(53, RecipesComponent)
+		WRITE_DATA_COMPONENT(54, LodestoneTrackerComponent)
+		WRITE_DATA_COMPONENT(55, FireworkExplosionComponent)
+		WRITE_DATA_COMPONENT(56, FireworksComponent)
+		WRITE_DATA_COMPONENT(57, ProfileComponent)
+		WRITE_DATA_COMPONENT(58, NoteBlockSoundComponent)
+		WRITE_DATA_COMPONENT(59, BannerPatternsComponent)
+		WRITE_DATA_COMPONENT(60, BaseColorComponent)
+		WRITE_DATA_COMPONENT(61, PotDecorationsComponent)
+		WRITE_DATA_COMPONENT(62, ContainerComponent)
+		WRITE_DATA_COMPONENT(63, BlockStateComponent)
+		WRITE_DATA_COMPONENT(64, BeesComponent)
+		WRITE_DATA_COMPONENT(65, LockComponent)
+		WRITE_DATA_COMPONENT(66, ContainerLootComponent)
+		*/
+	}, a_Component);
+}
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //  cProtocol_1_21_4:
 

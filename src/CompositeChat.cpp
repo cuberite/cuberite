@@ -32,6 +32,15 @@ cCompositeChat::cCompositeChat(const AString & a_ParseText, eMessageType a_Messa
 
 
 
+cCompositeChat::cCompositeChat(const cParsedNBT & a_ParsedNbt) : m_MessageType(mtCustom)
+{
+	ParseNBT(a_ParsedNbt);
+}
+
+
+
+
+
 void cCompositeChat::Clear(void)
 {
 	m_Parts.clear();
@@ -376,10 +385,42 @@ AString cCompositeChat::CreateJsonString(bool a_ShouldUseChatPrefixes) const
 
 
 
+void cCompositeChat::ParseNBT(const cParsedNBT & a_ParsedNbt)
+{
+	// TODO: read rest of the a_ParsedNbt = {const cParsedNBT &} data
+	if (const auto txt = a_ParsedNbt.FindChildByName(0, "text"); txt > 0)
+	{
+		AddTextPart(a_ParsedNbt.GetString(txt));
+	}
+	if (const auto extra = a_ParsedNbt.FindChildByName(0, "extra"); extra > 0 && (a_ParsedNbt.GetType(extra) == TAG_List))
+	{
+		for (int Child = a_ParsedNbt.GetFirstChild(extra); Child >= 0; Child = a_ParsedNbt.GetNextSibling(Child))
+		{
+			if (a_ParsedNbt.GetType(Child) == TAG_String)
+			{
+				AString str = a_ParsedNbt.GetString(Child);
+				if (str != "")  // Weird bugs happen if this is removed
+				{
+					AddTextPart(str);
+				}
+			}
+		}
+	}
+}
+
+
+
+
+
 void cCompositeChat::WriteAsNBT(cFastNBTWriter & a_Writer, bool a_ShouldUseChatPrefixes) const
 {
 	Json::Value Message;
 	a_Writer.AddString("text", cClientHandle::FormatMessageType(a_ShouldUseChatPrefixes, GetMessageType(), GetAdditionalMessageTypeData()));
+	if (m_Parts.empty())  // Lists cant be empty
+	{
+		a_Writer.Finish();
+		return;
+	}
 	a_Writer.BeginList("extra", eTagType::TAG_Compound);
 	for (const auto & Part : m_Parts)
 	{

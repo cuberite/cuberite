@@ -22,7 +22,7 @@ cEnchantingTableEntity::cEnchantingTableEntity(BlockState a_Block, Vector3i a_Po
 cItems cEnchantingTableEntity::ConvertToPickups() const
 {
 	cItem Item(Item::EnchantingTable);
-	Item.m_CustomName = m_CustomName;
+	Item.SetComponent(DataComponents::CustomNameComponent(m_CustomName));
 	return Item;
 }
 

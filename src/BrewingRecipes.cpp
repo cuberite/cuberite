@@ -90,6 +90,9 @@ void cBrewingRecipes::AddRecipeFromLine(AString a_Line, unsigned int a_LineNum)
 		return;
 	}
 
+
+	// TODO: FIX brewing
+	/*
 	if (!StringToInteger<short>(InputAndIngredient[0], Recipe->Input.m_ItemDamage))
 	{
 		LOGWARNING("brewing.txt: line %d: Cannot parse the damage value for the input item\"%s\".", a_LineNum, InputAndIngredient[0].c_str());
@@ -103,6 +106,7 @@ void cBrewingRecipes::AddRecipeFromLine(AString a_Line, unsigned int a_LineNum)
 		LOGINFO("Offending line: \"%s\"", a_Line.c_str());
 		return;
 	}
+	*/
 
 	m_Recipes.push_back(std::move(Recipe));
 }
@@ -148,7 +152,7 @@ const cBrewingRecipes::cRecipe * cBrewingRecipes::GetRecipeFrom(const cItem & a_
 			auto Recipe = std::make_unique<cRecipe>();
 
 			Recipe->Input.m_ItemType = Item::Potion;
-			Recipe->Output.m_ItemDamage = a_Input.m_ItemDamage + 8192;
+			// Recipe->Output.m_ItemDamage = a_Input.m_ItemDamage + 8192;  // TODO: fix
 			Recipe->Ingredient.m_ItemType = Item::Gunpowder;
 
 			auto RecipePtr = Recipe.get();
@@ -159,15 +163,15 @@ const cBrewingRecipes::cRecipe * cBrewingRecipes::GetRecipeFrom(const cItem & a_
 	}
 
 	// Check for splash potion
-	if (a_Input.m_ItemDamage & 0x4000)
+	if (a_Input.m_ItemType == Item::SplashPotion)
 	{
 		// Search for the drinkable potion, the ingredients are the same
-		short SplashItemDamage = a_Input.m_ItemDamage - 8192;
+		// short SplashItemDamage = 0;  // a_Input.m_ItemDamage - 8192;
 
 		auto FoundRecipe = std::find_if(m_Recipes.cbegin(), m_Recipes.cend(), [&](const std::unique_ptr<cRecipe>& a_Recipe)
 		{
 			return (
-				(a_Recipe->Input.m_ItemDamage == SplashItemDamage) &&
+				// (a_Recipe->Input.m_ItemDamage == SplashItemDamage) &&
 				(a_Recipe->Ingredient.IsEqual(a_Ingredient))
 			);
 		});
@@ -180,8 +184,8 @@ const cBrewingRecipes::cRecipe * cBrewingRecipes::GetRecipeFrom(const cItem & a_
 		// Create new recipe and add it to list
 		auto Recipe = std::make_unique<cRecipe>();
 
-		Recipe->Input.m_ItemDamage = a_Input.m_ItemDamage;
-		Recipe->Output.m_ItemDamage = (*FoundRecipe)->Output.m_ItemDamage + 8192;
+		// Recipe->Input.m_ItemDamage = a_Input.m_ItemDamage;
+		// Recipe->Output.m_ItemDamage = (*FoundRecipe)->Output.m_ItemDamage + 8192;
 		Recipe->Ingredient.m_ItemType = (*FoundRecipe)->Ingredient.m_ItemType;
 
 		auto RecipePtr = Recipe.get();

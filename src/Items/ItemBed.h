@@ -73,11 +73,11 @@ public:
 			return false;
 		}
 
-		auto SetColor = [&a_HeldItem](cBlockEntity & a_BlockEntity)
+		auto SetColor = [/* &a_HeldItem */](cBlockEntity & a_BlockEntity)
 		{
 			ASSERT(cBlockBedHandler::IsBlockBed(a_BlockEntity.GetBlock()));
 
-			static_cast<cBedEntity &>(a_BlockEntity).SetColor(a_HeldItem.m_ItemDamage);  // Broken
+			// static_cast<cBedEntity &>(a_BlockEntity).SetColor(a_HeldItem.m_ItemDamage);  // Broken
 			return false;
 		};
 		World.DoWithBlockEntityAt(a_PlacePosition, SetColor);

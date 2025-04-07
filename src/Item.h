@@ -14,6 +14,7 @@
 #include "Enchantments.h"
 #include "WorldStorage/FireworksSerializer.h"
 #include "Color.h"
+#include "DataComponents/DataComponents.h"
 #include "Registries/Items.h"
 #include "Protocol/Palettes/Upgrade.h"
 
@@ -48,8 +49,8 @@ public:
 		char a_ItemCount = 1,
 		short a_ItemDamage = 0,
 		const AString & a_Enchantments = "",
-		const AString & a_CustomName = "",
-		const AStringVector & a_LoreTable = {}
+		const AStringVector & a_LoreTable = {},
+		const DataComponents::DataComponentMap & a_DataComponents = DataComponents::DataComponentMap()
 	);
 
 	// The constructor is disabled in code, because the compiler generates it anyway,
@@ -79,13 +80,16 @@ public:
 	{
 		return (
 			IsSameType(a_Item) &&
-			(m_ItemDamage == a_Item.m_ItemDamage) &&
+			// (m_ItemDamage == a_Item.m_ItemDamage) &&
 			(m_Enchantments == a_Item.m_Enchantments) &&
-			(m_CustomName == a_Item.m_CustomName) &&
+			// (m_CustomName == a_Item.m_CustomName) &&
 			(m_LoreTable == a_Item.m_LoreTable) &&
-			m_FireworkItem.IsEqualTo(a_Item.m_FireworkItem)
+			m_FireworkItem.IsEqualTo(a_Item.m_FireworkItem) &&
+			m_ItemComponents.m_data == a_Item.m_ItemComponents.m_data
 		);
 	}
+
+	bool operator == (const cItem & rhs) const { return this->IsEqual(rhs); }
 
 
 	bool IsSameType(const cItem & a_Item) const
@@ -96,11 +100,11 @@ public:
 
 	bool IsBothNameAndLoreEmpty(void) const
 	{
-		return (m_CustomName.empty() && m_LoreTable.empty());
+		return (IsCustomNameEmpty() && IsLoreEmpty());
 	}
 
 
-	bool IsCustomNameEmpty(void) const { return (m_CustomName.empty()); }
+	bool IsCustomNameEmpty(void) const { return (!HasComponent<DataComponents::CustomNameComponent>()); }
 	bool IsLoreEmpty(void) const { return (m_LoreTable.empty()); }
 
 	/** Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items */
@@ -110,7 +114,7 @@ public:
 	cItem & AddCount(char a_AmountToAdd);
 
 	/** Returns the maximum damage value that this item can have; zero if damage is not applied */
-	short GetMaxDamage(void) const;
+	UInt32 GetMaxDamage(void) const;
 
 	/** Damages a weapon / tool. Returns true when damage reaches max value and the item should be destroyed */
 	bool DamageItem(short a_Amount = 1);
@@ -164,9 +168,9 @@ public:
 
 	Item           m_ItemType;
 	char           m_ItemCount;
-	short          m_ItemDamage;
+	// short          m_ItemDamage;
 	cEnchantments  m_Enchantments;
-	AString        m_CustomName;
+	// AString        m_CustomName;
 
 	// tolua_end
 
@@ -189,17 +193,81 @@ public:
 			{
 				return (a_Lhs.m_ItemType < a_Rhs.m_ItemType);
 			}
-			if ((a_Lhs.m_ItemDamage == -1) || (a_Rhs.m_ItemDamage == -1))
-			{
-				return false;  // -1 is a wildcard, damage of -1 alway compares equal
-			}
-			return (a_Lhs.m_ItemDamage < a_Rhs.m_ItemDamage);
+			return true;  // TODO: compare components
 		}
 	};
 
+	const std::map<int, DataComponents::DataComponent> & GetDefaultItemComponents(void) const;
+
+	template <typename TypeToFind> TypeToFind & GetOrAdd()
+	{
+		if (HasComponent<TypeToFind>())
+		{
+			return std::get<TypeToFind>(m_ItemComponents.m_data[DataComponents::GetIndexOfDataComponent<TypeToFind, 0>()]);
+		}
+		DataComponents::DataComponent def;
+		def.emplace<DataComponents::GetIndexOfDataComponent<TypeToFind>()>();
+		SetComponent(def);
+		return std::get<TypeToFind>(m_ItemComponents.m_data[DataComponents::GetIndexOfDataComponent<TypeToFind, 0>()]);
+	}
+
+	void SetComponent(const DataComponents::DataComponent & a_comp)
+	{
+		auto comps = GetDefaultItemComponents();
+
+		int ind = static_cast<int>(a_comp.index());
+		if (comps.contains(ind) && (a_comp == comps.at(ind)))
+		{
+			auto rez = m_ItemComponents.m_data.find(ind);
+			if (rez != m_ItemComponents.m_data.end())
+			{
+				m_ItemComponents.m_data.erase(rez);
+			}
+			return;
+		}
+
+		m_ItemComponents.AddComp(a_comp);
+	}
+
+	template <typename TypeToFind> const TypeToFind & GetComponentOrDefault() const
+	{
+		const auto & comps = GetDefaultItemComponents();
+		if (m_ItemComponents.HasComponent<TypeToFind>())
+		{
+			return m_ItemComponents.GetComp<TypeToFind>();
+		}
+		if (comps.contains(DataComponents::GetIndexOfDataComponent<TypeToFind>()))
+		{
+			return std::get<TypeToFind>(comps.at(DataComponents::GetIndexOfDataComponent<TypeToFind>()));
+		}
+		VERIFY("Component not found on item");
+		throw std::runtime_error("Component not found on item");
+	}
+
+	// Check if the given component is present or is a default component
+	template <typename TypeToFind> bool HasComponent() const
+	{
+		auto comps = GetDefaultItemComponents();
+		return m_ItemComponents.HasComponent<TypeToFind>() || comps.contains(DataComponents::GetIndexOfDataComponent<TypeToFind>());
+	}
+
+	template <typename TypeToFind> void RemoveComp()
+	{
+		if (m_ItemComponents.HasComponent<TypeToFind>())
+		{
+			m_ItemComponents.RemoveComp<TypeToFind>();
+		}
+		// TODO: default item component removal
+	}
+
+	const DataComponents::DataComponentMap & GetDataComponents(void) const { return m_ItemComponents; }
+
+private:
+	DataComponents::DataComponentMap m_ItemComponents;
+public:
 	// tolua_begin
 
-	int            m_RepairCost;
+	// int            m_RepairCost;
 	cFireworkItem  m_FireworkItem;
 	cColor         m_ItemColor;
 };

@@ -1286,7 +1286,6 @@ inline void cChunkDataSerializer::Serialize764(const int a_ChunkX, const int a_C
 	m_Packet.WriteBEInt32(a_ChunkX);
 	m_Packet.WriteBEInt32(a_ChunkZ);
 
-	m_Packet.WriteVarInt32(0);
 	{
 		cFastNBTWriter Writer = cFastNBTWriter(true);
 		// TODO: MOTION_BLOCKING height map

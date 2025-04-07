@@ -38,7 +38,8 @@ public:
 		eBlockFace a_ClickedBlockFace
 	) const override
 	{
-		short PotionDamage = a_HeldItem.m_ItemDamage;
+		// TODO: potion item component
+		short PotionDamage = 0;  // a_HeldItem.m_ItemDamage;
 
 		// Do not throw non-splash potions:
 		if (cEntityEffect::IsPotionDrinkable(PotionDamage))
@@ -71,10 +72,11 @@ public:
 
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) const override
 	{
-		short PotionDamage = a_Item->m_ItemDamage;
+		// TODO: potion item component
+		short PotionDamage = 0;  // a_Item->m_ItemDamage;
 
 		// Do not drink undrinkable potions:
-		if (!cEntityEffect::IsPotionDrinkable(a_Item->m_ItemDamage))
+		if (!cEntityEffect::IsPotionDrinkable(PotionDamage))
 		{
 			return false;
 		}

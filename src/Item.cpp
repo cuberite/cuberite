@@ -16,9 +16,6 @@
 cItem::cItem():
 	m_ItemType(Item::Air),
 	m_ItemCount(0),
-	m_ItemDamage(0),
-	m_CustomName(),
-	m_RepairCost(0),
 	m_FireworkItem(),
 	m_ItemColor()
 {
@@ -33,16 +30,14 @@ cItem::cItem(
 	char a_ItemCount,
 	short a_ItemDamage,
 	const AString & a_Enchantments,
-	const AString & a_CustomName,
-	const AStringVector & a_LoreTable
+	const AStringVector & a_LoreTable,
+	const DataComponents::DataComponentMap & a_DataComponents
 ):
-	m_ItemType    (a_ItemType),
-	m_ItemCount   (a_ItemCount),
-	m_ItemDamage  (a_ItemDamage),
+	m_ItemType(a_ItemType),
+	m_ItemCount(a_ItemCount),
 	m_Enchantments(a_Enchantments),
-	m_CustomName  (a_CustomName),
-	m_LoreTable   (a_LoreTable),
-	m_RepairCost  (0),
+	m_LoreTable(a_LoreTable),
+	m_ItemComponents(a_DataComponents),
 	m_FireworkItem(),
 	m_ItemColor()
 {
@@ -56,13 +51,11 @@ void cItem::Empty()
 {
 	m_ItemType = Item::Air;
 	m_ItemCount = 0;
-	m_ItemDamage = 0;
 	m_Enchantments.Clear();
-	m_CustomName = "";
 	m_LoreTable.clear();
-	m_RepairCost = 0;
 	m_FireworkItem.EmptyData();
 	m_ItemColor.Clear();
+	m_ItemComponents.m_data.clear();
 }
 
 
@@ -94,62 +87,9 @@ cItem & cItem::AddCount(char a_AmountToAdd)
 
 
 
-short cItem::GetMaxDamage(void) const
+UInt32 cItem::GetMaxDamage(void) const
 {
-	switch (m_ItemType)
-	{
-		case Item::Bow:                  return 384;
-		case Item::ChainmailBoots:       return 196;
-		case Item::ChainmailChestplate:  return 241;
-		case Item::ChainmailHelmet:      return 166;
-		case Item::ChainmailLeggings:    return 226;
-		case Item::DiamondAxe:           return 1561;
-		case Item::DiamondBoots:         return 430;
-		case Item::DiamondChestplate:    return 529;
-		case Item::DiamondHelmet:        return 364;
-		case Item::DiamondHoe:           return 1561;
-		case Item::DiamondLeggings:      return 496;
-		case Item::DiamondPickaxe:       return 1561;
-		case Item::DiamondShovel:        return 1561;
-		case Item::DiamondSword:         return 1561;
-		case Item::Elytra:               return 432;
-		case Item::FlintAndSteel:        return 64;
-		case Item::FishingRod:           return 65;
-		case Item::GoldenAxe:            return 32;
-		case Item::GoldenBoots:          return 92;
-		case Item::GoldenChestplate:     return 113;
-		case Item::GoldenHelmet:         return 78;
-		case Item::GoldenHoe:            return 32;
-		case Item::GoldenLeggings:       return 106;
-		case Item::GoldenPickaxe:        return 32;
-		case Item::GoldenShovel:         return 32;
-		case Item::GoldenSword:          return 32;
-		case Item::IronAxe:              return 250;
-		case Item::IronBoots:            return 196;
-		case Item::IronChestplate:       return 241;
-		case Item::IronHelmet:           return 166;
-		case Item::IronHoe:              return 250;
-		case Item::IronLeggings:         return 226;
-		case Item::IronPickaxe:          return 250;
-		case Item::IronShovel:           return 250;
-		case Item::IronSword:            return 250;
-		case Item::LeatherBoots:         return 66;
-		case Item::LeatherHelmet:        return 55;
-		case Item::LeatherLeggings:      return 76;
-		case Item::LeatherChestplate:    return 81;
-		case Item::Shears:               return 250;
-		case Item::StoneAxe:             return 131;
-		case Item::StoneHoe:             return 131;
-		case Item::StonePickaxe:         return 131;
-		case Item::StoneShovel:          return 131;
-		case Item::StoneSword:           return 131;
-		case Item::WoodenAxe:            return 59;
-		case Item::WoodenHoe:            return 59;
-		case Item::WoodenPickaxe:        return 59;
-		case Item::WoodenShovel:         return 59;
-		case Item::WoodenSword:          return 59;
-		default: return 0;
-	}
+	return GetComponentOrDefault<DataComponents::MaxDamageComponent>().MaxDamage;
 }
 
 
@@ -158,15 +98,16 @@ short cItem::GetMaxDamage(void) const
 
 bool cItem::DamageItem(short a_Amount)
 {
-	short MaxDamage = GetMaxDamage();
+	UInt32 MaxDamage = GetMaxDamage();
 	if (MaxDamage == 0)
 	{
 		// Item doesn't have damage
 		return false;
 	}
 
-	m_ItemDamage += a_Amount;
-	return (m_ItemDamage > MaxDamage);
+	auto & dmg = GetOrAdd<DataComponents::DamageComponent>();
+	dmg.Damage += static_cast<UInt32>(a_Amount);
+	return (dmg.Damage > MaxDamage);
 }
 
 
@@ -200,14 +141,22 @@ const cItemHandler & cItem::GetHandler(void) const
 
 
 
+const std::map<int, DataComponents::DataComponent> & cItem::GetDefaultItemComponents(void) const
+{
+	return cItemHandler::GetDefaultComponentsMap().GetComponentsFor(m_ItemType);
+}
+
+
+
+
+
 void cItem::GetJson(Json::Value & a_OutValue) const
 {
-	auto NumericItem = PaletteUpgrade::ToItem(m_ItemType);
-	a_OutValue["ID"] = NumericItem.first;
-	if (NumericItem.first > 0)
+	a_OutValue["ID"] = NamespaceSerializer::From(m_ItemType).data();
+	if (m_ItemType != Item::Air)
 	{
 		a_OutValue["Count"] = m_ItemCount;
-		a_OutValue["Health"] = m_ItemDamage + NumericItem.second;
+		// a_OutValue["Health"] = m_ItemDamage + NumericItem.second;
 		AString Enchantments(m_Enchantments.ToString());
 		if (!Enchantments.empty())
 		{
@@ -215,7 +164,7 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 		}
 		if (!IsCustomNameEmpty())
 		{
-			a_OutValue["Name"] = m_CustomName;
+			a_OutValue["Name"] = m_ItemComponents.GetComp<DataComponents::CustomNameComponent>().Name.ExtractText();
 		}
 		if (!IsLoreEmpty())
 		{
@@ -244,7 +193,10 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 			a_OutValue["FadeColours"] = m_FireworkItem.FadeColoursToString(m_FireworkItem);
 		}
 
-		a_OutValue["RepairCost"] = m_RepairCost;
+		if (HasComponent<DataComponents::RepairCostComponent>())
+		{
+			a_OutValue["RepairCost"] = GetComponentOrDefault<DataComponents::RepairCostComponent>().RepairCost;
+		}
 	}
 }
 
@@ -254,14 +206,17 @@ void cItem::GetJson(Json::Value & a_OutValue) const
 
 void cItem::FromJson(const Json::Value & a_Value)
 {
-	m_ItemType = PaletteUpgrade::FromItem(static_cast<short>(a_Value.get("ID", -1).asInt()), static_cast<short>(a_Value.get("Health", -1).asInt()));
+	m_ItemType = NamespaceSerializer::ToItem(a_Value.get("ID", "minecraft:air").asString());
 	if (m_ItemType != Item::Air)
 	{
-		m_ItemDamage = static_cast<short>(a_Value.get("Health", -1).asInt());
 		m_ItemCount = static_cast<char>(a_Value.get("Count", -1).asInt());
 		m_Enchantments.Clear();
 		m_Enchantments.AddFromString(a_Value.get("ench", "").asString());
-		m_CustomName = a_Value.get("Name", "").asString();
+		if (auto CustomName = a_Value.get("Name", Json::Value()); !CustomName.isNull())
+		{
+			m_ItemComponents.AddComp(DataComponents::CustomNameComponent(CustomName.asString()));
+		}
+
 		auto Lore = a_Value.get("Lore", Json::arrayValue);
 		for (auto & Line : Lore)
 		{
@@ -290,7 +245,10 @@ void cItem::FromJson(const Json::Value & a_Value)
 			m_FireworkItem.FadeColoursFromString(a_Value.get("FadeColours", "").asString(), m_FireworkItem);
 		}
 
-		m_RepairCost = a_Value.get("RepairCost", 0).asInt();
+		if (auto repair_cost = a_Value.get("RepairCost", Json::Value()); !repair_cost.isNull())
+		{
+			SetComponent(DataComponents::RepairCostComponent { repair_cost.asUInt() });
+		}
 	}
 }
 

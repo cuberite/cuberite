@@ -710,9 +710,9 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 	Super::OnRightClicked(a_Player);
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
-	if ((EquippedItem.m_ItemType == Item::NameTag) && !EquippedItem.m_CustomName.empty())
+	if ((EquippedItem.m_ItemType == Item::NameTag) && !EquippedItem.IsCustomNameEmpty())
 	{
-		SetCustomName(EquippedItem.m_CustomName);
+		SetCustomName(EquippedItem.GetComponentOrDefault<DataComponents::CustomNameComponent>().Name.ExtractText());
 		if (!a_Player.IsGameModeCreative())
 		{
 			a_Player.GetInventory().RemoveOneEquippedItem();

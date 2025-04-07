@@ -967,6 +967,7 @@ void cProtocol_1_13::HandlePacketNameItem(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, NewItemName);
 
+	m_Client->HandleAnvilItemName(NewItemName);
 	LOGD("New item name : %s", NewItemName);
 }
 
@@ -1918,7 +1919,7 @@ bool cProtocol_1_13_2::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size
 	}
 
 	ContiguousByteBuffer bfr;
-	cParsedNBT nbt(a_ByteBuffer, bfr);
+	cParsedNBT nbt(a_ByteBuffer, bfr, false);
 	if (bfr.empty() || (bfr[0] == static_cast<std::byte>(0)))
 	{
 		// No metadata
@@ -1958,7 +1959,8 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 	{
 		AString potionname;
 		AString finalname = "minecraft:";
-		int potion_dmg = a_Item.m_ItemDamage & 0x1F;
+		/*
+		int potion_dmg = 0;  // a_Item.m_ItemDamage & 0x1F;
 		switch (potion_dmg)
 		{
 			case 0: potionname = "water"; break;
@@ -1997,12 +1999,13 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 		{
 			finalname += "long_";
 		}
+		*/
 		finalname += potionname;
 		Writer.AddString("Potion", finalname);
 	}
-	if (a_Item.m_RepairCost != 0)
+	if (a_Item.HasComponent<DataComponents::RepairCostComponent>())
 	{
-		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
+		Writer.AddInt("RepairCost", static_cast<Int32>(a_Item.GetComponentOrDefault<DataComponents::RepairCostComponent>().RepairCost));
 	}
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
@@ -2024,7 +2027,7 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 
 		if (!a_Item.IsCustomNameEmpty())
 		{
-			Writer.AddString("Name", a_Item.m_CustomName);
+			Writer.AddString("Name", a_Item.GetComponentOrDefault<DataComponents::CustomNameComponent>().Name.ExtractText());
 		}
 		if (!a_Item.IsLoreEmpty())
 		{

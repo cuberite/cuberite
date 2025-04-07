@@ -38,6 +38,7 @@
 
 #include "mbedtls/md5.h"
 
+#include <ranges>
 
 
 /** Maximum number of explosions to send this tick, server will start dropping if exceeded. */
@@ -807,7 +808,7 @@ void cClientHandle::HandleCreativeInventory(Int16 a_SlotNum, const cItem & a_Hel
 		return;
 	}
 
-	m_Player->GetWindow()->Clicked(*m_Player, 0, a_SlotNum, a_ClickAction, a_HeldItem);
+	m_Player->GetWindow()->Clicked(*m_Player, 0, a_SlotNum, a_ClickAction, { {a_SlotNum, a_HeldItem} }, a_HeldItem);
 }
 
 
@@ -1168,7 +1169,7 @@ void cClientHandle::HandleLeftClick(Vector3i a_BlockPos, eBlockFace a_BlockFace,
 		case DIG_STATUS_SHOOT_EAT:
 		{
 			auto & ItemHandler = m_Player->GetEquippedItem().GetHandler();
-			if (ItemHandler.IsFood() || ItemHandler.IsDrinkable(m_Player->GetEquippedItem().m_ItemDamage))
+			if (ItemHandler.IsFood()  /* || ItemHandler.IsDrinkable(m_Player->GetEquippedItem().m_ItemDamage) */)  // TODO: check if is drinkable
 			{
 				m_Player->AbortEating();
 				return;
@@ -1754,21 +1755,45 @@ void cClientHandle::HandlePlayerSession(cUUID a_SessionID, Int64 a_ExpiresAt, co
 
 
 
-void cClientHandle::HandleWindowClick(UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem)
+void cClientHandle::HandleWindowClick(UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta, const cItem & a_DraggedItem)
 {
+	/*
 	LOGD("WindowClick: WinID %d, SlotNum %d, action: %s, Item %s x %d",
 		a_WindowID, a_SlotNum, ClickActionToString(a_ClickAction),
 		ItemToString(a_HeldItem).c_str(), a_HeldItem.m_ItemCount
 	);
-
+	*/
 	cWindow * Window = m_Player->GetWindow();
 	if (Window == nullptr)
 	{
 		LOGWARNING("Player \"%s\" clicked in a non-existent window. Ignoring", m_Username.c_str());
 		return;
 	}
-	m_Player->AddKnownItem(a_HeldItem);
-	Window->Clicked(*m_Player, a_WindowID, a_SlotNum, a_ClickAction, a_HeldItem);
+	for (const auto & a_item_delta : std::ranges::views::values(a_ItemDelta))
+	{
+		m_Player->AddKnownItem(a_item_delta);
+	}
+	Window->Clicked(*m_Player, a_WindowID, a_SlotNum, a_ClickAction, a_ItemDelta, a_DraggedItem);
+
+	bool IsDesync = false;
+	for (const auto & item_delta : a_ItemDelta)
+	{
+		auto CurrSlot = Window->GetSlot(*m_Player, item_delta.first);
+		if (!CurrSlot->IsEqual(item_delta.second))
+		{
+			IsDesync = true;
+			LOGWARN(fmt::format("Windows desync at slot num: {} - Server Item: {} - Client Item: {}", item_delta.first, NamespaceSerializer::From(CurrSlot->m_ItemType), NamespaceSerializer::From(item_delta.second.m_ItemType)));
+		}
+	}
+	if (!m_Player->GetDraggingItem().IsEqual(a_DraggedItem))
+	{
+		IsDesync = true;
+		LOGWARN(fmt::format("Windows desync at Cursor slot: Server Item: {} - Client Item: {}", NamespaceSerializer::From(m_Player->GetDraggingItem().m_ItemType), NamespaceSerializer::From(a_DraggedItem.m_ItemType)));
+	}
+	if (IsDesync)
+	{
+		Window->BroadcastWholeWindow();
+	}
 }
 
 
@@ -1893,7 +1918,7 @@ void cClientHandle::HandleUseItem(bool a_UsedMainHand)
 		return;
 	}
 
-	if (ItemHandler.IsFood() || ItemHandler.IsDrinkable(HeldItem.m_ItemDamage))
+	if (ItemHandler.IsFood()  /* || ItemHandler.IsDrinkable(HeldItem.m_ItemDamage) */)  // TODO: fix
 	{
 		if (
 			ItemHandler.IsFood() &&

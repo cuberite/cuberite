@@ -110,7 +110,7 @@ void cItemFrame::SpawnOn(cClientHandle & a_ClientHandle)
 
 	if (m_Item.m_ItemType == Item::FilledMap)
 	{
-		cMap * Map = GetWorld()->GetMapManager().GetMapData(static_cast<unsigned>(m_Item.m_ItemDamage));
+		cMap * Map = GetWorld()->GetMapManager().GetMapData(0);  // TODO: map component
 		if (Map != nullptr)
 		{
 			a_ClientHandle.SendMapData(*Map, 0, 0);

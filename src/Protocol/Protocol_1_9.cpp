@@ -1229,7 +1229,7 @@ void cProtocol_1_9_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 		}
 	}
 
-	m_Client->HandleWindowClick(WindowID, SlotNum, Action, Item);
+	m_Client->HandleWindowClick(WindowID, SlotNum, Action, {}, cItem());
 }
 
 
@@ -1324,7 +1324,7 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 					{
 						if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name"))  // Custon name tag
 						{
-							a_Item.m_CustomName = NBT.GetString(displaytag);
+							a_Item.SetComponent(DataComponents::CustomNameComponent(NBT.GetString(displaytag)));
 						}
 						else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore"))  // Lore tag
 						{
@@ -1352,8 +1352,8 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 						{
 							AString NBTName = NBT.GetString(entitytag);
 							ReplaceString(NBTName, "minecraft:", "");
-							auto MonsterType = cMonster::StringToMobType(NBTName);
-							a_Item.m_ItemDamage = static_cast<short>(GetProtocolEntityType(MonsterType));
+							// auto MonsterType = cMonster::StringToMobType(NBTName);
+							// a_Item.m_ItemDamage = static_cast<short>(GetProtocolEntityType(MonsterType));
 
 						}
 					}
@@ -1364,7 +1364,7 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 			{
 				if (TagName == "RepairCost")
 				{
-					a_Item.m_RepairCost = NBT.GetInt(tag);
+					a_Item.SetComponent(DataComponents::RepairCostComponent { static_cast<UInt32>(NBT.GetInt(tag)) });
 				}
 				break;
 			}
@@ -1380,6 +1380,7 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 						continue;
 					}
 
+					/*
 					if (PotionEffect.find("empty") != AString::npos)
 					{
 						a_Item.m_ItemDamage = 0;
@@ -1477,6 +1478,7 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 					{
 						a_Item.m_ItemDamage |= 0x40;
 					}
+					*/
 					/* TODO(12xx12)
 					// Ugly special case with the changed splash potion ID in 1.9
 					if ((a_Item.m_ItemType == 438) || (a_Item.m_ItemType == 441))
@@ -1605,7 +1607,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		return;
 	}
 
-	if ((a_Item.m_ItemType == Item::Potion) && ((a_Item.m_ItemDamage & 0x4000) != 0))
+	if (a_Item.m_ItemType == Item::SplashPotion)
 	{
 		// Ugly special case for splash potion ids which changed in 1.9; this can be removed when the new 1.9 ids are implemented
 		a_Pkt.WriteBEInt16(438);  // minecraft:splash_potion
@@ -1624,7 +1626,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	}
 	else
 	{
-		a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
+		// a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
 	}
 
 	if (
@@ -1643,9 +1645,9 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 
 	// Send the enchantments and custom names:
 	cFastNBTWriter Writer;
-	if (a_Item.m_RepairCost != 0)
+	if (a_Item.HasComponent<DataComponents::RepairCostComponent>())
 	{
-		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
+		Writer.AddInt("RepairCost", static_cast<Int32>(a_Item.GetComponentOrDefault<DataComponents::RepairCostComponent>().RepairCost));
 	}
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
@@ -1662,7 +1664,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 
 		if (!a_Item.IsCustomNameEmpty())
 		{
-			Writer.AddString("Name", a_Item.m_CustomName);
+			Writer.AddString("Name", a_Item.GetComponentOrDefault<DataComponents::CustomNameComponent>().Name.ExtractText());
 		}
 		if (!a_Item.IsLoreEmpty())
 		{
@@ -1688,7 +1690,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		{
 			// 1.9 potions use a different format.  In the future (when only 1.9+ is supported) this should be its own class
 			AString PotionID = "empty";  // Fallback of "Uncraftable potion" for unhandled cases
-
+			/*
 			cEntityEffect::eType Type = cEntityEffect::GetPotionEffectType(a_Item.m_ItemDamage);
 			if (Type != cEntityEffect::effNoEffect)
 			{
@@ -1740,7 +1742,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 			}
 
 			PotionID = "minecraft:" + PotionID;
-
+			*/
 			Writer.AddString("Potion", PotionID);
 			break;
 		}

@@ -149,14 +149,14 @@ The data pointer passed in the constructor is assumed to be valid throughout the
 The parser decomposes the input data into a tree of tags that is stored as an array of cFastNBTTag items,
 and accessing the tree is done by using the array indices for tags. Each tag stores the indices for its parent,
 first child, last child, prev sibling and next sibling, a value of -1 indicates that the indice is not valid.
-Each primitive tag also stores the length of the contained data, in bytes.
+Each primitive tag also stores the length of the contained data, in bytes.F
 */
 class cParsedNBT
 {
 public:
 	cParsedNBT(ContiguousByteBufferView a_Data);
 
-	cParsedNBT(cByteBuffer & a_Data, ContiguousByteBuffer & a_Bfr);
+	cParsedNBT(cByteBuffer & a_Data, ContiguousByteBuffer & a_Bfr, bool a_Network_1_21);
 
 	bool IsValid(void) const { return (m_Error == eNBTParseError::npSuccess); }
 
@@ -307,7 +307,7 @@ protected:
 	// Used while parsing:
 	size_t m_Pos;
 
-	eNBTParseError Parse(void);
+	eNBTParseError Parse(bool a_Network_1_21);
 	eNBTParseError ReadString(size_t & a_StringStart, size_t & a_StringLen);  // Reads a simple string (2 bytes length + data), sets the string descriptors
 	eNBTParseError ReadCompound(void);  // Reads the latest tag as a compound
 	eNBTParseError ReadList(eTagType a_ChildrenType);  // Reads the latest tag as a list of items of type a_ChildrenType

@@ -4,6 +4,7 @@
 #include "../Defines.h"
 #include "../Item.h"
 #include "../Registries/Items.h"
+#include "../DataComponents/JsonDataCompLoader.h"
 
 
 
@@ -23,6 +24,7 @@ class cItemHandler
 public:
 
 	friend class cItem;
+	friend class DataComponents::cDataComponents;
 
 	/** Actions that may cause durability of an item may be lost, where the
 	magnitude of the loss depends on the specific item used to perform the
@@ -131,6 +133,7 @@ public:
 	Defaults to 1 unless overriden. */
 	virtual float GetBlockBreakingStrength(BlockState a_Block) const;
 
+	static DataComponents::DefaultComponentsMap & GetDefaultComponentsMap() { static DataComponents::DefaultComponentsMap s_DefaultComponentsMap; return s_DefaultComponentsMap; }
 
 protected:
 
@@ -139,8 +142,6 @@ protected:
 	~cItemHandler() = default;
 
 	Item m_ItemType;
-
-	// const Item m_NewItemType;
 
 	/** Performs the actual placement of this placeable item.
 	The descendant handler should call a_Player.PlaceBlock(s) supplying correct values for the newly placed block.

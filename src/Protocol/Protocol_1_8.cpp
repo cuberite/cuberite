@@ -2989,8 +2989,7 @@ void cProtocol_1_8_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 			break;
 		}
 	}
-
-	m_Client->HandleWindowClick(WindowID, SlotNum, Action, Item);
+	m_Client->HandleWindowClick(WindowID, SlotNum, Action, {}, cItem());
 }
 
 
@@ -3137,7 +3136,7 @@ void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 					{
 						if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name"))  // Custon name tag
 						{
-							a_Item.m_CustomName = NBT.GetString(displaytag);
+							a_Item.SetComponent(DataComponents::CustomNameComponent(NBT.GetString(displaytag)));
 						}
 						else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore"))  // Lore tag
 						{
@@ -3162,7 +3161,7 @@ void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 			{
 				if (TagName == "RepairCost")
 				{
-					a_Item.m_RepairCost = NBT.GetInt(tag);
+					a_Item.SetComponent(DataComponents::RepairCostComponent{ static_cast<UInt32>(NBT.GetInt(tag)) });
 				}
 				break;
 			}
@@ -3190,7 +3189,7 @@ bool cProtocol_1_8_0::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemDamage);
 
 	a_Item.m_ItemCount  = ItemCount;
-	a_Item.m_ItemDamage = ItemDamage;
+	// a_Item.m_ItemDamage = ItemDamage;
 	if (ItemCount <= 0)
 	{
 		a_Item.Empty();
@@ -3199,7 +3198,7 @@ bool cProtocol_1_8_0::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_
 	a_Item.m_ItemType = PaletteUpgrade::FromItem(ItemType, ItemDamage);
 	if (ItemCategory::IsTool(a_Item.m_ItemType))
 	{
-		a_Item.m_ItemDamage += ItemDamage;
+		// a_Item.m_ItemDamage += ItemDamage;
 	}
 
 	ContiguousByteBuffer Metadata;
@@ -3438,7 +3437,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 		{
 			auto & FlowerPotEntity = static_cast<const cFlowerPotEntity &>(a_BlockEntity);
 			a_Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
-			a_Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
+			// a_Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
 			break;
 		}
 		case BlockType::Spawner:
@@ -3558,7 +3557,7 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 
 	a_Pkt.WriteBEInt16(ItemType);
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
-	a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
+	// a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
 
 	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != Item::FireworkRocket) && (a_Item.m_ItemType != Item::FireworkStar) && !a_Item.m_ItemColor.IsValid())
 	{
@@ -3569,9 +3568,9 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 
 	// Send the enchantments and custom names:
 	cFastNBTWriter Writer;
-	if (a_Item.m_RepairCost != 0)
+	if (a_Item.HasComponent<DataComponents::RepairCostComponent>())
 	{
-		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
+		Writer.AddInt("RepairCost", static_cast<int>(a_Item.GetComponentOrDefault<DataComponents::RepairCostComponent>().RepairCost));
 	}
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
@@ -3588,7 +3587,7 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 
 		if (!a_Item.IsCustomNameEmpty())
 		{
-			Writer.AddString("Name", a_Item.m_CustomName);
+			Writer.AddString("Name", a_Item.GetComponentOrDefault<DataComponents::CustomNameComponent>().Name.ExtractText());
 		}
 		if (!a_Item.IsLoreEmpty())
 		{

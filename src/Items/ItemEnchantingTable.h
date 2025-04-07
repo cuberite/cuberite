@@ -36,7 +36,10 @@ private:
 		{
 			ASSERT(a_BlockEntity.GetBlockType() == BlockType::EnchantingTable);
 
-			static_cast<cEnchantingTableEntity &>(a_BlockEntity).SetCustomName(a_HeldItem.m_CustomName);
+			if (!a_HeldItem.IsCustomNameEmpty())
+			{
+				static_cast<cEnchantingTableEntity &>(a_BlockEntity).SetCustomName(a_HeldItem.GetComponentOrDefault<DataComponents::CustomNameComponent>().Name.ExtractText());
+			}
 			return false;
 		});
 

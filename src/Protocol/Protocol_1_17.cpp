@@ -1035,7 +1035,7 @@ void cProtocol_1_17::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 		}
 	}
 
-	m_Client->HandleWindowClick(WindowID, SlotNum, Action, Item);
+	m_Client->HandleWindowClick(WindowID, SlotNum, Action, {}, cItem());
 }
 
 

@@ -737,7 +737,6 @@ public:
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_FlowerPot, "FlowerPot");
 			mWriter.AddInt   ("Item", static_cast<Int32>(a_FlowerPot->GetItem().m_ItemType));
-			mWriter.AddInt   ("Data", static_cast<Int32>(a_FlowerPot->GetItem().m_ItemDamage));
 		mWriter.EndCompound();
 	}
 

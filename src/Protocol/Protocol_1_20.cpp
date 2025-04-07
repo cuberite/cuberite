@@ -5,6 +5,7 @@
 #include <Entities/EnderCrystal.h>
 #include <Entities/Pickup.h>
 #include "JsonUtils.h"
+#include "Protocol_1_21.h"
 #include "Root.h"
 #include "Entities/Player.h"
 #include "../CompositeChat.h"
@@ -17,6 +18,9 @@
 #include "../Entities/Entity.h"
 #include "AllTags/BlockTags.h"
 #include "BlockEntities/SignEntity.h"
+#include "Generating/BioGen.h"
+
+#include <ranges>
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1138,6 +1142,7 @@ void cProtocol_1_20_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 		AString potionname;
 		AString finalname = "minecraft:";
 
+		/*
 		int potion_dmg = a_Item.m_ItemDamage & 0x1F;
 		switch (potion_dmg)
 		{
@@ -1180,11 +1185,12 @@ void cProtocol_1_20_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 			finalname += "long_";
 		}
 		finalname += potionname;
+		*/
 		Writer.AddString("Potion", finalname);
 	}
-	if (a_Item.m_RepairCost != 0)
+	if (a_Item.HasComponent<DataComponents::RepairCostComponent>())
 	{
-		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
+		Writer.AddInt("RepairCost", static_cast<int>(a_Item.GetComponentOrDefault<DataComponents::RepairCostComponent>().RepairCost));
 	}
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
@@ -1206,7 +1212,7 @@ void cProtocol_1_20_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 
 		if (!a_Item.IsCustomNameEmpty())
 		{
-			Writer.AddString("Name", a_Item.m_CustomName);
+			Writer.AddString("Name", a_Item.GetComponentOrDefault<DataComponents::CustomNameComponent>().Name.ExtractText());
 		}
 		if (!a_Item.IsLoreEmpty())
 		{
@@ -2388,8 +2394,12 @@ void cProtocol_1_20_5::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 	a_Pkt.WriteVarInt32(static_cast<UInt32>(a_Item.m_ItemCount));
 	a_Pkt.WriteVarInt32(GetProtocolItemType(a_Item.m_ItemType));
 	// TODO: item components
+	a_Pkt.WriteVarInt32(static_cast<UInt32>(a_Item.GetDataComponents().GetMap().size()));
 	a_Pkt.WriteVarInt32(0);
-	a_Pkt.WriteVarInt32(0);
+	for (auto & Component : std::views::values(a_Item.GetDataComponents().GetMap()))
+	{
+		WriteComponent(a_Pkt, Component);
+	}
 }
 
 
@@ -2411,9 +2421,25 @@ bool cProtocol_1_20_5::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size
 
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, ComponentsToAdd);
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, ComponentsToRemove);
+	for (size_t i = 0; i < ComponentsToAdd; ++i)
+	{
+		DataComponents::DataComponent rez;
+		//  HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, CompType);
+		//  HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt32, Int32, Hash);
+		//  LOG(fmt::format("Type:{} - Hash: {}", CompType, Hash));
+		ReadComponent(a_ByteBuffer, rez);
+		a_Item.SetComponent(rez);
+	}
 
-	ContiguousByteBuffer Metadata;
-	return a_ByteBuffer.ReadSome(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes);
+
+
+	std::vector<UInt32> CompToRemove;
+	for (size_t i = 0; i < ComponentsToRemove; ++i)
+	{
+		HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, CompId);
+		CompToRemove.push_back(CompId);
+	}
+	return true;
 }
 
 
@@ -2878,4 +2904,307 @@ Int32 cProtocol_1_20_5::GetProtocolCommandArgumentID(eCommandParserType a_Parser
 		case eCommandParserType::Uuid:              return 53;
 		default: return -1;
 	}
+}
+
+
+
+
+
+bool cProtocol_1_20_5::DataComponentSerializer::ReadComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+{
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, ProtocolCompID);
+	typedef DataComponentSerializer DCS;
+	static const std::map<UInt32, ReadCompFunc> ReadCompFuncs =
+	{
+		// {0, &ReadCustomDataComponent},
+		{1, &DCS::ReadMaxStackSizeComponent},
+		{2, &DCS::ReadMaxDamageComponent},
+		{3, &DCS::ReadDamageComponent},
+		{4, &DCS::ReadUnbreakableComponent},
+		{5, &DCS::ReadCustomNameComponent},
+		// {6, &ReadItemNameComponent},
+		// {7, &ReadLoreComponent},
+		// {8, &ReadRarityComponent},
+		// {9, &ReadEnchantmentsComponent},
+		// {10, &ReadCanPlaceOnComponent},
+		// {11, &ReadCanBreakComponent},
+		// {12, &ReadAttributeModifiersComponent},
+		// {13, &ReadCustomModelDataComponent},
+		// {14, &ReadHideAdditionalTooltipComponent},
+		// {15, &ReadHideTooltipComponent},
+		{16, &DCS::ReadRepairCostComponent},
+		// {17, &ReadCreativeSlotLockComponent},
+		// {18, &ReadEnchantmentGlintOverrideComponent},
+		// {19, &ReadIntangibleProjectileComponent},
+		// {20, &ReadFoodComponent},
+		// {21, &ReadFireResistantComponent},
+		// {22, &ReadToolComponent},
+		// {23, &ReadStoredEnchantmentsComponent},
+		// {24, &ReadDyedColorComponent},
+		// {25, &ReadMapColorComponent},
+		// {26, &ReadMapIdComponent},
+		// {27, &ReadMapDecorationsComponent},
+		// {28, &ReadMapPostProcessingComponent},
+		// {29, &ReadChargedProjectilesComponent},
+		// {30, &ReadBundleContentsComponent},
+		// {31, &ReadPotionContentsComponent},
+		// {32, &ReadSuspiciousStewEffectsComponent},
+		// {33, &ReadWritableBookContentComponent},
+		// {34, &ReadWrittenBookContentComponent},
+		// {35, &ReadTrimComponent},
+		// {36, &ReadDebugStickStateComponent},
+		// {37, &ReadEntityDataComponent},
+		// {38, &ReadBucketEntityDataComponent},
+		// {39, &ReadBlockEntityDataComponent},
+		// {40, &ReadInstrumentComponent},
+		// {41, &ReadOminousBottleAmplifierComponent},
+		// {42, &ReadRecipesComponent},
+		// {43, &ReadLodestoneTrackerComponent},
+		// {44, &ReadFireworkExplosionComponent},
+		// {45, &ReadFireworksComponent},
+		// {46, &ReadProfileComponent},
+		// {47, &ReadNoteBlockSoundComponent},
+		// {48, &ReadBannerPatternsComponent},
+		// {49, &ReadBaseColorComponent},
+		// {50, &ReadPotDecorationsComponent},
+		// {51, &ReadContainerComponent},
+		// {52, &ReadBlockStateComponent},
+		// {53, &ReadBeesComponent},
+		// {54, &ReadLockComponent},
+		// {55, &ReadContainerLootComponent},
+
+	};
+	const auto res = ReadCompFuncs.find(ProtocolCompID);
+	if (res == ReadCompFuncs.end())
+	{
+		LOGWARN(fmt::format("Data component with id {} not implemented", ProtocolCompID));
+		return false;
+	}
+	return (this->*res->second)(a_ByteBuffer, a_Result);
+}
+
+
+
+
+
+bool cProtocol_1_20_5::DataComponentSerializer::ReadMaxStackSizeComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+{
+
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, MaxStackSize);
+	DataComponents::MaxStackSizeComponent rez;
+	rez.maxStackSize = MaxStackSize;
+	a_Result = rez;
+	return true;
+}
+
+
+
+
+
+bool cProtocol_1_20_5::DataComponentSerializer::ReadUnbreakableComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+{
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBool, bool, Unbreakable);
+	DataComponents::UnbreakableComponent rez;
+	rez.unbreakable = Unbreakable;
+	a_Result = rez;
+	return true;
+}
+
+
+
+
+
+bool cProtocol_1_20_5::DataComponentSerializer::ReadCustomNameComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+{
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8, Int8, TagType);
+	DataComponents::CustomNameComponent comp;
+	if (TagType == TAG_Compound)
+	{
+		size_t oldpos = a_ByteBuffer.GetReadPos();
+		a_ByteBuffer.ResetRead();
+		a_ByteBuffer.SkipRead(oldpos - 1);
+		ContiguousByteBuffer bfr;
+		const cParsedNBT nbt(a_ByteBuffer, bfr, true);
+		comp.Name = cCompositeChat(nbt);
+	}
+	else if (TagType == TAG_String)
+	{
+		// Reads a single NBT string tag
+		HANDLE_PACKET_READ(a_ByteBuffer, ReadBEUInt16, UInt16, Size);
+
+		ContiguousByteBuffer Buffer;
+		if (!a_ByteBuffer.ReadSome(Buffer, Size))
+		{
+			return false;
+		}
+		// "Convert" a UTF-8 encoded string into system-native char.
+		// This isn't great, better would be to use codecvt:
+		AString a_Value = { reinterpret_cast<const char *>(Buffer.data()), Buffer.size() };
+		comp.Name.AddTextPart(a_Value);
+	}
+
+	a_Result = comp;
+	return true;
+}
+
+
+
+
+
+bool cProtocol_1_20_5::DataComponentSerializer::ReadDamageComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+{
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt, UInt32, dmg);
+	DataComponents::DamageComponent rez;
+	rez.Damage = dmg;
+	a_Result = rez;
+	return true;
+}
+
+
+
+
+
+bool cProtocol_1_20_5::DataComponentSerializer::ReadMaxDamageComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+{
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt, UInt32, Maxdmg);
+	DataComponents::MaxDamageComponent rez;
+	rez.MaxDamage = Maxdmg;
+	a_Result = rez;
+	return true;
+}
+
+
+
+
+
+bool cProtocol_1_20_5::DataComponentSerializer::ReadRepairCostComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+{
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt, UInt32, Maxdmg);
+	a_Result = DataComponents::RepairCostComponent { Maxdmg };
+	return true;
+}
+
+
+
+
+
+void cProtocol_1_20_5::DataComponentSerializer::WriteComponent(cPacketizer & a_Pkt, const DataComponents::DataComponent & a_Component) const
+{
+	// TODO: implement remaining components
+	std::visit(OverloadedVariantAccess
+	{
+		// WRITE_DATA_COMPONENT(0, CustomDataComponent)
+		WRITE_DATA_COMPONENT(1, MaxStackSizeComponent)
+		WRITE_DATA_COMPONENT(2, MaxDamageComponent)
+		WRITE_DATA_COMPONENT(3, DamageComponent)
+		WRITE_DATA_COMPONENT(4, UnbreakableComponent)
+		WRITE_DATA_COMPONENT(5, CustomNameComponent)
+		// WRITE_DATA_COMPONENT(6, ItemNameComponent)
+		// WRITE_DATA_COMPONENT(7, LoreComponent)
+		// WRITE_DATA_COMPONENT(8, RarityComponent)
+		// WRITE_DATA_COMPONENT(9, EnchantmentsComponent)
+		// WRITE_DATA_COMPONENT(10, CanPlaceOnComponent)
+		// WRITE_DATA_COMPONENT(11, CanBreakComponent)
+		// WRITE_DATA_COMPONENT(12, AttributeModifiersComponent)
+		// WRITE_DATA_COMPONENT(13, CustomModelDataComponent)
+		// WRITE_DATA_COMPONENT(14, HideAdditionalTooltipComponent)
+		// WRITE_DATA_COMPONENT(15, HideTooltipComponent)
+		WRITE_DATA_COMPONENT(16, RepairCostComponent)
+		// WRITE_DATA_COMPONENT(17, CreativeSlotLockComponent)
+		// WRITE_DATA_COMPONENT(18, EnchantmentGlintOverrideComponent)
+		// WRITE_DATA_COMPONENT(19, IntangibleProjectileComponent)
+		// WRITE_DATA_COMPONENT(20, FoodComponent)
+		// WRITE_DATA_COMPONENT(21, FireResistantComponent)
+		// WRITE_DATA_COMPONENT(22, ToolComponent)
+		// WRITE_DATA_COMPONENT(23, StoredEnchantmentsComponent)
+		// WRITE_DATA_COMPONENT(24, DyedColorComponent)
+		// WRITE_DATA_COMPONENT(25, MapColorComponent)
+		// WRITE_DATA_COMPONENT(26, MapIdComponent)
+		// WRITE_DATA_COMPONENT(27, MapDecorationsComponent)
+		// WRITE_DATA_COMPONENT(28, MapPostProcessingComponent)
+		// WRITE_DATA_COMPONENT(29, ChargedProjectilesComponent)
+		// WRITE_DATA_COMPONENT(30, BundleContentsComponent)
+		// WRITE_DATA_COMPONENT(31, PotionContentsComponent)
+		// WRITE_DATA_COMPONENT(32, SuspiciousStewEffectsComponent)
+		// WRITE_DATA_COMPONENT(33, WritableBookContentComponent)
+		// WRITE_DATA_COMPONENT(34, WrittenBookContentComponent)
+		// WRITE_DATA_COMPONENT(35, TrimComponent)
+		// WRITE_DATA_COMPONENT(36, DebugStickStateComponent)
+		// WRITE_DATA_COMPONENT(37, EntityDataComponent)
+		// WRITE_DATA_COMPONENT(38, BucketEntityDataComponent)
+		// WRITE_DATA_COMPONENT(39, BlockEntityDataComponent)
+		// WRITE_DATA_COMPONENT(40, InstrumentComponent)
+		// WRITE_DATA_COMPONENT(41, OminousBottleAmplifierComponent)
+		// WRITE_DATA_COMPONENT(42, RecipesComponent)
+		// WRITE_DATA_COMPONENT(43, LodestoneTrackerComponent)
+		// WRITE_DATA_COMPONENT(44, FireworkExplosionComponent)
+		// WRITE_DATA_COMPONENT(45, FireworksComponent)
+		// WRITE_DATA_COMPONENT(46, ProfileComponent)
+		// WRITE_DATA_COMPONENT(47, NoteBlockSoundComponent)
+		// WRITE_DATA_COMPONENT(48, BannerPatternsComponent)
+		// WRITE_DATA_COMPONENT(49, BaseColorComponent)
+		// WRITE_DATA_COMPONENT(50, PotDecorationsComponent)
+		// WRITE_DATA_COMPONENT(51, ContainerComponent)
+		// WRITE_DATA_COMPONENT(52, BlockStateComponent)
+		// WRITE_DATA_COMPONENT(53, BeesComponent)
+		// WRITE_DATA_COMPONENT(54, LockComponent)
+		// WRITE_DATA_COMPONENT(55, ContainerLootComponent)
+
+	}, a_Component);
+}
+
+
+
+
+
+void cProtocol_1_20_5::DataComponentSerializer::WriteMaxStackSizeComponent(cPacketizer & a_Pkt, const DataComponents::MaxStackSizeComponent & a_Comp) const
+{
+	a_Pkt.WriteVarInt32(a_Comp.maxStackSize);
+}
+
+
+
+
+
+void cProtocol_1_20_5::DataComponentSerializer::WriteUnbreakableComponent(cPacketizer & a_Pkt, const DataComponents::UnbreakableComponent & a_Comp) const
+{
+	a_Pkt.WriteBool(a_Comp.unbreakable);
+}
+
+
+
+
+
+void cProtocol_1_20_5::DataComponentSerializer::WriteCustomNameComponent(cPacketizer & a_Pkt, const DataComponents::CustomNameComponent & a_Comp) const
+{
+	cFastNBTWriter writer(true);
+	a_Comp.Name.WriteAsNBT(writer, false);
+	a_Pkt.WriteBuf(writer.GetResult());
+}
+
+
+
+
+
+void cProtocol_1_20_5::DataComponentSerializer::WriteDamageComponent(cPacketizer & a_Pkt, const DataComponents::DamageComponent & a_Comp) const
+{
+	a_Pkt.WriteVarInt32(a_Comp.Damage);
+}
+
+
+
+
+
+void cProtocol_1_20_5::DataComponentSerializer::WriteMaxDamageComponent(cPacketizer & a_Pkt, const DataComponents::MaxDamageComponent & a_Comp) const
+{
+	a_Pkt.WriteVarInt32(a_Comp.MaxDamage);
+}
+
+
+
+
+
+void cProtocol_1_20_5::DataComponentSerializer::WriteRepairCostComponent(cPacketizer & a_Pkt, const DataComponents::RepairCostComponent & a_Comp) const
+{
+	a_Pkt.WriteVarInt32(a_Comp.RepairCost);
 }

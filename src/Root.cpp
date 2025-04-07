@@ -53,6 +53,7 @@
 #include "AllTags/AbstractTag.h"
 
 // temp
+#include "DataComponents/JsonDataCompLoader.h"
 #include "Protocol/Palettes/BlockMap.h"
 #include <fstream>
 
@@ -147,6 +148,7 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 
 	m_RegistriesMap = new RegistriesMap::cRegistryHandler();
 	m_RegistriesMap->LoadAll();
+	DataComponents::cDataComponents::LoadFromJson("Protocol/items.json");
 
 
 	auto IniFile = std::make_unique<cIniFile>();

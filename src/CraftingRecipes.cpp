@@ -197,8 +197,8 @@ void cCraftingGrid::Dump(void)
 	for (int y = 0; y < m_Height; y++) for (int x = 0; x < m_Width; x++)
 	{
 		[[maybe_unused]] const int idx = x + m_Width * y;
-		LOGD("Slot (%d, %d): Type %d, health %d, count %d",
-			x, y, m_Items[idx].m_ItemType, m_Items[idx].m_ItemDamage, m_Items[idx].m_ItemCount
+		LOGD("Slot (%d, %d): Type %d, count %d",
+			x, y, m_Items[idx].m_ItemType, m_Items[idx].m_ItemCount
 		);
 	}
 }
@@ -251,8 +251,8 @@ void cCraftingRecipe::Dump(void)
 {
 	LOGD("Recipe ingredients:");
 	m_Ingredients.Dump();
-	LOGD("Result: Type %d, health %d, count %d",
-		m_Result.m_ItemType, m_Result.m_ItemDamage, m_Result.m_ItemCount
+	LOGD("Result: Type %d, count %d",
+		m_Result.m_ItemType, m_Result.m_ItemCount
 	);
 }
 
@@ -288,11 +288,7 @@ bool cCraftingRecipes::IsNewCraftableRecipe(const cRecipe * a_Recipe, const cIte
 	for (const auto & Ingredient : a_Recipe->m_Ingredients)
 	{
 		if (
-			(Ingredient.m_Item.m_ItemType == a_Item.m_ItemType) &&
-			(
-				(Ingredient.m_Item.m_ItemDamage == a_Item.m_ItemDamage) ||
-				(Ingredient.m_Item.m_ItemDamage == -1)
-			)
+			(Ingredient.m_Item == a_Item)
 		)
 		{
 			ContainsNewItem = true;
@@ -539,11 +535,6 @@ bool cCraftingRecipes::ParseItem(const AString & a_String, cItem & a_Item)
 	if (Split.size() > 1)
 	{
 		AString Damage = TrimString(Split[1]);
-		if (!StringToInteger<short>(Damage, a_Item.m_ItemDamage))
-		{
-			// Parsing the number failed
-			return false;
-		}
 	}
 
 	// Success
@@ -765,11 +756,8 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 			(itrS->x >= a_GridWidth) ||
 			(itrS->y >= a_GridHeight) ||
 			(Item.m_ItemType != a_CraftingGrid[GridID].m_ItemType) ||   // same item type?
-			(Item.m_ItemCount > a_CraftingGrid[GridID].m_ItemCount) ||  // not enough items
-			(
-				(Item.m_ItemDamage >= 0) &&  // should compare damage values?
-				(Item.m_ItemDamage != a_CraftingGrid[GridID].m_ItemDamage)
-			)
+			(Item.m_ItemCount > a_CraftingGrid[GridID].m_ItemCount)  // ||  // not enough items
+			// TODO: compare components
 		)
 		{
 			// Doesn't match
@@ -813,11 +801,8 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 				}
 				int GridIdx = x + a_GridStride * y;
 				if (
-					(a_CraftingGrid[GridIdx].m_ItemType == itrS->m_Item.m_ItemType) &&
-					(
-						(itrS->m_Item.m_ItemDamage < 0) ||  // doesn't want damage comparison
-						(itrS->m_Item.m_ItemDamage == a_CraftingGrid[GridIdx].m_ItemDamage)  // the damage matches
-					)
+					(a_CraftingGrid[GridIdx].m_ItemType == itrS->m_Item.m_ItemType)  // &&
+					// TODO: compare comps
 				)
 				{
 					HasMatched[x][y] = true;
@@ -945,8 +930,8 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 				case Item::WhiteDye:
 				case Item::YellowDye:
 				{
-					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
-					DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(static_cast<unsigned char>(a_CraftingGrid[GridID].m_ItemDamage & 0x0f)));
+					// int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
+					// DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(static_cast<unsigned char>(a_CraftingGrid[GridID].m_ItemDamage & 0x0f)));
 					break;
 				}
 				case Item::Gunpowder: break;

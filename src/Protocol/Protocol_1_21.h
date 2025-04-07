@@ -51,11 +51,17 @@ protected:
 	virtual void SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item) override;
 	virtual void SendRespawn(eDimension a_Dimension) override;
 	virtual void SendUpdateBlockEntity(cBlockEntity & a_BlockEntity) override;
+	virtual void SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount) override;
+	virtual void SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data) override;
 
 	virtual void HandlePacketBlockPlace(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketClientSettings(cByteBuffer & a_ByteBuffer) override;
 	virtual void HandlePacketSteerVehicle(cByteBuffer & a_ByteBuffer) override;
 	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
+
+	virtual bool ReadComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const override;
+	virtual void WriteComponent(cPacketizer & a_Pkt, const DataComponents::DataComponent & a_Component) const override;
+
 
 	virtual UInt8  GetProtocolEntityType(eEntityType a_Type) const override;
 	virtual UInt32 GetBlockEntityID(const cBlockEntity & a_BlockEntity) const override;

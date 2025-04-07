@@ -58,7 +58,7 @@ private:
 				case Item::Potion:
 				{
 					// Refill cauldron with water bottles.
-					if (EquippedItem.m_ItemDamage == 0)
+					if (true)  // TODO: potion item component
 					{
 						a_ChunkInterface.FastSetBlock(Vector3i(a_BlockPos), Block::WaterCauldron::WaterCauldron(1));
 						// Give back an empty bottle when the gamemode is not creative:
@@ -170,7 +170,7 @@ private:
 				case Item::Potion:
 				{
 					// Refill cauldron with water bottles.
-					if ((FillState < 3) && (EquippedItem.m_ItemDamage == 0))
+					if ((FillState < 3)  /* && (EquippedItem.m_ItemDamage == 0) */)  // TODO: potion item component
 					{
 						a_ChunkInterface.FastSetBlock(Vector3i(a_BlockPos), Block::WaterCauldron::WaterCauldron(++FillState));
 						// Give back an empty bottle when the gamemode is not creative:

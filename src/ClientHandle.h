@@ -410,7 +410,7 @@ public:  // tolua_export
 	void HandleUnmount          (void);
 	void HandleUseEntity        (UInt32 a_TargetEntityID, bool a_IsLeftClick);
 	void HandleUseItem          (bool a_UsedMainHand);
-	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem);
+	void HandleWindowClick      (UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta, const cItem & a_DraggedItem);
 	void HandleWindowClose      (UInt8 a_WindowID);
 	void HandlePlayerSession    (cUUID a_SessionID, Int64 a_ExpiresAt, const ContiguousByteBuffer & a_PublicKey, const ContiguousByteBuffer & a_KeySignature);
 

@@ -37,11 +37,12 @@ private:
 			return false;
 		}
 
-		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [&a_HeldItem](cBlockEntity & BlockToPlaceEntity)
+		a_Player.GetWorld()->DoWithBlockEntityAt(a_PlacePosition, [/* &a_HeldItem */](cBlockEntity & BlockToPlaceEntity)
 		{
 			ASSERT(cBlockStandingBannerHandler::IsBlockBanner(BlockToPlaceEntity.GetBlock()));
 
-			static_cast<cBannerEntity &>(BlockToPlaceEntity).SetBaseColor(static_cast<unsigned char>(a_HeldItem.m_ItemDamage));
+			// TODO: banner item component
+			// static_cast<cBannerEntity &>(BlockToPlaceEntity).SetBaseColor(static_cast<unsigned char>(a_HeldItem.m_ItemDamage));
 			return false;
 		});
 

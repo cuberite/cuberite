@@ -251,7 +251,8 @@ void cWolf::OnRightClicked(cPlayer & a_Player)
 			{
 				if (a_Player.GetUUID() == m_OwnerUUID)  // Is the player the owner of the dog?
 				{
-					SetCollarColor(EquippedItem.m_ItemDamage);
+					// TODO: color component??
+					SetCollarColor(0);
 					if (!a_Player.IsGameModeCreative())
 					{
 						a_Player.GetInventory().RemoveOneEquippedItem();

@@ -42,7 +42,7 @@ cSlotArea::cSlotArea(int a_NumSlots, cWindow & a_ParentWindow) :
 
 
 
-void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta, const cItem & a_ClickedItem)
 {
 	/*
 	LOGD("Slot area with %d slots clicked at slot number %d, clicked item %s, slot item %s",
@@ -74,7 +74,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 		case caShiftLeftClick:
 		case caShiftRightClick:
 		{
-			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+			ShiftClicked(a_Player, a_SlotNum);
 			return;
 		}
 		case caDblClick:
@@ -118,7 +118,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 		LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
 		LOGWARNING("My item:    %s", ItemToFullString(Slot).c_str());
 		LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
-		bAsync = true;
+		// bAsync = true;
 	}
 	cItem & DraggingItem = a_Player.GetDraggingItem();
 	switch (a_ClickAction)
@@ -214,7 +214,7 @@ void cSlotArea::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickA
 
 
 
-void cSlotArea::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem)
+void cSlotArea::ShiftClicked(cPlayer & a_Player, int a_SlotNum)
 {
 	// Make a copy of the slot, distribute it among the other areas, then update the slot to contain the leftover:
 	cItem Slot(*GetSlot(a_SlotNum, a_Player));
@@ -517,7 +517,7 @@ cSlotAreaCrafting::cSlotAreaCrafting(int a_GridSize, cWindow & a_ParentWindow) :
 
 
 
-void cSlotAreaCrafting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+void cSlotAreaCrafting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta, const cItem & a_DraggedItem)
 {
 	if (a_ClickAction == caMiddleClick)
 	{
@@ -543,7 +543,7 @@ void cSlotAreaCrafting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction 
 		return;
 	}
 
-	Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+	Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ItemDelta, a_DraggedItem);
 	UpdateRecipe(a_Player);
 }
 
@@ -603,11 +603,36 @@ void cSlotAreaCrafting::SetSlot(int a_SlotNum, cPlayer & a_Player, const cItem &
 
 void cSlotAreaCrafting::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bool a_ShouldApply, bool a_KeepEmptySlots, bool a_BackFill)
 {
-	UNUSED(a_ItemStack);
-	UNUSED(a_Player);
-	UNUSED(a_ShouldApply);
-	UNUSED(a_KeepEmptySlots);
-	UNUSED(a_BackFill);
+	for (int i = 1; i < m_NumSlots; i++)
+	{
+		int SlotNum = (a_BackFill) ? (m_NumSlots - 1 - i) : i;
+
+		const cItem * Slot = GetSlot(SlotNum, a_Player);
+		if (!Slot->IsEqual(a_ItemStack) && (!Slot->IsEmpty() || a_KeepEmptySlots))
+		{
+			// Different items
+			continue;
+		}
+		char NumFit = Slot->GetMaxStackSize() - Slot->m_ItemCount;
+		if (NumFit <= 0)
+		{
+			// Full stack already
+			continue;
+		}
+		NumFit = std::min(NumFit, a_ItemStack.m_ItemCount);
+
+		if (a_ShouldApply)
+		{
+			cItem NewSlot(a_ItemStack);
+			NewSlot.m_ItemCount = Slot->m_ItemCount + NumFit;
+			SetSlot(SlotNum, a_Player, NewSlot);
+		}
+		a_ItemStack.m_ItemCount -= NumFit;
+		if (a_ItemStack.IsEmpty())
+		{
+			return;
+		}
+	}  // for i - Slots
 }
 
 
@@ -864,12 +889,12 @@ cSlotAreaAnvil::cSlotAreaAnvil(cWindow & a_ParentWindow) :
 
 
 
-void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta, const cItem & a_DraggedItem)
 {
 	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
 	if (a_SlotNum != 2)
 	{
-		Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+		Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ItemDelta, a_DraggedItem);
 		UpdateResult(a_Player);
 		return;
 	}
@@ -890,7 +915,7 @@ void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 		case caShiftLeftClick:
 		case caShiftRightClick:
 		{
-			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+			ShiftClicked(a_Player, a_SlotNum);
 			return;
 		}
 		case caMiddleClick:
@@ -915,6 +940,7 @@ void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 	}
 
 	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+	/*
 	if (!Slot.IsSameType(a_ClickedItem))
 	{
 		LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
@@ -922,6 +948,7 @@ void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 		LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
 		bAsync = true;
 	}
+	*/
 	cItem & DraggingItem = a_Player.GetDraggingItem();
 
 	if (Slot.IsEmpty())
@@ -930,7 +957,7 @@ void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 	}
 	if (!DraggingItem.IsEmpty())
 	{
-		if (!(DraggingItem.IsEqual(Slot) && ((DraggingItem.m_ItemCount + Slot.m_ItemCount) <= Slot.GetMaxStackSize())))
+		if (!DraggingItem.IsEqual(Slot) || ((DraggingItem.m_ItemCount + Slot.m_ItemCount) > Slot.GetMaxStackSize()))
 		{
 			return;
 		}
@@ -961,11 +988,11 @@ void cSlotAreaAnvil::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 
 
 
-void cSlotAreaAnvil::ShiftClicked(cPlayer & a_Player, int a_SlotNum, const cItem & a_ClickedItem)
+void cSlotAreaAnvil::ShiftClicked(cPlayer & a_Player, int a_SlotNum)
 {
 	if (a_SlotNum != 2)
 	{
-		Super::ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+		Super::ShiftClicked(a_Player, a_SlotNum);
 		UpdateResult(a_Player);
 		return;
 	}
@@ -1155,17 +1182,17 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 	m_MaximumCost = 0;
 	m_StackSizeToBeUsedInRepair = 0;
-	int RepairCost = Target.m_RepairCost;
+	int RepairCost = Target.HasComponent<DataComponents::RepairCostComponent>() ? static_cast<int>(Target.GetComponentOrDefault<DataComponents::RepairCostComponent>().RepairCost) : 0;
 	int NeedExp = 0;
 	if (!Sacrifice.IsEmpty())
 	{
-		RepairCost += Sacrifice.m_RepairCost;
+		RepairCost += Sacrifice.HasComponent<DataComponents::RepairCostComponent>() ? Sacrifice.GetComponentOrDefault<DataComponents::RepairCostComponent>().RepairCost : 0;
 
 		// Can we repair with sacrifce material?
 		if (Target.IsDamageable() && Target.GetHandler().CanRepairWithRawMaterial(Sacrifice.m_ItemType))
 		{
 			// Tool and armor repair with special item (iron / gold / diamond / ...)
-			char DamageDiff = static_cast<char>(std::min(static_cast<int>(Target.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4));
+			UInt32 DamageDiff =std::min(Target.GetComponentOrDefault<DataComponents::DamageComponent>().Damage, (Target.GetMaxDamage()) / 4);
 			if (DamageDiff <= 0)
 			{
 				// No enchantment
@@ -1179,11 +1206,12 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			char NumItemsConsumed = 0;
 
 			// Repair until out of materials, or fully repaired:
+			auto & dmgcomp= Output.GetOrAdd<DataComponents::DamageComponent>();
 			while ((DamageDiff > 0) && (NumItemsConsumed < Sacrifice.m_ItemCount))
 			{
-				Output.m_ItemDamage -= static_cast<char>(DamageDiff);
-				NeedExp += std::max(1, DamageDiff / 100) + static_cast<int>(Target.m_Enchantments.Count());
-				DamageDiff = static_cast<char>(std::min(static_cast<int>(Output.m_ItemDamage), static_cast<int>(Target.GetMaxDamage()) / 4));
+				dmgcomp.Damage -= DamageDiff;
+				NeedExp += std::max(1u, DamageDiff / 100) + Target.m_Enchantments.Count();
+				DamageDiff = std::min(dmgcomp.Damage, Target.GetMaxDamage() / 4);
 
 				++NumItemsConsumed;
 			}
@@ -1205,22 +1233,26 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			}
 
 			// Can we repair with sacrifice tool / armour?
-			if (Target.IsDamageable() && !IsEnchantBook && (Target.m_ItemDamage != 0))
+			if (Target.IsDamageable() && !IsEnchantBook && Target.HasComponent<DataComponents::DamageComponent>() && Target.GetComponentOrDefault<DataComponents::DamageComponent>().Damage != 0)
 			{
+				auto target_dmg = Target.GetComponentOrDefault<DataComponents::DamageComponent>().Damage;
 				// Durability = MaxDamage - m_ItemDamage = how far from broken
-				const short TargetDurability = Target.GetMaxDamage() - Target.m_ItemDamage;
-				const short SacrificeDurability = Sacrifice.GetMaxDamage() - Sacrifice.m_ItemDamage;
+				const UInt32 TargetDurability = Target.GetMaxDamage() - target_dmg;
+				UInt32 sacrifice_dmg = Sacrifice.HasComponent<DataComponents::DamageComponent>() ? Sacrifice.GetComponentOrDefault<DataComponents::DamageComponent>().Damage : 0;
+				const UInt32 SacrificeDurability = Sacrifice.GetMaxDamage() - sacrifice_dmg;
 
 				// How much durability to repair by.
-				const short RepairDurability = SacrificeDurability + Target.GetMaxDamage() * 12 / 100;
+				const UInt32 RepairDurability = SacrificeDurability + Target.GetMaxDamage() * 12 / 100;
 
 				// Don't give item a negative damage:
-				short NewItemDamage = std::max<short>(Target.GetMaxDamage() - (TargetDurability + RepairDurability), 0);
+				UInt32 NewItemDamage = std::max<UInt32>(Target.GetMaxDamage() - (TargetDurability + RepairDurability), 0);
 
-				if (NewItemDamage < Target.m_ItemDamage)
+				if (NewItemDamage < target_dmg)
 				{
-					Output.m_ItemDamage = NewItemDamage;
-					NeedExp += std::max(1, RepairDurability / 100);
+					DataComponents::DamageComponent dmg;
+					dmg.Damage = NewItemDamage;
+					Output.SetComponent(dmg);
+					NeedExp += std::max(1u, RepairDurability / 100);
 				}
 			}
 
@@ -1230,30 +1262,40 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 		}
 	}
 
+	using namespace DataComponents;
+
 	int NameChangeExp = 0;
 	const AString & RepairedItemName = static_cast<cAnvilWindow*>(&m_ParentWindow)->GetRepairedItemName();
+	bool HasTargetName = Target.HasComponent<CustomNameComponent>();
 	if (RepairedItemName.empty())
 	{
 		// Remove custom name
-		if (!Target.m_CustomName.empty())
+		if (Target.HasComponent<CustomNameComponent>())
 		{
 			NameChangeExp = (Target.IsDamageable()) ? 7 : (Target.m_ItemCount * 5);
 			NeedExp += NameChangeExp;
-			Output.m_CustomName = "";
+			// Output.m_CustomName = "";
+			if (Output.HasComponent<CustomNameComponent>())
+			{
+				Output.RemoveComp<CustomNameComponent>();
+			}
 		}
 	}
-	else if (RepairedItemName != Target.m_CustomName)
+	else if ((HasTargetName && (RepairedItemName != Target.GetComponentOrDefault<CustomNameComponent>().Name.ExtractText())) || !HasTargetName)
 	{
 		// Change custom name
 		NameChangeExp = (Target.IsDamageable()) ? 7 : (Target.m_ItemCount * 5);
 		NeedExp += NameChangeExp;
 
-		if (!Target.m_CustomName.empty())
+		if (Target.HasComponent<CustomNameComponent>())
 		{
 			RepairCost += NameChangeExp / 2;
 		}
 
-		Output.m_CustomName = RepairedItemName;
+		// Output.m_CustomName = RepairedItemName;
+		auto cmp = CustomNameComponent();
+		cmp.Name.AddTextPart(RepairedItemName);
+		Output.SetComponent(cmp);
 	}
 
 	m_MaximumCost = RepairCost + NeedExp;
@@ -1274,14 +1316,17 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 
 	if (!Output.IsEmpty())
 	{
-		RepairCost = std::max(Target.m_RepairCost, Sacrifice.m_RepairCost);
-		if (!Output.m_CustomName.empty())
+		RepairCost = static_cast<int>(std::max(
+			Target.HasComponent<RepairCostComponent>() ? Target.GetComponentOrDefault<RepairCostComponent>().RepairCost : 0,
+			Sacrifice.HasComponent<RepairCostComponent>() ? Target.GetComponentOrDefault<RepairCostComponent>().RepairCost : 0
+			));
+		if (Output.HasComponent<CustomNameComponent>())
 		{
 			RepairCost -= 9;
 		}
 		RepairCost = std::max(RepairCost, 0);
 		RepairCost += 2;
-		Output.m_RepairCost = RepairCost;
+		Output.SetComponent( RepairCostComponent { static_cast<UInt32>(RepairCost) });
 	}
 
 	// If after everything, output will be the same then no point enchanting:
@@ -1339,7 +1384,7 @@ bool cSlotAreaBeacon::IsPlaceableItem(Item a_ItemType)
 
 
 
-void cSlotAreaBeacon::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+void cSlotAreaBeacon::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta, const cItem & a_DraggedItem)
 {
 	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
 
@@ -1355,7 +1400,7 @@ void cSlotAreaBeacon::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_
 		case caShiftLeftClick:
 		case caShiftRightClick:
 		{
-			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+			ShiftClicked(a_Player, a_SlotNum);
 			return;
 		}
 		case caMiddleClick:
@@ -1389,6 +1434,7 @@ void cSlotAreaBeacon::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_
 	}
 
 	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+	/*
 	if (!Slot.IsSameType(a_ClickedItem))
 	{
 		LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
@@ -1396,6 +1442,7 @@ void cSlotAreaBeacon::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_
 		LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
 		bAsync = true;
 	}
+	*/
 	cItem & DraggingItem = a_Player.GetDraggingItem();
 
 	if (DraggingItem.IsEmpty())
@@ -1506,7 +1553,7 @@ cSlotAreaEnchanting::cSlotAreaEnchanting(cWindow & a_ParentWindow, Vector3i a_Bl
 
 
 
-void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta, const cItem & a_DraggedItem)
 {
 	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
 
@@ -1522,7 +1569,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 		case caShiftLeftClick:
 		case caShiftRightClick:
 		{
-			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+			ShiftClicked(a_Player, a_SlotNum);
 			return;
 		}
 		case caDblClick:
@@ -1561,6 +1608,7 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 	}
 
 	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+	/*
 	if (!Slot.IsSameType(a_ClickedItem))
 	{
 		LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
@@ -1568,13 +1616,14 @@ void cSlotAreaEnchanting::Clicked(cPlayer & a_Player, int a_SlotNum, eClickActio
 		LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
 		bAsync = true;
 	}
+	*/
 	cItem & DraggingItem = a_Player.GetDraggingItem();
 	if (a_SlotNum == 1)
 	{
 		// Lapis slot can have a full stack handle it normally, also check for empty hand
 		if ((DraggingItem.IsEmpty()) || (DraggingItem.m_ItemType == Item::LapisLazuli))
 		{
-			return cSlotArea::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+			return cSlotArea::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ItemDelta, a_DraggedItem);
 		}
 
 		if (bAsync)
@@ -1891,7 +1940,7 @@ cSlotAreaFurnace::~cSlotAreaFurnace()
 
 
 
-void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta, const cItem & a_DraggedItem)
 {
 	if (m_Furnace == nullptr)
 	{
@@ -1921,6 +1970,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 		}
 
 		cItem Slot(*GetSlot(a_SlotNum, a_Player));
+		/*
 		if (!Slot.IsSameType(a_ClickedItem))
 		{
 			LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
@@ -1928,6 +1978,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 			LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
 			bAsync = true;
 		}
+		*/
 
 		switch (a_ClickAction)
 		{
@@ -1935,7 +1986,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 			case caShiftRightClick:
 			{
 				HandleSmeltItem(Slot, a_Player);
-				ShiftClicked(a_Player, a_SlotNum, Slot);
+				ShiftClicked(a_Player, a_SlotNum);
 				return;
 			}
 			case caMiddleClick:
@@ -2021,7 +2072,7 @@ void cSlotAreaFurnace::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a
 		return;
 	}
 
-	Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+	Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ItemDelta, a_DraggedItem);
 }
 
 
@@ -2154,7 +2205,7 @@ cSlotAreaBrewingstand::~cSlotAreaBrewingstand()
 
 
 
-void cSlotAreaBrewingstand::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+void cSlotAreaBrewingstand::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta, const cItem & a_DraggedItem)
 {
 	if (m_Brewingstand == nullptr)
 	{
@@ -2199,7 +2250,7 @@ void cSlotAreaBrewingstand::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAct
 				{
 					HandleBrewedItem(a_Player, Slot);
 				}
-				Super::ShiftClicked(a_Player, a_SlotNum, Slot);
+				Super::ShiftClicked(a_Player, a_SlotNum);
 				break;
 			}
 			default:
@@ -2222,7 +2273,7 @@ void cSlotAreaBrewingstand::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAct
 			case caShiftLeftClick:
 			case caShiftRightClick:
 			{
-				Super::ShiftClicked(a_Player, a_SlotNum, Slot);
+				Super::ShiftClicked(a_Player, a_SlotNum);
 				break;
 			}
 			default:
@@ -2245,7 +2296,7 @@ void cSlotAreaBrewingstand::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAct
 			case caShiftLeftClick:
 			case caShiftRightClick:
 			{
-				Super::ShiftClicked(a_Player, a_SlotNum, Slot);
+				Super::ShiftClicked(a_Player, a_SlotNum);
 				break;
 			}
 			default:
@@ -2260,7 +2311,7 @@ void cSlotAreaBrewingstand::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAct
 		}
 	}
 
-	Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+	Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ItemDelta, a_DraggedItem);
 }
 
 
@@ -2270,7 +2321,7 @@ void cSlotAreaBrewingstand::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAct
 void cSlotAreaBrewingstand::HandleBrewedItem(cPlayer & a_Player, const cItem & a_ClickedItem)
 {
 	// Award an achievement if the item is not a water bottle (is a real brewed potion)
-	if (a_ClickedItem.m_ItemDamage > 0)
+	if (a_ClickedItem.m_ItemType == Item::Potion)  // TODO: potion item component
 	{
 		a_Player.AwardAchievement(CustomStatistic::AchPotion);
 	}
@@ -2423,7 +2474,7 @@ cSlotAreaInventoryBase::cSlotAreaInventoryBase(int a_NumSlots, int a_SlotOffset,
 
 
 
-void cSlotAreaInventoryBase::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+void cSlotAreaInventoryBase::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta, const cItem & a_DraggedItem)
 {
 	if (a_Player.IsGameModeCreative() && (m_ParentWindow.GetWindowType() == cWindow::wtInventory))
 	{
@@ -2434,12 +2485,12 @@ void cSlotAreaInventoryBase::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAc
 		}
 
 		// Creative inventory must treat a_ClickedItem as a DraggedItem instead, replacing the inventory slot with it
-		SetSlot(a_SlotNum, a_Player, a_ClickedItem);
+		SetSlot(a_SlotNum, a_Player, a_DraggedItem);
 		return;
 	}
 
 	// Survival inventory and all other windows' inventory has the same handling as normal slot areas
-	Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+	Super::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ItemDelta, a_DraggedItem);
 }
 
 
@@ -2508,7 +2559,7 @@ void cSlotAreaArmor::DistributeStack(cItem & a_ItemStack, cPlayer & a_Player, bo
 
 
 
-void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta, const cItem & a_DraggedItem)
 {
 	ASSERT((a_SlotNum >= 0) && (a_SlotNum < GetNumSlots()));
 
@@ -2521,7 +2572,7 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 			return;
 		}
 
-		SetSlot(a_SlotNum, a_Player, a_ClickedItem);
+		SetSlot(a_SlotNum, a_Player, a_DraggedItem);
 		return;
 	}
 
@@ -2542,7 +2593,7 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 		case caShiftLeftClick:
 		case caShiftRightClick:
 		{
-			ShiftClicked(a_Player, a_SlotNum, a_ClickedItem);
+			ShiftClicked(a_Player, a_SlotNum);
 			return;
 		}
 		case caMiddleClick:
@@ -2557,6 +2608,7 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 	}
 
 	cItem Slot(*GetSlot(a_SlotNum, a_Player));
+	/*
 	if (!Slot.IsSameType(a_ClickedItem))
 	{
 		LOGWARNING("*** Window lost sync at item %d in SlotArea with %d items ***", a_SlotNum, m_NumSlots);
@@ -2564,6 +2616,7 @@ void cSlotAreaArmor::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 		LOGWARNING("Their item: %s", ItemToFullString(a_ClickedItem).c_str());
 		bAsync = true;
 	}
+	*/
 	cItem & DraggingItem = a_Player.GetDraggingItem();
 	if ((a_ClickAction != caRightClick) && (a_ClickAction != caLeftClick))
 	{
@@ -2796,7 +2849,7 @@ cSlotAreaHorse::cSlotAreaHorse(cHorse & a_Horse, cWindow & a_ParentWindow) :
 
 
 
-void cSlotAreaHorse::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+void cSlotAreaHorse::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_ClickAction, const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta, const cItem & a_DraggedItem)
 {
 	cItem & DraggingItem = a_Player.GetDraggingItem();
 
@@ -2837,7 +2890,7 @@ void cSlotAreaHorse::Clicked(cPlayer & a_Player, int a_SlotNum, eClickAction a_C
 		default: break;
 	}
 
-	cSlotArea::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ClickedItem);
+	cSlotArea::Clicked(a_Player, a_SlotNum, a_ClickAction, a_ItemDelta, a_DraggedItem);
 }
 
 

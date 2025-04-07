@@ -152,14 +152,14 @@ cParsedNBT::cParsedNBT(const ContiguousByteBufferView a_Data) :
 	m_Data(a_Data),
 	m_Pos(0)
 {
-	m_Error = Parse();
+	m_Error = Parse(false);
 }
 
 
 
 
 
-cParsedNBT::cParsedNBT(cByteBuffer & a_Data, ContiguousByteBuffer & a_Bfr) :
+cParsedNBT::cParsedNBT(cByteBuffer & a_Data, ContiguousByteBuffer & a_Bfr, bool a_Network_1_21) :
 	m_Data(a_Bfr),
 	m_Pos(0)
 {
@@ -167,7 +167,7 @@ cParsedNBT::cParsedNBT(cByteBuffer & a_Data, ContiguousByteBuffer & a_Bfr) :
 	size_t pos = a_Data.GetReadPos();
 	a_Data.ReadAll(a_Bfr);
 	m_Data = a_Bfr;
-	m_Error = Parse();
+	m_Error = Parse(a_Network_1_21);
 	a_Data.ResetRead();
 	a_Data.SkipRead(pos + (m_Pos == 0 ? 1 : m_Pos));
 }
@@ -176,7 +176,7 @@ cParsedNBT::cParsedNBT(cByteBuffer & a_Data, ContiguousByteBuffer & a_Bfr) :
 
 
 
-eNBTParseError cParsedNBT::Parse(void)
+eNBTParseError cParsedNBT::Parse(bool a_Network_1_21)
 {
 	if (m_Data.size() < 3)
 	{
@@ -195,7 +195,10 @@ eNBTParseError cParsedNBT::Parse(void)
 
 	m_Pos = 1;
 
-	PROPAGATE_ERROR(ReadString(m_Tags.back().m_NameStart, m_Tags.back().m_NameLength));
+	if (!a_Network_1_21)
+	{
+		PROPAGATE_ERROR(ReadString(m_Tags.back().m_NameStart, m_Tags.back().m_NameLength));
+	}
 	return ReadCompound();
 }
 
