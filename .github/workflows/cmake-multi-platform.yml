@@ -24,25 +24,45 @@ jobs:
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
         os: [ubuntu-latest, windows-latest]
-        build_type: [Release]
+        build_type: [Release, Debug]
         c_compiler: [gcc, clang, cl]
         include:
           - os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
+            build_type: Release
+          - os: windows-latest
+            c_compiler: cl
+            cpp_compiler: cl
+            build_type: Debug
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
+            build_type: Release
           - os: ubuntu-latest
             c_compiler: clang
             cpp_compiler: clang++
+            build_type: Release
         exclude:
           - os: windows-latest
             c_compiler: gcc
+            build_type: Release
           - os: windows-latest
+            build_type: Release
             c_compiler: clang
+          - os: windows-latest
+            c_compiler: gcc
+            build_type: Debug
+            # Originally I wanted to have just CL windows-latest Debug enabled because it was failing, however this also appears to fail for the same unknown reason so will
+            # keep it for now
+        # - os: windows-latest
+           # build_type: Debug
+           # c_compiler: clang
           - os: ubuntu-latest
             c_compiler: cl
+            build_type: Release
+          - os: ubuntu-latest
+            build_type: Debug
 
     steps:
     - uses: actions/checkout@v4

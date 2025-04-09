@@ -84,7 +84,7 @@ namespace DataComponents
 	public:
 		DefaultComponentsMap() : m_data() {}
 		friend class cDataComponents;
-		const std::map<int, DataComponent> & GetComponentsFor(Item a_item)
+		const std::map<size_t, DataComponent> & GetComponentsFor(Item a_item)
 		{
 			if (!m_data.contains(a_item))
 			{
@@ -96,7 +96,7 @@ namespace DataComponents
 
 	private:
 
-		void AddItem(Item a_Item, const std::map<int, DataComponent> & a_Comps)
+		void AddItem(Item a_Item, const std::map<size_t, DataComponent> & a_Comps)
 		{
 			if (m_data.contains(a_Item))
 			{
@@ -105,7 +105,7 @@ namespace DataComponents
 			}
 			m_data[a_Item] = a_Comps;
 		}
-		std::map<Item, std::map<int, DataComponent>> m_data;
+		std::map<Item, std::map<size_t, DataComponent>> m_data;
 	};
 
 	class DataComponentMap
@@ -114,7 +114,7 @@ namespace DataComponents
 		// A replace function at the same time
 		void AddComp(const DataComponent & a_comp)
 		{
-			m_data[static_cast<int>(a_comp.index())] = a_comp;
+			m_data[a_comp.index()] = a_comp;
 		}
 
 		template <typename TypeToFind> const TypeToFind & GetComp() const
@@ -137,9 +137,9 @@ namespace DataComponents
 			m_data.erase(GetIndexOfDataComponent<TypeToFind, 0>());
 		}
 
-		const std::map<int, DataComponent> & GetMap() const { return m_data; }
+		const std::map<size_t, DataComponent> & GetMap() const { return m_data; }
 
-		std::map<int, DataComponent> m_data;
+		std::map<size_t, DataComponent> m_data;
 	};
 
 	typedef std::vector<DataComponent> DefaultItemComps;

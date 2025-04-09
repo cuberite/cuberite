@@ -1701,15 +1701,15 @@ void cProtocol_1_21_2::SendParticleEffect(const AString & a_ParticleName, Vector
 bool cProtocol_1_21_2::ReadComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
 {
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, ProtocolCompID);
-	typedef DataComponentSerializer DCS;
+	typedef cProtocol_1_21_2 P;
 	static const std::map<UInt32, ReadCompFunc> ReadCompFuncs =
 	{
 		//  {0, &DCS::ReadCustomDataComponent},
-		{1, &DCS::ReadMaxStackSizeComponent},
-	{2, &DCS::ReadMaxDamageComponent},
-	{3, &DCS::ReadDamageComponent},
-	{4, &DCS::ReadUnbreakableComponent},
-	{5, &DCS::ReadCustomNameComponent},
+		{1, &P::ReadMaxStackSizeComponent},
+	{2, &P::ReadMaxDamageComponent},
+	{3, &P::ReadDamageComponent},
+	{4, &P::ReadUnbreakableComponent},
+	{5, &P::ReadCustomNameComponent},
 		/*
 		{6, &DCS::ReadItemNameComponent},
 		{7, &DCS::ReadItemModelComponent},
@@ -1723,7 +1723,7 @@ bool cProtocol_1_21_2::ReadComponent(cByteBuffer & a_ByteBuffer, DataComponents:
 		{15, &DCS::ReadHideAdditionalTooltipComponent},
 		{16, &DCS::ReadHideTooltipComponent},
 		*/
-	{17, &DCS::ReadRepairCostComponent},
+	{17, &P::ReadRepairCostComponent},
 		/*
 		{18, &DCS::ReadCreativeSlotLockComponent},
 		{19, &DCS::ReadEnchantmentGlintOverrideComponent},

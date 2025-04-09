@@ -97,46 +97,8 @@ protected:
 
 
 
-class DataComponentSerializer
-{
-	#define WRITE_DATA_COMPONENT(ID, Name) \
-	[this, &a_Pkt](const DataComponents::Name & a_CompName) \
-	{ \
-	a_Pkt.WriteVarInt32(ID); \
-	Write##Name (a_Pkt, a_CompName); \
-	},
-public:
-	virtual ~DataComponentSerializer() = default;
-	typedef bool (DataComponentSerializer::*ReadCompFunc)(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
-	virtual bool ReadComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
-
-	typedef void (DataComponentSerializer::*WriteCompFunc)(cPacketizer & a_Pkt, DataComponents::MaxStackSizeComponent a_Comp);
-	virtual void WriteComponent(cPacketizer & a_Pkt, const DataComponents::DataComponent & a_Component) const;
-
-	//  protected:  // can't be for some reason ????
-	//  Define all reader functions here
-	virtual bool ReadMaxStackSizeComponent (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
-	virtual bool ReadUnbreakableComponent  (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
-	virtual bool ReadCustomNameComponent   (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
-	virtual bool ReadMaxDamageComponent    (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
-	virtual bool ReadDamageComponent       (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
-	virtual bool ReadRepairCostComponent   (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
-
-	//  Define all writer functions here
-	virtual void WriteMaxStackSizeComponent (cPacketizer & a_Pkt, const DataComponents::MaxStackSizeComponent & a_Comp) const;
-	virtual void WriteUnbreakableComponent  (cPacketizer & a_Pkt, const DataComponents::UnbreakableComponent & a_Comp) const;
-	virtual void WriteCustomNameComponent   (cPacketizer & a_Pkt, const DataComponents::CustomNameComponent & a_Comp) const;
-	virtual void WriteMaxDamageComponent    (cPacketizer & a_Pkt, const DataComponents::MaxDamageComponent & a_Comp) const;
-	virtual void WriteDamageComponent       (cPacketizer & a_Pkt, const DataComponents::DamageComponent & a_Comp) const;
-	virtual void WriteRepairCostComponent   (cPacketizer & a_Pkt, const DataComponents::RepairCostComponent & a_Comp) const;
-};
-
-
-
-
-
 class cProtocol_1_20_5
-	: public cProtocol_1_20_3, public DataComponentSerializer
+	: public cProtocol_1_20_3
 {
 	using Super = cProtocol_1_20_3;
 public:
@@ -165,4 +127,34 @@ protected:
 	virtual int       GetProtocolParticleID(const AString & a_ParticleName) const override;
 	virtual UInt8     GetProtocolEntityType(eEntityType a_Type) const override;
 	virtual Int32     GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const override;
+
+	#define WRITE_DATA_COMPONENT(ID, Name) \
+	[this, &a_Pkt](const DataComponents::Name & a_CompName) \
+	{ \
+	a_Pkt.WriteVarInt32(ID); \
+	Write##Name (a_Pkt, a_CompName); \
+	},
+
+	typedef bool (cProtocol_1_20_5::*ReadCompFunc)(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
+	virtual bool ReadComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
+
+	typedef void (cProtocol_1_20_5::*WriteCompFunc)(cPacketizer & a_Pkt, DataComponents::MaxStackSizeComponent a_Comp);
+	virtual void WriteComponent(cPacketizer & a_Pkt, const DataComponents::DataComponent & a_Component) const;
+
+	//  protected:  // can't be for some reason ????
+	//  Define all reader functions here
+	virtual bool ReadMaxStackSizeComponent (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
+	virtual bool ReadUnbreakableComponent  (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
+	virtual bool ReadCustomNameComponent   (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
+	virtual bool ReadMaxDamageComponent    (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
+	virtual bool ReadDamageComponent       (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
+	virtual bool ReadRepairCostComponent   (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
+
+	//  Define all writer functions here
+	virtual void WriteMaxStackSizeComponent (cPacketizer & a_Pkt, const DataComponents::MaxStackSizeComponent & a_Comp) const;
+	virtual void WriteUnbreakableComponent  (cPacketizer & a_Pkt, const DataComponents::UnbreakableComponent & a_Comp) const;
+	virtual void WriteCustomNameComponent   (cPacketizer & a_Pkt, const DataComponents::CustomNameComponent & a_Comp) const;
+	virtual void WriteMaxDamageComponent    (cPacketizer & a_Pkt, const DataComponents::MaxDamageComponent & a_Comp) const;
+	virtual void WriteDamageComponent       (cPacketizer & a_Pkt, const DataComponents::DamageComponent & a_Comp) const;
+	virtual void WriteRepairCostComponent   (cPacketizer & a_Pkt, const DataComponents::RepairCostComponent & a_Comp) const;
 };

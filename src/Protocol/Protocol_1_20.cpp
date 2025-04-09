@@ -2910,18 +2910,18 @@ Int32 cProtocol_1_20_5::GetProtocolCommandArgumentID(eCommandParserType a_Parser
 
 
 
-bool cProtocol_1_20_5::DataComponentSerializer::ReadComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+bool cProtocol_1_20_5::ReadComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
 {
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, ProtocolCompID);
-	typedef DataComponentSerializer DCS;
+	typedef cProtocol_1_20_5 P;
 	static const std::map<UInt32, ReadCompFunc> ReadCompFuncs =
 	{
 		// {0, &ReadCustomDataComponent},
-		{1, &DCS::ReadMaxStackSizeComponent},
-		{2, &DCS::ReadMaxDamageComponent},
-		{3, &DCS::ReadDamageComponent},
-		{4, &DCS::ReadUnbreakableComponent},
-		{5, &DCS::ReadCustomNameComponent},
+		{1, &P::ReadMaxStackSizeComponent},
+		{2, &P::ReadMaxDamageComponent},
+		{3, &P::ReadDamageComponent},
+		{4, &P::ReadUnbreakableComponent},
+		{5, &P::ReadCustomNameComponent},
 		// {6, &ReadItemNameComponent},
 		// {7, &ReadLoreComponent},
 		// {8, &ReadRarityComponent},
@@ -2932,7 +2932,7 @@ bool cProtocol_1_20_5::DataComponentSerializer::ReadComponent(cByteBuffer & a_By
 		// {13, &ReadCustomModelDataComponent},
 		// {14, &ReadHideAdditionalTooltipComponent},
 		// {15, &ReadHideTooltipComponent},
-		{16, &DCS::ReadRepairCostComponent},
+		{16, &P::ReadRepairCostComponent},
 		// {17, &ReadCreativeSlotLockComponent},
 		// {18, &ReadEnchantmentGlintOverrideComponent},
 		// {19, &ReadIntangibleProjectileComponent},
@@ -2987,7 +2987,7 @@ bool cProtocol_1_20_5::DataComponentSerializer::ReadComponent(cByteBuffer & a_By
 
 
 
-bool cProtocol_1_20_5::DataComponentSerializer::ReadMaxStackSizeComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+bool cProtocol_1_20_5::ReadMaxStackSizeComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
 {
 
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, MaxStackSize);
@@ -3001,7 +3001,7 @@ bool cProtocol_1_20_5::DataComponentSerializer::ReadMaxStackSizeComponent(cByteB
 
 
 
-bool cProtocol_1_20_5::DataComponentSerializer::ReadUnbreakableComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+bool cProtocol_1_20_5::ReadUnbreakableComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
 {
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBool, bool, Unbreakable);
 	DataComponents::UnbreakableComponent rez;
@@ -3014,7 +3014,7 @@ bool cProtocol_1_20_5::DataComponentSerializer::ReadUnbreakableComponent(cByteBu
 
 
 
-bool cProtocol_1_20_5::DataComponentSerializer::ReadCustomNameComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+bool cProtocol_1_20_5::ReadCustomNameComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
 {
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8, Int8, TagType);
 	DataComponents::CustomNameComponent comp;
@@ -3051,7 +3051,7 @@ bool cProtocol_1_20_5::DataComponentSerializer::ReadCustomNameComponent(cByteBuf
 
 
 
-bool cProtocol_1_20_5::DataComponentSerializer::ReadDamageComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+bool cProtocol_1_20_5::ReadDamageComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
 {
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt, UInt32, dmg);
 	DataComponents::DamageComponent rez;
@@ -3064,7 +3064,7 @@ bool cProtocol_1_20_5::DataComponentSerializer::ReadDamageComponent(cByteBuffer 
 
 
 
-bool cProtocol_1_20_5::DataComponentSerializer::ReadMaxDamageComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+bool cProtocol_1_20_5::ReadMaxDamageComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
 {
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt, UInt32, Maxdmg);
 	DataComponents::MaxDamageComponent rez;
@@ -3077,7 +3077,7 @@ bool cProtocol_1_20_5::DataComponentSerializer::ReadMaxDamageComponent(cByteBuff
 
 
 
-bool cProtocol_1_20_5::DataComponentSerializer::ReadRepairCostComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+bool cProtocol_1_20_5::ReadRepairCostComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
 {
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt, UInt32, Maxdmg);
 	a_Result = DataComponents::RepairCostComponent { Maxdmg };
@@ -3088,7 +3088,7 @@ bool cProtocol_1_20_5::DataComponentSerializer::ReadRepairCostComponent(cByteBuf
 
 
 
-void cProtocol_1_20_5::DataComponentSerializer::WriteComponent(cPacketizer & a_Pkt, const DataComponents::DataComponent & a_Component) const
+void cProtocol_1_20_5::WriteComponent(cPacketizer & a_Pkt, const DataComponents::DataComponent & a_Component) const
 {
 	// TODO: implement remaining components
 	std::visit(OverloadedVariantAccess
@@ -3157,7 +3157,7 @@ void cProtocol_1_20_5::DataComponentSerializer::WriteComponent(cPacketizer & a_P
 
 
 
-void cProtocol_1_20_5::DataComponentSerializer::WriteMaxStackSizeComponent(cPacketizer & a_Pkt, const DataComponents::MaxStackSizeComponent & a_Comp) const
+void cProtocol_1_20_5::WriteMaxStackSizeComponent(cPacketizer & a_Pkt, const DataComponents::MaxStackSizeComponent & a_Comp) const
 {
 	a_Pkt.WriteVarInt32(a_Comp.maxStackSize);
 }
@@ -3166,7 +3166,7 @@ void cProtocol_1_20_5::DataComponentSerializer::WriteMaxStackSizeComponent(cPack
 
 
 
-void cProtocol_1_20_5::DataComponentSerializer::WriteUnbreakableComponent(cPacketizer & a_Pkt, const DataComponents::UnbreakableComponent & a_Comp) const
+void cProtocol_1_20_5::WriteUnbreakableComponent(cPacketizer & a_Pkt, const DataComponents::UnbreakableComponent & a_Comp) const
 {
 	a_Pkt.WriteBool(a_Comp.unbreakable);
 }
@@ -3175,7 +3175,7 @@ void cProtocol_1_20_5::DataComponentSerializer::WriteUnbreakableComponent(cPacke
 
 
 
-void cProtocol_1_20_5::DataComponentSerializer::WriteCustomNameComponent(cPacketizer & a_Pkt, const DataComponents::CustomNameComponent & a_Comp) const
+void cProtocol_1_20_5::WriteCustomNameComponent(cPacketizer & a_Pkt, const DataComponents::CustomNameComponent & a_Comp) const
 {
 	cFastNBTWriter writer(true);
 	a_Comp.Name.WriteAsNBT(writer, false);
@@ -3186,7 +3186,7 @@ void cProtocol_1_20_5::DataComponentSerializer::WriteCustomNameComponent(cPacket
 
 
 
-void cProtocol_1_20_5::DataComponentSerializer::WriteDamageComponent(cPacketizer & a_Pkt, const DataComponents::DamageComponent & a_Comp) const
+void cProtocol_1_20_5::WriteDamageComponent(cPacketizer & a_Pkt, const DataComponents::DamageComponent & a_Comp) const
 {
 	a_Pkt.WriteVarInt32(a_Comp.Damage);
 }
@@ -3195,7 +3195,7 @@ void cProtocol_1_20_5::DataComponentSerializer::WriteDamageComponent(cPacketizer
 
 
 
-void cProtocol_1_20_5::DataComponentSerializer::WriteMaxDamageComponent(cPacketizer & a_Pkt, const DataComponents::MaxDamageComponent & a_Comp) const
+void cProtocol_1_20_5::WriteMaxDamageComponent(cPacketizer & a_Pkt, const DataComponents::MaxDamageComponent & a_Comp) const
 {
 	a_Pkt.WriteVarInt32(a_Comp.MaxDamage);
 }
@@ -3204,7 +3204,7 @@ void cProtocol_1_20_5::DataComponentSerializer::WriteMaxDamageComponent(cPacketi
 
 
 
-void cProtocol_1_20_5::DataComponentSerializer::WriteRepairCostComponent(cPacketizer & a_Pkt, const DataComponents::RepairCostComponent & a_Comp) const
+void cProtocol_1_20_5::WriteRepairCostComponent(cPacketizer & a_Pkt, const DataComponents::RepairCostComponent & a_Comp) const
 {
 	a_Pkt.WriteVarInt32(a_Comp.RepairCost);
 }

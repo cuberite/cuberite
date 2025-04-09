@@ -141,7 +141,7 @@ const cItemHandler & cItem::GetHandler(void) const
 
 
 
-const std::map<int, DataComponents::DataComponent> & cItem::GetDefaultItemComponents(void) const
+const std::map<size_t, DataComponents::DataComponent> & cItem::GetDefaultItemComponents(void) const
 {
 	return cItemHandler::GetDefaultComponentsMap().GetComponentsFor(m_ItemType);
 }

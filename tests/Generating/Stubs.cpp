@@ -360,8 +360,8 @@ cItem::cItem(
 		char a_ItemCount,
 		short a_ItemDamage,
 		const AString & a_Enchantments,
-		const AString & a_CustomName,
-		const AStringVector & a_LoreTable
+		const AStringVector & a_LoreTable,
+		const DataComponents::DataComponentMap & a_DataComponents
 )
 {
 }

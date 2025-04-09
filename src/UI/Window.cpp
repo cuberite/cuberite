@@ -274,8 +274,18 @@ void cWindow::Clicked(
 			auto filter_func = [total_delta] (const std::pair<UInt16, cItem> & dlt) { return dlt.first - total_delta >= 0; };
 			auto adjust_ids = [total_delta] (const std::pair<UInt16, cItem> & dlt) -> std::pair<UInt16, cItem> { return { dlt.first - total_delta, dlt.second}; };
 
+			// GitHub actions still use GCC-13 but std::ranges::to is implemented in GCC-14. Remove this when GCC is updated.
+#ifdef __cpp_lib_ranges_to_container
 			// Filters out the slots that apply to this SlotArea and adjusts the ids accordingly
 			std::vector<std::pair<UInt16, cItem>> new_list = transform(filter(a_ItemDelta, filter_func), adjust_ids) | std::ranges::to<std::vector>();
+#else
+			std::vector<std::pair<UInt16, cItem>> new_list;
+			auto filtered = transform(filter(a_ItemDelta, filter_func), adjust_ids);
+			for (const auto & pair : filtered)
+			{
+				new_list.push_back(pair);
+			}
+#endif
 
 			itr->Clicked(a_Player, LocalSlotNum, a_ClickAction, new_list, a_DraggedItem);
 			return;

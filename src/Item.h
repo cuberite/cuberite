@@ -89,8 +89,6 @@ public:
 		);
 	}
 
-	bool operator == (const cItem & rhs) const { return this->IsEqual(rhs); }
-
 
 	bool IsSameType(const cItem & a_Item) const
 	{
@@ -128,6 +126,8 @@ public:
 	char GetMaxStackSize(void) const;
 
 	// tolua_end
+
+	bool operator == (const cItem & rhs) const { return this->IsEqual(rhs); }
 
 	/** Returns the cItemHandler responsible for this item type */
 	const cItemHandler & GetHandler(void) const;
@@ -197,7 +197,7 @@ public:
 		}
 	};
 
-	const std::map<int, DataComponents::DataComponent> & GetDefaultItemComponents(void) const;
+	const std::map<size_t, DataComponents::DataComponent> & GetDefaultItemComponents(void) const;
 
 	template <typename TypeToFind> TypeToFind & GetOrAdd()
 	{
@@ -215,7 +215,7 @@ public:
 	{
 		auto comps = GetDefaultItemComponents();
 
-		int ind = static_cast<int>(a_comp.index());
+		size_t ind = a_comp.index();
 		if (comps.contains(ind) && (a_comp == comps.at(ind)))
 		{
 			auto rez = m_ItemComponents.m_data.find(ind);

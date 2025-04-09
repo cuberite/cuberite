@@ -79,7 +79,7 @@ namespace DataComponents
 			}
 			AString item_name = CurrItem.name();
 			Item curr_item = NamespaceSerializer::ToItem(item_name.substr(10));
-			std::map<int, DataComponent> ToAddComps;
+			std::map<size_t, DataComponent> ToAddComps;
 			for (auto CurrentComponent = comps.begin(), end2 = comps.end(); CurrentComponent != end2; ++CurrentComponent)
 			{
 				AString comp_name = CurrentComponent.name();
@@ -88,7 +88,7 @@ namespace DataComponents
 				{
 					// Parse the component from JSON and add it to the current item as a default component
 					auto CurrComp = (*CompLoader->second)(*CurrentComponent);
-					auto [_, HasInserted] = ToAddComps.emplace(static_cast<int>(CurrComp.index()), CurrComp);
+					auto [_, HasInserted] = ToAddComps.emplace(CurrComp.index(), CurrComp);
 					if (!HasInserted)
 					{
 						LOGWARN("Duplicate data component {} on item {}", comp_name, item_name);
