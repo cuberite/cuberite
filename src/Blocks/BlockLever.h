@@ -55,7 +55,7 @@ private:
 	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// Reset meta to zero:
-		return cItem(Item::Lever, 1, 0);
+		return cItem(Item::Lever, 1);
 	}
 
 

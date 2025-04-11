@@ -358,10 +358,9 @@ cItem::cItem()
 cItem::cItem(
 		enum Item a_ItemType,
 		char a_ItemCount,
-		short a_ItemDamage,
+		const DataComponents::DataComponentMap & a_DataComponents,
 		const AString & a_Enchantments,
-		const AStringVector & a_LoreTable,
-		const DataComponents::DataComponentMap & a_DataComponents
+		const AStringVector & a_LoreTable
 )
 {
 }

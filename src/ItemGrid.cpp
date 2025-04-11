@@ -127,9 +127,9 @@ void cItemGrid::SetSlot(int a_X, int a_Y, const cItem & a_Item)
 
 
 
-void cItemGrid::SetSlot(int a_X, int a_Y, Item a_Item, char a_ItemCount, short a_ItemDamage)
+void cItemGrid::SetSlot(int a_X, int a_Y, Item a_Item, char a_ItemCount)
 {
-	SetSlot(GetSlotNum(a_X, a_Y), cItem(a_Item, a_ItemCount, a_ItemDamage));
+	SetSlot(GetSlotNum(a_X, a_Y), cItem(a_Item, a_ItemCount));
 }
 
 
@@ -157,9 +157,9 @@ void cItemGrid::SetSlot(int a_SlotNum, const cItem & a_Item)
 
 
 
-void cItemGrid::SetSlot(int a_SlotNum, Item a_Item, char a_ItemCount, short a_ItemDamage)
+void cItemGrid::SetSlot(int a_SlotNum, Item a_Item, char a_ItemCount)
 {
-	SetSlot(a_SlotNum, cItem(a_Item, a_ItemCount, a_ItemDamage));
+	SetSlot(a_SlotNum, cItem(a_Item, a_ItemCount));
 }
 
 

@@ -34,7 +34,7 @@ private:
 
 	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
-		return cItem(Item::Anvil, 1, 0);
+		return cItem(Item::Anvil, 1);
 	}
 
 

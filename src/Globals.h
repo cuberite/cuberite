@@ -292,7 +292,7 @@ template class SizeChecker<UInt8, 1>;
 
 
 
-
+/*
 namespace cpp20
 {
 	template <class T>
@@ -307,6 +307,7 @@ namespace cpp20
 		return std::unique_ptr<T>(new T);
 	}
 }
+*/
 
 
 

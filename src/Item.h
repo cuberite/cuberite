@@ -47,10 +47,9 @@ public:
 	cItem(
 		enum Item a_ItemType,
 		char a_ItemCount = 1,
-		short a_ItemDamage = 0,
+		const DataComponents::DataComponentMap & a_DataComponents = DataComponents::DataComponentMap(),
 		const AString & a_Enchantments = "",
-		const AStringVector & a_LoreTable = {},
-		const DataComponents::DataComponentMap & a_DataComponents = DataComponents::DataComponentMap()
+		const AStringVector & a_LoreTable = {}
 	);
 
 	// The constructor is disabled in code, because the compiler generates it anyway,
@@ -306,7 +305,7 @@ public:
 	void    Delete(int a_Idx);
 	void    Clear (void) {clear(); }
 	size_t  Size  (void) const { return size(); }
-	void    Set   (int a_Idx, Item a_Item, char a_ItemCount, short a_ItemDamage);
+	void    Set   (int a_Idx, Item a_Item, char a_ItemCount);
 	bool    Contains(const cItem & a_Item);
 	bool    ContainsType(const cItem & a_Item);
 

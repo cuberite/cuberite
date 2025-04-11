@@ -28,10 +28,9 @@ cItem::cItem():
 cItem::cItem(
 	enum Item a_ItemType,
 	char a_ItemCount,
-	short a_ItemDamage,
+	const DataComponents::DataComponentMap & a_DataComponents,
 	const AString & a_Enchantments,
-	const AStringVector & a_LoreTable,
-	const DataComponents::DataComponentMap & a_DataComponents
+	const AStringVector & a_LoreTable
 ):
 	m_ItemType(a_ItemType),
 	m_ItemCount(a_ItemCount),
@@ -689,14 +688,14 @@ void cItems::Delete(int a_Idx)
 
 
 
-void cItems::Set(int a_Idx, Item a_Item, char a_ItemCount, short a_ItemDamage)
+void cItems::Set(int a_Idx, Item a_Item, char a_ItemCount)
 {
 	if ((a_Idx < 0) || (a_Idx >= static_cast<int>(size())))
 	{
 		LOGWARNING("cItems: Attempt to set an item at an out-of-bounds index %d; there are currently %zu items. Not setting.", a_Idx, size());
 		return;
 	}
-	at(static_cast<size_t>(a_Idx)) = cItem(a_Item, a_ItemCount, a_ItemDamage);
+	at(static_cast<size_t>(a_Idx)) = cItem(a_Item, a_ItemCount);
 }
 
 
