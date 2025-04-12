@@ -2,7 +2,7 @@
 #include "EndPlatform.h"
 #include "BlockType.h"
 
-void EndPlatform::Generate(cWorld * m_EndWorld)
+void cEndPlatform::Generate(cWorld * m_EndWorld)
 {
 	Vector3i platformPos(100, 48, 0);
 	class cEndPlatformCallback : public cChunkCoordCallback
