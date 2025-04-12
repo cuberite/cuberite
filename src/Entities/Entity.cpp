@@ -1555,7 +1555,15 @@ bool cEntity::DetectPortal()
 					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
 
 					EndPlatform::Generate(TargetWorld);
-					Vector3d spawnPos(100, 49, 0);  // The spawn position of entities entering the End Portal
+					Vector3d spawnPos(100.5, 50, 0.5);  // The spawn position of entities entering the End Portal
+					if (IsPlayer())
+					{
+						spawnPos = Vector3d(100, 49, 0);  // Players spawn at different position than entities
+						cPlayer * player = static_cast<cPlayer *>(this);
+						// Player must face west, towards the main island
+						player->SetYaw(90.0);
+						player->SetPitch(0.0);
+					}
 					return MoveToWorld(*TargetWorld, spawnPos);  // Spawn at obsidian platform's fixed coordinates
 				}
 
