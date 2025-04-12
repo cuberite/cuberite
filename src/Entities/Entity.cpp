@@ -1554,7 +1554,7 @@ bool cEntity::DetectPortal()
 					ASSERT(TargetWorld != nullptr);  // The linkage checker should have prevented this at startup. See cWorld::start()
 					LOGD("Jumping %s -> %s", DimensionToString(dimOverworld).c_str(), DimensionToString(TargetWorld->GetDimension()).c_str());
 
-					EndPlatform::Generate(TargetWorld);
+					cEndPlatform::Generate(TargetWorld);
 					Vector3d spawnPos(100.5, 50, 0.5);  // The spawn position of entities entering the End Portal
 					if (IsPlayer())
 					{

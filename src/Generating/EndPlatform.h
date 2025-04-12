@@ -2,7 +2,7 @@
 
 #include "World.h"
 
-class EndPlatform
+class cEndPlatform
 {
 	public:
 		/** Generates the End Obsidian Platform that players spawn on. It is called by cEntity::DetectPortal */
