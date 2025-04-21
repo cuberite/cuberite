@@ -9,7 +9,7 @@
 
 
 cBlaze::cBlaze(void) :
-	Super("Blaze", mtBlaze, "entity.blaze.hurt", "entity.blaze.death", "entity.blaze.ambient", 0.6f, 1.8f),
+	Super("Blaze", etBlaze, "entity.blaze.hurt", "entity.blaze.death", "entity.blaze.ambient", 0.6f, 1.8f),
 	m_IsCharging(false),
 	m_ChargeTimer(0)
 {
@@ -40,7 +40,7 @@ void cBlaze::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	if ((a_Killer != nullptr) && (a_Killer->IsPlayer() || a_Killer->IsA("cWolf")))
 	{
 		unsigned int LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
-		AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_BLAZE_ROD);
+		AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, Item::BlazeRod);
 	}
 }
 

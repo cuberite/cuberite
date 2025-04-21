@@ -3,7 +3,7 @@
 # Use CMake to generate the build files for your platform
 
 cmake_minimum_required (VERSION 3.13)
-cmake_policy(VERSION 3.13...3.17.2)
+cmake_policy(VERSION 3.13...3.31.1)
 project(
 	Cuberite
 	DESCRIPTION "A lightweight, fast and extensible game server for Minecraft"
@@ -28,8 +28,8 @@ include("SetFlags.cmake")
 # Add build timestamp and details:
 include("CMake/StampBuild.cmake")
 
-# We need C++17 features:
-set(CMAKE_CXX_STANDARD 17)
+# We need C++23 features:
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -49,6 +49,12 @@ link_dependencies(${CMAKE_PROJECT_NAME})
 # Set the startup project to Cuberite, and the debugger dir:
 set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${CMAKE_PROJECT_NAME})
 set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/Server")
+
+if(NOT WIN32)
+	target_compile_options(Cuberite PRIVATE -Wno-switch)
+	target_compile_options(Cuberite PRIVATE -Wno-switch-default)
+	target_compile_options(Cuberite PRIVATE -Wno-nan-infinity-disabled)
+endif()
 
 # Enable PCH and jumbo builds on supporting CMake:
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.16")

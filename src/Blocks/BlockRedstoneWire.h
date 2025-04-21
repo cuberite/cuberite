@@ -18,18 +18,37 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		return cItem(E_ITEM_REDSTONE_DUST, 1, 0);
+		if (!cChunkDef::IsValidHeight(a_Position))
+		{
+			return false;
+		}
+
+		auto BelowBlock = a_Chunk.GetBlock(a_Position.addedY(-1));
+
+		return (
+			(cBlockInfo::FullyOccupiesVoxel(BelowBlock)) ||
+			(cBlockSlabHandler::IsAnySlabType(BelowBlock) && cBlockSlabHandler::IsSlabTop(BelowBlock)) ||
+			(cBlockStairsHandler::IsAnyStairType(BelowBlock) && cBlockStairsHandler::IsStairsUpsideDown(BelowBlock))
+		);
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
-		UNUSED(a_Meta);
+		return cItem(Item::Redstone);
+	}
+
+
+
+
+
+	virtual ColourID GetMapBaseColourID() const override
+	{
 		return 0;
 	}
 } ;

@@ -10,11 +10,11 @@
 
 
 
-cNoteEntity::cNoteEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+cNoteEntity::cNoteEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, a_World),
 	m_Note(0)
 {
-	ASSERT(a_BlockType == E_BLOCK_NOTE_BLOCK);
+	ASSERT(a_Block.Type() == BlockType::NoteBlock);
 }
 
 
@@ -49,202 +49,305 @@ void cNoteEntity::MakeSound(void)
 	char Instrument;
 	AString SampleName;
 
-	switch (m_World->GetBlock(m_Pos.addedY(-1)))
+	switch (m_World->GetBlock(m_Pos.addedY(-1)).Type())
 	{
-		case E_BLOCK_ACACIA_DOOR:
-		case E_BLOCK_ACACIA_FENCE:
-		case E_BLOCK_ACACIA_FENCE_GATE:
-		case E_BLOCK_ACACIA_WOOD_STAIRS:
-		case E_BLOCK_BIRCH_DOOR:
-		case E_BLOCK_BIRCH_FENCE:
-		case E_BLOCK_BIRCH_FENCE_GATE:
-		case E_BLOCK_BIRCH_WOOD_STAIRS:
-		case E_BLOCK_BOOKCASE:
-		case E_BLOCK_CHEST:
-		case E_BLOCK_CRAFTING_TABLE:
-		case E_BLOCK_DARK_OAK_DOOR:
-		case E_BLOCK_DARK_OAK_FENCE:
-		case E_BLOCK_DARK_OAK_FENCE_GATE:
-		case E_BLOCK_DARK_OAK_WOOD_STAIRS:
-		case E_BLOCK_DAYLIGHT_SENSOR:
-		case E_BLOCK_DOUBLE_WOODEN_SLAB:
-		case E_BLOCK_FENCE:
-		case E_BLOCK_HUGE_BROWN_MUSHROOM:
-		case E_BLOCK_HUGE_RED_MUSHROOM:
-		case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
-		case E_BLOCK_JUKEBOX:
-		case E_BLOCK_JUNGLE_DOOR:
-		case E_BLOCK_JUNGLE_FENCE:
-		case E_BLOCK_JUNGLE_FENCE_GATE:
-		case E_BLOCK_JUNGLE_WOOD_STAIRS:
-		case E_BLOCK_LOG:
-		case E_BLOCK_NEW_LOG:
-		case E_BLOCK_NOTE_BLOCK:
-		case E_BLOCK_OAK_DOOR:
-		case E_BLOCK_OAK_FENCE_GATE:
-		case E_BLOCK_OAK_WOOD_STAIRS:
-		case E_BLOCK_PLANKS:
-		case E_BLOCK_SIGN_POST:
-		case E_BLOCK_SPRUCE_DOOR:
-		case E_BLOCK_SPRUCE_FENCE:
-		case E_BLOCK_SPRUCE_FENCE_GATE:
-		case E_BLOCK_SPRUCE_WOOD_STAIRS:
-		case E_BLOCK_STANDING_BANNER:
-		case E_BLOCK_TRAPDOOR:
-		case E_BLOCK_TRAPPED_CHEST:
-		case E_BLOCK_WALL_BANNER:
-		case E_BLOCK_WALLSIGN:
-		case E_BLOCK_WOODEN_PRESSURE_PLATE:
-		case E_BLOCK_WOODEN_SLAB:
+		case BlockType::AcaciaDoor:
+		case BlockType::AcaciaFence:
+		case BlockType::AcaciaFenceGate:
+		case BlockType::AcaciaLog:
+		case BlockType::AcaciaSign:
+		case BlockType::AcaciaStairs:
+		case BlockType::AcaciaTrapdoor:
+		case BlockType::AcaciaWallSign:
+		case BlockType::BirchDoor:
+		case BlockType::BirchFence:
+		case BlockType::BirchFenceGate:
+		case BlockType::BirchLog:
+		case BlockType::BirchSign:
+		case BlockType::BirchStairs:
+		case BlockType::BirchTrapdoor:
+		case BlockType::BirchWallSign:
+		case BlockType::BlackBanner:
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BlueWallBanner:
+		case BlockType::Bookshelf:
+		case BlockType::BrownBanner:
+		case BlockType::BrownMushroomBlock:
+		case BlockType::BrownWallBanner:
+		case BlockType::Chest:
+		case BlockType::CraftingTable:
+		case BlockType::CrimsonSign:
+		case BlockType::CrimsonTrapdoor:
+		case BlockType::CrimsonWallSign:
+		case BlockType::CyanBanner:
+		case BlockType::CyanWallBanner:
+		case BlockType::DarkOakDoor:
+		case BlockType::DarkOakFence:
+		case BlockType::DarkOakFenceGate:
+		case BlockType::DarkOakLog:
+		case BlockType::DarkOakSign:
+		case BlockType::DarkOakStairs:
+		case BlockType::DarkOakTrapdoor:
+		case BlockType::DarkOakWallSign:
+		case BlockType::DaylightDetector:
+		case BlockType::GrayBanner:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenBanner:
+		case BlockType::GreenWallBanner:
+		case BlockType::IronTrapdoor:
+		case BlockType::Jukebox:
+		case BlockType::JungleDoor:
+		case BlockType::JungleFence:
+		case BlockType::JungleFenceGate:
+		case BlockType::JungleLog:
+		case BlockType::JungleSign:
+		case BlockType::JungleStairs:
+		case BlockType::JungleTrapdoor:
+		case BlockType::JungleWallSign:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LimeBanner:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::MagentaWallBanner:
+		case BlockType::NoteBlock:
+		case BlockType::OakDoor:
+		case BlockType::OakFence:
+		case BlockType::OakFenceGate:
+		case BlockType::OakLog:
+		case BlockType::OakPlanks:
+		case BlockType::OakPressurePlate:
+		case BlockType::OakSign:
+		case BlockType::OakSlab:
+		case BlockType::OakStairs:
+		case BlockType::OakTrapdoor:
+		case BlockType::OakWallSign:
+		case BlockType::OrangeBanner:
+		case BlockType::OrangeWallBanner:
+		case BlockType::PinkBanner:
+		case BlockType::PinkWallBanner:
+		case BlockType::PurpleBanner:
+		case BlockType::PurpleWallBanner:
+		case BlockType::RedBanner:
+		case BlockType::RedMushroomBlock:
+		case BlockType::RedWallBanner:
+		case BlockType::SpruceDoor:
+		case BlockType::SpruceFence:
+		case BlockType::SpruceFenceGate:
+		case BlockType::SpruceLog:
+		case BlockType::SpruceSign:
+		case BlockType::SpruceStairs:
+		case BlockType::SpruceTrapdoor:
+		case BlockType::SpruceWallSign:
+		case BlockType::TrappedChest:
+		case BlockType::WarpedFence:
+		case BlockType::WarpedSign:
+		case BlockType::WarpedTrapdoor:
+		case BlockType::WarpedWallSign:
+		case BlockType::WhiteBanner:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowBanner:
+		case BlockType::YellowWallBanner:
+
 		{
 			Instrument = E_INST_DOUBLE_BASS;
-			SampleName = "block.note.bass";
+			SampleName = "block.note_block.bass";
 			break;
 		}
 
-		case E_BLOCK_GRAVEL:
-		case E_BLOCK_SAND:
-		case E_BLOCK_SOULSAND:
+		case BlockType::Gravel:
+		case BlockType::Sand:
+		case BlockType::SoulSand:
 		{
 			Instrument = E_INST_SNARE_DRUM;
-			SampleName = "block.note.snare";
+			SampleName = "block.note_block.snare";
 			break;
 		}
-
-		case E_BLOCK_BEACON:
-		case E_BLOCK_GLASS:
-		case E_BLOCK_GLASS_PANE:
-		case E_BLOCK_GLOWSTONE:
-		case E_BLOCK_SEA_LANTERN:
-		case E_BLOCK_STAINED_GLASS:
-		case E_BLOCK_STAINED_GLASS_PANE:
+		case BlockType::Beacon:
+		case BlockType::BlackStainedGlass:
+		case BlockType::BlackStainedGlassPane:
+		case BlockType::BlueStainedGlass:
+		case BlockType::BlueStainedGlassPane:
+		case BlockType::BrownStainedGlass:
+		case BlockType::BrownStainedGlassPane:
+		case BlockType::CyanStainedGlass:
+		case BlockType::CyanStainedGlassPane:
+		case BlockType::Glass:
+		case BlockType::GlassPane:
+		case BlockType::Glowstone:
+		case BlockType::GrayStainedGlass:
+		case BlockType::GrayStainedGlassPane:
+		case BlockType::GreenStainedGlass:
+		case BlockType::GreenStainedGlassPane:
+		case BlockType::LightBlueStainedGlass:
+		case BlockType::LightBlueStainedGlassPane:
+		case BlockType::LightGrayStainedGlass:
+		case BlockType::LightGrayStainedGlassPane:
+		case BlockType::LimeStainedGlass:
+		case BlockType::LimeStainedGlassPane:
+		case BlockType::MagentaStainedGlass:
+		case BlockType::MagentaStainedGlassPane:
+		case BlockType::OrangeStainedGlass:
+		case BlockType::OrangeStainedGlassPane:
+		case BlockType::PinkStainedGlass:
+		case BlockType::PinkStainedGlassPane:
+		case BlockType::PurpleStainedGlass:
+		case BlockType::PurpleStainedGlassPane:
+		case BlockType::RedStainedGlass:
+		case BlockType::RedStainedGlassPane:
+		case BlockType::SeaLantern:
+		case BlockType::WhiteStainedGlass:
+		case BlockType::WhiteStainedGlassPane:
+		case BlockType::YellowStainedGlass:
+		case BlockType::YellowStainedGlassPane:
 		{
 			Instrument = E_INST_CLICKS;
-			SampleName = "block.note.hat";
+			SampleName = "block.note_block.hat";
 			break;
 		}
 
-		case E_BLOCK_BEDROCK:
-		case E_BLOCK_BLACK_SHULKER_BOX:
-		case E_BLOCK_BLOCK_OF_COAL:
-		case E_BLOCK_BLUE_SHULKER_BOX:
-		case E_BLOCK_BRICK:
-		case E_BLOCK_BRICK_STAIRS:
-		case E_BLOCK_BROWN_SHULKER_BOX:
-		case E_BLOCK_COAL_ORE:
-		case E_BLOCK_COBBLESTONE:
-		case E_BLOCK_COBBLESTONE_STAIRS:
-		case E_BLOCK_COBBLESTONE_WALL:
-		case E_BLOCK_CYAN_SHULKER_BOX:
-		case E_BLOCK_DIAMOND_ORE:
-		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DOUBLE_RED_SANDSTONE_SLAB:
-		case E_BLOCK_DOUBLE_STONE_SLAB:
-		case E_BLOCK_DROPPER:
-		case E_BLOCK_EMERALD_ORE:
-		case E_BLOCK_ENCHANTMENT_TABLE:
-		case E_BLOCK_END_BRICKS:
-		case E_BLOCK_END_PORTAL_FRAME:
-		case E_BLOCK_END_STONE:
-		case E_BLOCK_ENDER_CHEST:
-		case E_BLOCK_FURNACE:
-		case E_BLOCK_GOLD_ORE:
-		case E_BLOCK_GRAY_SHULKER_BOX:
-		case E_BLOCK_GREEN_SHULKER_BOX:
-		case E_BLOCK_IRON_ORE:
-		case E_BLOCK_LAPIS_ORE:
-		case E_BLOCK_LIGHT_BLUE_SHULKER_BOX:
-		case E_BLOCK_LIGHT_GRAY_SHULKER_BOX:
-		case E_BLOCK_LIME_SHULKER_BOX:
-		case E_BLOCK_LIT_FURNACE:
-		case E_BLOCK_MAGENTA_SHULKER_BOX:
-		case E_BLOCK_MAGMA:
-		case E_BLOCK_MOB_SPAWNER:
-		case E_BLOCK_MOSSY_COBBLESTONE:
-		case E_BLOCK_NETHER_BRICK:
-		case E_BLOCK_NETHER_BRICK_FENCE:
-		case E_BLOCK_NETHER_BRICK_STAIRS:
-		case E_BLOCK_NETHER_QUARTZ_ORE:
-		case E_BLOCK_NETHERRACK:
-		case E_BLOCK_OBSERVER:
-		case E_BLOCK_OBSIDIAN:
-		case E_BLOCK_ORANGE_SHULKER_BOX:
-		case E_BLOCK_PINK_SHULKER_BOX:
-		case E_BLOCK_PRISMARINE_BLOCK:
-		case E_BLOCK_PURPLE_SHULKER_BOX:
-		case E_BLOCK_PURPUR_BLOCK:
-		case E_BLOCK_PURPUR_DOUBLE_SLAB:
-		case E_BLOCK_PURPUR_PILLAR:
-		case E_BLOCK_PURPUR_SLAB:
-		case E_BLOCK_PURPUR_STAIRS:
-		case E_BLOCK_QUARTZ_BLOCK:
-		case E_BLOCK_QUARTZ_STAIRS:
-		case E_BLOCK_RED_NETHER_BRICK:
-		case E_BLOCK_RED_SANDSTONE:
-		case E_BLOCK_RED_SANDSTONE_SLAB:
-		case E_BLOCK_RED_SANDSTONE_STAIRS:
-		case E_BLOCK_RED_SHULKER_BOX:
-		case E_BLOCK_REDSTONE_ORE:
-		case E_BLOCK_REDSTONE_ORE_GLOWING:
-		case E_BLOCK_SANDSTONE:
-		case E_BLOCK_SANDSTONE_STAIRS:
-		case E_BLOCK_STONE:
-		case E_BLOCK_STONE_BRICK_STAIRS:
-		case E_BLOCK_STONE_BRICKS:
-		case E_BLOCK_STONE_PRESSURE_PLATE:
-		case E_BLOCK_STONE_SLAB:
-		case E_BLOCK_WHITE_SHULKER_BOX:
-		case E_BLOCK_YELLOW_SHULKER_BOX:
+		case BlockType::Bedrock:
+		case BlockType::BlackShulkerBox:
+		case BlockType::BlueShulkerBox:
+		case BlockType::BrickStairs:
+		case BlockType::Bricks:
+		case BlockType::BrownShulkerBox:
+		case BlockType::CoalBlock:
+		case BlockType::CoalOre:
+		case BlockType::Cobblestone:
+		case BlockType::CobblestoneStairs:
+		case BlockType::CobblestoneWall:
+		case BlockType::CyanShulkerBox:
+		case BlockType::DiamondOre:
+		case BlockType::Dispenser:
+		case BlockType::Dropper:
+		case BlockType::EmeraldOre:
+		case BlockType::EnchantingTable:
+		case BlockType::EndPortalFrame:
+		case BlockType::EndStone:
+		case BlockType::EndStoneBrickSlab:
+		case BlockType::EndStoneBrickStairs:
+		case BlockType::EndStoneBricks:
+		case BlockType::EnderChest:
+		case BlockType::Furnace:
+		case BlockType::GoldOre:
+		case BlockType::GrayShulkerBox:
+		case BlockType::GreenShulkerBox:
+		case BlockType::IronOre:
+		case BlockType::LapisOre:
+		case BlockType::LightBlueShulkerBox:
+		case BlockType::LightGrayShulkerBox:
+		case BlockType::LimeShulkerBox:
+		case BlockType::MagentaShulkerBox:
+		case BlockType::MagmaBlock:
+		case BlockType::MossyCobblestone:
+		case BlockType::MossyCobblestoneSlab:
+		case BlockType::MossyCobblestoneStairs:
+		case BlockType::MossyCobblestoneWall:
+		case BlockType::NetherBrickFence:
+		case BlockType::NetherBrickStairs:
+		case BlockType::NetherBricks:
+		case BlockType::NetherQuartzOre:
+		case BlockType::Netherrack:
+		case BlockType::Observer:
+		case BlockType::Obsidian:
+		case BlockType::OrangeShulkerBox:
+		case BlockType::PinkShulkerBox:
+		case BlockType::Prismarine:
+		case BlockType::PurpleShulkerBox:
+		case BlockType::PurpurBlock:
+		case BlockType::PurpurPillar:
+		case BlockType::PurpurSlab:
+		case BlockType::PurpurStairs:
+		case BlockType::QuartzBlock:
+		case BlockType::QuartzStairs:
+		case BlockType::RedNetherBrickSlab:
+		case BlockType::RedNetherBrickStairs:
+		case BlockType::RedNetherBrickWall:
+		case BlockType::RedNetherBricks:
+		case BlockType::RedSandstone:
+		case BlockType::RedSandstoneSlab:
+		case BlockType::RedSandstoneStairs:
+		case BlockType::RedShulkerBox:
+		case BlockType::RedstoneOre:
+		case BlockType::Sandstone:
+		case BlockType::SandstoneStairs:
+		case BlockType::Spawner:
+		case BlockType::Stone:
+		case BlockType::StoneBrickStairs:
+		case BlockType::StoneBricks:
+		case BlockType::StonePressurePlate:
+		case BlockType::StoneSlab:
+		case BlockType::WhiteShulkerBox:
+		case BlockType::YellowShulkerBox:
 		{
 			Instrument = E_INST_BASS_DRUM;
-			SampleName = "block.note.basedrum";
+			SampleName = "block.note_block.basedrum";
 			break;
 		}
 
-		case E_BLOCK_CLAY:
+		case BlockType::Clay:
 		{
 			Instrument = E_INST_FLUTE;
-			SampleName = "block.note.flute";
+			SampleName = "block.note_block.flute";
 			break;
 		}
 
-		case E_BLOCK_GOLD_BLOCK:
+		case BlockType::GoldBlock:
 		{
 			Instrument = E_INST_BELL;
-			SampleName = "block.note.bell";
+			SampleName = "block.note_block.bell";
 			break;
 		}
 
-		case E_BLOCK_WOOL:
+		case BlockType::BlackWool:
+		case BlockType::BlueWool:
+		case BlockType::BrownWool:
+		case BlockType::CyanWool:
+		case BlockType::GrayWool:
+		case BlockType::GreenWool:
+		case BlockType::LightBlueWool:
+		case BlockType::LightGrayWool:
+		case BlockType::LimeWool:
+		case BlockType::MagentaWool:
+		case BlockType::OrangeWool:
+		case BlockType::PinkWool:
+		case BlockType::PurpleWool:
+		case BlockType::RedWool:
+		case BlockType::WhiteWool:
+		case BlockType::YellowWool:
 		{
 			Instrument = E_INST_GUITAR;
-			SampleName = "block.note.guitar";
+			SampleName = "block.note_block.guitar";
 			break;
 		}
 
-		case E_BLOCK_PACKED_ICE:
+		case BlockType::PackedIce:
 		{
 			Instrument = E_INST_CHIME;
-			SampleName = "block.note.chime";
+			SampleName = "block.note_block.chime";
 			break;
 		}
 
-		case E_BLOCK_BONE_BLOCK:
+		case BlockType::BoneBlock:
 		{
 			Instrument = E_INST_XYLOPHONE;
-			SampleName = "block.note.xylophone";
+			SampleName = "block.note_block.xylophone";
 			break;
 		}
 
 		default:
 		{
 			Instrument = E_INST_HARP_PIANO;
-			SampleName = "block.note.harp";
+			SampleName = "block.note_block.harp";
 			break;
 		}
 	}
 
-	m_World->BroadcastBlockAction(m_Pos, static_cast<Byte>(Instrument), static_cast<Byte>(m_Note), E_BLOCK_NOTE_BLOCK);
+	m_World->BroadcastBlockAction(m_Pos, static_cast<Byte>(Instrument), static_cast<Byte>(m_Note), BlockType::NoteBlock);
 
 	m_World->BroadcastSoundEffect(
 		SampleName,

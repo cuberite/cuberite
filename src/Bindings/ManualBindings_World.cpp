@@ -68,7 +68,7 @@ static bool GetStackVectorOr3Numbers(cLuaState & L, int a_Index, Vector3<T> & a_
 
 
 /** Template for the bindings for the DoWithXYZAt(X, Y, Z) functions that don't need to check their coords. */
-template <class BlockEntityType, BLOCKTYPE... BlockTypes>
+template <class BlockEntityType, BlockType... BlockTypes>
 static int DoWithBlockEntityAt(lua_State * tolua_S)
 {
 	cLuaState L(tolua_S);
@@ -189,7 +189,7 @@ static int ForEachInBox(lua_State * tolua_S)
 
 
 
-template <class BlockEntityType, BLOCKTYPE... BlockTypes>
+template <class BlockEntityType, BlockType... BlockTypes>
 static int ForEachBlockEntityInChunk(lua_State * tolua_S)
 {
 	// Check params:
@@ -273,7 +273,7 @@ static int tolua_cWorld_BroadcastBlockAction(lua_State * tolua_S)
 	cWorld * Self;
 	Vector3i BlockPos;
 	Byte Byte1, Byte2;
-	BLOCKTYPE BlockType;
+	unsigned char BlockType;
 	const cClientHandle * Exclude = nullptr;
 
 	if (
@@ -288,7 +288,7 @@ static int tolua_cWorld_BroadcastBlockAction(lua_State * tolua_S)
 	// Optional param
 	L.GetStackValue(Byte1Index + 3, Exclude);
 
-	Self->BroadcastBlockAction(BlockPos, Byte1, Byte2, BlockType, Exclude);
+	Self->BroadcastBlockAction(BlockPos, Byte1, Byte2, PaletteUpgrade::FromBlock(BlockType, 0).Type(), Exclude);
 	return 0;
 }
 
@@ -729,8 +729,8 @@ static int tolua_cWorld_FastSetBlock(lua_State * tolua_S)
 
 	cWorld * World;
 	Vector3i Position;
-	BLOCKTYPE Type;
-	NIBBLETYPE Meta;
+	unsigned char Type;
+	unsigned char Meta;
 
 	// Read the params:
 	if (
@@ -752,7 +752,7 @@ static int tolua_cWorld_FastSetBlock(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
 
-	World->FastSetBlock(Position, Type, Meta);
+	World->FastSetBlock(Position, PaletteUpgrade::FromBlock(Type, Meta));
 	return 0;
 }
 
@@ -905,7 +905,7 @@ static int tolua_cWorld_GetBlock(lua_State * tolua_S)
 
 	if (!cChunkDef::IsValidHeight(Position))
 	{
-		L.Push(E_BLOCK_AIR);
+		L.Push(Block::Air::Air());
 		return 1;
 	}
 
@@ -1021,17 +1021,19 @@ static int tolua_cWorld_GetBlockInfo(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
 
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta, BlockSkyLight, BlockBlockLight;
+	BlockState Block;
+	LIGHTTYPE BlockSkyLight, BlockBlockLight;
 
 	// Call the function:
-	bool res = World->GetBlockInfo(Position, BlockType, BlockMeta, BlockSkyLight, BlockBlockLight);
+	bool res = World->GetBlockInfo(Position, Block, BlockSkyLight, BlockBlockLight);
+
+	auto NumericBlock = PaletteUpgrade::ToBlock(Block);
 
 	// Push the returned values:
 	L.Push(res);
 	if (res)
 	{
-		L.Push(BlockType, BlockMeta, BlockSkyLight, BlockBlockLight);
+		L.Push(NumericBlock.first, NumericBlock.second, BlockSkyLight, BlockBlockLight);
 		return 5;
 	}
 	return 1;
@@ -1089,7 +1091,7 @@ static int tolua_cWorld_GetBlockMeta(lua_State * tolua_S)
 		return 1;
 	}
 
-	L.Push(World->GetBlockMeta(Position));
+	L.Push(PaletteUpgrade::ToBlock(World->GetBlock(Position)).second);
 	return 1;
 }
 
@@ -1198,21 +1200,21 @@ static int tolua_cWorld_GetBlockTypeMeta(lua_State * tolua_S)
 
 	if (!cChunkDef::IsValidHeight(Position))
 	{
-		L.Push(E_BLOCK_AIR, 0);
+		L.Push(Block::Air::Air());
 		return 2;
 	}
 
-	BLOCKTYPE BlockType;
-	NIBBLETYPE BlockMeta;
-
 	// Call the function:
-	bool res = World->GetBlockTypeMeta(Position, BlockType, BlockMeta);
+	BlockState Block;
+	bool res = World->GetBlock(Position, Block);
+
+	auto NumericBlock = PaletteUpgrade::ToBlock(Block);
 
 	// Push the returned values:
 	L.Push(res);
 	if (res)
 	{
-		L.Push(BlockType, BlockMeta);
+		L.Push(NumericBlock.first, NumericBlock.second);
 		return 3;
 	}
 	return 1;
@@ -1452,8 +1454,8 @@ static int tolua_cWorld_SetBlock(lua_State * tolua_S)
 
 	cWorld * World;
 	Vector3i Position;
-	BLOCKTYPE Type;
-	NIBBLETYPE Meta;
+	unsigned char Type;
+	unsigned char Meta;
 
 	// Read the params:
 	if (
@@ -1475,65 +1477,7 @@ static int tolua_cWorld_SetBlock(lua_State * tolua_S)
 		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
 	}
 
-	World->SetBlock(Position, Type, Meta);
-	return 0;
-}
-
-
-
-
-
-static int tolua_cWorld_SetBlockMeta(lua_State * tolua_S)
-{
-	/* Function signature:
-	World:SetBlockMeta(BlockX, BlockY, BlockZ, BlockMeta)
-	--or--
-	World:SetBlockMeta(Position, BlockMeta)
-	*/
-
-	cLuaState L(tolua_S);
-	int OffsetIndex;
-	if (
-		!L.CheckParamSelf("cWorld") ||
-		!CheckParamVectorOr3Numbers(L, "Vector3<int>", 2, OffsetIndex) ||
-		!L.CheckParamNumber(OffsetIndex) ||
-		!L.CheckParamEnd(OffsetIndex + 1)
-	)
-	{
-		return 0;
-	}
-
-	if (OffsetIndex != 3)  // Not the vector overload
-	{
-		L.LogStackTrace();
-		LOGWARN("SetBlockMeta with 3 position arguments is deprecated, use vector-parametered version instead.");
-	}
-
-	cWorld * World;
-	Vector3i Position;
-	NIBBLETYPE Meta;
-
-	// Read the params:
-	if (
-		!L.GetStackValue(1, World) ||
-		!GetStackVectorOr3Numbers(L, 2, Position) ||
-		!L.GetStackValue(OffsetIndex, Meta)
-	)
-	{
-		return 0;
-	}
-
-	if (World == nullptr)
-	{
-		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'self'");
-	}
-
-	if (!cChunkDef::IsValidHeight(Position))
-	{
-		return cManualBindings::lua_do_error(tolua_S, "Error in function call '#funcname#': Invalid 'position'");
-	}
-
-	World->SetBlockMeta(Position, Meta);
+	World->SetBlock(Position, PaletteUpgrade::FromBlock(Type, Meta));
 	return 0;
 }
 
@@ -1773,33 +1717,42 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "BroadcastParticleEffect",      tolua_cWorld_BroadcastParticleEffect);
 			tolua_function(tolua_S, "ChunkStay",                    tolua_cWorld_ChunkStay);
 			tolua_function(tolua_S, "DoExplosionAt",                tolua_cWorld_DoExplosionAt);
-			tolua_function(tolua_S, "DoWithBeaconAt",               DoWithBlockEntityAt<cBeaconEntity, E_BLOCK_BEACON>);
-			tolua_function(tolua_S, "DoWithBedAt",                  DoWithBlockEntityAt<cBedEntity, E_BLOCK_BED>);
+			tolua_function(tolua_S, "DoWithBeaconAt",               DoWithBlockEntityAt<cBeaconEntity, BlockType::Beacon>);
+			tolua_function(tolua_S, "DoWithBedAt",                  DoWithBlockEntityAt<cBedEntity, BlockType::BlackBed, BlockType::BlueBed, BlockType::BrownBed,
+				BlockType::CyanBed, BlockType::GrayBed, BlockType::GreenBed, BlockType::LightBlueBed, BlockType::LightGrayBed, BlockType::LimeBed, BlockType::MagentaBed,
+				BlockType::OrangeBed, BlockType::PinkBed, BlockType::PurpleBed, BlockType::RedBed, BlockType::WhiteBed, BlockType::YellowBed>);
 			tolua_function(tolua_S, "DoWithBlockEntityAt",          DoWithBlockEntityAt<cBlockEntity>);
-			tolua_function(tolua_S, "DoWithBrewingstandAt",         DoWithBlockEntityAt<cBrewingstandEntity, E_BLOCK_BREWING_STAND>);
-			tolua_function(tolua_S, "DoWithChestAt",                DoWithBlockEntityAt<cChestEntity, E_BLOCK_CHEST, E_BLOCK_TRAPPED_CHEST>);
-			tolua_function(tolua_S, "DoWithCommandBlockAt",         DoWithBlockEntityAt<cCommandBlockEntity, E_BLOCK_COMMAND_BLOCK>);
-			tolua_function(tolua_S, "DoWithDispenserAt",            DoWithBlockEntityAt<cDispenserEntity, E_BLOCK_DISPENSER>);
-			tolua_function(tolua_S, "DoWithDropSpenserAt",          DoWithBlockEntityAt<cDropSpenserEntity, E_BLOCK_DISPENSER, E_BLOCK_DROPPER>);
-			tolua_function(tolua_S, "DoWithDropperAt",              DoWithBlockEntityAt<cDropperEntity, E_BLOCK_DROPPER>);
+			tolua_function(tolua_S, "DoWithBrewingstandAt",         DoWithBlockEntityAt<cBrewingstandEntity, BlockType::BrewingStand>);
+			tolua_function(tolua_S, "DoWithChestAt",                DoWithBlockEntityAt<cChestEntity, BlockType::Chest, BlockType::TrappedChest>);
+			tolua_function(tolua_S, "DoWithCommandBlockAt",         DoWithBlockEntityAt<cCommandBlockEntity, BlockType::CommandBlock, BlockType::ChainCommandBlock, BlockType::RepeatingCommandBlock>);
+			tolua_function(tolua_S, "DoWithDispenserAt",            DoWithBlockEntityAt<cDispenserEntity, BlockType::Dispenser>);
+			tolua_function(tolua_S, "DoWithDropSpenserAt",          DoWithBlockEntityAt<cDropSpenserEntity, BlockType::Dispenser, BlockType::Dropper>);
+			tolua_function(tolua_S, "DoWithDropperAt",              DoWithBlockEntityAt<cDropperEntity, BlockType::Dropper>);
 			tolua_function(tolua_S, "DoWithEntityByID",             DoWithID<cWorld, cEntity, &cWorld::DoWithEntityByID>);
-			tolua_function(tolua_S, "DoWithFlowerPotAt",            DoWithBlockEntityAt<cFlowerPotEntity, E_BLOCK_FLOWER_POT>);
-			tolua_function(tolua_S, "DoWithFurnaceAt",              DoWithBlockEntityAt<cFurnaceEntity, E_BLOCK_FURNACE, E_BLOCK_LIT_FURNACE>);
-			tolua_function(tolua_S, "DoWithHopperAt",               DoWithBlockEntityAt<cHopperEntity, E_BLOCK_HOPPER>);
-			tolua_function(tolua_S, "DoWithMobHeadAt",              DoWithBlockEntityAt<cMobHeadEntity, E_BLOCK_HEAD>);
+			tolua_function(tolua_S, "DoWithFlowerPotAt",            DoWithBlockEntityAt<cFlowerPotEntity, BlockType::PottedAcaciaSapling, BlockType::PottedAzureBluet, BlockType::PottedBamboo,
+				BlockType::PottedBirchSapling, BlockType::PottedBlueOrchid, BlockType::PottedBrownMushroom, BlockType::PottedCactus, BlockType::PottedCornflower, BlockType::PottedCrimsonRoots,
+				BlockType::PottedCrimsonFungus, BlockType::PottedDandelion, BlockType::PottedDarkOakSapling, BlockType::PottedDeadBush, BlockType::PottedFern, BlockType::PottedJungleSapling,
+				BlockType::PottedLilyOfTheValley, BlockType::PottedOakSapling, BlockType::PottedOrangeTulip, BlockType::PottedOxeyeDaisy, BlockType::PottedPinkTulip, BlockType::PottedPoppy,
+				BlockType::PottedRedMushroom, BlockType::PottedRedTulip, BlockType::PottedSpruceSapling, BlockType::PottedWarpedFungus, BlockType::PottedWarpedRoots, BlockType::PottedWhiteTulip,
+				BlockType::PottedWitherRose, BlockType::PottedAllium>);
+			tolua_function(tolua_S, "DoWithFurnaceAt",              DoWithBlockEntityAt<cFurnaceEntity, BlockType::Furnace>);
+			tolua_function(tolua_S, "DoWithHopperAt",               DoWithBlockEntityAt<cHopperEntity, BlockType::Hopper>);
+			tolua_function(tolua_S, "DoWithMobHeadAt",              DoWithBlockEntityAt<cMobHeadEntity, BlockType::CreeperHead, BlockType::CreeperWallHead, BlockType::DragonHead, BlockType::DragonWallHead,
+				BlockType::PlayerHead, BlockType::PlayerWallHead, BlockType::SkeletonSkull, BlockType::SkeletonWallSkull, BlockType::WitherSkeletonSkull, BlockType::WitherSkeletonWallSkull,
+				BlockType::ZombieHead, BlockType::ZombieWallHead>);
 			tolua_function(tolua_S, "DoWithNearestPlayer",          tolua_cWorld_DoWithNearestPlayer);
-			tolua_function(tolua_S, "DoWithNoteBlockAt",            DoWithBlockEntityAt<cNoteEntity, E_BLOCK_NOTE_BLOCK>);
+			tolua_function(tolua_S, "DoWithNoteBlockAt",            DoWithBlockEntityAt<cNoteEntity, BlockType::NoteBlock>);
 			tolua_function(tolua_S, "DoWithPlayer",                 DoWith<cWorld, cPlayer, &cWorld::DoWithPlayer>);
 			tolua_function(tolua_S, "DoWithPlayerByUUID",           tolua_cWorld_DoWithPlayerByUUID);
 			tolua_function(tolua_S, "FastSetBlock",                 tolua_cWorld_FastSetBlock);
 			tolua_function(tolua_S, "FindAndDoWithPlayer",          DoWith<cWorld, cPlayer, &cWorld::FindAndDoWithPlayer>);
 			tolua_function(tolua_S, "ForEachBlockEntityInChunk",    ForEachBlockEntityInChunk<cBlockEntity>);
-			tolua_function(tolua_S, "ForEachBrewingstandInChunk",   ForEachBlockEntityInChunk<cBrewingstandEntity, E_BLOCK_BREWING_STAND>);
-			tolua_function(tolua_S, "ForEachChestInChunk",          ForEachBlockEntityInChunk<cChestEntity, E_BLOCK_CHEST, E_BLOCK_TRAPPED_CHEST>);
+			tolua_function(tolua_S, "ForEachBrewingstandInChunk",   ForEachBlockEntityInChunk<cBrewingstandEntity, BlockType::BrewingStand>);
+			tolua_function(tolua_S, "ForEachChestInChunk",          ForEachBlockEntityInChunk<cChestEntity, BlockType::Chest, BlockType::TrappedChest>);
 			tolua_function(tolua_S, "ForEachEntity",                ForEach<cWorld, cEntity, &cWorld::ForEachEntity>);
 			tolua_function(tolua_S, "ForEachEntityInBox",           ForEachInBox<cWorld, cEntity, &cWorld::ForEachEntityInBox>);
 			tolua_function(tolua_S, "ForEachEntityInChunk",         tolua_cWorld_ForEachEntityInChunk);
-			tolua_function(tolua_S, "ForEachFurnaceInChunk",        ForEachBlockEntityInChunk<cFurnaceEntity, E_BLOCK_FURNACE, E_BLOCK_LIT_FURNACE>);
+			tolua_function(tolua_S, "ForEachFurnaceInChunk",        ForEachBlockEntityInChunk<cFurnaceEntity, BlockType::Furnace>);
 			tolua_function(tolua_S, "ForEachLoadedChunk",           tolua_cWorld_ForEachLoadedChunk);
 			tolua_function(tolua_S, "ForEachPlayer",                ForEach<cWorld, cPlayer, &cWorld::ForEachPlayer>);
 			tolua_function(tolua_S, "GetBlock",                     tolua_cWorld_GetBlock);
@@ -1816,7 +1769,6 @@ void cManualBindings::BindWorld(lua_State * tolua_S)
 			tolua_function(tolua_S, "QueueTask",                    tolua_cWorld_QueueTask);
 			tolua_function(tolua_S, "ScheduleTask",                 tolua_cWorld_ScheduleTask);
 			tolua_function(tolua_S, "SetBlock",                     tolua_cWorld_SetBlock);
-			tolua_function(tolua_S, "SetBlockMeta",                 tolua_cWorld_SetBlockMeta);
 			tolua_function(tolua_S, "SetSignLines",                 tolua_cWorld_SetSignLines);
 			tolua_function(tolua_S, "SetTimeOfDay",                 tolua_cWorld_SetTimeOfDay);
 			tolua_function(tolua_S, "SpawnSplitExperienceOrbs",     tolua_cWorld_SpawnSplitExperienceOrbs);

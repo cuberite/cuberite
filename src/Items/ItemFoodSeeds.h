@@ -15,7 +15,7 @@ class cItemFoodSeedsHandler final:
 
 public:
 
-	constexpr cItemFoodSeedsHandler(int a_ItemType, FoodInfo a_FoodInfo):
+	constexpr cItemFoodSeedsHandler(Item a_ItemType, FoodInfo a_FoodInfo):
 		Super(a_ItemType),
 		m_FoodInfo(a_FoodInfo)
 	{

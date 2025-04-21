@@ -51,8 +51,8 @@ public:
 
 	virtual void GetBreedingItems(cItems & a_Items) override
 	{
-		a_Items.Add(E_ITEM_GOLDEN_CARROT);
-		a_Items.Add(E_ITEM_GOLDEN_APPLE);
+		a_Items.Add(Item::GoldenCarrot);
+		a_Items.Add(Item::GoldenApple);
 	}
 
 	void PlayerOpenWindow(cPlayer & a_Player);

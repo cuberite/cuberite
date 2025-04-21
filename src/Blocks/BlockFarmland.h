@@ -81,7 +81,7 @@ public:
 				return false;
 			});
 
-		a_Chunk.SetBlock(a_RelPos, E_BLOCK_DIRT, 0);
+		a_Chunk.SetBlock(a_RelPos, BlockType::Dirt);
 	}
 
 
@@ -90,9 +90,9 @@ public:
 
 private:
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
-		return cItem(E_BLOCK_DIRT, 1, 0);
+		return cItem(Item::Dirt);
 	}
 
 
@@ -107,32 +107,35 @@ private:
 		const Vector3i a_RelPos
 	) const override
 	{
-		auto BlockMeta = a_Chunk.GetMeta(a_RelPos);
+		auto Self = a_Chunk.GetBlock(a_RelPos);
 
 		if (IsWaterInNear(a_Chunk, a_RelPos))
 		{
 			// Water was found, set block meta to 7
-			a_Chunk.FastSetBlock(a_RelPos, m_BlockType, 7);
+			a_Chunk.FastSetBlock(a_RelPos, Block::Farmland::Farmland(7));
 			return;
 		}
 
+		auto Moisture = Block::Farmland::Moisture(Self);
 		// Water wasn't found, de-hydrate block:
-		if (BlockMeta > 0)
+		if (Moisture > 0)
 		{
-			a_Chunk.FastSetBlock(a_RelPos, E_BLOCK_FARMLAND, --BlockMeta);
+			a_Chunk.FastSetBlock(a_RelPos, Block::Farmland::Farmland(--Moisture));
 			return;
 		}
 
 		// Farmland too dry. If nothing is growing on top, turn back to dirt:
-		auto UpperBlock = cChunkDef::IsValidHeight(a_RelPos.addedY(1)) ? a_Chunk.GetBlock(a_RelPos.addedY(1)) : E_BLOCK_AIR;
-		switch (UpperBlock)
+		auto UpperBlock = cChunkDef::IsValidHeight(a_RelPos.addedY(1)) ? a_Chunk.GetBlock(a_RelPos.addedY(1)) : Block::Air::Air();
+		switch (UpperBlock.Type())
 		{
-			case E_BLOCK_BEETROOTS:
-			case E_BLOCK_CROPS:
-			case E_BLOCK_POTATOES:
-			case E_BLOCK_CARROTS:
-			case E_BLOCK_MELON_STEM:
-			case E_BLOCK_PUMPKIN_STEM:
+			case BlockType::Beetroots:
+			case BlockType::Carrots:
+			case BlockType::MelonStem:
+			case BlockType::AttachedMelonStem:
+			case BlockType::Potatoes:
+			case BlockType::PumpkinStem:
+			case BlockType::AttachedPumpkinStem:
+			case BlockType::Wheat:
 			{
 				// Produce on top, don't revert
 				break;
@@ -166,8 +169,8 @@ private:
 
 		// Check whether we should revert to dirt:
 		// TODO: fix for signs and slabs (possibly more blocks) - they should destroy farmland
-		auto upperBlock = a_ChunkInterface.GetBlock(a_BlockPos.addedY(1));
-		if (cBlockInfo::FullyOccupiesVoxel(upperBlock))
+		auto UpperBlock = a_ChunkInterface.GetBlock(a_BlockPos.addedY(1));
+		if (cBlockInfo::FullyOccupiesVoxel(UpperBlock))
 		{
 			// Until the fix above is done, this line should also suffice:
 			// a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_DIRT, 0);
@@ -205,10 +208,10 @@ private:
 		}
 
 		size_t NumBlocks = Area.GetBlockCount();
-		BLOCKTYPE * BlockTypes = Area.GetBlockTypes();
+		auto Blocks = Area.GetBlocks();
 		for (size_t i = 0; i < NumBlocks; i++)
 		{
-			if (IsBlockWater(BlockTypes[i]))
+			if (Blocks[i].Type() == BlockType::Water)
 			{
 				return true;
 			}
@@ -221,15 +224,20 @@ private:
 
 
 
-	virtual bool CanSustainPlant(BLOCKTYPE a_Plant) const override
+	virtual bool CanSustainPlant(BlockState a_Plant) const override
 	{
-		return (
-			(a_Plant == E_BLOCK_BEETROOTS) ||
-			(a_Plant == E_BLOCK_CROPS) ||
-			(a_Plant == E_BLOCK_CARROTS) ||
-			(a_Plant == E_BLOCK_POTATOES) ||
-			(a_Plant == E_BLOCK_MELON_STEM) ||
-			(a_Plant == E_BLOCK_PUMPKIN_STEM)
-		);
+		switch (a_Plant.Type())
+		{
+			case BlockType::Beetroots:
+			case BlockType::Wheat:
+			case BlockType::Carrots:
+			case BlockType::Potatoes:
+			case BlockType::MelonStem:
+			case BlockType::AttachedMelonStem:
+			case BlockType::PumpkinStem:
+			case BlockType::AttachedPumpkinStem:
+				return true;
+			default: return false;
+		}
 	}
 } ;

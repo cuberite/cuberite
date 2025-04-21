@@ -14,11 +14,11 @@
 
 
 
-cEnderChestEntity::cEnderChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+cEnderChestEntity::cEnderChestEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, a_World),
 	cBlockEntityWindowOwner(this)
 {
-	ASSERT(a_BlockType == E_BLOCK_ENDER_CHEST);
+	ASSERT(a_Block.Type() == BlockType::EnderChest);
 }
 
 
@@ -28,7 +28,7 @@ cEnderChestEntity::cEnderChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMe
 void cEnderChestEntity::SendTo(cClientHandle & a_Client)
 {
 	// Send a dummy "number of players with chest open" packet to make the chest visible:
-	a_Client.SendBlockAction(m_Pos, 1, 0, m_BlockType);
+	a_Client.SendBlockAction(m_Pos, 1, 0, m_Block.Type());
 }
 
 

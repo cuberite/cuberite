@@ -1,11 +1,11 @@
 #include "Globals.h"
-#include "BlockState.h"
+#include "Bindings/BlockState.h"
 
 
 
 
 
-BlockState::BlockState():
+CustomBlockState::CustomBlockState():
 	mChecksum(initializeChecksum())
 {
 	// Nothing needed yet
@@ -15,7 +15,7 @@ BlockState::BlockState():
 
 
 
-BlockState::BlockState(const AString & aKey, const AString & aValue):
+CustomBlockState::CustomBlockState(const AString & aKey, const AString & aValue):
 	mState({{aKey, aValue}}),
 	mChecksum(initializeChecksum())
 {
@@ -25,7 +25,7 @@ BlockState::BlockState(const AString & aKey, const AString & aValue):
 
 
 
-BlockState::BlockState(std::initializer_list<std::pair<const AString, AString>> aKeysAndValues):
+CustomBlockState::CustomBlockState(std::initializer_list<std::pair<const AString, AString>> aKeysAndValues):
 	mState(aKeysAndValues),
 	mChecksum(initializeChecksum())
 {
@@ -35,7 +35,7 @@ BlockState::BlockState(std::initializer_list<std::pair<const AString, AString>> 
 
 
 
-BlockState::BlockState(const std::map<AString, AString> & aKeysAndValues):
+CustomBlockState::CustomBlockState(const std::map<AString, AString> & aKeysAndValues):
 	mState(aKeysAndValues),
 	mChecksum(initializeChecksum())
 {
@@ -45,7 +45,7 @@ BlockState::BlockState(const std::map<AString, AString> & aKeysAndValues):
 
 
 
-BlockState::BlockState(std::map<AString, AString> && aKeysAndValues):
+CustomBlockState::CustomBlockState(std::map<AString, AString> && aKeysAndValues):
 	mState(std::move(aKeysAndValues)),
 	mChecksum(initializeChecksum())
 {
@@ -55,7 +55,7 @@ BlockState::BlockState(std::map<AString, AString> && aKeysAndValues):
 
 
 
-BlockState::BlockState(const BlockState & aCopyFrom, std::initializer_list<std::pair<const AString, AString>> aAdditionalKeysAndValues):
+CustomBlockState::CustomBlockState(const CustomBlockState & aCopyFrom, std::initializer_list<std::pair<const AString, AString>> aAdditionalKeysAndValues):
 	mState(aCopyFrom.mState)
 {
 	for (const auto & kav: aAdditionalKeysAndValues)
@@ -69,7 +69,7 @@ BlockState::BlockState(const BlockState & aCopyFrom, std::initializer_list<std::
 
 
 
-BlockState::BlockState(const BlockState & aCopyFrom, const std::map<AString, AString> & aAdditionalKeysAndValues):
+CustomBlockState::CustomBlockState(const CustomBlockState & aCopyFrom, const std::map<AString, AString> & aAdditionalKeysAndValues):
 	mState(aCopyFrom.mState)
 {
 	for (const auto & kav: aAdditionalKeysAndValues)
@@ -83,7 +83,7 @@ BlockState::BlockState(const BlockState & aCopyFrom, const std::map<AString, ASt
 
 
 
-bool BlockState::operator <(const BlockState & aOther) const
+bool CustomBlockState::operator <(const CustomBlockState & aOther) const
 {
 	// Fast-return this using checksum
 	if (mChecksum != aOther.mChecksum)
@@ -129,7 +129,7 @@ bool BlockState::operator <(const BlockState & aOther) const
 
 
 
-bool BlockState::operator ==(const BlockState & aOther) const
+bool CustomBlockState::operator ==(const CustomBlockState & aOther) const
 {
 	// Fast-fail if the checksums differ or differrent counts:
 	if ((mChecksum != aOther.mChecksum) || (mState.size() != aOther.mState.size()))
@@ -145,7 +145,7 @@ bool BlockState::operator ==(const BlockState & aOther) const
 
 
 
-const AString & BlockState::value(const AString & aKey) const
+const AString & CustomBlockState::value(const AString & aKey) const
 {
 	auto itr = mState.find(aKey);
 	if (itr == mState.end())
@@ -160,7 +160,7 @@ const AString & BlockState::value(const AString & aKey) const
 
 
 
-UInt32 BlockState::initializeChecksum()
+UInt32 CustomBlockState::initializeChecksum()
 {
 	removeEmptyKeys();
 
@@ -179,7 +179,7 @@ UInt32 BlockState::initializeChecksum()
 
 
 
-void BlockState::removeEmptyKeys()
+void CustomBlockState::removeEmptyKeys()
 {
 	for (auto itr = mState.begin(); itr != mState.end();)
 	{
@@ -198,7 +198,7 @@ void BlockState::removeEmptyKeys()
 
 
 
-UInt32 BlockState::partialChecksum(const AString & aString)
+UInt32 CustomBlockState::partialChecksum(const AString & aString)
 {
 	UInt32 shift = 0;
 	UInt32 res = 0;

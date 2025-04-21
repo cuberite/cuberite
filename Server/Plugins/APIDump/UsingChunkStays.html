@@ -71,7 +71,7 @@ function HandleCommandSaveSpawn(a_Split, a_Player)
 	-- Read the area around spawn into a cBlockArea, save to file:
 	local Area = cBlockArea()
 	local FileName = a_Player:GetName() .. "_spawn.schematic"
-	Area:Read(a_Player:GetWorld(), Bounds, cBlockArea.baTypes + cBlockArea.baMetas)
+	Area:Read(a_Player:GetWorld(), Bounds, cBlockArea.baBlocks + cBlockArea.baMetas)
 	Area:SaveToSchematicFile(FileName)
 
 	-- Notify the player:
@@ -119,7 +119,7 @@ function HandleCommandSaveSpawn(a_Split, a_Player)
 		-- Read the area around spawn into a cBlockArea, save to file:
 		local Area = cBlockArea()
 		local FileName = PlayerName .. "_spawn.schematic"
-		if (Area:Read(World, Bounds, cBlockArea.baTypes + cBlockArea.baMetas)) then
+		if (Area:Read(World, Bounds, cBlockArea.baBlocks + cBlockArea.baMetas)) then
 			Area:SaveToSchematicFile(FileName)
 			Msg = cCompositeChat("The spawn has been saved", mtInfo)
 		else

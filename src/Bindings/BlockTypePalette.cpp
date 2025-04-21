@@ -40,7 +40,7 @@ BlockTypePalette::BlockTypePalette():
 
 
 
-UInt32 BlockTypePalette::index(const AString & aBlockTypeName, const BlockState & aBlockState)
+UInt32 BlockTypePalette::index(const AString & aBlockTypeName, const CustomBlockState & aBlockState)
 {
 	auto idx = maybeIndex(aBlockTypeName, aBlockState);
 	if (idx.second)
@@ -59,7 +59,7 @@ UInt32 BlockTypePalette::index(const AString & aBlockTypeName, const BlockState 
 
 
 
-std::pair<UInt32, bool> BlockTypePalette::maybeIndex(const AString & aBlockTypeName, const BlockState & aBlockState) const
+std::pair<UInt32, bool> BlockTypePalette::maybeIndex(const AString & aBlockTypeName, const CustomBlockState & aBlockState) const
 {
 	auto itr1 = mBlockToNumber.find(aBlockTypeName);
 	if (itr1 == mBlockToNumber.end())
@@ -87,7 +87,7 @@ UInt32 BlockTypePalette::count() const
 
 
 
-const std::pair<AString, BlockState> & BlockTypePalette::entry(UInt32 aIndex) const
+const std::pair<AString, CustomBlockState> & BlockTypePalette::entry(UInt32 aIndex) const
 {
 	auto itr = mNumberToBlock.find(aIndex);
 	if (itr == mNumberToBlock.end())
@@ -108,8 +108,8 @@ std::map<UInt32, UInt32> BlockTypePalette::createTransformMapAddMissing(const Bl
 	{
 		auto fromIndex = fromEntry.first;
 		const auto & blockTypeName = fromEntry.second.first;
-		const auto & blockState = fromEntry.second.second;
-		res[fromIndex] = index(blockTypeName, blockState);
+		const auto & CustomBlockState = fromEntry.second.second;
+		res[fromIndex] = index(blockTypeName, CustomBlockState);
 	}
 	return res;
 }
@@ -125,8 +125,8 @@ std::map<UInt32, UInt32> BlockTypePalette::createTransformMapWithFallback(const 
 	{
 		auto fromIndex = fromEntry.first;
 		const auto & blockTypeName = fromEntry.second.first;
-		const auto & blockState = fromEntry.second.second;
-		auto thisIndex = maybeIndex(blockTypeName, blockState);
+		const auto & CustomBlockState = fromEntry.second.second;
+		auto thisIndex = maybeIndex(blockTypeName, CustomBlockState);
 		if (thisIndex.second)
 		{
 			// The entry was found in this
@@ -337,7 +337,7 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 		}
 		auto blockTypeName = aTsvPalette.substr(metaEnd + 1, blockTypeEnd - metaEnd - 1);
 		auto blockStateEnd = blockTypeEnd;
-		AStringMap blockState;
+		AStringMap CustomBlockState;
 		while (aTsvPalette[blockStateEnd] == '\t')
 		{
 			auto keyEnd = findNextSeparator(aTsvPalette, blockStateEnd + 1);
@@ -352,10 +352,10 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 			}
 			auto key = aTsvPalette.substr(blockStateEnd + 1, keyEnd - blockStateEnd - 1);
 			auto value = aTsvPalette.substr(keyEnd + 1, valueEnd - keyEnd - 1);
-			blockState[key] = value;
+			CustomBlockState[key] = value;
 			blockStateEnd = valueEnd;
 		}
-		addMapping(id, commonPrefix + blockTypeName, std::move(blockState));
+		addMapping(id, commonPrefix + blockTypeName, std::move(CustomBlockState));
 		++line;
 		if (aTsvPalette[blockStateEnd] == '\r')  // CR of the CRLF pair, skip the LF:
 		{
@@ -369,7 +369,7 @@ void BlockTypePalette::loadFromTsv(const AString & aTsvPalette, bool aIsUpgrade)
 
 
 
-void BlockTypePalette::addMapping(UInt32 aID, const AString & aBlockTypeName, const BlockState & aBlockState)
+void BlockTypePalette::addMapping(UInt32 aID, const AString & aBlockTypeName, const CustomBlockState & aBlockState)
 {
 	mNumberToBlock[aID] = {aBlockTypeName, aBlockState};
 	mBlockToNumber[aBlockTypeName][aBlockState] = aID;

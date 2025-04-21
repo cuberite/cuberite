@@ -13,7 +13,7 @@
 
 
 cWither::cWither(void) :
-	Super("Wither", mtWither, "entity.wither.hurt", "entity.wither.death", "entity.wither.ambient", 0.9f, 3.5f),
+	Super("Wither", etWither, "entity.wither.hurt", "entity.wither.death", "entity.wither.ambient", 0.9f, 3.5f),
 	m_WitherInvulnerableTicks(220)
 {
 	SetMaxHealth(300);
@@ -65,7 +65,7 @@ bool cWither::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 void cWither::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	AddRandomDropItem(a_Drops, 1, 1, E_ITEM_NETHER_STAR);
+	AddRandomDropItem(a_Drops, 1, 1, Item::NetherStar);
 }
 
 

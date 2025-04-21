@@ -12,6 +12,7 @@
 #include <time.h>
 
 #include "UUID.h"
+#include "mbedtls/pk.h"
 
 
 
@@ -77,6 +78,9 @@ public:
 
 	/** Sets the m_RankMgr that is used for name-uuid notifications. Accepts nullptr to remove the binding. */
 	void SetRankManager(cRankManager * a_RankManager) { m_RankMgr = a_RankManager; }
+
+	/** Used by player session packets to verify that player public keys are signed by Mojangs key. There may be multiple mojang keys the player key has to be signed with any one of them */
+	bool VerifyUsingMojangKeys(const ContiguousByteBuffer & DataToVerify, const ContiguousByteBuffer & Signature);
 
 protected:
 	/** The thread that periodically checks for stale data and re-queries it from the server. */
@@ -167,6 +171,8 @@ protected:
 	/** The thread that periodically updates the stale data in the DB from the Mojang servers. */
 	std::shared_ptr<cUpdateThread> m_UpdateThread;
 
+	/** Acquired via the mojang API during startup. Used for verifying player's public keys in 1.19+ */
+	std::vector<mbedtls_pk_context> MojangPublicKeys;
 
 	/** Loads the caches from a disk storage. */
 	void LoadCachesFromDisk(void);
@@ -196,6 +202,9 @@ protected:
 	/** Called for each name-uuid pairing that is discovered.
 	If assigned, notifies the m_RankManager of the event. */
 	void NotifyNameUUID(const AString & a_PlayerName, const cUUID & a_PlayerUUID);
+
+	/* Called during init to get public keys via the API */
+	void GetMojangKeys(void);
 
 	/** Updates the stale values in the DB from the Mojang servers. Called from the cUpdateThread, blocks on the HTTPS API calls. */
 	void Update(void);

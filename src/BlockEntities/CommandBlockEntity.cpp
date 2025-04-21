@@ -12,17 +12,18 @@
 #include "../ChatColor.h"
 #include "../World.h"
 #include "../ClientHandle.h"
+#include "../Entities/Player.h"
 
 
 
 
 
-cCommandBlockEntity::cCommandBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+cCommandBlockEntity::cCommandBlockEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, a_World),
 	m_ShouldExecute(false),
 	m_Result(0)
 {
-	ASSERT(a_BlockType == E_BLOCK_COMMAND_BLOCK);
+	ASSERT((a_Block.Type() == BlockType::CommandBlock) || (a_Block.Type() == BlockType::ChainCommandBlock) || (a_Block.Type() == BlockType::RepeatingCommandBlock));
 }
 
 
@@ -31,8 +32,7 @@ cCommandBlockEntity::cCommandBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_Blo
 
 bool cCommandBlockEntity::UsedBy(cPlayer * a_Player)
 {
-	// Nothing to do
-	UNUSED(a_Player);
+	a_Player->GetClientHandle()->SendUpdateBlockEntity(*this);  // Necessary to send an empty block entity update to enable the command block GUI
 	return true;
 }
 
@@ -58,7 +58,7 @@ void cCommandBlockEntity::SetLastOutput(const AString & a_LastOut)
 
 
 
-void cCommandBlockEntity::SetResult(const NIBBLETYPE a_Result)
+void cCommandBlockEntity::SetResult(const unsigned char a_Result)
 {
 	m_Result = a_Result;
 }
@@ -85,7 +85,7 @@ const AString & cCommandBlockEntity::GetLastOutput(void) const
 
 
 
-NIBBLETYPE cCommandBlockEntity::GetResult(void) const
+unsigned char cCommandBlockEntity::GetResult(void) const
 {
 	return m_Result;
 }

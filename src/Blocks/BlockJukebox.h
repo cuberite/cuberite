@@ -9,17 +9,17 @@
 
 
 class cBlockJukeboxHandler final :
-	public cClearMetaOnDrop<cBlockEntityHandler>
+	public cBlockEntityHandler
 {
+	using Super = cBlockEntityHandler;
 public:
 
-	using cClearMetaOnDrop<cBlockEntityHandler>::cClearMetaOnDrop;
+	using Super::Super;
 
 private:
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 10;
 	}
 } ;

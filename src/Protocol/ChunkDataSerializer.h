@@ -33,7 +33,23 @@ class cChunkDataSerializer
 		v401,
 		v477,
 		v573,
-		Last = CacheVersion::v573
+		v735,
+		v751,
+		v755,
+		v757,
+		v759,
+		v760,
+		v761,
+		v762,
+		v763,
+		v764,
+		v765,
+		v766,
+		v767,
+		v768,
+		v769,
+		v770,
+		Last = CacheVersion::v770
 	};
 
 	/** A single cache entry containing the raw data, compressed data, and a validity flag. */
@@ -49,28 +65,46 @@ public:
 
 	/** For each client, serializes the chunk into their protocol version and sends it.
 	Parameters are the coordinates of the chunk to serialise, and the data and biome data read from the chunk. */
-	void SendToClients(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const ClientHandles & a_SendTo);
+	void SendToClients(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const std::vector<cBlockEntity *> & a_BlockEntities, const cChunkDef::HeightMap & a_SurfaceHeightMap, const ClientHandles & a_SendTo);
 
 private:
 
 	/** Serialises the given chunk, storing the result into the given cache entry, and sends the data.
 	If the cache entry is already present, simply re-uses it. */
-	inline void Serialize(const ClientHandles::value_type & a_Client, int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, CacheVersion a_CacheVersion);
+	inline void Serialize(const ClientHandles::value_type & a_Client, int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const std::vector<cBlockEntity *> & a_BlockEntities, const cChunkDef::HeightMap & a_SurfaceHeightMap, CacheVersion a_CacheVersion);
 
 	inline void Serialize47 (int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);  // Release 1.8
 	inline void Serialize107(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);  // Release 1.9
 	inline void Serialize110(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);  // Release 1.9.4
 	template <auto Palette>
 	inline void Serialize393(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);  // Release 1.13 - 1.13.2
+	template <auto Palette>
 	inline void Serialize477(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);	 // Release 1.14 - 1.14.4
-
+	template <auto Palette>
 	inline void Serialize573(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);
+	template <auto Palette>
+	inline void Serialize735(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);
+	template <auto Palette>
+	inline void Serialize751(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);
+	template <auto Palette>
+	inline void Serialize755(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap);
+	template <auto Palette>
+	inline void Serialize757(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, UInt32 a_packet_id);
+	template <auto Palette>
+	inline void Serialize763(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, UInt32 a_packet_id);
+	template <auto Palette>
+	inline void Serialize764(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const std::vector<cBlockEntity *> & a_BlockEntities, const ClientHandles::value_type & a_Client, const cChunkDef::HeightMap & a_SurfaceHeightMap, UInt32 a_packet_id);
+	template <auto Palette>
+	inline void Serialize770(int a_ChunkX, int a_ChunkZ, const ChunkBlockData & a_BlockData, const ChunkLightData & a_LightData, const unsigned char * a_BiomeMap, const std::vector<cBlockEntity *> & a_BlockEntities, const ClientHandles::value_type & a_Client, const cChunkDef::HeightMap & a_SurfaceHeightMap, UInt32 a_packet_id);
 
-
+	template <auto Palette>
+	inline void WriteBlockSectionSeamless2(const ChunkBlockData::BlockArray * a_Blocks, const UInt8 a_BitsPerEntry, bool padding);
 	/** Writes all blocks in a chunk section into a series of Int64.
 	Writes start from the bit directly subsequent to the previous write's end, possibly crossing over to the next Int64. */
 	template <auto Palette>
-	inline void WriteBlockSectionSeamless(const ChunkBlockData::BlockArray * a_Blocks, const ChunkBlockData::MetaArray * a_Metas, UInt8 a_BitsPerEntry);
+	inline void WriteBlockSectionSeamless(const ChunkBlockData::BlockArray * a_Blocks, UInt8 a_BitsPerEntry);
+
+	inline void WriteHeightMap(UInt64 * a_Array, const cChunkDef::HeightMap & a_HeightMap, const UInt8 a_BitsPerEntry, bool padding);
 
 	/** Copies all lights in a chunk section into the packet, block light followed immediately by sky light. */
 	inline void WriteLightSectionGrouped(const ChunkLightData::LightArray * a_BlockLights, const ChunkLightData::LightArray * a_SkyLights);

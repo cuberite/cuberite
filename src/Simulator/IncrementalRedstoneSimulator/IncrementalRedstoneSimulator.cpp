@@ -11,17 +11,25 @@
 
 
 
-bool cIncrementalRedstoneSimulator::IsAlwaysTicked(BLOCKTYPE a_Block)
+inline bool cIncrementalRedstoneSimulator::IsAlwaysTicked(BlockType a_Block)
 {
-	switch (a_Block)  // Call the appropriate simulator for the entry's block type
+	switch (a_Block)
 	{
-		case E_BLOCK_DAYLIGHT_SENSOR:
-		case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
-		case E_BLOCK_TRIPWIRE_HOOK:
-		case E_BLOCK_WOODEN_PRESSURE_PLATE:
-		case E_BLOCK_STONE_PRESSURE_PLATE:
-		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE: return true;
+		case BlockType::DaylightDetector:
+		case BlockType::TripwireHook:
+		case BlockType::AcaciaPressurePlate:
+		case BlockType::BirchPressurePlate:
+		case BlockType::CrimsonPressurePlate:
+		case BlockType::DarkOakPressurePlate:
+		case BlockType::HeavyWeightedPressurePlate:
+		case BlockType::LightWeightedPressurePlate:
+		case BlockType::JunglePressurePlate:
+		case BlockType::OakPressurePlate:
+		case BlockType::PolishedBlackstonePressurePlate:
+		case BlockType::SprucePressurePlate:
+		case BlockType::StonePressurePlate:
+		case BlockType::WarpedPressurePlate:
+			return true;
 		default: return false;
 	}
 }
@@ -30,60 +38,82 @@ bool cIncrementalRedstoneSimulator::IsAlwaysTicked(BLOCKTYPE a_Block)
 
 
 
-bool cIncrementalRedstoneSimulator::IsRedstone(BLOCKTYPE a_Block)
-
+inline bool cIncrementalRedstoneSimulator::IsRedstone(BlockType a_Block)
 {
 	switch (a_Block)
 	{
 		// All redstone devices, please alpha sort
-		case E_BLOCK_ACACIA_DOOR:
-		case E_BLOCK_ACACIA_FENCE_GATE:
-		case E_BLOCK_ACTIVATOR_RAIL:
-		case E_BLOCK_ACTIVE_COMPARATOR:
-		case E_BLOCK_BIRCH_DOOR:
-		case E_BLOCK_BIRCH_FENCE_GATE:
-		case E_BLOCK_BLOCK_OF_REDSTONE:
-		case E_BLOCK_COMMAND_BLOCK:
-		case E_BLOCK_DARK_OAK_DOOR:
-		case E_BLOCK_DARK_OAK_FENCE_GATE:
-		case E_BLOCK_DAYLIGHT_SENSOR:
-		case E_BLOCK_DETECTOR_RAIL:
-		case E_BLOCK_DISPENSER:
-		case E_BLOCK_DROPPER:
-		case E_BLOCK_FENCE_GATE:
-		case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_HOPPER:
-		case E_BLOCK_INACTIVE_COMPARATOR:
-		case E_BLOCK_INVERTED_DAYLIGHT_SENSOR:
-		case E_BLOCK_IRON_DOOR:
-		case E_BLOCK_IRON_TRAPDOOR:
-		case E_BLOCK_JUNGLE_DOOR:
-		case E_BLOCK_JUNGLE_FENCE_GATE:
-		case E_BLOCK_LEVER:
-		case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:
-		case E_BLOCK_NOTE_BLOCK:
-		case E_BLOCK_OBSERVER:
-		case E_BLOCK_POWERED_RAIL:
-		case E_BLOCK_REDSTONE_LAMP_OFF:
-		case E_BLOCK_REDSTONE_LAMP_ON:
-		case E_BLOCK_REDSTONE_REPEATER_OFF:
-		case E_BLOCK_REDSTONE_REPEATER_ON:
-		case E_BLOCK_REDSTONE_TORCH_OFF:
-		case E_BLOCK_REDSTONE_TORCH_ON:
-		case E_BLOCK_REDSTONE_WIRE:
-		case E_BLOCK_SPRUCE_DOOR:
-		case E_BLOCK_SPRUCE_FENCE_GATE:
-		case E_BLOCK_STICKY_PISTON:
-		case E_BLOCK_STONE_BUTTON:
-		case E_BLOCK_STONE_PRESSURE_PLATE:
-		case E_BLOCK_TNT:
-		case E_BLOCK_TRAPDOOR:
-		case E_BLOCK_TRAPPED_CHEST:
-		case E_BLOCK_TRIPWIRE_HOOK:
-		case E_BLOCK_WOODEN_BUTTON:
-		case E_BLOCK_WOODEN_DOOR:
-		case E_BLOCK_WOODEN_PRESSURE_PLATE:
-		case E_BLOCK_PISTON:
+		case BlockType::AcaciaButton:
+		case BlockType::AcaciaDoor:
+		case BlockType::AcaciaFenceGate:
+		case BlockType::AcaciaPressurePlate:
+		case BlockType::AcaciaTrapdoor:
+
+		case BlockType::ActivatorRail:
+
+		case BlockType::BirchButton:
+		case BlockType::BirchDoor:
+		case BlockType::BirchFenceGate:
+		case BlockType::BirchPressurePlate:
+		case BlockType::BirchTrapdoor:
+
+		case BlockType::Comparator:
+		case BlockType::RedstoneBlock:
+		case BlockType::CommandBlock:
+		case BlockType::ChainCommandBlock:
+		case BlockType::RepeatingCommandBlock:
+
+		case BlockType::DarkOakButton:
+		case BlockType::DarkOakDoor:
+		case BlockType::DarkOakFenceGate:
+		case BlockType::DarkOakPressurePlate:
+		case BlockType::DarkOakTrapdoor:
+
+		case BlockType::DaylightDetector:
+		case BlockType::DetectorRail:
+		case BlockType::Dispenser:
+		case BlockType::Dropper:
+
+		case BlockType::OakButton:
+		case BlockType::OakDoor:
+		case BlockType::OakFenceGate:
+		case BlockType::OakPressurePlate:
+		case BlockType::OakTrapdoor:
+
+		case BlockType::HeavyWeightedPressurePlate:
+		case BlockType::Hopper:
+		case BlockType::IronDoor:
+		case BlockType::IronTrapdoor:
+
+		case BlockType::JungleButton:
+		case BlockType::JungleDoor:
+		case BlockType::JungleFenceGate:
+		case BlockType::JunglePressurePlate:
+		case BlockType::JungleTrapdoor:
+
+		case BlockType::Lever:
+		case BlockType::LightWeightedPressurePlate:
+		case BlockType::NoteBlock:
+		case BlockType::Observer:
+		case BlockType::PoweredRail:
+		case BlockType::RedstoneLamp:
+		case BlockType::Repeater:
+		case BlockType::RedstoneTorch:
+		case BlockType::RedstoneWire:
+
+		case BlockType::SpruceButton:
+		case BlockType::SpruceDoor:
+		case BlockType::SpruceFenceGate:
+		case BlockType::SprucePressurePlate:
+		case BlockType::SpruceTrapdoor:
+
+		case BlockType::StickyPiston:
+		case BlockType::StoneButton:
+		case BlockType::StonePressurePlate:
+		case BlockType::Tnt:
+		case BlockType::TrappedChest:
+		case BlockType::TripwireHook:
+		case BlockType::Piston:
 		{
 			return true;
 		}
@@ -97,15 +127,13 @@ bool cIncrementalRedstoneSimulator::IsRedstone(BLOCKTYPE a_Block)
 
 void cIncrementalRedstoneSimulator::ProcessWorkItem(cChunk & Chunk, cChunk & TickingSource, const Vector3i Position)
 {
-	BLOCKTYPE CurrentBlock;
-	NIBBLETYPE CurrentMeta;
-	Chunk.GetBlockTypeMeta(Position, CurrentBlock, CurrentMeta);
+	auto CurrentBlock = Chunk.GetBlock(Position);
 
 	ForEachSourceCallback Callback(Chunk, Position, CurrentBlock);
-	RedstoneHandler::ForValidSourcePositions(Chunk, Position, CurrentBlock, CurrentMeta, Callback);
+	RedstoneHandler::ForValidSourcePositions(Chunk, Position, CurrentBlock, Callback);
 
 	// Inform the handler to update
-	RedstoneHandler::Update(Chunk, TickingSource, Position, CurrentBlock, CurrentMeta, Callback.Power);
+	RedstoneHandler::Update(Chunk, TickingSource, Position, CurrentBlock, Callback.Power);
 }
 
 
@@ -152,23 +180,23 @@ void cIncrementalRedstoneSimulator::SimulateChunk(std::chrono::milliseconds a_Dt
 
 
 
-void cIncrementalRedstoneSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
+void cIncrementalRedstoneSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block)
 {
 	// Never update blocks without a handler:
-	if (!IsRedstone(a_Block))
+	if (!IsRedstone(a_Block.Type()))
 	{
 		return;
 	}
 
 	auto & ChunkData = *static_cast<cIncrementalRedstoneSimulatorChunkData *>(a_Chunk.GetRedstoneSimulatorData());
 
-	if (IsAlwaysTicked(a_Block))
+	if (IsAlwaysTicked(a_Block.Type()))
 	{
 		ChunkData.AlwaysTickedPositions.emplace(a_Position);
 	}
 
 	// Temporary: in the absence of block state support calculate our own:
-	if (a_Block == E_BLOCK_REDSTONE_WIRE)
+	if (a_Block == BlockType::RedstoneWire)
 	{
 		RedstoneHandler::SetWireState(a_Chunk, a_Position);
 	}
@@ -190,7 +218,7 @@ cRedstoneSimulatorChunkData * cIncrementalRedstoneSimulator::CreateChunkData()
 
 
 
-void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
+void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block)
 {
 	// Having WakeUp called on us directly means someone called SetBlock (or WakeUp)
 	// Since the simulator never does this, something external changed. Clear cached data:
@@ -204,7 +232,7 @@ void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position
 
 
 
-void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BLOCKTYPE a_Block)
+void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BlockState a_Block)
 {
 	// This is an automatic cross-coords wakeup by cSimulatorManager
 	// There is no need to erase power data; if a component was destroyed the 3-arg WakeUp will handle it
@@ -230,7 +258,6 @@ void cIncrementalRedstoneSimulator::WakeUp(cChunk & a_Chunk, Vector3i a_Position
 			continue;
 		}
 
-		const auto Block = Chunk->GetBlock(Relative);
-		AddBlock(*Chunk, Relative, Block);
+		AddBlock(*Chunk, Relative, Chunk->GetBlock(Relative));
 	}
 }

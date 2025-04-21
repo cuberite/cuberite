@@ -4,6 +4,8 @@ include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/mbedtls/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set (SHARED_SRCS
+	${PROJECT_SOURCE_DIR}/src/UUID.cpp
+	${PROJECT_SOURCE_DIR}/src/ByteBuffer.cpp
 	${PROJECT_SOURCE_DIR}/src/BiomeDef.cpp
 	${PROJECT_SOURCE_DIR}/src/BlockArea.cpp
 	${PROJECT_SOURCE_DIR}/src/BlockInfo.cpp
@@ -31,6 +33,12 @@ set (SHARED_SRCS
 
 	${PROJECT_SOURCE_DIR}/src/WorldStorage/FastNBT.cpp
 	${PROJECT_SOURCE_DIR}/src/WorldStorage/SchematicFileSerializer.cpp
+
+	${PROJECT_SOURCE_DIR}/src/Registries/BlockStates.cpp  # Need for BlockState
+	${PROJECT_SOURCE_DIR}/src/Registries/BlockItemConverter.cpp
+	${PROJECT_SOURCE_DIR}/src/Protocol/Palettes/Upgrade.cpp
+	${PROJECT_SOURCE_DIR}/src/BlockState.cpp
+	${PROJECT_SOURCE_DIR}/src/WorldStorage/NamespaceSerializer.cpp
 )
 
 set (GENERATING_SRCS
@@ -69,6 +77,8 @@ set (GENERATING_SRCS
 )
 
 set (SHARED_HDRS
+	${PROJECT_SOURCE_DIR}/src/UUID.h
+	${PROJECT_SOURCE_DIR}/src/ByteBuffer.h
 	${PROJECT_SOURCE_DIR}/src/BiomeDef.h
 	${PROJECT_SOURCE_DIR}/src/BlockArea.h
 	${PROJECT_SOURCE_DIR}/src/BlockInfo.h
@@ -182,6 +192,16 @@ add_test(
 	COMMAND BasicGeneratorTest
 )
 
+# Necessary for some tests here to run.
+# Otherwise they crash with the error STATUS_DLL_NOT_FOUND (0xC0000135) because they can't find the lua51.dll
+
+if(WIN32)
+	add_custom_command(
+		TARGET BasicGeneratorTest  POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy
+		${CMAKE_BINARY_DIR}/Server/lua51.dll # Source
+		${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/) # Destination
+endif()
 
 
 
@@ -193,7 +213,7 @@ add_executable(LoadablePieces
 	Test.cubeset
 	Test1.schematic
 )
-target_link_libraries(LoadablePieces GeneratorTestingSupport)
+target_link_libraries(LoadablePieces GeneratorTestingSupport mbedtls)
 add_test(
 	NAME LoadablePieces-test
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -208,7 +228,7 @@ add_test(
 add_executable(PieceRotation
 	PieceRotationTest.cpp
 )
-target_link_libraries(PieceRotation GeneratorTestingSupport)
+target_link_libraries(PieceRotation GeneratorTestingSupport mbedtls)
 add_test(
 	NAME PieceRotation-test
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -223,7 +243,7 @@ add_test(
 add_executable(PieceGeneratorBFSTree
 	PieceGeneratorBFSTreeTest.cpp
 )
-target_link_libraries(PieceGeneratorBFSTree GeneratorTestingSupport)
+target_link_libraries(PieceGeneratorBFSTree GeneratorTestingSupport mbedtls)
 add_test(
 	NAME PieceGeneratorBFSTree-test
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/Server/Prefabs/PieceStructures

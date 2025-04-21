@@ -83,7 +83,7 @@ end_stone_bricks: EndstoneBrick, 4        = Endstone, 1:1, 1:2, 2:1, 2:2
 glowstone: Glowstone               = GlowstoneDust, 1:1, 1:2, 2:1, 2:2
 gold_block: GoldBlock               = GoldIngot,   1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 granite: Granite, 2              = Diorite, * | NetherQuartz, *
-hay_block: HayBale                 = Wheat, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
+hay_block: HayBlock                 = Wheat, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 iron_block: IronBlock               = IronIngot,   1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
 jack_o_lantern: JackOLantern            = Pumpkin, 1:1 | Torch, 1:2
 lapis_block: LapisBlock              = LapisLazuli, 1:1, 1:2, 1:3, 2:1, 2:2, 2:3, 3:1, 3:2, 3:3
@@ -357,7 +357,7 @@ pumpkin_seeds: PumpkinSeeds, 4      = Pumpkin, *
 rabbit_stew_from_brown_mushroom: RabbitStew           = Cooked Rabbit, 2:1 | Carrot, 1:2 | BakedPotato, 2:2 | BrownMushroom, 3:2 | Bowl, 2:3
 rabbit_stew_from_red_mushroom: RabbitStew           = Cooked Rabbit, 2:1 | Carrot, 1:2 | BakedPotato, 2:2 | RedMushroom, 3:2 | Bowl, 2:3
 sugar: Sugar                = Sugarcane, *
-wheat: Wheat, 9             = Haybale, *
+wheat: Wheat, 9             = HayBlock, *
 
 
 

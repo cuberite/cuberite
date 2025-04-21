@@ -44,7 +44,7 @@ private:
 
 
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
 		// No pickups
 		return {};
@@ -57,7 +57,7 @@ private:
 	virtual void OnBroken(
 		cChunkInterface & a_ChunkInterface, cWorldInterface & a_WorldInterface,
 		Vector3i a_BlockPos,
-		BLOCKTYPE a_OldBlockType, NIBBLETYPE a_OldBlockMeta,
+		BlockState a_OldBlock,
 		const cEntity * a_Digger
 	) const override
 	{
@@ -72,7 +72,7 @@ private:
 
 		const auto Player = static_cast<const cPlayer *>(a_Digger);
 		auto & Handler = Player->GetEquippedItem().GetHandler();
-		if (!Player->IsGameModeSurvival() || !Handler.CanHarvestBlock(E_BLOCK_MOB_SPAWNER))
+		if (!Player->IsGameModeSurvival() || !Handler.CanHarvestBlock(a_OldBlock))
 		{
 			return;
 		}

@@ -17,6 +17,11 @@
 #include "Root.h"
 #include "SQLiteCpp/Database.h"
 #include "SQLiteCpp/Statement.h"
+#include <mbedtls/base64.h>
+#include "mbedtls/rsa.h"
+
+
+#include "mbedtls/library/md_wrap.h"
 
 
 
@@ -241,6 +246,7 @@ void cMojangAPI::Start(cSettingsRepositoryInterface & a_Settings, bool a_ShouldA
 	m_NameToUUIDUrl = "https://" + NameToUUIDServer + NameToUUIDAddress;
 	m_UUIDToProfileUrl = "https://" + UUIDToProfileServer + UUIDToProfileAddress;
 	LoadCachesFromDisk();
+	GetMojangKeys();
 	if (a_ShouldAuth)
 	{
 		m_UpdateThread->Start();
@@ -402,9 +408,9 @@ void cMojangAPI::LoadCachesFromDisk(void)
 			SQLite::Statement stmt(db, "SELECT PlayerName, UUID, DateTime FROM PlayerNameToUUID");
 			while (stmt.executeStep())
 			{
-				AString PlayerName = stmt.getColumn(0);
-				AString StringUUID = stmt.getColumn(1);
-				Int64 DateTime     = stmt.getColumn(2);
+				AString PlayerName = stmt.getColumn(0).getString();
+				AString StringUUID = stmt.getColumn(1).getString();
+				Int64 DateTime     = stmt.getColumn(2).getInt64();
 
 				cUUID UUID;
 				if (!UUID.FromString(StringUUID))
@@ -420,11 +426,11 @@ void cMojangAPI::LoadCachesFromDisk(void)
 			SQLite::Statement stmt(db, "SELECT PlayerName, UUID, Textures, TexturesSignature, DateTime FROM UUIDToProfile");
 			while (stmt.executeStep())
 			{
-				AString PlayerName        = stmt.getColumn(0);
-				AString StringUUID        = stmt.getColumn(1);
-				AString Textures          = stmt.getColumn(2);
-				AString TexturesSignature = stmt.getColumn(2);
-				Int64 DateTime            = stmt.getColumn(4);
+				AString PlayerName        = stmt.getColumn(0).getString();
+				AString StringUUID        = stmt.getColumn(1).getString();
+				AString Textures          = stmt.getColumn(2).getString();
+				AString TexturesSignature = stmt.getColumn(2).getString();
+				Int64 DateTime            = stmt.getColumn(4).getInt64();
 
 				cUUID UUID;
 				if (!UUID.FromString(StringUUID))
@@ -474,7 +480,7 @@ void cMojangAPI::SaveCachesToDisk(void)
 				}
 				stmt.bind(1, Profile.m_PlayerName);
 				stmt.bind(2, Profile.m_UUID.ToShortString());
-				stmt.bind(3, Profile.m_DateTime);
+				stmt.bind(3, static_cast<int64_t>(Profile.m_DateTime));
 				stmt.exec();
 				stmt.reset();
 			}
@@ -496,7 +502,7 @@ void cMojangAPI::SaveCachesToDisk(void)
 				stmt.bind(2, Profile.m_PlayerName);
 				stmt.bind(3, Profile.m_Textures);
 				stmt.bind(4, Profile.m_TexturesSignature);
-				stmt.bind(5, Profile.m_DateTime);
+				stmt.bind(5, static_cast<int64_t>(Profile.m_DateTime));
 				stmt.exec();
 				stmt.reset();
 			}
@@ -703,6 +709,96 @@ void cMojangAPI::NotifyNameUUID(const AString & a_PlayerName, const cUUID & a_UU
 	{
 		m_RankMgr->NotifyNameUUID(a_PlayerName, a_UUID);
 	}
+}
+
+
+
+
+
+void cMojangAPI::GetMojangKeys(void)
+{
+	/* In case this function is called multiple times there are no duplicate keys */
+
+	for (auto mojang_public_key : MojangPublicKeys)
+	{
+		mbedtls_pk_free(&mojang_public_key);
+	}
+	MojangPublicKeys.clear();
+
+	AString url = "https://api.minecraftservices.com/publickeys";
+	auto [IsSuccessful, Response] = cUrlClient::BlockingGet(url, {}, {}, MojangTrustedRootCAs::UrlClientOptions());
+	if (!IsSuccessful)
+	{
+		LOGWARNING("Failed to acquire mojang public keys");
+		return;
+	}
+	// Parse the returned string into Json:
+	Json::Value root;
+	AString ParseError;
+	if (!JsonUtils::ParseString(Response, root, &ParseError) || !root.isObject())
+	{
+		LOGWARNING("%s failed: Cannot parse received data (GetMojangKeys) to JSON: \"%s\"", __FUNCTION__, ParseError);
+#ifdef NDEBUG
+		AString HexDump;
+		LOGD("Response body:\n%s", CreateHexDump(HexDump, Response.data(), Response.size(), 16).c_str());
+#endif
+		return;
+	}
+	//  TODO: parse profilePropertyKeys
+	const Json::Value & ProfCertKeys = root.get("playerCertificateKeys", "");
+	if (ProfCertKeys.empty() || !ProfCertKeys.isArray())
+	{
+		LOGWARNING("Failed to parse mojang public keys -- no entries");
+		return;
+	}
+	for (Json::UInt i = 0; i < ProfCertKeys.size(); i++)
+	{
+		const Json::Value & Key = ProfCertKeys[i];
+		AString pubkey = Key.get("publicKey", "").asString();
+		unsigned char * tempbfr = new unsigned char[pubkey.size()];
+		size_t BytesWritten = 0;
+		if (mbedtls_base64_decode(tempbfr, pubkey.size(), &BytesWritten, reinterpret_cast<const unsigned char *>(pubkey.c_str()), pubkey.size()) != 0)
+		{
+			LOGWARNING("Failed to base64 decode mojang key");
+			continue;
+		}
+		mbedtls_pk_context ctx;
+		mbedtls_pk_init(&ctx);
+		if (mbedtls_pk_parse_public_key(&ctx, tempbfr, BytesWritten) != 0)
+		{
+			LOGWARNING("Failed to parse mojang public key");
+			continue;
+		}
+		MojangPublicKeys.push_back(ctx);
+		delete[] tempbfr;
+	}
+}
+
+
+
+
+
+bool cMojangAPI::VerifyUsingMojangKeys(const ContiguousByteBuffer & DataToVerify, const ContiguousByteBuffer & Signature)
+{
+	const mbedtls_md_type_t hash_type = MBEDTLS_MD_SHA1;
+	const mbedtls_md_info_t *mdinfo = mbedtls_md_info_from_type(hash_type);
+	unsigned char * Digest = new unsigned char[mdinfo->size];
+	int hash_err = mbedtls_md(mdinfo, reinterpret_cast<const unsigned char *>(DataToVerify.c_str()), DataToVerify.size(), Digest);
+	if (hash_err != 0)
+	{
+		LOGWARN("Failed to calculate hash");
+		return false;
+	}
+	for (auto ctx : MojangPublicKeys)
+	{
+		int verify_error = mbedtls_pk_verify(&ctx, hash_type, Digest, mdinfo->size, reinterpret_cast<const unsigned char *>(Signature.c_str()), Signature.size());
+		if (verify_error == 0)
+		{
+			return true;
+		}
+	}
+	delete[] Digest;
+	return false;
 }
 
 

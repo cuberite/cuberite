@@ -12,6 +12,7 @@ Implements the 1.8 protocol classes:
 #include "main.h"
 #include "../mbedTLS++/Sha1Checksum.h"
 #include "Packetizer.h"
+#include "Palettes/Upgrade.h"
 
 #include "../ClientHandle.h"
 #include "../Root.h"
@@ -21,7 +22,6 @@ Implements the 1.8 protocol classes:
 #include "../StringCompression.h"
 #include "../CompositeChat.h"
 #include "../UUID.h"
-#include "../World.h"
 #include "../JsonUtils.h"
 
 #include "../WorldStorage/FastNBT.h"
@@ -56,7 +56,6 @@ Implements the 1.8 protocol classes:
 
 
 const int MAX_ENC_LEN = 512;  // Maximum size of the encrypted message; should be 128, but who knows...
-static const UInt32 CompressionThreshold = 256;  // After how large a packet should we compress it.
 
 
 
@@ -168,6 +167,15 @@ void cProtocol_1_8_0::DataPrepared(ContiguousByteBuffer & a_Data)
 
 
 
+void cProtocol_1_8_0::SendAcknowledgeBlockChange(int a_SequenceId)
+{
+	// used in 1.19+
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendAttachEntity(const cEntity & a_Entity, const cEntity & a_Vehicle)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -182,7 +190,7 @@ void cProtocol_1_8_0::SendAttachEntity(const cEntity & a_Entity, const cEntity &
 
 
 
-void cProtocol_1_8_0::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
+void cProtocol_1_8_0::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BlockState a_Block)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -190,7 +198,8 @@ void cProtocol_1_8_0::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_
 	Pkt.WriteXYZPosition64(a_BlockPos);
 	Pkt.WriteBEInt8(a_Byte1);
 	Pkt.WriteBEInt8(a_Byte2);
-	Pkt.WriteVarInt32(a_BlockType);
+	auto NumericBlock = PaletteUpgrade::ToBlock(a_Block);
+	Pkt.WriteVarInt32(NumericBlock.first);
 }
 
 
@@ -211,13 +220,34 @@ void cProtocol_1_8_0::SendBlockBreakAnim(UInt32 a_EntityID, Vector3i a_BlockPos,
 
 
 
-void cProtocol_1_8_0::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cProtocol_1_8_0::SendBlockChange(Vector3i a_BlockPos, BlockState a_Block)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktBlockChange);
 	Pkt.WriteXYZPosition64(a_BlockPos);
-	Pkt.WriteVarInt32((static_cast<UInt32>(a_BlockType) << 4) | (static_cast<UInt32>(a_BlockMeta) & 15));
+	auto NumericBlock = PaletteUpgrade::ToBlock(a_Block);
+	Pkt.WriteVarInt32((static_cast<UInt32>(NumericBlock.first) << 4) | (static_cast<UInt32>(NumericBlock.second) & 15));
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendRenderDistanceCenter(cChunkCoords a_chunk)
+{
+	// not used in this version
+	return;
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendPlayerListInitChat(const cPlayer & a_Player)
+{
+	// not used in this version
+	return;
 }
 
 
@@ -237,8 +267,9 @@ void cProtocol_1_8_0::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlo
 	{
 		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
 		Pkt.WriteBEInt16(Coords);
-		Pkt.WriteVarInt32(static_cast<UInt32>(Change.m_BlockType & 0xFFF) << 4 | (Change.m_BlockMeta & 0xF));
-	}
+		auto NumericBlock = PaletteUpgrade::ToBlock(Change.m_Block);
+		Pkt.WriteVarInt32(static_cast<UInt32>(NumericBlock.first & 0xFFF) << 4 | (NumericBlock.second & 0xF));
+	}  // for itr - a_Changes[]
 }
 
 
@@ -291,6 +322,15 @@ void cProtocol_1_8_0::SendBossBarUpdateStyle(UInt32 a_UniqueID, BossBarColor a_C
 
 
 void cProtocol_1_8_0::SendBossBarUpdateTitle(UInt32 a_UniqueID, const cCompositeChat & a_Title)
+{
+	// No such packet here
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendTags(void)
 {
 	// No such packet here
 }
@@ -360,6 +400,16 @@ void cProtocol_1_8_0::SendChatRaw(const AString & a_MessageRaw, eChatType a_Type
 
 
 
+void cProtocol_1_8_0::SendCommandTree()
+{
+	// no such packet here
+	return;
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendChunkData(const ContiguousByteBufferView a_ChunkData)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -402,7 +452,7 @@ void cProtocol_1_8_0::SendDestroyEntity(const cEntity & a_Entity)
 	}
 
 	const auto & Mob = static_cast<const cMonster &>(a_Entity);
-	if ((Mob.GetMobType() == mtEnderDragon) || (Mob.GetMobType() == mtWither))
+	if ((Mob.GetEntityType() == etEnderDragon) || (Mob.GetEntityType() == etWither))
 	{
 		SendBossBarRemove(Mob.GetUniqueID());
 	}
@@ -450,6 +500,15 @@ void cProtocol_1_8_0::SendDisconnect(const AString & a_Reason)
 			);
 		}
 	}
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendDynamicRegistries()
+{
+	return;
 }
 
 
@@ -711,6 +770,15 @@ void cProtocol_1_8_0::SendExplosion(const Vector3f a_Position, const float a_Pow
 
 
 
+void cProtocol_1_8_0::SendFinishConfiguration()
+{
+	return;
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendGameMode(eGameMode a_GameMode)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -782,7 +850,7 @@ void cProtocol_1_8_0::SendKeepAlive(UInt32 a_PingID)
 	// Drop the packet if the protocol is not in the Game state yet (caused a client crash):
 	if (m_State != 3)
 	{
-		LOGWARNING("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class prevented the packet.", m_State);
+		LOGWARNING("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class prevented the packet.", static_cast<UInt32>(m_State));
 		return;
 	}
 
@@ -1215,7 +1283,7 @@ void cProtocol_1_8_0::SendPlayerSpawn(const cPlayer & a_Player)
 	Pkt.WriteFPInt(LastSentPos.z);
 	Pkt.WriteByteAngle(a_Player.GetYaw());
 	Pkt.WriteByteAngle(a_Player.GetPitch());
-	Pkt.WriteBEInt16(a_Player.GetEquippedItem().IsEmpty() ? 0 : a_Player.GetEquippedItem().m_ItemType);
+	Pkt.WriteBEInt16(a_Player.GetEquippedItem().IsEmpty() ? 0 : PaletteUpgrade::ToItem(a_Player.GetEquippedItem().m_ItemType).first);
 	WriteEntityMetadata(Pkt, a_Player);
 	Pkt.WriteBEUInt8(0x7f);  // Metadata: end
 }
@@ -1226,7 +1294,7 @@ void cProtocol_1_8_0::SendPlayerSpawn(const cPlayer & a_Player)
 
 void cProtocol_1_8_0::SendPluginMessage(const AString & a_Channel, const ContiguousByteBufferView a_Message)
 {
-	ASSERT(m_State == 3);  // In game mode?
+	ASSERT((m_State == 3) || (m_State == 4));  // In game mode?
 
 	cPacketizer Pkt(*this, pktPluginMessage);
 	Pkt.WriteString(a_Channel);
@@ -1424,7 +1492,7 @@ void cProtocol_1_8_0::SendSoundParticleEffect(const EffectID a_EffectID, Vector3
 void cProtocol_1_8_0::SendSpawnEntity(const cEntity & a_Entity)
 {
 	Int32 EntityData = /* Default: velocity present flag */ 1;
-	const auto EntityType = GetProtocolEntityType(a_Entity);
+	const auto EntityType = GetProtocolEntityType(a_Entity.GetEntityType());
 
 	if (a_Entity.IsMinecart())
 	{
@@ -1439,7 +1507,8 @@ void cProtocol_1_8_0::SendSpawnEntity(const cEntity & a_Entity)
 	else if (a_Entity.IsFallingBlock())
 	{
 		const auto & Block = static_cast<const cFallingBlock &>(a_Entity);
-		EntityData = Block.GetBlockType() | (static_cast<Int32>(Block.GetBlockMeta()) << 12);
+		auto NumericBlock = PaletteUpgrade::ToBlock(Block.GetBlock());
+		EntityData = NumericBlock.first | (static_cast<Int32>(NumericBlock.second) << 12);
 	}
 	else if (a_Entity.IsFloater())
 	{
@@ -1448,10 +1517,9 @@ void cProtocol_1_8_0::SendSpawnEntity(const cEntity & a_Entity)
 	}
 	else if (a_Entity.IsProjectile())
 	{
-		using PType = cProjectileEntity::eKind;
 		const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
 
-		if (Projectile.GetProjectileKind() == PType::pkArrow)
+		if (Projectile.GetEntityType() == etArrow)
 		{
 			const auto & Arrow = static_cast<const cArrowEntity &>(Projectile);
 			EntityData = static_cast<Int32>(Arrow.GetCreatorUniqueID() + 1);
@@ -1469,7 +1537,7 @@ void cProtocol_1_8_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	const auto MobType = GetProtocolMobType(a_Mob.GetMobType());
+	const auto MobType = GetProtocolEntityType(a_Mob.GetEntityType());
 
 	// If the type is not valid in this protocol bail out:
 	if (MobType == 0)
@@ -1519,8 +1587,9 @@ void cProtocol_1_8_0::SendStatistics(const StatisticsManager & a_Manager)
 
 
 
-void cProtocol_1_8_0::SendTabCompletionResults(const AStringVector & a_Results)
+void cProtocol_1_8_0::SendTabCompletionResults(const AStringVector & a_Results, UInt32 CompletionId)
 {
+	UNUSED(CompletionId);
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktTabCompletionResults);
@@ -1613,24 +1682,109 @@ void cProtocol_1_8_0::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	Byte Action;
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case E_BLOCK_CHEST:
-		case E_BLOCK_ENCHANTMENT_TABLE:
-		case E_BLOCK_END_PORTAL:
-		case E_BLOCK_TRAPPED_CHEST:
-		{
-			// The ones with a action of 0 is just a workaround to send the block entities to a client.
-			// Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
-			Action = 0;
-			break;
-		}
+		case BlockType::EnchantingTable: Action = 0; break;  // The ones with a action of 0 is just a workaround to send the block entities to a client.
+		case BlockType::EndPortal:       Action = 0; break;  // Todo: 18.09.2020 - remove this when block entities are transmitted in the ChunkData packet - 12xx12
 
-		case E_BLOCK_MOB_SPAWNER:       Action = 1;  break;  // Update mob spawner spinny mob thing
-		case E_BLOCK_COMMAND_BLOCK:     Action = 2;  break;  // Update command block text
-		case E_BLOCK_BEACON:            Action = 3;  break;  // Update beacon entity
-		case E_BLOCK_HEAD:              Action = 4;  break;  // Update mobhead entity
-		case E_BLOCK_FLOWER_POT:        Action = 5;  break;  // Update flower pot
-		case E_BLOCK_WALL_BANNER:
-		case E_BLOCK_STANDING_BANNER:   Action = 6;  break;  // Update banner
+		case BlockType::Spawner:       Action = 1; break;  // Update mob spawner spinny mob thing
+		case BlockType::CommandBlock:
+		case BlockType::ChainCommandBlock:
+		case BlockType::RepeatingCommandBlock:
+			Action = 2; break;  // Update command block text
+		case BlockType::Beacon:        Action = 3; break;  // Update beacon entity
+		case BlockType::CreeperHead:
+		case BlockType::CreeperWallHead:
+		case BlockType::DragonHead:
+		case BlockType::DragonWallHead:
+		case BlockType::PlayerHead:
+		case BlockType::PlayerWallHead:
+		case BlockType::ZombieHead:
+		case BlockType::ZombieWallHead:
+		case BlockType::SkeletonSkull:
+		case BlockType::SkeletonWallSkull:
+		case BlockType::WitherSkeletonSkull:
+		case BlockType::WitherSkeletonWallSkull:
+			Action = 4; break;  // Update Mobhead entity
+		case BlockType::PottedAcaciaSapling:
+		case BlockType::PottedAzureBluet:
+		case BlockType::PottedBamboo:
+		case BlockType::PottedBirchSapling:
+		case BlockType::PottedBlueOrchid:
+		case BlockType::PottedBrownMushroom:
+		case BlockType::PottedCactus:
+		case BlockType::PottedCornflower:
+		case BlockType::PottedCrimsonRoots:
+		case BlockType::PottedCrimsonFungus:
+		case BlockType::PottedDandelion:
+		case BlockType::PottedDarkOakSapling:
+		case BlockType::PottedDeadBush:
+		case BlockType::PottedFern:
+		case BlockType::PottedJungleSapling:
+		case BlockType::PottedLilyOfTheValley:
+		case BlockType::PottedOakSapling:
+		case BlockType::PottedOrangeTulip:
+		case BlockType::PottedOxeyeDaisy:
+		case BlockType::PottedPinkTulip:
+		case BlockType::PottedPoppy:
+		case BlockType::PottedRedMushroom:
+		case BlockType::PottedRedTulip:
+		case BlockType::PottedSpruceSapling:
+		case BlockType::PottedWarpedFungus:
+		case BlockType::PottedWarpedRoots:
+		case BlockType::PottedWhiteTulip:
+		case BlockType::PottedWitherRose:
+		case BlockType::PottedAllium:
+			Action = 5; break;  // Update flower pot
+		case BlockType::BlackBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BrownBanner:
+		case BlockType::CyanBanner:
+		case BlockType::GrayBanner:
+		case BlockType::GreenBanner:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LimeBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::OrangeBanner:
+		case BlockType::PinkBanner:
+		case BlockType::PurpleBanner:
+		case BlockType::RedBanner:
+		case BlockType::WhiteBanner:
+		case BlockType::YellowBanner:
+
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueWallBanner:
+		case BlockType::BrownWallBanner:
+		case BlockType::CyanWallBanner:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenWallBanner:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaWallBanner:
+		case BlockType::OrangeWallBanner:
+		case BlockType::PinkWallBanner:
+		case BlockType::PurpleWallBanner:
+		case BlockType::RedWallBanner:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowWallBanner:
+			Action = 6; break;  // Update Banner
+		case BlockType::BlackBed:
+		case BlockType::BlueBed:
+		case BlockType::BrownBed:
+		case BlockType::CyanBed:
+		case BlockType::GrayBed:
+		case BlockType::GreenBed:
+		case BlockType::LightBlueBed:
+		case BlockType::LightGrayBed:
+		case BlockType::LimeBed:
+		case BlockType::MagentaBed:
+		case BlockType::OrangeBed:
+		case BlockType::PinkBed:
+		case BlockType::PurpleBed:
+		case BlockType::RedBed:
+		case BlockType::WhiteBed:
+		case BlockType::YellowBed:
+			Action = 11; break;  // Update bed color
 
 		default: return;  // Block entities change between versions
 	}
@@ -1704,10 +1858,25 @@ void cProtocol_1_8_0::SendWeather(eWeather a_Weather)
 
 
 
-void cProtocol_1_8_0::SendWholeInventory(const cWindow & a_Window)
+void cProtocol_1_8_0::SendGameStateChange(eGameStateReason a_Reason, float a_Value)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
+	{
+		cPacketizer Pkt(*this, pktWeather);
+		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Reason));
+		Pkt.WriteBEFloat(a_Value);
+	}
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendWholeInventory(const cWindow & a_Window, const cItem & a_CursorStack)
+{
+	ASSERT(m_State == 3);  // In game mode?
+	UNUSED(a_CursorStack);
 	cPacketizer Pkt(*this, pktWindowItems);
 	Pkt.WriteBEUInt8(static_cast<UInt8>(a_Window.GetWindowID()));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Window.GetNumSlots()));
@@ -1965,7 +2134,7 @@ UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType) const
 		case pktWindowProperty:         return 0x31;
 		default:
 		{
-			LOG("Unhandled outgoing packet type: %s (0x%02x)", cPacketizer::PacketTypeToStr(a_PacketType), a_PacketType);
+			LOG("Unhandled outgoing packet type: %s (0x%02x)", cPacketizer::PacketTypeToStr(a_PacketType), static_cast<UInt32>(a_PacketType));
 			ASSERT(!"Unhandled outgoing packet type");
 			return 0;
 		}
@@ -2027,64 +2196,6 @@ signed char cProtocol_1_8_0::GetProtocolEntityStatus(const EntityAnimation a_Ani
 		case EntityAnimation::WolfTamingSucceeds: return 7;
 		case EntityAnimation::ZombieVillagerCureFinishes: return 16;
 		default: return -1;
-	}
-}
-
-
-
-
-
-UInt32 cProtocol_1_8_0::GetProtocolMobType(const eMonsterType a_MobType) const
-{
-	switch (a_MobType)
-	{
-		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
-		case mtInvalidType:           return 53;
-		case mtBat:                   return 65;
-		case mtBlaze:                 return 61;
-		case mtCaveSpider:            return 59;
-		case mtChicken:               return 93;
-		case mtCow:                   return 92;
-		case mtCreeper:               return 50;
-		case mtEnderDragon:           return 63;
-		case mtEnderman:              return 58;
-		case mtEndermite:             return 67;
-		case mtGhast:                 return 56;
-		case mtGiant:                 return 53;
-		case mtGuardian:              return 68;
-		case mtHorse:                 return 100;
-		case mtIronGolem:             return 99;
-		case mtMagmaCube:             return 62;
-		case mtMooshroom:             return 96;
-		case mtOcelot:                return 98;
-		case mtPig:                   return 90;
-		case mtRabbit:                return 101;
-		case mtSheep:                 return 91;
-		case mtSilverfish:            return 60;
-		case mtSkeleton:              return 51;
-		case mtSlime:                 return 55;
-		case mtSnowGolem:             return 97;
-		case mtSpider:                return 52;
-		case mtSquid:                 return 94;
-		case mtVillager:              return 120;
-		case mtWitch:                 return 66;
-		case mtWither:                return 64;
-		case mtWitherSkeleton:        return 51;
-		case mtWolf:                  return 95;
-		case mtZombie:                return 54;
-		case mtZombiePigman:          return 57;
-		case mtZombieVillager:        return 27;
-
-		// Mobs that get replaced with another because they were added later
-		case mtCat:                   return GetProtocolMobType(mtOcelot);
-		case mtDonkey:                return GetProtocolMobType(mtHorse);
-		case mtMule:                  return GetProtocolMobType(mtHorse);
-		case mtSkeletonHorse:         return GetProtocolMobType(mtHorse);
-		case mtZombieHorse:           return GetProtocolMobType(mtHorse);
-		case mtStray:                 return GetProtocolMobType(mtSkeleton);
-		case mtHusk:                  return GetProtocolMobType(mtZombie);
-
-		default:                      return 0;
 	}
 }
 
@@ -2201,7 +2312,31 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 	Json::Value Players;
 	Players["online"] = NumPlayers;
 	Players["max"] = MaxPlayers;
-	// TODO: Add "sample"
+	std::vector<std::pair<cUUID, AString>> playeruuids;
+	const std::pair<cUUID, AString> AnonPlayer = {cUUID(), "Anonymous"};
+	cRoot::Get()->ForEachPlayer([&playeruuids, &AnonPlayer](const cPlayer & a_Player)
+	{
+		if (a_Player.GetClientHandle()->GetAllowListing())
+		{
+			playeruuids.emplace_back(a_Player.GetUUID(), a_Player.GetName());
+		}
+		else
+		{
+			playeruuids.push_back(AnonPlayer);
+		}
+		return true;
+	});
+	Json::Value sample;
+	int i = 0;
+	for (const std::pair<cUUID, AString> & PlayerId : playeruuids)
+	{
+		Json::Value entry;
+		entry["name"] = PlayerId.second;
+		entry["id"] = PlayerId.first.ToLongString();
+		sample[i] = entry;
+		i++;
+	}
+	Players["sample"] = sample;
 
 	// Description:
 	Json::Value Description;
@@ -2218,6 +2353,7 @@ void cProtocol_1_8_0::HandlePacketStatusRequest(cByteBuffer & a_ByteBuffer)
 		ResponseValue["favicon"] = "data:image/png;base64," + Favicon;
 	}
 
+	ResponseValue["enforcesSecureChat"] = "false";
 	// Serialize the response into a packet:
 	cPacketizer Pkt(*this, pktStatusResponse);
 	Pkt.WriteString(JsonUtils::WriteFastString(ResponseValue));
@@ -2327,6 +2463,33 @@ void cProtocol_1_8_0::HandlePacketLoginStart(cByteBuffer & a_ByteBuffer)
 
 
 
+void cProtocol_1_8_0::HandlePacketPlayerSession(cByteBuffer & a_ByteBuffer)
+{
+	return;
+}
+
+
+
+
+
+void cProtocol_1_8_0::HandlePacketEnterConfiguration(cByteBuffer & a_ByteBuffer)
+{
+	return;
+}
+
+
+
+
+
+void cProtocol_1_8_0::HandlePacketReady(cByteBuffer & a_ByteBuffer)
+{
+	return;
+}
+
+
+
+
+
 void cProtocol_1_8_0::HandlePacketAnimation(cByteBuffer & a_ByteBuffer)
 {
 	m_Client->HandleAnimation(true);  // Packet exists solely for arm-swing notification (main hand).
@@ -2398,6 +2561,15 @@ void cProtocol_1_8_0::HandlePacketChatMessage(cByteBuffer & a_ByteBuffer)
 
 
 
+void cProtocol_1_8_0::HandlePacketCommandExecution(cByteBuffer & a_ByteBuffer)
+{
+	return;
+}
+
+
+
+
+
 void cProtocol_1_8_0::HandlePacketClientSettings(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, Locale);
@@ -2441,6 +2613,16 @@ void cProtocol_1_8_0::HandlePacketClientStatus(cByteBuffer & a_ByteBuffer)
 			break;
 		}
 	}
+}
+
+
+
+
+
+void cProtocol_1_8_0::HandlePacketCommandBlockUpdate(cByteBuffer & a_ByteBuffer)
+{
+	// Used in 1.13+
+	return;
 }
 
 
@@ -2672,7 +2854,7 @@ void cProtocol_1_8_0::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 		HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, Position);
 	}
 
-	m_Client->HandleTabCompletion(Text);
+	m_Client->HandleTabCompletion(Text, 0);
 }
 
 
@@ -2807,8 +2989,7 @@ void cProtocol_1_8_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 			break;
 		}
 	}
-
-	m_Client->HandleWindowClick(WindowID, SlotNum, Action, Item);
+	m_Client->HandleWindowClick(WindowID, SlotNum, Action, {}, cItem());
 }
 
 
@@ -2822,11 +3003,17 @@ void cProtocol_1_8_0::HandlePacketWindowClose(cByteBuffer & a_ByteBuffer)
 	m_Client->HandleWindowClose(WindowID);
 }
 
+
+
+
+
 void cProtocol_1_8_0::HandlePacketBookUpdate(cByteBuffer & a_ByteBuffer)
 {
-	//Used by clients 1.15+
+	// Used by clients 1.15+
 	return;
 }
+
+
 
 
 
@@ -2949,7 +3136,7 @@ void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 					{
 						if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name"))  // Custon name tag
 						{
-							a_Item.m_CustomName = NBT.GetString(displaytag);
+							a_Item.SetComponent(DataComponents::CustomNameComponent(NBT.GetString(displaytag)));
 						}
 						else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore"))  // Lore tag
 						{
@@ -2966,7 +3153,7 @@ void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 				}
 				else if ((TagName == "Fireworks") || (TagName == "Explosion"))
 				{
-					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, a_Item.m_ItemType);
 				}
 				break;
 			}
@@ -2974,7 +3161,7 @@ void cProtocol_1_8_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 			{
 				if (TagName == "RepairCost")
 				{
-					a_Item.m_RepairCost = NBT.GetInt(tag);
+					a_Item.SetComponent(DataComponents::RepairCostComponent{ static_cast<UInt32>(NBT.GetInt(tag)) });
 				}
 				break;
 			}
@@ -2997,16 +3184,21 @@ bool cProtocol_1_8_0::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_
 		a_Item.Empty();
 		return true;
 	}
-	a_Item.m_ItemType = ItemType;
 
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt8,  Int8,  ItemCount);
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemDamage);
 
 	a_Item.m_ItemCount  = ItemCount;
-	a_Item.m_ItemDamage = ItemDamage;
+	// a_Item.m_ItemDamage = ItemDamage;
 	if (ItemCount <= 0)
 	{
 		a_Item.Empty();
+	}
+
+	a_Item.m_ItemType = PaletteUpgrade::FromItem(ItemType, ItemDamage);
+	if (ItemCategory::IsTool(a_Item.m_ItemType))
+	{
+		// a_Item.m_ItemDamage += ItemDamage;
 	}
 
 	ContiguousByteBuffer Metadata;
@@ -3059,7 +3251,7 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 
 	const auto PacketData = m_Compressor.GetView();
 
-	if (m_State == 3)
+	if ((m_State == 3) || m_CompressionEnabled)
 	{
 		ContiguousByteBuffer CompressedPacket;
 
@@ -3091,20 +3283,18 @@ void cProtocol_1_8_0::SendPacket(cPacketizer & a_Pkt)
 		m_CommLogFile.Write(fmt::format(
 			FMT_STRING("Outgoing packet: type {} (translated to 0x{:02x}), length {} (0x{:04x}), state {}. Payload (incl. type):\n{}\n"),
 			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
-			PacketData.size(), PacketData.size(), m_State, Hex
+			PacketData.size(), PacketData.size(), static_cast<UInt32>(m_State), Hex
 		));
-		/*
+
 		// Useful for debugging a new protocol:
 		LOGD("Outgoing packet: type %s (translated to 0x%02x), length %u (0x%04x), state %d. Payload (incl. type):\n%s\n",
 			cPacketizer::PacketTypeToStr(a_Pkt.GetPacketType()), GetPacketID(a_Pkt.GetPacketType()),
-			PacketLen, PacketLen, m_State, Hex
+			0, 0, static_cast<UInt32>(m_State), Hex
 		);
-		//*/
 	}
-	/*
+
 	// Useful for debugging a new protocol:
-	std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	*/
+	// std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 
@@ -3115,20 +3305,53 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 {
 	switch (a_BlockEntity.GetBlockType())
 	{
-		case E_BLOCK_WALL_BANNER:
-		case E_BLOCK_STANDING_BANNER:
+		case BlockType::BlackBanner:
+		case BlockType::BlueBanner:
+		case BlockType::BrownBanner:
+		case BlockType::CyanBanner:
+		case BlockType::GrayBanner:
+		case BlockType::GreenBanner:
+		case BlockType::LightBlueBanner:
+		case BlockType::LightGrayBanner:
+		case BlockType::LimeBanner:
+		case BlockType::MagentaBanner:
+		case BlockType::OrangeBanner:
+		case BlockType::PinkBanner:
+		case BlockType::PurpleBanner:
+		case BlockType::RedBanner:
+		case BlockType::WhiteBanner:
+		case BlockType::YellowBanner:
+
+		case BlockType::BlackWallBanner:
+		case BlockType::BlueWallBanner:
+		case BlockType::BrownWallBanner:
+		case BlockType::CyanWallBanner:
+		case BlockType::GrayWallBanner:
+		case BlockType::GreenWallBanner:
+		case BlockType::LightBlueWallBanner:
+		case BlockType::LightGrayWallBanner:
+		case BlockType::LimeWallBanner:
+		case BlockType::MagentaWallBanner:
+		case BlockType::OrangeWallBanner:
+		case BlockType::PinkWallBanner:
+		case BlockType::PurpleWallBanner:
+		case BlockType::RedWallBanner:
+		case BlockType::WhiteWallBanner:
+		case BlockType::YellowWallBanner:
 		{
 			auto & BannerEntity = static_cast<const cBannerEntity &>(a_BlockEntity);
 			a_Writer.AddInt("Base", static_cast<Int32>(BannerEntity.GetBaseColor()));
 			break;
 		}
-		case E_BLOCK_BEACON:
-		case E_BLOCK_CHEST:
+		case BlockType::Beacon:
+		case BlockType::Chest:
 		{
 			// Nothing!
 			break;
 		}
-		case E_BLOCK_COMMAND_BLOCK:
+		case BlockType::CommandBlock:
+		case BlockType::ChainCommandBlock:
+		case BlockType::RepeatingCommandBlock:
 		{
 			auto & CommandBlockEntity = static_cast<const cCommandBlockEntity &>(a_BlockEntity);
 			a_Writer.AddByte("TrackOutput", 1);  // Neither I nor the MC wiki has any idea about this
@@ -3144,16 +3367,27 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			}
 			break;
 		}
-		case E_BLOCK_ENCHANTMENT_TABLE:
-		case E_BLOCK_END_PORTAL:
+		case BlockType::EnchantingTable:
+		case BlockType::EndPortal:
 		{
 			// Nothing!
 			break;
 		}
-		case E_BLOCK_HEAD:
+		case BlockType::CreeperHead:
+		case BlockType::CreeperWallHead:
+		case BlockType::DragonHead:
+		case BlockType::DragonWallHead:
+		case BlockType::PlayerHead:
+		case BlockType::PlayerWallHead:
+		case BlockType::SkeletonSkull:
+		case BlockType::SkeletonWallSkull:
+		case BlockType::WitherSkeletonSkull:
+		case BlockType::WitherSkeletonWallSkull:
+		case BlockType::ZombieHead:
+		case BlockType::ZombieWallHead:
 		{
 			auto & MobHeadEntity = static_cast<const cMobHeadEntity &>(a_BlockEntity);
-			a_Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);
+			// a_Writer.AddByte("SkullType", MobHeadEntity.GetType() & 0xFF);  // ignore 1.12 < is basically unsupported
 			a_Writer.AddByte("Rot", MobHeadEntity.GetRotation() & 0xFF);
 
 			// The new Block Entity format for a Mob Head. See: https://minecraft.wiki/w/Head#Block_entity
@@ -3171,14 +3405,42 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 			a_Writer.EndCompound();
 			break;
 		}
-		case E_BLOCK_FLOWER_POT:
+		case BlockType::PottedAcaciaSapling:
+		case BlockType::PottedAzureBluet:
+		case BlockType::PottedBamboo:
+		case BlockType::PottedBirchSapling:
+		case BlockType::PottedBlueOrchid:
+		case BlockType::PottedBrownMushroom:
+		case BlockType::PottedCactus:
+		case BlockType::PottedCornflower:
+		case BlockType::PottedCrimsonRoots:
+		case BlockType::PottedCrimsonFungus:
+		case BlockType::PottedDandelion:
+		case BlockType::PottedDarkOakSapling:
+		case BlockType::PottedDeadBush:
+		case BlockType::PottedFern:
+		case BlockType::PottedJungleSapling:
+		case BlockType::PottedLilyOfTheValley:
+		case BlockType::PottedOakSapling:
+		case BlockType::PottedOrangeTulip:
+		case BlockType::PottedOxeyeDaisy:
+		case BlockType::PottedPinkTulip:
+		case BlockType::PottedPoppy:
+		case BlockType::PottedRedMushroom:
+		case BlockType::PottedRedTulip:
+		case BlockType::PottedSpruceSapling:
+		case BlockType::PottedWarpedFungus:
+		case BlockType::PottedWarpedRoots:
+		case BlockType::PottedWhiteTulip:
+		case BlockType::PottedWitherRose:
+		case BlockType::PottedAllium:
 		{
 			auto & FlowerPotEntity = static_cast<const cFlowerPotEntity &>(a_BlockEntity);
 			a_Writer.AddInt("Item", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemType));
-			a_Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
+			// a_Writer.AddInt("Data", static_cast<Int32>(FlowerPotEntity.GetItem().m_ItemDamage));
 			break;
 		}
-		case E_BLOCK_MOB_SPAWNER:
+		case BlockType::Spawner:
 		{
 			auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
 			a_Writer.AddString("EntityId", cMonster::MobTypeToVanillaName(MobSpawnerEntity.GetEntity()));
@@ -3187,6 +3449,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 		}
 		default:
 		{
+			LOGWARN(fmt::format(FMT_STRING("Unhandled block entity {}"), NamespaceSerializer::From(a_BlockEntity.GetBlockType())));
 			return;
 		}
 	}
@@ -3200,7 +3463,7 @@ void cProtocol_1_8_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 
 
 
-void cProtocol_1_8_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
+void cProtocol_1_8_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity, bool a_WriteCommon) const
 {
 	// Common metadata:
 	Byte Flags = 0;
@@ -3230,121 +3493,6 @@ void cProtocol_1_8_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 	}
 	a_Pkt.WriteBEUInt8(0);  // Byte(0) + index 0
 	a_Pkt.WriteBEUInt8(Flags);
-
-	switch (a_Entity.GetEntityType())
-	{
-		case cEntity::etPlayer:
-		{
-			auto & Player = static_cast<const cPlayer &>(a_Entity);
-
-			// Player name:
-			a_Pkt.WriteBEUInt8(0x82);
-			a_Pkt.WriteString(Player.GetName());
-
-			// Player health:
-			a_Pkt.WriteBEUInt8(0x66);
-			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
-
-			// Skin flags:
-			a_Pkt.WriteBEUInt8(0x0A);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
-
-			break;
-		}
-		case cEntity::etPickup:
-		{
-			a_Pkt.WriteBEUInt8((5 << 5) | 10);  // Slot(5) + index 10
-			WriteItem(a_Pkt, static_cast<const cPickup &>(a_Entity).GetItem());
-			break;
-		}
-		case cEntity::etMinecart:
-		{
-			a_Pkt.WriteBEUInt8(0x51);
-
-			// The following expression makes Minecarts shake more with less health or higher damage taken
-			// It gets half the maximum health, and takes it away from the current health minus the half health:
-			/*
-			Health: 5 | 3 - (5 - 3) = 1 (shake power)
-			Health: 3 | 3 - (3 - 3) = 3
-			Health: 1 | 3 - (1 - 3) = 5
-			*/
-			auto & Minecart = static_cast<const cMinecart &>(a_Entity);
-			a_Pkt.WriteBEInt32(static_cast<Int32>((((a_Entity.GetMaxHealth() / 2) - (a_Entity.GetHealth() - (a_Entity.GetMaxHealth() / 2))) * Minecart.LastDamage()) * 4));
-			a_Pkt.WriteBEUInt8(0x52);
-			a_Pkt.WriteBEInt32(1);  // Shaking direction, doesn't seem to affect anything
-			a_Pkt.WriteBEUInt8(0x73);
-			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));  // Damage taken / shake effect multiplyer
-
-			if (Minecart.GetPayload() == cMinecart::mpNone)
-			{
-				auto & RideableMinecart = static_cast<const cRideableMinecart &>(Minecart);
-				const cItem & MinecartContent = RideableMinecart.GetContent();
-				if (!MinecartContent.IsEmpty())
-				{
-					a_Pkt.WriteBEUInt8(0x54);
-					int Content = MinecartContent.m_ItemType;
-					Content |= MinecartContent.m_ItemDamage << 8;
-					a_Pkt.WriteBEInt32(Content);
-					a_Pkt.WriteBEUInt8(0x55);
-					a_Pkt.WriteBEInt32(RideableMinecart.GetBlockHeight());
-					a_Pkt.WriteBEUInt8(0x56);
-					a_Pkt.WriteBEUInt8(1);
-				}
-			}
-			else if (Minecart.GetPayload() == cMinecart::mpFurnace)
-			{
-				a_Pkt.WriteBEUInt8(0x10);
-				a_Pkt.WriteBEUInt8(static_cast<const cMinecartWithFurnace &>(Minecart).IsFueled() ? 1 : 0);
-			}
-			break;
-		}  // case etMinecart
-
-		case cEntity::etProjectile:
-		{
-			auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
-			switch (Projectile.GetProjectileKind())
-			{
-				case cProjectileEntity::pkArrow:
-				{
-					a_Pkt.WriteBEUInt8(0x10);
-					a_Pkt.WriteBEUInt8(static_cast<const cArrowEntity &>(Projectile).IsCritical() ? 1 : 0);
-					break;
-				}
-				case cProjectileEntity::pkFirework:
-				{
-					a_Pkt.WriteBEUInt8(0xa8);
-					WriteItem(a_Pkt, static_cast<const cFireworkEntity &>(Projectile).GetItem());
-					break;
-				}
-				default:
-				{
-					break;
-				}
-			}
-			break;
-		}  // case etProjectile
-
-		case cEntity::etMonster:
-		{
-			WriteMobMetadata(a_Pkt, static_cast<const cMonster &>(a_Entity));
-			break;
-		}
-
-		case cEntity::etItemFrame:
-		{
-			auto & Frame = static_cast<const cItemFrame &>(a_Entity);
-			a_Pkt.WriteBEUInt8(0xa8);
-			WriteItem(a_Pkt, Frame.GetItem());
-			a_Pkt.WriteBEUInt8(0x09);
-			a_Pkt.WriteBEUInt8(Frame.GetItemRotation());
-			break;
-		}  // case etItemFrame
-
-		default:
-		{
-			break;
-		}
-	}
 }
 
 
@@ -3393,7 +3541,7 @@ void cProtocol_1_8_0::WriteEntityProperties(cPacketizer & a_Pkt, const cEntity &
 
 void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 {
-	short ItemType = a_Item.m_ItemType;
+	short ItemType = PaletteUpgrade::ToItem(a_Item.m_ItemType).first;
 	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
 	if (ItemType <= 0)
 	{
@@ -3409,9 +3557,9 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 
 	a_Pkt.WriteBEInt16(ItemType);
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
-	a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
+	// a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
 
-	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != E_ITEM_FIREWORK_ROCKET) && (a_Item.m_ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid())
+	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (a_Item.m_ItemType != Item::FireworkRocket) && (a_Item.m_ItemType != Item::FireworkStar) && !a_Item.m_ItemColor.IsValid())
 	{
 		a_Pkt.WriteBEInt8(0);
 		return;
@@ -3420,14 +3568,14 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 
 	// Send the enchantments and custom names:
 	cFastNBTWriter Writer;
-	if (a_Item.m_RepairCost != 0)
+	if (a_Item.HasComponent<DataComponents::RepairCostComponent>())
 	{
-		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
+		Writer.AddInt("RepairCost", static_cast<int>(a_Item.GetComponentOrDefault<DataComponents::RepairCostComponent>().RepairCost));
 	}
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
-		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
+		const char * TagName = (a_Item.m_ItemType == Item::EnchantedBook) ? "StoredEnchantments" : "ench";
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName, false);
 	}
 	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
 	{
@@ -3439,7 +3587,7 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 
 		if (!a_Item.IsCustomNameEmpty())
 		{
-			Writer.AddString("Name", a_Item.m_CustomName);
+			Writer.AddString("Name", a_Item.GetComponentOrDefault<DataComponents::CustomNameComponent>().Name.ExtractText());
 		}
 		if (!a_Item.IsLoreEmpty())
 		{
@@ -3454,9 +3602,9 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		}
 		Writer.EndCompound();
 	}
-	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
+	if ((a_Item.m_ItemType == Item::FireworkRocket) || (a_Item.m_ItemType == Item::FireworkStar))
 	{
-		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, a_Item.m_ItemType);
 	}
 	Writer.Finish();
 
@@ -3467,332 +3615,6 @@ void cProtocol_1_8_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		return;
 	}
 	a_Pkt.WriteBuf(Result);
-}
-
-
-
-
-
-void cProtocol_1_8_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const
-{
-	// Living Enitiy Metadata
-	if (a_Mob.HasCustomName())
-	{
-		a_Pkt.WriteBEUInt8(0x82);
-		a_Pkt.WriteString(a_Mob.GetCustomName());
-
-		a_Pkt.WriteBEUInt8(0x03);
-		a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
-	}
-
-	a_Pkt.WriteBEUInt8(0x66);
-	a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
-
-	switch (a_Mob.GetMobType())
-	{
-		case mtBat:
-		{
-			auto & Bat = static_cast<const cBat &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(Bat.IsHanging() ? 1 : 0);
-			break;
-		}  // case mtBat
-
-		case mtChicken:
-		{
-			auto & Chicken = static_cast<const cChicken &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Chicken.IsBaby() ? -1 : (Chicken.IsInLoveCooldown() ? 1 : 0));
-			break;
-		}  // case mtChicken
-
-		case mtCow:
-		{
-			auto & Cow = static_cast<const cCow &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Cow.IsBaby() ? -1 : (Cow.IsInLoveCooldown() ? 1 : 0));
-			break;
-		}  // case mtCow
-
-		case mtCreeper:
-		{
-			auto & Creeper = static_cast<const cCreeper &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(Creeper.IsBlowing() ? 1 : 255);
-			a_Pkt.WriteBEUInt8(0x11);
-			a_Pkt.WriteBEUInt8(Creeper.IsCharged() ? 1 : 0);
-			break;
-		}  // case mtCreeper
-
-		case mtEnderman:
-		{
-			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x30);
-			a_Pkt.WriteBEInt16(static_cast<Byte>(Enderman.GetCarriedBlock()));
-			a_Pkt.WriteBEUInt8(0x11);
-			a_Pkt.WriteBEUInt8(static_cast<Byte>(Enderman.GetCarriedMeta()));
-			a_Pkt.WriteBEUInt8(0x12);
-			a_Pkt.WriteBEUInt8(Enderman.IsScreaming() ? 1 : 0);
-			break;
-		}  // case mtEnderman
-
-		case mtGhast:
-		{
-			auto & Ghast = static_cast<const cGhast &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(Ghast.IsCharging());
-			break;
-		}  // case mtGhast
-
-		case mtHorse:
-		{
-			auto & Horse = static_cast<const cHorse &>(a_Mob);
-			int Flags = 0;
-			if (Horse.IsTame())
-			{
-				Flags |= 0x02;
-			}
-			if (Horse.IsSaddled())
-			{
-				Flags |= 0x04;
-			}
-			if (Horse.IsChested())
-			{
-				Flags |= 0x08;
-			}
-			if (Horse.IsEating())
-			{
-				Flags |= 0x20;
-			}
-			if (Horse.IsRearing())
-			{
-				Flags |= 0x40;
-			}
-			if (Horse.IsMthOpen())
-			{
-				Flags |= 0x80;
-			}
-			a_Pkt.WriteBEUInt8(0x50);  // Int at index 16
-			a_Pkt.WriteBEInt32(Flags);
-			a_Pkt.WriteBEUInt8(0x13);  // Byte at index 19
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Horse.GetHorseType()));
-			a_Pkt.WriteBEUInt8(0x54);  // Int at index 20
-			int Appearance = 0;
-			Appearance = Horse.GetHorseColor();
-			Appearance |= Horse.GetHorseStyle() << 8;
-			a_Pkt.WriteBEInt32(Appearance);
-			a_Pkt.WriteBEUInt8(0x56);  // Int at index 22
-			a_Pkt.WriteBEInt32(Horse.GetHorseArmour());
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Horse.IsBaby() ? -1 : (Horse.IsInLoveCooldown() ? 1 : 0));
-			break;
-		}  // case mtHorse
-
-		case mtMagmaCube:
-		{
-			auto & MagmaCube = static_cast<const cMagmaCube &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(MagmaCube.GetSize()));
-			break;
-		}  // case mtMagmaCube
-
-		case mtOcelot:
-		{
-			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Ocelot.IsBaby() ? -1 : (Ocelot.IsInLoveCooldown() ? 1 : 0));
-			break;
-		}  // case mtOcelot
-
-		case mtPig:
-		{
-			auto & Pig = static_cast<const cPig &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Pig.IsBaby() ? -1 : (Pig.IsInLoveCooldown() ? 1 : 0));
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(Pig.IsSaddled() ? 1 : 0);
-			break;
-		}  // case mtPig
-
-		case mtSheep:
-		{
-			auto & Sheep = static_cast<const cSheep &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Sheep.IsBaby() ? -1 : (Sheep.IsInLoveCooldown() ? 1 : 0));
-
-			a_Pkt.WriteBEUInt8(0x10);
-			Byte SheepMetadata = 0;
-			SheepMetadata = static_cast<Byte>(Sheep.GetFurColor());
-			if (Sheep.IsSheared())
-			{
-				SheepMetadata |= 0x10;
-			}
-			a_Pkt.WriteBEUInt8(SheepMetadata);
-			break;
-		}  // case mtSheep
-
-		case mtRabbit:
-		{
-			auto & Rabbit = static_cast<const cRabbit &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x12);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Rabbit.GetRabbitType()));
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Rabbit.IsBaby() ? -1 : (Rabbit.IsInLoveCooldown() ? 1 : 0));
-			break;
-		}  // case mtRabbit
-
-		case mtSlime:
-		{
-			auto & Slime = static_cast<const cSlime &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Slime.GetSize()));
-			break;
-		}  // case mtSlime
-
-		case mtSkeleton:
-		case mtStray:
-		{
-			a_Pkt.WriteBEUInt8(0x0d);
-			a_Pkt.WriteBEUInt8(0);  // Is normal skeleton
-			break;
-		}
-
-		case mtVillager:
-		{
-			auto & Villager = static_cast<const cVillager &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x50);
-			a_Pkt.WriteBEInt32(Villager.GetVilType());
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Villager.IsBaby() ? -1 : 0);
-			break;
-		}  // case mtVillager
-
-		case mtWitch:
-		{
-			auto & Witch = static_cast<const cWitch &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x15);
-			a_Pkt.WriteBEUInt8(Witch.IsAngry() ? 1 : 0);
-			break;
-		}  // case mtWitch
-
-		case mtWither:
-		{
-			auto & Wither = static_cast<const cWither &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x54);  // Int at index 20
-			a_Pkt.WriteBEInt32(static_cast<Int32>(Wither.GetWitherInvulnerableTicks()));
-			a_Pkt.WriteBEUInt8(0x66);  // Float at index 6
-			a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
-			break;
-		}  // case mtWither
-
-		case mtWitherSkeleton:
-		{
-			a_Pkt.WriteBEUInt8(0x0d);
-			a_Pkt.WriteBEUInt8(1);  // Is wither skeleton
-			break;
-		}  // case mtWitherSkeleton
-
-		case mtWolf:
-		{
-			auto & Wolf = static_cast<const cWolf &>(a_Mob);
-			Byte WolfStatus = 0;
-			if (Wolf.IsSitting())
-			{
-				WolfStatus |= 0x1;
-			}
-			if (Wolf.IsAngry())
-			{
-				WolfStatus |= 0x2;
-			}
-			if (Wolf.IsTame())
-			{
-				WolfStatus |= 0x4;
-			}
-			a_Pkt.WriteBEUInt8(0x10);
-			a_Pkt.WriteBEUInt8(WolfStatus);
-
-			a_Pkt.WriteBEUInt8(0x72);
-			a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
-			a_Pkt.WriteBEUInt8(0x13);
-			a_Pkt.WriteBEUInt8(Wolf.IsBegging() ? 1 : 0);
-			a_Pkt.WriteBEUInt8(0x14);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Wolf.GetCollarColor()));
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Wolf.IsBaby() ? -1 : 0);
-			break;
-		}  // case mtWolf
-
-		case mtHusk:
-		case mtZombie:
-		{
-			auto & Zombie = static_cast<const cZombie &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(Zombie.IsBaby() ? 1 : -1);
-			a_Pkt.WriteBEUInt8(0x0d);
-			a_Pkt.WriteBEUInt8(0);
-			a_Pkt.WriteBEUInt8(0x0e);
-			a_Pkt.WriteBEUInt8(0);
-			break;
-		}  // case mtZombie
-
-		case mtZombiePigman:
-		{
-			auto & ZombiePigman = static_cast<const cZombiePigman &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(ZombiePigman.IsBaby() ? 1 : -1);
-			break;
-		}  // case mtZombiePigman
-
-		case mtZombieVillager:
-		{
-			auto & ZombieVillager = reinterpret_cast<const cZombieVillager &>(a_Mob);
-			a_Pkt.WriteBEUInt8(0x0c);
-			a_Pkt.WriteBEInt8(ZombieVillager.IsBaby() ? 1 : -1);
-			a_Pkt.WriteBEUInt8(0x0d);
-			a_Pkt.WriteBEUInt8(1);
-			a_Pkt.WriteBEUInt8(0x0e);
-			a_Pkt.WriteBEUInt8((ZombieVillager.ConversionTime() == -1) ? 0 : 1);
-			break;
-		}  // case mtZombieVillager
-
-		case mtBlaze:
-		case mtElderGuardian:
-		case mtGuardian:
-		{
-			// TODO: Mobs with extra fields that aren't implemented
-			break;
-		}
-
-		case mtCat:
-
-
-		case mtDonkey:
-		case mtMule:
-		case mtSkeletonHorse:
-		case mtZombieHorse:
-		{
-			// Todo: Mobs not added yet. Grouped ones have the same metadata
-			ASSERT(!"cProtocol_1_8::WriteMobMetadata: received unimplemented type");
-			break;
-		}
-
-		case mtCaveSpider:
-		case mtEnderDragon:
-		case mtGiant:
-		case mtIronGolem:
-		case mtMooshroom:
-		case mtSilverfish:
-		case mtEndermite:
-		case mtSnowGolem:
-		case mtSpider:
-		case mtSquid:
-		{
-			// Allowed mobs without additional metadata
-			break;
-		}
-
-		default: UNREACHABLE("cProtocol_1_8::WriteMobMetadata: received mob of invalid type");
-	}  // switch (a_Mob.GetType())
 }
 
 
@@ -3853,7 +3675,7 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousBy
 		}
 
 		// Check packet for compression:
-		if (m_State == 3)
+		if ((m_State == 3) || m_CompressionEnabled)
 		{
 			UInt32 NumBytesRead = static_cast<UInt32>(a_Buffer.GetReadableSpace());
 
@@ -3919,49 +3741,79 @@ void cProtocol_1_8_0::AddReceivedData(cByteBuffer & a_Buffer, const ContiguousBy
 
 
 
-UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity) const
+UInt8 cProtocol_1_8_0::GetProtocolEntityType(eEntityType a_Type) const
 {
-	using Type = cEntity::eEntityType;
+	using Type = eEntityType;
 
-	switch (a_Entity.GetEntityType())
+	switch (a_Type)
 	{
-		case Type::etEnderCrystal: return 51;
-		case Type::etPickup: return 2;
+		case Type::etEndCrystal: return 51;
+		case Type::etItem: return 2;
 		case Type::etFallingBlock: return 70;
 		case Type::etMinecart: return 10;
-		case Type::etBoat: return 1;
-		case Type::etTNT: return 50;
-		case Type::etProjectile:
-		{
-			using PType = cProjectileEntity::eKind;
-			const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
-
-			switch (Projectile.GetProjectileKind())
-			{
-				case PType::pkArrow: return 60;
-				case PType::pkSnowball: return 61;
-				case PType::pkEgg: return 62;
-				case PType::pkGhastFireball: return 63;
-				case PType::pkFireCharge: return 64;
-				case PType::pkEnderPearl: return 65;
-				case PType::pkExpBottle: return 75;
-				case PType::pkSplashPotion: return 73;
-				case PType::pkFirework: return 76;
-				case PType::pkWitherSkull: return 66;
-			}
-
-			break;
-		}
-		case Type::etFloater: return 90;
+		case Type::etOakBoat: return 1;
+		case Type::etTnt: return 50;
+		case Type::etArrow: return 60;
+		case Type::etSnowball: return 61;
+		case Type::etEgg: return 62;
+		case Type::etFireball: return 63;
+		case Type::etSmallFireball: return 64;
+		case Type::etEnderPearl: return 65;
+		case Type::etExperienceBottle: return 75;
+		case Type::etPotion: return 73;
+		case Type::etFireworkRocket: return 76;
+		case Type::etWitherSkull: return 66;
+		case Type::etFishingBobber: return 90;
 		case Type::etItemFrame: return 71;
 		case Type::etLeashKnot: return 77;
 
 		// Non-objects must not be sent
-		case Type::etEntity:
 		case Type::etPlayer:
-		case Type::etMonster:
-		case Type::etExpOrb:
+		case Type::etExperienceOrb:
 		case Type::etPainting: break;
+		case Type::etBat:                   return 65;
+		case Type::etBlaze:                 return 61;
+		case Type::etCaveSpider:            return 59;
+		case Type::etChicken:               return 93;
+		case Type::etCow:                   return 92;
+		case Type::etCreeper:               return 50;
+		case Type::etEnderDragon:           return 63;
+		case Type::etEnderman:              return 58;
+		case Type::etEndermite:             return 67;
+		case Type::etGhast:                 return 56;
+		case Type::etGiant:                 return 53;
+		case Type::etGuardian:              return 68;
+		case Type::etHorse:                 return 100;
+		case Type::etIronGolem:             return 99;
+		case Type::etMagmaCube:             return 62;
+		case Type::etMooshroom:             return 96;
+		case Type::etOcelot:                return 98;
+		case Type::etPig:                   return 90;
+		case Type::etRabbit:                return 101;
+		case Type::etSheep:                 return 91;
+		case Type::etSilverfish:            return 60;
+		case Type::etSkeleton:              return 51;
+		case Type::etSlime:                 return 55;
+		case Type::etSnowGolem:             return 97;
+		case Type::etSpider:                return 52;
+		case Type::etSquid:                 return 94;
+		case Type::etVillager:              return 120;
+		case Type::etWitch:                 return 66;
+		case Type::etWither:                return 64;
+		case Type::etWitherSkeleton:        return 51;
+		case Type::etWolf:                  return 95;
+		case Type::etZombie:                return 54;
+		case Type::etZombifiedPiglin:       return 57;
+		case Type::etZombieVillager:        return 27;
+
+		// Mobs that get replaced with another because they were added later
+		case Type::etCat:                   return GetProtocolEntityType(Type::etOcelot);
+		case Type::etDonkey:                return GetProtocolEntityType(Type::etHorse);
+		case Type::etMule:                  return GetProtocolEntityType(Type::etHorse);
+		case Type::etSkeletonHorse:         return GetProtocolEntityType(Type::etHorse);
+		case Type::etZombieHorse:           return GetProtocolEntityType(Type::etHorse);
+		case Type::etStray:                 return GetProtocolEntityType(Type::etSkeleton);
+		case Type::etHusk:                  return GetProtocolEntityType(Type::etZombie);
 	}
 	UNREACHABLE("Unhandled entity kind");
 }
@@ -4165,14 +4017,16 @@ void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
 		CreateHexDump(PacketDataHex, PacketData.data(), PacketData.size(), 16);
 		m_CommLogFile.Write(fmt::format(
 			FMT_STRING("Next incoming packet is type {0} (0x{0:x}), length {1} (0x{1:x}) at state {2}. Payload:\n{3}\n"),
-			PacketType, a_Buffer.GetUsedSpace(), m_State, PacketDataHex
+			PacketType, a_Buffer.GetUsedSpace(), static_cast<UInt32>(m_State), PacketDataHex
 		));
 	}
+
+	cProtocol::State oldstate = m_State;
 
 	if (!HandlePacket(a_Buffer, PacketType))
 	{
 		// Unknown packet, already been reported, but without the length. Log the length here:
-		LOGWARNING("Unhandled packet: type 0x%x, state %d, length %u", PacketType, m_State, a_Buffer.GetUsedSpace());
+		LOGWARNING("Unhandled packet: type 0x%x, state %d, length %u", PacketType, static_cast<UInt32>(m_State), a_Buffer.GetUsedSpace());
 
 #ifndef NDEBUG
 		// Dump the packet contents into the log:
@@ -4199,7 +4053,7 @@ void cProtocol_1_8_0::HandlePacket(cByteBuffer & a_Buffer)
 	{
 		// Read more or less than packet length, report as error
 		LOGWARNING("Protocol 1.8: Wrong number of bytes read for packet 0x%x, state %d. Read %zu bytes, packet contained %u bytes",
-			PacketType, m_State, a_Buffer.GetUsedSpace() - a_Buffer.GetReadableSpace(), a_Buffer.GetUsedSpace()
+		PacketType, static_cast<UInt32>(oldstate), a_Buffer.GetUsedSpace() - a_Buffer.GetReadableSpace(), a_Buffer.GetUsedSpace()
 		);
 
 		// Put a message in the comm log:
@@ -4237,4 +4091,31 @@ void cProtocol_1_8_0::StartEncryption(const Byte * a_Key)
 	Byte Digest[20];
 	Checksum.Finalize(Digest);
 	cSha1Checksum::DigestToJava(Digest, m_AuthServerID);
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendPlayerActionResponse(Vector3i a_blockpos, int a_state_id, cProtocol::PlayerActionResponses a_action, bool a_IsApproved)
+{
+	// Used by 1.15+
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendSelectKnownPacks()
+{
+	// used in 1.20.5+
+}
+
+
+
+
+
+void cProtocol_1_8_0::SendInitialChunksComing()
+{
+	// used in 1.20.3+
 }

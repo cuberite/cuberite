@@ -1,6 +1,16 @@
 
 #include "Globals.h"
 
+// #define RedstoneLogger
+
+// Some wrapper for the LOGD function to enable - disable the redstone logging
+#ifdef RedstoneLogger
+	#define LOGREDSTONE LOGD
+#else
+	#define LOGREDSTONE(...)
+#endif
+
+
 #include "RedstoneHandler.h"
 #include "RedstoneDataHelper.h"
 #include "ForEachSourceCallback.h"
@@ -35,85 +45,129 @@
 #define INVOKE_FOR_HANDLERS(Callback) \
 	do \
 	{ \
-		switch (BlockType) \
+		switch (a_Block.Type()) \
 		{ \
-			case E_BLOCK_ACTIVATOR_RAIL:                                                       \
-			case E_BLOCK_DETECTOR_RAIL:                                                        \
-			case E_BLOCK_POWERED_RAIL:             return PoweredRailHandler::Callback;        \
-			case E_BLOCK_ACTIVE_COMPARATOR:                                                    \
-			case E_BLOCK_INACTIVE_COMPARATOR:      return RedstoneComparatorHandler::Callback; \
-			case E_BLOCK_DISPENSER:                                                            \
-			case E_BLOCK_DROPPER:                  return DropSpenserHandler::Callback;        \
-			case E_BLOCK_HEAVY_WEIGHTED_PRESSURE_PLATE:                                        \
-			case E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE:                                        \
-			case E_BLOCK_STONE_PRESSURE_PLATE:                                                 \
-			case E_BLOCK_WOODEN_PRESSURE_PLATE:    return PressurePlateHandler::Callback;      \
-			case E_BLOCK_ACACIA_FENCE_GATE:                                                    \
-			case E_BLOCK_BIRCH_FENCE_GATE:                                                     \
-			case E_BLOCK_DARK_OAK_FENCE_GATE:                                                  \
-			case E_BLOCK_FENCE_GATE:                                                           \
-			case E_BLOCK_IRON_TRAPDOOR:                                                        \
-			case E_BLOCK_JUNGLE_FENCE_GATE:                                                    \
-			case E_BLOCK_SPRUCE_FENCE_GATE:                                                    \
-			case E_BLOCK_TRAPDOOR:                 return SmallGateHandler::Callback;          \
-			case E_BLOCK_REDSTONE_LAMP_OFF:                                                    \
-			case E_BLOCK_REDSTONE_LAMP_ON:         return RedstoneLampHandler::Callback;       \
-			case E_BLOCK_REDSTONE_REPEATER_OFF:                                                \
-			case E_BLOCK_REDSTONE_REPEATER_ON:     return RedstoneRepeaterHandler::Callback;   \
-			case E_BLOCK_REDSTONE_TORCH_OFF:                                                   \
-			case E_BLOCK_REDSTONE_TORCH_ON:        return RedstoneTorchHandler::Callback;      \
-			case E_BLOCK_OBSERVER:                 return ObserverHandler::Callback;           \
-			case E_BLOCK_PISTON:                                                               \
-			case E_BLOCK_STICKY_PISTON:            return PistonHandler::Callback;             \
-			case E_BLOCK_DAYLIGHT_SENSOR:                                                      \
-			case E_BLOCK_INVERTED_DAYLIGHT_SENSOR: return DaylightSensorHandler::Callback;     \
-			case E_BLOCK_LEVER:                                                                \
-			case E_BLOCK_STONE_BUTTON:                                                         \
-			case E_BLOCK_WOODEN_BUTTON:            return RedstoneToggleHandler::Callback;     \
-			case E_BLOCK_BLOCK_OF_REDSTONE:        return RedstoneBlockHandler::Callback;      \
-			case E_BLOCK_COMMAND_BLOCK:            return CommandBlockHandler::Callback;       \
-			case E_BLOCK_HOPPER:                   return HopperHandler::Callback;             \
-			case E_BLOCK_NOTE_BLOCK:               return NoteBlockHandler::Callback;          \
-			case E_BLOCK_REDSTONE_WIRE:            return RedstoneWireHandler::Callback;       \
-			case E_BLOCK_TNT:                      return TNTHandler::Callback;                \
-			case E_BLOCK_TRAPPED_CHEST:            return TrappedChestHandler::Callback;       \
-			case E_BLOCK_TRIPWIRE_HOOK:            return TripwireHookHandler::Callback;       \
-			default:                                                                           \
+			case BlockType::ActivatorRail: \
+			case BlockType::DetectorRail: \
+			case BlockType::PoweredRail: \
+				return PoweredRailHandler::Callback; \
+			case BlockType::Comparator: \
+				return RedstoneComparatorHandler::Callback; \
+			case BlockType::Dispenser: \
+			case BlockType::Dropper: \
+				return DropSpenserHandler::Callback; \
+			case BlockType::AcaciaPressurePlate: \
+			case BlockType::BirchPressurePlate: \
+			case BlockType::CrimsonPressurePlate: \
+			case BlockType::DarkOakPressurePlate: \
+			case BlockType::HeavyWeightedPressurePlate: \
+			case BlockType::JunglePressurePlate: \
+			case BlockType::LightWeightedPressurePlate: \
+			case BlockType::OakPressurePlate: \
+			case BlockType::PolishedBlackstonePressurePlate: \
+			case BlockType::SprucePressurePlate: \
+			case BlockType::StonePressurePlate: \
+			case BlockType::WarpedPressurePlate: \
+				return PressurePlateHandler::Callback; \
+			case BlockType::AcaciaFenceGate: \
+			case BlockType::BirchFenceGate: \
+			case BlockType::CrimsonFenceGate: \
+			case BlockType::DarkOakFenceGate: \
+			case BlockType::JungleFenceGate: \
+			case BlockType::OakFenceGate: \
+			case BlockType::SpruceFenceGate: \
+			case BlockType::WarpedFenceGate: \
+			case BlockType::IronTrapdoor: \
+			case BlockType::AcaciaTrapdoor: \
+			case BlockType::BirchTrapdoor: \
+			case BlockType::CrimsonTrapdoor: \
+			case BlockType::DarkOakTrapdoor: \
+			case BlockType::JungleTrapdoor: \
+			case BlockType::OakTrapdoor: \
+			case BlockType::SpruceTrapdoor: \
+			case BlockType::WarpedTrapdoor: \
+				return SmallGateHandler::Callback; \
+			case BlockType::RedstoneLamp: \
+				return RedstoneLampHandler::Callback; \
+			case BlockType::Repeater: \
+				return RedstoneRepeaterHandler::Callback; \
+			case BlockType::RedstoneTorch: \
+			case BlockType::RedstoneWallTorch: \
+				return RedstoneTorchHandler::Callback; \
+			case BlockType::Observer: \
+				return ObserverHandler::Callback; \
+			case BlockType::Piston: \
+			case BlockType::PistonHead: \
+			case BlockType::StickyPiston: \
+			case BlockType::MovingPiston: \
+				return PistonHandler::Callback; \
+			case BlockType::DaylightDetector: \
+				return DaylightSensorHandler::Callback; \
+			case BlockType::Lever: \
+			case BlockType::AcaciaButton: \
+			case BlockType::BirchButton: \
+			case BlockType::CrimsonButton: \
+			case BlockType::DarkOakButton: \
+			case BlockType::JungleButton: \
+			case BlockType::OakButton: \
+			case BlockType::PolishedBlackstoneButton: \
+			case BlockType::SpruceButton: \
+			case BlockType::StoneButton: \
+			case BlockType::WarpedButton: \
+				return RedstoneToggleHandler::Callback; \
+			case BlockType::RedstoneBlock: \
+				return RedstoneBlockHandler::Callback; \
+			case BlockType::ChainCommandBlock: \
+			case BlockType::CommandBlock: \
+			case BlockType::RepeatingCommandBlock: \
+				return CommandBlockHandler::Callback; \
+			case BlockType::Hopper: \
+				return HopperHandler::Callback; \
+			case BlockType::NoteBlock: \
+				return NoteBlockHandler::Callback; \
+			case BlockType::RedstoneWire: \
+				return RedstoneWireHandler::Callback; \
+			case BlockType::Tnt: \
+				return TNTHandler::Callback; \
+			case BlockType::TrappedChest: \
+				return TrappedChestHandler::Callback; \
+			case BlockType::TripwireHook: \
+				return TripwireHookHandler::Callback; \
+			default: \
 			{ \
-				if (cBlockDoorHandler::IsDoorBlockType(BlockType)) \
+				if (cBlockDoorHandler::IsBlockDoor(a_Block)) \
 				{ \
 					return DoorHandler::Callback; \
 				} \
 			} \
 		} \
-	} while (false)
-
+	} \
+	while (false)
 
 
 
 
 namespace RedstoneHandler
 {
-	PowerLevel GetPowerDeliveredToPosition(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType, const Vector3i QueryPosition, const BLOCKTYPE QueryBlockType, const bool IsLinked)
+	PowerLevel GetPowerDeliveredToPosition(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Block, const Vector3i a_QueryPosition, const BlockState a_QueryBlock, const bool a_IsLinked)
 	{
-		INVOKE_FOR_HANDLERS(GetPowerDeliveredToPosition(Chunk, Position, BlockType, QueryPosition, QueryBlockType, IsLinked));
+		INVOKE_FOR_HANDLERS(GetPowerDeliveredToPosition(a_Chunk, a_Position, a_Block, a_QueryPosition, a_QueryBlock, a_IsLinked));
 
 		// Fell through the switch statement
 		// Block at Position doesn't have a corresponding redstone handler
 		// ErasePowerData will have been called in AddBlock
-
 		// Default:
 		return 0;
 	}
 
-	void Update(cChunk & Chunk, cChunk & CurrentlyTicking, const Vector3i Position, const BLOCKTYPE BlockType, const NIBBLETYPE Meta, const PowerLevel PowerLevel)
+	void Update(cChunk & Chunk, cChunk & CurrentlyTicking, const Vector3i Position, const BlockState a_Block, const PowerLevel PowerLevel)
 	{
-		INVOKE_FOR_HANDLERS(Update(Chunk, CurrentlyTicking, Position, BlockType, Meta, PowerLevel));
+		INVOKE_FOR_HANDLERS(Update(Chunk, CurrentlyTicking, Position, a_Block, PowerLevel));
 	}
 
-	void ForValidSourcePositions(const cChunk & Chunk, const Vector3i Position, const BLOCKTYPE BlockType, const NIBBLETYPE Meta, ForEachSourceCallback & Callback)
+	void ForValidSourcePositions(const cChunk & Chunk, const Vector3i Position, const BlockState a_Block, ForEachSourceCallback & Callback)
 	{
-		INVOKE_FOR_HANDLERS(ForValidSourcePositions(Chunk, Position, BlockType, Meta, Callback));
+		INVOKE_FOR_HANDLERS(ForValidSourcePositions(Chunk, Position, a_Block, Callback));
 	}
 
 	void SetWireState(const cChunk & Chunk, const Vector3i Position)

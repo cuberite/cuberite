@@ -48,7 +48,7 @@ public:
 		}
 
 		// Replace map in the inventory:
-		a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_MAP, 1, static_cast<short>(NewMap->GetID() & 0x7fff)));
+		a_Player->ReplaceOneEquippedItemTossRest(cItem(Item::Map, 1, static_cast<short>(NewMap->GetID() & 0x7fff)));
 		return true;
 	}
 } ;

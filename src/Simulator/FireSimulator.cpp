@@ -36,32 +36,6 @@
 
 
 
-static constexpr Vector3i gCrossCoords[] =
-{
-	{ 1, 0,  0},
-	{-1, 0,  0},
-	{ 0, 0,  1},
-	{ 0, 0, -1},
-} ;
-
-
-
-
-
-static constexpr Vector3i gNeighborCoords[] =
-{
-	{ 1,  0,  0},
-	{-1,  0,  0},
-	{ 0,  1,  0},
-	{ 0, -1,  0},
-	{ 0,  0,  1},
-	{ 0,  0, -1},
-};
-
-
-
-
-
 ////////////////////////////////////////////////////////////////////////////////
 // cFireSimulator:
 
@@ -86,23 +60,22 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 	int NumMSecs = static_cast<int>(a_Dt.count());
 	for (cCoordWithIntList::iterator itr = Data.begin(); itr != Data.end();)
 	{
-		Vector3i relPos(itr->x, itr->y, itr->z);
-		auto blockType = a_Chunk->GetBlock(relPos);
+		Vector3i RelPos(itr->x, itr->y, itr->z);
+		auto Self = a_Chunk->GetBlock(RelPos);
 
-		if (!IsAllowedBlock(blockType))
+		if (!IsAllowedBlock(Self))
 		{
 			// The block is no longer eligible (not a fire block anymore; a player probably placed a block over the fire)
-			FIRE_FLOG("FS: Removing block {0}", absPos);
+			FIRE_FLOG("FS: Removing block {0}", AbsPos);
 			itr = Data.erase(itr);
 			continue;
 		}
 
-		auto BurnsForever = ((relPos.y > 0) && DoesBurnForever(a_Chunk->GetBlock(relPos.addedY(-1))));
-		auto BlockMeta = a_Chunk->GetMeta(relPos);
+		auto BurnsForever = ((RelPos.y > 0) && DoesBurnForever(a_Chunk->GetBlock(RelPos.addedY(-1))));
 
-		auto Raining = std::any_of(std::begin(gCrossCoords), std::end(gCrossCoords), [a_Chunk, relPos](Vector3i cc)
+		auto Raining = std::any_of(FlatCrossCoords.begin(), FlatCrossCoords.end(), [a_Chunk, RelPos](Vector3i Offset)
 		{
-			auto Adjusted = relPos + cc;
+			auto Adjusted = RelPos + Offset;
 			const auto Chunk = a_Chunk->GetRelNeighborChunkAdjustCoords(Adjusted);
 			if ((Chunk != nullptr) && Chunk->IsValid())
 			{
@@ -112,15 +85,15 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		});
 
 		// Randomly burn out the fire if it is raining:
-		if (!BurnsForever && Raining && GetRandomProvider().RandBool(CHANCE_BASE_RAIN_EXTINGUISH + (BlockMeta * CHANCE_AGE_M_RAIN_EXTINGUISH)))
+		if (!BurnsForever && Raining && GetRandomProvider().RandBool(CHANCE_BASE_RAIN_EXTINGUISH + (a_Chunk->GetBlock(RelPos.addedY(-1)).ID * CHANCE_AGE_M_RAIN_EXTINGUISH)))
 		{
-			a_Chunk->SetBlock(relPos, E_BLOCK_AIR, 0);
+			a_Chunk->SetBlock(RelPos, Block::Air::Air());
 			itr = Data.erase(itr);
 			continue;
 		}
 
 		// Try to spread the fire:
-		TrySpreadFire(a_Chunk, relPos);
+		TrySpreadFire(a_Chunk, RelPos);
 
 		itr->Data -= NumMSecs;
 		if (itr->Data >= 0)
@@ -130,25 +103,25 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 			continue;
 		}
 
-		// FIRE_FLOG("FS: Fire at {0} is stepping", absPos);
+		// FIRE_FLOG("FS: Fire at {0} is stepping", AbsPos);
 
 		// TODO: Add some randomness into this
-		const auto BurnStep = GetBurnStepTime(a_Chunk, relPos);
+		const auto BurnStep = GetBurnStepTime(a_Chunk, RelPos);
 		if (BurnStep == 0)
 		{
 			// Fire has no fuel or ground block, extinguish flame
-			a_Chunk->SetBlock(relPos, E_BLOCK_AIR, 0);
+			a_Chunk->SetBlock(RelPos, Block::Air::Air());
 			itr = Data.erase(itr);
 			continue;
 		}
 
 		// Has the fire burnt out?
-		if (BlockMeta == 0x0f)
+		if (Block::Fire::Age(Self) == 15)
 		{
 			// The fire burnt out completely
-			FIRE_FLOG("FS: Fire at {0} burnt out, removing the fire block", absPos);
-			a_Chunk->SetBlock(relPos, E_BLOCK_AIR, 0);
-			RemoveFuelNeighbors(a_Chunk, relPos);
+			FIRE_FLOG("FS: Fire at {0} burnt out, removing the fire block", AbsPos);
+			a_Chunk->SetBlock(RelPos, Block::Air::Air());
+			RemoveFuelNeighbors(a_Chunk, RelPos);
 			itr = Data.erase(itr);
 			continue;
 		}
@@ -156,7 +129,16 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 		// Burn out the fire one step by increasing the meta:
 		if (!BurnsForever)
 		{
-			a_Chunk->SetMeta(relPos, BlockMeta + 1);
+			using namespace Block;
+			a_Chunk->SetBlock(RelPos, Fire::Fire
+			(
+				Fire::Age(Self) + 1,
+				Fire::East(Self),
+				Fire::North(Self),
+				Fire::South(Self),
+				Fire::Up(Self),
+				Fire::West(Self)
+			));
 		}
 
 		itr->Data = BurnStep;
@@ -168,73 +150,168 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 
 
 
-bool cFireSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
+bool cFireSimulator::IsAllowedBlock(BlockState a_Block)
 {
-	return (a_BlockType == E_BLOCK_FIRE);
+	return (a_Block.Type() == BlockType::Fire);
 }
 
 
 
 
 
-bool cFireSimulator::IsFuel(BLOCKTYPE a_BlockType)
+bool cFireSimulator::IsFuel(BlockState a_Block)
 {
-	switch (a_BlockType)
+	switch (a_Block.Type())
 	{
-		case E_BLOCK_PLANKS:
-		case E_BLOCK_DOUBLE_WOODEN_SLAB:
-		case E_BLOCK_WOODEN_SLAB:
-		case E_BLOCK_OAK_WOOD_STAIRS:
-		case E_BLOCK_SPRUCE_WOOD_STAIRS:
-		case E_BLOCK_BIRCH_WOOD_STAIRS:
-		case E_BLOCK_JUNGLE_WOOD_STAIRS:
-		case E_BLOCK_LEAVES:
-		case E_BLOCK_NEW_LEAVES:
-		case E_BLOCK_LOG:
-		case E_BLOCK_NEW_LOG:
-		case E_BLOCK_WOOL:
-		case E_BLOCK_BOOKCASE:
-		case E_BLOCK_FENCE:
-		case E_BLOCK_SPRUCE_FENCE:
-		case E_BLOCK_BIRCH_FENCE:
-		case E_BLOCK_JUNGLE_FENCE:
-		case E_BLOCK_DARK_OAK_FENCE:
-		case E_BLOCK_ACACIA_FENCE:
-		case E_BLOCK_OAK_FENCE_GATE:
-		case E_BLOCK_SPRUCE_FENCE_GATE:
-		case E_BLOCK_BIRCH_FENCE_GATE:
-		case E_BLOCK_JUNGLE_FENCE_GATE:
-		case E_BLOCK_DARK_OAK_FENCE_GATE:
-		case E_BLOCK_ACACIA_FENCE_GATE:
-		case E_BLOCK_TNT:
-		case E_BLOCK_VINES:
-		case E_BLOCK_HAY_BALE:
-		case E_BLOCK_TALL_GRASS:
-		case E_BLOCK_BIG_FLOWER:
-		case E_BLOCK_DANDELION:
-		case E_BLOCK_FLOWER:
-		case E_BLOCK_CARPET:
+		case BlockType::Bookshelf:
+		case BlockType::Tnt:
+		case BlockType::Vine:
+		case BlockType::HayBlock:
+			// Carpets
+		case BlockType::BlackCarpet:
+		case BlockType::BlueCarpet:
+		case BlockType::BrownCarpet:
+		case BlockType::CyanCarpet:
+		case BlockType::GrayCarpet:
+		case BlockType::GreenCarpet:
+		case BlockType::LightBlueCarpet:
+		case BlockType::LightGrayCarpet:
+		case BlockType::LimeCarpet:
+		case BlockType::MagentaCarpet:
+		case BlockType::OrangeCarpet:
+		case BlockType::PinkCarpet:
+		case BlockType::PurpleCarpet:
+		case BlockType::RedCarpet:
+		case BlockType::WhiteCarpet:
+		case BlockType::YellowCarpet:
+			// Fence
+		case BlockType::AcaciaFence:
+		case BlockType::BirchFence:
+		case BlockType::DarkOakFence:
+		case BlockType::JungleFence:
+		case BlockType::NetherBrickFence:
+		case BlockType::OakFence:
+		case BlockType::SpruceFence:
+		case BlockType::WarpedFence:
+			// Fence Gate
+		case BlockType::AcaciaFenceGate:
+		case BlockType::BirchFenceGate:
+		case BlockType::CrimsonFenceGate:
+		case BlockType::DarkOakFenceGate:
+		case BlockType::JungleFenceGate:
+		case BlockType::OakFenceGate:
+		case BlockType::SpruceFenceGate:
+		case BlockType::WarpedFenceGate:
+			// Flowers
+		case BlockType::TallGrass:
+		case BlockType::LargeFern:
+		case BlockType::Lilac:
+		case BlockType::Peony:
+		case BlockType::RoseBush:
+		case BlockType::Sunflower:
+		case BlockType::Allium:
+		case BlockType::AzureBluet:
+		case BlockType::BlueOrchid:
+		case BlockType::Cornflower:
+		case BlockType::LilyOfTheValley:
+		case BlockType::OrangeTulip:
+		case BlockType::OxeyeDaisy:
+		case BlockType::PinkTulip:
+		case BlockType::Poppy:
+		case BlockType::RedTulip:
+		case BlockType::WhiteTulip:
+			// Leaves
+		case BlockType::AcaciaLeaves:
+		case BlockType::BirchLeaves:
+		case BlockType::DarkOakLeaves:
+		case BlockType::JungleLeaves:
+		case BlockType::OakLeaves:
+		case BlockType::SpruceLeaves:
+			// Log
+		case BlockType::AcaciaLog:
+		case BlockType::BirchLog:
+		case BlockType::DarkOakLog:
+		case BlockType::JungleLog:
+		case BlockType::OakLog:
+		case BlockType::SpruceLog:
+		case BlockType::StrippedAcaciaLog:
+		case BlockType::StrippedBirchLog:
+		case BlockType::StrippedDarkOakLog:
+		case BlockType::StrippedJungleLog:
+		case BlockType::StrippedOakLog:
+		case BlockType::StrippedSpruceLog:
+			// Planks
+		case BlockType::AcaciaPlanks:
+		case BlockType::BirchPlanks:
+		case BlockType::CrimsonPlanks:
+		case BlockType::DarkOakPlanks:
+		case BlockType::JunglePlanks:
+		case BlockType::OakPlanks:
+		case BlockType::SprucePlanks:
+		case BlockType::WarpedPlanks:
+			// Slabs
+		case BlockType::AcaciaSlab:
+		case BlockType::BirchSlab:
+		case BlockType::BrickSlab:
+		case BlockType::CrimsonSlab:
+		case BlockType::DarkOakSlab:
+		case BlockType::JungleSlab:
+		case BlockType::OakSlab:
+		case BlockType::PetrifiedOakSlab:
+		case BlockType::SpruceSlab:
+		case BlockType::WarpedSlab:
+			// Stairs
+		case BlockType::AcaciaStairs:
+		case BlockType::BirchStairs:
+		case BlockType::CrimsonStairs:
+		case BlockType::DarkOakStairs:
+		case BlockType::JungleStairs:
+		case BlockType::OakStairs:
+		case BlockType::SpruceStairs:
+		case BlockType::WarpedStairs:
+			// Wool
+		case BlockType::BlackWool:
+		case BlockType::BlueWool:
+		case BlockType::BrownWool:
+		case BlockType::CyanWool:
+		case BlockType::GrayWool:
+		case BlockType::GreenWool:
+		case BlockType::LightBlueWool:
+		case BlockType::LightGrayWool:
+		case BlockType::LimeWool:
+		case BlockType::MagentaWool:
+		case BlockType::OrangeWool:
+		case BlockType::PinkWool:
+		case BlockType::PurpleWool:
+		case BlockType::RedWool:
+		case BlockType::WhiteWool:
+		case BlockType::YellowWool:
 		{
 			return true;
 		}
+		default: return false;
 	}
-	return false;
 }
 
 
 
 
 
-bool cFireSimulator::DoesBurnForever(BLOCKTYPE a_BlockType)
+bool cFireSimulator::DoesBurnForever(BlockState a_Block)
 {
-	return (a_BlockType == E_BLOCK_NETHERRACK);
+	switch (a_Block.Type())
+	{
+		case BlockType::Netherrack:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-void cFireSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block)
+void cFireSimulator::AddBlock(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block)
 {
 	if (!IsAllowedBlock(a_Block))
 	{
@@ -274,7 +351,7 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, Vector3i a_RelPos)
 	bool IsBlockBelowSolid = false;
 	if (a_RelPos.y > 0)
 	{
-		BLOCKTYPE BlockBelow = a_Chunk->GetBlock(a_RelPos.addedY(-1));
+		auto BlockBelow = a_Chunk->GetBlock(a_RelPos.addedY(-1));
 		if (DoesBurnForever(BlockBelow))
 		{
 			// Is burning atop of netherrack, burn forever (re-check in 10 sec)
@@ -287,18 +364,17 @@ int cFireSimulator::GetBurnStepTime(cChunk * a_Chunk, Vector3i a_RelPos)
 		IsBlockBelowSolid = cBlockInfo::IsSolid(BlockBelow);
 	}
 
-	for (const auto & cross: gCrossCoords)
+	for (const auto & Cross: FlatCrossCoords)
 	{
-		BLOCKTYPE  BlockType;
-		NIBBLETYPE BlockMeta;
-		if (a_Chunk->UnboundedRelGetBlock(a_RelPos + cross, BlockType, BlockMeta))
+		BlockState Other = 0;
+		if (a_Chunk->UnboundedRelGetBlock(a_RelPos + Cross, Other))
 		{
-			if (IsFuel(BlockType))
+			if (IsFuel(Other))
 			{
 				return static_cast<int>(m_BurnStepTimeFuel);
 			}
 		}
-	}  // for i - gCrossCoords[]
+	}
 
 	if (!IsBlockBelowSolid)
 	{
@@ -348,7 +424,7 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, Vector3i a_RelPos)
 					}
 
 					FIRE_FLOG("FS: Starting new fire at {0}.", dstAbsPos);
-					a_Chunk->UnboundedRelSetBlock(dstRelPos, E_BLOCK_FIRE, 0);
+					a_Chunk->UnboundedRelSetBlock(dstRelPos, Block::Fire::Fire());
 				}
 			}  // for y
 		}  // for z
@@ -361,45 +437,38 @@ void cFireSimulator::TrySpreadFire(cChunk * a_Chunk, Vector3i a_RelPos)
 
 void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos)
 {
-	for (auto & coord : gNeighborCoords)
+	for (auto & Coord : ThreeDimensionalNeighborCoords)
 	{
-		auto relPos = a_RelPos + coord;
+		BlockState Self = 0;
+		auto RelPos = a_RelPos + Coord;
+		auto NeighborChunk = a_Chunk->GetRelNeighborChunkAdjustCoords(RelPos);
+		if ((NeighborChunk == nullptr) || !NeighborChunk->IsValid())
+		{
+			continue;
+		}
+		Self = NeighborChunk->GetBlock(RelPos);
 
-		if (!cChunkDef::IsValidHeight(relPos))
+		if (!IsFuel(Self))
 		{
 			continue;
 		}
 
-		const auto neighbor = a_Chunk->GetRelNeighborChunkAdjustCoords(relPos);
-
-		if ((neighbor == nullptr) || !neighbor->IsValid())
+		auto AbsPos = NeighborChunk->RelativeToAbsolute(RelPos);
+		if (Self.Type() == BlockType::Tnt)
 		{
-			continue;
-		}
-
-		BLOCKTYPE BlockType = neighbor->GetBlock(relPos);
-
-		if (!IsFuel(BlockType))
-		{
-			continue;
-		}
-
-		auto absPos = neighbor->RelativeToAbsolute(relPos);
-		if (BlockType == E_BLOCK_TNT)
-		{
-			neighbor->SetBlock(relPos, E_BLOCK_AIR, 0);
-			m_World.SpawnPrimedTNT(Vector3d(absPos) + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom
+			NeighborChunk->SetBlock(RelPos, Block::Air::Air());
+			m_World.SpawnPrimedTNT(Vector3d(AbsPos) + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom
 			return;
 		}
 
 		bool ShouldReplaceFuel = (GetRandomProvider().RandBool(m_ReplaceFuelChance * (1.0 / MAX_CHANCE_REPLACE_FUEL)));
-		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, absPos, ssFireSpread))
+		if (ShouldReplaceFuel && !cRoot::Get()->GetPluginManager()->CallHookBlockSpread(m_World, AbsPos, ssFireSpread))
 		{
-			neighbor->SetBlock(relPos, E_BLOCK_FIRE, 0);
+			NeighborChunk->SetBlock(RelPos, Block::Fire::Fire());
 		}
 		else
 		{
-			neighbor->SetBlock(relPos, E_BLOCK_AIR, 0);
+			NeighborChunk->SetBlock(RelPos, Block::Air::Air());
 		}
 	}  // for i - Coords[]
 }
@@ -410,31 +479,30 @@ void cFireSimulator::RemoveFuelNeighbors(cChunk * a_Chunk, Vector3i a_RelPos)
 
 bool cFireSimulator::CanStartFireInBlock(cChunk * a_NearChunk, Vector3i a_RelPos)
 {
-	BLOCKTYPE  BlockType;
-	NIBBLETYPE BlockMeta;
-	if (!a_NearChunk->UnboundedRelGetBlock(a_RelPos, BlockType, BlockMeta))
+	BlockState Self = 0;
+	if (!a_NearChunk->UnboundedRelGetBlock(a_RelPos, Self))
 	{
 		// The chunk is not accessible
 		return false;
 	}
 
-	if (BlockType != E_BLOCK_AIR)
+	if (Self.Type() != BlockType::Air)
 	{
 		// Only an air block can be replaced by a fire block
 		return false;
 	}
 
-	for (const auto & neighbor: gNeighborCoords)
+	for (const auto & NeighborCoord : ThreeDimensionalNeighborCoords)
 	{
-		if (!a_NearChunk->UnboundedRelGetBlock(a_RelPos + neighbor, BlockType, BlockMeta))
+		if (!a_NearChunk->UnboundedRelGetBlock(a_RelPos + NeighborCoord, Self))
 		{
 			// Neighbor inaccessible, skip it while evaluating
 			continue;
 		}
-		if (IsFuel(BlockType))
+		if (IsFuel(Self))
 		{
 			return true;
 		}
-	}  // for i - Coords[]
+	}
 	return false;
 }

@@ -46,7 +46,7 @@ public:
 
 	enum eEnchantment
 	{
-		// Currently missing: Frost walker, curse of binding, sweeping edge, mending, and curse of vanishing.
+		// Currently missing: Frost walker, curse of binding, sweeping edge, mending, quick charge, riptide, piercing, multishot, loyalty and curse of vanishing.
 		enchProtection           = 0,
 		enchFireProtection       = 1,
 		enchFeatherFalling       = 2,
@@ -126,7 +126,7 @@ public:
 	static unsigned int GetLevelCap(int a_EnchantmentID);
 
 	/** Add enchantment weights from item to the vector */
-	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, short a_ItemType, unsigned a_EnchantmentLevel);
+	static void AddItemEnchantmentWeights(cWeightedEnchantments & a_Enchantments, Item a_ItemType, unsigned a_EnchantmentLevel);
 
 	/** Add a enchantment with weight to the vector */
 	static void AddEnchantmentWeightToVector(cWeightedEnchantments & a_Enchantments, int a_Weight, int a_EnchantmentID, unsigned int a_EnchantmentLevel);
@@ -152,7 +152,7 @@ public:
 	bool operator !=(const cEnchantments & a_Other) const;
 
 	/** Writes the enchantments into the specified NBT writer; begins with the LIST tag of the specified name ("ench" or "StoredEnchantments") */
-	friend void EnchantmentSerializer::WriteToNBTCompound(const cEnchantments & a_Enchantments, cFastNBTWriter & a_Writer, const AString & a_ListTagName);
+	friend void EnchantmentSerializer::WriteToNBTCompound(const cEnchantments & a_Enchantments, cFastNBTWriter & a_Writer, const AString & a_ListTagName, bool stringmode);
 
 	/** Reads the enchantments from the specified NBT list tag (ench or StoredEnchantments) */
 	friend void EnchantmentSerializer::ParseFromNBT(cEnchantments & a_Enchantments, const cParsedNBT & a_NBT, int a_EnchListTagIdx);

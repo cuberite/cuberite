@@ -29,32 +29,17 @@ class cProjectileEntity :
 
 public:
 
-	/** The kind of the projectile. */
-	enum eKind
-	{
-		pkArrow,
-		pkSnowball,
-		pkEgg,
-		pkGhastFireball,
-		pkFireCharge,
-		pkEnderPearl,
-		pkExpBottle,
-		pkSplashPotion,
-		pkFirework,
-		pkWitherSkull,
-	} ;
-
 	// tolua_end
 
 	CLASS_PROTODEF(cProjectileEntity)
 
-	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, float a_Width, float a_Height);
-	cProjectileEntity(eKind a_Kind, cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed, float a_Width, float a_Height);
+	cProjectileEntity(eEntityType a_Kind, cEntity * a_Creator, Vector3d a_Pos, float a_Width, float a_Height);
+	cProjectileEntity(eEntityType a_Kind, cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed, float a_Width, float a_Height);
 
 	/** Creates a new instance of the specified projectile entity.
 	a_Item is the item from which the projectile originated (such as firework or arrow). */
 	static std::unique_ptr<cProjectileEntity> Create(
-		eKind a_Kind,
+		eEntityType a_Kind,
 		cEntity * a_Creator,
 		Vector3d a_Pos,
 		const cItem * a_Item,
@@ -65,7 +50,7 @@ public:
 	Creates a new instance of the specified projectile entity.
 	a_Item is the item from which the projectile originated (such as firework or arrow). */
 	static std::unique_ptr<cProjectileEntity> Create(
-		eKind a_Kind,
+		eEntityType a_Kind,
 		cEntity * a_Creator,
 		double a_PosX, double a_PosY, double a_PosZ,
 		const cItem * a_Item,
@@ -84,10 +69,12 @@ public:
 	/** Called by Chunk when the projectile is eligible for player collection */
 	virtual void CollectedBy(cPlayer & a_Dest);
 
+	virtual bool IsProjectile() const override { return true; }
+
 	// tolua_begin
 
 	/** Returns the kind of the projectile (fast class identification) */
-	eKind GetProjectileKind(void) const { return m_ProjectileKind; }
+	// eKind GetProjectileKind(void) const { return m_ProjectileKind; }
 
 	/** Returns the unique ID of the entity who created this projectile
 	May return an ID <0
@@ -129,7 +116,7 @@ protected:
 	};
 
 	/** The type of projectile I am */
-	eKind m_ProjectileKind;
+	// eKind m_ProjectileKind;
 
 	/** The structure for containing the entity ID and name who has created this projectile
 	The ID and / or name may be nullptr (e.g. for dispensers / mobs). */

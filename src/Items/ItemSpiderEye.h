@@ -14,7 +14,7 @@ class cItemSpiderEyeHandler final:
 
 public:
 
-	constexpr cItemSpiderEyeHandler(int a_ItemType):
+	constexpr cItemSpiderEyeHandler(Item a_ItemType):
 		Super(a_ItemType, FoodInfo(2, 3.2))
 	{
 	}

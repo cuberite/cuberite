@@ -179,7 +179,7 @@ void cEndGen::GenShape(cChunkCoords a_ChunkCoords, cChunkDesc::Shape & a_Shape)
 
 void cEndGen::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape)
 {
-	a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
+	a_ChunkDesc.FillBlocks(Block::Air::Air());
 	for (int z = 0; z < cChunkDef::Width; z++)
 	{
 		for (int x = 0; x < cChunkDef::Width; x++)
@@ -188,7 +188,7 @@ void cEndGen::ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape &
 			{
 				if (cChunkDesc::GetShapeIsSolidAt(a_Shape, x, y, z))
 				{
-					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_END_STONE);
+					a_ChunkDesc.SetBlock({x, y, z}, Block::EndStone::EndStone());
 				}
 			}  // for y
 		}  // for x

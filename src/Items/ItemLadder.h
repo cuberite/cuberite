@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ItemHandler.h"
+#include "SimplePlaceableItemHandler.h"
 #include "Blocks/BlockLadder.h"
 
 
@@ -9,31 +10,15 @@
 
 
 class cItemLadderHandler final  :
-	public cItemHandler
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 
 	using Super::Super;
 
 private:
-
-	/** Converts the block face of the neighbor to which the ladder is attached to the ladder block's meta. */
-	static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_NeighborBlockFace)
-	{
-		switch (a_NeighborBlockFace)
-		{
-			case BLOCK_FACE_ZM: return 0x2;
-			case BLOCK_FACE_ZP: return 0x3;
-			case BLOCK_FACE_XM: return 0x4;
-			case BLOCK_FACE_XP: return 0x5;
-			case BLOCK_FACE_YM:
-			case BLOCK_FACE_YP: return 0x2;
-			default: UNREACHABLE("Unsupported neighbor block face");
-		}
-	}
-
 
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
@@ -52,7 +37,7 @@ private:
 			}
 		}
 
-		return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_LADDER, BlockFaceToMetaData(a_ClickedBlockFace));
+		return a_Player.PlaceBlock(a_PlacePosition, Block::Ladder::Ladder(RotationToBlockFace(a_Player.GetYaw()), a_Player.GetWorld()->GetBlock(a_PlacePosition).Type() == BlockType::Water));
 	}
 
 

@@ -31,7 +31,7 @@ public:
 	) const override
 	{
 		// Only allow placing blocks on top of blocks, or when not in range of dest block:
-		if ((a_ClickedBlockFace != BLOCK_FACE_YM) && (a_ClickedBlockFace != BLOCK_FACE_NONE))
+		if ((a_ClickedBlockFace != BLOCK_FACE_YP) && (a_ClickedBlockFace != BLOCK_FACE_NONE))
 		{
 			return false;
 		}
@@ -49,9 +49,9 @@ public:
 			{
 			}
 
-			virtual bool OnNextBlock(Vector3i a_CBBlockPos, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
+			virtual bool OnNextBlock(Vector3i a_CBBlockPos, BlockState a_Block, eBlockFace a_CBEntryFace) override
 			{
-				if (a_CBBlockType != E_BLOCK_AIR)
+				if (a_Block != Block::Air::Air())
 				{
 					m_Pos = a_CBBlockPos;
 					m_HasFound = true;
@@ -74,8 +74,8 @@ public:
 		{
 			return false;
 		}
-		BLOCKTYPE BlockAbove = a_World->GetBlock(PosAbove);
-		if (BlockAbove != E_BLOCK_AIR)
+		auto BlockAbove = a_World->GetBlock(PosAbove);
+		if (BlockAbove != Block::Air::Air())
 		{
 			return false;
 		}

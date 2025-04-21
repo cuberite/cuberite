@@ -58,6 +58,8 @@ public:
 	/** Wakes up simulators for the specified block */
 	void WakeUpSimulators(Vector3i a_Block);
 
+	void FlushPendingBlockChanges();
+
 	// DEPRECATED, use the vector-parametered version instead.
 	void WakeUpSimulators(int a_BlockX, int a_BlockY, int a_BlockZ)
 	{
@@ -78,8 +80,8 @@ public:
 
 	void ChunkLighted(
 		int a_ChunkX, int a_ChunkZ,
-		const cChunkDef::BlockNibbles & a_BlockLight,
-		const cChunkDef::BlockNibbles & a_SkyLight
+		const cChunkDef::LightNibbles & a_BlockLight,
+		const cChunkDef::LightNibbles & a_SkyLight
 	);
 
 	/** Calls the callback with the chunk's data, if available (with ChunkCS locked).
@@ -102,27 +104,22 @@ public:
 	The replacement doesn't trigger block updates, nor wake up simulators.
 	The replaced blocks aren't checked for block entities (block entity is leaked if it exists at this block).
 	If the chunk is invalid, the operation is ignored silently. */
-	void FastSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	void FastSetBlock(Vector3i a_BlockPos, BlockState a_Block);
 
 	/** Makes the specified entity collect all the pickups around them. */
 	void CollectPickupsByEntity(cEntity & a_Entity);
 
-	BLOCKTYPE  GetBlock          (Vector3i a_BlockPos) const;
-	NIBBLETYPE GetBlockMeta      (Vector3i a_BlockPos) const;
-	NIBBLETYPE GetBlockSkyLight  (Vector3i a_BlockPos) const;
-	NIBBLETYPE GetBlockBlockLight(Vector3i a_BlockPos) const;
+	BlockState GetBlock          (Vector3i a_BlockPos) const;
+	bool       GetBlock          (Vector3i a_BlockPos, BlockState & a_Block) const;
+	LIGHTTYPE  GetBlockSkyLight  (Vector3i a_BlockPos) const;
+	LIGHTTYPE  GetBlockBlockLight(Vector3i a_BlockPos) const;
 
 	/** Sets the meta for the specified block, while keeping the blocktype.
 	Ignored if the chunk is invalid. */
-	void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta);
+	// void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta);
 
-	void SetBlock          (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
-	/** Get the block type and meta at the specified coords
-	Will always initialise a_BlockType and a_BlockMeta if called.
-	Returns false if the data could not be retrieved, either because the chunk is invalid or the height is invalid.
-	Otherwise, returns true. */
-	bool GetBlockTypeMeta  (Vector3i a_BlockPos, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_BlockMeta) const;
-	bool GetBlockInfo      (Vector3i, BLOCKTYPE & a_BlockType, NIBBLETYPE & a_Meta, NIBBLETYPE & a_SkyLight, NIBBLETYPE & a_BlockLight) const;
+	void SetBlock     (Vector3i a_BlockPos, BlockState a_Block);
+	bool GetBlockInfo (Vector3i, BlockState & a_Block, LIGHTTYPE & a_SkyLight, LIGHTTYPE & a_BlockLight) const;
 
 	/** Special function used for growing trees, replaces only blocks that tree may overwrite */
 	void ReplaceTreeBlocks(const sSetBlockVector & a_Blocks);
@@ -244,7 +241,7 @@ public:
 	/** Grows the plant at the specified position by at most a_NumStages.
 	The block's Grow handler is invoked.
 	Returns the number of stages the plant has grown, 0 if not a plant. */
-	int GrowPlantAt(Vector3i a_BlockPos, int a_NumStages = 1);
+	int GrowPlantAt(Vector3i a_BlockPos, char a_NumStages = 1);
 
 	/** Causes the specified block to be ticked on the next Tick() call.
 	Plugins can use this via the cWorld:SetNextBlockToTick() API.

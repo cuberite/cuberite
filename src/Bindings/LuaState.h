@@ -633,6 +633,7 @@ public:
 	void Push(long a_Value);
 	void Push(const UInt32 a_Value);
 	void Push(std::chrono::milliseconds a_time);
+	void Push(BlockState a_Block);  // Pushes the ID of the BlockState
 
 	/** Pops the specified number of values off the top of the Lua stack. */
 	void Pop(int a_NumValuesToPop = 1);
@@ -665,6 +666,7 @@ public:
 	bool GetStackValue(int a_StackPos, float & a_ReturnedVal);
 	bool GetStackValue(int a_StackPos, cUUID & a_Value);
 	bool GetStackValue(int a_StackPos, std::string_view & a_Value);
+	bool GetStackValue(int a_StackPos, BlockState & a_Value);
 
 	// template to catch all of the various c++ integral types without overload conflicts
 	template <class T, typename = std::enable_if_t<std::is_integral_v<T>>>

@@ -1,9 +1,11 @@
 
-// Protocol_1_14.cpp
+// Protocol_1_15.cpp
 
 /*
-Implements the 1.14 protocol classes:
-- release 1.14 protocol (#477)
+Implements the 1.15 protocol classes:
+		- release 1.15 protocol (#573)
+		- release 1.15.1 protocol (#574)
+		- release 1.15.2 protocol (#577)
 */
 
 #include "Globals.h"
@@ -43,8 +45,9 @@ Implements the 1.14 protocol classes:
 #include "../Mobs/Wither.h"
 #include "../Mobs/Zombie.h"
 #include "../Mobs/ZombiePigman.h"
-
+#include "../Entities/Painting.h"
 #include "Palettes/Upgrade.h"
+
 #include "Palettes/Palette_1_15.h"
 
 #include "Protocol.h"
@@ -54,7 +57,7 @@ Implements the 1.14 protocol classes:
 ////////////////////////////////////////////////////////////////////////////////
 // cProtocol_1_15:
 
-void cProtocol_1_15::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType)
+void cProtocol_1_15::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BlockState a_BlockType)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -62,7 +65,28 @@ void cProtocol_1_15::SendBlockAction(Vector3i a_BlockPos, char a_Byte1, char a_B
 	Pkt.WriteXZYPosition64(a_BlockPos);
 	Pkt.WriteBEInt8(a_Byte1);
 	Pkt.WriteBEInt8(a_Byte2);
-	Pkt.WriteVarInt32(a_BlockType);
+	Pkt.WriteVarInt32(GetProtocolBlockType(a_BlockType));
+}
+
+
+
+
+
+void cProtocol_1_15::SendBlockChanges(int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes)
+{
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktBlockChanges);
+	Pkt.WriteBEInt32(a_ChunkX);
+	Pkt.WriteBEInt32(a_ChunkZ);
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_Changes.size()));
+
+	for (const auto & Change : a_Changes)
+	{
+		Int16 Coords = static_cast<Int16>(Change.m_RelY | (Change.m_RelZ << 8) | (Change.m_RelX << 12));
+		Pkt.WriteBEInt16(Coords);
+		Pkt.WriteVarInt32(GetProtocolBlockType(Change.m_Block));
+	}
 }
 
 
@@ -83,40 +107,11 @@ void cProtocol_1_15::SendBlockBreakAnim(UInt32 a_EntityID, Vector3i a_BlockPos, 
 
 
 
-void cProtocol_1_15::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cProtocol_1_15::SendRenderDistanceCenter(cChunkCoords a_chunk)
 {
-	cPacketizer Pkt(*this, pktBlockChange);
-	Pkt.WriteXZYPosition64(a_BlockPos);
-	Pkt.WriteVarInt32(GetProtocolBlockType(a_BlockType, a_BlockMeta));
-}
-
-static const UInt32 CompressionThreshold = 256;  // After how large a packet should we compress it. //Taken from Protocol_1_8.cpp
-
-void cProtocol_1_15::SendLoginSuccess()
-{
-	ASSERT(m_State == 2);  // State: login?
-
-	// Enable compression:
-	{
-		cPacketizer Pkt(*this, pktStartCompression);
-		Pkt.WriteVarInt32(CompressionThreshold);
-	}
-
-	m_State = State::Game;
-
-	{
-		cPacketizer Pkt(*this, pktLoginSuccess);
-		Pkt.WriteString(m_Client->GetUUID().ToLongString());
-		Pkt.WriteString(m_Client->GetUsername());
-		//Pkt.WriteVarInt32(1);//temp fix 
-	}
-	
-}
-
-
-
-void cProtocol_1_15::SendEditSign(Vector3i a_BlockPos)
-{
+	cPacketizer Pkt(*this, pktRenderDistanceCenter);
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_chunk.m_ChunkX));
+	Pkt.WriteVarInt32(static_cast<UInt32>(a_chunk.m_ChunkZ));
 }
 
 
@@ -149,7 +144,6 @@ void cProtocol_1_15::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Obj
 	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
 	Pkt.WriteBEUInt64(0);
 	Pkt.WriteBEUInt64(a_Entity.GetUniqueID());
-
 	Pkt.WriteVarInt32(a_ObjectType);
 	Pkt.WriteBEDouble(a_Entity.GetPosX());
 	Pkt.WriteBEDouble(a_Entity.GetPosY());
@@ -175,12 +169,12 @@ void cProtocol_1_15::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		Pkt.WriteBEUInt32(a_Player.GetUniqueID());
 		Pkt.WriteBEUInt8(static_cast<UInt8>(a_Player.GetEffectiveGameMode()) | (Server->IsHardcore() ? 0x08 : 0));
 		Pkt.WriteBEInt32(static_cast<Int32>(a_World.GetDimension()));
-		Pkt.WriteBEInt64(0);//seed
+		Pkt.WriteBEInt64(0);  // Seed
 		Pkt.WriteBEUInt8(static_cast<UInt8>(Clamp<size_t>(Server->GetMaxPlayers(), 0, 255)));
 		Pkt.WriteString("default");
 		Pkt.WriteVarInt32(ToUnsigned(a_World.GetMaxViewDistance()));
 		Pkt.WriteBool(false);
-		Pkt.WriteBool(false);//death screen
+		Pkt.WriteBool(false);  // Death screen
 	}
 
 	// Send the spawn position:
@@ -188,13 +182,38 @@ void cProtocol_1_15::SendLogin(const cPlayer & a_Player, const cWorld & a_World)
 		cPacketizer Pkt(*this, pktSpawnPosition);
 		Pkt.WriteXZYPosition64(a_World.GetSpawnX(), a_World.GetSpawnY(), a_World.GetSpawnZ());
 	}
-	
 	// Send the server difficulty:
 	{
 		cPacketizer Pkt(*this, pktDifficulty);
 		Pkt.WriteBEInt8(1);
 		Pkt.WriteBool(false);  // Difficulty locked?
 	}
+	// Send world Border  // temporarily here
+	{
+		cPacketizer Pkt(*this, pktWorldBorder);
+		Pkt.WriteVarInt32(3);
+		Pkt.WriteBEDouble(0);  // X
+		Pkt.WriteBEDouble(0);  // Z
+		Pkt.WriteBEDouble(60000000);
+		Pkt.WriteBEDouble(60000000);
+		Pkt.WriteVarInt32(0);
+		Pkt.WriteVarInt32(29999984);
+		Pkt.WriteVarInt32(5);
+		Pkt.WriteVarInt32(15);
+	}
+}
+
+
+
+
+
+void cProtocol_1_15::SendPlayerActionResponse(Vector3i a_blockpos, int a_state_id, cProtocol::PlayerActionResponses a_action, bool a_IsApproved)
+{
+	cPacketizer pkt(*this, pktDifficulty);
+	pkt.WriteXYZPosition64(a_blockpos.x, a_blockpos.y, a_blockpos.z);
+	pkt.WriteVarInt32(static_cast<UInt32>(a_state_id));
+	pkt.WriteVarInt32(static_cast<UInt32>(a_action));
+	pkt.WriteBool(a_IsApproved);
 }
 
 
@@ -210,9 +229,27 @@ void cProtocol_1_15::SendMapData(const cMap & a_Map, int a_DataStartX, int a_Dat
 
 
 void cProtocol_1_15::SendPaintingSpawn(const cPainting & a_Painting)
-{}
+{
+	ASSERT(m_State == 3);  // In game mode?
+	double PosX = a_Painting.GetPosX();
+	double PosY = a_Painting.GetPosY();
+	double PosZ = a_Painting.GetPosZ();
 
-void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset,float a_ParticleData, int a_ParticleAmount)
+	cPacketizer Pkt(*this, pktSpawnPainting);
+	Pkt.WriteVarInt32(a_Painting.GetUniqueID());
+	// TODO: Bad way to write a UUID, and it's not a true UUID, but this is functional for now.
+	Pkt.WriteBEUInt64(0);
+	Pkt.WriteBEUInt64(a_Painting.GetUniqueID());
+	Pkt.WriteVarInt32(a_Painting.GetPaintingId());
+	Pkt.WriteXYZPosition64(static_cast<Int32>(PosX), static_cast<Int32>(PosY), static_cast<Int32>(PosZ));
+	Pkt.WriteBEInt8(static_cast<Int8>(a_Painting.GetProtocolFacing()));
+}
+
+
+
+
+
+void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
@@ -236,16 +273,18 @@ void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f
 
 
 
+
+
 void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f a_Src, Vector3f a_Offset, float a_ParticleData, int a_ParticleAmount, std::array<int, 2> a_Data)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	const auto ParticleID = GetProtocolParticleID(a_ParticleName);
-	
+
 	cPacketizer Pkt(*this, pktParticleEffect);
 	Pkt.WriteBEInt32(ParticleID);
-	
-	Pkt.WriteBool(false); // Long Distance
+
+	Pkt.WriteBool(false);  // Long Distance
 	Pkt.WriteBEDouble(a_Src.x);
 	Pkt.WriteBEDouble(a_Src.y);
 	Pkt.WriteBEDouble(a_Src.z);
@@ -259,22 +298,22 @@ void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f
 
 	switch (ParticleID)
 	{
-		case 3: // blockdust
-		case 23: //FALLING_DUST
+		case 3:  // blockdust
+		case 23:  // FALLING_DUST
 		{
 			Pkt.WriteVarInt32(static_cast<UInt32>(a_Data[0]));
 			break;
 		}
-		case 14: //DUST
+		case 14:  // DUST
 		{
-			Pkt.WriteBEDouble(1); //red
-			Pkt.WriteBEDouble(1); //green
-			Pkt.WriteBEDouble(1); //blue
-			Pkt.WriteBEDouble(1); //scale
+			Pkt.WriteBEDouble(1);  // Red
+			Pkt.WriteBEDouble(1);  // Green
+			Pkt.WriteBEDouble(1);  // Blue
+			Pkt.WriteBEDouble(1);  // Scale
 
 			break;
 		}
-		case 32: //ITEM
+		case 32:  // ITEM
 		{
 			cItem senditem;
 			senditem.Empty();
@@ -283,6 +322,10 @@ void cProtocol_1_15::SendParticleEffect(const AString & a_ParticleName, Vector3f
 		}
 	}
 }
+
+
+
+
 
 void cProtocol_1_15::HandlePacketBookUpdate(cByteBuffer & a_ByteBuffer)
 {
@@ -301,10 +344,15 @@ void cProtocol_1_15::HandlePacketBookUpdate(cByteBuffer & a_ByteBuffer)
 	{
 		UNREACHABLE("Failed to parse book data from bookupdate packet -- enum index");
 	}
-	Hand handused = (Hand)enumindex;
+	Hand handused = static_cast<Hand>(enumindex);
+
+
+	LOG("Book is signed: %d - Hand used: %d", signedbook, static_cast<UInt32>(handused));
 	LOG("PacketBookUpdate is not imlpemented fully");
 	return;
 }
+
+
 
 
 
@@ -313,7 +361,7 @@ void cProtocol_1_15::SendRespawn(eDimension a_Dimension)
 	cPacketizer Pkt(*this, pktRespawn);
 	cPlayer * Player = m_Client->GetPlayer();
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Dimension));
-	Pkt.WriteBEUInt64(0);//appears to be a SHA256 od the world seed
+	Pkt.WriteBEUInt64(0);  // Appears to be a SHA256 od the world seed
 	Pkt.WriteBEUInt8(static_cast<Byte>(Player->GetEffectiveGameMode()));
 	Pkt.WriteString("default");
 }
@@ -330,7 +378,7 @@ void cProtocol_1_15::SendSoundParticleEffect(const EffectID a_EffectID, Vector3i
 
 	cPacketizer Pkt(*this, pktSoundParticleEffect);
 	Pkt.WriteBEInt32(static_cast<int>(a_EffectID));
-	Pkt.WriteXYZPosition64(a_Origin);
+	Pkt.WriteXZYPosition64(a_Origin);
 	Pkt.WriteBEInt32(a_Data);
 	Pkt.WriteBool(false);
 }
@@ -343,6 +391,8 @@ void cProtocol_1_15::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
+	return;
+	/*
 	Byte Action;
 	switch (a_BlockEntity.GetBlockType())
 	{
@@ -383,6 +433,7 @@ void cProtocol_1_15::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	WriteBlockEntity(Writer, a_BlockEntity);
 	Writer.Finish();
 	Pkt.WriteBuf(Writer.GetResult());
+	*/
 }
 
 
@@ -537,11 +588,14 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 	{
 		case cProtocol::pktBossBar:			     return 0x0D;
 		case cProtocol::pktBlockAction:			 return 0x0B;
+		case cProtocol::pktCommandTree:          return 0x12;
+		case cProtocol::pktCustomPayload:        return 0x19;
 		case cProtocol::pktEntityLook:		     return 0x2B;
 		case cProtocol::pktEntityRelMoveLook:	 return 0x2A;
 		case cProtocol::pktUpdateBlockEntity:	 return 0x0A;
 		case cProtocol::pktBlockChange:			 return 0x0C;
 		case cProtocol::pktBlockChanges:		 return 0x10;
+		case cProtocol::pktWorldBorder:          return 0x3E;
 		case cProtocol::pktEntityRelMove:		 return 0x29;
 		case cProtocol::pktEntityStatus:		 return 0x1C;
 		case cProtocol::pktJoinGame:             return 0x26;
@@ -552,8 +606,8 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktCollectEntity:        return 0x56;
 		case cProtocol::pktDestroyEntity:        return 0x38;
 		case cProtocol::pktDisconnectDuringGame: return 0x1B;
-		case cProtocol::pktEntityEffect:         return 0x59;
-		case cProtocol::pktEntityEquipment:      return 0x46;
+		case cProtocol::pktEntityEffect:         return 0x5A;
+		case cProtocol::pktEntityEquipment:      return 0x47;
 		case cProtocol::pktEntityHeadLook:       return 0x3C;
 		case cProtocol::pktEntityMeta:           return 0x44;
 		case cProtocol::pktEntityProperties:     return 0x59;
@@ -562,29 +616,31 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 		case cProtocol::pktExplosion:            return 0x1D;
 		case cProtocol::pktGameMode:             return 0x1F;
 		case cProtocol::pktHeldItemChange:       return 0x40;
-		case cProtocol::pktHorseWindowOpen:      return 0x1F;
+		case cProtocol::pktHorseWindowOpen:      return 0x20;
 		case cProtocol::pktInventorySlot:        return 0x17;
 		case cProtocol::pktKeepAlive:            return 0x21;
+		case cProtocol::pktLightUpdate:          return 0x25;
 		case cProtocol::pktParticleEffect:       return 0x24;
 		case cProtocol::pktPlayerAbilities:      return 0x32;
 		case cProtocol::pktPlayerList:           return 0x34;
 		case cProtocol::pktPlayerMoveLook:       return 0x36;
 		case cProtocol::pktPluginMessage:        return 0x19;
-		case cProtocol::pktRemoveEntityEffect:   return 0x38;
-		case cProtocol::pktResourcePack:         return 0x39;
+		case cProtocol::pktRenderDistanceCenter: return 0x41;
+		case cProtocol::pktRemoveEntityEffect:   return 0x39;
+		case cProtocol::pktResourcePack:         return 0x3A;
 		case cProtocol::pktRespawn:              return 0x3B;
-		case cProtocol::pktScoreboardObjective:  return 0x49;
+		case cProtocol::pktScoreboardObjective:  return 0x4A;
 		case cProtocol::pktSoundEffect:          return 0x1A;
 		case cProtocol::pktSoundParticleEffect:  return 0x23;
 		case cProtocol::pktSpawnPosition:        return 0x4E;
 		case cProtocol::pktTeleportEntity:       return 0x57;
 		case cProtocol::pktTimeUpdate:           return 0x4F;
-		case cProtocol::pktTitle:                return 0x4F;
+		case cProtocol::pktTitle:                return 0x50;
 		case cProtocol::pktUnloadChunk:          return 0x1E;
-		case cProtocol::pktUnlockRecipe:         return 0x36;
+		case cProtocol::pktUnlockRecipe:         return 0x37;
 		case cProtocol::pktUpdateHealth:         return 0x49;
 		case cProtocol::pktUpdateScore:          return 0x4C;
-		case cProtocol::pktUpdateSign:           return 0x2F;
+		case cProtocol::pktUpdateSign:           return 0x30;
 		case cProtocol::pktWeather:              return 0x1F;
 		case cProtocol::pktWindowItems:          return 0x15;
 		case cProtocol::pktWindowOpen:           return 0x2F;
@@ -594,16 +650,39 @@ UInt32 cProtocol_1_15::GetPacketID(ePacketType a_PacketType) const
 	}
 }
 
+
+
+
+
+void cProtocol_1_15::SendPlayerSpawn(const cPlayer & a_Player)
+{
+	// Called to spawn another player for the client
+	cPacketizer Pkt(*this, pktSpawnOtherPlayer);
+	Pkt.WriteVarInt32(a_Player.GetUniqueID());
+	Pkt.WriteUUID(a_Player.GetUUID());
+	Vector3d LastSentPos = a_Player.GetLastSentPosition();
+	Pkt.WriteBEDouble(LastSentPos.x);
+	Pkt.WriteBEDouble(LastSentPos.y + 0.001);  // The "+ 0.001" is there because otherwise the player falls through the block they were standing on.
+	Pkt.WriteBEDouble(LastSentPos.z);
+	Pkt.WriteByteAngle(a_Player.GetYaw());
+	Pkt.WriteByteAngle(a_Player.GetPitch());
+	// WriteEntityMetadata(Pkt, a_Player);
+	// Pkt.WriteBEUInt8(0xff);  // Metadata: end
+}
+
+
+
+
+
 void cProtocol_1_15::SendSoundEffect(
 	const AString & a_SoundName, Vector3d a_Origin, float a_Volume,
 	float a_Pitch)
 {
 	ASSERT(m_State == 3);  // In game mode?
-	
+
 	cPacketizer Pkt(*this, pktSoundEffect);
 	Pkt.WriteString(a_SoundName);
-	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a
-						   // parameter later)
+	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.x * 8.0));
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.y * 8.0));
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.z * 8.0));
@@ -611,32 +690,40 @@ void cProtocol_1_15::SendSoundEffect(
 	Pkt.WriteBEFloat(a_Pitch);
 }
 
+
+
+
+
 void cProtocol_1_15::SendEntityMetadata(const cEntity & a_Entity)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktEntityMeta);
 	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	//TODO: implement entity metadata
 	WriteEntityMetadata(Pkt, a_Entity);
 	Pkt.WriteBEUInt8(0xFF);	 // The termination byte
 }
+
+
+
+
 
 void cProtocol_1_15::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
 
-	const auto MobType = GetProtocolMobType(a_Mob.GetMobType());
+	const auto MobType = GetProtocolEntityType(a_Mob.GetEntityType());
 
 	// If the type is not valid in this protocol bail out:
 	if (MobType == 0)
 	{
 		return;
 	}
-	
+
 	cPacketizer Pkt(*this, pktSpawnMob);
 	Pkt.WriteVarInt32(a_Mob.GetUniqueID());
-	Pkt.WriteUUID(cUUID::GenerateVersion3("fixxxxx"));	 // Temp fix
+	Pkt.WriteBEInt64(0);
+	Pkt.WriteBEInt64(a_Mob.GetUniqueID());
 	Pkt.WriteVarInt32(static_cast<Byte>(MobType));
 	Vector3d LastSentPos = a_Mob.GetLastSentPosition();
 	Pkt.WriteBEDouble(LastSentPos.x);
@@ -648,207 +735,15 @@ void cProtocol_1_15::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedX() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedY() * 400));
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
-	//WriteEntityMetadata(Pkt, a_Mob);
-	//Pkt.WriteBEUInt8(0xFF);	 // Metadata terminator*/
-}
-
-void cProtocol_1_15::SendEntityPosition(const cEntity & a_Entity)
-{
-	ASSERT(m_State == 3);  // In game mode?
-
-	const auto Delta = (a_Entity.GetPosition() * 32).Floor() -
-					   (a_Entity.GetLastSentPosition() * 32).Floor();
-
-	// Ensure that the delta has enough precision and is within range of a
-	// BEInt8:
-	if (Delta.HasNonZeroLength() && cByteBuffer::CanBEInt8Represent(Delta.x) &&
-		cByteBuffer::CanBEInt8Represent(Delta.y) &&
-		cByteBuffer::CanBEInt8Represent(Delta.z))
-	{
-		const auto Move = static_cast<Vector3<Int16>>(Delta);
-
-		// Difference within limitations, use a relative move packet
-		if (a_Entity.IsOrientationDirty())
-		{ 
-			cPacketizer Pkt(*this, pktEntityRelMoveLook); 
-			Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-			Pkt.WriteBEInt16(Move.x);
-			Pkt.WriteBEInt16(Move.y);
-			Pkt.WriteBEInt16(Move.z);
-			Pkt.WriteByteAngle(a_Entity.GetYaw()); 
-			Pkt.WriteByteAngle(a_Entity.GetPitch()); 
-			Pkt.WriteBool(a_Entity.IsOnGround()); 
-		}
-		else
-		{
-			cPacketizer Pkt(*this, pktEntityRelMove);
-			Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-			Pkt.WriteBEInt16(Move.x);
-			Pkt.WriteBEInt16(Move.y);
-			Pkt.WriteBEInt16(Move.z);
-			Pkt.WriteBool(a_Entity.IsOnGround());
-		}
-
-		return;
-	}
-
-	// Too big or small a movement, do a teleport.
-
-	cPacketizer Pkt(*this, pktTeleportEntity);
-	Pkt.WriteVarInt32(a_Entity.GetUniqueID());
-	Pkt.WriteBEDouble(a_Entity.GetPosX());
-	Pkt.WriteBEDouble(a_Entity.GetPosY());
-	Pkt.WriteBEDouble(a_Entity.GetPosZ());
-	Pkt.WriteByteAngle(a_Entity.GetYaw());
-	Pkt.WriteByteAngle(a_Entity.GetPitch());
-	Pkt.WriteBool(a_Entity.IsOnGround());
-}
-
-
-
-UInt8 cProtocol_1_15::GetEntityMetadataID(EntityMetadata a_Metadata) const
-{
-	const UInt8 Entity = 7;
-	const UInt8 Living = Entity + 6;
-	const UInt8 Insentient = Living + 1;
-	const UInt8 Ageable = Insentient + 1;
-	const UInt8 AbstractHorse = Ageable + 2;
-	const UInt8 ChestedHorse = AbstractHorse + 1;
-	const UInt8 TameableAnimal = Ageable + 2;
-	const UInt8 Minecart = Entity + 6;
-	const UInt8 RaidParticipent = Insentient + 1;
-
-	switch (a_Metadata)
-	{
-		case EntityMetadata::EntityFlags:                           return 0;
-		case EntityMetadata::EntityAir:                             return 1;
-		case EntityMetadata::EntityCustomName:                      return 2;
-		case EntityMetadata::EntityCustomNameVisible:               return 3;
-		case EntityMetadata::EntitySilent:                          return 4;
-		case EntityMetadata::EntityNoGravity:                       return 5;
-		case EntityMetadata::EntityPose:                            return 6;
-		case EntityMetadata::ThrowableItem:                         return Entity;
-		case EntityMetadata::PotionThrown:                          return Entity;
-		case EntityMetadata::FallingBlockPosition:                  return Entity;
-		case EntityMetadata::AreaEffectCloudRadius:                 return Entity;
-		case EntityMetadata::AreaEffectCloudColor:                  return Entity + 1;
-		case EntityMetadata::AreaEffectCloudSinglePointEffect:      return Entity + 2;
-		case EntityMetadata::AreaEffectCloudParticleId:             return Entity + 3;
-		case EntityMetadata::ArrowFlags:                            return Entity;
-		case EntityMetadata::PiercingLevel:                         return Entity + 2;
-		case EntityMetadata::TippedArrowColor:                      return Entity + 3;
-		case EntityMetadata::BoatLastHitTime:                       return Entity;
-		case EntityMetadata::BoatForwardDirection:                  return Entity + 1;
-		case EntityMetadata::BoatDamageTaken:                       return Entity + 2;
-		case EntityMetadata::BoatType:                              return Entity + 3;
-		case EntityMetadata::BoatLeftPaddleTurning:                 return Entity + 4;
-		case EntityMetadata::BoatRightPaddleTurning:                return Entity + 5;
-		case EntityMetadata::BoatSplashTimer:                       return Entity + 6;
-		case EntityMetadata::EnderCrystalBeamTarget:                return Entity;
-		case EntityMetadata::EnderCrystalShowBottom:                return Entity + 1;
-		case EntityMetadata::WitherSkullInvulnerable:               return Entity;
-		case EntityMetadata::FireworkInfo:                          return Entity;
-		case EntityMetadata::FireworkBoostedEntityId:               return Entity + 1;
-		case EntityMetadata::FireworkFromCrossbow:                  return Entity + 2;
-		case EntityMetadata::ItemFrameItem:                         return Entity;
-		case EntityMetadata::ItemFrameRotation:                     return Entity + 1;
-		case EntityMetadata::ItemItem:                              return Entity;
-		case EntityMetadata::LivingActiveHand:                      return Entity;
-		case EntityMetadata::LivingHealth:                          return Entity + 1;
-		case EntityMetadata::LivingPotionEffectColor:               return Entity + 2;
-		case EntityMetadata::LivingPotionEffectAmbient:             return Entity + 3;
-		case EntityMetadata::LivingNumberOfArrows:                  return Entity + 4;
-		case EntityMetadata::PlayerAdditionalHearts:                return Living;
-		case EntityMetadata::PlayerScore:                           return Living + 1;
-		case EntityMetadata::PlayerDisplayedSkinParts:              return Living + 2;
-		case EntityMetadata::PlayerMainHand:                        return Living + 3;
-		case EntityMetadata::ArmorStandStatus:                      return Living;
-		case EntityMetadata::ArmorStandHeadRotation:                return Living + 1;
-		case EntityMetadata::ArmorStandBodyRotation:                return Living + 2;
-		case EntityMetadata::ArmorStandLeftArmRotation:             return Living + 3;
-		case EntityMetadata::ArmorStandRightArmRotation:            return Living + 4;
-		case EntityMetadata::ArmorStandLeftLegRotation:             return Living + 5;
-		case EntityMetadata::ArmorStandRightLegRotation:            return Living + 6;
-		case EntityMetadata::InsentientFlags:                       return Living;
-		case EntityMetadata::BatHanging:                            return Insentient;
-		case EntityMetadata::AgeableIsBaby:                         return Insentient;
-		case EntityMetadata::AbstractHorseFlags:                    return Ageable;
-		case EntityMetadata::AbstractHorseOwner:                    return Ageable + 1;
-		case EntityMetadata::HorseVariant:                          return AbstractHorse;
-		case EntityMetadata::ChestedHorseChested:                   return AbstractHorse;
-		case EntityMetadata::LlamaStrength:                         return ChestedHorse;
-		case EntityMetadata::LlamaCarpetColor:                      return ChestedHorse + 1;
-		case EntityMetadata::LlamaVariant:                          return ChestedHorse + 2;
-		case EntityMetadata::PigHasSaddle:                          return Ageable;
-		case EntityMetadata::PigTotalCarrotOnAStickBoost:           return Ageable + 1;
-		case EntityMetadata::RabbitType:                            return Ageable;
-		case EntityMetadata::PolarBearStanding:                     return Ageable;
-		case EntityMetadata::SheepFlags:                            return Ageable;
-		case EntityMetadata::TameableAnimalFlags:                   return Ageable;
-		case EntityMetadata::TameableAnimalOwner:                   return Ageable + 1;
-		case EntityMetadata::OcelotType:                            return TameableAnimal;
-		case EntityMetadata::WolfDamageTaken:                       return TameableAnimal;
-		case EntityMetadata::WolfBegging:                           return TameableAnimal + 1;
-		case EntityMetadata::WolfCollarColour:                      return TameableAnimal + 2;
-		case EntityMetadata::VillagerProfession:                    return Ageable;
-		case EntityMetadata::IronGolemPlayerCreated:                return Insentient;
-		case EntityMetadata::ShulkerFacingDirection:                return Insentient;
-		case EntityMetadata::ShulkerAttachmentFallingBlockPosition: return Insentient + 1;
-		case EntityMetadata::ShulkerShieldHeight:                   return Insentient + 2;
-		case EntityMetadata::BlazeOnFire:                           return Insentient;
-		case EntityMetadata::CreeperState:                          return Insentient;
-		case EntityMetadata::CreeperPowered:                        return Insentient + 1;
-		case EntityMetadata::CreeperIgnited:                        return Insentient + 2;
-		case EntityMetadata::GuardianStatus:                        return Insentient;
-		case EntityMetadata::GuardianTarget:                        return Insentient + 1;
-		case EntityMetadata::IllagerFlags:                          return Insentient;
-		case EntityMetadata::SpeIlagerSpell:                        return Insentient + 1;
-		case EntityMetadata::VexFlags:                              return Insentient;
-		case EntityMetadata::AbstractSkeletonArmsSwinging:          return Insentient;
-		case EntityMetadata::SpiderClimbing:                        return Insentient;
-		case EntityMetadata::WitchAggresive:                        return Insentient;
-		case EntityMetadata::WitherFirstHeadTarget:                 return Insentient;
-		case EntityMetadata::WitherSecondHeadTarget:                return Insentient + 1;
-		case EntityMetadata::WitherThirdHeadTarget:                 return Insentient + 2;
-		case EntityMetadata::WitherInvulnerableTimer:               return Insentient + 3;
-		case EntityMetadata::ZombieIsBaby:                          return Insentient;
-		case EntityMetadata::ZombieHandsRisedUp:                    return Insentient + 2;
-		case EntityMetadata::ZombieVillagerConverting:              return Insentient + 4;
-		case EntityMetadata::ZombieVillagerProfession:              return Insentient + 5;
-		case EntityMetadata::EndermanCarriedBlock:                  return Insentient;
-		case EntityMetadata::EndermanScreaming:                     return Insentient + 1;
-		case EntityMetadata::EnderDragonDragonPhase:                return Insentient;
-		case EntityMetadata::GhastAttacking:                        return Insentient;
-		case EntityMetadata::SlimeSize:                             return Insentient;
-		case EntityMetadata::MinecartShakingPower:                  return Entity;
-		case EntityMetadata::MinecartShakingDirection:              return Entity + 1;
-		case EntityMetadata::MinecartShakingMultiplier:             return Entity + 2;
-		case EntityMetadata::MinecartBlockIDMeta:                   return Entity + 3;
-		case EntityMetadata::MinecartBlockY:                        return Entity + 4;
-		case EntityMetadata::MinecartShowBlock:                     return Entity + 5;
-		case EntityMetadata::MinecartCommandBlockCommand:           return Minecart;
-		case EntityMetadata::MinecartCommandBlockLastOutput:        return Minecart + 1;
-		case EntityMetadata::MinecartFurnacePowered:                return Minecart;
-		case EntityMetadata::TNTPrimedFuseTime:                     return Entity;
-		case EntityMetadata::TridentLoyaltyLevel:                   return Entity + 3;
-		case EntityMetadata::MooshroomType:                         return Ageable;
-		case EntityMetadata::WitchDrinking:                         return RaidParticipent;
-
-		case EntityMetadata::AreaEffectCloudParticleParameter1:
-		case EntityMetadata::AreaEffectCloudParticleParameter2:
-		case EntityMetadata::ZombieUnusedWasType: break;
-
-		default:
-			break;
-	}
-	UNREACHABLE("Retrieved invalid metadata for protocol");
+	// WriteEntityMetadata(Pkt, a_Mob);
+	// Pkt.WriteBEUInt8(0xFF);	 // Metadata terminator
 }
 
 
 
 
 
-std::pair<short, short> cProtocol_1_15::GetItemFromProtocolID(UInt32 a_ProtocolID) const
+/* std::pair<short, short> cProtocol_1_15::GetItemFromProtocolID(UInt32 a_ProtocolID) const
 {
 	return PaletteUpgrade::ToItem(Palette_1_15::ToItem(a_ProtocolID));
 }
@@ -860,7 +755,7 @@ std::pair<short, short> cProtocol_1_15::GetItemFromProtocolID(UInt32 a_ProtocolI
 UInt32 cProtocol_1_15::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const
 {
 	return Palette_1_15::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
-}
+} */
 
 
 
@@ -893,48 +788,114 @@ signed char cProtocol_1_15::GetProtocolEntityStatus(EntityAnimation a_Animation)
 
 
 
-UInt8 cProtocol_1_15::GetProtocolEntityType(const cEntity & a_Entity) const
+UInt8 cProtocol_1_15::GetProtocolEntityType(eEntityType a_Type) const
 {
-	using Type = cEntity::eEntityType;
+	using Type = eEntityType;
 
-	switch (a_Entity.GetEntityType())
+	switch (a_Type)
 	{
-		case Type::etEnderCrystal: return 17;
-		case Type::etPickup: return 34;
-		case Type::etFallingBlock: return 25;
-		case Type::etMinecart: return 41;
-		case Type::etBoat: return 5;
-		case Type::etTNT: return 58;
-		case Type::etProjectile:
-		{
-			using PType = cProjectileEntity::eKind;
-			const auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
-
-			switch (Projectile.GetProjectileKind())
-			{
-				case PType::pkArrow: return 2;
-				case PType::pkSnowball: return 70;
-				case PType::pkEgg: return 78;
-				case PType::pkGhastFireball: return 36;
-				case PType::pkFireCharge: return 68;
-				case PType::pkEnderPearl: return 79;
-				case PType::pkExpBottle: return 80;
-				case PType::pkSplashPotion: return 81;
-				case PType::pkFirework: return 26;
-				case PType::pkWitherSkull: return 92;
-			}
-			break;
-		}
-		case Type::etFloater: return 101;
-		case Type::etItemFrame: return 35;
-		case Type::etLeashKnot: return 37;
-
-		// Non-objects must not be sent
-		case Type::etEntity:
-		case Type::etPlayer:
-		case Type::etMonster:
-		case Type::etExpOrb:
-		case Type::etPainting: break;
+		case Type::etAreaEffectCloud:      return 0;
+		case Type::etArmorStand:           return 1;
+		case Type::etArrow:                return 2;
+		case Type::etBat:                  return 3;
+		case Type::etBee:                  return 4;
+		case Type::etBlaze:                return 5;
+		case Type::etCat:                  return 7;
+		case Type::etCaveSpider:           return 8;
+		case Type::etChicken:              return 9;
+		case Type::etCod:                  return 10;
+		case Type::etCow:                  return 11;
+		case Type::etCreeper:              return 12;
+		case Type::etDonkey:               return 13;
+		case Type::etDolphin:              return 14;
+		case Type::etDragonFireball:       return 15;
+		case Type::etDrowned:              return 16;
+		case Type::etElderGuardian:        return 17;
+		case Type::etEndCrystal:           return 18;
+		case Type::etEnderDragon:          return 19;
+		case Type::etEnderman:             return 20;
+		case Type::etEndermite:            return 21;
+		case Type::etEvokerFangs:          return 22;
+		case Type::etEvoker:               return 23;
+		case Type::etExperienceOrb:        return 24;
+		case Type::etEyeOfEnder:           return 25;
+		case Type::etFallingBlock:         return 26;
+		case Type::etFireworkRocket:       return 27;
+		case Type::etFox:                  return 28;
+		case Type::etGhast:                return 29;
+		case Type::etGiant:                return 30;
+		case Type::etGuardian:             return 31;
+		case Type::etHorse:                return 32;
+		case Type::etHusk:                 return 33;
+		case Type::etIllusioner:           return 34;
+		case Type::etItem:                 return 35;
+		case Type::etItemFrame:            return 36;
+		case Type::etFireball:             return 37;
+		case Type::etLeashKnot:            return 38;
+		case Type::etLlama:                return 39;
+		case Type::etLlamaSpit:            return 40;
+		case Type::etMagmaCube:            return 41;
+		case Type::etMinecart:             return 42;
+		case Type::etChestMinecart:        return 43;
+		case Type::etCommandBlockMinecart: return 44;
+		case Type::etFurnaceMinecart:      return 45;
+		case Type::etHopperMinecart:       return 46;
+		case Type::etSpawnerMinecart:      return 47;
+		case Type::etTntMinecart:          return 48;
+		case Type::etMule:                 return 49;
+		case Type::etMooshroom:            return 50;
+		case Type::etOcelot:               return 51;
+		case Type::etPainting:             return 52;
+		case Type::etPanda:                return 53;
+		case Type::etParrot:               return 54;
+		case Type::etPig:                  return 55;
+		case Type::etPufferfish:           return 56;
+		case Type::etZombifiedPiglin:      return 57;
+		case Type::etPolarBear:            return 58;
+		case Type::etTnt:                  return 59;
+		case Type::etRabbit:               return 60;
+		case Type::etSalmon:               return 61;
+		case Type::etSheep:                return 62;
+		case Type::etShulker:              return 63;
+		case Type::etShulkerBullet:        return 64;
+		case Type::etSilverfish:           return 65;
+		case Type::etSkeleton:             return 66;
+		case Type::etSkeletonHorse:        return 67;
+		case Type::etSlime:                return 68;
+		case Type::etSmallFireball:        return 69;
+		case Type::etSnowGolem:            return 70;
+		case Type::etSnowball:             return 71;
+		case Type::etSpectralArrow:        return 72;
+		case Type::etSpider:               return 73;
+		case Type::etSquid:                return 74;
+		case Type::etStray:                return 75;
+		case Type::etTraderLlama:          return 76;
+		case Type::etTropicalFish:         return 77;
+		case Type::etTurtle:               return 78;
+		case Type::etEgg:                  return 79;
+		case Type::etEnderPearl:           return 80;
+		case Type::etExperienceBottle:     return 81;
+		case Type::etPotion:               return 82;
+		case Type::etTrident:              return 83;
+		case Type::etVex:                  return 84;
+		case Type::etVillager:             return 85;
+		case Type::etIronGolem:            return 86;
+		case Type::etVindicator:           return 87;
+		case Type::etPillager:             return 88;
+		case Type::etWanderingTrader:      return 89;
+		case Type::etWitch:                return 90;
+		case Type::etWither:               return 91;
+		case Type::etWitherSkeleton:       return 92;
+		case Type::etWitherSkull:          return 93;
+		case Type::etWolf:                 return 94;
+		case Type::etZombie:               return 95;
+		case Type::etZombieHorse:          return 96;
+		case Type::etZombieVillager:       return 97;
+		case Type::etPhantom:              return 98;
+		case Type::etRavager:              return 99;
+		case Type::etLightningBolt:        return 100;
+		case Type::etPlayer:               return 101;
+		case Type::etFishingBobber:        return 102;
 	}
 	UNREACHABLE("Unhandled entity kind");
 }
@@ -943,91 +904,10 @@ UInt8 cProtocol_1_15::GetProtocolEntityType(const cEntity & a_Entity) const
 
 
 
-UInt32 cProtocol_1_15::GetProtocolItemType(short a_ItemID, short a_ItemDamage) const
+/* UInt32 cProtocol_1_15::GetProtocolItemType(short a_ItemID, short a_ItemDamage) const
 {
 	return Palette_1_15::From(PaletteUpgrade::FromItem(a_ItemID, a_ItemDamage));
-}
-
-
-
-
-
-UInt32 cProtocol_1_15::GetProtocolMobType(eMonsterType a_MobType) const
-{
-	switch (a_MobType)
-	{
-		// Map invalid type to Giant for easy debugging (if this ever spawns, something has gone very wrong)
-		case mtInvalidType:           return 29;
-		case mtBat:                   return 3;
-		case mtBee:					  return 4;					
-		case mtBlaze:                 return 5;
-		case mtBoat:				  return 6;
-		case mtCat:                   return 6;
-		case mtCaveSpider:            return 7;
-		case mtChicken:               return 8;
-		case mtCod:                   return 9;
-		case mtCow:                   return 10;
-		case mtCreeper:               return 11;
-		case mtDonkey:                return 12;
-		case mtDolphin:               return 13;
-		case mtDrowned:               return 16;
-		case mtElderGuardian:         return 17;
-		case mtEnderDragon:           return 19;
-		case mtEnderman:              return 20;
-		case mtEndermite:             return 21;
-		case mtEvoker:                return 23;
-		case mtFox:                   return 28;
-		case mtGhast:                 return 29;
-		case mtGiant:                 return 30;
-		case mtGuardian:              return 31;
-		case mtHorse:                 return 32;
-		case mtHusk:                  return 33;
-		case mtIllusioner:            return 34;
-		case mtLlama:                 return 39;
-		case mtMagmaCube:             return 41;
-		case mtMule:                  return 49;
-		case mtMooshroom:             return 50;
-		case mtOcelot:                return 51;
-		case mtPanda:                 return 53;
-		case mtParrot:                return 54;
-		case mtPig:                   return 55;
-		case mtPufferfish:            return 56;
-		case mtZombiePigman:		  return 57;
-		case mtPolarBear:             return 58;
-		case mtRabbit:                return 60;
-		case mtSalmon:                return 61;
-		case mtSheep:                 return 62;
-		case mtShulker:               return 63;
-		case mtSilverfish:            return 65;
-		case mtSkeleton:              return 66;
-		case mtSkeletonHorse:         return 67;
-		case mtSlime:                 return 68;
-		case mtSnowGolem:             return 70;
-		case mtSpider:                return 73;
-		case mtSquid:                 return 74;
-		case mtStray:                 return 75;
-		case mtTraderLlama:           return 76;
-		case mtTropicalFish:          return 77;
-		case mtTurtle:                return 78;
-		case mtVex:                   return 84;
-		case mtVillager:              return 85;
-		case mtIronGolem:			  return 86;
-		case mtVindicator:            return 87;
-		case mtPillager:              return 88;
-		case mtWanderingTrader:       return 89;
-		case mtWitch:                 return 90;
-		case mtWither:                return 91;
-		case mtWitherSkeleton:        return 92;
-		case mtWolf:                  return 94;
-		case mtZombie:                return 95;
-		case mtZombieHorse:           return 96;
-		case mtZombieVillager:        return 97;
-		case mtPhantom:               return 98;
-		case mtRavager:               return 99;
-
-		default:                      return 0;
-	}
-}
+} */
 
 
 
@@ -1096,10 +976,10 @@ int cProtocol_1_15::GetProtocolParticleID(const AString & a_ParticleName) const
 		{ "dolphin",                55 },
 		{ "campfirecosysmoke",      56 },
 		{ "campfiresignalsmoke",    57 },
-		{ "dripping_honey",			58 },
-		{ "falling_honey",			59 },
-		{ "landing_honey",			60 },
-		{ "falling_nectar",			61 },
+		{ "dripping_honey",         58 },
+		{ "falling_honey",          59 },
+		{ "landing_honey",          60 },
+		{ "falling_nectar",         61 },
 	};
 
 
@@ -1121,7 +1001,7 @@ int cProtocol_1_15::GetProtocolParticleID(const AString & a_ParticleName) const
 
 UInt32 cProtocol_1_15::GetProtocolStatisticType(const CustomStatistic a_Statistic) const
 {
-	return Palette_1_14::From(a_Statistic);
+	return Palette_1_15::From(a_Statistic);
 }
 
 
@@ -1130,7 +1010,7 @@ UInt32 cProtocol_1_15::GetProtocolStatisticType(const CustomStatistic a_Statisti
 
 cProtocol::Version cProtocol_1_15::GetProtocolVersion() const
 {
-	return Version::v1_14;
+	return Version::v1_15;
 }
 
 
@@ -1147,6 +1027,8 @@ bool cProtocol_1_15::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 	// Game
 	switch (a_PacketType)
 	{
+		case 0x01: /* query nbt packet */ return false;
+		case 0x02: /* update difficulty */ return false;
 		case 0x03: HandlePacketChatMessage(a_ByteBuffer); return true;
 		case 0x04: HandlePacketClientStatus(a_ByteBuffer); return true;
 		case 0x05: HandlePacketClientSettings(a_ByteBuffer); return true;
@@ -1156,32 +1038,41 @@ bool cProtocol_1_15::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketTyp
 		case 0x09: HandlePacketWindowClick(a_ByteBuffer); return true;
 		case 0x0A: HandlePacketWindowClose(a_ByteBuffer); return true;
 		case 0x0B: HandlePacketPluginMessage(a_ByteBuffer); return true;
-		case 0x0C: HandlePacketBookUpdate(a_ByteBuffer); return true;
+		case 0x0C: HandlePacketBookUpdate(a_ByteBuffer); return true;  // not fully implemented
 		case 0x0E: HandlePacketUseEntity(a_ByteBuffer); return true;
 		case 0x0F: HandlePacketKeepAlive(a_ByteBuffer); return true;
+		case 0x10: /* Update difficulty lock */ return false;  // only used in single player
 		case 0x11: HandlePacketPlayerPos(a_ByteBuffer); return true;
 		case 0x12: HandlePacketPlayerPosLook(a_ByteBuffer); return true;
 		case 0x13: HandlePacketPlayerLook(a_ByteBuffer); return true;
 		case 0x14: HandlePacketPlayer(a_ByteBuffer); return true;
 		case 0x15: HandlePacketVehicleMove(a_ByteBuffer); return true;
 		case 0x16: HandlePacketBoatSteer(a_ByteBuffer); return true;
+		case 0x17: /* pick from inventory */ return false;
 		case 0x18: HandleCraftRecipe(a_ByteBuffer); return true;
 		case 0x19: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
 		case 0x1A: HandlePacketBlockDig(a_ByteBuffer); return true;
-		case 0x1C: HandlePacketSteerVehicle(a_ByteBuffer); return true;
+		case 0x1B: /* client command packet */ return false;
+		case 0x1C: HandlePacketSteerVehicle(a_ByteBuffer); return true;  // player input packet
 		case 0x1D: HandlePacketCraftingBookData(a_ByteBuffer); return true;
 		case 0x1E: HandlePacketNameItem(a_ByteBuffer); return true;
 		case 0x1F: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
 		case 0x20: HandlePacketAdvancementTab(a_ByteBuffer); return true;
+		case 0x21: /* select villager trade */ return false;
 		case 0x22: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
 		case 0x23: HandlePacketSlotSelect(a_ByteBuffer); return true;
+		case 0x24: HandlePacketCommandBlockUpdate(a_ByteBuffer); return true;
+		case 0x25: /* update minecart command block */ return false;
 		case 0x26: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
+		case 0x27: /* Update jigsaw block */ return false;
+		case 0x28: /* Update structure block */ return false;
+		case 0x29: HandlePacketUpdateSign(a_ByteBuffer); return true;
+		case 0x2B: /* Spectator teleport */ return false;
+		case 0x2A: /* Update hand swing */ return false;
 		case 0x2C: HandlePacketBlockPlace(a_ByteBuffer); return true;
 		case 0x2D: HandlePacketUseItem(a_ByteBuffer); return true;
-
 		default: break;
 	}
-
 	return Super::HandlePacket(a_ByteBuffer, a_PacketType);
 }
 
@@ -1240,639 +1131,100 @@ void cProtocol_1_15::HandlePacketUpdateSign(cByteBuffer & a_ByteBuffer)
 
 void cProtocol_1_15::WriteEntityMetadata(cPacketizer & a_Pkt, const EntityMetadata a_Metadata, const EntityMetadataType a_FieldType) const
 {
-	a_Pkt.WriteBEUInt8(GetEntityMetadataID(a_Metadata));		  // Index
-	a_Pkt.WriteVarInt32((UInt32)a_FieldType);					  // Type
+	a_Pkt.WriteBEUInt8(GetEntityMetadataID(a_Metadata));	      // Index
+	a_Pkt.WriteVarInt32(static_cast<UInt32>(a_FieldType));        // Type
 }
 
 
 
 
 
-void cProtocol_1_15::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
+void cProtocol_1_15::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity, bool a_WriteCommon) const
 {
-	// Common metadata:
-	Int8 Flags = 0;
-	if (a_Entity.IsOnFire())
+	if (a_WriteCommon)
 	{
-		Flags |= 0x01;
-	}
-	if (a_Entity.IsCrouched())
-	{
-		Flags |= 0x02;
-	}
-	if (a_Entity.IsSprinting())
-	{
-		Flags |= 0x08;
-	}
-	if (a_Entity.IsRclking())
-	{
-		Flags |= 0x10;
-	}
-	if (a_Entity.IsInvisible())
-	{
-		Flags |= 0x20;
-	}
-	/*
-	if (a_Entity.IsGlowing())
-	{
-		Flags |= 0x40;
-	}
-	*/
-	if (a_Entity.IsElytraFlying())
-	{
-		Flags |= 0x80;
-	}
+		// Living Entity Metadata
+		if (a_Entity.IsMob())
+		{
+			auto & a_Mob = dynamic_cast<const cMonster &>(a_Entity);
+			if (a_Mob.HasCustomName())
+			{
+				WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::OptChat);
+				a_Pkt.WriteBool(true);
+				a_Pkt.WriteString(a_Mob.GetCustomName());
 
-	WriteEntityMetadata(a_Pkt, EntityMetadata::EntityFlags, EntityMetadataType::Byte);
-	a_Pkt.WriteBEInt8(Flags);
+				WriteEntityMetadata(a_Pkt, EntityMetadata::EntityNameVisible, EntityMetadataType::Boolean);
+				a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
+			}
+		}
+
+		// Common metadata:
+		Int8 Flags = 0;
+		if (a_Entity.IsOnFire())
+		{
+			Flags |= 0x01;
+		}
+		if (a_Entity.IsCrouched())
+		{
+			Flags |= 0x02;
+		}
+		if (a_Entity.IsSprinting())
+		{
+			Flags |= 0x08;
+		}
+		if (a_Entity.IsRclking())
+		{
+			Flags |= 0x10;
+		}
+		if (a_Entity.IsInvisible())
+		{
+			Flags |= 0x20;
+		}
+		/*
+		if (a_Entity.IsGlowing())
+		{
+			Flags |= 0x40;
+		}
+		*/
+		if (a_Entity.IsElytraFlying())
+		{
+			Flags |= 0x80;
+		}
+
+		WriteEntityMetadata(a_Pkt, EntityMetadata::EntityFlags, EntityMetadataType::Byte);
+		a_Pkt.WriteBEInt8(Flags);
+	}
 
 	switch (a_Entity.GetEntityType())
 	{
-		case cEntity::etPlayer:
+		case etPlayer:
 		{
-			auto & Player = static_cast<const cPlayer &>(a_Entity);
+			auto & Player = dynamic_cast<const cPlayer &>(a_Entity);
 
 			// TODO Set player custom name to their name.
 			// Then it's possible to move the custom name of mobs to the entities
 			// and to remove the "special" player custom name.
-			WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::String);
-			a_Pkt.WriteString(Player.GetName());
+			WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::OptChat);
+			a_Pkt.WriteBool(true);
+			a_Pkt.WriteString("\"{" + Player.GetName() + "\"}");	 // needs to be json formatted
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
 			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerDisplayedSkinParts, EntityMetadataType::Byte);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerPlayerModelParts, EntityMetadataType::Byte);
 			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
 
-			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerMainHand, EntityMetadataType::Byte);
+			WriteEntityMetadata(a_Pkt, EntityMetadata::PlayerMainArm, EntityMetadataType::Byte);
 			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
 			break;
 		}
-		case cEntity::etPickup:
-		{
-			WriteEntityMetadata(a_Pkt, EntityMetadata::ItemItem, EntityMetadataType::Item);
-			WriteItem(a_Pkt, static_cast<const cPickup &>(a_Entity).GetItem());
-			break;
-		}
-		case cEntity::etMinecart:
-		{
-			WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShakingPower, EntityMetadataType::VarInt);
-
-			// The following expression makes Minecarts shake more with less health or higher damage taken
-			auto & Minecart = static_cast<const cMinecart &>(a_Entity);
-			auto maxHealth = a_Entity.GetMaxHealth();
-			auto curHealth = a_Entity.GetHealth();
-			a_Pkt.WriteVarInt32(static_cast<UInt32>((maxHealth - curHealth) * Minecart.LastDamage() * 4));
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShakingDirection, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(1);  // (doesn't seem to effect anything)
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShakingMultiplier, EntityMetadataType::Float);
-			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));  // or damage taken
-
-			if (Minecart.GetPayload() == cMinecart::mpNone)
-			{
-				auto & RideableMinecart = static_cast<const cRideableMinecart &>(Minecart);
-				const cItem & MinecartContent = RideableMinecart.GetContent();
-				if (!MinecartContent.IsEmpty())
-				{
-					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockIDMeta, EntityMetadataType::VarInt);
-					int Content = MinecartContent.m_ItemType;
-					Content |= MinecartContent.m_ItemDamage << 8;
-					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
-
-					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartBlockY, EntityMetadataType::VarInt);
-					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
-
-					WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartShowBlock, EntityMetadataType::Boolean);
-					a_Pkt.WriteBool(true);
-				}
-			}
-			else if (Minecart.GetPayload() == cMinecart::mpFurnace)
-			{
-				WriteEntityMetadata(a_Pkt, EntityMetadata::MinecartFurnacePowered, EntityMetadataType::Boolean);
-				a_Pkt.WriteBool(static_cast<const cMinecartWithFurnace &>(Minecart).IsFueled());
-			}
-			break;
-		}  // case etMinecart
-
-		case cEntity::etProjectile:
-		{
-			auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
-			switch (Projectile.GetProjectileKind())
-			{
-				case cProjectileEntity::pkArrow:
-				{
-					WriteEntityMetadata(a_Pkt, EntityMetadata::ArrowFlags, EntityMetadataType::Byte);
-					a_Pkt.WriteBEInt8(static_cast<const cArrowEntity &>(Projectile).IsCritical() ? 1 : 0);
-
-					// TODO: Piercing level
-					break;
-				}
-				case cProjectileEntity::pkFirework:
-				{
-					// TODO
-					break;
-				}
-				case cProjectileEntity::pkSplashPotion:
-				{
-					// TODO
-				}
-				default:
-				{
-					break;
-				}
-			}
-			break;
-		}  // case etProjectile
-
-		case cEntity::etMonster:
-		{
-			WriteMobMetadata(a_Pkt, static_cast<const cMonster &>(a_Entity));
-			break;
-		}
-
-		case cEntity::etBoat:
-		{
-			auto & Boat = static_cast<const cBoat &>(a_Entity);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatLastHitTime, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetLastDamage()));
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatForwardDirection, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetForwardDirection()));
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatDamageTaken, EntityMetadataType::Float);
-			a_Pkt.WriteBEFloat(Boat.GetDamageTaken());
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatType, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatRightPaddleTurning, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Boat.IsRightPaddleUsed());
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatLeftPaddleTurning, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(static_cast<bool>(Boat.IsLeftPaddleUsed()));
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BoatSplashTimer, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(0);
-
-			break;
-		}  // case etBoat
-
-		case cEntity::etItemFrame:
-		{
-			// TODO
-			break;
-		}  // case etItemFrame
-
-		case cEntity::etEnderCrystal:
-		{
-			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
-			if (EnderCrystal.DisplaysBeam())
-			{
-				WriteEntityMetadata(a_Pkt, EntityMetadata::EnderCrystalBeamTarget, EntityMetadataType::OptPosition);
-				a_Pkt.WriteBool(true);  // Dont do a second check if it should display the beam
-				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
-			}
-			WriteEntityMetadata(a_Pkt, EntityMetadata::EnderCrystalShowBottom, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
-			break;
-		}  // case etEnderCrystal
 
 		default:
 		{
-			break;
+			Super::WriteEntityMetadata(a_Pkt, a_Entity, false);
 		}
 	}
 }
-
-
-
-
-
-void cProtocol_1_15::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const
-{
-	// Living Enitiy Metadata
-	if (a_Mob.HasCustomName())
-	{
-		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
-		WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::OptChat);
-		a_Pkt.WriteBool(true);
-		a_Pkt.WriteString(a_Mob.GetCustomName());
-
-		WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomNameVisible, EntityMetadataType::Boolean);
-		a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
-	}
-
-	WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
-	a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
-
-	// TODO: pose
-
-	switch (a_Mob.GetMobType())
-	{
-		case mtBat:
-		{
-			auto & Bat = static_cast<const cBat &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::BatHanging, EntityMetadataType::Byte);
-			a_Pkt.WriteBEInt8(Bat.IsHanging() ? 1 : 0);
-			break;
-		}  // case mtBat
-
-		case mtChicken:
-		{
-			auto & Chicken = static_cast<const cChicken &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Chicken.IsBaby());
-			break;
-		}  // case mtChicken
-
-		case mtCow:
-		{
-			auto & Cow = static_cast<const cCow &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Cow.IsBaby());
-			break;
-		}  // case mtCow
-
-		case mtCreeper:
-		{
-			auto & Creeper = static_cast<const cCreeper &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::CreeperState, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(Creeper.IsBlowing() ? 1 : static_cast<UInt32>(-1));  // (idle or "blowing")
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::CreeperPowered, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Creeper.IsCharged());
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::CreeperIgnited, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Creeper.IsBurnedWithFlintAndSteel());
-			break;
-		}  // case mtCreeper
-
-		case mtEnderman:
-		{
-			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
-			WriteEntityMetadata(a_Pkt, EntityMetadata::EndermanCarriedBlock, EntityMetadataType::OptBlockID);
-			UInt32 Carried = 0;
-			Carried |= static_cast<UInt32>(Enderman.GetCarriedBlock() << 4);
-			Carried |= Enderman.GetCarriedMeta();
-			a_Pkt.WriteVarInt32(Carried);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::EndermanScreaming, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Enderman.IsScreaming());
-			break;
-		}  // case mtEnderman
-
-		case mtGhast:
-		{
-			auto & Ghast = static_cast<const cGhast &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::GhastAttacking, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Ghast.IsCharging());
-			break;
-		}  // case mtGhast
-
-		case mtHorse:
-		{
-			// XXX This behaves incorrectly with different varients; horses have different entity IDs now
-
-			// Abstract horse
-			auto & Horse = static_cast<const cHorse &>(a_Mob);
-
-			Int8 Flags = 0;
-			if (Horse.IsTame())
-			{
-				Flags |= 0x02;
-			}
-			if (Horse.IsSaddled())
-			{
-				Flags |= 0x04;
-			}
-			if (Horse.IsInLoveCooldown())
-			{
-				Flags |= 0x08;
-			}
-			if (Horse.IsEating())
-			{
-				Flags |= 0x10;
-			}
-			if (Horse.IsRearing())
-			{
-				Flags |= 0x20;
-			}
-			if (Horse.IsMthOpen())
-			{
-				Flags |= 0x40;
-			}
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AbstractHorseFlags, EntityMetadataType::Byte);
-			a_Pkt.WriteBEInt8(Flags);
-
-			// Regular horses
-			int Appearance = 0;
-			Appearance = Horse.GetHorseColor();
-			Appearance |= Horse.GetHorseStyle() << 8;
-			WriteEntityMetadata(a_Pkt, EntityMetadata::HorseVariant, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Appearance));  // Color / style
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Horse.IsBaby());
-			break;
-		}  // case mtHorse
-
-		case mtMagmaCube:
-		{
-			auto & MagmaCube = static_cast<const cMagmaCube &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::SlimeSize, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(MagmaCube.GetSize()));
-			break;
-		}  // case mtMagmaCube
-
-		case mtOcelot:
-		{
-			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Ocelot.IsBaby());
-
-			// TODO: Ocelot trusting
-
-			break;
-		}  // case mtOcelot
-
-		case mtPig:
-		{
-			auto & Pig = static_cast<const cPig &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Pig.IsBaby());
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::PigHasSaddle, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Pig.IsSaddled());
-
-			// PIG_TOTAL_CARROT_ON_A_STICK_BOOST in 1.11.1 only
-			break;
-		}  // case mtPig
-
-		case mtRabbit:
-		{
-			auto & Rabbit = static_cast<const cRabbit &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Rabbit.IsBaby());
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::RabbitType, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Rabbit.GetRabbitType()));
-			break;
-		}  // case mtRabbit
-
-		case mtSheep:
-		{
-			auto & Sheep = static_cast<const cSheep &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Sheep.IsBaby());
-
-			Int8 SheepMetadata = 0;
-			SheepMetadata = static_cast<Int8>(Sheep.GetFurColor());
-			if (Sheep.IsSheared())
-			{
-				SheepMetadata |= 0x10;
-			}
-			WriteEntityMetadata(a_Pkt, EntityMetadata::SheepFlags, EntityMetadataType::Byte);
-			a_Pkt.WriteBEInt8(SheepMetadata);
-			break;
-		}  // case mtSheep
-
-		case mtSkeleton:
-		{
-			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
-			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingActiveHand, EntityMetadataType::Byte);
-			a_Pkt.WriteBEUInt8(Skeleton.IsChargingBow() ? 0x01 : 0x00);
-
-			// TODO: Skeleton animation
-			break;
-		}  // case mtSkeleton
-
-		case mtSlime:
-		{
-			auto & Slime = static_cast<const cSlime &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::SlimeSize, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Slime.GetSize()));
-			break;
-		}  // case mtSlime
-
-		case mtVillager:
-		{
-			auto & Villager = static_cast<const cVillager &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Villager.IsBaby());
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::VillagerProfession, EntityMetadataType::VillagerData);
-			a_Pkt.WriteVarInt32(2);  // Villager from plains
-			switch (Villager.GetVilType())
-			{
-				case cVillager::vtFarmer:
-				{
-					a_Pkt.WriteVarInt32(5);
-					break;
-				}
-				case cVillager::vtLibrarian:
-				{
-					a_Pkt.WriteVarInt32(9);
-					break;
-				}
-				case cVillager::vtPriest:
-				{
-					a_Pkt.WriteVarInt32(4);
-					break;
-				}
-				case cVillager::vtBlacksmith:
-				{
-					a_Pkt.WriteVarInt32(13);
-					break;
-				}
-				case cVillager::vtButcher:
-				{
-					a_Pkt.WriteVarInt32(2);
-					break;
-				}
-				case cVillager::vtGeneric:
-				{
-					a_Pkt.WriteVarInt32(0);
-					break;
-				}
-			}
-			a_Pkt.WriteVarInt32(1);  // Level 1 villager
-			break;
-		}  // case mtVillager
-
-		case mtWitch:
-		{
-			// auto & Witch = static_cast<const cWitch &>(a_Mob);
-
-			// TODO: Witch drinking potion
-			break;
-		}  // case mtWitch
-
-		case mtWither:
-		{
-			auto & Wither = static_cast<const cWither &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::WitherInvulnerableTimer, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(Wither.GetWitherInvulnerableTicks());
-
-			// TODO: Use boss bar packet for health
-			break;
-		}  // case mtWither
-
-		case mtWolf:
-		{
-			auto & Wolf = static_cast<const cWolf &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Wolf.IsBaby());
-
-			Int8 WolfStatus = 0;
-			if (Wolf.IsSitting())
-			{
-				WolfStatus |= 0x1;
-			}
-			if (Wolf.IsAngry())
-			{
-				WolfStatus |= 0x2;
-			}
-			if (Wolf.IsTame())
-			{
-				WolfStatus |= 0x4;
-			}
-			WriteEntityMetadata(a_Pkt, EntityMetadata::TameableAnimalFlags, EntityMetadataType::Byte);
-			a_Pkt.WriteBEInt8(WolfStatus);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::WolfDamageTaken, EntityMetadataType::Float);
-			a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));  // TODO Not use the current health
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::WolfBegging, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Wolf.IsBegging());
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::WolfCollarColour, EntityMetadataType::VarInt);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Wolf.GetCollarColor()));
-			break;
-		}  // case mtWolf
-
-		case mtZombie:
-		{
-			// XXX Zombies were also split into new sublcasses; this doesn't handle that.
-
-			auto & Zombie = static_cast<const cZombie &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::ZombieIsBaby, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(Zombie.IsBaby());
-			break;
-		}  // case mtZombie
-
-		case mtZombiePigman:
-		{
-			auto & ZombiePigman = static_cast<const cZombiePigman &>(a_Mob);
-
-			WriteEntityMetadata(a_Pkt, EntityMetadata::AgeableIsBaby, EntityMetadataType::Boolean);
-			a_Pkt.WriteBool(ZombiePigman.IsBaby());
-			break;
-		}  // case mtZombiePigman
-
-		case mtBlaze:
-		case mtEnderDragon:
-		case mtIronGolem:
-		case mtSnowGolem:
-		case mtSpider:
-		case mtZombieVillager:
-
-		case mtElderGuardian:
-		case mtGuardian:
-		{
-			// TODO: Mobs with extra fields that aren't implemented
-			break;
-		}
-
-		case mtCat:
-
-		case mtCod:
-
-		case mtDolphin:
-
-		case mtDonkey:
-
-		case mtDrowned:
-
-		case mtEvoker:
-
-		case mtIllusioner:
-
-		case mtLlama:
-
-		case mtMule:
-
-		case mtParrot:
-
-		case mtPhantom:
-
-		case mtPolarBear:
-
-		case mtPufferfish:
-
-		case mtSalmon:
-
-		case mtShulker:
-
-		case mtStray:
-
-		case mtSkeletonHorse:
-		case mtZombieHorse:
-
-		case mtTropicalFish:
-
-		case mtTurtle:
-
-		case mtVex:
-
-		case mtVindicator:
-
-		case mtHusk:
-		{
-			// Todo: Mobs not added yet. Grouped ones have the same metadata
-			ASSERT(!"cProtocol_1_15::WriteMobMetadata: received unimplemented type");
-			break;
-		}
-
-		case mtMooshroom:
-		case mtCaveSpider:
-		{
-			// Not mentioned on http://wiki.vg/Entities
-			break;
-		}
-
-		case mtEndermite:
-		case mtGiant:
-		case mtSilverfish:
-		case mtSquid:
-		case mtWitherSkeleton:
-		{
-			// Mobs with no extra fields
-			break;
-		}
-
-		default: UNREACHABLE("cProtocol_1_15::WriteMobMetadata: received mob of invalid type");
-	}  // switch (a_Mob.GetType())
-}
-
-
 
 
 
@@ -1881,7 +1233,7 @@ void cProtocol_1_15::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 
 cProtocol::Version cProtocol_1_15_1::GetProtocolVersion() const
 {
-	return Version::v1_14_1;
+	return Version::v1_15_1;
 }
 
 
@@ -1893,5 +1245,5 @@ cProtocol::Version cProtocol_1_15_1::GetProtocolVersion() const
 
 cProtocol::Version cProtocol_1_15_2::GetProtocolVersion() const
 {
-	return Version::v1_14_2;
+	return Version::v1_15_2;
 }

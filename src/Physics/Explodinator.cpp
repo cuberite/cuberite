@@ -41,121 +41,269 @@ namespace Explodinator
 
 	/** Returns how much of an explosion Destruction Lazor's (tm) intensity the given block attenuates.
 	Values are scaled as 0.3 * (0.3 + Wiki) since some compilers miss the constant folding optimisation.
-	Wiki values are https://minecraft.wiki/w/Explosion#Blast_resistance as of 2021-02-06. */
-	static float GetExplosionAbsorption(const BLOCKTYPE Block)
+	Wiki values are https://minecraft.gamepedia.com/Explosion#Blast_resistance as of 2021-02-06. */
+	static float GetExplosionAbsorption(const BlockState a_Block)
 	{
-		switch (Block)
+		switch (a_Block.Type())
 		{
-			case E_BLOCK_BEDROCK:
-			case E_BLOCK_COMMAND_BLOCK:
-			case E_BLOCK_END_GATEWAY:
-			case E_BLOCK_END_PORTAL:
-			case E_BLOCK_END_PORTAL_FRAME: return 1080000.09f;
-			case E_BLOCK_ANVIL:
-			case E_BLOCK_ENCHANTMENT_TABLE:
-			case E_BLOCK_OBSIDIAN: return 360.09f;
-			case E_BLOCK_ENDER_CHEST: return 180.09f;
-			case E_BLOCK_LAVA:
-			case E_BLOCK_STATIONARY_LAVA:
-			case E_BLOCK_WATER:
-			case E_BLOCK_STATIONARY_WATER: return 30.09f;
-			case E_BLOCK_DRAGON_EGG:
-			case E_BLOCK_END_STONE:
-			case E_BLOCK_END_BRICKS: return 2.79f;
-			case E_BLOCK_STONE:
-			case E_BLOCK_BLOCK_OF_COAL:
-			case E_BLOCK_DIAMOND_BLOCK:
-			case E_BLOCK_EMERALD_BLOCK:
-			case E_BLOCK_GOLD_BLOCK:
-			case E_BLOCK_IRON_BLOCK:
-			case E_BLOCK_BLOCK_OF_REDSTONE:
-			case E_BLOCK_BRICK:
-			case E_BLOCK_BRICK_STAIRS:
-			case E_BLOCK_COBBLESTONE:
-			case E_BLOCK_COBBLESTONE_STAIRS:
-			case E_BLOCK_IRON_BARS:
-			case E_BLOCK_JUKEBOX:
-			case E_BLOCK_MOSSY_COBBLESTONE:
-			case E_BLOCK_NETHER_BRICK:
-			case E_BLOCK_NETHER_BRICK_FENCE:
-			case E_BLOCK_NETHER_BRICK_STAIRS:
-			case E_BLOCK_PRISMARINE_BLOCK:
-			case E_BLOCK_STONE_BRICKS:
-			case E_BLOCK_STONE_BRICK_STAIRS:
-			case E_BLOCK_COBBLESTONE_WALL: return 1.89f;
-			case E_BLOCK_IRON_DOOR:
-			case E_BLOCK_IRON_TRAPDOOR:
-			case E_BLOCK_MOB_SPAWNER: return 1.59f;
-			case E_BLOCK_HOPPER: return 1.53f;
-			case E_BLOCK_TERRACOTTA: return 1.35f;
-			case E_BLOCK_COBWEB: return 1.29f;
-			case E_BLOCK_DISPENSER:
-			case E_BLOCK_DROPPER:
-			case E_BLOCK_FURNACE:
-			case E_BLOCK_OBSERVER: return 1.14f;
-			case E_BLOCK_BEACON:
-			case E_BLOCK_COAL_ORE:
-			case E_BLOCK_COCOA_POD:
-			case E_BLOCK_DIAMOND_ORE:
-			case E_BLOCK_EMERALD_ORE:
-			case E_BLOCK_GOLD_ORE:
-			case E_BLOCK_IRON_ORE:
-			case E_BLOCK_LAPIS_BLOCK:
-			case E_BLOCK_LAPIS_ORE:
-			case E_BLOCK_NETHER_QUARTZ_ORE:
-			case E_BLOCK_PLANKS:
-			case E_BLOCK_REDSTONE_ORE:
-			case E_BLOCK_FENCE:
-			case E_BLOCK_FENCE_GATE:
-			case E_BLOCK_WOODEN_DOOR:
-			case E_BLOCK_WOODEN_SLAB:
-			case E_BLOCK_WOODEN_STAIRS:
-			case E_BLOCK_TRAPDOOR: return 0.99f;
-			case E_BLOCK_CHEST:
-			case E_BLOCK_WORKBENCH:
-			case E_BLOCK_TRAPPED_CHEST: return 0.84f;
-			case E_BLOCK_BONE_BLOCK:
-			case E_BLOCK_CAULDRON:
-			case E_BLOCK_LOG: return 0.69f;  // nIcE
-			case E_BLOCK_CONCRETE: return 0.63f;
-			case E_BLOCK_BOOKCASE: return 0.54f;
-			case E_BLOCK_STANDING_BANNER:
-			case E_BLOCK_WALL_BANNER:
-			case E_BLOCK_JACK_O_LANTERN:
-			case E_BLOCK_MELON:
-			case E_BLOCK_HEAD:
-			case E_BLOCK_NETHER_WART_BLOCK:
-			case E_BLOCK_PUMPKIN:
-			case E_BLOCK_SIGN_POST:
-			case E_BLOCK_WALLSIGN: return 0.39f;
-			case E_BLOCK_QUARTZ_BLOCK:
-			case E_BLOCK_QUARTZ_STAIRS:
-			case E_BLOCK_RED_SANDSTONE:
-			case E_BLOCK_RED_SANDSTONE_STAIRS:
-			case E_BLOCK_SANDSTONE:
-			case E_BLOCK_SANDSTONE_STAIRS:
-			case E_BLOCK_WOOL: return 0.33f;
-			case E_BLOCK_SILVERFISH_EGG: return 0.315f;
-			case E_BLOCK_ACTIVATOR_RAIL:
-			case E_BLOCK_DETECTOR_RAIL:
-			case E_BLOCK_POWERED_RAIL:
-			case E_BLOCK_RAIL: return 0.3f;
-			case E_BLOCK_GRASS_PATH:
-			case E_BLOCK_CLAY:
-			case E_BLOCK_FARMLAND:
-			case E_BLOCK_GRASS:
-			case E_BLOCK_GRAVEL:
-			case E_BLOCK_SPONGE: return 0.27f;
-			case E_BLOCK_BREWING_STAND:
-			case E_BLOCK_STONE_BUTTON:
-			case E_BLOCK_WOODEN_BUTTON:
-			case E_BLOCK_CAKE:
-			case E_BLOCK_CONCRETE_POWDER:
-			case E_BLOCK_DIRT:
-			case E_BLOCK_FROSTED_ICE:
-			case E_BLOCK_HAY_BALE:
-			case E_BLOCK_ICE: return 0.24f;
-			default: return 0.09f;
+			case BlockType::Bedrock:
+			case BlockType::CommandBlock:
+			case BlockType::ChainCommandBlock:
+			case BlockType::RepeatingCommandBlock:
+			case BlockType::EndGateway:
+			case BlockType::EndPortal:
+			case BlockType::EndPortalFrame: return 1080000.09f;
+			case BlockType::Anvil:
+			case BlockType::ChippedAnvil:
+			case BlockType::DamagedAnvil:
+			case BlockType::EnchantingTable:
+			case BlockType::Obsidian: return 360.09f;
+			case BlockType::EnderChest: return 180.09f;
+			case BlockType::Lava:
+			case BlockType::Water: return 30.09f;
+			case BlockType::DragonEgg:
+			case BlockType::EndStone:
+			case BlockType::EndStoneBricks: return 2.79f;
+			case BlockType::Stone:
+			case BlockType::CoalBlock:
+			case BlockType::DiamondBlock:
+			case BlockType::EmeraldBlock:
+			case BlockType::GoldBlock:
+			case BlockType::IronBlock:
+			case BlockType::RedstoneBlock:
+			case BlockType::Bricks:
+			case BlockType::BrickStairs:
+			case BlockType::Cobblestone:
+			case BlockType::CobblestoneStairs:
+			case BlockType::IronBars:
+			case BlockType::Jukebox:
+			case BlockType::MossyCobblestone:
+			case BlockType::NetherBricks:
+			case BlockType::NetherBrickFence:
+			case BlockType::NetherBrickStairs:
+			case BlockType::Prismarine:
+			case BlockType::StoneBricks:
+			case BlockType::StoneBrickStairs:
+			case BlockType::CobblestoneWall: return 1.89f;
+			case BlockType::IronDoor:
+			case BlockType::IronTrapdoor:
+			case BlockType::Spawner: return 1.59f;
+			case BlockType::Hopper: return 1.53f;
+
+			case BlockType::BlackTerracotta:
+			case BlockType::BlueTerracotta:
+			case BlockType::BrownTerracotta:
+			case BlockType::CyanTerracotta:
+			case BlockType::GrayTerracotta:
+			case BlockType::GreenTerracotta:
+			case BlockType::LightBlueTerracotta:
+			case BlockType::LightGrayTerracotta:
+			case BlockType::LimeTerracotta:
+			case BlockType::MagentaTerracotta:
+			case BlockType::OrangeTerracotta:
+			case BlockType::PinkTerracotta:
+			case BlockType::PurpleTerracotta:
+			case BlockType::RedTerracotta:
+			case BlockType::WhiteTerracotta:
+			case BlockType::YellowTerracotta:
+				return 1.35f;
+			case BlockType::Cobweb: return 1.29f;
+			case BlockType::Dispenser:
+			case BlockType::Dropper:
+			case BlockType::Furnace:
+			case BlockType::Observer: return 1.14f;
+			case BlockType::Beacon:
+			case BlockType::CoalOre:
+			case BlockType::Cocoa:
+			case BlockType::DiamondOre:
+			case BlockType::EmeraldOre:
+			case BlockType::GoldOre:
+			case BlockType::NetherGoldOre:
+			case BlockType::IronOre:
+			case BlockType::LapisBlock:
+			case BlockType::LapisOre:
+			case BlockType::NetherQuartzOre:
+			case BlockType::OakPlanks:
+			case BlockType::RedstoneOre:
+			case BlockType::OakFence:
+			case BlockType::OakFenceGate:
+			case BlockType::OakDoor:
+			case BlockType::OakSlab:
+			case BlockType::OakStairs:
+			case BlockType::OakTrapdoor: return 0.99f;
+			case BlockType::Chest:
+			case BlockType::CraftingTable:
+			case BlockType::TrappedChest: return 0.84f;
+			case BlockType::BoneBlock:
+			case BlockType::Cauldron:
+			case BlockType::OakLog: return 0.69f;  // nIcE
+
+			case BlockType::BlackConcrete:
+			case BlockType::BlueConcrete:
+			case BlockType::BrownConcrete:
+			case BlockType::CyanConcrete:
+			case BlockType::GrayConcrete:
+			case BlockType::GreenConcrete:
+			case BlockType::LightBlueConcrete:
+			case BlockType::LightGrayConcrete:
+			case BlockType::LimeConcrete:
+			case BlockType::MagentaConcrete:
+			case BlockType::OrangeConcrete:
+			case BlockType::PinkConcrete:
+			case BlockType::PurpleConcrete:
+			case BlockType::RedConcrete:
+			case BlockType::WhiteConcrete:
+			case BlockType::YellowConcrete:
+				return 0.63f;
+			case BlockType::Bookshelf: return 0.54f;
+
+			case BlockType::BlackBanner:
+			case BlockType::BlueBanner:
+			case BlockType::BrownBanner:
+			case BlockType::CyanBanner:
+			case BlockType::GrayBanner:
+			case BlockType::GreenBanner:
+			case BlockType::LightBlueBanner:
+			case BlockType::LightGrayBanner:
+			case BlockType::LimeBanner:
+			case BlockType::MagentaBanner:
+			case BlockType::OrangeBanner:
+			case BlockType::PinkBanner:
+			case BlockType::PurpleBanner:
+			case BlockType::RedBanner:
+			case BlockType::WhiteBanner:
+			case BlockType::YellowBanner:
+
+			case BlockType::BlackWallBanner:
+			case BlockType::BlueWallBanner:
+			case BlockType::BrownWallBanner:
+			case BlockType::CyanWallBanner:
+			case BlockType::GrayWallBanner:
+			case BlockType::GreenWallBanner:
+			case BlockType::LightBlueWallBanner:
+			case BlockType::LightGrayWallBanner:
+			case BlockType::LimeWallBanner:
+			case BlockType::MagentaWallBanner:
+			case BlockType::OrangeWallBanner:
+			case BlockType::PinkWallBanner:
+			case BlockType::PurpleWallBanner:
+			case BlockType::RedWallBanner:
+			case BlockType::WhiteWallBanner:
+			case BlockType::YellowWallBanner:
+			case BlockType::JackOLantern:
+			case BlockType::Melon:
+
+			case BlockType::CreeperHead:
+			case BlockType::CreeperWallHead:
+			case BlockType::DragonHead:
+			case BlockType::DragonWallHead:
+			case BlockType::PlayerHead:
+			case BlockType::PlayerWallHead:
+			case BlockType::ZombieHead:
+			case BlockType::ZombieWallHead:
+			case BlockType::SkeletonSkull:
+			case BlockType::SkeletonWallSkull:
+			case BlockType::WitherSkeletonSkull:
+			case BlockType::WitherSkeletonWallSkull:
+
+			case BlockType::NetherWartBlock:
+			case BlockType::Pumpkin:
+
+			case BlockType::AcaciaSign:
+			case BlockType::AcaciaWallSign:
+			case BlockType::BirchSign:
+			case BlockType::BirchWallSign:
+			case BlockType::CrimsonSign:
+			case BlockType::CrimsonWallSign:
+			case BlockType::DarkOakSign:
+			case BlockType::DarkOakWallSign:
+			case BlockType::JungleSign:
+			case BlockType::JungleWallSign:
+			case BlockType::OakSign:
+			case BlockType::OakWallSign:
+			case BlockType::SpruceSign:
+			case BlockType::SpruceWallSign:
+			case BlockType::WarpedSign:
+			case BlockType::WarpedWallSign:
+				return 0.39f;
+			case BlockType::QuartzBlock:
+			case BlockType::QuartzStairs:
+			case BlockType::RedSandstone:
+			case BlockType::RedSandstoneStairs:
+			case BlockType::Sandstone:
+			case BlockType::SandstoneStairs:
+
+			case BlockType::BlackWool:
+			case BlockType::BlueWool:
+			case BlockType::BrownWool:
+			case BlockType::CyanWool:
+			case BlockType::GrayWool:
+			case BlockType::GreenWool:
+			case BlockType::LightBlueWool:
+			case BlockType::LightGrayWool:
+			case BlockType::LimeWool:
+			case BlockType::MagentaWool:
+			case BlockType::OrangeWool:
+			case BlockType::PinkWool:
+			case BlockType::PurpleWool:
+			case BlockType::RedWool:
+			case BlockType::WhiteWool:
+			case BlockType::YellowWool:
+				return 0.33f;
+			case BlockType::InfestedChiseledStoneBricks:
+			case BlockType::InfestedCobblestone:
+			case BlockType::InfestedCrackedStoneBricks:
+			case BlockType::InfestedMossyStoneBricks:
+			case BlockType::InfestedStone:
+				return 0.315f;
+			case BlockType::ActivatorRail:
+			case BlockType::DetectorRail:
+			case BlockType::PoweredRail:
+			case BlockType::Rail: return 0.3f;
+			case BlockType::DirtPath:
+			case BlockType::Clay:
+			case BlockType::Farmland:
+			case BlockType::GrassBlock:
+			case BlockType::Gravel:
+			case BlockType::Sponge:
+			case BlockType::WetSponge: return 0.27f;
+			case BlockType::BrewingStand:
+
+			case BlockType::AcaciaButton:
+			case BlockType::BirchButton:
+			case BlockType::CrimsonButton:
+			case BlockType::DarkOakButton:
+			case BlockType::JungleButton:
+			case BlockType::OakButton:
+			case BlockType::PolishedBlackstoneButton:
+			case BlockType::SpruceButton:
+			case BlockType::StoneButton:
+			case BlockType::WarpedButton:
+
+			case BlockType::Cake:
+
+			case BlockType::BlackConcretePowder:
+			case BlockType::BlueConcretePowder:
+			case BlockType::BrownConcretePowder:
+			case BlockType::CyanConcretePowder:
+			case BlockType::GrayConcretePowder:
+			case BlockType::GreenConcretePowder:
+			case BlockType::LightBlueConcretePowder:
+			case BlockType::LightGrayConcretePowder:
+			case BlockType::LimeConcretePowder:
+			case BlockType::MagentaConcretePowder:
+			case BlockType::OrangeConcretePowder:
+			case BlockType::PinkConcretePowder:
+			case BlockType::PurpleConcretePowder:
+			case BlockType::RedConcretePowder:
+			case BlockType::WhiteConcretePowder:
+			case BlockType::YellowConcretePowder:
+
+			case BlockType::Dirt:
+			case BlockType::FrostedIce:
+			case BlockType::HayBlock:
+			case BlockType::Ice: return 0.24f;
+			default: ASSERT("BLOCK MIGHT NOT HAVE RIGHT EXPLOSION ABSORPTION"); return 0.09f;
 		}
 	}
 
@@ -164,9 +312,9 @@ namespace Explodinator
 	{
 		class LineOfSightCallbacks final : public cLineBlockTracer::cCallbacks
 		{
-			virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+			virtual bool OnNextBlock(Vector3i a_BlockPos, BlockState a_Block, eBlockFace a_EntryFace) override
 			{
-				return a_BlockType != E_BLOCK_AIR;
+				return a_Block.Type() != BlockType::Air;
 			}
 		} Callback;
 
@@ -239,36 +387,45 @@ namespace Explodinator
 
 	/** Returns true if block should always drop when exploded.
 	Currently missing conduits from 1.13 */
-	static bool BlockAlwaysDrops(const BLOCKTYPE a_Block)
+	static bool BlockAlwaysDrops(const BlockState a_Block)
 	{
 		if (IsBlockShulkerBox(a_Block))
 		{
 			return true;
 		}
 
-		switch (a_Block)
+		switch (a_Block.Type())
 		{
-			case E_BLOCK_DRAGON_EGG:
-			case E_BLOCK_BEACON:
-			case E_BLOCK_HEAD: return true;
+			case BlockType::DragonEgg:
+			case BlockType::Beacon:
+			case BlockType::CreeperHead:
+			case BlockType::CreeperWallHead:
+			case BlockType::DragonHead:
+			case BlockType::DragonWallHead:
+			case BlockType::PlayerHead:
+			case BlockType::PlayerWallHead:
+			case BlockType::ZombieHead:
+			case BlockType::ZombieWallHead:
+			case BlockType::SkeletonSkull:
+			case BlockType::SkeletonWallSkull:
+			case BlockType::WitherSkeletonSkull:
+			case BlockType::WitherSkeletonWallSkull:
+				return true;
+			default: return false;
 		}
-
-		return false;
 	}
 
 	/** Sets the block at the given position, updating surroundings. */
-	static void SetBlock(cWorld & a_World, cChunk & a_Chunk, const Vector3i a_AbsolutePosition, const Vector3i a_RelativePosition, const BLOCKTYPE a_DestroyedBlock, const BLOCKTYPE a_NewBlock, const cEntity * const a_ExplodingEntity)
+	static void SetBlock(cWorld & a_World, cChunk & a_Chunk, const Vector3i a_AbsolutePosition, const Vector3i a_RelativePosition, const BlockState a_DestroyedBlock, const BlockState a_NewBlock, const cEntity * const a_ExplodingEntity)
 	{
-		const auto DestroyedMeta = a_Chunk.GetMeta(a_RelativePosition);
-
 		// SetBlock wakes up all simulators for the area, so that water and lava flows and sand falls into the blasted holes
 		// It also is responsible for calling cBlockHandler::OnNeighborChanged to pop off blocks that fail CanBeAt
 		// An explicit call to cBlockHandler::OnBroken handles the destruction of multiblock structures
 		// References at (FS #391, GH #4418):
-		a_Chunk.SetBlock(a_RelativePosition, a_NewBlock, 0);
+		a_Chunk.SetBlock(a_RelativePosition, a_NewBlock);
 
 		cChunkInterface Interface(a_World.GetChunkMap());
-		cBlockHandler::For(a_DestroyedBlock).OnBroken(Interface, a_World, a_AbsolutePosition, a_DestroyedBlock, DestroyedMeta, a_ExplodingEntity);
+		cBlockHandler::For(a_DestroyedBlock.Type()).OnBroken(Interface, a_World, a_AbsolutePosition, a_DestroyedBlock, a_ExplodingEntity);
 	}
 
 	/** Work out what should happen when an explosion destroys the given block.
@@ -277,7 +434,7 @@ namespace Explodinator
 	static void DestroyBlock(cChunk & a_Chunk, const Vector3i a_Position, const int a_Power, const bool a_Fiery, const cEntity * const a_ExplodingEntity)
 	{
 		const auto DestroyedBlock = a_Chunk.GetBlock(a_Position);
-		if (DestroyedBlock == E_BLOCK_AIR)
+		if (IsBlockAir(DestroyedBlock))
 		{
 			// There's nothing left for us here, but a barren and empty land
 			// Let's go.
@@ -288,7 +445,7 @@ namespace Explodinator
 		auto & Random = GetRandomProvider();
 		const auto Absolute = cChunkDef::RelativeToAbsolute(a_Position, a_Chunk.GetPos());
 
-		if (DestroyedBlock == E_BLOCK_TNT)  // If the block is TNT we should set it off
+		if (DestroyedBlock == BlockType::Tnt)  // If the block is TNT we should set it off
 		{
 			// Random fuse between 10 to 30 game ticks.
 			const int FuseTime = Random.RandInt(10, 30);
@@ -298,8 +455,7 @@ namespace Explodinator
 		}
 		else if ((a_ExplodingEntity != nullptr) && (a_ExplodingEntity->IsTNT() || BlockAlwaysDrops(DestroyedBlock) || Random.RandBool(1.f / a_Power)))  // For TNT explosions, destroying a block that always drops, or if RandBool, drop pickups
 		{
-			const auto DestroyedMeta = a_Chunk.GetMeta(a_Position);
-			a_Chunk.GetWorld()->SpawnItemPickups(cBlockHandler::For(DestroyedBlock).ConvertToPickups(DestroyedMeta), Absolute);
+			a_Chunk.GetWorld()->SpawnItemPickups(cBlockHandler::For(DestroyedBlock.Type()).ConvertToPickups(DestroyedBlock), Absolute);
 		}
 		else if (a_Fiery && Random.RandBool(1 / 3.0))  // 33% chance of starting fires if it can start fires
 		{
@@ -307,7 +463,7 @@ namespace Explodinator
 			if ((Below.y >= 0) && cBlockInfo::FullyOccupiesVoxel(a_Chunk.GetBlock(Below)))
 			{
 				// Start a fire:
-				SetBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_FIRE, a_ExplodingEntity);
+				SetBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, Block::Fire::Fire(), a_ExplodingEntity);
 				return;
 			}
 		}
@@ -319,14 +475,13 @@ namespace Explodinator
 				((Shrapnel == slGravityAffectedOnly) && cSandSimulator::IsAllowedBlock(DestroyedBlock))
 			)
 			{
-				const auto DestroyedMeta = a_Chunk.GetMeta(a_Position);
-				auto FallingBlock = std::make_unique<cFallingBlock>(Vector3d(0.5, 0, 0.5) + Absolute, DestroyedBlock, DestroyedMeta);
+				auto FallingBlock = std::make_unique<cFallingBlock>(Vector3d(0.5, 0, 0.5) + Absolute, DestroyedBlock);
 				// TODO: correct velocity FallingBlock->SetSpeedY(40);
 				FallingBlock->Initialize(std::move(FallingBlock), World);
 			}
 		}
 
-		SetBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, E_BLOCK_AIR, a_ExplodingEntity);
+		SetBlock(World, a_Chunk, Absolute, a_Position, DestroyedBlock, Block::Air::Air(), a_ExplodingEntity);
 	}
 
 	/** Traces the path taken by one Explosion Lazor (tm) with given direction and intensity, that will destroy blocks until it is exhausted. */

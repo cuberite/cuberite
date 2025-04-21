@@ -1,9 +1,13 @@
 find_package(Threads REQUIRED)
 include_directories(${PROJECT_SOURCE_DIR}/src/)
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/)
+include_directories(${PROJECT_SOURCE_DIR}/lib/mbedtls/include)
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/jsoncpp/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set (SHARED_SRCS
+	${PROJECT_SOURCE_DIR}/src/UUID.cpp
+	${PROJECT_SOURCE_DIR}/src/ByteBuffer.cpp
 	${PROJECT_SOURCE_DIR}/src/BiomeDef.cpp
 	${PROJECT_SOURCE_DIR}/src/BlockArea.cpp
 	${PROJECT_SOURCE_DIR}/src/Cuboid.cpp
@@ -32,9 +36,18 @@ set (SHARED_SRCS
 
 	${PROJECT_SOURCE_DIR}/src/WorldStorage/FastNBT.cpp
 	${PROJECT_SOURCE_DIR}/src/WorldStorage/SchematicFileSerializer.cpp
+
+	${PROJECT_SOURCE_DIR}/src/Registries/BlockStates.cpp  # Need for BlockState
+	${PROJECT_SOURCE_DIR}/src/Registries/BlockItemConverter.cpp
+	${PROJECT_SOURCE_DIR}/src/Protocol/Palettes/Upgrade.cpp
+	${PROJECT_SOURCE_DIR}/src/BlockState.cpp
+	${PROJECT_SOURCE_DIR}/src/WorldStorage/NamespaceSerializer.cpp
+	${PROJECT_SOURCE_DIR}/src/BlockInfo.cpp
 )
 
 set (SHARED_HDRS
+	${PROJECT_SOURCE_DIR}/src/UUID.h
+	${PROJECT_SOURCE_DIR}/src/ByteBuffer.h
 	${PROJECT_SOURCE_DIR}/src/BiomeDef.h
 	${PROJECT_SOURCE_DIR}/src/BlockArea.h
 	${PROJECT_SOURCE_DIR}/src/Cuboid.h
@@ -80,8 +93,19 @@ source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 source_group("Lua files" FILES Test.lua)
 add_executable(LuaThreadStress ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS} Test.lua)
-target_link_libraries(LuaThreadStress fmt::fmt libdeflate lsqlite luaexpat Threads::Threads tolualib)
+target_link_libraries(LuaThreadStress fmt::fmt libdeflate lsqlite luaexpat Threads::Threads tolualib mbedtls)
 add_test(NAME LuaThreadStress-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND LuaThreadStress)
+
+# Necessary for the test to run.
+# Otherwise they crash with the error STATUS_DLL_NOT_FOUND (0xC0000135) because they can't find the lua51.dll
+
+if(WIN32)
+	add_custom_command(
+			TARGET LuaThreadStress  POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy
+			${CMAKE_BINARY_DIR}/Server/lua51.dll # Source
+			${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/) # Destination
+endif()
 
 
 

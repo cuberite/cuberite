@@ -21,7 +21,7 @@ cRabbit::cRabbit(void) :
 
 
 cRabbit::cRabbit(eRabbitType Type, int MoreCarrotTicks) :
-	Super("Rabbit", mtRabbit, "entity.rabbit.hurt", "entity.rabbit.death", "entity.rabbit.ambient", 0.4f, 0.5f),
+	Super("Rabbit", etRabbit, "entity.rabbit.hurt", "entity.rabbit.death", "entity.rabbit.ambient", 0.4f, 0.5f),
 	m_Type(Type),
 	m_MoreCarrotTicks(MoreCarrotTicks)
 {
@@ -43,10 +43,10 @@ void cRabbit::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, IsOnFire() ? E_ITEM_COOKED_RABBIT : E_ITEM_RAW_RABBIT);
-	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_RABBIT_HIDE);
+	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, IsOnFire() ? Item::CookedRabbit : Item::Rabbit);
+	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, Item::RabbitHide);
 	cItems RareDrops;
-	RareDrops.Add(cItem(E_ITEM_RABBITS_FOOT));
+	RareDrops.Add(cItem(Item::RabbitFoot));
 	AddRandomRareDropItem(a_Drops, RareDrops, LootingLevel);
 }
 

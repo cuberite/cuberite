@@ -13,86 +13,79 @@ class cBlockInfo
 public:
 
 	/** How much light do the blocks emit on their own? */
-	static NIBBLETYPE GetLightValue(BLOCKTYPE Block);
+	static LIGHTTYPE GetLightValue(BlockState a_Block);
 
 	/** How much light do the blocks consume? */
-	static NIBBLETYPE GetSpreadLightFalloff(BLOCKTYPE Block);
+	static LIGHTTYPE GetSpreadLightFalloff(BlockState a_Block);
 
 	/** Can a finisher change it? */
-	static bool CanBeTerraformed(BLOCKTYPE Block);
+	static bool CanBeTerraformed(BlockState a_Block);
 
 	/** Does this block fully occupy its voxel - is it a 'full' block? */
-	static bool FullyOccupiesVoxel(BLOCKTYPE Block);
+	static bool FullyOccupiesVoxel(BlockState a_Block);
 
 	/** Does the client pretend the block doesn't exist when clicking?
 	For example, digging a fire will hit the block below the fire, so fire is "clicked through". */
-	static bool IsClickedThrough(BLOCKTYPE a_Block);
+	static bool IsClickedThrough(BlockState a_Block);
 
 	/** Is a block destroyed after a single hit?
 	Warning: IsOneHitDig does not take into account enchantments / status effects / swim state / floating state
 	and therefore may be incorrect. Only use to check if hardness is 0.
 	If you want to check if a player would instantly mine a_Block use cPlayer::CanInstantlyMine(a_Block) */
-	static bool IsOneHitDig(BLOCKTYPE Block);
+	static bool IsOneHitDig(BlockState a_Block);
 
 	/** Can a piston break this block? */
-	static bool IsPistonBreakable(BLOCKTYPE Block);
+	static bool IsPistonBreakable(BlockState a_Block);
 
 	/** Does this block block the passage of rain? */
-	static bool IsRainBlocker(BLOCKTYPE Block);
+	static bool IsRainBlocker(BlockState a_Block);
 
 	/** Does this block disperse sky light? (only relevant for transparent blocks) */
-	static bool IsSkylightDispersant(BLOCKTYPE Block);
+	static bool IsSkylightDispersant(BlockState a_Block);
 
-	static bool IsSnowable(BLOCKTYPE Block);
+	static bool IsSnowable(BlockState a_Block);
 
 	/** Is this block solid (player cannot walk through)? */
-	static bool IsSolid(BLOCKTYPE Block);
+	static bool IsSolid(BlockState a_Block);
 
-	/** Is a block transparent? (https://minecraft.wiki/w/Opacity) */
-	static bool IsTransparent(BLOCKTYPE Block);
+	/** Is a block transparent? (https://minecraft.gamepedia.com/Opacity) */
+	static bool IsTransparent(BlockState a_Block);
 
 	/** Can a spectator interact with this block? */
-	static bool IsUseableBySpectator(BLOCKTYPE Block);
+	static bool IsUseableBySpectator(BlockState a_Block);
 
 	/** Block's height. */
-	static float GetBlockHeight(BLOCKTYPE Block);
+	static float GetBlockHeight(BlockState a_Block);
 
 	/** Block's hardness. The greater the value the longer the player needs to break the block. */
-	static float GetHardness(BLOCKTYPE Block);
+	static float GetHardness(BlockState a_Block);
 };
 // tolua_end
 
+bool IsBlockAir(BlockState a_Block);
 
+bool IsBlockAnvil(BlockState a_Block);
 
+bool IsBlockIce(BlockState a_Block);
 
-bool IsBlockWater(BLOCKTYPE a_BlockType);
+bool IsBlockLiquid(BlockState a_Block);
 
-bool IsBlockIce(BLOCKTYPE a_BlockType);
+bool IsBlockMaterialDirt(BlockState a_Block);
 
-bool IsBlockWaterOrIce(BLOCKTYPE a_BlockType);
+bool IsBlockMaterialGourd(BlockState a_Block);
 
-bool IsBlockLava(BLOCKTYPE a_BlockType);
+bool IsBlockMaterialIron(BlockState a_Block);
 
-bool IsBlockLiquid(BLOCKTYPE a_BlockType);
+bool IsBlockMaterialPlants(BlockState a_Block);
 
-bool IsBlockRail(BLOCKTYPE a_BlockType);
+bool IsBlockMaterialRock(BlockState a_Block);
 
-bool IsBlockTypeOfDirt(BLOCKTYPE a_BlockType);
+bool IsBlockMaterialVine(BlockState a_Block);
 
-bool IsBlockFence(BLOCKTYPE a_BlockType);
+bool IsBlockMaterialWood(BlockState a_Block);
 
-bool IsBlockShulkerBox(BLOCKTYPE a_BlockType);
+bool IsBlockMobHead(BlockState a_Block);
 
-bool IsBlockMaterialWood(BLOCKTYPE a_BlockType);
+bool IsBlockShulkerBox(BlockState a_Block);
 
-bool IsBlockMaterialPlants(BLOCKTYPE a_BlockType);
-
-bool IsBlockMaterialVine(BLOCKTYPE a_BlockType);
-
-bool IsBlockMaterialIron(BLOCKTYPE a_BlockType);
-
-bool IsBlockMaterialLeaves(BLOCKTYPE a_BlockType);
-
-bool IsBlockMaterialGourd(BLOCKTYPE a_BlockType);
-
-bool IsBlockMaterialRock(BLOCKTYPE a_BlockType);
+bool IsBlockWaterOrIce(BlockState a_Block);

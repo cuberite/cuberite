@@ -13,7 +13,7 @@
 
 
 cWitherSkullEntity::cWitherSkullEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
-	Super(pkWitherSkull, a_Creator, a_Pos, 0.3125f, 0.3125f)
+	Super(etWitherSkull, a_Creator, a_Pos, 0.3125f, 0.3125f)
 {
 	SetSpeed(a_Speed);
 	SetGravity(0);

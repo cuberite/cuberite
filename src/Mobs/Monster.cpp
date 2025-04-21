@@ -22,7 +22,8 @@
 
 #include "PathFinder.h"
 #include "../Entities/LeashKnot.h"
-
+#include "../Protocol/Palettes/Upgrade.h"
+#include "../Blocks/BlockLeaves.h"
 
 
 /** Map for eType <-> string
@@ -32,47 +33,48 @@ m_VanillaName is the name that vanilla use for this mob.
 */
 static const struct
 {
-	eMonsterType m_Type;
+	eEntityType m_Type;
 	const char * m_lcName;
 	const char * m_VanillaName;
 	const char * m_VanillaNameNBT;
 } g_MobTypeNames[] =
 {
-	{mtBat,            "bat",            "Bat",            "bat"},
-	{mtBlaze,          "blaze",          "Blaze",          "blaze"},
-	{mtCaveSpider,     "cavespider",     "CaveSpider",     "cave_spider"},
-	{mtChicken,        "chicken",        "Chicken",        "chicken"},
-	{mtCow,            "cow",            "Cow",            "cow"},
-	{mtCreeper,        "creeper",        "Creeper",        "creeper"},
-	{mtEnderman,       "enderman",       "Enderman",       "enderman"},
-	{mtEndermite,      "endermite",      "Endermite",      "endermite"},
-	{mtEnderDragon,    "enderdragon",    "EnderDragon",    "ender_dragon"},
-	{mtGhast,          "ghast",          "Ghast",          "ghast"},
-	{mtGiant,          "giant",          "Giant",          "giant"},
-	{mtGuardian,       "guardian",       "Guardian",       "guardian"},
-	{mtHorse,          "horse",          "EntityHorse",    "horse"},
-	{mtIronGolem,      "irongolem",      "VillagerGolem",  "iron_golem"},
-	{mtMagmaCube,      "magmacube",      "LavaSlime",      "magma_cube"},
-	{mtMooshroom,      "mooshroom",      "MushroomCow",    "mooshroom"},
-	{mtOcelot,         "ocelot",         "Ozelot",         "ocelot"},
-	{mtPig,            "pig",            "Pig",            "pig"},
-	{mtRabbit,         "rabbit",         "Rabbit",         "rabbit"},
-	{mtSheep,          "sheep",          "Sheep",          "sheep"},
-	{mtSilverfish,     "silverfish",     "Silverfish",     "silverfish"},
-	{mtSkeleton,       "skeleton",       "Skeleton",       "skeleton"},
-	{mtSlime,          "slime",          "Slime",          "slime"},
-	{mtSnowGolem,      "snowgolem",      "SnowMan",        "snow_golem"},
-	{mtSpider,         "spider",         "Spider",         "spider"},
-	{mtSquid,          "squid",          "Squid",          "squid"},
-	{mtVillager,       "villager",       "Villager",       "villager"},
-	{mtWitch,          "witch",          "Witch",          "witch"},
-	{mtWither,         "wither",         "WitherBoss",     "wither"},
-	{mtWitherSkeleton, "witherskeleton", "WitherSkeleton", "wither_skeleton"},
-	{mtWolf,           "wolf",           "Wolf",           "wolf"},
-	{mtZombie,         "zombie",         "Zombie",         "zombie"},
-	{mtZombiePigman,   "zombiepigman",   "PigZombie",      "zombie_pigman"},
-	{mtZombieVillager, "zombievillager", "ZombieVillager", "zombie_villager"},
-	{mtBee,			   "bee",			 "Bee",			   "bee"}};
+	{etBat,            "bat",            "Bat",            "bat"},
+	{etBlaze,          "blaze",          "Blaze",          "blaze"},
+	{etCaveSpider,     "cavespider",     "CaveSpider",     "cave_spider"},
+	{etChicken,        "chicken",        "Chicken",        "chicken"},
+	{etCow,            "cow",            "Cow",            "cow"},
+	{etCreeper,        "creeper",        "Creeper",        "creeper"},
+	{etEnderman,       "enderman",       "Enderman",       "enderman"},
+	{etEndermite,      "endermite",      "Endermite",      "endermite"},
+	{etEnderDragon,    "enderdragon",    "EnderDragon",    "ender_dragon"},
+	{etGhast,          "ghast",          "Ghast",          "ghast"},
+	{etGiant,          "giant",          "Giant",          "giant"},
+	{etGuardian,       "guardian",       "Guardian",       "guardian"},
+	{etHorse,          "horse",          "EntityHorse",    "horse"},
+	{etIronGolem,      "irongolem",      "VillagerGolem",  "iron_golem"},
+	{etMagmaCube,      "magmacube",      "LavaSlime",      "magma_cube"},
+	{etMooshroom,      "mooshroom",      "MushroomCow",    "mooshroom"},
+	{etOcelot,         "ocelot",         "Ozelot",         "ocelot"},
+	{etPig,            "pig",            "Pig",            "pig"},
+	{etRabbit,         "rabbit",         "Rabbit",         "rabbit"},
+	{etSheep,          "sheep",          "Sheep",          "sheep"},
+	{etSilverfish,     "silverfish",     "Silverfish",     "silverfish"},
+	{etSkeleton,       "skeleton",       "Skeleton",       "skeleton"},
+	{etSlime,          "slime",          "Slime",          "slime"},
+	{etSnowGolem,      "snowgolem",      "SnowMan",        "snow_golem"},
+	{etSpider,         "spider",         "Spider",         "spider"},
+	{etSquid,          "squid",          "Squid",          "squid"},
+	{etVillager,       "villager",       "Villager",       "villager"},
+	{etWitch,          "witch",          "Witch",          "witch"},
+	{etWither,         "wither",         "WitherBoss",     "wither"},
+	{etWitherSkeleton, "witherskeleton", "WitherSkeleton", "wither_skeleton"},
+	{etWolf,           "wolf",           "Wolf",           "wolf"},
+	{etZombie,         "zombie",         "Zombie",         "zombie"},
+	{etZombifiedPiglin,   "zombiepigman",   "PigZombie",      "zombie_pigman"},  // TODO: fix name
+	{etZombieVillager, "zombievillager", "ZombieVillager", "zombie_villager"},
+	{etBee,			   "bee",			 "Bee",			   "bee"},
+	{etParrot,         "parrot",         "Parrot",         "parrot"}};
 
 
 
@@ -81,8 +83,8 @@ static const struct
 ////////////////////////////////////////////////////////////////////////////////
 // cMonster:
 
-cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height)
-	: Super(etMonster, a_Width, a_Height)
+cMonster::cMonster(const AString & a_ConfigName, eEntityType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height)
+	: Super(a_MobType, a_Width, a_Height)
 	, m_EMState(IDLE)
 	, m_EMPersonality(AGGRESSIVE)
 	, m_PathFinder(a_Width, a_Height)
@@ -90,7 +92,6 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_JumpCoolDown(0)
 	, m_IdleInterval(0)
 	, m_DestroyTimer(0)
-	, m_MobType(a_MobType)
 	, m_CustomName()
 	, m_CustomNameAlwaysVisible(false)
 	, m_SoundHurt(a_SoundHurt)
@@ -307,7 +308,7 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	HandleDaylightBurning(*Chunk, WouldBurnAt(GetPosition(), *Chunk));
 
 	bool a_IsFollowingPath = false;
-	if (m_PathfinderActivated && (GetMobType() != mtGhast))  // Pathfinder is currently disabled for ghasts, which have their own flying mechanism
+	if (m_PathfinderActivated && (GetEntityType() != etGhast))  // Pathfinder is currently disabled for ghasts, which have their own flying mechanism
 	{
 		if (ReachedFinalDestination() || (m_LeashToPos != nullptr))
 		{
@@ -619,69 +620,69 @@ void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 
 	if (IsTame())
 	{
-		if ((m_MobType == mtWolf) || (m_MobType == mtOcelot) || (m_MobType == mtCat) || (m_MobType == mtParrot))
+		if ((m_EntityType == etWolf) || (m_EntityType == etOcelot) || (m_EntityType == etCat) || (m_EntityType == etParrot))
 		{
 			BroadcastDeathMessage(a_TDI);
 		}
 	}
 
 	int Reward;
-	switch (m_MobType)
+	switch (m_EntityType)
 	{
 		// Animals
-		case mtChicken:
-		case mtCow:
-		case mtHorse:
-		case mtPig:
-		case mtRabbit:
-		case mtSheep:
-		case mtSquid:
-		case mtMooshroom:
-		case mtOcelot:
-		case mtWolf:
+		case etChicken:
+		case etCow:
+		case etHorse:
+		case etPig:
+		case etRabbit:
+		case etSheep:
+		case etSquid:
+		case etMooshroom:
+		case etOcelot:
+		case etWolf:
 		{
 			Reward = GetRandomProvider().RandInt(1, 3);
 			break;
 		}
 
 		// Monsters
-		case mtCaveSpider:
-		case mtCreeper:
-		case mtEnderman:
-		case mtGhast:
-		case mtGuardian:
-		case mtSilverfish:
-		case mtSkeleton:
-		case mtSpider:
-		case mtWitch:
-		case mtWitherSkeleton:
-		case mtZombie:
-		case mtZombiePigman:
-		case mtZombieVillager:
-		case mtSlime:
-		case mtMagmaCube:
+		case etCaveSpider:
+		case etCreeper:
+		case etEnderman:
+		case etGhast:
+		case etGuardian:
+		case etSilverfish:
+		case etSkeleton:
+		case etSpider:
+		case etWitch:
+		case etWitherSkeleton:
+		case etZombie:
+		// case etZombiePigman:
+		case etZombieVillager:
+		case etSlime:
+		case etMagmaCube:
 		{
 			Reward = GetRandomProvider().RandInt(6, 8);
 			break;
 		}
-		case mtEndermite:
+		case etEndermite:
 		{
 			Reward = 3;
 			break;
 		}
-		case mtBlaze:
+		case etBlaze:
 		{
 			Reward = 10;
 			break;
 		}
 
 		// Bosses
-		case mtEnderDragon:
+		case etEnderDragon:
 		{
 			Reward = 12000;
 			break;
 		}
-		case mtWither:
+		case etWither:
 		{
 			Reward = 50;
 			break;
@@ -709,9 +710,9 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 	Super::OnRightClicked(a_Player);
 
 	const cItem & EquippedItem = a_Player.GetEquippedItem();
-	if ((EquippedItem.m_ItemType == E_ITEM_NAME_TAG) && !EquippedItem.m_CustomName.empty())
+	if ((EquippedItem.m_ItemType == Item::NameTag) && !EquippedItem.IsCustomNameEmpty())
 	{
-		SetCustomName(EquippedItem.m_CustomName);
+		SetCustomName(EquippedItem.GetComponentOrDefault<DataComponents::CustomNameComponent>().Name.ExtractText());
 		if (!a_Player.IsGameModeCreative())
 		{
 			a_Player.GetInventory().RemoveOneEquippedItem();
@@ -729,7 +730,7 @@ void cMonster::OnRightClicked(cPlayer & a_Player)
 		// Mob is already leashed but client anticipates the server action and draws a leash link, so we need to send current leash to cancel it
 		m_World->BroadcastLeashEntity(*this, *this->GetLeashedTo());
 	}
-	else if (CanBeLeashed() && (EquippedItem.m_ItemType == E_ITEM_LEASH))
+	else if (CanBeLeashed() && (EquippedItem.m_ItemType == Item::Lead))
 	{
 		if (!a_Player.IsGameModeCreative())
 		{
@@ -890,15 +891,13 @@ void cMonster::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 				return;
 			}
 
-			BLOCKTYPE BlockType;
-			NIBBLETYPE BlockMeta;
 			int RelX = static_cast<int>(Destination.x) - Chunk->GetPosX() * cChunkDef::Width;
 			int RelZ = static_cast<int>(Destination.z) - Chunk->GetPosZ() * cChunkDef::Width;
 			int YBelowUs = static_cast<int>(Destination.y) - 1;
 			if (YBelowUs >= 0)
 			{
-				Chunk->GetBlockTypeMeta(RelX, YBelowUs, RelZ, BlockType, BlockMeta);
-				if (BlockType != E_BLOCK_STATIONARY_WATER)  // Idle mobs shouldn't enter water on purpose
+				auto BlockToCheck = Chunk->GetBlock(RelX, YBelowUs, RelZ);
+				if ((BlockToCheck.Type() != BlockType::Water) || (Block::Water::Level(BlockToCheck) != 0))  // Idle mobs shouldn't enter water on purpose
 				{
 					MoveToPosition(Destination);
 				}
@@ -1013,7 +1012,7 @@ bool cMonster::IsUndead(void)
 
 
 
-AString cMonster::MobTypeToString(eMonsterType a_MobType)
+AString cMonster::MobTypeToString(eEntityType a_MobType)
 {
 	// Mob types aren't sorted, so we need to search linearly:
 	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
@@ -1032,7 +1031,7 @@ AString cMonster::MobTypeToString(eMonsterType a_MobType)
 
 
 
-AString cMonster::MobTypeToVanillaName(eMonsterType a_MobType)
+AString cMonster::MobTypeToVanillaName(eEntityType a_MobType)
 {
 	// Mob types aren't sorted, so we need to search linearly:
 	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
@@ -1051,7 +1050,7 @@ AString cMonster::MobTypeToVanillaName(eMonsterType a_MobType)
 
 
 
-AString cMonster::MobTypeToVanillaNBT(eMonsterType a_MobType)
+AString cMonster::MobTypeToVanillaNBT(eEntityType a_MobType)
 {
 	// Mob types aren't sorted, so we need to search linearly:
 	for (size_t i = 0; i < ARRAYCOUNT(g_MobTypeNames); i++)
@@ -1070,7 +1069,7 @@ AString cMonster::MobTypeToVanillaNBT(eMonsterType a_MobType)
 
 
 
-eMonsterType cMonster::StringToMobType(const AString & a_Name)
+eEntityType cMonster::StringToMobType(const AString & a_Name)
 {
 	AString lcName = StrToLower(a_Name);
 
@@ -1102,89 +1101,97 @@ eMonsterType cMonster::StringToMobType(const AString & a_Name)
 	}
 
 	// Not found:
-	return mtInvalidType;
+	return etGiant;
 }
 
 
 
 
 
-cMonster::eFamily cMonster::FamilyFromType(eMonsterType a_Type)
+cMonster::eFamily cMonster::FamilyFromType(eEntityType a_Type)
 {
-	// Passive-agressive mobs are counted in mob spawning code as passive
+	// Passive-aggressive mobs are counted in mob spawning code as passive
+
+	/*
+	if (!IsMob())
+	{
+		return mfNoSpawn;
+	}
+	*/
 
 	switch (a_Type)
 	{
-		case mtBat:             return mfAmbient;
-		case mtBlaze:           return mfHostile;
-		case mtCat:             return mfPassive;
-		case mtCaveSpider:      return mfHostile;
-		case mtChicken:         return mfPassive;
-		case mtCod:             return mfWater;
-		case mtCow:             return mfPassive;
-		case mtCreeper:         return mfHostile;
-		case mtDolphin:         return mfWater;
-		case mtDonkey:          return mfPassive;
-		case mtDrowned:         return mfHostile;
-		case mtElderGuardian:   return mfHostile;
-		case mtEnderDragon:     return mfNoSpawn;
-		case mtEnderman:        return mfHostile;
-		case mtEndermite:       return mfHostile;
-		case mtEvoker:          return mfHostile;
-		case mtFox:             return mfPassive;
-		case mtGhast:           return mfHostile;
-		case mtGiant:           return mfNoSpawn;
-		case mtGuardian:        return mfWater;  // Just because they have special spawning conditions. TODO: If Watertemples have been added, this needs to be edited!
-		case mtHoglin:          return mfHostile;
-		case mtHorse:           return mfPassive;
-		case mtHusk:            return mfHostile;
-		case mtIllusioner:      return mfHostile;
-		case mtIronGolem:       return mfPassive;
-		case mtLlama:           return mfPassive;
-		case mtMagmaCube:       return mfHostile;
-		case mtMooshroom:       return mfPassive;
-		case mtMule:            return mfPassive;
-		case mtOcelot:          return mfPassive;
-		case mtPanda:           return mfPassive;
-		case mtParrot:          return mfPassive;
-		case mtPhantom:         return mfHostile;
-		case mtPig:             return mfPassive;
-		case mtPiglin:          return mfHostile;
-		case mtPiglinBrute:     return mfHostile;
-		case mtPillager:        return mfHostile;
-		case mtPolarBear:       return mfPassive;
-		case mtPufferfish:      return mfWater;
-		case mtRabbit:          return mfPassive;
-		case mtRavager:         return mfHostile;
-		case mtSalmon:          return mfWater;
-		case mtSheep:           return mfPassive;
-		case mtShulker:         return mfHostile;
-		case mtSilverfish:      return mfHostile;
-		case mtSkeleton:        return mfHostile;
-		case mtSkeletonHorse:   return mfPassive;
-		case mtSlime:           return mfHostile;
-		case mtSnowGolem:       return mfNoSpawn;
-		case mtSpider:          return mfHostile;
-		case mtSquid:           return mfWater;
-		case mtStray:           return mfHostile;
-		case mtStrider:         return mfHostile;
-		case mtTraderLlama:     return mfPassive;
-		case mtTropicalFish:    return mfWater;
-		case mtTurtle:          return mfWater;  // I'm not quite sure
-		case mtVex:             return mfHostile;
-		case mtVindicator:      return mfHostile;
-		case mtVillager:        return mfPassive;
-		case mtWanderingTrader: return mfPassive;
-		case mtWitch:           return mfHostile;
-		case mtWither:          return mfNoSpawn;
-		case mtWitherSkeleton:  return mfHostile;
-		case mtWolf:            return mfPassive;
-		case mtZoglin:          return mfHostile;
-		case mtZombie:          return mfHostile;
-		case mtZombieHorse:     return mfPassive;
-		case mtZombiePigman:    return mfHostile;
-		case mtZombieVillager:  return mfHostile;
-		case mtInvalidType:     break;
+		case etBat:             return mfAmbient;
+		case etBlaze:           return mfHostile;
+		case etCat:             return mfPassive;
+		case etCaveSpider:      return mfHostile;
+		case etChicken:         return mfPassive;
+		case etCod:             return mfWater;
+		case etCow:             return mfPassive;
+		case etCreeper:         return mfHostile;
+		case etDolphin:         return mfWater;
+		case etDonkey:          return mfPassive;
+		case etDrowned:         return mfHostile;
+		case etElderGuardian:   return mfHostile;
+		case etEnderDragon:     return mfNoSpawn;
+		case etEnderman:        return mfHostile;
+		case etEndermite:       return mfHostile;
+		case etEvoker:          return mfHostile;
+		case etFox:             return mfPassive;
+		case etGhast:           return mfHostile;
+		case etGiant:           return mfNoSpawn;
+		case etGuardian:        return mfWater;  // Just because they have special spawning conditions. TODO: If Watertemples have been added, this needs to be edited!
+		case etHoglin:          return mfHostile;
+		case etHorse:           return mfPassive;
+		case etHusk:            return mfHostile;
+		case etIllusioner:      return mfHostile;
+		case etIronGolem:       return mfPassive;
+		case etLlama:           return mfPassive;
+		case etMagmaCube:       return mfHostile;
+		case etMooshroom:       return mfPassive;
+		case etMule:            return mfPassive;
+		case etOcelot:          return mfPassive;
+		case etPanda:           return mfPassive;
+		case etParrot:          return mfPassive;
+		case etPhantom:         return mfHostile;
+		case etPig:             return mfPassive;
+		case etPiglin:          return mfHostile;
+		case etPiglinBrute:     return mfHostile;
+		case etPillager:        return mfHostile;
+		case etPolarBear:       return mfPassive;
+		case etPufferfish:      return mfWater;
+		case etRabbit:          return mfPassive;
+		case etRavager:         return mfHostile;
+		case etSalmon:          return mfWater;
+		case etSheep:           return mfPassive;
+		case etShulker:         return mfHostile;
+		case etSilverfish:      return mfHostile;
+		case etSkeleton:        return mfHostile;
+		case etSkeletonHorse:   return mfPassive;
+		case etSlime:           return mfHostile;
+		case etSnowGolem:       return mfNoSpawn;
+		case etSpider:          return mfHostile;
+		case etSquid:           return mfWater;
+		case etStray:           return mfHostile;
+		case etStrider:         return mfHostile;
+		case etTraderLlama:     return mfPassive;
+		case etTropicalFish:    return mfWater;
+		case etTurtle:          return mfWater;  // I'm not quite sure
+		case etVex:             return mfHostile;
+		case etVindicator:      return mfHostile;
+		case etVillager:        return mfPassive;
+		case etWanderingTrader: return mfPassive;
+		case etWitch:           return mfHostile;
+		case etWither:          return mfNoSpawn;
+		case etWitherSkeleton:  return mfHostile;
+		case etWolf:            return mfPassive;
+		case etZoglin:          return mfHostile;
+		case etZombie:          return mfHostile;
+		case etZombieHorse:     return mfPassive;
+		case etZombifiedPiglin: return mfHostile;
+		case etZombieVillager:  return mfHostile;
+		case etBee:             return mfPassive;
+		case etInvalid:     break;
 	}
 	UNREACHABLE("Unhandled mob type");
 }
@@ -1259,23 +1266,23 @@ cPawn * cMonster::GetTarget()
 
 
 
-std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
+std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eEntityType a_MobType)
 {
 	auto & Random = GetRandomProvider();
 
 	// Create the mob entity
 	switch (a_MobType)
 	{
-		case mtMagmaCube:
+		case etMagmaCube:
 		{
 			return std::make_unique<cMagmaCube>(1 << Random.RandInt(2));  // Size 1, 2 or 4
 		}
-		case mtSlime:
+		case etSlime:
 		{
 			return std::make_unique<cSlime>(1 << Random.RandInt(2));  // Size 1, 2 or 4
 		}
-		case mtVillager: return std::make_unique<cVillager>(cVillager::GetRandomProfession());
-		case mtHorse:
+		case etVillager: return std::make_unique<cVillager>(cVillager::GetRandomProfession());
+		case etHorse:
 		{
 			// Horses take a type (species), a colour, and a style (dots, stripes, etc.)
 			int HorseType = Random.RandInt(7);
@@ -1291,39 +1298,40 @@ std::unique_ptr<cMonster> cMonster::NewMonsterFromType(eMonsterType a_MobType)
 
 			return std::make_unique<cHorse>(HorseType, HorseColor, HorseStyle, HorseTameTimes);
 		}
-		case mtZombieVillager:
+		case etZombieVillager:
 		{
 			return std::make_unique<cZombieVillager>(cVillager::GetRandomProfession());
 		}
-		case mtBat:            return std::make_unique<cBat>();
-		case mtBlaze:          return std::make_unique<cBlaze>();
-		case mtCaveSpider:     return std::make_unique<cCaveSpider>();
-		case mtChicken:        return std::make_unique<cChicken>();
-		case mtCow:            return std::make_unique<cCow>();
-		case mtCreeper:        return std::make_unique<cCreeper>();
-		case mtEnderDragon:    return std::make_unique<cEnderDragon>();
-		case mtEndermite:      return std::make_unique<cEndermite>();
-		case mtEnderman:       return std::make_unique<cEnderman>();
-		case mtGhast:          return std::make_unique<cGhast>();
-		case mtGiant:          return std::make_unique<cGiant>();
-		case mtGuardian:       return std::make_unique<cGuardian>();
-		case mtIronGolem:      return std::make_unique<cIronGolem>();
-		case mtMooshroom:      return std::make_unique<cMooshroom>();
-		case mtOcelot:         return std::make_unique<cOcelot>();
-		case mtPig:            return std::make_unique<cPig>();
-		case mtRabbit:         return std::make_unique<cRabbit>();
-		case mtSheep:          return std::make_unique<cSheep>();
-		case mtSilverfish:     return std::make_unique<cSilverfish>();
-		case mtSkeleton:       return std::make_unique<cSkeleton>();
-		case mtSnowGolem:      return std::make_unique<cSnowGolem>();
-		case mtSpider:         return std::make_unique<cSpider>();
-		case mtSquid:          return std::make_unique<cSquid>();
-		case mtWitch:          return std::make_unique<cWitch>();
-		case mtWither:         return std::make_unique<cWither>();
-		case mtWitherSkeleton: return std::make_unique<cWitherSkeleton>();
-		case mtWolf:           return std::make_unique<cWolf>();
-		case mtZombie:         return std::make_unique<cZombie>();
-		case mtZombiePigman:   return std::make_unique<cZombiePigman>();
+		case etBat:            return std::make_unique<cBat>();
+		case etBlaze:          return std::make_unique<cBlaze>();
+		case etCaveSpider:     return std::make_unique<cCaveSpider>();
+		case etChicken:        return std::make_unique<cChicken>();
+		case etCow:            return std::make_unique<cCow>();
+		case etCreeper:        return std::make_unique<cCreeper>();
+		case etEnderDragon:    return std::make_unique<cEnderDragon>();
+		case etEndermite:      return std::make_unique<cEndermite>();
+		case etEnderman:       return std::make_unique<cEnderman>();
+		case etGhast:          return std::make_unique<cGhast>();
+		case etGiant:          return std::make_unique<cGiant>();
+		case etGuardian:       return std::make_unique<cGuardian>();
+		case etIronGolem:      return std::make_unique<cIronGolem>();
+		case etMooshroom:      return std::make_unique<cMooshroom>();
+		case etOcelot:         return std::make_unique<cOcelot>();
+		case etPig:            return std::make_unique<cPig>();
+		case etRabbit:         return std::make_unique<cRabbit>();
+		case etSheep:          return std::make_unique<cSheep>();
+		case etSilverfish:     return std::make_unique<cSilverfish>();
+		case etSkeleton:       return std::make_unique<cSkeleton>();
+		case etSnowGolem:      return std::make_unique<cSnowGolem>();
+		case etSpider:         return std::make_unique<cSpider>();
+		case etSquid:          return std::make_unique<cSquid>();
+		case etWitch:          return std::make_unique<cWitch>();
+		case etWither:         return std::make_unique<cWither>();
+		case etWitherSkeleton: return std::make_unique<cWitherSkeleton>();
+		case etWolf:           return std::make_unique<cWolf>();
+		case etZombie:         return std::make_unique<cZombie>();
+		case etZombifiedPiglin:return std::make_unique<cZombiePigman>();
+		case etBee:			   return std::make_unique<cBee>();
 		default:
 		{
 			ASSERT(!"Unhandled mob type whilst trying to spawn mob!");
@@ -1377,7 +1385,7 @@ void cMonster::LoveTick(void)
 		{
 			// Mating finished. Spawn baby
 			Vector3f Pos = (GetPosition() + m_LovePartner->GetPosition()) * 0.5;
-			UInt32 BabyID = m_World->SpawnMob(Pos.x, Pos.y, Pos.z, GetMobType(), true);
+			UInt32 BabyID = m_World->SpawnMob(Pos.x, Pos.y, Pos.z, GetEntityType(), true);
 
 			cMonster * Baby = nullptr;
 
@@ -1397,7 +1405,7 @@ void cMonster::LoveTick(void)
 			m_World->DoWithPlayerByUUID(m_Feeder, [&] (cPlayer & a_Player)
 			{
 				a_Player.GetStatistics().Custom[CustomStatistic::AnimalsBred]++;
-				if (GetMobType() == eMonsterType::mtCow)
+				if (GetEntityType() == eEntityType::etCow)
 				{
 					a_Player.AwardAchievement(CustomStatistic::AchBreedCow);
 				}
@@ -1428,16 +1436,16 @@ void cMonster::LoveTick(void)
 		}
 	}
 
-	// If we are in love mode but we have no partner, search for a partner neabry
+	// If we are in love mode, but we have no partner, search for a partner nearby
 	if (m_LoveTimer > 0)
 	{
 		if (m_LovePartner == nullptr)
 		{
-			m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8), [=](cEntity & a_Entity)
+			m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8), [this](cEntity & a_Entity)
 			{
 				// If the entity is not a monster, don't breed with it
 				// Also, do not self-breed
-				if ((a_Entity.GetEntityType() != etMonster) || (&a_Entity == this))
+				if ((!a_Entity.IsMob()) || (&a_Entity == this))
 				{
 					return false;
 				}
@@ -1446,7 +1454,7 @@ void cMonster::LoveTick(void)
 				auto & PotentialPartner = static_cast<cMonster &>(a_Entity);
 
 				// If the potential partner is not of the same species, don't breed with it
-				if (PotentialPartner.GetMobType() != Me.GetMobType())
+				if (PotentialPartner.GetEntityType() != Me.GetEntityType())
 				{
 					return false;
 				}
@@ -1491,7 +1499,7 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 	{
 		cItems Items;
 		GetBreedingItems(Items);
-		if (Items.ContainsType(EquippedItem.m_ItemType))
+		if (Items.ContainsType(EquippedItem))
 		{
 			if (!a_Player.IsGameModeCreative())
 			{
@@ -1502,12 +1510,12 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 		}
 	}
 	// If a player holding my spawn egg right-clicked me, spawn a new baby
-	if (EquippedItem.m_ItemType == E_ITEM_SPAWN_EGG)
+	if (cItemSpawnEggHandler::IsSpawnEgg(EquippedItem))
 	{
-		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(EquippedItem.m_ItemDamage);
+		eEntityType MonsterType = cItemSpawnEggHandler::ItemToMonsterType(EquippedItem);
 		if (
-			(MonsterType == m_MobType) &&
-			(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_MobType, true) != cEntity::INVALID_ID)  // Spawning succeeded
+			(MonsterType == m_EntityType) &&
+			(m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), m_EntityType, true) != cEntity::INVALID_ID)  // Spawning succeeded
 			)
 		{
 			if (!a_Player.IsGameModeCreative())
@@ -1525,18 +1533,18 @@ void cMonster::RightClickFeed(cPlayer & a_Player)
 
 
 
-void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth)
+void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, Item a_Item)
 {
 	auto Count = GetRandomProvider().RandInt(a_Min, a_Max);
 	auto MaxStackSize = static_cast<unsigned int>(cItem(a_Item).GetMaxStackSize());
 	while (Count > MaxStackSize)
 	{
-		a_Drops.emplace_back(a_Item, MaxStackSize, a_ItemHealth);
+		a_Drops.emplace_back(a_Item, MaxStackSize);
 		Count -= MaxStackSize;
 	}
 	if (Count > 0)
 	{
-		a_Drops.emplace_back(a_Item, Count, a_ItemHealth);
+		a_Drops.emplace_back(a_Item, Count);
 	}
 }
 
@@ -1544,11 +1552,11 @@ void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned 
 
 
 
-void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth)
+void cMonster::AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, enum Item a_Item)
 {
 	if (GetRandomProvider().RandBool(a_Chance / 100.0))
 	{
-		a_Drops.emplace_back(a_Item, static_cast<char>(1), a_ItemHealth);
+		a_Drops.emplace_back(a_Item);
 	}
 }
 
@@ -1680,8 +1688,8 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 	}
 
 	if (
-		(Chunk->GetBlock(Rel) != E_BLOCK_SOULSAND) &&   // Not on soulsand
-		(GetWorld()->GetTimeOfDay() < 13000_tick) &&    // Daytime
+		(Chunk->GetBlock(Rel) != BlockType::SoulSand) &&   // Not on soulsand
+		(GetWorld()->GetTimeOfDay() < 13000_tick) &&  // Daytime
 		Chunk->IsWeatherSunnyAt(Rel.x, Rel.z) &&        // Not raining
 		!IsInWater()                                    // Isn't swimming
 	)
@@ -1698,13 +1706,12 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 		int CurrentBlock = Chunk->GetHeight(Rel.x, Rel.z);
 		while (CurrentBlock > MobHeight)
 		{
-			BLOCKTYPE Block = Chunk->GetBlock(Rel.x, CurrentBlock, Rel.z);
+			auto BlockToCheck = Chunk->GetBlock(Rel.x, CurrentBlock, Rel.z);
 			if (
 				// Do not burn if a block above us meets one of the following conditions:
-				(!cBlockInfo::IsTransparent(Block)) ||
-				(Block == E_BLOCK_LEAVES) ||
-				(Block == E_BLOCK_NEW_LEAVES) ||
-				(IsBlockWater(Block))
+				(!cBlockInfo::IsTransparent(BlockToCheck)) ||
+				(cBlockLeavesHandler::IsBlockLeaves(BlockToCheck)) ||
+				(BlockToCheck.Type() == BlockType::Water)
 			)
 			{
 				return false;
@@ -1723,7 +1730,7 @@ bool cMonster::WouldBurnAt(Vector3d a_Location, cChunk & a_Chunk)
 
 cMonster::eFamily cMonster::GetMobFamily(void) const
 {
-	return FamilyFromType(m_MobType);
+	return FamilyFromType(m_EntityType);
 }
 
 
@@ -1769,7 +1776,7 @@ void cMonster::Unleash(bool a_ShouldDropLeashPickup, bool a_ShouldBroadcast)
 	if (a_ShouldDropLeashPickup)
 	{
 		cItems Pickups;
-		Pickups.Add(cItem(E_ITEM_LEASH, 1, 0));
+		Pickups.Add(cItem(Item::Lead));
 		GetWorld()->SpawnItemPickups(Pickups, GetPosX() + 0.5, GetPosY() + 0.5, GetPosZ() + 0.5);
 	}
 

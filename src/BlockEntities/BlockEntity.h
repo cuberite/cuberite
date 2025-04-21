@@ -25,7 +25,7 @@ class cBlockEntity
 {
 protected:
 
-	cBlockEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cBlockEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World);
 
 public:
 
@@ -49,14 +49,14 @@ public:
 	/** Creates a new block entity for the specified block type at the specified absolute pos.
 	If a_World is valid, then the entity is created bound to that world
 	Returns nullptr for unknown block types. */
-	static OwnedBlockEntity CreateByBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World = nullptr);
+	static OwnedBlockEntity CreateByBlockType(BlockState a_Block, Vector3i a_Pos, cWorld * a_World = nullptr);
 
 	/** Called when this block entity's associated block is destroyed.
 	It is guaranteed that this function is called before OnRemoveFromWorld. */
 	virtual void Destroy();
 
 	/** Returns true if the specified blocktype is supposed to have an associated block entity. */
-	static bool IsBlockEntityBlockType(BLOCKTYPE a_BlockType);
+	static bool IsBlockEntityBlockType(BlockState a_Block);
 
 	/** Called when the block entity object is added to a world. */
 	virtual void OnAddToWorld(cWorld & a_World, cChunk & a_Chunk);
@@ -94,7 +94,8 @@ public:
 
 	Vector3i GetRelPos() const { return Vector3i(m_RelX, m_Pos.y, m_RelZ); }
 
-	BLOCKTYPE GetBlockType() const { return m_BlockType; }
+	BlockType GetBlockType() const { return m_Block.Type(); }
+	BlockState GetBlock() const { return m_Block; }
 
 	cWorld * GetWorld() const { return m_World; }
 
@@ -115,13 +116,7 @@ protected:
 	/** Position relative to the chunk, used to speed up ticking */
 	int m_RelX, m_RelZ;
 
-	/** The blocktype representing this particular instance in the world.
-	Mainly used for multi-block-type entities, such as furnaces / lit furnaces. */
-	BLOCKTYPE m_BlockType;
-
-	/** The block meta representing this particular instance in the world
-	Mainly used for directional entities, such as dispensers. */
-	NIBBLETYPE m_BlockMeta;
+	BlockState m_Block;
 
 	cWorld * m_World;
 } ;  // tolua_export

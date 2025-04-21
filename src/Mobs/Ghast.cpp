@@ -9,7 +9,7 @@
 
 
 cGhast::cGhast(void) :
-	Super("Ghast", mtGhast, "entity.ghast.hurt", "entity.ghast.death", "entity.ghast.ambient", 4, 4),
+	Super("Ghast", etGhast, "entity.ghast.hurt", "entity.ghast.death", "entity.ghast.ambient", 4, 4),
 	m_IsCharging(false),
 	m_FlightCooldown(5),
 	m_TicksUntilShot(10)
@@ -63,8 +63,8 @@ void cGhast::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_GUNPOWDER);
-	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, E_ITEM_GHAST_TEAR);
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, Item::Gunpowder);
+	AddRandomDropItem(a_Drops, 0, 1 + LootingLevel, Item::GhastTear);
 }
 
 

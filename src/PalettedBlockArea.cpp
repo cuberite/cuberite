@@ -14,7 +14,7 @@ PalettedBlockArea::PalettedBlockArea()
 
 
 
-PalettedBlockArea PalettedBlockArea::createFilled(Vector3i aSize, const AString & aBlockTypeName, const BlockState & aBlockState)
+PalettedBlockArea PalettedBlockArea::createFilled(Vector3i aSize, const AString & aBlockTypeName, const CustomBlockState & aCustomBlockState)
 {
 	ASSERT(aSize.x > 0);
 	ASSERT(aSize.y > 0);
@@ -29,7 +29,7 @@ PalettedBlockArea PalettedBlockArea::createFilled(Vector3i aSize, const AString 
 	}
 	res.mSize = aSize;
 	res.mBlocks.resize(static_cast<size_t>(numBlocks));
-	res.fill(aBlockTypeName, aBlockState);
+	res.fill(aBlockTypeName, aCustomBlockState);
 	return res;
 }
 
@@ -46,9 +46,9 @@ cCuboid PalettedBlockArea::whole() const
 
 
 
-void PalettedBlockArea::setBlock(Vector3i aPos, const AString & aBlockTypeName, const BlockState & aBlockState)
+void PalettedBlockArea::setBlock(Vector3i aPos, const AString & aBlockTypeName, const CustomBlockState & aCustomBlockState)
 {
-	setBlock(aPos, paletteIndex(aBlockTypeName, aBlockState));
+	setBlock(aPos, paletteIndex(aBlockTypeName, aCustomBlockState));
 }
 
 
@@ -68,18 +68,18 @@ void PalettedBlockArea::setBlock(Vector3i aPos, UInt32 aPaletteIndex)
 
 
 
-UInt32 PalettedBlockArea::paletteIndex(const AString & aBlockTypeName, const BlockState & aBlockState)
+UInt32 PalettedBlockArea::paletteIndex(const AString & aBlockTypeName, const CustomBlockState & aCustomBlockState)
 {
-	return mPalette.index(aBlockTypeName, aBlockState);
+	return mPalette.index(aBlockTypeName, aCustomBlockState);
 }
 
 
 
 
 
-std::pair<UInt32, bool> PalettedBlockArea::maybePaletteIndex(const AString & aBlockTypeName, const BlockState & aBlockState) const
+std::pair<UInt32, bool> PalettedBlockArea::maybePaletteIndex(const AString & aBlockTypeName, const CustomBlockState & aCustomBlockState) const
 {
-	return mPalette.maybeIndex(aBlockTypeName, aBlockState);
+	return mPalette.maybeIndex(aBlockTypeName, aCustomBlockState);
 }
 
 
@@ -96,7 +96,7 @@ UInt32 PalettedBlockArea::blockPaletteIndex(Vector3i aPos) const
 
 
 
-const std::pair<AString, BlockState> & PalettedBlockArea::block(Vector3i aPos) const
+const std::pair<AString, CustomBlockState> & PalettedBlockArea::block(Vector3i aPos) const
 {
 	return paletteEntry(blockPaletteIndex(aPos));
 }
@@ -105,7 +105,7 @@ const std::pair<AString, BlockState> & PalettedBlockArea::block(Vector3i aPos) c
 
 
 
-const std::pair<AString, BlockState> & PalettedBlockArea::paletteEntry(UInt32 aPaletteIndex) const
+const std::pair<AString, CustomBlockState> & PalettedBlockArea::paletteEntry(UInt32 aPaletteIndex) const
 {
 	return mPalette.entry(aPaletteIndex);
 }
@@ -126,10 +126,10 @@ bool PalettedBlockArea::isPositionValid(Vector3i aPos) const
 
 
 
-void PalettedBlockArea::fill(const AString & aBlockTypeName, const BlockState & aBlockState)
+void PalettedBlockArea::fill(const AString & aBlockTypeName, const CustomBlockState & aCustomBlockState)
 {
 	BlockTypePalette btp;
-	auto idx = btp.index(aBlockTypeName, aBlockState);
+	auto idx = btp.index(aBlockTypeName, aCustomBlockState);
 	std::swap(mPalette, btp);
 	std::fill(mBlocks.begin(), mBlocks.end(), idx);
 }

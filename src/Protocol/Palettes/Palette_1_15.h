@@ -4,6 +4,8 @@
 #include "Registries/Items.h"
 #include "Registries/CustomStatistics.h"
 
+#include "BlockType.h"
+
 namespace Palette_1_15
 {
 	UInt32 From(BlockState Block);

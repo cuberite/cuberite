@@ -119,7 +119,7 @@ void cWorld::BroadcastAttachEntity(const cEntity & a_Entity, const cEntity & a_V
 
 
 
-void cWorld::BroadcastBlockAction(Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BLOCKTYPE a_BlockType, const cClientHandle * a_Exclude)
+void cWorld::BroadcastBlockAction(Vector3i a_BlockPos, Byte a_Byte1, Byte a_Byte2, BlockState a_BlockType, const cClientHandle * a_Exclude)
 {
 	ForClientsWithChunkAtPos(a_BlockPos, *this, a_Exclude, [&](cClientHandle & a_Client)
 		{
@@ -623,6 +623,19 @@ void cWorld::BroadcastWeather(eWeather a_Weather, const cClientHandle * a_Exclud
 	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
 		{
 			a_Client.SendWeather(a_Weather);
+		}
+	);
+}
+
+
+
+
+
+void cWorld::BroadcastGameStateChange(eGameStateReason a_Reason, float a_Value, const cClientHandle * a_Exclude)
+{
+	ForClientsInWorld(*this, a_Exclude, [&](cClientHandle & a_Client)
+		{
+			a_Client.SendGameStateChange(a_Reason, a_Value);
 		}
 	);
 }

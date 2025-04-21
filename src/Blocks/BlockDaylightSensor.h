@@ -2,7 +2,7 @@
 #pragma once
 
 #include "BlockHandler.h"
-
+#include "ChunkInterface.h"
 
 
 
@@ -27,28 +27,32 @@ private:
 		const Vector3i a_CursorPos
 	) const override
 	{
-		if (a_ChunkInterface.GetBlock(a_BlockPos) == E_BLOCK_DAYLIGHT_SENSOR)
-		{
-			a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_INVERTED_DAYLIGHT_SENSOR, 0);
-		}
-		else
-		{
-			a_ChunkInterface.SetBlock(a_BlockPos, E_BLOCK_DAYLIGHT_SENSOR, 0);
-		}
+		using namespace Block;
 
+		auto BlockToReplace = a_ChunkInterface.GetBlock(a_BlockPos);
+		BlockToReplace = DaylightDetector::DaylightDetector(!DaylightDetector::Inverted(BlockToReplace), Block::DaylightDetector::Power(BlockToReplace));
+		a_ChunkInterface.SetBlock(a_BlockPos, BlockToReplace);
 		return true;
 	}
 
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
+		UNUSED(a_Tool);
 		// Always drop the regular daylight sensor:
-		return { E_BLOCK_DAYLIGHT_SENSOR };
+		return { Item::DaylightDetector };
 	}
 
 
 	virtual bool IsUseable(void) const override
 	{
 		return true;
+	}
+
+public:
+
+	static unsigned char GetPowerLevel(BlockState a_Block)
+	{
+		return Block::DaylightDetector::Power(a_Block);
 	}
 };

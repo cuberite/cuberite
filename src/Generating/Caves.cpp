@@ -100,8 +100,7 @@ public:
 	/** Carves the tunnel into the chunk specified */
 	void ProcessChunk(
 		int a_ChunkX, int a_ChunkZ,
-		cChunkDef::BlockTypes & a_BlockTypes,
-		cChunkDesc::BlockNibbleBytes & a_BlockMetas,
+		cChunkDef::BlockStates a_BlockStates,
 		cChunkDef::HeightMap & a_HeightMap
 	);
 
@@ -457,8 +456,7 @@ void cCaveTunnel::CalcBoundingBox(void)
 
 void cCaveTunnel::ProcessChunk(
 	int a_ChunkX, int a_ChunkZ,
-	cChunkDef::BlockTypes & a_BlockTypes,
-	cChunkDesc::BlockNibbleBytes & a_BlockMetas,
+	cChunkDef::BlockStates a_BlockStates,
 	cChunkDef::HeightMap & a_HeightMap
 )
 {
@@ -504,25 +502,19 @@ void cCaveTunnel::ProcessChunk(
 				int SqDist = (DifX - x) * (DifX - x) + (DifY - y) * (DifY - y) + (DifZ - z) * (DifZ - z);
 				if (4 * SqDist <= SqRad)
 				{
-					if (cBlockInfo::CanBeTerraformed(cChunkDef::GetBlock(a_BlockTypes, x, y, z)))
+					if (cBlockInfo::CanBeTerraformed(cChunkDef::GetBlock(a_BlockStates, x, y, z)))
 					{
-						cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
+						cChunkDef::SetBlock(a_BlockStates, x, y, z, Block::CaveAir::CaveAir());
 					}
 				}
 				else if (SqDist <= SqRad * 2)
 				{
-					if (cChunkDef::GetBlock(a_BlockTypes, x, y, z) == E_BLOCK_SAND)
+					auto InspectBlock = cChunkDef::GetBlock(a_BlockStates, x, y, z);
+					switch (InspectBlock.Type())
 					{
-						const auto Index = cChunkDef::MakeIndex(x, y, z);
-						if (a_BlockMetas[Index] == 1)
-						{
-							a_BlockMetas[Index] = 0;
-							cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_RED_SANDSTONE);
-						}
-						else
-						{
-							cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_SANDSTONE);
-						}
+						case BlockType::Sand:    cChunkDef::SetBlock(a_BlockStates, x, y, z, Block::Sandstone::Sandstone()); break;
+						case BlockType::RedSand: cChunkDef::SetBlock(a_BlockStates, x, y, z, Block::RedSandstone::RedSandstone()); break;
+						default: break;
 					}
 				}
 			}  // for y
@@ -542,7 +534,7 @@ void cCaveTunnel::ProcessChunk(
 			(DifZ >= 0) && (DifZ < cChunkDef::Width)
 		)
 		{
-			cChunkDef::SetBlock(a_BlockTypes, DifX, itr->m_BlockY, DifZ, E_BLOCK_GLOWSTONE);
+			cChunkDef::SetBlock(a_BlockStates, DifX, itr->m_BlockY, DifZ, BlockType::GLOWSTONE);
 		}
 	}  // for itr - m_Points[]
 	#endif  // !NDEBUG
@@ -615,12 +607,11 @@ void cStructGenWormNestCaves::cCaveSystem::DrawIntoChunk(cChunkDesc & a_ChunkDes
 {
 	int ChunkX = a_ChunkDesc.GetChunkX();
 	int ChunkZ = a_ChunkDesc.GetChunkZ();
-	cChunkDef::BlockTypes        & BlockTypes = a_ChunkDesc.GetBlockTypes();
-	cChunkDef::HeightMap         &  HeightMap = a_ChunkDesc.GetHeightMap();
-	cChunkDesc::BlockNibbleBytes & BlockMetas = a_ChunkDesc.GetBlockMetasUncompressed();
+	auto           BlockStates = a_ChunkDesc.GetBlocks();
+	auto         & HeightMap   = a_ChunkDesc.GetHeightMap();
 	for (cCaveTunnels::const_iterator itr = m_Tunnels.begin(), end = m_Tunnels.end(); itr != end; ++itr)
 	{
-		(*itr)->ProcessChunk(ChunkX, ChunkZ, BlockTypes, BlockMetas, HeightMap);
+		(*itr)->ProcessChunk(ChunkX, ChunkZ, BlockStates, HeightMap);
 	}  // for itr - m_Tunnels[]
 }
 
@@ -740,7 +731,7 @@ void cStructGenMarbleCaves::GenFinish(cChunkDesc & a_ChunkDesc)
 			int Top = a_ChunkDesc.GetHeight(x, z);
 			for (int y = 1; y < Top; ++y)
 			{
-				if (a_ChunkDesc.GetBlockType(x, y, z) != E_BLOCK_STONE)
+				if (a_ChunkDesc.GetBlock({x, y, z}).Type() != BlockType::Stone)
 				{
 					continue;
 				}
@@ -749,7 +740,7 @@ void cStructGenMarbleCaves::GenFinish(cChunkDesc & a_ChunkDesc)
 				const float WaveNoise = 1;
 				if (cosf(GetMarbleNoise(xx, yy * 0.5f, zz, Noise)) * fabs(cosf(yy * 0.2f + WaveNoise * 2) * 0.75f + WaveNoise) > 0.0005f)
 				{
-					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
+					a_ChunkDesc.SetBlock({x, y, z}, BlockType::CaveAir);
 				}
 			}  // for y
 		}  // for x
@@ -782,7 +773,7 @@ void cStructGenDualRidgeCaves::GenFinish(cChunkDesc & a_ChunkDesc)
 				float n4 = m_Noise2.CubicNoise3D(xx * 4, yy * 4, zz * 4) / 4;
 				if ((std::abs(n1 + n3) * std::abs(n2 + n4)) > m_Threshold)
 				{
-					a_ChunkDesc.SetBlockType(x, y, z, E_BLOCK_AIR);
+					a_ChunkDesc.SetBlock({x, y, z}, Block::CaveAir::CaveAir());
 				}
 			}  // for y
 		}  // for x

@@ -127,7 +127,7 @@ public:
 
 		// Empty fishing rod, just damage it:
 		auto BlockType = a_World.GetBlock(FloaterInfo.GetPos() - Vector3d(0, 0.1, 0));
-		if ((BlockType != E_BLOCK_AIR) && !IsBlockWater(BlockType))
+		if (cBlockAirHandler::IsBlockAir(BlockType) && (BlockType.Type() != BlockType::Water))
 		{
 			a_Player.UseEquippedItem(2);
 		}
@@ -171,38 +171,38 @@ public:
 			{
 				case 0:
 				{
-					cItem Bow(E_ITEM_BOW, 1, Random.RandInt<short>(50));
+					cItem Bow(Item::Bow, 1, Random.RandInt<short>(50));
 					Bow.EnchantByXPLevels(Random.RandInt(22U, 30U), GetRandomProvider());
 					Drops.Add(Bow);
 					break;
 				}
 				case 1:
 				{
-					cItem Book(E_ITEM_BOOK);
+					cItem Book(Item::Book);
 					Book.EnchantByXPLevels(30, GetRandomProvider());
 					Drops.Add(Book);
 					break;
 				}
 				case 2:
 				{
-					cItem Rod(E_ITEM_FISHING_ROD, 1, Random.RandInt<short>(50));
+					cItem Rod(Item::FishingRod, 1, Random.RandInt<short>(50));
 					Rod.EnchantByXPLevels(Random.RandInt(22U, 30U), GetRandomProvider());
 					Drops.Add(Rod);
 					break;
 				}
 				case 3:
 				{
-					Drops.Add(cItem(E_ITEM_NAME_TAG));
+					Drops.Add(cItem(Item::NameTag));
 					break;
 				}
 				case 4:
 				{
-					Drops.Add(cItem(E_ITEM_SADDLE));
+					Drops.Add(cItem(Item::Saddle));
 					break;
 				}
 				case 5:
 				{
-					Drops.Add(cItem(E_BLOCK_LILY_PAD));
+					Drops.Add(cItem(Item::LilyPad));
 					break;
 				}
 			}
@@ -214,49 +214,49 @@ public:
 			int Junk = Random.RandInt(82);
 			if (Junk < 10)  // 10 / 83 chance of spawning a bowl
 			{
-				Drops.Add(cItem(E_ITEM_BOWL));
+				Drops.Add(cItem(Item::Bowl));
 			}
 			else if (Junk < 12)  // 2 / 83 chance of spawning a fishing rod
 			{
 				// Fishing Rods caught from the Junk category will be 10% .. 100% damaged, and always unenchanted.
-				Drops.Add(cItem(E_ITEM_FISHING_ROD, 1, Random.RandInt<short>(7, 65)));
+				Drops.Add(cItem(Item::FishingRod, 1, Random.RandInt<short>(7, 65)));
 			}
 			else if (Junk < 22)  // 10 / 83 chance of spawning leather
 			{
-				Drops.Add(cItem(E_ITEM_LEATHER));
+				Drops.Add(cItem(Item::Leather));
 			}
 			else if (Junk < 32)  // 10 / 83 chance of spawning leather boots
 			{
 				// Leather boots caught from the Junk category will be 10% .. 100% damaged, and always unenchanted.
-				Drops.Add(cItem(E_ITEM_LEATHER_BOOTS, 1, Random.RandInt<short>(7, 66)));
+				Drops.Add(cItem(Item::LeatherBoots, 1, Random.RandInt<short>(7, 66)));
 			}
 			else if (Junk < 42)  // 10 / 83 chance of spawning rotten flesh
 			{
-				Drops.Add(cItem(E_ITEM_ROTTEN_FLESH));
+				Drops.Add(cItem(Item::RottenFlesh));
 			}
 			else if (Junk < 47)  // 5 / 83 chance of spawning a stick
 			{
-				Drops.Add(cItem(E_ITEM_STICK));
+				Drops.Add(cItem(Item::Stick));
 			}
 			else if (Junk < 52)  // 5 / 83 chance of spawning string
 			{
-				Drops.Add(cItem(E_ITEM_STRING));
+				Drops.Add(cItem(Item::String));
 			}
 			else if (Junk < 62)  // 10 / 83 chance of spawning a water bottle
 			{
-				Drops.Add(cItem(E_ITEM_POTION));
+				Drops.Add(cItem(Item::Potion));
 			}
 			else if (Junk < 72)  // 10 / 83 chance of spawning a bone
 			{
-				Drops.Add(cItem(E_ITEM_BONE));
+				Drops.Add(cItem(Item::Bone));
 			}
 			else if (Junk < 73)  // 1 / 83 chance of spawning an ink sac
 			{
-				Drops.Add(cItem(E_ITEM_DYE));
+				Drops.Add(cItem(Item::BoneMeal));
 			}
 			else  // 10 / 83 chance of spawning a tripwire hook
 			{
-				Drops.Add(cItem(E_BLOCK_TRIPWIRE_HOOK));
+				Drops.Add(cItem(Item::TripwireHook));
 			}
 
 			a_Player.GetStatistics().Custom[CustomStatistic::JunkFished]++;
@@ -266,19 +266,19 @@ public:
 			int FishType = Random.RandInt(99);
 			if (FishType <= 1)  // Clownfish has a 2% chance of spawning
 			{
-				Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_CLOWNFISH));
+				Drops.Add(cItem(Item::TropicalFish));
 			}
 			else if (FishType <= 12)  // Pufferfish has a 13% chance of spawning
 			{
-				Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_PUFFERFISH));
+				Drops.Add(cItem(Item::Pufferfish));
 			}
 			else if (FishType <= 24)  // Raw salmon has a 25% chance of spawning
 			{
-				Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_SALMON));
+				Drops.Add(cItem(Item::Salmon));
 			}
 			else  // Raw fish has a 60% chance of spawning
 			{
-				Drops.Add(cItem(E_ITEM_RAW_FISH, 1, E_META_RAW_FISH_FISH));
+				Drops.Add(cItem(Item::Cod));
 			}
 
 			a_Player.GetStatistics().Custom[CustomStatistic::FishCaught]++;

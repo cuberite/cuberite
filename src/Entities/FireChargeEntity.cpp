@@ -2,13 +2,13 @@
 
 #include "FireChargeEntity.h"
 #include "../World.h"
-
+#include "BlockInfo.h"
 
 
 
 
 cFireChargeEntity::cFireChargeEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
-	Super(pkFireCharge, a_Creator, a_Pos, 0.3125f, 0.3125f)
+	Super(etSmallFireball, a_Creator, a_Pos, 0.3125f, 0.3125f)
 {
 	SetSpeed(a_Speed);
 	SetGravity(0);
@@ -21,9 +21,9 @@ cFireChargeEntity::cFireChargeEntity(cEntity * a_Creator, Vector3d a_Pos, Vector
 
 void cFireChargeEntity::Explode(Vector3i a_Block)
 {
-	if (m_World->GetBlock(a_Block) == E_BLOCK_AIR)
+	if (IsBlockAir(m_World->GetBlock(a_Block)))
 	{
-		m_World->SetBlock(a_Block, E_BLOCK_FIRE, 1);
+		m_World->SetBlock(a_Block, Block::Fire::Fire());
 	}
 }
 

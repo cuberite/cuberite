@@ -17,15 +17,16 @@ cSplashPotionEntity::cSplashPotionEntity(
 	Vector3d a_Speed,
 	const cItem & a_Item
 ):
-	Super(pkSplashPotion, a_Creator, a_Pos, a_Speed, 0.25f, 0.25f),
+	Super(etPotion, a_Creator, a_Pos, a_Speed, 0.25f, 0.25f),
 	m_Item(a_Item)
 {
-	m_EntityEffectType = cEntityEffect::GetPotionEffectType(a_Item.m_ItemDamage);
+	// TODO: potion item component
+	m_EntityEffectType = cEntityEffect::GetPotionEffectType(0);
 	m_EntityEffect = cEntityEffect(
-		cEntityEffect::GetPotionEffectDuration(a_Item.m_ItemDamage),
-		cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage)
+		cEntityEffect::GetPotionEffectDuration(0),
+		cEntityEffect::GetPotionEffectIntensity(0)
 	);
-	m_PotionColor = cEntityEffect::GetPotionColor(a_Item.m_ItemDamage);
+	m_PotionColor = cEntityEffect::GetPotionColor(0);
 }
 
 

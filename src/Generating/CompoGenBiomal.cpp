@@ -10,6 +10,7 @@
 #include "../IniFile.h"
 #include "../Noise/Noise.h"
 #include "../LinearUpscale.h"
+#include "BlockInfo.h"
 
 
 
@@ -25,13 +26,7 @@ pattern - there will always be enough pattern left, even for the whole-chunk-hei
 class cPattern
 {
 public:
-	struct BlockInfo
-	{
-		BLOCKTYPE  m_BlockType = E_BLOCK_STONE;
-		NIBBLETYPE m_BlockMeta = 0;
-	};
-
-	constexpr cPattern(std::initializer_list<BlockInfo> a_TopBlocks)
+	constexpr cPattern(std::initializer_list<BlockState> a_TopBlocks)
 	{
 		ASSERT(a_TopBlocks.size() <= cChunkDef::Height);
 		// Copy the pattern into the top:
@@ -45,10 +40,10 @@ public:
 		// The remaining blocks default to stone
 	}
 
-	const BlockInfo * Get(void) const { return m_Pattern; }
+	const BlockState * Get(void) const { return m_Pattern; }
 
 protected:
-	BlockInfo m_Pattern[cChunkDef::Height] = {};
+	BlockState m_Pattern[cChunkDef::Height] = {};
 } ;
 
 
@@ -58,98 +53,100 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // Land top block patterns:
 
-static constexpr cPattern patGrass =
+namespace
 {
-	{E_BLOCK_GRASS, 0},
-	{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT,  E_META_DIRT_NORMAL},
-} ;
+	static constexpr cPattern patGrass =
+	{
+		Block::GrassBlock::GrassBlock(false),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+	} ;
 
-static constexpr cPattern patSand =
-{
-	{ E_BLOCK_SAND, 0},
-	{ E_BLOCK_SAND, 0},
-	{ E_BLOCK_SAND, 0},
-	{ E_BLOCK_SANDSTONE, 0},
-} ;
+	static constexpr cPattern patSand =
+	{
+		Block::Sand::Sand(),
+		Block::Sand::Sand(),
+		Block::Sand::Sand(),
+		Block::Sandstone::Sandstone(),
+	} ;
 
-static constexpr cPattern patDirt =
-{
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-} ;
+	static constexpr cPattern patDirt =
+	{
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+	} ;
 
-static constexpr cPattern patPodzol =
-{
-	{E_BLOCK_DIRT, E_META_DIRT_PODZOL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-} ;
+	static constexpr cPattern patPodzol =
+	{
+		Block::Podzol::Podzol(false),
+		Block::Podzol::Podzol(false),
+		Block::Podzol::Podzol(false),
+		Block::Podzol::Podzol(false),
+	} ;
 
-static constexpr cPattern patGrassLess =
-{
-	{E_BLOCK_DIRT, E_META_DIRT_GRASSLESS},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-	{E_BLOCK_DIRT, E_META_DIRT_NORMAL},
-} ;
+	static constexpr cPattern patGrassLess =
+	{
+		Block::CoarseDirt::CoarseDirt(),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+	} ;
 
-static constexpr cPattern patMycelium =
-{
-	{E_BLOCK_MYCELIUM, 0},
-	{E_BLOCK_DIRT,     0},
-	{E_BLOCK_DIRT,     0},
-	{E_BLOCK_DIRT,     0},
-} ;
+	static constexpr cPattern patMycelium =
+	{
+		Block::Mycelium::Mycelium(false),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+		Block::Dirt::Dirt(),
+	} ;
 
-static constexpr cPattern patGravel =
-{
-	{E_BLOCK_GRAVEL, 0},
-	{E_BLOCK_GRAVEL, 0},
-	{E_BLOCK_GRAVEL, 0},
-	{E_BLOCK_STONE,  0},
-} ;
+	static constexpr cPattern patGravel =
+	{
+		Block::Gravel::Gravel(),
+		Block::Gravel::Gravel(),
+		Block::Gravel::Gravel(),
 
-static constexpr cPattern patStone =
-{
-	{E_BLOCK_STONE,   0},
-	{E_BLOCK_STONE,   0},
-	{E_BLOCK_STONE,   0},
-	{E_BLOCK_STONE,   0},
-} ;
+	} ;
+
+	static constexpr cPattern patStone =
+	{
+		Block::Stone::Stone(),
+		Block::Stone::Stone(),
+		Block::Stone::Stone(),
+		Block::Stone::Stone(),
+	} ;
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-// Ocean floor patterns:
+	////////////////////////////////////////////////////////////////////////////////
+	// Ocean floor patterns:
 
-static constexpr cPattern patOFSand =
-{
-	{E_BLOCK_SAND, 0},
-	{E_BLOCK_SAND, 0},
-	{E_BLOCK_SAND, 0},
-	{E_BLOCK_SANDSTONE, 0}
-} ;
+	static const cPattern patOFSand =
+	{
+		Block::Sand::Sand(),
+		Block::Sand::Sand(),
+		Block::Sand::Sand(),
+		Block::Sandstone::Sandstone()
+	} ;
 
-static constexpr cPattern patOFClay =
-{
-	{ E_BLOCK_CLAY, 0},
-	{ E_BLOCK_CLAY, 0},
-	{ E_BLOCK_SAND, 0},
-	{ E_BLOCK_SAND, 0},
-} ;
+	static const cPattern patOFClay =
+	{
+		Block::Clay::Clay(),
+		Block::Clay::Clay(),
+		Block::Sand::Sand(),
+		Block::Sand::Sand(),
+	} ;
 
-static constexpr cPattern patOFOrangeClay =
-{
-	{ E_BLOCK_STAINED_CLAY, E_META_STAINED_GLASS_ORANGE},
-	{ E_BLOCK_STAINED_CLAY, E_META_STAINED_GLASS_ORANGE},
-	{ E_BLOCK_STAINED_CLAY, E_META_STAINED_GLASS_ORANGE},
-} ;
-
+	static const cPattern patOFOrangeClay =
+	{
+		Block::OrangeTerracotta::OrangeTerracotta(),
+		Block::OrangeTerracotta::OrangeTerracotta(),
+		Block::OrangeTerracotta::OrangeTerracotta(),
+	} ;
+}
 
 
 
@@ -174,7 +171,7 @@ protected:
 	HEIGHTTYPE m_SeaLevel;
 
 	/** The pattern used for mesa biomes. Initialized by seed on generator creation. */
-	cPattern::BlockInfo m_MesaPattern[2 * cChunkDef::Height];
+	std::array<BlockState, 2 * cChunkDef::Height> m_MesaPattern;
 
 	/** Noise used for selecting between dirt and sand on the ocean floor. */
 	cNoise m_OceanFloorSelect;
@@ -186,7 +183,7 @@ protected:
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) override
 	{
-		a_ChunkDesc.FillBlocks(E_BLOCK_AIR, 0);
+		a_ChunkDesc.FillBlocks(Block::Air::Air());
 		for (int z = 0; z < cChunkDef::Width; z++)
 		{
 			for (int x = 0; x < cChunkDef::Width; x++)
@@ -211,70 +208,71 @@ protected:
 		// In a loop, choose whether to use one, two or three layers of stained clay, then choose a color and width for each layer
 		// Separate each group with another layer of hardened clay
 		cNoise patternNoise(a_Seed);
-		static NIBBLETYPE allowedColors[] =
+		static const std::array<BlockState, 15> AllowedColors =
 		{
-			E_META_STAINED_CLAY_YELLOW,
-			E_META_STAINED_CLAY_YELLOW,
-			E_META_STAINED_CLAY_RED,
-			E_META_STAINED_CLAY_RED,
-			E_META_STAINED_CLAY_WHITE,
-			E_META_STAINED_CLAY_BROWN,
-			E_META_STAINED_CLAY_BROWN,
-			E_META_STAINED_CLAY_BROWN,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_ORANGE,
-			E_META_STAINED_CLAY_LIGHTGRAY,
+			Block::YellowTerracotta::YellowTerracotta(),
+			Block::YellowTerracotta::YellowTerracotta(),
+			Block::RedTerracotta::RedTerracotta(),
+			Block::RedTerracotta::RedTerracotta(),
+			Block::WhiteTerracotta::WhiteTerracotta(),
+			Block::BrownTerracotta::BrownTerracotta(),
+			Block::BrownTerracotta::BrownTerracotta(),
+			Block::BrownTerracotta::BrownTerracotta(),
+			Block::OrangeTerracotta::OrangeTerracotta(),
+			Block::OrangeTerracotta::OrangeTerracotta(),
+			Block::OrangeTerracotta::OrangeTerracotta(),
+			Block::OrangeTerracotta::OrangeTerracotta(),
+			Block::OrangeTerracotta::OrangeTerracotta(),
+			Block::OrangeTerracotta::OrangeTerracotta(),
+			Block::LightGrayTerracotta::LightGrayTerracotta(),
 		} ;
-		static int layerSizes[] =  // Adjust the chance so that thinner layers occur more commonly
+		static const std::array<size_t, 12> LayerSizes[] =  // Adjust the chance so that thinner layers occur more commonly
 		{
-			1, 1, 1, 1, 1, 1,
-			2, 2, 2, 2,
-			3, 3,
+			{
+				1, 1, 1, 1, 1, 1,
+				2, 2, 2, 2,
+				3, 3,
+			}
 		} ;
-		int idx = ARRAYCOUNT(m_MesaPattern) - 1;
-		while (idx >= 0)
+		auto Idx = static_cast<int>(m_MesaPattern.size() - 1);
+		while (Idx >= 0)
 		{
 			// A layer group of 1 - 2 color stained clay:
-			int rnd = patternNoise.IntNoise1DInt(idx) / 7;
-			int numLayers = (rnd % 2) + 1;
+			int rnd = patternNoise.IntNoise1DInt(Idx) / 7;
+			int NumLayers = (rnd % 2) + 1;
 			rnd /= 2;
-			for (int lay = 0; lay < numLayers; lay++)
+			for (int lay = 0; lay < NumLayers; lay++)
 			{
-				int numBlocks = layerSizes[(static_cast<size_t>(rnd) % ARRAYCOUNT(layerSizes))];
-				NIBBLETYPE Color = allowedColors[static_cast<size_t>(rnd / 4) % ARRAYCOUNT(allowedColors)];
+				auto NumBlocks = static_cast<size_t>(LayerSizes->at(static_cast<size_t>(rnd) % LayerSizes->size()));
+				auto BlockToPlace = AllowedColors.at(static_cast<size_t>(rnd / 4) % AllowedColors.size());
 				if (
-					((numBlocks == 3) && (numLayers == 2)) ||  // In two-layer mode disallow the 3-high layers:
-					(Color == E_META_STAINED_CLAY_WHITE))      // White stained clay can ever be only 1 block high
+					((NumBlocks == 3) && (NumLayers == 2)) ||  // In two-layer mode disallow the 3-high layers:
+					(BlockToPlace.Type() == BlockType::WhiteTerracotta)  // White stained teracotta can ever be only 1 block high
+				)
 				{
-					numBlocks = 1;
+					NumBlocks = 1;
 				}
-				numBlocks = std::min(idx + 1, numBlocks);  // Limit by idx so that we don't have to check inside the loop
+				NumBlocks = std::min<size_t>(static_cast<size_t>(Idx + 1), NumBlocks);  // Limit by Idx so that we don't have to check inside the loop
 				rnd /= 32;
-				for (int block = 0; block < numBlocks; block++, idx--)
+				for (size_t Block = 0; Block < NumBlocks; Block++, Idx--)
 				{
-					m_MesaPattern[idx].m_BlockMeta = Color;
-					m_MesaPattern[idx].m_BlockType = E_BLOCK_STAINED_CLAY;
+					m_MesaPattern[static_cast<size_t>(Idx)] = BlockToPlace;
 				}  // for block
 			}  // for lay
 
 			// A layer of hardened clay in between the layer group:
-			int numBlocks = (rnd % 4) + 1;  // All heights the same probability
-			if ((numLayers == 2) && (numBlocks < 4))
+			size_t NumBlocks = static_cast<size_t>(rnd % 4) + 1;  // All heights the same probability
+			if ((NumLayers == 2) && (NumBlocks < 4))
 			{
 				// For two layers of stained clay, add an extra block of hardened clay:
-				numBlocks++;
+				NumBlocks++;
 			}
-			numBlocks = std::min(idx + 1, numBlocks);  // Limit by idx so that we don't have to check inside the loop
-			for (int block = 0; block < numBlocks; block++, idx--)
+			NumBlocks = std::min<size_t>(static_cast<size_t>(Idx + 1), NumBlocks);  // Limit by Idx so that we don't have to check inside the loop
+			for (size_t Block = 0; Block < NumBlocks; Block++, Idx--)
 			{
-				m_MesaPattern[idx].m_BlockMeta = 0;
-				m_MesaPattern[idx].m_BlockType = E_BLOCK_HARDENED_CLAY;
+				m_MesaPattern[static_cast<size_t>(Idx)] = Block::Terracotta::Terracotta();
 			}  // for block
-		}  // while (idx >= 0)
+		}  // while (Idx >= 0)
 	}
 
 
@@ -344,7 +342,7 @@ protected:
 				NOISE_DATATYPE NoiseX = (static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkX() * cChunkDef::Width + a_RelX)) / FrequencyX;
 				NOISE_DATATYPE NoiseY = (static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + a_RelZ)) / FrequencyZ;
 				NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
-				const cPattern::BlockInfo * Pattern = (Val < -0.9) ? patGrassLess.Get() : ((Val > 0) ? patPodzol.Get() : patGrass.Get());
+				const BlockState * Pattern = (Val < -0.9) ? patGrassLess.Get() : ((Val > 0) ? patPodzol.Get() : patGrass.Get());
 				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern, a_ShapeColumn);
 				return;
 			}
@@ -386,7 +384,7 @@ protected:
 				NOISE_DATATYPE NoiseX = (static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkX() * cChunkDef::Width + a_RelX)) / FrequencyX;
 				NOISE_DATATYPE NoiseY = (static_cast<NOISE_DATATYPE>(a_ChunkDesc.GetChunkZ() * cChunkDef::Width + a_RelZ)) / FrequencyZ;
 				NOISE_DATATYPE Val = m_OceanFloorSelect.CubicNoise2D(NoiseX, NoiseY);
-				const cPattern::BlockInfo * Pattern = (Val < 0.0) ? patStone.Get() : patGrass.Get();
+				const BlockState * Pattern = (Val < 0.0) ? patStone.Get() : patGrass.Get();
 				FillColumnPattern(a_ChunkDesc, a_RelX, a_RelZ, Pattern, a_ShapeColumn);
 				return;
 			}
@@ -409,7 +407,7 @@ protected:
 
 	/** Fills the specified column with the specified pattern; restarts the pattern when air is reached,
 	switches to ocean floor pattern if ocean is reached. Always adds bedrock at the very bottom. */
-	void FillColumnPattern(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, const cPattern::BlockInfo * a_Pattern, const Byte * a_ShapeColumn)
+	void FillColumnPattern(cChunkDesc & a_ChunkDesc, int a_RelX, int a_RelZ, const BlockState * a_Pattern, const Byte * a_ShapeColumn)
 	{
 		bool HasHadWater = false;
 		int PatternIdx = 0;
@@ -421,10 +419,19 @@ protected:
 		}
 		for (int y = top; y > 0; y--)
 		{
+			// FLOG("{}", a_ShapeColumn[y]);
 			if (a_ShapeColumn[y] > 0)
 			{
 				// "ground" part, use the pattern:
-				a_ChunkDesc.SetBlockTypeMeta(a_RelX, y, a_RelZ, a_Pattern[PatternIdx].m_BlockType, a_Pattern[PatternIdx].m_BlockMeta);
+				auto Block =  a_Pattern[PatternIdx];
+				if (IsBlockAir(Block))
+				{
+					a_ChunkDesc.SetBlock({a_RelX, y, a_RelZ}, Block::Stone::Stone());
+				}
+				else
+				{
+					a_ChunkDesc.SetBlock({a_RelX, y, a_RelZ}, Block);
+				}
 				PatternIdx++;
 				continue;
 			}
@@ -439,7 +446,7 @@ protected:
 				continue;
 			}
 
-			a_ChunkDesc.SetBlockType(a_RelX, y, a_RelZ, E_BLOCK_STATIONARY_WATER);
+			a_ChunkDesc.SetBlock({a_RelX, y, a_RelZ}, Block::Water::Water());
 			if (HasHadWater)
 			{
 				continue;
@@ -456,10 +463,7 @@ protected:
 			}
 			HasHadWater = true;
 		}  // for y
-		if (a_ShapeColumn[0] > 0)
-		{
-			a_ChunkDesc.SetBlockType(a_RelX, 0, a_RelZ, E_BLOCK_BEDROCK);
-		}
+		a_ChunkDesc.SetBlock({a_RelX, 0, a_RelZ}, Block::Bedrock::Bedrock());
 	}
 
 
@@ -490,29 +494,29 @@ protected:
 		if (Top - m_SeaLevel < 5)
 		{
 			// Simple case: top is red sand, then hardened clay down to ClayFloor, then stone:
-			a_ChunkDesc.SetBlockTypeMeta(a_RelX, Top, a_RelZ, E_BLOCK_SAND, E_META_SAND_RED);
+			a_ChunkDesc.SetBlock({a_RelX, Top, a_RelZ}, Block::RedSand::RedSand());
 			for (int y = Top - 1; y >= ClayFloor; y--)
 			{
-				a_ChunkDesc.SetBlockType(a_RelX, y, a_RelZ, E_BLOCK_HARDENED_CLAY);
+				a_ChunkDesc.SetBlock({a_RelX, y, a_RelZ}, Block::WhiteTerracotta::WhiteTerracotta());
 			}
 			for (int y = ClayFloor - 1; y > 0; y--)
 			{
-				a_ChunkDesc.SetBlockType(a_RelX, y, a_RelZ, E_BLOCK_STONE);
+				a_ChunkDesc.SetBlock({a_RelX, y, a_RelZ}, Block::Stone::Stone());
 			}
-			a_ChunkDesc.SetBlockType(a_RelX, 0, a_RelZ, E_BLOCK_BEDROCK);
+			a_ChunkDesc.SetBlock({a_RelX, 0, a_RelZ}, Block::Bedrock::Bedrock());
 			return;
 		}
 
 		// Difficult case: use the mesa pattern and watch for overhangs:
 		int PatternIdx = cChunkDef::Height - (Top - ClayFloor);  // We want the block at index ClayFloor to be pattern's 256th block (first stone)
-		const cPattern::BlockInfo * Pattern = m_MesaPattern;
+		const BlockState * Pattern = m_MesaPattern.data();
 		bool HasHadWater = false;
 		for (int y = Top; y > 0; y--)
 		{
 			if (a_ShapeColumn[y] > 0)
 			{
 				// "ground" part, use the pattern:
-				a_ChunkDesc.SetBlockTypeMeta(a_RelX, y, a_RelZ, Pattern[PatternIdx].m_BlockType, Pattern[PatternIdx].m_BlockMeta);
+				a_ChunkDesc.SetBlock({a_RelX, y, a_RelZ}, Pattern[PatternIdx]);
 				PatternIdx++;
 				continue;
 			}
@@ -525,7 +529,7 @@ protected:
 
 			// "water" part, fill with water and choose new pattern for ocean floor, if not chosen already:
 			PatternIdx = 0;
-			a_ChunkDesc.SetBlockType(a_RelX, y, a_RelZ, E_BLOCK_STATIONARY_WATER);
+			a_ChunkDesc.SetBlock({a_RelX, y, a_RelZ}, Block::Water::Water());
 			if (HasHadWater)
 			{
 				continue;
@@ -535,7 +539,7 @@ protected:
 			Pattern = ChooseOceanFloorPattern(a_ChunkDesc.GetChunkX(), a_ChunkDesc.GetChunkZ(), a_RelX, a_RelZ);
 			HasHadWater = true;
 		}  // for y
-		a_ChunkDesc.SetBlockType(a_RelX, 0, a_RelZ, E_BLOCK_BEDROCK);
+		a_ChunkDesc.SetBlock({a_RelX, 0, a_RelZ}, Block::Bedrock::Bedrock());
 
 		EMCSBiome MesaVersion = a_ChunkDesc.GetBiome(a_RelX, a_RelZ);
 		if ((MesaVersion == biMesaPlateauF) || (MesaVersion == biMesaPlateauFM))
@@ -545,10 +549,9 @@ protected:
 				return;
 			}
 
-			BLOCKTYPE Block = (m_MesaFloor.CubicNoise2D(NoiseX * 4, NoiseY * 4) < 0) ? E_BLOCK_DIRT : E_BLOCK_GRASS;
-			NIBBLETYPE Meta = (Block == E_BLOCK_GRASS) ? 0 : 1;
+			auto Block = (m_MesaFloor.CubicNoise2D(NoiseX * 4, NoiseY * 4) < 0) ? Block::Dirt::Dirt() : Block::CoarseDirt::CoarseDirt();
 
-			a_ChunkDesc.SetBlockTypeMeta(a_RelX, Top, a_RelZ, Block, Meta);
+			a_ChunkDesc.SetBlock({a_RelX, Top, a_RelZ}, Block);
 		}
 	}
 
@@ -556,7 +559,7 @@ protected:
 
 	/** Returns the pattern to use for an ocean floor in the specified column.
 	The returned pattern is guaranteed to be 256 blocks long. */
-	const cPattern::BlockInfo * ChooseOceanFloorPattern(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ)
+	const BlockState * ChooseOceanFloorPattern(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelZ)
 	{
 		// Frequencies for the ocean floor selecting noise:
 		const NOISE_DATATYPE FrequencyX = 3;

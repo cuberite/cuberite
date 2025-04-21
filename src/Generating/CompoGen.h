@@ -28,14 +28,14 @@ class cCompoGenSameBlock :
 {
 public:
 	cCompoGenSameBlock(void) :
-		m_BlockType(E_BLOCK_STONE),
+		m_Block(Block::Stone::Stone()),
 		m_IsBedrocked(true)
 	{}
 
 protected:
 
-	BLOCKTYPE m_BlockType;
-	bool      m_IsBedrocked;
+	BlockState m_Block;
+	bool       m_IsBedrocked;
 
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) override;
@@ -73,12 +73,12 @@ protected:
 	int m_SeaLevel;
 	int m_BeachHeight;
 	int m_BeachDepth;
-	BLOCKTYPE m_BlockTop;
-	BLOCKTYPE m_BlockMiddle;
-	BLOCKTYPE m_BlockBottom;
-	BLOCKTYPE m_BlockBeach;
-	BLOCKTYPE m_BlockBeachBottom;
-	BLOCKTYPE m_BlockSea;
+	BlockState m_BlockTop;
+	BlockState m_BlockMiddle;
+	BlockState m_BlockBottom;
+	BlockState m_BlockBeach;
+	BlockState m_BlockBeachBottom;
+	BlockState m_BlockSea;
 
 	// cTerrainCompositionGen overrides:
 	virtual void ComposeTerrain(cChunkDesc & a_ChunkDesc, const cChunkDesc::Shape & a_Shape) override;
@@ -130,8 +130,7 @@ protected:
 	{
 		int m_ChunkX;
 		int m_ChunkZ;
-		cChunkDef::BlockTypes        m_BlockTypes;
-		cChunkDesc::BlockNibbleBytes m_BlockMetas;  // The metas are uncompressed, 1 meta per byte
+		cChunkDef::BlockStates       m_BlockTypes;
 		cChunkDef::HeightMap         m_HeightMap;
 	} ;
 

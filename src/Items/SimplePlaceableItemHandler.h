@@ -4,21 +4,19 @@
 
 
 
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnon-virtual-dtor"
+#endif
 
-
-class cSimplePlaceableItemHandler final:
+class cSimplePlaceableItemHandler:
 	public cItemHandler
 {
 	using Super = cItemHandler;
 
 public:
 
-	constexpr cSimplePlaceableItemHandler(int a_ItemType, BLOCKTYPE a_BlockType) :
-		Super(a_ItemType),
-		m_BlockType(a_BlockType)
-	{
-	}
-
+	using Super::Super;
 
 	virtual bool IsPlaceable(void) const override
 	{
@@ -28,10 +26,11 @@ public:
 
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
-		return a_Player.PlaceBlock(a_PlacePosition, m_BlockType, 0);
+		return a_Player.PlaceBlock(a_PlacePosition, BlockItemConverter::FromItem(a_HeldItem.m_ItemType));
 	}
-
-private:
-
-	BLOCKTYPE m_BlockType;
 };
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+
