@@ -24,25 +24,45 @@ jobs:
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
         os: [ubuntu-latest, windows-latest]
-        build_type: [Release]
+        build_type: [Release, Debug]
         c_compiler: [gcc, clang, cl]
         include:
           - os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
+            build_type: Release
+          - os: windows-latest
+            c_compiler: cl
+            cpp_compiler: cl
+            build_type: Debug
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
+            build_type: Release
           - os: ubuntu-latest
             c_compiler: clang
             cpp_compiler: clang++
+            build_type: Release
         exclude:
           - os: windows-latest
             c_compiler: gcc
+            build_type: Release
           - os: windows-latest
+            build_type: Release
             c_compiler: clang
+          - os: windows-latest
+            c_compiler: gcc
+            build_type: Debug
+            # Originally I wanted to have just CL windows-latest Debug enabled because it was failing, however this also appears to fail for the same unknown reason so will
+            # keep it for now
+        # - os: windows-latest
+           # build_type: Debug
+           # c_compiler: clang
           - os: ubuntu-latest
             c_compiler: cl
+            build_type: Release
+          - os: ubuntu-latest
+            build_type: Debug
 
     steps:
     - uses: actions/checkout@v4
@@ -65,6 +85,8 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -DBUILD_TOOLS=Yes
+        -DSELF_TEST=Yes
         -S ${{ github.workspace }}
         
     - name: Build
@@ -76,3 +98,30 @@ jobs:
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest --build-config ${{ matrix.build_type }}
+
+    - if: runner.os != 'Windows'
+      name: Docs
+      run: |
+           cd build/Server
+           touch apiCheckFailed.flag
+           ./Cuberite <<- EOF
+           load APIDump
+           api
+           apicheck
+           restart
+           stop
+           EOF
+           if [ -f ./NewlyUndocumented.lua ]; then
+                echo "ERROR: Newly undocumented API symbols found:"
+                cat ./NewlyUndocumented.lua
+                exit 1
+           fi
+           if [ -f ./DuplicateDocs.txt ]; then
+                echo "ERROR: API documentation has duplicate symbol warnings:"
+                cat ./DuplicateDocs.txt
+                exit 1
+            fi
+            if [ -f ./apiCheckFailed.flag ]; then
+                echo "ERROR: API check has failed with an unknown error"
+                exit 1
+            fi
