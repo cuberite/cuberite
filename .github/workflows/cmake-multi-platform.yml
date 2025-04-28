@@ -35,6 +35,10 @@ jobs:
             c_compiler: cl
             cpp_compiler: cl
             build_type: Debug
+          - os: windows-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+            build_type: Debug
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
