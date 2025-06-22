@@ -14,6 +14,7 @@ public:
 		void LoadFromJson(const Json::Value & a_Root, const AString & file_name)
 		{
 			LoadItems(a_Root, file_name);
+			LoadBlockTypes(a_Root, file_name);
 		}
 
 		void LoadItems(const Json::Value & a_Root, const AString & file_name)
@@ -40,6 +41,31 @@ public:
 			}
 		}
 
+		void LoadBlockTypes(const Json::Value & a_Root, const AString & file_name)
+		{
+			auto items = a_Root.get("minecraft:block_type", Json::Value());
+			if (items.type() == Json::nullValue)
+			{
+				LOGERROR(fmt::format(FMT_STRING("Failed to get minecraft:block_type object in json file registries file {}."), file_name));
+				return;
+			}
+			items = items.get("entries", Json::Value());
+			if (items.type() == Json::nullValue)
+			{
+				LOGERROR(fmt::format(FMT_STRING("Failed to get entries in items object in json registries tags file {}."), file_name));
+				return;
+			}
+			for (auto itr = items.begin(), end = items.end(); itr != end; ++itr)
+			{
+				auto Item = NamespaceSerializer::ToBlockType(itr.name().substr(PrefixLength));
+				auto id = itr->get("protocol_id", Json::Value()).asUInt();
+
+				m_ToProtocolBlockTypeMap[Item] = id;
+				m_ProtocolToBlockTypeMap[id] = Item;
+			}
+		}
+
+
 		UInt32 ItemToProtocol(Item a_Item)
 		{
 			return m_ToProtocolItemMap[a_Item];
@@ -50,9 +76,22 @@ public:
 			return m_ProtocolToItemMap[a_Item];
 		}
 
+		UInt32 BlockTypeToProtocol(BlockType a_Item)
+		{
+			return m_ToProtocolBlockTypeMap[a_Item];
+		}
+
+		BlockType ProtocolToBlockType(UInt32 a_Item)
+		{
+			return m_ProtocolToBlockTypeMap[a_Item];
+		}
+
 	private:
 		std::map<Item, UInt32> m_ToProtocolItemMap;
 		std::map<UInt32, Item> m_ProtocolToItemMap;
+
+		std::map<BlockType, UInt32> m_ToProtocolBlockTypeMap;
+		std::map<UInt32, BlockType> m_ProtocolToBlockTypeMap;
 	};
 
 	class cRegistryHandler
@@ -138,6 +177,27 @@ public:
 			}
 			return m_VersionSpecificMap[a_Version].ProtocolToItem(a_ID);
 		}
+
+		UInt32 BlockTypeToProtocol(BlockType a_BlockType, cProtocol::Version a_Version)
+		{
+			if (m_VersionSpecificMap.count(a_Version) == 0)
+			{
+				LOGERROR(fmt::format(FMT_STRING("Tried to get Id for item {} for Version: {}. But the version is not loaded returning 0"), NamespaceSerializer::From(a_BlockType), cMultiVersionProtocol::GetVersionTextFromInt(a_Version)));
+				return 0;
+			}
+			return m_VersionSpecificMap[a_Version].BlockTypeToProtocol(a_BlockType);
+		}
+
+		BlockType ProtocolToBlockType(UInt32 a_ID, cProtocol::Version a_Version)
+		{
+			if (m_VersionSpecificMap.count(a_Version) == 0)
+			{
+				LOGERROR(fmt::format(FMT_STRING("Tried to get Item from id {} for Version: {}. But the version is not loaded returning Air"), a_ID, cMultiVersionProtocol::GetVersionTextFromInt(a_Version)));
+				return BlockType::Air;
+			}
+			return m_VersionSpecificMap[a_Version].ProtocolToBlockType(a_ID);
+		}
+
 private:
 		std::map<cProtocol::Version, cVersionSpecificMap> m_VersionSpecificMap;
 	};
