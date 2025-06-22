@@ -317,6 +317,7 @@ namespace BlockItemConverter
 			case Item::Dispenser:                          return BlockType::Dispenser;
 			case Item::DragonEgg:                          return BlockType::DragonEgg;
 			case Item::DragonHead:                         return BlockType::DragonHead;
+			case Item::DriedGhast:                         return BlockType::DriedGhast;
 			case Item::DriedKelpBlock:                     return BlockType::DriedKelpBlock;
 			case Item::DripstoneBlock:                     return BlockType::DripstoneBlock;
 			case Item::Dropper:                            return BlockType::Dropper;
@@ -1281,6 +1282,7 @@ namespace BlockItemConverter
 			case BlockType::Dispenser:                       return Item::Dispenser;
 			case BlockType::DragonEgg:                       return Item::DragonEgg;
 			case BlockType::DragonHead:                      return Item::DragonHead;
+			case BlockType::DriedGhast:                      return Item::DriedGhast;
 			case BlockType::DriedKelpBlock:                  return Item::DriedKelpBlock;
 			case BlockType::DripstoneBlock:                  return Item::DripstoneBlock;
 			case BlockType::Dropper:                         return Item::Dropper;

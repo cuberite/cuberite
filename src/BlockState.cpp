@@ -358,6 +358,7 @@ BlockState::BlockState(BlockType a_Type) : ID([&]
 		case BlockType::DragonEgg:                       return DragonEgg::DragonEgg().ID;
 		case BlockType::DragonHead:                      return DragonHead::DragonHead().ID;
 		case BlockType::DragonWallHead:                  return DragonWallHead::DragonWallHead().ID;
+		case BlockType::DriedGhast:                      return DriedGhast::DriedGhast().ID;
 		case BlockType::DriedKelpBlock:                  return DriedKelpBlock::DriedKelpBlock().ID;
 		case BlockType::DripstoneBlock:                  return DripstoneBlock::DripstoneBlock().ID;
 		case BlockType::Dropper:                         return Dropper::Dropper().ID;

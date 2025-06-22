@@ -352,6 +352,7 @@ enum class BlockType
 	DragonEgg,
 	DragonHead,
 	DragonWallHead,
+	DriedGhast,
 	DriedKelpBlock,
 	DripstoneBlock,
 	Dropper,

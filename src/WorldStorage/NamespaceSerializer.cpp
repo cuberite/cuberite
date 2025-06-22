@@ -423,6 +423,7 @@ std::string_view NamespaceSerializer::From(const BlockType a_ID)
 		case BlockType::DragonEgg:                       return "dragon_egg";
 		case BlockType::DragonHead:                      return "dragon_head";
 		case BlockType::DragonWallHead:                  return "dragon_wall_head";
+		case BlockType::DriedGhast:                      return "dried_ghast";
 		case BlockType::DriedKelpBlock:                  return "dried_kelp_block";
 		case BlockType::DripstoneBlock:                  return "dripstone_block";
 		case BlockType::Dropper:                         return "dropper";
@@ -1502,6 +1503,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::BlackConcretePowder:                return "black_concrete_powder";
 		case Item::BlackDye:                           return "black_dye";
 		case Item::BlackGlazedTerracotta:              return "black_glazed_terracotta";
+		case Item::BlackHarness:                       return "black_harness";
 		case Item::BlackShulkerBox:                    return "black_shulker_box";
 		case Item::BlackStainedGlass:                  return "black_stained_glass";
 		case Item::BlackStainedGlassPane:              return "black_stained_glass_pane";
@@ -1526,6 +1528,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::BlueDye:                            return "blue_dye";
 		case Item::BlueEgg:                            return "blue_egg";
 		case Item::BlueGlazedTerracotta:               return "blue_glazed_terracotta";
+		case Item::BlueHarness:                        return "blue_harness";
 		case Item::BlueIce:                            return "blue_ice";
 		case Item::BlueOrchid:                         return "blue_orchid";
 		case Item::BlueShulkerBox:                     return "blue_shulker_box";
@@ -1566,6 +1569,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::BrownDye:                           return "brown_dye";
 		case Item::BrownEgg:                           return "brown_egg";
 		case Item::BrownGlazedTerracotta:              return "brown_glazed_terracotta";
+		case Item::BrownHarness:                       return "brown_harness";
 		case Item::BrownMushroom:                      return "brown_mushroom";
 		case Item::BrownMushroomBlock:                 return "brown_mushroom_block";
 		case Item::BrownShulkerBox:                    return "brown_shulker_box";
@@ -1732,6 +1736,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::CyanConcretePowder:                 return "cyan_concrete_powder";
 		case Item::CyanDye:                            return "cyan_dye";
 		case Item::CyanGlazedTerracotta:               return "cyan_glazed_terracotta";
+		case Item::CyanHarness:                        return "cyan_harness";
 		case Item::CyanShulkerBox:                     return "cyan_shulker_box";
 		case Item::CyanStainedGlass:                   return "cyan_stained_glass";
 		case Item::CyanStainedGlassPane:               return "cyan_stained_glass_pane";
@@ -1823,6 +1828,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::DragonBreath:                       return "dragon_breath";
 		case Item::DragonEgg:                          return "dragon_egg";
 		case Item::DragonHead:                         return "dragon_head";
+		case Item::DriedGhast:                         return "dried_ghast";
 		case Item::DriedKelp:                          return "dried_kelp";
 		case Item::DriedKelpBlock:                     return "dried_kelp_block";
 		case Item::DripstoneBlock:                     return "dripstone_block";
@@ -1944,6 +1950,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::GrayConcretePowder:                 return "gray_concrete_powder";
 		case Item::GrayDye:                            return "gray_dye";
 		case Item::GrayGlazedTerracotta:               return "gray_glazed_terracotta";
+		case Item::GrayHarness:                        return "gray_harness";
 		case Item::GrayShulkerBox:                     return "gray_shulker_box";
 		case Item::GrayStainedGlass:                   return "gray_stained_glass";
 		case Item::GrayStainedGlassPane:               return "gray_stained_glass_pane";
@@ -1958,6 +1965,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::GreenConcretePowder:                return "green_concrete_powder";
 		case Item::GreenDye:                           return "green_dye";
 		case Item::GreenGlazedTerracotta:              return "green_glazed_terracotta";
+		case Item::GreenHarness:                       return "green_harness";
 		case Item::GreenShulkerBox:                    return "green_shulker_box";
 		case Item::GreenStainedGlass:                  return "green_stained_glass";
 		case Item::GreenStainedGlassPane:              return "green_stained_glass_pane";
@@ -1969,6 +1977,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::GusterBannerPattern:                return "guster_banner_pattern";
 		case Item::GusterPotterySherd:                 return "guster_pottery_sherd";
 		case Item::HangingRoots:                       return "hanging_roots";
+		case Item::HappyGhastSpawnEgg:                 return "happy_ghast_spawn_egg";
 		case Item::HayBlock:                           return "hay_block";
 		case Item::HeartOfTheSea:                      return "heart_of_the_sea";
 		case Item::HeartPotterySherd:                  return "heart_pottery_sherd";
@@ -2067,6 +2076,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::LightBlueConcretePowder:            return "light_blue_concrete_powder";
 		case Item::LightBlueDye:                       return "light_blue_dye";
 		case Item::LightBlueGlazedTerracotta:          return "light_blue_glazed_terracotta";
+		case Item::LightBlueHarness:                   return "light_blue_harness";
 		case Item::LightBlueShulkerBox:                return "light_blue_shulker_box";
 		case Item::LightBlueStainedGlass:              return "light_blue_stained_glass";
 		case Item::LightBlueStainedGlassPane:          return "light_blue_stained_glass_pane";
@@ -2081,6 +2091,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::LightGrayConcretePowder:            return "light_gray_concrete_powder";
 		case Item::LightGrayDye:                       return "light_gray_dye";
 		case Item::LightGrayGlazedTerracotta:          return "light_gray_glazed_terracotta";
+		case Item::LightGrayHarness:                   return "light_gray_harness";
 		case Item::LightGrayShulkerBox:                return "light_gray_shulker_box";
 		case Item::LightGrayStainedGlass:              return "light_gray_stained_glass";
 		case Item::LightGrayStainedGlassPane:          return "light_gray_stained_glass_pane";
@@ -2100,6 +2111,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::LimeConcretePowder:                 return "lime_concrete_powder";
 		case Item::LimeDye:                            return "lime_dye";
 		case Item::LimeGlazedTerracotta:               return "lime_glazed_terracotta";
+		case Item::LimeHarness:                        return "lime_harness";
 		case Item::LimeShulkerBox:                     return "lime_shulker_box";
 		case Item::LimeStainedGlass:                   return "lime_stained_glass";
 		case Item::LimeStainedGlassPane:               return "lime_stained_glass_pane";
@@ -2119,6 +2131,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::MagentaConcretePowder:              return "magenta_concrete_powder";
 		case Item::MagentaDye:                         return "magenta_dye";
 		case Item::MagentaGlazedTerracotta:            return "magenta_glazed_terracotta";
+		case Item::MagentaHarness:                     return "magenta_harness";
 		case Item::MagentaShulkerBox:                  return "magenta_shulker_box";
 		case Item::MagentaStainedGlass:                return "magenta_stained_glass";
 		case Item::MagentaStainedGlassPane:            return "magenta_stained_glass_pane";
@@ -2192,6 +2205,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::MusicDiscRelic:                     return "music_disc_relic";
 		case Item::MusicDiscStal:                      return "music_disc_stal";
 		case Item::MusicDiscStrad:                     return "music_disc_strad";
+		case Item::MusicDiscTears:                     return "music_disc_tears";
 		case Item::MusicDiscWait:                      return "music_disc_wait";
 		case Item::MusicDiscWard:                      return "music_disc_ward";
 		case Item::Mutton:                             return "mutton";
@@ -2258,6 +2272,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::OrangeConcretePowder:               return "orange_concrete_powder";
 		case Item::OrangeDye:                          return "orange_dye";
 		case Item::OrangeGlazedTerracotta:             return "orange_glazed_terracotta";
+		case Item::OrangeHarness:                      return "orange_harness";
 		case Item::OrangeShulkerBox:                   return "orange_shulker_box";
 		case Item::OrangeStainedGlass:                 return "orange_stained_glass";
 		case Item::OrangeStainedGlassPane:             return "orange_stained_glass_pane";
@@ -2320,6 +2335,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::PinkConcretePowder:                 return "pink_concrete_powder";
 		case Item::PinkDye:                            return "pink_dye";
 		case Item::PinkGlazedTerracotta:               return "pink_glazed_terracotta";
+		case Item::PinkHarness:                        return "pink_harness";
 		case Item::PinkPetals:                         return "pink_petals";
 		case Item::PinkShulkerBox:                     return "pink_shulker_box";
 		case Item::PinkStainedGlass:                   return "pink_stained_glass";
@@ -2396,6 +2412,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::PurpleConcretePowder:               return "purple_concrete_powder";
 		case Item::PurpleDye:                          return "purple_dye";
 		case Item::PurpleGlazedTerracotta:             return "purple_glazed_terracotta";
+		case Item::PurpleHarness:                      return "purple_harness";
 		case Item::PurpleShulkerBox:                   return "purple_shulker_box";
 		case Item::PurpleStainedGlass:                 return "purple_stained_glass";
 		case Item::PurpleStainedGlassPane:             return "purple_stained_glass_pane";
@@ -2435,6 +2452,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::RedConcretePowder:                  return "red_concrete_powder";
 		case Item::RedDye:                             return "red_dye";
 		case Item::RedGlazedTerracotta:                return "red_glazed_terracotta";
+		case Item::RedHarness:                         return "red_harness";
 		case Item::RedMushroom:                        return "red_mushroom";
 		case Item::RedMushroomBlock:                   return "red_mushroom_block";
 		case Item::RedNetherBrickSlab:                 return "red_nether_brick_slab";
@@ -2752,6 +2770,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::WhiteConcretePowder:                return "white_concrete_powder";
 		case Item::WhiteDye:                           return "white_dye";
 		case Item::WhiteGlazedTerracotta:              return "white_glazed_terracotta";
+		case Item::WhiteHarness:                       return "white_harness";
 		case Item::WhiteShulkerBox:                    return "white_shulker_box";
 		case Item::WhiteStainedGlass:                  return "white_stained_glass";
 		case Item::WhiteStainedGlassPane:              return "white_stained_glass_pane";
@@ -2784,6 +2803,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::YellowConcretePowder:               return "yellow_concrete_powder";
 		case Item::YellowDye:                          return "yellow_dye";
 		case Item::YellowGlazedTerracotta:             return "yellow_glazed_terracotta";
+		case Item::YellowHarness:                      return "yellow_harness";
 		case Item::YellowShulkerBox:                   return "yellow_shulker_box";
 		case Item::YellowStainedGlass:                 return "yellow_stained_glass";
 		case Item::YellowStainedGlassPane:             return "yellow_stained_glass_pane";
@@ -3229,6 +3249,7 @@ BlockType NamespaceSerializer::ToBlockType(std::string_view a_ID)
 		{ "dragon_egg",                        BlockType::DragonEgg },
 		{ "dragon_head",                       BlockType::DragonHead },
 		{ "dragon_wall_head",                  BlockType::DragonWallHead },
+		{ "dried_ghast",                       BlockType::DriedGhast },
 		{ "dried_kelp_block",                  BlockType::DriedKelpBlock },
 		{ "dripstone_block",                   BlockType::DripstoneBlock },
 		{ "dropper",                           BlockType::Dropper },
@@ -4263,6 +4284,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "black_concrete_powder",                 Item::BlackConcretePowder },
 		{ "black_dye",                             Item::BlackDye },
 		{ "black_glazed_terracotta",               Item::BlackGlazedTerracotta },
+		{ "black_harness",                         Item::BlackHarness },
 		{ "black_shulker_box",                     Item::BlackShulkerBox },
 		{ "black_stained_glass",                   Item::BlackStainedGlass },
 		{ "black_stained_glass_pane",              Item::BlackStainedGlassPane },
@@ -4287,6 +4309,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "blue_dye",                              Item::BlueDye },
 		{ "blue_egg",                              Item::BlueEgg },
 		{ "blue_glazed_terracotta",                Item::BlueGlazedTerracotta },
+		{ "blue_harness",                          Item::BlueHarness },
 		{ "blue_ice",                              Item::BlueIce },
 		{ "blue_orchid",                           Item::BlueOrchid },
 		{ "blue_shulker_box",                      Item::BlueShulkerBox },
@@ -4327,6 +4350,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "brown_dye",                             Item::BrownDye },
 		{ "brown_egg",                             Item::BrownEgg },
 		{ "brown_glazed_terracotta",               Item::BrownGlazedTerracotta },
+		{ "brown_harness",                         Item::BrownHarness },
 		{ "brown_mushroom",                        Item::BrownMushroom },
 		{ "brown_mushroom_block",                  Item::BrownMushroomBlock },
 		{ "brown_shulker_box",                     Item::BrownShulkerBox },
@@ -4493,6 +4517,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "cyan_concrete_powder",                  Item::CyanConcretePowder },
 		{ "cyan_dye",                              Item::CyanDye },
 		{ "cyan_glazed_terracotta",                Item::CyanGlazedTerracotta },
+		{ "cyan_harness",                          Item::CyanHarness },
 		{ "cyan_shulker_box",                      Item::CyanShulkerBox },
 		{ "cyan_stained_glass",                    Item::CyanStainedGlass },
 		{ "cyan_stained_glass_pane",               Item::CyanStainedGlassPane },
@@ -4584,6 +4609,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "dragon_breath",                         Item::DragonBreath },
 		{ "dragon_egg",                            Item::DragonEgg },
 		{ "dragon_head",                           Item::DragonHead },
+		{ "dried_ghast",                           Item::DriedGhast },
 		{ "dried_kelp",                            Item::DriedKelp },
 		{ "dried_kelp_block",                      Item::DriedKelpBlock },
 		{ "dripstone_block",                       Item::DripstoneBlock },
@@ -4705,6 +4731,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "gray_concrete_powder",                  Item::GrayConcretePowder },
 		{ "gray_dye",                              Item::GrayDye },
 		{ "gray_glazed_terracotta",                Item::GrayGlazedTerracotta },
+		{ "gray_harness",                          Item::GrayHarness },
 		{ "gray_shulker_box",                      Item::GrayShulkerBox },
 		{ "gray_stained_glass",                    Item::GrayStainedGlass },
 		{ "gray_stained_glass_pane",               Item::GrayStainedGlassPane },
@@ -4719,6 +4746,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "green_concrete_powder",                 Item::GreenConcretePowder },
 		{ "green_dye",                             Item::GreenDye },
 		{ "green_glazed_terracotta",               Item::GreenGlazedTerracotta },
+		{ "green_harness",                         Item::GreenHarness },
 		{ "green_shulker_box",                     Item::GreenShulkerBox },
 		{ "green_stained_glass",                   Item::GreenStainedGlass },
 		{ "green_stained_glass_pane",              Item::GreenStainedGlassPane },
@@ -4730,6 +4758,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "guster_banner_pattern",                 Item::GusterBannerPattern },
 		{ "guster_pottery_sherd",                  Item::GusterPotterySherd },
 		{ "hanging_roots",                         Item::HangingRoots },
+		{ "happy_ghast_spawn_egg",                 Item::HappyGhastSpawnEgg },
 		{ "hay_block",                             Item::HayBlock },
 		{ "heart_of_the_sea",                      Item::HeartOfTheSea },
 		{ "heart_pottery_sherd",                   Item::HeartPotterySherd },
@@ -4828,6 +4857,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "light_blue_concrete_powder",            Item::LightBlueConcretePowder },
 		{ "light_blue_dye",                        Item::LightBlueDye },
 		{ "light_blue_glazed_terracotta",          Item::LightBlueGlazedTerracotta },
+		{ "light_blue_harness",                    Item::LightBlueHarness },
 		{ "light_blue_shulker_box",                Item::LightBlueShulkerBox },
 		{ "light_blue_stained_glass",              Item::LightBlueStainedGlass },
 		{ "light_blue_stained_glass_pane",         Item::LightBlueStainedGlassPane },
@@ -4842,6 +4872,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "light_gray_concrete_powder",            Item::LightGrayConcretePowder },
 		{ "light_gray_dye",                        Item::LightGrayDye },
 		{ "light_gray_glazed_terracotta",          Item::LightGrayGlazedTerracotta },
+		{ "light_gray_harness",                    Item::LightGrayHarness },
 		{ "light_gray_shulker_box",                Item::LightGrayShulkerBox },
 		{ "light_gray_stained_glass",              Item::LightGrayStainedGlass },
 		{ "light_gray_stained_glass_pane",         Item::LightGrayStainedGlassPane },
@@ -4861,6 +4892,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "lime_concrete_powder",                  Item::LimeConcretePowder },
 		{ "lime_dye",                              Item::LimeDye },
 		{ "lime_glazed_terracotta",                Item::LimeGlazedTerracotta },
+		{ "lime_harness",                          Item::LimeHarness },
 		{ "lime_shulker_box",                      Item::LimeShulkerBox },
 		{ "lime_stained_glass",                    Item::LimeStainedGlass },
 		{ "lime_stained_glass_pane",               Item::LimeStainedGlassPane },
@@ -4880,6 +4912,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "magenta_concrete_powder",               Item::MagentaConcretePowder },
 		{ "magenta_dye",                           Item::MagentaDye },
 		{ "magenta_glazed_terracotta",             Item::MagentaGlazedTerracotta },
+		{ "magenta_harness",                       Item::MagentaHarness },
 		{ "magenta_shulker_box",                   Item::MagentaShulkerBox },
 		{ "magenta_stained_glass",                 Item::MagentaStainedGlass },
 		{ "magenta_stained_glass_pane",            Item::MagentaStainedGlassPane },
@@ -4953,6 +4986,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "music_disc_relic",                      Item::MusicDiscRelic },
 		{ "music_disc_stal",                       Item::MusicDiscStal },
 		{ "music_disc_strad",                      Item::MusicDiscStrad },
+		{ "music_disc_tears",                      Item::MusicDiscTears },
 		{ "music_disc_wait",                       Item::MusicDiscWait },
 		{ "music_disc_ward",                       Item::MusicDiscWard },
 		{ "mutton",                                Item::Mutton },
@@ -5019,6 +5053,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "orange_concrete_powder",                Item::OrangeConcretePowder },
 		{ "orange_dye",                            Item::OrangeDye },
 		{ "orange_glazed_terracotta",              Item::OrangeGlazedTerracotta },
+		{ "orange_harness",                        Item::OrangeHarness },
 		{ "orange_shulker_box",                    Item::OrangeShulkerBox },
 		{ "orange_stained_glass",                  Item::OrangeStainedGlass },
 		{ "orange_stained_glass_pane",             Item::OrangeStainedGlassPane },
@@ -5081,6 +5116,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "pink_concrete_powder",                  Item::PinkConcretePowder },
 		{ "pink_dye",                              Item::PinkDye },
 		{ "pink_glazed_terracotta",                Item::PinkGlazedTerracotta },
+		{ "pink_harness",                          Item::PinkHarness },
 		{ "pink_petals",                           Item::PinkPetals },
 		{ "pink_shulker_box",                      Item::PinkShulkerBox },
 		{ "pink_stained_glass",                    Item::PinkStainedGlass },
@@ -5157,6 +5193,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "purple_concrete_powder",                Item::PurpleConcretePowder },
 		{ "purple_dye",                            Item::PurpleDye },
 		{ "purple_glazed_terracotta",              Item::PurpleGlazedTerracotta },
+		{ "purple_harness",                        Item::PurpleHarness },
 		{ "purple_shulker_box",                    Item::PurpleShulkerBox },
 		{ "purple_stained_glass",                  Item::PurpleStainedGlass },
 		{ "purple_stained_glass_pane",             Item::PurpleStainedGlassPane },
@@ -5196,6 +5233,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "red_concrete_powder",                   Item::RedConcretePowder },
 		{ "red_dye",                               Item::RedDye },
 		{ "red_glazed_terracotta",                 Item::RedGlazedTerracotta },
+		{ "red_harness",                           Item::RedHarness },
 		{ "red_mushroom",                          Item::RedMushroom },
 		{ "red_mushroom_block",                    Item::RedMushroomBlock },
 		{ "red_nether_brick_slab",                 Item::RedNetherBrickSlab },
@@ -5513,6 +5551,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "white_concrete_powder",                 Item::WhiteConcretePowder },
 		{ "white_dye",                             Item::WhiteDye },
 		{ "white_glazed_terracotta",               Item::WhiteGlazedTerracotta },
+		{ "white_harness",                         Item::WhiteHarness },
 		{ "white_shulker_box",                     Item::WhiteShulkerBox },
 		{ "white_stained_glass",                   Item::WhiteStainedGlass },
 		{ "white_stained_glass_pane",              Item::WhiteStainedGlassPane },
@@ -5545,6 +5584,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "yellow_concrete_powder",                Item::YellowConcretePowder },
 		{ "yellow_dye",                            Item::YellowDye },
 		{ "yellow_glazed_terracotta",              Item::YellowGlazedTerracotta },
+		{ "yellow_harness",                        Item::YellowHarness },
 		{ "yellow_shulker_box",                    Item::YellowShulkerBox },
 		{ "yellow_stained_glass",                  Item::YellowStainedGlass },
 		{ "yellow_stained_glass_pane",             Item::YellowStainedGlassPane },

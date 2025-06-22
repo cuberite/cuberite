@@ -49,7 +49,8 @@ class cChunkDataSerializer
 		v768,
 		v769,
 		v770,
-		Last = CacheVersion::v770
+		v771,
+		Last = CacheVersion::v771
 	};
 
 	/** A single cache entry containing the raw data, compressed data, and a validity flag. */

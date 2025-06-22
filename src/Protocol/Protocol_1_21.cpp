@@ -12,6 +12,7 @@
 #include "Palettes/Palette_1_21_4.h"
 #include "Palettes/Palette_1_21_5.h"
 #include "../Entities/Entity.h"
+#include "Palettes/Palette_1_21_6.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3273,4 +3274,826 @@ UInt8 cProtocol_1_21_5::GetProtocolEntityType(eEntityType a_Type) const
 		case eEntityType::etZombifiedPiglin:      return 147;
 		default: return 0;
 	}
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//  cProtocol_1_21_5:
+
+cProtocol::Version cProtocol_1_21_6::GetProtocolVersion() const
+{
+	return Version::v1_21_6;
+}
+
+
+
+
+
+void cProtocol_1_21_6::SendSelectKnownPacks()
+{
+	{
+		cPacketizer Pkt(*this, pktSelectKnownPacks);
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteString("minecraft");
+		Pkt.WriteString("core");
+		Pkt.WriteString("1.21.6");
+	}
+}
+
+
+
+
+
+void cProtocol_1_21_6::SendTags(void)
+{
+	{
+		cPacketizer Pkt(*this, pktConfigurationTags);
+		Pkt.WriteVarInt32(4);
+		cRoot::Get()->GetTagManager()->GetItemTags().WriteTags<&Palette_1_21_6::From>(Pkt);
+		cRoot::Get()->GetTagManager()->GetBlockTags().WriteTags<&Palette_1_21_6::From>(Pkt);
+		cRoot::Get()->GetTagManager()->GetFluidTags().WriteTags<&Palette_1_21_5::From>(Pkt);
+		Pkt.WriteString("minecraft:worldgen/biome");
+
+		Pkt.WriteVarInt32(3);
+			Pkt.WriteString("minecraft:is_badlands");
+			Pkt.WriteVarInt32(1);
+				Pkt.WriteVarInt32(1);
+			Pkt.WriteString("minecraft:is_savanna");
+			Pkt.WriteVarInt32(1);
+				Pkt.WriteVarInt32(2);
+			Pkt.WriteString("minecraft:is_jungle");
+			Pkt.WriteVarInt32(1);
+				Pkt.WriteVarInt32(3);
+			// indent -- Has to be here so CheckBasicStyle does not fail
+		// indent
+	}
+}
+
+
+
+
+
+bool cProtocol_1_21_6::HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType)
+{
+	switch (m_State)
+	{
+		case State::Status:
+		{
+			switch (a_PacketType)
+			{
+				case 0x00: HandlePacketStatusRequest(a_ByteBuffer); return true;
+				case 0x01: HandlePacketStatusPing(a_ByteBuffer); return true;
+			}
+			break;
+		}
+
+		case State::Login:
+		{
+			switch (a_PacketType)
+			{
+				case 0x00: HandlePacketLoginStart(a_ByteBuffer); return true;
+				case 0x01: HandlePacketLoginEncryptionResponse(a_ByteBuffer); return true;
+				case 0x02: /* LoginQueryResponseC2SPacket */ return false;
+				case 0x03: HandlePacketEnterConfiguration(a_ByteBuffer); return true;
+				case 0x04: /* CookieResponseC2SPacket */ return false;
+			}
+			break;
+		}
+
+		case State::Configuration:
+		{
+			switch (a_PacketType)
+			{
+				case 0x00: HandlePacketClientSettings(a_ByteBuffer); return true;
+				case 0x01: /* Cookie Response */ return false;
+				case 0x02: HandlePacketPluginMessage(a_ByteBuffer); return true;
+				case 0x03: HandlePacketReady(a_ByteBuffer); return true;
+				case 0x04: HandlePacketKeepAlive(a_ByteBuffer); return true;
+				case 0x05: /* CommonPongC2SPacket */ return false;
+				case 0x06: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
+				case 0x07: /* SelectKnownPacks */ return false;
+				case 0x08: /* Custom Click Action */ return false;
+			}
+			break;
+		}
+
+		case State::Game:
+		{
+			switch (a_PacketType)
+			{
+				case 0x00: HandleConfirmTeleport(a_ByteBuffer); return true;
+				case 0x01: /* query nbt packet */ return false;
+				case 0x02: /* BundleItemSelected */ return false;
+				case 0x03: /* update difficulty */ return false;
+				case 0x04: /* Change game mode */ return false;
+				case 0x05: /* MessageAcknowledgmentC2SPacket */ return false;
+				case 0x06: HandlePacketCommandExecution(a_ByteBuffer); return true;
+				case 0x07: /* ChatCommandSignedC2SPacket */ return false;
+				case 0x08: HandlePacketChatMessage(a_ByteBuffer); return true;
+				case 0x09: HandlePacketPlayerSession(a_ByteBuffer); return true;
+				case 0x0A: /* AcknowledgeChunksC2SPacket */ return false;
+				case 0x0B: HandlePacketClientStatus(a_ByteBuffer); return true;
+				case 0x0C: HandlePacketClientTickEnd(a_ByteBuffer); return true;
+				case 0x0D: HandlePacketClientSettings(a_ByteBuffer); return true;
+				case 0x0E: HandlePacketTabComplete(a_ByteBuffer); return true;
+				case 0x0F: /* AcknowledgeReconfigurationC2SPacket */ return false;
+				case 0x10: /* ButtonClickC2SPacket */ return false;
+				case 0x11: HandlePacketWindowClick(a_ByteBuffer); return true;
+				case 0x12: HandlePacketWindowClose(a_ByteBuffer); return true;
+				case 0x13: /* SlotChangedStateC2SPacket */ return false;
+				case 0x14: /* CookieResponseC2SPacket */ return false;
+				case 0x15: HandlePacketPluginMessage(a_ByteBuffer); return true;
+				case 0x16: /* DebugSampleSubscriptionC2SPacket */ return false;
+				case 0x17: HandlePacketBookUpdate(a_ByteBuffer); return true;  // not fully implemented
+				case 0x18: /* QueryEntityNbtC2SPacket */ return false;
+				case 0x19: HandlePacketUseEntity(a_ByteBuffer); return true;
+				case 0x1A: /* Jigsaw generating */ return false;
+				case 0x1B: HandlePacketKeepAlive(a_ByteBuffer); return true;
+				case 0x1C: /* Update difficulty lock */ return false;  // only used in single player
+				case 0x1D: HandlePacketPlayerPos(a_ByteBuffer); return true;  // PositionAndOnGround
+				case 0x1E: HandlePacketPlayerPosLook(a_ByteBuffer); return true;  // full
+				case 0x1F: HandlePacketPlayerLook(a_ByteBuffer); return true;  // LookAndOnGround
+				case 0x20: HandlePacketPlayer(a_ByteBuffer); return true;
+				case 0x21: HandlePacketVehicleMove(a_ByteBuffer); return true;
+				case 0x22: HandlePacketBoatSteer(a_ByteBuffer); return true;
+				case 0x23: /* pick item from block */ return false;
+				case 0x24: /* pick item from entity */ return false;
+				case 0x25: /* QueryPingC2SPacket */ return false;
+				case 0x26: HandleCraftRecipe(a_ByteBuffer); return true;
+				case 0x27: HandlePacketPlayerAbilities(a_ByteBuffer); return true;
+				case 0x28: HandlePacketBlockDig(a_ByteBuffer); return true;
+				case 0x29: /* client command packet */ return false;
+				case 0x2A: HandlePacketSteerVehicle(a_ByteBuffer); return true;  // player input packet
+				case 0x2B: /* Player Loaded */ return false;
+				case 0x2C: /* PlayPongC2SPacket */ return false;
+				case 0x2D: /* Recipe Category Options */ return false;
+				case 0x2E: HandlePacketCraftingBookData(a_ByteBuffer); return true;
+				case 0x2F: HandlePacketNameItem(a_ByteBuffer); return true;
+				case 0x30: HandlePacketResourcePackStatus(a_ByteBuffer); return true;
+				case 0x31: HandlePacketAdvancementTab(a_ByteBuffer); return true;
+				case 0x32: /* select villager trade */ return false;
+				case 0x33: HandlePacketSetBeaconEffect(a_ByteBuffer); return true;
+				case 0x34: HandlePacketSlotSelect(a_ByteBuffer); return true;
+				case 0x35: HandlePacketCommandBlockUpdate(a_ByteBuffer); return true;
+				case 0x36: /* update minecart command block */ return false;
+				case 0x37: HandlePacketCreativeInventoryAction(a_ByteBuffer); return true;
+				case 0x38: /* Update jigsaw block */ return false;
+				case 0x39: /* Update structure block */ return false;
+				case 0x3A: /* set test block */ return false;
+				case 0x3B: HandlePacketUpdateSign(a_ByteBuffer); return true;
+				case 0x3C: /* Update hand swing */ return false;
+				case 0x3D: /* Spectator teleport */ return false;
+				case 0x3E: /* test instance block action */ return false;
+				case 0x3F: HandlePacketBlockPlace(a_ByteBuffer); return true;
+				case 0x40: HandlePacketUseItem(a_ByteBuffer); return true;
+				case 0x41: /* Custom Click Action */ return false;
+				default: break;
+			}
+		}
+	}
+	UNREACHABLE("");
+}
+
+
+
+
+
+UInt32 cProtocol_1_21_6::GetPacketID(ePacketType a_PacketType) const
+{
+	switch (a_PacketType)
+	{
+		// Status packets
+		case cProtocol::pktStatusResponse:       return 0x00;
+		case cProtocol::pktPingResponse:         return 0x01;
+
+		//  Login Packets
+		case cProtocol::pktDisconnectDuringLogin:return 0x00;
+		case cProtocol::pktEncryptionRequest:    return 0x01;
+		case cProtocol::pktLoginSuccess:         return 0x02;
+		case cProtocol::pktStartCompression:     return 0x03;
+			// login query request 0x4
+			// cookie request 0x5
+
+		// Configuration
+			// CookieRequestS2CPacket 0x0
+		case cProtocol::pktConfigurationCustomPayload: return 0x01;
+			//  Disconnect 0x02
+		case cProtocol::pktConfigurationReady:   return 0x03;
+			//  KeepAlive 0x04
+			//  CommonPing 0x05
+			// RestChat 0x06
+		case cProtocol::pktConfigurationDynamicRegistries: return 0x07;
+			// Resource pack remove 0x08
+			// ResourcePackSend  0x09
+			// StoreCookie 0x0A
+			// ServerTransfer 0x0B
+			// Features 0x0C
+		case cProtocol::pktConfigurationTags:    return 0x0D;
+		case cProtocol::pktSelectKnownPacks:     return 0x0E;
+			// CustomReportDetailsS2CPacket 0x0F
+			// ServerLinksS2CPacket 0x10
+
+		//  Game packets
+		case cProtocol::pktSpawnObject:          return 0x01;
+		case cProtocol::pktSpawnMob:             return 0x01;
+		case cProtocol::pktSpawnPainting:        return 0x01;
+		case cProtocol::pktSpawnOtherPlayer:     return 0x01;
+		case cProtocol::pktSpawnExperienceOrb:   return 0x01;
+		case cProtocol::pktEntityAnimation:      return 0x02;
+		case cProtocol::pktStatistics:           return 0x03;
+		case cProtocol::pktPlayerActionResponse: return 0x04;
+		// case cProtocol::pktBlockbreakingprogress:   return 0x05;
+		case cProtocol::pktUpdateBlockEntity:    return 0x06;
+		case cProtocol::pktBlockAction:          return 0x07;
+		case cProtocol::pktBlockChange:          return 0x08;
+		case cProtocol::pktBossBar:              return 0x09;
+		case cProtocol::pktDifficulty:           return 0x0A;
+			//  ChunkSentS2CPacket 0x0B
+			//  StartChunkSendS2CPacket 0xD
+			//  ChunkBiomeDataS2CPacket 0x0D
+			//  clear title 0x0E
+			//  command suggestions here 0x0F
+		case cProtocol::pktCommandTree:          return 0x10;
+		case cProtocol::pktWindowClose:          return 0x11;
+		case cProtocol::pktWindowItems:          return 0x12;  //  Inventory packet
+		case cProtocol::pktWindowProperty:       return 0x13;  //  ScreenHandlerPropertyUpdateS2CPacket
+		case cProtocol::pktInventorySlot:        return 0x14;  //  ScreenHandlerSlotUpdateS2CPacket
+			//  CookieRequest 0x15
+			//  cooldown update 0x16
+			//  chat suggestions 0x17
+		case cProtocol::pktCustomPayload:        return 0x18;
+		case cProtocol::pktPluginMessage:        return 0x18;
+			// EntityDamageS2CPacket 0x19
+			// DebugSample 0x1A
+			// RemoveMessageS2CPacket 0x1B
+		case cProtocol::pktDisconnectDuringGame: return 0x1C;
+			//  ProfilelessChatMessageS2CPacket 0x1D
+		case cProtocol::pktEntityStatus:         return 0x1E;
+			// case EntityPositionSync 0x1F
+		case cProtocol::pktExplosion:            return 0x20;
+		case cProtocol::pktUnloadChunk:          return 0x21;
+		case cProtocol::pktGameMode:             return 0x22;
+		case cProtocol::pktWeather:              return 0x22;
+		case cProtocol::pktHorseWindowOpen:      return 0x23;
+			// DamageTiltS2CPacket 0x24
+			// world border initialize 0x25
+		case cProtocol::pktKeepAlive:            return 0x26;
+			// chunk data packet 0x27
+		case cProtocol::pktSoundParticleEffect:  return 0x28;  // world event
+		case cProtocol::pktParticleEffect:       return 0x29;
+		case cProtocol::pktLightUpdate:          return 0x2A;
+		case cProtocol::pktJoinGame:             return 0x2B;
+			//  map update 0x2C
+			//  set trade offers 0x2D
+		case cProtocol::pktEntityRelMove:        return 0x2E;
+		case cProtocol::pktEntityRelMoveLook:    return 0x2F;
+			// MoveMinecartAlongTrack 0x30
+		case cProtocol::pktEntityLook:           return 0x31;
+			//  vehicle move 0x32
+			//  open written book 0x33
+		case cProtocol::pktWindowOpen:           return 0x34;
+		case cProtocol::pktUpdateSign:           return 0x35;
+			//  CommonPingS2CPacket 0x36
+			//  PingResultS2CPacket 0x37
+			//  craft failed response 0x38
+		case cProtocol::pktPlayerAbilities:      return 0x39;
+			//  ChatMessageS2CPacket 0x3A
+			//  combat exit 0x3B
+			//  comabt enter 0x3C
+			//  death msg 0x3D
+		case cProtocol::pktPlayerLstRemove:      return 0x3E;
+		case cProtocol::pktPlayerList:           return 0x3F;
+			//  look at 0x40
+		case cProtocol::pktPlayerMoveLook:       return 0x41;
+			// player rotation 0x42
+			// recipe add 0x42
+		case cProtocol::pktUnlockRecipe:         return 0x43;
+			// recipe remove 0x44
+			// recipe settings 0x45
+		case cProtocol::pktDestroyEntity:        return 0x46;
+		case cProtocol::pktRemoveEntityEffect:   return 0x47;
+			// ScoreboardScoreResetS2CPacket 0x48
+			// ResourcePackRemoveS2CPacket 0x49
+		case cProtocol::pktResourcePack:         return 0x4A;
+		case cProtocol::pktRespawn:              return 0x4B;
+		case cProtocol::pktEntityHeadLook:       return 0x4C;
+		case cProtocol::pktBlockChanges:         return 0x4D;
+			// select advancment tab 0x4E
+			// ServerMetadataS2CPacket 0x4F
+			// overlay msg 0x50
+			// wb -- worldborder wb center changed 0x51
+			// wb interpolate size 0x52
+			// wb size changed 0x53
+			// wb warning time changed 0x54
+			// wb warning blocks changed 0x55
+		case cProtocol::pktCameraSetTo:          return 0x56;
+		case cProtocol::pktRenderDistanceCenter: return 0x57;
+			//  chunk load distance 0x58
+		case cProtocol::pktSetCursorItem:        return 0x59;
+		case cProtocol::pktSpawnPosition:        return 0x5A;
+			//  scoreboard display 0x5B
+		case cProtocol::pktEntityMeta:           return 0x5C;
+		case cProtocol::pktLeashEntity:          return 0x5D;
+		case cProtocol::pktEntityVelocity:       return 0x5E;
+		case cProtocol::pktEntityEquipment:      return 0x5F;
+		case cProtocol::pktExperience:           return 0x60;
+		case cProtocol::pktUpdateHealth:         return 0x61;
+		case cProtocol::pktHeldItemChange:       return 0x62;
+		case cProtocol::pktScoreboardObjective:  return 0x63;
+		case cProtocol::pktAttachEntity:         return 0x64;
+			// set player inventory 0x65
+			// Teams 0x66
+		case cProtocol::pktUpdateScore:          return 0x67;
+			// simulation distance 0x68
+			// subtitle 0x69
+		case cProtocol::pktTimeUpdate:           return 0x6A;
+		case cProtocol::pktTitle:                return 0x6B;
+			//  title fade 0x6C
+			//  play sound from entity 0x6D
+		case cProtocol::pktSoundEffect:          return 0x6E;
+			//  EnterReconfigurationS2CPacket 0x6F
+			//  stop sound 0x70
+			//  StoreCookies 0x71
+		case cProtocol::pktChatRaw:              return 0x72;  //  Gamemessage
+			//  player list header 0x73
+			//  NbtQueryResponseS2CPacket 0x74
+		case cProtocol::pktCollectEntity:        return 0x75;
+		case cProtocol::pktTeleportEntity:       return 0x76;
+			// Test instance block status 0x77
+			//  UpdateTickRateS2CPacket 0x78
+			//  TickStepS2CPacket 0x79
+			//  ServerTransfer 0x7A
+			//  advancment update 0x7B
+		case cProtocol::pktEntityProperties:     return 0x7C;
+		case cProtocol::pktEntityEffect:         return 0x7D;
+			//  sync recepies 0x7E
+			//  sync tags 0x7F
+			//  ProjectilePower 0x80
+			// CustomReportDetailsS2CPacket 0x81
+			// ServerLinksS2CPacket 0x82
+			// Custom Click Action 0x83
+		default: UNREACHABLE("unhandeled packet");
+	}
+}
+
+
+
+
+
+UInt8 cProtocol_1_21_6::GetProtocolEntityType(eEntityType a_Type) const
+{
+	switch (a_Type)
+	{
+		case eEntityType::etAcaciaBoat:           return 0;
+		case eEntityType::etAcaciaChestBoat:      return 1;
+		case eEntityType::etAllay:                return 2;
+		case eEntityType::etAreaEffectCloud:      return 3;
+		case eEntityType::etArmadillo:            return 4;
+		case eEntityType::etArmorStand:           return 5;
+		case eEntityType::etArrow:                return 6;
+		case eEntityType::etAxolotl:              return 7;
+		case eEntityType::etBambooChestRaft:      return 8;
+		case eEntityType::etBambooRaft:           return 9;
+		case eEntityType::etBat:                  return 10;
+		case eEntityType::etBee:                  return 11;
+		case eEntityType::etBirchBoat:            return 12;
+		case eEntityType::etBirchChestBoat:       return 13;
+		case eEntityType::etBlaze:                return 14;
+		case eEntityType::etBlockDisplay:         return 15;
+		case eEntityType::etBogged:               return 16;
+		case eEntityType::etBreeze:               return 17;
+		case eEntityType::etBreezeWindCharge:     return 18;
+		case eEntityType::etCamel:                return 19;
+		case eEntityType::etCat:                  return 20;
+		case eEntityType::etCaveSpider:           return 21;
+		case eEntityType::etCherryBoat:           return 22;
+		case eEntityType::etCherryChestBoat:      return 23;
+		case eEntityType::etChestMinecart:        return 24;
+		case eEntityType::etChicken:              return 25;
+		case eEntityType::etCod:                  return 26;
+		case eEntityType::etCommandBlockMinecart: return 27;
+		case eEntityType::etCow:                  return 28;
+		case eEntityType::etCreaking:             return 29;
+		case eEntityType::etCreeper:              return 30;
+		case eEntityType::etDarkOakBoat:          return 31;
+		case eEntityType::etDarkOakChestBoat:     return 32;
+		case eEntityType::etDolphin:              return 33;
+		case eEntityType::etDonkey:               return 34;
+		case eEntityType::etDragonFireball:       return 35;
+		case eEntityType::etDrowned:              return 36;
+		case eEntityType::etEgg:                  return 37;
+		case eEntityType::etElderGuardian:        return 38;
+		case eEntityType::etEndCrystal:           return 43;
+		case eEntityType::etEnderDragon:          return 41;
+		case eEntityType::etEnderPearl:           return 42;
+		case eEntityType::etEnderman:             return 39;
+		case eEntityType::etEndermite:            return 40;
+		case eEntityType::etEvoker:               return 44;
+		case eEntityType::etEvokerFangs:          return 45;
+		case eEntityType::etExperienceBottle:     return 46;
+		case eEntityType::etExperienceOrb:        return 47;
+		case eEntityType::etEyeOfEnder:           return 48;
+		case eEntityType::etFallingBlock:         return 49;
+		case eEntityType::etFireball:             return 50;
+		case eEntityType::etFireworkRocket:       return 51;
+		case eEntityType::etFishingBobber:        return 150;
+		case eEntityType::etFox:                  return 52;
+		case eEntityType::etFrog:                 return 53;
+		case eEntityType::etFurnaceMinecart:      return 54;
+		case eEntityType::etGhast:                return 55;
+		case eEntityType::etGiant:                return 57;
+		case eEntityType::etGlowItemFrame:        return 58;
+		case eEntityType::etGlowSquid:            return 59;
+		case eEntityType::etGoat:                 return 60;
+		case eEntityType::etGuardian:             return 61;
+		case eEntityType::etHappyGhast:           return 56;
+		case eEntityType::etHoglin:               return 62;
+		case eEntityType::etHopperMinecart:       return 63;
+		case eEntityType::etHorse:                return 64;
+		case eEntityType::etHusk:                 return 65;
+		case eEntityType::etIllusioner:           return 66;
+		case eEntityType::etInteraction:          return 67;
+		case eEntityType::etIronGolem:            return 68;
+		case eEntityType::etItem:                 return 69;
+		case eEntityType::etItemDisplay:          return 70;
+		case eEntityType::etItemFrame:            return 71;
+		case eEntityType::etJungleBoat:           return 72;
+		case eEntityType::etJungleChestBoat:      return 73;
+		case eEntityType::etLeashKnot:            return 74;
+		case eEntityType::etLightningBolt:        return 75;
+		case eEntityType::etLingeringPotion:      return 101;
+		case eEntityType::etLlama:                return 76;
+		case eEntityType::etLlamaSpit:            return 77;
+		case eEntityType::etMagmaCube:            return 78;
+		case eEntityType::etMangroveBoat:         return 79;
+		case eEntityType::etMangroveChestBoat:    return 80;
+		case eEntityType::etMarker:               return 81;
+		case eEntityType::etMinecart:             return 82;
+		case eEntityType::etMooshroom:            return 83;
+		case eEntityType::etMule:                 return 84;
+		case eEntityType::etOakBoat:              return 85;
+		case eEntityType::etOakChestBoat:         return 86;
+		case eEntityType::etOcelot:               return 87;
+		case eEntityType::etOminousItemSpawner:   return 88;
+		case eEntityType::etPainting:             return 89;
+		case eEntityType::etPaleOakBoat:          return 90;
+		case eEntityType::etPaleOakChestBoat:     return 91;
+		case eEntityType::etPanda:                return 92;
+		case eEntityType::etParrot:               return 93;
+		case eEntityType::etPhantom:              return 94;
+		case eEntityType::etPig:                  return 95;
+		case eEntityType::etPiglin:               return 96;
+		case eEntityType::etPiglinBrute:          return 97;
+		case eEntityType::etPillager:             return 98;
+		case eEntityType::etPlayer:               return 149;
+		case eEntityType::etPolarBear:            return 99;
+		case eEntityType::etPufferfish:           return 102;
+		case eEntityType::etRabbit:               return 103;
+		case eEntityType::etRavager:              return 104;
+		case eEntityType::etSalmon:               return 105;
+		case eEntityType::etSheep:                return 106;
+		case eEntityType::etShulker:              return 107;
+		case eEntityType::etShulkerBullet:        return 108;
+		case eEntityType::etSilverfish:           return 109;
+		case eEntityType::etSkeleton:             return 110;
+		case eEntityType::etSkeletonHorse:        return 111;
+		case eEntityType::etSlime:                return 112;
+		case eEntityType::etSmallFireball:        return 113;
+		case eEntityType::etSniffer:              return 114;
+		case eEntityType::etSnowGolem:            return 116;
+		case eEntityType::etSnowball:             return 115;
+		case eEntityType::etSpawnerMinecart:      return 117;
+		case eEntityType::etSpectralArrow:        return 118;
+		case eEntityType::etSpider:               return 119;
+		case eEntityType::etSplashPotion:         return 100;
+		case eEntityType::etSpruceBoat:           return 120;
+		case eEntityType::etSpruceChestBoat:      return 121;
+		case eEntityType::etSquid:                return 122;
+		case eEntityType::etStray:                return 123;
+		case eEntityType::etStrider:              return 124;
+		case eEntityType::etTadpole:              return 125;
+		case eEntityType::etTextDisplay:          return 126;
+		case eEntityType::etTnt:                  return 127;
+		case eEntityType::etTntMinecart:          return 128;
+		case eEntityType::etTraderLlama:          return 129;
+		case eEntityType::etTrident:              return 130;
+		case eEntityType::etTropicalFish:         return 131;
+		case eEntityType::etTurtle:               return 132;
+		case eEntityType::etVex:                  return 133;
+		case eEntityType::etVillager:             return 134;
+		case eEntityType::etVindicator:           return 135;
+		case eEntityType::etWanderingTrader:      return 136;
+		case eEntityType::etWarden:               return 137;
+		case eEntityType::etWindCharge:           return 138;
+		case eEntityType::etWitch:                return 139;
+		case eEntityType::etWither:               return 140;
+		case eEntityType::etWitherSkeleton:       return 141;
+		case eEntityType::etWitherSkull:          return 142;
+		case eEntityType::etWolf:                 return 143;
+		case eEntityType::etZoglin:               return 144;
+		case eEntityType::etZombie:               return 145;
+		case eEntityType::etZombieHorse:          return 146;
+		case eEntityType::etZombieVillager:       return 147;
+		case eEntityType::etZombifiedPiglin:      return 148;
+		default: return 0;
+	}
+}
+
+
+
+
+
+Int32 cProtocol_1_21_6::GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const
+{
+	switch (a_ParserType)
+	{
+		case eCommandParserType::Bool:              return 0;
+		case eCommandParserType::Float:             return 1;
+		case eCommandParserType::Double:            return 2;
+		case eCommandParserType::Integer:           return 3;
+		case eCommandParserType::Long:              return 4;
+		case eCommandParserType::String:            return 5;
+		case eCommandParserType::Entity:            return 6;
+		case eCommandParserType::GameProfile:       return 7;
+		case eCommandParserType::BlockPos:          return 8;
+		case eCommandParserType::ColumnPos:         return 9;
+		case eCommandParserType::Vec3:              return 10;
+		case eCommandParserType::Vec2:              return 11;
+		case eCommandParserType::BlockState:        return 12;
+		case eCommandParserType::BlockPredicate:    return 13;
+		case eCommandParserType::ItemStack:         return 14;
+		case eCommandParserType::ItemPredicate:     return 15;
+		case eCommandParserType::Color:             return 16;
+		case eCommandParserType::HexColor:          return 17;
+		case eCommandParserType::Component:         return 18;
+		case eCommandParserType::Style:             return 19;
+		case eCommandParserType::Message:           return 20;
+		case eCommandParserType::NbtCompoundTag:    return 21;
+		case eCommandParserType::NbtTag:            return 22;
+		case eCommandParserType::NbtPath:           return 23;
+		case eCommandParserType::Objective:         return 24;
+		case eCommandParserType::ObjectiveCriteria: return 25;
+		case eCommandParserType::Operation:         return 26;
+		case eCommandParserType::Particle:          return 27;
+		case eCommandParserType::Angle:             return 28;
+		case eCommandParserType::Rotation:          return 29;
+		case eCommandParserType::ScoreboardSlot:    return 30;
+		case eCommandParserType::ScoreHolder:       return 31;
+		case eCommandParserType::Swizzle:           return 32;
+		case eCommandParserType::Team:              return 33;
+		case eCommandParserType::ItemSlot:          return 34;
+		case eCommandParserType::ItemSlots:         return 35;
+		case eCommandParserType::ResourceLocation:  return 36;
+		case eCommandParserType::Function:          return 37;
+		case eCommandParserType::EntityAnchor:      return 38;
+		case eCommandParserType::IntRange:          return 39;
+		case eCommandParserType::FloatRange:        return 40;
+		case eCommandParserType::Dimension:         return 41;
+		case eCommandParserType::Gamemode:          return 42;
+		case eCommandParserType::Time:              return 43;
+		case eCommandParserType::ResourceOrTag:     return 44;
+		case eCommandParserType::ResourceOrTagKey:  return 45;
+		case eCommandParserType::Resource:          return 46;
+		case eCommandParserType::ResourceKey:       return 47;
+		case eCommandParserType::ResourceSelector:  return 48;
+		case eCommandParserType::TemplateMirror:    return 49;
+		case eCommandParserType::TemplateRotation:  return 50;
+		case eCommandParserType::Heightmap:         return 51;
+		case eCommandParserType::LootTable:         return 52;
+		case eCommandParserType::LootPredicate:     return 53;
+		case eCommandParserType::LootModifier:      return 54;
+		case eCommandParserType::Dialog:            return 55;
+		case eCommandParserType::Uuid:              return 56;
+		default: return -1;
+	}
+}
+
+
+
+
+
+bool cProtocol_1_21_5::ReadComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+{
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt32, UInt32, ProtocolCompID);
+	typedef cProtocol_1_21_2 P;
+	static const std::map<UInt32, ReadCompFunc> ReadCompFuncs =
+	{
+	// {0, &ReadCustomDataComponent},
+	{1, &P::ReadMaxStackSizeComponent},
+	{2, &P::ReadMaxDamageComponent},
+	{3, &P::ReadDamageComponent},
+	{4, &P::ReadUnbreakableComponent},
+	{5, &P::ReadCustomNameComponent},
+	// {6, &ReadItemNameComponent},
+	// {7, &ReadItemModelComponent},
+	// {8, &ReadLoreComponent},
+	// {9, &ReadRarityComponent},
+	// {10, &ReadEnchantmentsComponent},
+	// {11, &ReadCanPlaceOnComponent},
+	// {12, &ReadCanBreakComponent},
+	// {13, &ReadAttributeModifiersComponent},
+	// {14, &ReadCustomModelDataComponent},
+	// {15, &ReadTooltipDisplayComponent},
+	{16, &P::ReadRepairCostComponent},
+	/*
+	{17, &ReadCreativeSlotLockComponent},
+	{18, &ReadEnchantmentGlintOverrideComponent},
+	{19, &ReadIntangibleProjectileComponent},
+	{20, &ReadFoodComponent},
+	{21, &ReadConsumableComponent},
+	{22, &ReadUseRemainderComponent},
+	{23, &ReadUseCooldownComponent},
+	{24, &ReadDamageResistantComponent},
+	{25, &ReadToolComponent},
+	{26, &ReadWeaponComponent},
+	{27, &ReadEnchantableComponent},
+	{28, &ReadEquippableComponent},
+	{29, &ReadRepairableComponent},
+	{30, &ReadGliderComponent},
+	{31, &ReadTooltipStyleComponent},
+	{32, &ReadDeathProtectionComponent},
+	{33, &ReadBlocksAttacksComponent},
+	{34, &ReadStoredEnchantmentsComponent},
+	{35, &ReadDyedColorComponent},
+	{36, &ReadMapColorComponent},
+	{37, &ReadMapIdComponent},
+	{38, &ReadMapDecorationsComponent},
+	{39, &ReadMapPostProcessingComponent},
+	{40, &ReadChargedProjectilesComponent},
+	{41, &ReadBundleContentsComponent},
+	{42, &ReadPotionContentsComponent},
+	{43, &ReadPotionDurationScaleComponent},
+	{44, &ReadSuspiciousStewEffectsComponent},
+	{45, &ReadWritableBookContentComponent},
+	{46, &ReadWrittenBookContentComponent},
+	{47, &ReadTrimComponent},
+	{48, &ReadDebugStickStateComponent},
+	{49, &ReadEntityDataComponent},
+	{50, &ReadBucketEntityDataComponent},
+	{51, &ReadBlockEntityDataComponent},
+	{52, &ReadInstrumentComponent},
+	{53, &ReadProvidesTrimMaterialComponent},
+	{54, &ReadOminousBottleAmplifierComponent},
+	{55, &ReadJukeboxPlayableComponent},
+	{56, &ReadProvidesBannerPatternsComponent},
+	{57, &ReadRecipesComponent},
+	{58, &ReadLodestoneTrackerComponent},
+	{59, &ReadFireworkExplosionComponent},
+	{60, &ReadFireworksComponent},
+	{61, &ReadProfileComponent},
+	{62, &ReadNoteBlockSoundComponent},
+	{63, &ReadBannerPatternsComponent},
+	{64, &ReadBaseColorComponent},
+	{65, &ReadPotDecorationsComponent},
+	{66, &ReadContainerComponent},
+	{67, &ReadBlockStateComponent},
+	{68, &ReadBeesComponent},
+	{69, &ReadLockComponent},
+	{70, &ReadContainerLootComponent},
+	{71, &ReadBreakSoundComponent},
+	{72, &ReadVillager_VariantComponent},
+	{73, &ReadWolf_VariantComponent},
+	{74, &ReadWolf_SoundVariantComponent},
+	{75, &ReadWolf_CollarComponent},
+	{76, &ReadFox_VariantComponent},
+	{77, &ReadSalmon_SizeComponent},
+	{78, &ReadParrot_VariantComponent},
+	{79, &ReadTropicalFish_PatternComponent},
+	{80, &ReadTropicalFish_BaseColorComponent},
+	{81, &ReadTropicalFish_PatternColorComponent},
+	{82, &ReadMooshroom_VariantComponent},
+	{83, &ReadRabbit_VariantComponent},
+	{84, &ReadPig_VariantComponent},
+	{85, &ReadCow_VariantComponent},
+	{86, &ReadChicken_VariantComponent},
+	{87, &ReadFrog_VariantComponent},
+	{88, &ReadHorse_VariantComponent},
+	{89, &ReadPainting_VariantComponent},
+	{90, &ReadLlama_VariantComponent},
+	{91, &ReadAxolotl_VariantComponent},
+	{92, &ReadCat_VariantComponent},
+	{93, &ReadCat_CollarComponent},
+	{94, &ReadSheep_ColorComponent},
+	{95, &ReadShulker_ColorComponent},
+	*/
+	};
+	const auto res = ReadCompFuncs.find(ProtocolCompID);
+	if (res == ReadCompFuncs.end())
+	{
+		LOGWARN(fmt::format("Data component with id {} not implemented", ProtocolCompID));
+		return false;
+	}
+	return (this->*res->second)(a_ByteBuffer, a_Result);
+}
+
+
+
+
+
+void cProtocol_1_21_5::WriteComponent(cPacketizer & a_Pkt, const DataComponents::DataComponent & a_Component) const
+{
+	// TODO: implement remaining components
+	std::visit(OverloadedVariantAccess
+	{
+	// WRITE_DATA_COMPONENT(0, CustomDataComponent)
+	WRITE_DATA_COMPONENT(1, MaxStackSizeComponent)
+	WRITE_DATA_COMPONENT(2, MaxDamageComponent)
+	WRITE_DATA_COMPONENT(3, DamageComponent)
+	WRITE_DATA_COMPONENT(4, UnbreakableComponent)
+	WRITE_DATA_COMPONENT(5, CustomNameComponent)
+	// WRITE_DATA_COMPONENT(6, ItemNameComponent)
+	// WRITE_DATA_COMPONENT(7, ItemModelComponent)
+	// WRITE_DATA_COMPONENT(8, LoreComponent)
+	// WRITE_DATA_COMPONENT(9, RarityComponent)
+	// WRITE_DATA_COMPONENT(10, EnchantmentsComponent)
+	// WRITE_DATA_COMPONENT(11, CanPlaceOnComponent)
+	// WRITE_DATA_COMPONENT(12, CanBreakComponent)
+	// WRITE_DATA_COMPONENT(13, AttributeModifiersComponent)
+	// WRITE_DATA_COMPONENT(14, CustomModelDataComponent)
+	// WRITE_DATA_COMPONENT(15, TooltipDisplayComponent)
+	WRITE_DATA_COMPONENT(16, RepairCostComponent)
+	/*
+	WRITE_DATA_COMPONENT(17, CreativeSlotLockComponent)
+	WRITE_DATA_COMPONENT(18, EnchantmentGlintOverrideComponent)
+	WRITE_DATA_COMPONENT(19, IntangibleProjectileComponent)
+	WRITE_DATA_COMPONENT(20, FoodComponent)
+	WRITE_DATA_COMPONENT(21, ConsumableComponent)
+	WRITE_DATA_COMPONENT(22, UseRemainderComponent)
+	WRITE_DATA_COMPONENT(23, UseCooldownComponent)
+	WRITE_DATA_COMPONENT(24, DamageResistantComponent)
+	WRITE_DATA_COMPONENT(25, ToolComponent)
+	WRITE_DATA_COMPONENT(26, WeaponComponent)
+	WRITE_DATA_COMPONENT(27, EnchantableComponent)
+	WRITE_DATA_COMPONENT(28, EquippableComponent)
+	WRITE_DATA_COMPONENT(29, RepairableComponent)
+	WRITE_DATA_COMPONENT(30, GliderComponent)
+	WRITE_DATA_COMPONENT(31, TooltipStyleComponent)
+	WRITE_DATA_COMPONENT(32, DeathProtectionComponent)
+	WRITE_DATA_COMPONENT(33, BlocksAttacksComponent)
+	WRITE_DATA_COMPONENT(34, StoredEnchantmentsComponent)
+	WRITE_DATA_COMPONENT(35, DyedColorComponent)
+	WRITE_DATA_COMPONENT(36, MapColorComponent)
+	WRITE_DATA_COMPONENT(37, MapIdComponent)
+	WRITE_DATA_COMPONENT(38, MapDecorationsComponent)
+	WRITE_DATA_COMPONENT(39, MapPostProcessingComponent)
+	WRITE_DATA_COMPONENT(40, ChargedProjectilesComponent)
+	WRITE_DATA_COMPONENT(41, BundleContentsComponent)
+	WRITE_DATA_COMPONENT(42, PotionContentsComponent)
+	WRITE_DATA_COMPONENT(43, PotionDurationScaleComponent)
+	WRITE_DATA_COMPONENT(44, SuspiciousStewEffectsComponent)
+	WRITE_DATA_COMPONENT(45, WritableBookContentComponent)
+	WRITE_DATA_COMPONENT(46, WrittenBookContentComponent)
+	WRITE_DATA_COMPONENT(47, TrimComponent)
+	WRITE_DATA_COMPONENT(48, DebugStickStateComponent)
+	WRITE_DATA_COMPONENT(49, EntityDataComponent)
+	WRITE_DATA_COMPONENT(50, BucketEntityDataComponent)
+	WRITE_DATA_COMPONENT(51, BlockEntityDataComponent)
+	WRITE_DATA_COMPONENT(52, InstrumentComponent)
+	WRITE_DATA_COMPONENT(53, ProvidesTrimMaterialComponent)
+	WRITE_DATA_COMPONENT(54, OminousBottleAmplifierComponent)
+	WRITE_DATA_COMPONENT(55, JukeboxPlayableComponent)
+	WRITE_DATA_COMPONENT(56, ProvidesBannerPatternsComponent)
+	WRITE_DATA_COMPONENT(57, RecipesComponent)
+	WRITE_DATA_COMPONENT(58, LodestoneTrackerComponent)
+	WRITE_DATA_COMPONENT(59, FireworkExplosionComponent)
+	WRITE_DATA_COMPONENT(60, FireworksComponent)
+	WRITE_DATA_COMPONENT(61, ProfileComponent)
+	WRITE_DATA_COMPONENT(62, NoteBlockSoundComponent)
+	WRITE_DATA_COMPONENT(63, BannerPatternsComponent)
+	WRITE_DATA_COMPONENT(64, BaseColorComponent)
+	WRITE_DATA_COMPONENT(65, PotDecorationsComponent)
+	WRITE_DATA_COMPONENT(66, ContainerComponent)
+	WRITE_DATA_COMPONENT(67, BlockStateComponent)
+	WRITE_DATA_COMPONENT(68, BeesComponent)
+	WRITE_DATA_COMPONENT(69, LockComponent)
+	WRITE_DATA_COMPONENT(70, ContainerLootComponent)
+	WRITE_DATA_COMPONENT(71, BreakSoundComponent)
+	WRITE_DATA_COMPONENT(72, Villager_VariantComponent)
+	WRITE_DATA_COMPONENT(73, Wolf_VariantComponent)
+	WRITE_DATA_COMPONENT(74, Wolf_SoundVariantComponent)
+	WRITE_DATA_COMPONENT(75, Wolf_CollarComponent)
+	WRITE_DATA_COMPONENT(76, Fox_VariantComponent)
+	WRITE_DATA_COMPONENT(77, Salmon_SizeComponent)
+	WRITE_DATA_COMPONENT(78, Parrot_VariantComponent)
+	WRITE_DATA_COMPONENT(79, TropicalFish_PatternComponent)
+	WRITE_DATA_COMPONENT(80, TropicalFish_BaseColorComponent)
+	WRITE_DATA_COMPONENT(81, TropicalFish_PatternColorComponent)
+	WRITE_DATA_COMPONENT(82, Mooshroom_VariantComponent)
+	WRITE_DATA_COMPONENT(83, Rabbit_VariantComponent)
+	WRITE_DATA_COMPONENT(84, Pig_VariantComponent)
+	WRITE_DATA_COMPONENT(85, Cow_VariantComponent)
+	WRITE_DATA_COMPONENT(86, Chicken_VariantComponent)
+	WRITE_DATA_COMPONENT(87, Frog_VariantComponent)
+	WRITE_DATA_COMPONENT(88, Horse_VariantComponent)
+	WRITE_DATA_COMPONENT(89, Painting_VariantComponent)
+	WRITE_DATA_COMPONENT(90, Llama_VariantComponent)
+	WRITE_DATA_COMPONENT(91, Axolotl_VariantComponent)
+	WRITE_DATA_COMPONENT(92, Cat_VariantComponent)
+	WRITE_DATA_COMPONENT(93, Cat_CollarComponent)
+	WRITE_DATA_COMPONENT(94, Sheep_ColorComponent)
+	WRITE_DATA_COMPONENT(95, Shulker_ColorComponent)
+	*/
+	}, a_Component);
 }

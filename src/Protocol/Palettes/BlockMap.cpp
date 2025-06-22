@@ -78,7 +78,19 @@ namespace BlockMap
 		{
 			if (version.is_directory())
 			{
-				AddVersion(cMultiVersionProtocol::GetVersionFromText(version.path().filename().string()));
+				cProtocol::Version e_version = {};
+				AString text_version = version.path().filename().string();
+				try
+				{
+					e_version = cMultiVersionProtocol::GetVersionFromText(version.path().filename().string());
+				}
+				catch (...)
+				{
+					LOGERROR("Invalid directory name {} in Protocol/. Failed to parse directory name as a game version", text_version);
+					continue;
+				}
+
+				AddVersion(e_version);
 			}
 		}
 	}

@@ -71,6 +71,7 @@ enum eEntityType
 	etGlowSquid,
 	etGoat,
 	etGuardian,
+	etHappyGhast,
 	etHoglin,
 	etHopperMinecart,
 	etHorse,

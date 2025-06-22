@@ -143,6 +143,7 @@ protected:
 
 	//  protected:  // can't be for some reason ????
 	//  Define all reader functions here
+public:
 	virtual bool ReadMaxStackSizeComponent (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
 	virtual bool ReadUnbreakableComponent  (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
 	virtual bool ReadCustomNameComponent   (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;

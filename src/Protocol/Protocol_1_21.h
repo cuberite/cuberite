@@ -125,4 +125,36 @@ protected:
 
 	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
 	virtual Version GetProtocolVersion() const override;
+
+	virtual bool ReadComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const override;
+	virtual void WriteComponent(cPacketizer & a_Pkt, const DataComponents::DataComponent & a_Component) const override;
+};
+
+
+
+
+
+class cProtocol_1_21_6
+	: public cProtocol_1_21_5
+{
+	using Super = cProtocol_1_21_5;
+public:
+
+	using Super::Super;
+
+protected:
+
+	virtual void SendSelectKnownPacks() override;
+	// virtual void SendDynamicRegistries() override;
+
+	virtual void SendTags(void) override;
+
+	virtual bool HandlePacket(cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
+
+	virtual UInt8  GetProtocolEntityType(eEntityType a_Type) const override;
+	// virtual UInt8  GetEntityMetadataID(EntityMetadata a_Metadata) const override;
+
+	virtual UInt32 GetPacketID(ePacketType a_PacketType) const override;
+	virtual Version GetProtocolVersion() const override;
+	virtual Int32  GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const override;
 };

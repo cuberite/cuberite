@@ -456,7 +456,8 @@ public:
 		// v1_21_3 = 768
 		v1_21_4 = 769,
 		v1_21_5 = 770,
-		Latest = v1_21_5,
+		v1_21_6 = 771,
+		Latest = v1_21_6,
 	};
 	auto format_as(Version f) { return fmt::underlying(f); }
 
