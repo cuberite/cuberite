@@ -19,6 +19,7 @@
 	// Use non-standard defines in <cmath>
 	#define _USE_MATH_DEFINES
 
+	/*
 	#ifndef NDEBUG
 		// Override the "new" operator to include file and line specification for debugging memory leaks
 		// Ref.: https://social.msdn.microsoft.com/Forums/en-US/ebc7dd7a-f3c6-49f1-8a60-e381052f21b6/debugging-memory-leaks?forum=vcgeneral#53f0cc89-62fe-45e8-bbf0-56b89f2a1901
@@ -34,6 +35,7 @@
 		// For some reason this works magically - each "new X" gets replaced as "new(_CLIENT_BLOCK, "file", line) X"
 		// The CRT has a definition for this operator new that stores the debugging info for leak-finding later.
 	#endif
+	*/
 
 	#define UNREACHABLE_INTRINSIC __assume(false)
 
