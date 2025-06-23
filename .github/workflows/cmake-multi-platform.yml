@@ -4,9 +4,9 @@ name: CMake on multiple platforms
 
 on:
   push:
-    branches: [ "NewPaletteSystem"]
+    branches: [ "NewPaletteSystem", "master" ]
   pull_request:
-    branches: [ "NewPaletteSystem" ]
+    branches: [ "NewPaletteSystem", "master" ]
 
 jobs:
   build:
