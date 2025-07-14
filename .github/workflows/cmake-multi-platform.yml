@@ -74,7 +74,11 @@ jobs:
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
     - name: Create Zip
-      run: zip -r Cuberite-${{ github.action }}.zip build/Server
+      run: |
+         if [ "$RUNNER_OS" == "Linux" ]; then
+              zip -r Cuberite-${{ matrix.os }}-${{ matrix.matrix.cpp_compiler }}-${{ matrix.build_type }}.zip build/Server
+         elif [ "$RUNNER_OS" == "Windows" ]; then
+              powershell Compress-Archive build/Server Cuberite-${{ matrix.os }}-${{ matrix.matrix.cpp_compiler }}-${{ matrix.build_type }}.zip
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
@@ -111,8 +115,8 @@ jobs:
     - name: Upload Binary
       uses: softprops/action-gh-release@v2
       with:
-        name: ${{ github.event_name }} - Dev Build
+        name: Latest dev build
         body: Automatically uploaded release by GitHub actions
-        files: Cuberite-${{ github.action }}.zip
+        files: Cuberite-${{ matrix.os }}-${{ matrix.matrix.cpp_compiler }}-${{ matrix.build_type }}.zip
         prerelease: true
         tag_name: autobuild
