@@ -158,3 +158,22 @@ protected:
 	virtual Version GetProtocolVersion() const override;
 	virtual Int32  GetProtocolCommandArgumentID(eCommandParserType a_ParserType) const override;
 };
+
+
+
+
+
+class cProtocol_1_21_7
+	: public cProtocol_1_21_6
+{
+	using Super = cProtocol_1_21_6;
+public:
+
+	using Super::Super;
+
+protected:
+	virtual void SendTags(void) override;
+
+	virtual void SendSelectKnownPacks() override;
+	virtual Version GetProtocolVersion() const override;
+};

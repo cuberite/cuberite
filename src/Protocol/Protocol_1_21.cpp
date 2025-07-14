@@ -13,6 +13,7 @@
 #include "Palettes/Palette_1_21_5.h"
 #include "../Entities/Entity.h"
 #include "Palettes/Palette_1_21_6.h"
+#include "Palettes/Palette_1_21_7.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3280,7 +3281,7 @@ UInt8 cProtocol_1_21_5::GetProtocolEntityType(eEntityType a_Type) const
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  cProtocol_1_21_5:
+//  cProtocol_1_21_6:
 
 cProtocol::Version cProtocol_1_21_6::GetProtocolVersion() const
 {
@@ -4096,4 +4097,59 @@ void cProtocol_1_21_5::WriteComponent(cPacketizer & a_Pkt, const DataComponents:
 	WRITE_DATA_COMPONENT(95, Shulker_ColorComponent)
 	*/
 	}, a_Component);
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+//  cProtocol_1_21_7:
+
+cProtocol::Version cProtocol_1_21_7::GetProtocolVersion() const
+{
+	return Version::v1_21_7;
+}
+
+
+
+
+
+void cProtocol_1_21_7::SendSelectKnownPacks()
+{
+	{
+		cPacketizer Pkt(*this, pktSelectKnownPacks);
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteString("minecraft");
+		Pkt.WriteString("core");
+		Pkt.WriteString("1.21.7");
+	}
+}
+
+
+
+
+
+void cProtocol_1_21_7::SendTags(void)
+{
+	{
+		cPacketizer Pkt(*this, pktConfigurationTags);
+		Pkt.WriteVarInt32(4);
+		cRoot::Get()->GetTagManager()->GetItemTags().WriteTags<&Palette_1_21_7::From>(Pkt);
+		cRoot::Get()->GetTagManager()->GetBlockTags().WriteTags<&Palette_1_21_7::From>(Pkt);
+		cRoot::Get()->GetTagManager()->GetFluidTags().WriteTags<&Palette_1_21_7::From>(Pkt);
+		Pkt.WriteString("minecraft:worldgen/biome");
+
+		Pkt.WriteVarInt32(3);
+		Pkt.WriteString("minecraft:is_badlands");
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteString("minecraft:is_savanna");
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteVarInt32(2);
+		Pkt.WriteString("minecraft:is_jungle");
+		Pkt.WriteVarInt32(1);
+		Pkt.WriteVarInt32(3);
+		// indent -- Has to be here so CheckBasicStyle does not fail
+		// indent
+	}
 }
