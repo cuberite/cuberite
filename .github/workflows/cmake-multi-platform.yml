@@ -115,3 +115,4 @@ jobs:
         body: Automatically uploaded release by GitHub actions
         files: Cuberite-${{ github.action }}.zip
         prerelease: true
+        tag_name: autobuild
