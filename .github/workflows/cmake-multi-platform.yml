@@ -116,7 +116,7 @@ jobs:
     - name: Upload Binary
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ github.ref }}
+        tag_name: ${{ github.ref_name }}
         name: Release ${{ github.ref }}
         body: Automatically uploaded release by GitHub actions
         files: Cuberite-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}.zip
