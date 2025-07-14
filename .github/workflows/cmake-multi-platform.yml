@@ -73,13 +73,14 @@ jobs:
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
-    - name: Create Zip
-      run: |
-         if [ "$RUNNER_OS" == "Linux" ]; then
-              zip -r Cuberite-${{ matrix.os }}-${{ matrix.matrix.cpp_compiler }}-${{ matrix.build_type }}.zip build/Server
-         elif [ "$RUNNER_OS" == "Windows" ]; then
-              powershell Compress-Archive build/Server Cuberite-${{ matrix.os }}-${{ matrix.matrix.cpp_compiler }}-${{ matrix.build_type }}.zip
-
+    - if: runner.os == 'Windows'
+      name: Create Zip Windows
+      run:  powershell Compress-Archive build/Server Cuberite-${{ matrix.os }}-${{ matrix.matrix.cpp_compiler }}-${{ matrix.build_type }}.zip
+      
+    - if: runner.os != 'Windows'
+      name: Create Zip Linux
+      run: zip -r Cuberite-${{ matrix.os }}-${{ matrix.matrix.cpp_compiler }}-${{ matrix.build_type }}.zip build/Server
+      
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
