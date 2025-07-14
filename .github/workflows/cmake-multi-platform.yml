@@ -75,11 +75,11 @@ jobs:
 
     - if: runner.os == 'Windows'
       name: Create Zip Windows
-      run:  powershell Compress-Archive build/Server Cuberite-${{ matrix.os }}-${{ matrix.matrix.cpp_compiler }}-${{ matrix.build_type }}.zip
+      run:  powershell Compress-Archive build/Server Cuberite-${{ matrix.os }}-${{ matrix.cpp_compiler }}-${{ matrix.build_type }}.zip
       
     - if: runner.os != 'Windows'
       name: Create Zip Linux
-      run: zip -r Cuberite-${{ matrix.os }}-${{ matrix.matrix.cpp_compiler }}-${{ matrix.build_type }}.zip build/Server
+      run: zip -r Cuberite-${{ matrix.os }}-${{ matrix.cpp_compiler }}-${{ matrix.build_type }}.zip build/Server
       
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
@@ -118,6 +118,6 @@ jobs:
       with:
         name: Latest dev build
         body: Automatically uploaded release by GitHub actions
-        files: Cuberite-${{ matrix.os }}-${{ matrix.matrix.cpp_compiler }}-${{ matrix.build_type }}.zip
+        files: Cuberite-${{ matrix.os }}-${{ matrix.cpp_compiler }}-${{ matrix.build_type }}.zip
         prerelease: true
         tag_name: autobuild
