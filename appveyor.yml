@@ -77,8 +77,8 @@ for:
 ###########################################
 # Cache for speeding up subsequent builds #
 ###########################################
-cache:
-  - '%BUILD_DIR%\CMakeCache.txt'
+#cache:
+#  - '%BUILD_DIR%\CMakeCache.txt'
 
 #####################
 # Package artifacts #
