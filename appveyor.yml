@@ -8,7 +8,6 @@ branches:
   only:
     - master
 
-
 # Set up environment variables for build info
 environment:
   CUBERITE_BUILD_SERIES_NAME: AppVeyor
