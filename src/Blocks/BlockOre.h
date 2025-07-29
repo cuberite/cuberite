@@ -44,7 +44,7 @@ private:
 		switch (m_BlockType)
 		{
 			case BlockType::DeepslateLapisOre:
-			case BlockType::LapisOre:        return cItem(Item::LapisLazuli, DropMult * Random.RandInt<char>(4, 9), 4);
+			case BlockType::LapisOre:        return cItem(Item::LapisLazuli, DropMult * Random.RandInt<char>(4, 9));
 			case BlockType::DeepslateDiamondOre:
 			case BlockType::DiamondOre:      return cItem(Item::Diamond,     DropMult);
 			case BlockType::DeepslateEmeraldOre:
@@ -54,7 +54,7 @@ private:
 			case BlockType::NetherQuartzOre: return cItem(Item::Quartz,      DropMult);
 			case BlockType::Clay:            return cItem(Item::ClayBall,    4);
 			case BlockType::CopperOre:
-			case BlockType::DeepslateCopperOre: return cItem(Item::RawCopper, DropMult * Random.RandInt<char>(2, 5), 4);
+			case BlockType::DeepslateCopperOre: return cItem(Item::RawCopper, DropMult * Random.RandInt<char>(2, 5));
 			case BlockType::IronOre:
 			case BlockType::DeepslateIronOre: return cItem(Item::RawIron, static_cast<char>(1 + FortuneLevel));
 			case BlockType::GoldOre:

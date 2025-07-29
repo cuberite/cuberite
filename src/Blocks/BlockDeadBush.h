@@ -80,7 +80,7 @@ private:
 		auto chance = GetRandomProvider().RandInt<char>(3);
 		if (chance > 0)
 		{
-			return cItem(Item::Stick, chance, 0);
+			return cItem(Item::Stick, chance);
 		}
 		return {};
 	}

@@ -1210,7 +1210,7 @@ void cSlotAreaAnvil::UpdateResult(cPlayer & a_Player)
 			while ((DamageDiff > 0) && (NumItemsConsumed < Sacrifice.m_ItemCount))
 			{
 				dmgcomp.Damage -= DamageDiff;
-				NeedExp += std::max(1u, DamageDiff / 100) + Target.m_Enchantments.Count();
+				NeedExp += std::max(1u, DamageDiff / 100u) + Target.m_Enchantments.Count();
 				DamageDiff = std::min(dmgcomp.Damage, Target.GetMaxDamage() / 4);
 
 				++NumItemsConsumed;

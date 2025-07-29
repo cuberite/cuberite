@@ -16,21 +16,41 @@ namespace DataComponents
 	#define COMP_EQU_OP(Comp, Comparer) inline bool operator == (const Comp & lhs, const Comp & rhs) { return Comparer; }
 	struct MaxDamageComponent
 	{
+		MaxDamageComponent() = default;
+		MaxDamageComponent(UInt32 a_MaxDamage)
+		{
+			MaxDamage = a_MaxDamage;
+		}
 		UInt32 MaxDamage;
 	};
 
 	struct DamageComponent
 	{
+		DamageComponent() = default;
+		DamageComponent(UInt32 a_Damage)
+		{
+			Damage = a_Damage;
+		}
 		UInt32 Damage;
 	};
 
 	struct MaxStackSizeComponent
 	{
+		MaxStackSizeComponent() = default;
+		MaxStackSizeComponent(UInt32 a_maxStackSize)
+		{
+			maxStackSize = a_maxStackSize;
+		}
 		UInt32 maxStackSize;
 	};
 
 	struct UnbreakableComponent
 	{
+		UnbreakableComponent() = default;
+		UnbreakableComponent(bool a_unbreakable)
+		{
+			unbreakable = a_unbreakable;
+		}
 		bool unbreakable;
 	};
 
@@ -45,6 +65,11 @@ namespace DataComponents
 
 	struct RepairCostComponent
 	{
+		RepairCostComponent() = default;
+		RepairCostComponent(UInt32 a_RepairCost)
+		{
+			RepairCost = a_RepairCost;
+		}
 		UInt32 RepairCost;
 	};
 
@@ -111,6 +136,20 @@ namespace DataComponents
 	class DataComponentMap
 	{
 	public:
+		DataComponentMap() = default;
+		DataComponentMap(std::initializer_list<DataComponent> a_Comps)
+		{
+			for (const auto & a_comp : a_Comps)
+			{
+				AddComp(a_comp);
+			}
+		}
+
+		DataComponentMap(const DataComponent & a_Comps)
+		{
+			AddComp(a_Comps);
+		}
+
 		// A replace function at the same time
 		void AddComp(const DataComponent & a_comp)
 		{
