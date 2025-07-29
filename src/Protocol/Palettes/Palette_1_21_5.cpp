@@ -1134,6 +1134,7 @@ namespace Palette_1_21_5
 			case BlockType::PottedOpenEyeblossom:            return 1101;
 			case BlockType::PottedClosedEyeblossom:          return 1102;
 			case BlockType::FireflyBush:                     return 1103;
+			default: return 0;
 		}
 	}
 	UInt32 From(const CustomStatistic ID)
@@ -1226,4 +1227,4 @@ namespace Palette_1_21_5
 	{
 		return cRoot::Get()->GetRegistryMap()->ItemToProtocol(ID, cProtocol::Version::v1_21_5);
 	}
-}  // namespace Palette_1_21_4
+}  // namespace Palette_1_21_5

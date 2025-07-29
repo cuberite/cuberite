@@ -2,9 +2,9 @@ name: Style Check
 
 on:
   push:
-    branches: [ "NewPaletteSystem"]
+    branches: [ "NewPaletteSystem", "master" ]
   pull_request:
-    branches: [ "NewPaletteSystem" ]
+    branches: [ "NewPaletteSystem", "master" ]
 
 jobs:
   build:

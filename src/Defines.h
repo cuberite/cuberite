@@ -614,6 +614,7 @@ enum class eCommandParserType : std::int8_t
 	ItemStack,
 	ItemPredicate,
 	Color,
+	HexColor,
 	Component,
 	Style,
 	Message,
@@ -644,12 +645,14 @@ enum class eCommandParserType : std::int8_t
 	ResourceOrTagKey,
 	Resource,
 	ResourceKey,
+	ResourceSelector,
 	TemplateMirror,
 	TemplateRotation,
 	Heightmap,
 	LootTable,
 	LootPredicate,
 	LootModifier,
+	Dialog,
 	Uuid
 	// TODO: actually implement these parsers
 };

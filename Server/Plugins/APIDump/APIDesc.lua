@@ -14140,7 +14140,11 @@ end
 				PlayTime =
 				{
 					Notes = "The total amount of time played (tracked in ticks) -- NOT IMPLEMENTED",
-				},
+                },
+                HappyGhastOneCm =
+                {
+                    Notes = "NOT IMPLEMENTED",
+                },
 			},
 		},
 		Globals =
@@ -18243,10 +18247,6 @@ end
 				{
 					Notes = "",
 				},
-				etWitherSkeleton =
-				{
-					Notes = "",
-				},
 				etWolf =
 				{
 					Notes = "",
@@ -18260,10 +18260,6 @@ end
 					Notes = "",
 				},
 				etZombieHorse =
-				{
-					Notes = "",
-				},
-				etZombifiedPiglin =
 				{
 					Notes = "",
 				},
@@ -18558,7 +18554,11 @@ end
 				etWitherSkeleton =
 				{
 					Notes = ""
-				},
+                },
+                etHappyGhast =
+                {
+                    Notes = ""
+                },
 				-- eMessageType:
 				mtCustom =
 				{

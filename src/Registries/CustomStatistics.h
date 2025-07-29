@@ -67,6 +67,7 @@ enum class CustomStatistic
 	FillCauldron,
 	FishCaught,
 	FlyOneCm,
+	HappyGhastOneCm,
 	HorseOneCm,
 	InspectDispenser,
 	InspectDropper,
@@ -123,7 +124,7 @@ enum class CustomStatistic
 	PlayOneMinute = PlayTime,
 
 	// Old ones just for compatibility
-	JunkFished = 108,
+	JunkFished = 110,
 	TreasureFished = 109,
 };
 // tolua_end
