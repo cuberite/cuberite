@@ -239,13 +239,6 @@ bool cFurnaceRecipe::ParseItem(const AString & a_String, cItem & a_Item)
 		}
 	}
 
-	if (SplitMeta.size() > 1)
-	{
-		if (!StringToInteger<short>(SplitMeta[1], a_Item.m_ItemDamage))
-		{
-			return false;
-		}
-	}
 	return true;
 }
 
@@ -290,10 +283,7 @@ const cFurnaceRecipe::cRecipe * cFurnaceRecipe::GetRecipeFrom(const cItem & a_In
 			{
 				continue;
 			}
-			else if ((Recipe.In->m_ItemDamage == -1) || (Recipe.In->m_ItemDamage == a_Ingredient.m_ItemDamage))
-			{
-				BestRecipe = &Recipe;
-			}
+			BestRecipe = &Recipe;
 		}
 	}
 	return BestRecipe;

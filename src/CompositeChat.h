@@ -7,7 +7,7 @@
 
 #include "Defines.h"
 #include "json/json.h"
-
+#include "WorldStorage/FastNBT.h"
 
 
 
@@ -108,6 +108,8 @@ public:
 	Exported manually due to ToLua++ generating extra output parameter. */
 	cCompositeChat(const AString & a_ParseText, eMessageType a_MessageType = mtCustom);
 
+	cCompositeChat(const cParsedNBT & a_ParsedNbt);
+
 	// The following are exported in ManualBindings in order to support chaining - they return "self" in Lua (#755)
 
 	/** Removes all parts from the object. */
@@ -141,6 +143,10 @@ public:
 	Recognizes "http:" and "https:" URLs and &color-codes. */
 	void ParseText(const AString & a_ParseText);
 
+	/** Parses text into various parts, adds those.
+	Recognizes "http:" and "https:" URLs and &color-codes. */
+	void ParseNBT(const cParsedNBT & a_ParsedNbt);
+
 	/** Adds the "underline" style to each part that is an URL. */
 	void UnderlineUrls(void);
 
@@ -171,6 +177,10 @@ public:
 	/** Converts the MessageType to a LogLevel value.
 	Used by the logging bindings when logging a cCompositeChat object. */
 	static eLogLevel MessageTypeToLogLevel(eMessageType a_MessageType);
+
+	void WriteAsNBT(cFastNBTWriter & a_Writer, bool a_ShouldUseChatPrefixes) const;
+
+	void AddChatPartStyle(cFastNBTWriter & a_Writer, const AString & a_PartStyle) const;
 
 	/** Adds the chat part's style (represented by the part's stylestring) into the Json object. */
 	void AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle) const;

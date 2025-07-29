@@ -18,18 +18,17 @@ private:
 
 	// TODO: Add Mycel Spread
 
-	virtual cItems ConvertToPickups(const NIBBLETYPE a_BlockMeta, const cItem * const a_Tool) const override
+	virtual cItems ConvertToPickups(BlockState a_Block, const cItem * a_Tool) const override
 	{
-		return cItem(E_BLOCK_DIRT, 1, 0);
+		return cItem(Item::Dirt);
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 24;
 	}
 } ;

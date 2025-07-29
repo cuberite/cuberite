@@ -40,7 +40,7 @@ public:
 		/** Called on each block encountered along the path, including the first block (path start)
 		When this callback returns true, the tracing is aborted.
 		*/
-		virtual bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) = 0;
+		virtual bool OnNextBlock(Vector3i a_BlockPos, BlockState a_Block, eBlockFace a_EntryFace) = 0;
 
 		/** Called on each block encountered along the path, including the first block (path start), if chunk data is not loaded
 		When this callback returns true, the tracing is aborted.

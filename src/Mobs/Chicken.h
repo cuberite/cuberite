@@ -22,10 +22,10 @@ public:
 
 	virtual void GetFollowedItems(cItems & a_Items) override
 	{
-		a_Items.Add(E_ITEM_BEETROOT_SEEDS);
-		a_Items.Add(E_ITEM_MELON_SEEDS);
-		a_Items.Add(E_ITEM_PUMPKIN_SEEDS);
-		a_Items.Add(E_ITEM_SEEDS);
+		a_Items.Add(Item::BeetrootSeeds);
+		a_Items.Add(Item::MelonSeeds);
+		a_Items.Add(Item::PumpkinSeeds);
+		a_Items.Add(Item::WheatSeeds);
 	}
 
 	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;

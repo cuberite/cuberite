@@ -8,17 +8,28 @@
 
 #include "../World.h"
 #include "../ClientHandle.h"
+#include "../Chunk.h"
+#include "../Registries/BlockItemConverter.h"
+#include "../Blocks/BlockStandingBanner.h"
 
 
 
 
 
-cBannerEntity::cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, unsigned char a_BaseColor, AString a_CustomName):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
-	m_BaseColor(a_BaseColor),
-	m_CustomName(std::move(a_CustomName))
+cBannerEntity::cBannerEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World) :
+	cBannerEntity(a_Block, a_Pos, a_World, 1)
 {
-	ASSERT((a_BlockType == E_BLOCK_WALL_BANNER) || (a_BlockType == E_BLOCK_STANDING_BANNER));
+}
+
+
+
+
+
+cBannerEntity::cBannerEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World, unsigned char a_BaseColor):
+	Super(a_Block, a_Pos, a_World),
+	m_BaseColor(a_BaseColor)
+{
+	ASSERT(cBlockStandingBannerHandler::IsBlockBanner(a_Block));
 }
 
 
@@ -27,9 +38,7 @@ cBannerEntity::cBannerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vect
 
 cItems cBannerEntity::ConvertToPickups() const
 {
-	cItem Item(E_ITEM_BANNER, 1, static_cast<NIBBLETYPE>(GetBaseColor()));
-	Item.m_CustomName = m_CustomName;
-	return Item;
+	return cItem(BlockItemConverter::FromBlock(m_Block.Type()));
 }
 
 
@@ -50,7 +59,7 @@ void cBannerEntity::CopyFrom(const cBlockEntity & a_Src)
 
 void cBannerEntity::SendTo(cClientHandle & a_Client)
 {
-	a_Client.SendBlockChange(m_Pos, m_BlockType, m_BlockMeta);
+	a_Client.SendBlockChange(m_Pos, m_Block);
 	a_Client.SendUpdateBlockEntity(*this);
 }
 

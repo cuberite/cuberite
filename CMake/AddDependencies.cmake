@@ -78,9 +78,9 @@ function(link_dependencies TARGET)
 		target_link_libraries(${TARGET} PRIVATE Psapi.lib Winmm.lib)
 	endif()
 
-	# Special case handling for libevent pthreads:
+	# Special case handling for libevent pthreads and filesystem lib:
 	if(NOT WIN32)
-		target_link_libraries(${TARGET} PRIVATE event_pthreads)
+		target_link_libraries(${TARGET} PRIVATE event_pthreads stdc++fs)
 	endif()
 
 	# Prettify jsoncpp_static name in VS solution explorer:

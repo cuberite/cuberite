@@ -47,6 +47,8 @@ protected:
 	/** The current state of the parser (parsing chunk length / chunk data). */
 	eState m_State;
 
+	auto format_as(eState f) { return fmt::underlying(f); }
+
 	/** Number of bytes that still belong to the chunk currently being parsed.
 	When in psChunkLength, the value is the currently parsed length digits. */
 	size_t m_ChunkDataLengthLeft;
@@ -296,7 +298,7 @@ protected:
 	{
 		if (m_State != psFinished)
 		{
-			Error(fmt::format(FMT_STRING("ChunkedTransferEncoding: Finish signal received before the data stream ended (state: {})"), m_State));
+			Error(fmt::format(FMT_STRING("ChunkedTransferEncoding: Finish signal received before the data stream ended (state: {})"), static_cast<UInt32>(m_State)));
 		}
 		m_State = psFinished;
 	}

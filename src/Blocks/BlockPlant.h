@@ -43,14 +43,14 @@ protected:
 		{
 			return paGrowth;
 		}
-		NIBBLETYPE Blocklight = a_Chunk.GetBlockLight(a_RelPos);
-		NIBBLETYPE SkyLight   = a_Chunk.GetSkyLight  (a_RelPos);
-		NIBBLETYPE Light = a_Chunk.GetTimeAlteredLight(SkyLight);
+		LIGHTTYPE BlockLight = a_Chunk.GetBlockLight(a_RelPos);
+		LIGHTTYPE SkyLight   = a_Chunk.GetSkyLight  (a_RelPos);
+		LIGHTTYPE Light      = a_Chunk.GetTimeAlteredLight(SkyLight);
 
 		// If the amount of light provided by blocks is greater than the sky light, use it instead
-		if (Blocklight > Light)
+		if (BlockLight > Light)
 		{
-			Light = Blocklight;
+			Light = BlockLight;
 		}
 
 		// Based on light levels, decide between growth, stay and death:
@@ -58,7 +58,7 @@ protected:
 		{
 			return paGrowth;
 		}
-		else if ((Blocklight < 9) && (SkyLight < 9))
+		else if ((BlockLight < 9) && (SkyLight < 9))
 		{
 			return paDeath;
 		}
@@ -104,19 +104,18 @@ protected:
 			for (int z = -1; z < 2; ++z)
 			{
 				float Adjustment = 0.0f;
-				BLOCKTYPE Block;
-				NIBBLETYPE Meta;
+				BlockState BlockToCheck = 0;
 
 				// If the chunk we are trying to get the block information from is loaded
-				if (a_Chunk.UnboundedRelGetBlock(a_RelPos + Vector3i(x, 0, z), Block, Meta))
+				if (a_Chunk.UnboundedRelGetBlock(a_RelPos + Vector3i(x, 0, z), BlockToCheck))
 				{
 					// If the block affects growth, add to the adjustment
-					if (cBlockHandler::For(Block).CanSustainPlant(m_BlockType))
+					if (cBlockHandler::For(BlockToCheck.Type()).CanSustainPlant(m_BlockType))
 					{
 						Adjustment = 1.0f;
 
 						// Farmland  alters the chance further if it is watered
-						if ((Block == E_BLOCK_FARMLAND) && (Meta != 0))
+						if ((BlockToCheck.Type() == BlockType::Farmland) && Block::Farmland::Moisture(BlockToCheck) > 0)
 						{
 							Adjustment = 3.0f;
 						}
@@ -158,7 +157,7 @@ private:
 			}
 			case paDeath:
 			{
-				a_ChunkInterface.SetBlock(a_Chunk.RelativeToAbsolute(a_RelPos), E_BLOCK_AIR, 0);
+				a_ChunkInterface.SetBlock(a_Chunk.RelativeToAbsolute(a_RelPos), Block::Air::Air());
 				break;
 			}
 			case paStay: break;  // do nothing

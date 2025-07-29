@@ -28,12 +28,12 @@ class cMobHeadEntity :
 public:  // tolua_export
 
 	/** Creates a new mob head entity at the specified block coords. a_World may be nullptr */
-	cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cMobHeadEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World);
 
 	// tolua_begin
 
 	/** Set the type of the mob head */
-	void SetType(const eMobHeadType & a_SkullType);
+	void SetType(const Item & a_SkullType);
 
 	/** Set the rotation of the mob head */
 	void SetRotation(eMobHeadRotation a_Rotation);
@@ -42,7 +42,7 @@ public:  // tolua_export
 	void SetOwner(const cPlayer & a_Owner);
 
 	/** Returns the type of the mob head */
-	eMobHeadType GetType(void) const { return m_Type; }
+	Item GetType(void) const { return m_Type; }
 
 	/** Returns the rotation of the mob head */
 	eMobHeadRotation GetRotation(void) const { return m_Rotation; }
@@ -69,7 +69,8 @@ public:  // tolua_export
 
 private:
 
-	eMobHeadType m_Type;
+	// eMobHeadType m_Type;
+	Item m_Type;
 	eMobHeadRotation m_Rotation;
 
 	AString m_OwnerName;

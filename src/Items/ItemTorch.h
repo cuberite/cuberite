@@ -9,9 +9,9 @@
 
 
 class cItemTorchHandler final  :
-	public cItemHandler
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 
@@ -19,30 +19,14 @@ public:
 
 private:
 
-	/** Converts the block face of the neighbor to which the torch is attached, to the torch block's meta. */
-	static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_BlockFace)
-	{
-		switch (a_BlockFace)
-		{
-			case BLOCK_FACE_TOP:    return E_META_TORCH_FLOOR;
-			case BLOCK_FACE_EAST:   return E_META_TORCH_EAST;
-			case BLOCK_FACE_WEST:   return E_META_TORCH_WEST;
-			case BLOCK_FACE_NORTH:  return E_META_TORCH_NORTH;
-			case BLOCK_FACE_SOUTH:  return E_META_TORCH_SOUTH;
-			default: UNREACHABLE("Unsupported block face");
-		}
-	}
-
 
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
 		const auto & World = *a_Player.GetWorld();
-		BLOCKTYPE ClickedBlockType;
-		NIBBLETYPE ClickedBlockMeta;
-		World.GetBlockTypeMeta(AddFaceDirection(a_PlacePosition, a_ClickedBlockFace, true), ClickedBlockType, ClickedBlockMeta);
+		auto OldBlock = World.GetBlock(AddFaceDirection(a_PlacePosition, a_ClickedBlockFace, true));
 
 		// Try finding a suitable neighbor block face for the torch; start with the given one:
-		if (!cBlockTorchHandler::CanBePlacedOn(ClickedBlockType, ClickedBlockMeta, a_ClickedBlockFace))
+		if (!cBlockTorchHandler::CanBePlacedOn(OldBlock, a_ClickedBlockFace))
 		{
 			// Couldn't be placed on whatever face was clicked, last ditch resort - find another face:
 			a_ClickedBlockFace = FindSuitableFace(World, a_PlacePosition);
@@ -53,7 +37,92 @@ private:
 			}
 		}
 
-		return a_Player.PlaceBlock(a_PlacePosition, static_cast<BLOCKTYPE>(a_HeldItem.m_ItemType), BlockFaceToMetaData(a_ClickedBlockFace));
+		BlockState BlockToPlace;
+
+		switch (BlockItemConverter::FromItem(a_HeldItem.m_ItemType))
+		{
+			case BlockType::Torch:
+			case BlockType::WallTorch:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						BlockToPlace = Block::Torch::Torch();
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						BlockToPlace = Block::WallTorch::WallTorch(a_ClickedBlockFace);
+						break;
+					}
+					case BLOCK_FACE_NONE:
+					case BLOCK_FACE_YM:
+					{
+						return false;
+					}
+				}
+				break;
+			}
+			case BlockType::RedstoneTorch:
+			case BlockType::RedstoneWallTorch:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						BlockToPlace = Block::RedstoneTorch::RedstoneTorch();
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						BlockToPlace = Block::RedstoneWallTorch::RedstoneWallTorch(a_ClickedBlockFace, true);
+						break;
+					}
+					case BLOCK_FACE_NONE:
+					case BLOCK_FACE_YM:
+					{
+						return false;
+					}
+				}
+				break;
+			}
+			case BlockType::SoulTorch:
+			case BlockType::SoulWallTorch:
+			{
+				switch (a_ClickedBlockFace)
+				{
+					case BLOCK_FACE_YP:
+					{
+						BlockToPlace = Block::SoulTorch::SoulTorch();
+						break;
+					}
+					case BLOCK_FACE_XM:
+					case BLOCK_FACE_XP:
+					case BLOCK_FACE_ZM:
+					case BLOCK_FACE_ZP:
+					{
+						BlockToPlace = Block::SoulWallTorch::SoulWallTorch(a_ClickedBlockFace);
+						break;
+					}
+					case BLOCK_FACE_NONE:
+					case BLOCK_FACE_YM:
+					{
+						return false;
+					}
+				}
+				break;
+			}
+			default: return false;
+		}
+
+		return a_Player.PlaceBlock(a_PlacePosition, BlockToPlace);
 	}
 
 
@@ -67,11 +136,9 @@ private:
 			// This is the position, computed inverted, that such a torch would attach to.
 			const auto NeighborPosition = AddFaceDirection(a_Position, Face, true);
 
-			BLOCKTYPE NeighborBlockType;
-			NIBBLETYPE NeighborBlockMeta;
-			a_World.GetBlockTypeMeta(NeighborPosition, NeighborBlockType, NeighborBlockMeta);
+			auto Neighbor = a_World.GetBlock(NeighborPosition);
 
-			if (cBlockTorchHandler::CanBePlacedOn(NeighborBlockType, NeighborBlockMeta, Face))
+			if (cBlockTorchHandler::CanBePlacedOn(Neighbor, Face))
 			{
 				return Face;
 			}
