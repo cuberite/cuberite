@@ -171,7 +171,7 @@ public:
 			{
 				case 0:
 				{
-					cItem Bow(Item::Bow, 1,{DataComponents::DamageComponent(Random.RandInt<UInt32>(50))} );
+					cItem Bow(Item::Bow, 1, {DataComponents::DamageComponent(Random.RandInt<UInt32>(50))});
 					Bow.EnchantByXPLevels(Random.RandInt(22U, 30U), GetRandomProvider());
 					Drops.Add(Bow);
 					break;
@@ -185,7 +185,7 @@ public:
 				}
 				case 2:
 				{
-					cItem Rod(Item::FishingRod, 1, { DataComponents::DamageComponent(Random.RandInt<UInt32>(50))} );
+					cItem Rod(Item::FishingRod, 1, { DataComponents::DamageComponent(Random.RandInt<UInt32>(50))});
 					Rod.EnchantByXPLevels(Random.RandInt(22U, 30U), GetRandomProvider());
 					Drops.Add(Rod);
 					break;
@@ -219,7 +219,7 @@ public:
 			else if (Junk < 12)  // 2 / 83 chance of spawning a fishing rod
 			{
 				// Fishing Rods caught from the Junk category will be 10% .. 100% damaged, and always unenchanted.
-				Drops.Add(cItem(Item::FishingRod, 1,{ DataComponents::DamageComponent(Random.RandInt<UInt32>(7, 65)) }) );
+				Drops.Add(cItem(Item::FishingRod, 1, { DataComponents::DamageComponent(Random.RandInt<UInt32>(7, 65)) }));
 			}
 			else if (Junk < 22)  // 10 / 83 chance of spawning leather
 			{
