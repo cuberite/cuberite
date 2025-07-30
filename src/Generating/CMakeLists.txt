@@ -11,6 +11,7 @@ target_sources(
 	DistortedHeightmap.cpp
 	DungeonRoomsFinisher.cpp
 	EndGen.cpp
+	EndPlatform.cpp
 	EnderDragonFightStructuresGen.cpp
 	FinishGen.cpp
 	GridStructGen.cpp
