@@ -1650,7 +1650,7 @@ void cProtocol_1_14::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		case mtMooshroom:
 		case mtCaveSpider:
 		{
-			// Not mentioned on http://wiki.vg/Entities
+			// Not mentioned on http://wiki.vg/Entities -- page no longer exists
 			break;
 		}
 
