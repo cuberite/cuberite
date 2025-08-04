@@ -113,11 +113,16 @@ jobs:
                 echo "ERROR: API check has failed with an unknown error"
                 exit 1
             fi
+    - name: Extract branch name
+      shell: bash
+      run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+      id: extract_branch
+
     - name: Upload Binary
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: Tag-${{ github.sha }}
-        name: Release ${{ github.sha }}
+        tag_name: Tag-${{ steps.extract_branch.outputs.branch }}
+        name: Release ${{ steps.extract_branch.outputs.branch }}
         body: Automatically uploaded release by GitHub actions
         files: Cuberite-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}.zip
         prerelease: true
