@@ -28,6 +28,8 @@ function(build_dependencies)
 	set(ENABLE_PROGRAMS OFF CACHE BOOL "Build mbed TLS programs.")
 	set(ENABLE_TESTING OFF CACHE BOOL "Build mbed TLS tests.")
 
+	set(MBEDTLS_AS_SUBPROJECT ON CACHE BOOL "Use mbed TLS as subproject")
+
 	# Enumerate all submodule libraries
 	# SQLiteCpp needs to be included before sqlite so the lsqlite target is available:
 	set(DEPENDENCIES expat fmt jsoncpp libdeflate libevent lua luaexpat mbedtls SQLiteCpp sqlite tolua++)
