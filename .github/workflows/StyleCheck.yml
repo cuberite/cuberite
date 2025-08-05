@@ -1,10 +1,6 @@
 name: Style Check
-
-on:
-  push:
-    branches: [ "master", "experimental" ]
-  pull_request:
-    branches: [ "master", "experimental" ]
+permissions: {}
+on: [push, pull_request]
 
 jobs:
   build:

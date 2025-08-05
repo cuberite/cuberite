@@ -2,11 +2,7 @@
 # See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
 name: Build
 
-on:
-  push:
-    branches: [ "master", "experimental" ]
-  pull_request:
-    branches: [ "master", "experimental" ]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -118,7 +114,8 @@ jobs:
       run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
       id: extract_branch
 
-    - name: Upload Binary
+    - if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/experimental'
+      name: Upload Binary
       uses: softprops/action-gh-release@v2
       with:
         tag_name: release-${{ steps.extract_branch.outputs.branch }}
