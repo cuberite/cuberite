@@ -63,6 +63,8 @@ public:
 	UInt8 Biomes[cChunkDef::Width * cChunkDef::Width];
 	int Heights[cChunkDef::Width * cChunkDef::Width];
 
+	cChunkPoiData m_PoiData;
+
 	/** True if a tag has been opened in the callbacks and not yet closed. */
 	bool mIsTagOpen;
 
@@ -135,6 +137,15 @@ public:
 				return;
 			}
 		}  // for i - mBiomeMap[]
+	}
+
+
+
+
+
+	virtual void PoiData(const cChunkPoiData & a_PoiData) override
+	{
+		m_PoiData = a_PoiData;
 	}
 
 
@@ -1246,6 +1257,18 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 		{
 			aWriter.AddByteArray("SkyLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue);
 		}
+
+		const auto Poies = serializer.m_PoiData.GetPoies(Y);
+		aWriter.BeginList("PoiData", TAG_Compound);
+		for (auto poi : Poies)
+		{
+			aWriter.BeginCompound("");
+			aWriter.AddString("type", NamespaceSerializer::From(poi.GetPoiType()));
+			aWriter.AddIntArray("pos", reinterpret_cast<const Int32*>(&poi.GetBlockPosition()), 3);
+			aWriter.AddInt("free_tickets", poi.GetTicketsRemaining());
+			aWriter.EndCompound();
+		}
+		aWriter.EndList();
 
 		aWriter.AddByte("Y", static_cast<unsigned char>(Y));
 		aWriter.EndCompound();
