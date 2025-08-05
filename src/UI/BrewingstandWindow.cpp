@@ -25,13 +25,13 @@ cBrewingstandWindow::cBrewingstandWindow(cBrewingstandEntity * a_Brewingstand):
 
 
 
-void cBrewingstandWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
+void cBrewingstandWindow::DistributeStack(cItem & a_ItemStack, std::size_t a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
 {
 	cSlotAreas AreasInOrder;
 
 	if (a_ClickedArea == m_SlotAreas[0])
 	{
-		if ((a_Slot >= 0) && (a_Slot <= 4))
+		if (a_Slot <= 4)
 		{
 			// Brewing stand Area
 			AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar */

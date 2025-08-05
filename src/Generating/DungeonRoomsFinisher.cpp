@@ -228,7 +228,7 @@ protected:
 		cChestEntity * ChestEntity = static_cast<cChestEntity *>(a_ChunkDesc.GetBlockEntity(RelX, m_FloorHeight + 1, RelZ));
 		ASSERT((ChestEntity != nullptr) && (ChestEntity->GetBlockType() == E_BLOCK_CHEST));
 		cNoise Noise(a_ChunkDesc.GetChunkX() ^ a_ChunkDesc.GetChunkZ());
-		int NumSlots = 3 + ((Noise.IntNoise3DInt(a_Chest.x, a_Chest.y, a_Chest.z) / 11) % 4);
+		std::size_t NumSlots = 3 + ((Noise.IntNoise3DInt(a_Chest.x, a_Chest.y, a_Chest.z) / 11) % 4);
 		int Seed = Noise.IntNoise2DInt(RelX, RelZ);
 		ChestEntity->GetContents().GenerateRandomLootWithBooks(LootProbab, ARRAYCOUNT(LootProbab), NumSlots, Seed);
 	}

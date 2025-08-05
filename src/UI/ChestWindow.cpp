@@ -106,7 +106,7 @@ void cChestWindow::OpenedByPlayer(cPlayer & a_Player)
 
 
 
-void cChestWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
+void cChestWindow::DistributeStack(cItem & a_ItemStack, std::size_t a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply)
 {
 	cSlotAreas AreasInOrder;
 

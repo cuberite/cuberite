@@ -60,7 +60,7 @@ namespace RedstoneComparatorHandler
 			auto & Contents = BlockEntityWithItems->GetContents();
 			float Fullness = 0;  // Is a floating-point type to allow later calculation to produce a non-truncated value
 
-			for (int Slot = 0; Slot != Contents.GetNumSlots(); ++Slot)
+			for (std::size_t Slot = 0; Slot != Contents.GetNumSlots(); ++Slot)
 			{
 				Fullness += static_cast<float>(Contents.GetSlot(Slot).m_ItemCount) / Contents.GetSlot(Slot).GetMaxStackSize();
 			}
