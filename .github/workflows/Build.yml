@@ -1,11 +1,20 @@
 # This starter workflow is for a CMake project running on multiple platforms. There is a different starter workflow if you just want a single platform.
 # See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-single-platform.yml
 name: Build
-
-on: [push, pull_request]
+on:
+  push:
+    tags-ignore:
+      - release-*
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
 
 jobs:
   build:
+    timeout-minutes: 60
+    permissions: {}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -115,11 +124,58 @@ jobs:
       id: extract_branch
 
     - if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/experimental'
-      name: Upload Binary
-      uses: softprops/action-gh-release@v2
+      name: Upload artifact
+      uses: actions/upload-artifact@v4
       with:
-        tag_name: release-${{ steps.extract_branch.outputs.branch }}
-        name: Release ${{ steps.extract_branch.outputs.branch }}
-        body: Automatically uploaded release by GitHub actions
-        files: Cuberite-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}.zip
-        prerelease: true
+        if-no-files-found: 'error'
+        name: Cuberite-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}
+        path: Cuberite-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}.zip
+  upload_release:
+    permissions:
+      contents: write
+    needs: build
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract branch name
+        shell: bash
+        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+        id: extract_branch
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/experimental'
+        name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: release-${{ steps.extract_branch.outputs.branch }}
+          name: Release ${{ steps.extract_branch.outputs.branch }}
+          body: Automatically uploaded release by GitHub actions
+          fail_on_unmatched_files: true
+          files: |
+                  ${{ github.workspace }}/Cuberite-ubuntu-latest-clang-Release.zip
+                  ${{ github.workspace }}/Cuberite-ubuntu-latest-gcc-Release.zip
+                  ${{ github.workspace }}/Cuberite-windows-latest-cl-Release.zip
+          prerelease: true
+      # Taken from here https://stackoverflow.com/questions/68895194/github-actions-create-or-update-a-git-tag
+      - if: ${{ success() }}
+        name: Fix tag
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/release-${{ steps.extract_branch.outputs.branch }}',
+              sha: context.sha
+            }).catch(err => {
+              if (err.status !== 422) throw err;
+              github.rest.git.updateRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: 'tags/release-${{ steps.extract_branch.outputs.branch }}',
+                sha: context.sha
+              });
+            })
+

@@ -1,10 +1,18 @@
 name: Style Check
 permissions: {}
-on: [push, pull_request]
+on:
+  push:
+    tags-ignore:
+      - release-*
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
 
 jobs:
   build:
-
+    timeout-minutes: 60
     runs-on: ubuntu-latest
 
     steps:
