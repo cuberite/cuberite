@@ -62,10 +62,12 @@ protected:
 	virtual void HandlePacketSetBeaconEffect(cByteBuffer & a_ByteBuffer);
 	virtual void HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, std::string_view a_Channel) override;
 
+	virtual void ParseItemMetadata(cItem & a_Item, const ContiguousByteBufferView a_Metadata) const override;
 	virtual bool ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) const override;
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, EntityMetadata a_Metadata, EntityMetadataType a_FieldType) const;
 	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const override;
+	virtual void WriteItemNBT(cPacketizer & a_Pkt, const cItem & a_Item) const;
 	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const override;
 };
 
