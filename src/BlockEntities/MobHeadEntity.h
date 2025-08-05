@@ -28,7 +28,7 @@ class cMobHeadEntity :
 public:  // tolua_export
 
 	/** Creates a new mob head entity at the specified block coords. a_World may be nullptr */
-	cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cMobHeadEntity(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	// tolua_begin
 
