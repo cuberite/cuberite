@@ -51,6 +51,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
@@ -58,9 +60,6 @@ jobs:
       shell: bash
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
-
-    - name: Setup Deps
-      run: git submodule update --init
    
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -113,11 +112,11 @@ jobs:
                 echo "ERROR: API documentation has duplicate symbol warnings:"
                 cat ./DuplicateDocs.txt
                 exit 1
-            fi
-            if [ -f ./apiCheckFailed.flag ]; then
+           fi
+           if [ -f ./apiCheckFailed.flag ]; then
                 echo "ERROR: API check has failed with an unknown error"
                 exit 1
-            fi
+           fi
     - name: Extract branch name
       shell: bash
       run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
@@ -131,6 +130,7 @@ jobs:
         name: Cuberite-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}
         path: Cuberite-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}.zip
   upload_release:
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/experimental'
     permissions:
       contents: write
     needs: build
@@ -145,8 +145,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           merge-multiple: true
-      - if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/experimental'
-        name: Create GitHub Release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: release-${{ steps.extract_branch.outputs.branch }}
