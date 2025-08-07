@@ -35,7 +35,7 @@ public:
 		if (cPawn::FindTeleportDestination(*World, 2, 16, Destination, a_Player->GetPosition(), 8))
 		{
 			// Broadcast sound effect to _pre-teleport_ location, then teleport player.
-			World->BroadcastSoundEffect("item.chorus_fruit.teleport", a_Player->GetPosition(), 1, 1);
+			World->BroadcastSoundEffect(eSoundEvent::ItemChorusfruitTeleport, a_Player->GetPosition(), 1, 1);
 			a_Player->TeleportToCoords(Destination.x, Destination.y, Destination.z);
 		}
 		return true;

@@ -223,6 +223,7 @@ public:  // tolua_export
 	void SendSetRawTitle                (const AString & a_Title);  // tolua_export
 	void SendSoundEffect                (const AString & a_SoundName, double a_X, double a_Y, double a_Z, float a_Volume, float a_Pitch);  // tolua_export
 	void SendSoundEffect                (const AString & a_SoundName, Vector3d a_Position, float a_Volume, float a_Pitch);  // tolua_export
+	void SendSoundEffect                (const eSoundEvent a_SoundEvent, Vector3d a_Position, float a_Volume, float a_Pitch);
 	void SendSoundParticleEffect        (const EffectID a_EffectID, Vector3i a_Source, int a_Data);
 	void SendSpawnEntity                (const cEntity & a_Entity);
 	void SendSpawnMob                   (const cMonster & a_Mob);

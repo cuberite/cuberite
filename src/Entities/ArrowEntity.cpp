@@ -81,7 +81,7 @@ void cArrowEntity::OnHitSolidBlock(Vector3d a_HitPos, eBlockFace a_HitFace)
 	m_HitBlockPos = (a_HitPos + (Speed / 100000)).Floor();
 
 	// Broadcast arrow hit sound
-	m_World->BroadcastSoundEffect("entity.arrow.hit", m_HitBlockPos, 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+	m_World->BroadcastSoundEffect(eSoundEvent::ArrowHit, m_HitBlockPos, 0.5f, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 
 	// Trigger any buttons that were hit
 	// Wooden buttons will be depressed by the arrow
@@ -129,7 +129,7 @@ void cArrowEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 	}
 
 	// Broadcast successful hit sound
-	GetWorld()->BroadcastSoundEffect("entity.arrow.hit", GetPosition(), 0.5, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+	GetWorld()->BroadcastSoundEffect(eSoundEvent::ArrowHit, GetPosition(), 0.5, static_cast<float>(0.75 + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 
 	Destroy();
 }
@@ -154,7 +154,7 @@ void cArrowEntity::CollectedBy(cPlayer & a_Dest)
 		}
 
 		GetWorld()->BroadcastCollectEntity(*this, a_Dest, 1);
-		GetWorld()->BroadcastSoundEffect("entity.item.pickup", GetPosition(), 0.3f, (1.2f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+		GetWorld()->BroadcastSoundEffect(eSoundEvent::ItemPickup, GetPosition(), 0.3f, (1.2f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 		m_bIsCollected = true;
 	}
 }

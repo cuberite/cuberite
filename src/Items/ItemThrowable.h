@@ -47,7 +47,7 @@ public:
 		}
 
 		// Play sound:
-		a_World->BroadcastSoundEffect("entity.arrow.shoot", a_Player->GetPosition() - Vector3d(0, a_Player->GetHeight(), 0), 0.5f, 0.4f / GetRandomProvider().RandReal(0.8f, 1.2f));
+		a_World->BroadcastSoundEffect(eSoundEvent::ArrowShoot, a_Player->GetPosition() - Vector3d(0, a_Player->GetHeight(), 0), 0.5f, 0.4f / GetRandomProvider().RandReal(0.8f, 1.2f));
 
 		// Remove from inventory
 		if (!a_Player->IsGameModeCreative())

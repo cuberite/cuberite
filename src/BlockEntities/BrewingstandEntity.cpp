@@ -123,7 +123,7 @@ bool cBrewingstandEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		}
 
 		// Brewing process completed
-		m_World->BroadcastSoundEffect("block.brewing_stand.brew", m_Pos, 1.0f, 1.0f);
+		m_World->BroadcastSoundEffect(eSoundEvent::BlockBrewingstandBrew, m_Pos, 1.0f, 1.0f);
 		cPluginManager::Get()->CallHookBrewingCompleted(*m_World, *this);
 		return true;
 	}

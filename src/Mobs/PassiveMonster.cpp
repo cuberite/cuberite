@@ -20,6 +20,19 @@ cPassiveMonster::cPassiveMonster(const AString & a_ConfigName, eMonsterType a_Mo
 
 
 
+cPassiveMonster::cPassiveMonster(
+	const AString & a_ConfigName, eMonsterType a_MobType,
+	const eSoundEvent a_SoundHurt, const eSoundEvent a_SoundDeath,
+	const eSoundEvent a_SoundAmbient, float a_Width, float a_Height) :
+	Super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_SoundAmbient, a_Width, a_Height)
+{
+	m_EMPersonality = PASSIVE;
+}
+
+
+
+
+
 bool cPassiveMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 {
 	if (!Super::DoTakeDamage(a_TDI))

@@ -9,7 +9,7 @@
 
 
 cBlaze::cBlaze(void) :
-	Super("Blaze", mtBlaze, "entity.blaze.hurt", "entity.blaze.death", "entity.blaze.ambient", 0.6f, 1.8f),
+	Super("Blaze", mtBlaze, eSoundEvent::EntityBlazeHurt, eSoundEvent::EntityBlazeDeath, eSoundEvent::EntityBlazeAmbient, 0.6f, 1.8f),
 	m_IsCharging(false),
 	m_ChargeTimer(0)
 {
@@ -73,7 +73,7 @@ void cBlaze::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			auto FireChargePtr = FireCharge.get();
 			FireChargePtr->Initialize(std::move(FireCharge), *m_World);
 
-			m_World->BroadcastSoundEffect("entity.blaze.shoot", GetPosition(), 4.0f, 1.0f);
+			m_World->BroadcastSoundEffect(eSoundEvent::EntityBlazeShoot, GetPosition(), 4.0f, 1.0f);
 		}
 	}
 

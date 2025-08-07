@@ -104,6 +104,7 @@ public:
 	virtual void SendResourcePack               (const AString & a_ResourcePackUrl) override;
 	virtual void SendRespawn                    (eDimension a_Dimension) override;
 	virtual void SendSoundEffect                (const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch) override;
+	virtual void SendSoundEffect                (const eSoundEvent a_SoundEvent, Vector3d a_Origin, float a_Volume, float a_Pitch) override;
 	virtual void SendScoreboardObjective        (const AString & a_Name, const AString & a_DisplayName, Byte a_Mode) override;
 	virtual void SendScoreUpdate                (const AString & a_Objective, const AString & a_Player, cObjective::Score a_Score, Byte a_Mode) override;
 	virtual void SendDisplayObjective           (const AString & a_Objective, cScoreboard::eDisplaySlot a_Display) override;
@@ -166,6 +167,9 @@ protected:
 
 	/** The 1.8 protocol use a particle id instead of a string. This function converts the name to the id. If the name is incorrect, it returns 0. */
 	virtual int GetProtocolParticleID(const AString & a_ParticleName) const;
+
+	/** A certain era of protocol uses String for SoundEffects. If it doesn't exists, it returns an empty string. */
+	virtual AString GetProtocolSoundEffectAsString(eSoundEvent a_SoundEvent) const;
 
 	/** Returns the protocol version. */
 	virtual Version GetProtocolVersion() const override;

@@ -40,7 +40,7 @@ private:
 
 		a_ChunkInterface.SetBlockMeta(a_BlockPos, Meta);
 		a_WorldInterface.WakeUpSimulators(a_BlockPos);
-		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect("block.lever.click", a_BlockPos, 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
+		a_WorldInterface.GetBroadcastManager().BroadcastSoundEffect(eSoundEvent::BlockLeverClick, a_BlockPos, 0.5f, (Meta & 0x08) ? 0.6f : 0.5f);
 		return true;
 	}
 

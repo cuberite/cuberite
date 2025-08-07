@@ -16,6 +16,9 @@
 #include "../EffectID.h"
 #include "../World.h"
 
+// Enums
+#include "../Registries/SoundEvent.h"
+
 
 
 
@@ -442,6 +445,7 @@ public:
 	virtual void SendSetTitle                   (const cCompositeChat & a_Title) = 0;
 	virtual void SendSetRawTitle                (const AString & a_Title) = 0;
 	virtual void SendSoundEffect                (const AString & a_SoundName, Vector3d a_Origin, float a_Volume, float a_Pitch) = 0;
+	virtual void SendSoundEffect                (const eSoundEvent a_SoundEvent, Vector3d a_Origin, float a_Volume, float a_Pitch) = 0;
 	virtual void SendSoundParticleEffect        (const EffectID a_EffectID, Vector3i a_Origin, int a_Data) = 0;
 	virtual void SendSpawnEntity                (const cEntity & a_Entity) = 0;
 	virtual void SendSpawnMob                   (const cMonster & a_Mob) = 0;

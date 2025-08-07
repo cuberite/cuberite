@@ -97,7 +97,7 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 			World.SetBlock(extensionPos, E_BLOCK_PISTON_EXTENSION, pistonMeta | (IsSticky(pistonBlock) ? 8 : 0));
 
 			// Play sound effect only if extended successfully
-			World.BroadcastSoundEffect("block.piston.extend", a_BlockPos, 0.5f, 0.7f);
+			World.BroadcastSoundEffect(eSoundEvent::BlockPistonExtend, a_BlockPos, 0.5f, 0.7f);
 		}
 	);
 }
@@ -155,7 +155,7 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 			World.SetBlock(a_BlockPos, pistonBlock, pistonMeta & ~(8));
 
 			// (Retraction is always successful, but play in the task for consistency)
-			World.BroadcastSoundEffect("block.piston.contract", a_BlockPos, 0.5f, 0.7f);
+			World.BroadcastSoundEffect(eSoundEvent::BlockPistonContract, a_BlockPos, 0.5f, 0.7f);
 
 			if (!IsSticky(pistonBlock))
 			{

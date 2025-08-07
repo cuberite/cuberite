@@ -31,7 +31,7 @@ public:
 		m_SlotAreas.push_back(new cSlotAreaInventory(*this));
 		m_SlotAreas.push_back(new cSlotAreaHotBar(*this));
 
-		a_ChestCart->GetWorld()->BroadcastSoundEffect("block.chest.open", a_ChestCart->GetPosition(), 1, 1);
+		a_ChestCart->GetWorld()->BroadcastSoundEffect(eSoundEvent::BlockChestOpen, a_ChestCart->GetPosition(), 1, 1);
 	}
 
 	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override
@@ -56,7 +56,7 @@ public:
 
 	virtual ~cMinecartWithChestWindow() override
 	{
-		m_ChestCart->GetWorld()->BroadcastSoundEffect("block.chest.close", m_ChestCart->GetPosition(), 1, 1);
+		m_ChestCart->GetWorld()->BroadcastSoundEffect(eSoundEvent::BlockChestClose, m_ChestCart->GetPosition(), 1, 1);
 	}
 
 private:
