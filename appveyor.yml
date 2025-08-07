@@ -2,8 +2,7 @@ version: 1.0.{build}
 clone_depth: 50
 
 image:
-- Visual Studio 2019
-- Visual Studio 2017
+- Visual Studio 2022
 
 branches:
   only:
@@ -27,14 +26,6 @@ environment:
   - job_name: Windows-x64
     configuration: Release
     BUILD_DIR: Release x64
-
-matrix:
-  exclude:
-    - image: Visual Studio 2017
-      configuration: Release
-    - image: Visual Studio 2019
-      configuration: Debug
-
 build:
   project: '%BUILD_DIR%\Cuberite.sln'
   parallel: true
@@ -59,7 +50,7 @@ for:
 
   before_build:
   # TODO: re-add -DSELF_TEST=YES -DBUILD_TOOLS=YES once PCH for tools enabled (too slow otherwise)
-  - cmake -G "Visual Studio 15 2017" -DSELF_TEST=No -DBUILD_TOOLS=No ..
+  - cmake -G "Visual Studio 17 2022" -DSELF_TEST=No -DBUILD_TOOLS=No ..
 
 ################################
 # Windows 32-bit release build #
@@ -70,7 +61,7 @@ for:
       - job_name: Windows-x86
 
   before_build:
-  - cmake -G "Visual Studio 16 2019" -A "Win32" ..
+  - cmake -G "Visual Studio 17 2022" -A "Win32" ..
 
 ################################
 # Windows 64-bit release build #
@@ -81,7 +72,7 @@ for:
       - job_name: Windows-x64
 
   before_build:
-  - cmake -G "Visual Studio 16 2019" -A "x64" ..
+  - cmake -G "Visual Studio 17 2022" -A "x64" ..
 
 ###########################################
 # Cache for speeding up subsequent builds #
