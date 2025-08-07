@@ -133,7 +133,8 @@ jobs:
         name: Cuberite-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}
         path: Cuberite-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}.zip
   upload_release:
-    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/experimental'
+    # Disable the job until a proper release process is made
+    if: (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/experimental') && false
     permissions:
       contents: write
     needs: build
