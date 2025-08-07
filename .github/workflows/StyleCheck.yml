@@ -1,0 +1,29 @@
+name: Style Check
+permissions: {}
+on:
+  push:
+    tags-ignore:
+      - release-*
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  build:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: leafo/gh-actions-lua@v11
+
+    - name: Find Files
+      run: cd src && find . -name "*.cpp" -or -name "*.h" > AllFiles.lst
+
+    - name: Check Basic Style
+      run: cd src && lua CheckBasicStyle.lua
+
+    - name: Check Bindings and Deps
+      run: cd src/Bindings && lua CheckBindingsDependencies.lua
