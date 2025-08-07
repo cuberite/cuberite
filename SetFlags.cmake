@@ -156,6 +156,8 @@ function(set_exe_flags TARGET)
 			# or at least disable on a file-level basis:
 			-Wno-padded
 			-Wno-double-promotion
+			-Wno-switch-default
+			-Wno-switch
 
 			# This is a pretty useless warning, we've already got -Wswitch which is what we need:
 			-Wno-switch-enum
