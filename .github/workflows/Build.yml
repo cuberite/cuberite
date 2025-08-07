@@ -27,6 +27,9 @@ jobs:
       # 3. <Linux, Release, latest Clang compiler toolchain on the default runner image, default generator>
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
+
+      # The excluded ones are needed so some configs don't run.
+      # The included ones are needed because the cpp_compiler field is not set otherwise, leading CMake to fail.
       matrix:
         os: [ubuntu-latest, windows-latest]
         build_type: [Release]
