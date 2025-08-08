@@ -32,6 +32,8 @@ public:
 
 
 
+
+
 	/** Loads the piecepool from a file.
 	Returns true on success, logs warning and returns false on failure. */
 	bool LoadFromFile(const AString & a_FileName)
@@ -56,6 +58,14 @@ public:
 
 		return true;
 	}
+
+
+
+
+
+	AString GetName() const { return m_Name; }
+
+
 
 
 
@@ -159,6 +169,22 @@ bool cPieceStructuresGen::Initialize(const AString & a_Prefabs, int a_SeaLevel, 
 		return false;
 	}
 	return true;
+}
+
+
+
+
+
+Vector3i cPieceStructuresGen::GetNearestStructure(const AString & a_Structure, Vector3i a_Position)
+{
+	for (auto & Gen : m_Gens)
+	{
+		if (Gen->GetName() == a_Structure)
+		{
+			return Gen->GetNearestStructure(a_Structure, a_Position);
+		}
+	}
+	return a_Position;  // No such structure found
 }
 
 

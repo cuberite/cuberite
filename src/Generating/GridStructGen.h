@@ -94,6 +94,10 @@ public:
 	Note that this must not be called anymore after generating a chunk. */
 	void SetGeneratorParams(const AStringMap & a_GeneratorParams);
 
+	/** Gets the nearest structure from the current position
+	By reaching a GridStructGen, we expect that the type of structure has been filtered down */
+	Vector3i GetNearestStructure(const AString & a_StructureName, Vector3i a_StartPos);
+
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 
@@ -145,6 +149,11 @@ protected:
 	The structures are considered as intersecting iff their bounding box (defined by m_MaxStructureSize)
 	around their gridpoint intersects the chunk. */
 	void GetStructuresForChunk(int a_ChunkX, int a_ChunkZ, cStructurePtrs & a_Structures);
+
+	/** Returns all structures that may intersect the given chunk or a "radius" beyond.
+	The structures are considered as intersecting iff their bounding box
+	(defined by m_MaxStructureSize) around their gridpoint intersects the chunk. */
+	void GetStructuresForChunk(int a_ChunkX, int a_ChunkZ, cStructurePtrs & a_Structures, int a_Radius);
 
 	// Functions for the descendants to override:
 	/** Create a new structure at the specified gridpoint */
