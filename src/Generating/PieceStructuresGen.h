@@ -36,6 +36,11 @@ public:
 	Returns true if at least one prefab set is valid (the generator should be kept). */
 	bool Initialize(const AString & a_Prefabs, int a_SeaLevel, cBiomeGen & a_BiomeGen, cTerrainHeightGen & a_HeightGen);
 
+	/** Returns the BlockCoordinates of the nearest queried structure.
+	Needs to filter all the gens part of the PieceStructuresGen to find the right
+	structure category. */
+	Vector3i GetNearestStructure(AString a_Structure, Vector3i a_Position);
+
 	// cFinishGen override:
 	virtual void GenFinish(cChunkDesc & a_ChunkDesc) override;
 

@@ -1,0 +1,5880 @@
+
+-- Fortress.cubeset
+
+-- Defines the prefabs in the group Fortress
+
+-- NOTE: This file has been generated automatically by GalExport!
+-- Any manual changes will be overwritten by the next automatic export!
+
+
+
+
+Cubeset =
+{
+	Metadata =
+	{
+		CubesetFormatVersion = 1,
+		ExportDate = "2023-03-10 11:22:45",
+		["GridSizeX"] = "512",
+		["GridSizeZ"] = "512",
+		["IntendedUse"] = "PieceStructures",
+		["MaxDepth"] = "10",
+		["MaxOffsetX"] = "256",
+		["MaxOffsetZ"] = "256",
+		["MaxStructureSizeX"] = "384",
+		["MaxStructureSizeZ"] = "384",
+	},
+
+	Pieces =
+	{
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_253",
+				Name         = "Under 38",
+				GalleryName  = "Under",
+				GalleryIndex = "38",
+				ID           = "253",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 13,
+				y = 8,
+				z = 15,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 12,
+				MaxY = 7,
+				MaxZ = 14,
+			},
+			StructureBox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 12,
+				MaxY = 7,
+				MaxZ = 14,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 6,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "1",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+				["VerticalStrategy"] = "Range|20|40",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 1",  -- stonebricks
+				"b: 98: 0",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"d: 10: 0",  -- lava
+				"e: 97: 2",  -- silverfishblock
+				"f:109: 1",  -- stonebrickstairs
+				"g:109: 0",  -- stonebrickstairs
+				"h:109: 3",  -- stonebrickstairs
+				"i:109: 2",  -- stonebrickstairs
+				"j:101: 0",  -- ironbars
+				"k: 52: 0",  -- mobspawner
+				"l: 98: 3",  -- stonebricks
+				"m: 19: 0",  -- sponge
+				"n:120: 0",  -- endportalframe
+				"o: 97: 3",  -- silverfishblock
+			},
+			BlockData =
+			{
+				-- Level 0
+				"abbbbbbbbbabc",  --  0
+				"bcabbbbbbbbba",  --  1
+				"bbaabbbbbbbbb",  --  2
+				"bbbabbbcbcbbb",  --  3
+				"bbbbbbabbbbbc",  --  4
+				"bbbcbbcbbabba",  --  5
+				"baacbbbccccac",  --  6
+				"cbabcdddbcbbb",  --  7
+				"bbcbcdddbbbac",  --  8
+				"babbcdddcbaba",  --  9
+				"bcbcabbbbbabb",  -- 10
+				"babeeeeeebabb",  -- 11
+				"bcbbaabbcabcb",  -- 12
+				"cbbccbbbbabbb",  -- 13
+				"bbbcbbbbabbbb",  -- 14
+
+				-- Level 1
+				"acbbc...cbbba",  --  0
+				"bdf.......gdb",  --  1
+				"adf.......gdb",  --  2
+				"ahh..iii..hhb",  --  3
+				"b....bbb....b",  --  4
+				"b....bba....b",  --  5
+				"c...eeeee...e",  --  6
+				"b...b...e...a",  --  7
+				"b...c...e...b",  --  8
+				"c...b...e...b",  --  9
+				"b...eeeee...b",  -- 10
+				"bii.......iia",  -- 11
+				"bdf.......gda",  -- 12
+				"bdf.......gdb",  -- 13
+				"bbabbbbccbbbb",  -- 14
+
+				-- Level 2
+				"abbab...babab",  --  0
+				"b...........b",  --  1
+				"e...........e",  --  2
+				"b...........b",  --  3
+				"c....iii....b",  --  4
+				"a....bbb....a",  --  5
+				"e....cbb....e",  --  6
+				"a...........b",  --  7
+				"c...........b",  --  8
+				"b...........b",  --  9
+				"e...........e",  -- 10
+				"b...........b",  -- 11
+				"c...........b",  -- 12
+				"c...........b",  -- 13
+				"cbaaabeebbcbb",  -- 14
+
+				-- Level 3
+				"babbc...bbbbb",  --  0
+				"b...........b",  --  1
+				"j...........j",  --  2
+				"c...........a",  --  3
+				"j...........j",  --  4
+				"b....iki....b",  --  5
+				"j...lnnnl...j",  --  6
+				"b...n...n...b",  --  7
+				"j...n...n...j",  --  8
+				"b...n...n...e",  --  9
+				"j...lnnnl...j",  -- 10
+				"b...........b",  -- 11
+				"j...........j",  -- 12
+				"c...........b",  -- 13
+				"bbjcjajbjajab",  -- 14
+
+				-- Level 4
+				"abbabbbcbbbbc",  --  0
+				"c...........a",  --  1
+				"j...........j",  --  2
+				"b...........b",  --  3
+				"j...........j",  --  4
+				"b...........a",  --  5
+				"j...........j",  --  6
+				"a...........a",  --  7
+				"j...........j",  --  8
+				"b...........c",  --  9
+				"j...........j",  -- 10
+				"c...........b",  -- 11
+				"j...........j",  -- 12
+				"b...........b",  -- 13
+				"cbjcjbjajbjbb",  -- 14
+
+				-- Level 5
+				"babbbbbbbbbab",  --  0
+				"b...........b",  --  1
+				"e...........e",  --  2
+				"b...........b",  --  3
+				"b...........b",  --  4
+				"b...........b",  --  5
+				"e...........e",  --  6
+				"b...........b",  --  7
+				"b...........b",  --  8
+				"b...........b",  --  9
+				"e...........e",  -- 10
+				"b...........c",  -- 11
+				"b...........b",  -- 12
+				"c...........b",  -- 13
+				"bbbabbebababb",  -- 14
+
+				-- Level 6
+				"bbbbcbbcbbbba",  --  0
+				"b...........a",  --  1
+				"e...........e",  --  2
+				"b...........b",  --  3
+				"b...........b",  --  4
+				"b...........b",  --  5
+				"e...........e",  --  6
+				"a...........b",  --  7
+				"b...........a",  --  8
+				"b...........b",  --  9
+				"e...........e",  -- 10
+				"b...........b",  -- 11
+				"b...........a",  -- 12
+				"c...........b",  -- 13
+				"bbbbbbebbbbbb",  -- 14
+
+				-- Level 7
+				"abcbbbbabbbcb",  --  0
+				"babbbccbbcabb",  --  1
+				"bbbbabbbbbbbb",  --  2
+				"bbbabbbbcbabc",  --  3
+				"bbbbbbbbcbcab",  --  4
+				"abbaabbcbbbbb",  --  5
+				"ebbbbbbbbbbbb",  --  6
+				"bbcbbcbabbcbb",  --  7
+				"acbbaaobccbbc",  --  8
+				"bcbcbabbbbaac",  --  9
+				"bcbbbbbbbbbbb",  -- 10
+				"bbbbabbbacabb",  -- 11
+				"bbbbbbbcbbabb",  -- 12
+				"babbbcbbbbbab",  -- 13
+				"cbbbbbbbbcbbb",  -- 14
+
+			},
+		},  -- Fortress_253
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_27",
+				Name         = "U.1",
+				GalleryName  = "Under",
+				GalleryIndex = "1",
+				ID           = "27",
+				CreatorName  = "STR_Warrior",
+			},
+			Size =
+			{
+				x = 13,
+				y = 8,
+				z = 14,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 12,
+				MaxY = 7,
+				MaxZ = 13,
+			},
+			StructureBox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 12,
+				MaxY = 7,
+				MaxZ = 13,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 6,
+					RelY = 1,
+					RelZ = 13,
+					Direction = "z+",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "1",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+				["VerticalStrategy"] = "Range|20|40",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 2",  -- stonebricks
+				"c: 98: 1",  -- stonebricks
+				"d: 10: 0",  -- lava
+				"e:109: 2",  -- stonebrickstairs
+				"f:109: 0",  -- stonebrickstairs
+				"g:109: 1",  -- stonebrickstairs
+				"h:109: 3",  -- stonebrickstairs
+				"i:109: 7",  -- stonebrickstairs
+				"j:109: 5",  -- stonebrickstairs
+				"k:109: 4",  -- stonebrickstairs
+				"l:101: 0",  -- ironbars
+				"m: 19: 0",  -- sponge
+				"n: 98: 3",  -- stonebricks
+				"o:120: 0",  -- endportalframe
+				"p:120: 1",  -- endportalframe
+				"q:120: 3",  -- endportalframe
+				"r: 52: 0",  -- mobspawner
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aabcabaaababa",  --  0
+				"acaaaabaaccba",  --  1
+				"aaaaabbaaaaaa",  --  2
+				"aabaadddabaaa",  --  3
+				"aaaaadddbaaba",  --  4
+				"aaacadddbaaca",  --  5
+				"cacaaaaaabcaa",  --  6
+				"aabbaaaaaabaa",  --  7
+				"aaaaaaaaaaaaa",  --  8
+				"ababaacaaaaaa",  --  9
+				"aaababaaaabca",  -- 10
+				"aacbaaaaaaacb",  -- 11
+				"aaaaabccbaaaa",  -- 12
+				"aaacaaaaaaaaa",  -- 13
+
+				-- Level 1
+				"aaaaaaaaaaaaa",  --  0
+				"a...........c",  --  1
+				"a...eeeee...a",  --  2
+				"a...f...g...b",  --  3
+				"a...f...g...a",  --  4
+				"a...f...g...a",  --  5
+				"aaa.fhhhg.aaa",  --  6
+				"bdc..aaa..adc",  --  7
+				"ada..aaa..bdb",  --  8
+				"adab.hhh.acda",  --  9
+				"adda.....addb",  -- 10
+				"adda.....adda",  -- 11
+				"addb.....cdda",  -- 12
+				"acaaa...aaaaa",  -- 13
+
+				-- Level 2
+				"bcaacaibaaaaa",  --  0
+				"a...........b",  --  1
+				"c...aaaaa...c",  --  2
+				"j...a...a...k",  --  3
+				"a...a...a...a",  --  4
+				"b...a...b...b",  --  5
+				"a...abbaa...a",  --  6
+				"j....aba....k",  --  7
+				"a....hhh....a",  --  8
+				"a...........a",  --  9
+				"c...........a",  -- 10
+				"j...........k",  -- 11
+				"a...........a",  -- 12
+				"aacab...aaaaa",  -- 13
+
+				-- Level 3
+				"aacaaalaaacac",  --  0
+				"c...........a",  --  1
+				"a...nooon...a",  --  2
+				"l...p...q...l",  --  3
+				"b...p...q...c",  --  4
+				"a...p...q...a",  --  5
+				"a...nooon...c",  --  6
+				"l....hrh....l",  --  7
+				"a...........a",  --  8
+				"c...........a",  --  9
+				"c...........b",  -- 10
+				"l...........l",  -- 11
+				"a...........a",  -- 12
+				"acbaa...bbacc",  -- 13
+
+				-- Level 4
+				"baabaclacaaaa",  --  0
+				"a...........a",  --  1
+				"a...........a",  --  2
+				"l...........l",  --  3
+				"a...........a",  --  4
+				"a...........b",  --  5
+				"a...........a",  --  6
+				"l...........l",  --  7
+				"a...........a",  --  8
+				"a...........a",  --  9
+				"a...........b",  -- 10
+				"l...........l",  -- 11
+				"a...........a",  -- 12
+				"aacaaaaaaaaca",  -- 13
+
+				-- Level 5
+				"abcaaalabacbc",  --  0
+				"b...........a",  --  1
+				"a...........a",  --  2
+				"l...........l",  --  3
+				"a...........a",  --  4
+				"a...........a",  --  5
+				"a...........c",  --  6
+				"l...........l",  --  7
+				"a...........a",  --  8
+				"a...........a",  --  9
+				"a...........c",  -- 10
+				"l...........l",  -- 11
+				"c...........a",  -- 12
+				"baaaabaacbaac",  -- 13
+
+				-- Level 6
+				"abaaaahaaaaaa",  --  0
+				"a...........a",  --  1
+				"a...........a",  --  2
+				"g...........f",  --  3
+				"a...........a",  --  4
+				"a...........a",  --  5
+				"a...........b",  --  6
+				"g...........f",  --  7
+				"a...........a",  --  8
+				"a...........a",  --  9
+				"b...........c",  -- 10
+				"g...........f",  -- 11
+				"a...........a",  -- 12
+				"cabaabaaaaaab",  -- 13
+
+				-- Level 7
+				"aaaaaaaaabcaa",  --  0
+				"abaaaabaaabaa",  --  1
+				"caaacabbbbaab",  --  2
+				"baaaababaaaaa",  --  3
+				"aaacaaacaaaaa",  --  4
+				"aaaaaaaacaaaa",  --  5
+				"aaaacbaaacaaa",  --  6
+				"babcaabcaabac",  --  7
+				"cbaaaababaaaa",  --  8
+				"abaabaaaaaaab",  --  9
+				"bbaaaaaaabaaa",  -- 10
+				"aaaaaaabaaaca",  -- 11
+				"aaaaaaaaaacaa",  -- 12
+				"acbaaaaabaaaa",  -- 13
+
+			},
+		},  -- Fortress_27
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "DiagonalCorridor",
+				Name         = "Under 65",
+				GalleryName  = "Under",
+				GalleryIndex = "65",
+				ID           = "952",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 16,
+				y = 5,
+				z = 15,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 15,
+				MaxY = 4,
+				MaxZ = 14,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 13,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 14,
+					Direction = "z+",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"mmmmmmmmmmmabbca",  --  0
+				"mmmmmmmmmmbabccb",  --  1
+				"mmmmmmmmmcabbbaa",  --  2
+				"mmmmmmmmbaaabbcc",  --  3
+				"mmmmmmmbaacacaam",  --  4
+				"mmmmmmccaabaacmm",  --  5
+				"mmmmmbcabbbbbmmm",  --  6
+				"mmmmccbbaaaammmm",  --  7
+				"mmmbabbbccbmmmmm",  --  8
+				"mmaaccabbbmmmmmm",  --  9
+				"maabaaacbmmmmmmm",  -- 10
+				"bbacaabammmmmmmm",  -- 11
+				"bbacbabmmmmmmmmm",  -- 12
+				"cabaaammmmmmmmmm",  -- 13
+				"abcacmmmmmmmmmmm",  -- 14
+
+				-- Level 1
+				"mmmmmmmmmmma...b",  --  0
+				"mmmmmmmmmmc....c",  --  1
+				"mmmmmmmmma.....b",  --  2
+				"mmmmmmmma......b",  --  3
+				"mmmmmmmb......am",  --  4
+				"mmmmmmb......amm",  --  5
+				"mmmmmc......bmmm",  --  6
+				"mmmma......ammmm",  --  7
+				"mmmb......ammmmm",  --  8
+				"mmb......bmmmmmm",  --  9
+				"ma......ammmmmmm",  -- 10
+				"b......cmmmmmmmm",  -- 11
+				"c.....ammmmmmmmm",  -- 12
+				"a....ammmmmmmmmm",  -- 13
+				"a...bmmmmmmmmmmm",  -- 14
+
+				-- Level 2
+				"mmmmmmmmmmmb...c",  --  0
+				"mmmmmmmmmmb....b",  --  1
+				"mmmmmmmmmb.....b",  --  2
+				"mmmmmmmmb......c",  --  3
+				"mmmmmmma......bm",  --  4
+				"mmmmmmb......bmm",  --  5
+				"mmmmmb......ammm",  --  6
+				"mmmma......cmmmm",  --  7
+				"mmmb......ammmmm",  --  8
+				"mmb......bmmmmmm",  --  9
+				"ma......bmmmmmmm",  -- 10
+				"b......bmmmmmmmm",  -- 11
+				"a.....ammmmmmmmm",  -- 12
+				"b....cmmmmmmmmmm",  -- 13
+				"c...bmmmmmmmmmmm",  -- 14
+
+				-- Level 3
+				"mmmmmmmmmmma...a",  --  0
+				"mmmmmmmmmma....a",  --  1
+				"mmmmmmmmma.....c",  --  2
+				"mmmmmmmma......a",  --  3
+				"mmmmmmma......bm",  --  4
+				"mmmmmmc......amm",  --  5
+				"mmmmmb......cmmm",  --  6
+				"mmmmb......ammmm",  --  7
+				"mmma......bmmmmm",  --  8
+				"mmb......ammmmmm",  --  9
+				"mb......ammmmmmm",  -- 10
+				"a......ammmmmmmm",  -- 11
+				"b.....cmmmmmmmmm",  -- 12
+				"a....ammmmmmmmmm",  -- 13
+				"a...bmmmmmmmmmmm",  -- 14
+
+				-- Level 4
+				"mmmmmmmmmmmaaaab",  --  0
+				"mmmmmmmmmmcbacbb",  --  1
+				"mmmmmmmmmbaaaaca",  --  2
+				"mmmmmmmmbbaabaab",  --  3
+				"mmmmmmmaacaaaaam",  --  4
+				"mmmmmmacaabcbbmm",  --  5
+				"mmmmmbaaaacccmmm",  --  6
+				"mmmmababaacammmm",  --  7
+				"mmmabcaaabammmmm",  --  8
+				"mmbabbbbcammmmmm",  --  9
+				"mbbaaabcammmmmmm",  -- 10
+				"acabbaacmmmmmmmm",  -- 11
+				"cabbcbammmmmmmmm",  -- 12
+				"aacaaammmmmmmmmm",  -- 13
+				"abbbammmmmmmmmmm",  -- 14
+
+			},
+		},  -- DiagonalCorridor
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_136",
+				Name         = "Under 7",
+				GalleryName  = "Under",
+				GalleryIndex = "7",
+				ID           = "136",
+				CreatorName  = "STR_Warrior",
+			},
+			Size =
+			{
+				x = 15,
+				y = 7,
+				z = 15,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 14,
+				MaxY = 6,
+				MaxZ = 14,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 0,
+					RelY = 1,
+					RelZ = 7,
+					Direction = "x-",
+				},
+				{
+					Type = 0,
+					RelX = 7,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+				{
+					Type = 0,
+					RelX = 14,
+					RelY = 1,
+					RelZ = 7,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 7,
+					RelY = 1,
+					RelZ = 14,
+					Direction = "z+",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"d:101: 0",  -- ironbars
+				"e: 44: 5",  -- stone_slab
+				"f:  8: 0",  -- water
+				"g: 50: 3",  -- torch
+				"h: 50: 4",  -- torch
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaaaaaaaabaaaa",  --  0
+				"baaaaacaabacbca",  --  1
+				"acaacabaaaaaaca",  --  2
+				"abaaaaaaccaaaaa",  --  3
+				"aaabaaaabaaaaac",  --  4
+				"aacaaaacaabacaa",  --  5
+				"aabcaaaacaacaca",  --  6
+				"aaaaabaaabbbaac",  --  7
+				"caaaaacaaababab",  --  8
+				"abaaaaaaaaaacac",  --  9
+				"caaaaaacaaaaaac",  -- 10
+				"aaaacaaaaaaaabc",  -- 11
+				"aaaacaaaaaaacaa",  -- 12
+				"acbaacaaaaabaca",  -- 13
+				"cabaaaacbaaaaaa",  -- 14
+
+				-- Level 1
+				"aaabaad.dababaa",  --  0
+				"b.............a",  --  1
+				"a.............a",  --  2
+				"a.............a",  --  3
+				"a.............a",  --  4
+				"b....ecaae....a",  --  5
+				"d....b...c....d",  --  6
+				".....a.a.a.....",  --  7
+				"d....a...a....d",  --  8
+				"a....eaaae....a",  --  9
+				"a.............a",  -- 10
+				"a.............a",  -- 11
+				"b.............a",  -- 12
+				"a.............a",  -- 13
+				"aaacacd.daabbca",  -- 14
+
+				-- Level 2
+				"bbbabad.dcccbaa",  --  0
+				"c.............c",  --  1
+				"a.............b",  --  2
+				"c.............a",  --  3
+				"a.............c",  --  4
+				"a.............c",  --  5
+				"d.............d",  --  6
+				".......a.......",  --  7
+				"d.............d",  --  8
+				"a.............b",  --  9
+				"a.............a",  -- 10
+				"c.............b",  -- 11
+				"a.............c",  -- 12
+				"a.............a",  -- 13
+				"aaabaad.dcaaaaa",  -- 14
+
+				-- Level 3
+				"acbaaadddbbaaca",  --  0
+				"a.............a",  --  1
+				"a.............a",  --  2
+				"a.............a",  --  3
+				"a.............c",  --  4
+				"a.............b",  --  5
+				"d.............d",  --  6
+				"d......a......d",  --  7
+				"d.............d",  --  8
+				"a.............a",  --  9
+				"a.............a",  -- 10
+				"a.............b",  -- 11
+				"c.............b",  -- 12
+				"a.............c",  -- 13
+				"aaaaaadddaaabaa",  -- 14
+
+				-- Level 4
+				"abcbaaaaaabaaaa",  --  0
+				"a.............a",  --  1
+				"b.............b",  --  2
+				"a.............a",  --  3
+				"a.............a",  --  4
+				"a.............a",  --  5
+				"a.............a",  --  6
+				"a......f......a",  --  7
+				"a.............a",  --  8
+				"a.............a",  --  9
+				"a.............a",  -- 10
+				"a.............a",  -- 11
+				"a.............a",  -- 12
+				"a.............a",  -- 13
+				"bacaaaaaabaaaaa",  -- 14
+
+				-- Level 5
+				"aaaaaaaaaaaabaa",  --  0
+				"a.g...........a",  --  1
+				"a.............c",  --  2
+				"a.............b",  --  3
+				"a.............a",  --  4
+				"a.............a",  --  5
+				"a.............a",  --  6
+				"a.............b",  --  7
+				"a.............a",  --  8
+				"c.............a",  --  9
+				"b.............a",  -- 10
+				"a.............a",  -- 11
+				"a.............a",  -- 12
+				"ah...........ha",  -- 13
+				"aaaaaabaaaacaaa",  -- 14
+
+				-- Level 6
+				"aaccbabaaaaaaca",  --  0
+				"aaaaaaaaabaaaaa",  --  1
+				"cbaaabaacaaabab",  --  2
+				"caaaaaaaaaaacaa",  --  3
+				"aaaaaaaaaaacaaa",  --  4
+				"abaaaaaaaaaacaa",  --  5
+				"aaaaaacaaaabaaa",  --  6
+				"aaababcaacccaaa",  --  7
+				"ababcbabaacbaab",  --  8
+				"acaaaaaaccacaaa",  --  9
+				"aaaaaaabbaaabba",  -- 10
+				"aaaaaaaaacaaaaa",  -- 11
+				"caaaaaaaaaacaaa",  -- 12
+				"aaacaabbbaaaaab",  -- 13
+				"caaaaabaaaaacaa",  -- 14
+
+			},
+		},  -- Fortress_136
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_223",
+				Name         = "Under 8",
+				GalleryName  = "Under",
+				GalleryIndex = "8",
+				ID           = "223",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 5,
+				y = 11,
+				z = 5,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 10,
+				MaxZ = 4,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 7,
+					RelZ = 4,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"d: 97: 3",  -- silverfishblock
+				"e: 44: 0",  -- stone_slab
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaaa",  --  0
+				"aaaaa",  --  1
+				"aaaaa",  --  2
+				"abaca",  --  3
+				"abaad",  --  4
+
+				-- Level 1
+				"a...b",  --  0
+				"a..ea",  --  1
+				"a..aa",  --  2
+				"a..aa",  --  3
+				"aabaa",  --  4
+
+				-- Level 2
+				"c...a",  --  0
+				"a...a",  --  1
+				"a...a",  --  2
+				"aaaeb",  --  3
+				"abbaa",  --  4
+
+				-- Level 3
+				"c...a",  --  0
+				"cb..a",  --  1
+				"ab..a",  --  2
+				"ae..a",  --  3
+				"aaaaa",  --  4
+
+				-- Level 4
+				"accac",  --  0
+				"beaba",  --  1
+				"a...a",  --  2
+				"c...b",  --  3
+				"aaaaa",  --  4
+
+				-- Level 5
+				"aaaab",  --  0
+				"a..ea",  --  1
+				"a..aa",  --  2
+				"b..ab",  --  3
+				"caaba",  --  4
+
+				-- Level 6
+				"acaab",  --  0
+				"c...a",  --  1
+				"a...a",  --  2
+				"a.aea",  --  3
+				"aaaca",  --  4
+
+				-- Level 7
+				"acaab",  --  0
+				"a...a",  --  1
+				"a...a",  --  2
+				"a...a",  --  3
+				"b...a",  --  4
+
+				-- Level 8
+				"caaba",  --  0
+				"a...c",  --  1
+				"a...a",  --  2
+				"a...c",  --  3
+				"a...a",  --  4
+
+				-- Level 9
+				"aaaac",  --  0
+				"a...a",  --  1
+				"a...a",  --  2
+				"a...a",  --  3
+				"b...a",  --  4
+
+				-- Level 10
+				"aaacb",  --  0
+				"aaaca",  --  1
+				"aaaaa",  --  2
+				"aaaac",  --  3
+				"aaaaa",  --  4
+
+			},
+		},  -- Fortress_223
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_224",
+				Name         = "Under 9",
+				GalleryName  = "Under",
+				GalleryIndex = "9",
+				ID           = "224",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 10,
+				y = 9,
+				z = 11,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 9,
+				MaxY = 8,
+				MaxZ = 10,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 3,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+				{
+					Type = 0,
+					RelX = 9,
+					RelY = 3,
+					RelZ = 8,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 0,
+					RelY = 5,
+					RelZ = 2,
+					Direction = "x-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 97: 2",  -- silverfishblock
+				"c: 98: 1",  -- stonebricks
+				"d: 44: 0",  -- stone_slab
+				"e: 98: 2",  -- stonebricks
+				"f:  1: 0",  -- stone
+				"g: 43: 0",  -- doublestoneslab
+				"h: 50: 3",  -- torch
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"maaaaammmm",  --  0
+				"maaaaammmm",  --  1
+				"mmmmmmmmmm",  --  2
+				"mmmmmmmmmm",  --  3
+				"mmmmmmmmmm",  --  4
+				"mmmmmmmmmm",  --  5
+				"mmmmmmmmmm",  --  6
+				"mmmmmmmmmm",  --  7
+				"mmmmmmmmmm",  --  8
+				"mmmmmmmmmm",  --  9
+				"mmmmmmmmmm",  -- 10
+
+				-- Level 1
+				"mb...cmmmm",  --  0
+				"madddammmm",  --  1
+				"mabbbemmmm",  --  2
+				"mabbfammmm",  --  3
+				"mabbfammmm",  --  4
+				"mabbfammmm",  --  5
+				"mmmmmmmmmm",  --  6
+				"mmmmmmmmmm",  --  7
+				"mmmmmmmmmm",  --  8
+				"mmmmmmmmmm",  --  9
+				"mmmmmmmmmm",  -- 10
+
+				-- Level 2
+				"mb...ammmm",  --  0
+				"mc...ammmm",  --  1
+				"ma...emmmm",  --  2
+				"medddammmm",  --  3
+				"mabbbemmmm",  --  4
+				"bcbcaammmm",  --  5
+				"bbbbbaaeab",  --  6
+				"bbcaaaaaab",  --  7
+				"bbaaaaacab",  --  8
+				"bbaaaaaaab",  --  9
+				"bbbbbbbbbb",  -- 10
+
+				-- Level 3
+				"mb...afffe",  --  0
+				"ma...afffe",  --  1
+				"ma...afffa",  --  2
+				"ma...afffa",  --  3
+				"ma...efffe",  --  4
+				"ba...abbba",  --  5
+				"b.....ddda",  --  6
+				"b.........",  --  7
+				"a.........",  --  8
+				"b.........",  --  9
+				"baaeaaaaab",  -- 10
+
+				-- Level 4
+				"caaaaaaaaa",  --  0
+				"aa...abbbe",  --  1
+				"ec...abbbc",  --  2
+				"aa...abbba",  --  3
+				"aa...addda",  --  4
+				"ca...e...a",  --  5
+				"a........a",  --  6
+				"a.........",  --  7
+				"a.........",  --  8
+				"b.........",  --  9
+				"baeeaecaab",  -- 10
+
+				-- Level 5
+				"ccacacaaaa",  --  0
+				".dgggd...a",  --  1
+				".dgggd...a",  --  2
+				".dgggd...a",  --  3
+				"a..h.....c",  --  4
+				"c........a",  --  5
+				"c........a",  --  6
+				"a.........",  --  7
+				"e.........",  --  8
+				"a.........",  --  9
+				"baeaaceeab",  -- 10
+
+				-- Level 6
+				"acaaeaaaac",  --  0
+				".........a",  --  1
+				".........a",  --  2
+				".........c",  --  3
+				"a........a",  --  4
+				"a........a",  --  5
+				"a........c",  --  6
+				"a........a",  --  7
+				"a........a",  --  8
+				"a........a",  --  9
+				"baaaaaaacb",  -- 10
+
+				-- Level 7
+				"aeaaaaaaaa",  --  0
+				".........e",  --  1
+				".........a",  --  2
+				".........a",  --  3
+				"a........c",  --  4
+				"a........a",  --  5
+				"c........a",  --  6
+				"a........a",  --  7
+				"a........a",  --  8
+				"c........a",  --  9
+				"beaaaaaaeb",  -- 10
+
+				-- Level 8
+				"caaaaeecac",  --  0
+				"eaaaaacaea",  --  1
+				"eaaeaeaaea",  --  2
+				"caaaaeaace",  --  3
+				"aaaaaaaaaa",  --  4
+				"aaaaaeaaee",  --  5
+				"aaaaaaecca",  --  6
+				"aaaaaaaaea",  --  7
+				"aacaaaaeaa",  --  8
+				"eacaaecaca",  --  9
+				"aeeaaaaaaa",  -- 10
+
+			},
+		},  -- Fortress_224
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_225",
+				Name         = "Under 10",
+				GalleryName  = "Under",
+				GalleryIndex = "10",
+				ID           = "225",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 5,
+				y = 5,
+				z = 7,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 4,
+				MaxZ = 6,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 6,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "-50",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 2",  -- stonebricks
+				"c: 98: 1",  -- stonebricks
+				"d: 44: 5",  -- stone_slab
+				"e: 97: 2",  -- silverfishblock
+				"f: 54: 5",  -- chest
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"abcaa",  --  0
+				"baaaa",  --  1
+				"caaaa",  --  2
+				"abaab",  --  3
+				"aaaaa",  --  4
+				"baaac",  --  5
+				"aaaab",  --  6
+
+				-- Level 1
+				"b...a",  --  0
+				"ad..a",  --  1
+				"aed.a",  --  2
+				"aed.a",  --  3
+				"aed.c",  --  4
+				"ad..a",  --  5
+				"c...b",  --  6
+
+				-- Level 2
+				"c...a",  --  0
+				"a...a",  --  1
+				"ad..a",  --  2
+				"af..a",  --  3
+				"cd..a",  --  4
+				"a...a",  --  5
+				"b...a",  --  6
+
+				-- Level 3
+				"a...a",  --  0
+				"a...a",  --  1
+				"b...a",  --  2
+				"a...a",  --  3
+				"a...c",  --  4
+				"a...a",  --  5
+				"a...a",  --  6
+
+				-- Level 4
+				"aaabc",  --  0
+				"caaaa",  --  1
+				"aabac",  --  2
+				"aacab",  --  3
+				"caaaa",  --  4
+				"aaaaa",  --  5
+				"baacc",  --  6
+
+			},
+		},  -- Fortress_225
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_226",
+				Name         = "Under 11",
+				GalleryName  = "Under",
+				GalleryIndex = "11",
+				ID           = "226",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 5,
+				y = 5,
+				z = 16,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 4,
+				MaxZ = 15,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 15,
+					Direction = "z+",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 2",  -- stonebricks
+				"c: 98: 1",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaaa",  --  0
+				"aaaaa",  --  1
+				"baaba",  --  2
+				"caaaa",  --  3
+				"aaaaa",  --  4
+				"aaaab",  --  5
+				"accaa",  --  6
+				"caaaa",  --  7
+				"aaaca",  --  8
+				"aaaaa",  --  9
+				"aaaaa",  -- 10
+				"aacaa",  -- 11
+				"baaaa",  -- 12
+				"aaaab",  -- 13
+				"accaa",  -- 14
+				"aaaaa",  -- 15
+
+				-- Level 1
+				"a...a",  --  0
+				"a...a",  --  1
+				"a...a",  --  2
+				"a...a",  --  3
+				"c...b",  --  4
+				"c...a",  --  5
+				"a...a",  --  6
+				"a...c",  --  7
+				"b...c",  --  8
+				"b...b",  --  9
+				"a...a",  -- 10
+				"a...a",  -- 11
+				"c...a",  -- 12
+				"a...a",  -- 13
+				"a...a",  -- 14
+				"a...a",  -- 15
+
+				-- Level 2
+				"a...a",  --  0
+				"a...a",  --  1
+				"a...b",  --  2
+				"c...a",  --  3
+				"a...a",  --  4
+				"a...a",  --  5
+				"a...c",  --  6
+				"b...b",  --  7
+				"a...a",  --  8
+				"a...a",  --  9
+				"a...a",  -- 10
+				"a...a",  -- 11
+				"a...a",  -- 12
+				"a...c",  -- 13
+				"a...b",  -- 14
+				"b...a",  -- 15
+
+				-- Level 3
+				"a...a",  --  0
+				"a...a",  --  1
+				"a...a",  --  2
+				"b...a",  --  3
+				"a...b",  --  4
+				"b...a",  --  5
+				"b...c",  --  6
+				"a...c",  --  7
+				"b...a",  --  8
+				"a...a",  --  9
+				"a...c",  -- 10
+				"a...a",  -- 11
+				"b...b",  -- 12
+				"a...a",  -- 13
+				"a...a",  -- 14
+				"a...a",  -- 15
+
+				-- Level 4
+				"ababb",  --  0
+				"aabaa",  --  1
+				"aaaaa",  --  2
+				"abaaa",  --  3
+				"aaaaa",  --  4
+				"baaaa",  --  5
+				"aaaba",  --  6
+				"aacbb",  --  7
+				"aabca",  --  8
+				"aaaac",  --  9
+				"aaaaa",  -- 10
+				"aaabc",  -- 11
+				"baaaa",  -- 12
+				"cbbaa",  -- 13
+				"aabaa",  -- 14
+				"aacaa",  -- 15
+
+			},
+		},  -- Fortress_226
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_227",
+				Name         = "Under 12",
+				GalleryName  = "Under",
+				GalleryIndex = "12",
+				ID           = "227",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 6,
+				y = 5,
+				z = 7,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 5,
+				MaxY = 4,
+				MaxZ = 6,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 6,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 5,
+					RelY = 1,
+					RelZ = 4,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 2",  -- stonebricks
+				"c: 98: 1",  -- stonebricks
+				"d: 44: 5",  -- stone_slab
+				"e: 54: 5",  -- chest
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaabam",  --  0
+				"abaaam",  --  1
+				"aaaaba",  --  2
+				"aaaaca",  --  3
+				"abaaac",  --  4
+				"accaaa",  --  5
+				"caaaac",  --  6
+
+				-- Level 1
+				"a...am",  --  0
+				"ad..am",  --  1
+				"aad.aa",  --  2
+				"bcd...",  --  3
+				"abd...",  --  4
+				"ad....",  --  5
+				"c...aa",  --  6
+
+				-- Level 2
+				"a...am",  --  0
+				"b...am",  --  1
+				"ad..ac",  --  2
+				"ae....",  --  3
+				"ad....",  --  4
+				"a.....",  --  5
+				"c...ac",  --  6
+
+				-- Level 3
+				"a...am",  --  0
+				"b...am",  --  1
+				"a...aa",  --  2
+				"a.....",  --  3
+				"a.....",  --  4
+				"a.....",  --  5
+				"a...aa",  --  6
+
+				-- Level 4
+				"acaacm",  --  0
+				"acaaam",  --  1
+				"aaaaaa",  --  2
+				"aaabaa",  --  3
+				"cabacc",  --  4
+				"caaaaa",  --  5
+				"aaaaac",  --  6
+
+			},
+		},  -- Fortress_227
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_228",
+				Name         = "Under 13",
+				GalleryName  = "Under",
+				GalleryIndex = "13",
+				ID           = "228",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 5,
+				y = 5,
+				z = 15,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 4,
+				MaxZ = 14,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 14,
+					Direction = "z+",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 1",  -- stonebricks
+				"b: 98: 0",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"abbba",  --  0
+				"bbbba",  --  1
+				"baabb",  --  2
+				"abbbb",  --  3
+				"bbaab",  --  4
+				"bbbba",  --  5
+				"bbbbb",  --  6
+				"bbaba",  --  7
+				"abbbb",  --  8
+				"abcbb",  --  9
+				"bbcbc",  -- 10
+				"abbcb",  -- 11
+				"bbbbb",  -- 12
+				"bbbbb",  -- 13
+				"bcbbb",  -- 14
+
+				-- Level 1
+				"b...b",  --  0
+				"b...b",  --  1
+				"b...b",  --  2
+				"b...b",  --  3
+				"b...b",  --  4
+				"b...b",  --  5
+				"b...b",  --  6
+				"b...b",  --  7
+				"b...b",  --  8
+				"b...a",  --  9
+				"c...b",  -- 10
+				"b...b",  -- 11
+				"b...b",  -- 12
+				"c...b",  -- 13
+				"b...a",  -- 14
+
+				-- Level 2
+				"b...b",  --  0
+				"b...b",  --  1
+				"a...b",  --  2
+				"b...b",  --  3
+				"b...b",  --  4
+				"b...b",  --  5
+				"b...b",  --  6
+				"b...a",  --  7
+				"b...b",  --  8
+				"b...b",  --  9
+				"a...b",  -- 10
+				"b...b",  -- 11
+				"b...b",  -- 12
+				"b...b",  -- 13
+				"b...b",  -- 14
+
+				-- Level 3
+				"a...b",  --  0
+				"a...b",  --  1
+				"b...b",  --  2
+				"b...b",  --  3
+				"b...b",  --  4
+				"c...a",  --  5
+				"b...b",  --  6
+				"b...b",  --  7
+				"b...b",  --  8
+				"c...a",  --  9
+				"c...b",  -- 10
+				"c...b",  -- 11
+				"b...b",  -- 12
+				"b...b",  -- 13
+				"c...a",  -- 14
+
+				-- Level 4
+				"acbbb",  --  0
+				"babbb",  --  1
+				"bbbbc",  --  2
+				"bbcbb",  --  3
+				"bbbcc",  --  4
+				"bbabb",  --  5
+				"bbbbb",  --  6
+				"bbbbb",  --  7
+				"bbbbb",  --  8
+				"bbbbc",  --  9
+				"bbbbb",  -- 10
+				"abbbb",  -- 11
+				"bbbbb",  -- 12
+				"bbbbb",  -- 13
+				"cbbbb",  -- 14
+
+			},
+		},  -- Fortress_228
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_229",
+				Name         = "Under 14",
+				GalleryName  = "Under",
+				GalleryIndex = "14",
+				ID           = "229",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 11,
+				y = 5,
+				z = 15,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 10,
+				MaxY = 4,
+				MaxZ = 14,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 14,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 10,
+					RelY = 1,
+					RelZ = 7,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aababmmmmmm",  --  0
+				"caaaammmmmm",  --  1
+				"aaaabmmmmmm",  --  2
+				"caaaammmmmm",  --  3
+				"aaaaammmmmm",  --  4
+				"caabaaaacba",  --  5
+				"cbaaacabaab",  --  6
+				"bcaacaacaac",  --  7
+				"ccacaaaaaaa",  --  8
+				"aaaaabaabab",  --  9
+				"aaaaammmmmm",  -- 10
+				"cabaammmmmm",  -- 11
+				"aaaaammmmmm",  -- 12
+				"aaaaammmmmm",  -- 13
+				"aaaaammmmmm",  -- 14
+
+				-- Level 1
+				"c...ammmmmm",  --  0
+				"a...cmmmmmm",  --  1
+				"a...bmmmmmm",  --  2
+				"a...ammmmmm",  --  3
+				"a...ammmmmm",  --  4
+				"a...bbacaaa",  --  5
+				"a..........",  --  6
+				"a..........",  --  7
+				"a..........",  --  8
+				"a...aabaaaa",  --  9
+				"a...ammmmmm",  -- 10
+				"a...ammmmmm",  -- 11
+				"a...bmmmmmm",  -- 12
+				"a...ammmmmm",  -- 13
+				"b...ammmmmm",  -- 14
+
+				-- Level 2
+				"b...cmmmmmm",  --  0
+				"c...ammmmmm",  --  1
+				"a...ammmmmm",  --  2
+				"c...ammmmmm",  --  3
+				"b...bmmmmmm",  --  4
+				"a...abccbab",  --  5
+				"c..........",  --  6
+				"a..........",  --  7
+				"c..........",  --  8
+				"c...aaaaaaa",  --  9
+				"a...ammmmmm",  -- 10
+				"a...ammmmmm",  -- 11
+				"b...ammmmmm",  -- 12
+				"a...ammmmmm",  -- 13
+				"b...ammmmmm",  -- 14
+
+				-- Level 3
+				"a...cmmmmmm",  --  0
+				"a...ammmmmm",  --  1
+				"a...ammmmmm",  --  2
+				"a...cmmmmmm",  --  3
+				"a...ammmmmm",  --  4
+				"a...aacaaaa",  --  5
+				"a..........",  --  6
+				"a..........",  --  7
+				"a..........",  --  8
+				"b...aaacaaa",  --  9
+				"a...bmmmmmm",  -- 10
+				"a...ammmmmm",  -- 11
+				"b...ammmmmm",  -- 12
+				"a...ammmmmm",  -- 13
+				"a...ammmmmm",  -- 14
+
+				-- Level 4
+				"aaabcmmmmmm",  --  0
+				"aabacmmmmmm",  --  1
+				"aaaacmmmmmm",  --  2
+				"abaaammmmmm",  --  3
+				"aaacbmmmmmm",  --  4
+				"caacaaaaaab",  --  5
+				"abcaaaaaabc",  --  6
+				"aaacaaaacaa",  --  7
+				"aaaaaabbaab",  --  8
+				"aaaaaacaabb",  --  9
+				"cabaammmmmm",  -- 10
+				"aacaammmmmm",  -- 11
+				"aacaammmmmm",  -- 12
+				"baaaammmmmm",  -- 13
+				"aaaaammmmmm",  -- 14
+
+			},
+		},  -- Fortress_229
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_230",
+				Name         = "Under 15",
+				GalleryName  = "Under",
+				GalleryIndex = "15",
+				ID           = "230",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 11,
+				y = 5,
+				z = 11,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 10,
+				MaxY = 4,
+				MaxZ = 10,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 0,
+					RelY = 1,
+					RelZ = 5,
+					Direction = "x-",
+				},
+				{
+					Type = 0,
+					RelX = 5,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+				{
+					Type = 0,
+					RelX = 10,
+					RelY = 1,
+					RelZ = 5,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 5,
+					RelY = 1,
+					RelZ = 10,
+					Direction = "z+",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 2",  -- stonebricks
+				"c: 98: 1",  -- stonebricks
+				"d: 97: 2",  -- silverfishblock
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aabaaaaaaaa",  --  0
+				"abaaaaaabaa",  --  1
+				"aaaaabbaaaa",  --  2
+				"aaaaaaaaaba",  --  3
+				"acaaaacabaa",  --  4
+				"abcaaacaaaa",  --  5
+				"abbacabbaaa",  --  6
+				"aabcaaaaaaa",  --  7
+				"baaaaaabaaa",  --  8
+				"aabaaaaaacb",  --  9
+				"abacbcaaaaa",  -- 10
+
+				-- Level 1
+				"caac...caab",  --  0
+				"a.........a",  --  1
+				"a.........a",  --  2
+				"a.........a",  --  3
+				"...........",  --  4
+				"...........",  --  5
+				"...........",  --  6
+				"d.........a",  --  7
+				"a.........a",  --  8
+				"c.........a",  --  9
+				"aaaa...daaa",  -- 10
+
+				-- Level 2
+				"aaaa...caaa",  --  0
+				"a.........a",  --  1
+				"a.........a",  --  2
+				"a.........a",  --  3
+				"...........",  --  4
+				"...........",  --  5
+				"...........",  --  6
+				"d.........a",  --  7
+				"a.........a",  --  8
+				"c.........b",  --  9
+				"acaa...daba",  -- 10
+
+				-- Level 3
+				"aaba...aaaa",  --  0
+				"a.........c",  --  1
+				"a.........a",  --  2
+				"b.........a",  --  3
+				"...........",  --  4
+				"...........",  --  5
+				"...........",  --  6
+				"d.........a",  --  7
+				"a.........c",  --  8
+				"a.........a",  --  9
+				"aaba...daac",  -- 10
+
+				-- Level 4
+				"aaaaaaaaaac",  --  0
+				"aaaaccaacac",  --  1
+				"ccaacaacaaa",  --  2
+				"abaaaaababa",  --  3
+				"bcaaaabcaca",  --  4
+				"aaaabaaaaab",  --  5
+				"aaaaabaaaaa",  --  6
+				"bcaabcaaaaa",  --  7
+				"caaaaaaccca",  --  8
+				"caacaaaaaaa",  --  9
+				"caaaaabaaaa",  -- 10
+
+			},
+		},  -- Fortress_230
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_231",
+				Name         = "Under 16",
+				GalleryName  = "Under",
+				GalleryIndex = "16",
+				ID           = "231",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 5,
+				y = 11,
+				z = 8,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 10,
+				MaxZ = 7,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 7,
+					RelZ = 7,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 2",  -- stonebricks
+				"b: 98: 0",  -- stonebricks
+				"c: 98: 1",  -- stonebricks
+				"d: 97: 2",  -- silverfishblock
+				"e: 67: 2",  -- stonestairs
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"abbbc",  --  0
+				"cabcb",  --  1
+				"mmmmm",  --  2
+				"mmmmm",  --  3
+				"mmmmm",  --  4
+				"mmmmm",  --  5
+				"mmmmm",  --  6
+				"mmmmm",  --  7
+
+				-- Level 1
+				"b...c",  --  0
+				"deeeb",  --  1
+				"dddda",  --  2
+				"mmmmm",  --  3
+				"mmmmm",  --  4
+				"mmmmm",  --  5
+				"mmmmm",  --  6
+				"mmmmm",  --  7
+
+				-- Level 2
+				"b...b",  --  0
+				"b...b",  --  1
+				"deeeb",  --  2
+				"ddddb",  --  3
+				"mmmmm",  --  4
+				"mmmmm",  --  5
+				"mmmmm",  --  6
+				"mmmmm",  --  7
+
+				-- Level 3
+				"c...b",  --  0
+				"b...b",  --  1
+				"b...b",  --  2
+				"deeed",  --  3
+				"ddddc",  --  4
+				"mmmmm",  --  5
+				"mmmmm",  --  6
+				"mmmmm",  --  7
+
+				-- Level 4
+				"bcbbb",  --  0
+				"b...c",  --  1
+				"c...b",  --  2
+				"b...a",  --  3
+				"beeed",  --  4
+				"cdddd",  --  5
+				"mmmmm",  --  6
+				"mmmmm",  --  7
+
+				-- Level 5
+				"abbba",  --  0
+				"b...a",  --  1
+				"c...b",  --  2
+				"b...b",  --  3
+				"b...b",  --  4
+				"beeed",  --  5
+				"bdddd",  --  6
+				"mmmmm",  --  7
+
+				-- Level 6
+				"bbbbb",  --  0
+				"b...c",  --  1
+				"b...a",  --  2
+				"c...b",  --  3
+				"b...b",  --  4
+				"b...a",  --  5
+				"beeeb",  --  6
+				"bdddb",  --  7
+
+				-- Level 7
+				"abbbb",  --  0
+				"b...b",  --  1
+				"b...b",  --  2
+				"c...b",  --  3
+				"a...b",  --  4
+				"c...b",  --  5
+				"b...b",  --  6
+				"b...b",  --  7
+
+				-- Level 8
+				"bbbbb",  --  0
+				"b...b",  --  1
+				"b...a",  --  2
+				"b...a",  --  3
+				"b...b",  --  4
+				"a...b",  --  5
+				"b...b",  --  6
+				"a...b",  --  7
+
+				-- Level 9
+				"acbbb",  --  0
+				"b...b",  --  1
+				"c...b",  --  2
+				"b...b",  --  3
+				"b...b",  --  4
+				"b...b",  --  5
+				"b...a",  --  6
+				"c...a",  --  7
+
+				-- Level 10
+				"bbbbb",  --  0
+				"abbba",  --  1
+				"bbbba",  --  2
+				"bbbbb",  --  3
+				"bbbbc",  --  4
+				"bbbbb",  --  5
+				"bbbab",  --  6
+				"bbcbb",  --  7
+
+			},
+		},  -- Fortress_231
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_232",
+				Name         = "Under 17",
+				GalleryName  = "Under",
+				GalleryIndex = "17",
+				ID           = "232",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 5,
+				y = 5,
+				z = 1,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 4,
+				MaxZ = 0,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z+",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "-10000",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 2",  -- stonebricks
+				"b: 98: 0",  -- stonebricks
+				"c: 98: 1",  -- stonebricks
+				"d:101: 0",  -- ironbars
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"abbbc",  --  0
+
+				-- Level 1
+				"bd.da",  --  0
+
+				-- Level 2
+				"bd.db",  --  0
+
+				-- Level 3
+				"cddda",  --  0
+
+				-- Level 4
+				"abbbc",  --  0
+
+			},
+		},  -- Fortress_232
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_233",
+				Name         = "Under 18",
+				GalleryName  = "Under",
+				GalleryIndex = "18",
+				ID           = "233",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 10,
+				y = 5,
+				z = 13,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 9,
+				MaxY = 4,
+				MaxZ = 12,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 12,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 9,
+					RelY = 1,
+					RelZ = 6,
+					Direction = "x+",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 2",  -- stonebricks
+				"c: 98: 1",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaaammmmm",  --  0
+				"aaaaammmmm",  --  1
+				"aaabammmmm",  --  2
+				"ababammmmm",  --  3
+				"acaaaaaaca",  --  4
+				"aaaaaabacb",  --  5
+				"abaabaaaab",  --  6
+				"aaaaaaaaaa",  --  7
+				"aaaaaacaaa",  --  8
+				"abacammmmm",  --  9
+				"aaaaammmmm",  -- 10
+				"aababmmmmm",  -- 11
+				"aaaaammmmm",  -- 12
+
+				-- Level 1
+				"a...ammmmm",  --  0
+				"a...ammmmm",  --  1
+				"a...cmmmmm",  --  2
+				"a...ammmmm",  --  3
+				"c...ccaaaa",  --  4
+				"a.........",  --  5
+				"a.........",  --  6
+				"b.........",  --  7
+				"a...aaccaa",  --  8
+				"a...ammmmm",  --  9
+				"a...ammmmm",  -- 10
+				"a...ammmmm",  -- 11
+				"a...ammmmm",  -- 12
+
+				-- Level 2
+				"b...bmmmmm",  --  0
+				"b...ammmmm",  --  1
+				"a...ammmmm",  --  2
+				"a...ammmmm",  --  3
+				"c...aaaaaa",  --  4
+				"a.........",  --  5
+				"a.........",  --  6
+				"a.........",  --  7
+				"c...abaaaa",  --  8
+				"b...ammmmm",  --  9
+				"a...ammmmm",  -- 10
+				"a...bmmmmm",  -- 11
+				"a...ammmmm",  -- 12
+
+				-- Level 3
+				"a...ammmmm",  --  0
+				"b...ammmmm",  --  1
+				"a...ammmmm",  --  2
+				"b...ammmmm",  --  3
+				"a...aaabaa",  --  4
+				"a.........",  --  5
+				"a.........",  --  6
+				"a.........",  --  7
+				"a...baabaa",  --  8
+				"a...ammmmm",  --  9
+				"b...cmmmmm",  -- 10
+				"a...ammmmm",  -- 11
+				"a...ammmmm",  -- 12
+
+				-- Level 4
+				"aaacbmmmmm",  --  0
+				"cabcammmmm",  --  1
+				"aaaacmmmmm",  --  2
+				"bacccmmmmm",  --  3
+				"baaaaaacaa",  --  4
+				"aacbaaabaa",  --  5
+				"cbaaaabcaa",  --  6
+				"abaaacaacc",  --  7
+				"abbcaacaab",  --  8
+				"acaacmmmmm",  --  9
+				"aaaaammmmm",  -- 10
+				"acbbammmmm",  -- 11
+				"caaacmmmmm",  -- 12
+
+			},
+		},  -- Fortress_233
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_234",
+				Name         = "Under 19",
+				GalleryName  = "Under",
+				GalleryIndex = "19",
+				ID           = "234",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 9,
+				y = 5,
+				z = 11,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 8,
+				MaxY = 4,
+				MaxZ = 10,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 10,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 8,
+					RelY = 1,
+					RelZ = 5,
+					Direction = "x+",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aababmmmm",  --  0
+				"aaaaammmm",  --  1
+				"aaaabmmmm",  --  2
+				"aaaacaaaa",  --  3
+				"ccaaabaaa",  --  4
+				"aacabaaac",  --  5
+				"aaaacaaaa",  --  6
+				"aaaaaacca",  --  7
+				"abcaammmm",  --  8
+				"aabcammmm",  --  9
+				"ababammmm",  -- 10
+
+				-- Level 1
+				"a...ammmm",  --  0
+				"a...cmmmm",  --  1
+				"a...ammmm",  --  2
+				"b...ababa",  --  3
+				"a........",  --  4
+				"c........",  --  5
+				"a........",  --  6
+				"a...aaaaa",  --  7
+				"a...bmmmm",  --  8
+				"a...bmmmm",  --  9
+				"a...cmmmm",  -- 10
+
+				-- Level 2
+				"a...ammmm",  --  0
+				"a...ammmm",  --  1
+				"a...ammmm",  --  2
+				"b...baaaa",  --  3
+				"a........",  --  4
+				"a........",  --  5
+				"a........",  --  6
+				"a...aaaaa",  --  7
+				"a...cmmmm",  --  8
+				"a...ammmm",  --  9
+				"a...ammmm",  -- 10
+
+				-- Level 3
+				"c...ammmm",  --  0
+				"a...ammmm",  --  1
+				"a...ammmm",  --  2
+				"a...bacba",  --  3
+				"a........",  --  4
+				"c........",  --  5
+				"b........",  --  6
+				"a...abaac",  --  7
+				"a...ammmm",  --  8
+				"a...ammmm",  --  9
+				"a...ammmm",  -- 10
+
+				-- Level 4
+				"aaaaammmm",  --  0
+				"abbaammmm",  --  1
+				"aacaammmm",  --  2
+				"aaaaacbab",  --  3
+				"aaaacaaaa",  --  4
+				"acabaaaaa",  --  5
+				"aaaacaaaa",  --  6
+				"baaaabbaa",  --  7
+				"cacbammmm",  --  8
+				"accbammmm",  --  9
+				"cababmmmm",  -- 10
+
+			},
+		},  -- Fortress_234
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_235",
+				Name         = "Under 20",
+				GalleryName  = "Under",
+				GalleryIndex = "20",
+				ID           = "235",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 8,
+				y = 5,
+				z = 9,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 7,
+				MaxY = 4,
+				MaxZ = 8,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 7,
+					RelY = 1,
+					RelZ = 4,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 8,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 1",  -- stonebricks
+				"b: 98: 0",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"abbcbmmm",  --  0
+				"bbbbbmmm",  --  1
+				"bcbbbabc",  --  2
+				"aabacbbb",  --  3
+				"bbbabcbb",  --  4
+				"bcccbcbb",  --  5
+				"bbcbbbbc",  --  6
+				"bccbbmmm",  --  7
+				"bcabbmmm",  --  8
+
+				-- Level 1
+				"b...bmmm",  --  0
+				"b...bmmm",  --  1
+				"b...bbab",  --  2
+				"b.......",  --  3
+				"a.......",  --  4
+				"b.......",  --  5
+				"b...bbbb",  --  6
+				"c...bmmm",  --  7
+				"b...bmmm",  --  8
+
+				-- Level 2
+				"b...bmmm",  --  0
+				"c...bmmm",  --  1
+				"c...bbbb",  --  2
+				"b.......",  --  3
+				"b.......",  --  4
+				"b.......",  --  5
+				"b...bbbb",  --  6
+				"b...bmmm",  --  7
+				"b...bmmm",  --  8
+
+				-- Level 3
+				"b...ammm",  --  0
+				"b...bmmm",  --  1
+				"b...babb",  --  2
+				"a.......",  --  3
+				"b.......",  --  4
+				"b.......",  --  5
+				"b...bbbc",  --  6
+				"b...cmmm",  --  7
+				"b...bmmm",  --  8
+
+				-- Level 4
+				"babbbmmm",  --  0
+				"bbbabmmm",  --  1
+				"abbbbbab",  --  2
+				"bbbbbbbb",  --  3
+				"abbbbbcb",  --  4
+				"bcabbabc",  --  5
+				"bbbbbbbb",  --  6
+				"abbbbmmm",  --  7
+				"bbbbbmmm",  --  8
+
+			},
+		},  -- Fortress_235
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_236",
+				Name         = "Under 21",
+				GalleryName  = "Under",
+				GalleryIndex = "21",
+				ID           = "236",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 7,
+				y = 5,
+				z = 7,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 6,
+				MaxY = 4,
+				MaxZ = 6,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 6,
+					RelY = 1,
+					RelZ = 3,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 6,
+					Direction = "z+",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 2",  -- stonebricks
+				"c: 98: 1",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaabamm",  --  0
+				"acaaaaa",  --  1
+				"abbacaa",  --  2
+				"aabacca",  --  3
+				"bcaaaac",  --  4
+				"abaaaaa",  --  5
+				"aaaacmm",  --  6
+
+				-- Level 1
+				"a...bmm",  --  0
+				"a...caa",  --  1
+				"b......",  --  2
+				"b......",  --  3
+				"b......",  --  4
+				"a...aaa",  --  5
+				"b...amm",  --  6
+
+				-- Level 2
+				"a...amm",  --  0
+				"c...aaa",  --  1
+				"b......",  --  2
+				"b......",  --  3
+				"a......",  --  4
+				"a...aaa",  --  5
+				"a...cmm",  --  6
+
+				-- Level 3
+				"a...amm",  --  0
+				"b...cca",  --  1
+				"a......",  --  2
+				"a......",  --  3
+				"a......",  --  4
+				"a...cca",  --  5
+				"b...bmm",  --  6
+
+				-- Level 4
+				"acaabmm",  --  0
+				"ababaaa",  --  1
+				"abaaacc",  --  2
+				"cccabaa",  --  3
+				"aaabcab",  --  4
+				"abaabaa",  --  5
+				"aaaabmm",  --  6
+
+			},
+		},  -- Fortress_236
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_237",
+				Name         = "Under 22",
+				GalleryName  = "Under",
+				GalleryIndex = "22",
+				ID           = "237",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 6,
+				y = 5,
+				z = 5,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 5,
+				MaxY = 4,
+				MaxZ = 4,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 5,
+					RelY = 1,
+					RelZ = 2,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 4,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 2",  -- stonebricks
+				"c: 98: 1",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaaaa",  --  0
+				"aaaaba",  --  1
+				"aaaaac",  --  2
+				"ababaa",  --  3
+				"caaabc",  --  4
+
+				-- Level 1
+				"a...aa",  --  0
+				"b.....",  --  1
+				"a.....",  --  2
+				"a.....",  --  3
+				"a...aa",  --  4
+
+				-- Level 2
+				"a...ca",  --  0
+				"a.....",  --  1
+				"a.....",  --  2
+				"a.....",  --  3
+				"a...aa",  --  4
+
+				-- Level 3
+				"c...ac",  --  0
+				"c.....",  --  1
+				"a.....",  --  2
+				"a.....",  --  3
+				"a...aa",  --  4
+
+				-- Level 4
+				"bacbaa",  --  0
+				"cbabab",  --  1
+				"aaaaaa",  --  2
+				"aaaaba",  --  3
+				"aaabca",  --  4
+
+			},
+		},  -- Fortress_237
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_238",
+				Name         = "Under 23",
+				GalleryName  = "Under",
+				GalleryIndex = "23",
+				ID           = "238",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 5,
+				y = 5,
+				z = 13,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 4,
+				MaxZ = 12,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 12,
+					Direction = "z+",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 2",  -- stonebricks
+				"b: 98: 0",  -- stonebricks
+				"c: 98: 1",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"abbbb",  --  0
+				"bbbbb",  --  1
+				"bbabc",  --  2
+				"bcabb",  --  3
+				"bbcab",  --  4
+				"bbbaa",  --  5
+				"bbbbb",  --  6
+				"babcb",  --  7
+				"bbbcb",  --  8
+				"bccbb",  --  9
+				"bbbbb",  -- 10
+				"bbbbc",  -- 11
+				"bbcbb",  -- 12
+
+				-- Level 1
+				"b...b",  --  0
+				"b...b",  --  1
+				"a...b",  --  2
+				"b...b",  --  3
+				"b...a",  --  4
+				"b...b",  --  5
+				"b...a",  --  6
+				"b...b",  --  7
+				"b...b",  --  8
+				"a...b",  --  9
+				"b...c",  -- 10
+				"b...c",  -- 11
+				"c...b",  -- 12
+
+				-- Level 2
+				"b...b",  --  0
+				"b...c",  --  1
+				"b...b",  --  2
+				"b...b",  --  3
+				"c...b",  --  4
+				"b...a",  --  5
+				"b...b",  --  6
+				"b...b",  --  7
+				"b...b",  --  8
+				"b...c",  --  9
+				"b...b",  -- 10
+				"b...b",  -- 11
+				"b...b",  -- 12
+
+				-- Level 3
+				"b...b",  --  0
+				"b...b",  --  1
+				"b...c",  --  2
+				"b...b",  --  3
+				"b...b",  --  4
+				"b...b",  --  5
+				"b...b",  --  6
+				"b...c",  --  7
+				"b...b",  --  8
+				"b...b",  --  9
+				"b...b",  -- 10
+				"b...b",  -- 11
+				"b...b",  -- 12
+
+				-- Level 4
+				"aabbb",  --  0
+				"babbb",  --  1
+				"bcbbb",  --  2
+				"bbbbb",  --  3
+				"bbbba",  --  4
+				"bbbbb",  --  5
+				"bbbbb",  --  6
+				"acbbb",  --  7
+				"bacbb",  --  8
+				"babbb",  --  9
+				"bcbbb",  -- 10
+				"bbbab",  -- 11
+				"bcbbc",  -- 12
+
+			},
+		},  -- Fortress_238
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_239",
+				Name         = "Under 24",
+				GalleryName  = "Under",
+				GalleryIndex = "24",
+				ID           = "239",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 5,
+				y = 5,
+				z = 11,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 4,
+				MaxZ = 10,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 10,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaba",  --  0
+				"aabaa",  --  1
+				"abbaa",  --  2
+				"aabaa",  --  3
+				"aaaaa",  --  4
+				"acaaa",  --  5
+				"aaaba",  --  6
+				"acaac",  --  7
+				"aabaa",  --  8
+				"acbaa",  --  9
+				"cabaa",  -- 10
+
+				-- Level 1
+				"a...b",  --  0
+				"b...c",  --  1
+				"a...c",  --  2
+				"a...c",  --  3
+				"a...b",  --  4
+				"a...a",  --  5
+				"a...a",  --  6
+				"b...a",  --  7
+				"a...a",  --  8
+				"a...c",  --  9
+				"a...a",  -- 10
+
+				-- Level 2
+				"a...c",  --  0
+				"a...c",  --  1
+				"a...a",  --  2
+				"b...a",  --  3
+				"a...b",  --  4
+				"a...b",  --  5
+				"a...c",  --  6
+				"a...a",  --  7
+				"a...b",  --  8
+				"a...c",  --  9
+				"a...a",  -- 10
+
+				-- Level 3
+				"a...a",  --  0
+				"a...a",  --  1
+				"a...a",  --  2
+				"a...a",  --  3
+				"a...a",  --  4
+				"a...a",  --  5
+				"a...a",  --  6
+				"b...a",  --  7
+				"a...c",  --  8
+				"a...a",  --  9
+				"a...a",  -- 10
+
+				-- Level 4
+				"caaab",  --  0
+				"acaaa",  --  1
+				"abaaa",  --  2
+				"cbaaa",  --  3
+				"aaaaa",  --  4
+				"aaaaa",  --  5
+				"acaba",  --  6
+				"bcaaa",  --  7
+				"aaaaa",  --  8
+				"cbaaa",  --  9
+				"aaaca",  -- 10
+
+			},
+		},  -- Fortress_239
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_240",
+				Name         = "Under 25",
+				GalleryName  = "Under",
+				GalleryIndex = "25",
+				ID           = "240",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 5,
+				y = 5,
+				z = 9,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 4,
+				MaxZ = 8,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 8,
+					Direction = "z+",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 97: 2",  -- silverfishblock
+				"d: 98: 2",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaba",  --  0
+				"aacaa",  --  1
+				"aacab",  --  2
+				"aaaad",  --  3
+				"daaaa",  --  4
+				"aaaaa",  --  5
+				"badaa",  --  6
+				"ddaaa",  --  7
+				"daaaa",  --  8
+
+				-- Level 1
+				"a...a",  --  0
+				"a...a",  --  1
+				"a...a",  --  2
+				"b...d",  --  3
+				"a...a",  --  4
+				"d...a",  --  5
+				"a...a",  --  6
+				"a...a",  --  7
+				"d...a",  --  8
+
+				-- Level 2
+				"a...a",  --  0
+				"d...a",  --  1
+				"a...a",  --  2
+				"a...a",  --  3
+				"a...a",  --  4
+				"d...a",  --  5
+				"a...a",  --  6
+				"b...b",  --  7
+				"a...a",  --  8
+
+				-- Level 3
+				"a...a",  --  0
+				"d...a",  --  1
+				"a...b",  --  2
+				"a...b",  --  3
+				"a...a",  --  4
+				"a...a",  --  5
+				"a...a",  --  6
+				"a...a",  --  7
+				"a...b",  --  8
+
+				-- Level 4
+				"aaaaa",  --  0
+				"dabda",  --  1
+				"aabda",  --  2
+				"abaaa",  --  3
+				"abadd",  --  4
+				"aadaa",  --  5
+				"adaaa",  --  6
+				"dabab",  --  7
+				"aaaad",  --  8
+
+			},
+		},  -- Fortress_240
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_241",
+				Name         = "Under 26",
+				GalleryName  = "Under",
+				GalleryIndex = "26",
+				ID           = "241",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 5,
+				y = 5,
+				z = 3,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 4,
+				MaxZ = 2,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 2,
+					Direction = "z+",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "-10000",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 2",  -- stonebricks
+				"c: 98: 1",  -- stonebricks
+				"d: 71: 1",  -- irondoorblock
+				"e: 77: 4",  -- stonebutton
+				"f: 71: 8",  -- irondoorblock
+				"g: 77: 3",  -- stonebutton
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaaa",  --  0
+				"aabba",  --  1
+				"baacc",  --  2
+
+				-- Level 1
+				"c...a",  --  0
+				"ccdaa",  --  1
+				"a...a",  --  2
+
+				-- Level 2
+				"ae..c",  --  0
+				"acfac",  --  1
+				"ag..c",  --  2
+
+				-- Level 3
+				"a...a",  --  0
+				"aaaca",  --  1
+				"a...a",  --  2
+
+				-- Level 4
+				"aaabc",  --  0
+				"caaac",  --  1
+				"aaaaa",  --  2
+
+			},
+		},  -- Fortress_241
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_242",
+				Name         = "Under 27",
+				GalleryName  = "Under",
+				GalleryIndex = "27",
+				ID           = "242",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 5,
+				y = 5,
+				z = 1,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 4,
+				MaxZ = 0,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "-10000",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"abbab",  --  0
+
+				-- Level 1
+				"ca.ac",  --  0
+
+				-- Level 2
+				"aa.aa",  --  0
+
+				-- Level 3
+				"aaaca",  --  0
+
+				-- Level 4
+				"caaaa",  --  0
+
+			},
+		},  -- Fortress_242
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_243",
+				Name         = "Under 28",
+				GalleryName  = "Under",
+				GalleryIndex = "28",
+				ID           = "243",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 11,
+				y = 5,
+				z = 11,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 10,
+				MaxY = 4,
+				MaxZ = 10,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 10,
+					RelY = 1,
+					RelZ = 8,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 2",  -- stonebricks
+				"c: 98: 1",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"abacammmmmm",  --  0
+				"aaabammmmmm",  --  1
+				"aaaaammmmmm",  --  2
+				"bcbaammmmmm",  --  3
+				"aaaaammmmmm",  --  4
+				"aaaaammmmmm",  --  5
+				"aacaacbaaaa",  --  6
+				"aaaaaaaaaaa",  --  7
+				"aaaaabacaab",  --  8
+				"aaaaaabaaab",  --  9
+				"aaaaacaacaa",  -- 10
+
+				-- Level 1
+				"a...ammmmmm",  --  0
+				"a...bmmmmmm",  --  1
+				"b...ammmmmm",  --  2
+				"a...ammmmmm",  --  3
+				"b...ammmmmm",  --  4
+				"a...ammmmmm",  --  5
+				"a...caacaaa",  --  6
+				"a..........",  --  7
+				"c..........",  --  8
+				"c..........",  --  9
+				"abaaaaaacaa",  -- 10
+
+				-- Level 2
+				"a...ammmmmm",  --  0
+				"b...ammmmmm",  --  1
+				"a...ammmmmm",  --  2
+				"a...ammmmmm",  --  3
+				"a...ammmmmm",  --  4
+				"b...ammmmmm",  --  5
+				"a...abacaaa",  --  6
+				"a..........",  --  7
+				"a..........",  --  8
+				"a..........",  --  9
+				"aacaaaaaaab",  -- 10
+
+				-- Level 3
+				"a...cmmmmmm",  --  0
+				"a...ammmmmm",  --  1
+				"a...bmmmmmm",  --  2
+				"a...ammmmmm",  --  3
+				"a...ammmmmm",  --  4
+				"b...ammmmmm",  --  5
+				"a...aabaaaa",  --  6
+				"a..........",  --  7
+				"a..........",  --  8
+				"a..........",  --  9
+				"caaabaaaaba",  -- 10
+
+				-- Level 4
+				"abaabmmmmmm",  --  0
+				"acabammmmmm",  --  1
+				"caaaammmmmm",  --  2
+				"aaaaammmmmm",  --  3
+				"aaacammmmmm",  --  4
+				"aacbammmmmm",  --  5
+				"abaaaaaaaaa",  --  6
+				"aaaaaaaaaaa",  --  7
+				"aaaaaaaaaaa",  --  8
+				"babbcaaaaca",  --  9
+				"aaababaacac",  -- 10
+
+			},
+		},  -- Fortress_243
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_244",
+				Name         = "Under 29",
+				GalleryName  = "Under",
+				GalleryIndex = "29",
+				ID           = "244",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 9,
+				y = 5,
+				z = 9,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 8,
+				MaxY = 4,
+				MaxZ = 8,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 8,
+					RelY = 1,
+					RelZ = 6,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 1",  -- stonebricks
+				"b: 98: 2",  -- stonebricks
+				"c: 98: 0",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"abcccmmmm",  --  0
+				"bcccbmmmm",  --  1
+				"cccacmmmm",  --  2
+				"ccacammmm",  --  3
+				"bbbccccca",  --  4
+				"bcccbcccb",  --  5
+				"ccbccaacc",  --  6
+				"ccccbcccc",  --  7
+				"acccccccc",  --  8
+
+				-- Level 1
+				"a...cmmmm",  --  0
+				"c...cmmmm",  --  1
+				"c...cmmmm",  --  2
+				"c...cmmmm",  --  3
+				"a...caccc",  --  4
+				"c........",  --  5
+				"c........",  --  6
+				"c........",  --  7
+				"cacabbccc",  --  8
+
+				-- Level 2
+				"c...ammmm",  --  0
+				"c...cmmmm",  --  1
+				"c...cmmmm",  --  2
+				"c...cmmmm",  --  3
+				"c...cabbc",  --  4
+				"c........",  --  5
+				"c........",  --  6
+				"c........",  --  7
+				"cccccbccc",  --  8
+
+				-- Level 3
+				"c...cmmmm",  --  0
+				"c...cmmmm",  --  1
+				"c...cmmmm",  --  2
+				"a...cmmmm",  --  3
+				"c...cbccc",  --  4
+				"c........",  --  5
+				"c........",  --  6
+				"c........",  --  7
+				"ccccccacb",  --  8
+
+				-- Level 4
+				"cccccmmmm",  --  0
+				"bacccmmmm",  --  1
+				"cbcccmmmm",  --  2
+				"bbcccmmmm",  --  3
+				"ccccbcccc",  --  4
+				"ccccccccc",  --  5
+				"cccccaccc",  --  6
+				"cbccacccc",  --  7
+				"ccccacabc",  --  8
+
+			},
+		},  -- Fortress_244
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_245",
+				Name         = "Under 30",
+				GalleryName  = "Under",
+				GalleryIndex = "30",
+				ID           = "245",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 7,
+				y = 5,
+				z = 7,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 6,
+				MaxY = 4,
+				MaxZ = 6,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 6,
+					RelY = 1,
+					RelZ = 4,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aabaamm",  --  0
+				"aaaaamm",  --  1
+				"ababaaa",  --  2
+				"baaacaa",  --  3
+				"ccabbaa",  --  4
+				"aaaaaaa",  --  5
+				"aaaacab",  --  6
+
+				-- Level 1
+				"a...amm",  --  0
+				"a...cmm",  --  1
+				"b...aaa",  --  2
+				"b......",  --  3
+				"a......",  --  4
+				"b......",  --  5
+				"aaaaaaa",  --  6
+
+				-- Level 2
+				"a...amm",  --  0
+				"a...bmm",  --  1
+				"a...aaa",  --  2
+				"a......",  --  3
+				"a......",  --  4
+				"a......",  --  5
+				"cabaaaa",  --  6
+
+				-- Level 3
+				"a...amm",  --  0
+				"a...amm",  --  1
+				"a...aaa",  --  2
+				"b......",  --  3
+				"a......",  --  4
+				"a......",  --  5
+				"baaaaac",  --  6
+
+				-- Level 4
+				"aaaabmm",  --  0
+				"aaccamm",  --  1
+				"aaabbab",  --  2
+				"bcaaabb",  --  3
+				"aaaabaa",  --  4
+				"aaacaaa",  --  5
+				"acaaaaa",  --  6
+
+			},
+		},  -- Fortress_245
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_246",
+				Name         = "Under 31",
+				GalleryName  = "Under",
+				GalleryIndex = "31",
+				ID           = "246",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 5,
+				y = 5,
+				z = 5,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 4,
+				MaxZ = 4,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 4,
+					RelY = 1,
+					RelZ = 2,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"abaca",  --  0
+				"abcaa",  --  1
+				"aaaaa",  --  2
+				"aabab",  --  3
+				"acaaa",  --  4
+
+				-- Level 1
+				"a...c",  --  0
+				"a....",  --  1
+				"c....",  --  2
+				"a....",  --  3
+				"abaab",  --  4
+
+				-- Level 2
+				"a...b",  --  0
+				"a....",  --  1
+				"a....",  --  2
+				"a....",  --  3
+				"ccbba",  --  4
+
+				-- Level 3
+				"a...a",  --  0
+				"a....",  --  1
+				"a....",  --  2
+				"a....",  --  3
+				"acaaa",  --  4
+
+				-- Level 4
+				"aaaaa",  --  0
+				"aacba",  --  1
+				"caaaa",  --  2
+				"aacaa",  --  3
+				"aaaba",  --  4
+
+			},
+		},  -- Fortress_246
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_247",
+				Name         = "Under 32",
+				GalleryName  = "Under",
+				GalleryIndex = "32",
+				ID           = "247",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 9,
+				y = 5,
+				z = 11,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 8,
+				MaxY = 4,
+				MaxZ = 10,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 8,
+					RelY = 1,
+					RelZ = 8,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaaammmm",  --  0
+				"aaaabmmmm",  --  1
+				"caabammmm",  --  2
+				"aaaaammmm",  --  3
+				"aaaaammmm",  --  4
+				"aaabcmmmm",  --  5
+				"aaaaabaca",  --  6
+				"bcaabaaaa",  --  7
+				"aaaabaaac",  --  8
+				"acbacaaaa",  --  9
+				"aaaaaaaaa",  -- 10
+
+				-- Level 1
+				"a...ammmm",  --  0
+				"b...ammmm",  --  1
+				"a...ammmm",  --  2
+				"a...ammmm",  --  3
+				"a...ammmm",  --  4
+				"a...ammmm",  --  5
+				"a...acbaa",  --  6
+				"c........",  --  7
+				"a........",  --  8
+				"b........",  --  9
+				"aababaaba",  -- 10
+
+				-- Level 2
+				"a...ammmm",  --  0
+				"a...bmmmm",  --  1
+				"c...ammmm",  --  2
+				"a...bmmmm",  --  3
+				"a...ammmm",  --  4
+				"a...ammmm",  --  5
+				"b...abaaa",  --  6
+				"c........",  --  7
+				"b........",  --  8
+				"c........",  --  9
+				"cacbaccaa",  -- 10
+
+				-- Level 3
+				"b...ammmm",  --  0
+				"a...ammmm",  --  1
+				"a...ammmm",  --  2
+				"a...ammmm",  --  3
+				"a...ammmm",  --  4
+				"c...bmmmm",  --  5
+				"b...aaaaa",  --  6
+				"a........",  --  7
+				"a........",  --  8
+				"a........",  --  9
+				"caabaaaac",  -- 10
+
+				-- Level 4
+				"aaaaammmm",  --  0
+				"abcaammmm",  --  1
+				"aaaaammmm",  --  2
+				"aabaammmm",  --  3
+				"cccaammmm",  --  4
+				"aaabammmm",  --  5
+				"aaaaaaabc",  --  6
+				"aabaaaaac",  --  7
+				"acccbaaba",  --  8
+				"aacacbaca",  --  9
+				"acaabaaab",  -- 10
+
+			},
+		},  -- Fortress_247
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_248",
+				Name         = "Under 33",
+				GalleryName  = "Under",
+				GalleryIndex = "33",
+				ID           = "248",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 7,
+				y = 5,
+				z = 9,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 6,
+				MaxY = 4,
+				MaxZ = 8,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 6,
+					RelY = 1,
+					RelZ = 6,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 1",  -- stonebricks
+				"b: 98: 0",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"abbbbmm",  --  0
+				"bcabbmm",  --  1
+				"bbbacmm",  --  2
+				"bbbcbmm",  --  3
+				"bbcbbaa",  --  4
+				"abbbbab",  --  5
+				"bbabbbb",  --  6
+				"abbbbbb",  --  7
+				"bbbbbcb",  --  8
+
+				-- Level 1
+				"c...bmm",  --  0
+				"b...bmm",  --  1
+				"b...cmm",  --  2
+				"b...cmm",  --  3
+				"b...baa",  --  4
+				"a......",  --  5
+				"b......",  --  6
+				"b......",  --  7
+				"abbbbba",  --  8
+
+				-- Level 2
+				"b...bmm",  --  0
+				"b...cmm",  --  1
+				"b...bmm",  --  2
+				"b...bmm",  --  3
+				"b...baa",  --  4
+				"b......",  --  5
+				"b......",  --  6
+				"b......",  --  7
+				"bbbbbbb",  --  8
+
+				-- Level 3
+				"c...bmm",  --  0
+				"b...cmm",  --  1
+				"b...cmm",  --  2
+				"a...bmm",  --  3
+				"b...bbb",  --  4
+				"b......",  --  5
+				"b......",  --  6
+				"b......",  --  7
+				"bbbbabb",  --  8
+
+				-- Level 4
+				"cbaabmm",  --  0
+				"bbbbbmm",  --  1
+				"bbbbbmm",  --  2
+				"bcbbbmm",  --  3
+				"babcbbb",  --  4
+				"bbabbbc",  --  5
+				"bcbbbba",  --  6
+				"bcbbbbb",  --  7
+				"bcabbba",  --  8
+
+			},
+		},  -- Fortress_248
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_249",
+				Name         = "Under 34",
+				GalleryName  = "Under",
+				GalleryIndex = "34",
+				ID           = "249",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 5,
+				y = 5,
+				z = 7,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 4,
+				MaxZ = 6,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 4,
+					RelY = 1,
+					RelZ = 4,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 2",  -- stonebricks
+				"c: 98: 1",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaabb",  --  0
+				"abaab",  --  1
+				"caaaa",  --  2
+				"aaabb",  --  3
+				"abbaa",  --  4
+				"aaaba",  --  5
+				"abbab",  --  6
+
+				-- Level 1
+				"a...a",  --  0
+				"b...b",  --  1
+				"b...a",  --  2
+				"a....",  --  3
+				"b....",  --  4
+				"a....",  --  5
+				"acaca",  --  6
+
+				-- Level 2
+				"a...a",  --  0
+				"b...a",  --  1
+				"c...a",  --  2
+				"a....",  --  3
+				"a....",  --  4
+				"a....",  --  5
+				"aaaaa",  --  6
+
+				-- Level 3
+				"c...b",  --  0
+				"a...b",  --  1
+				"a...a",  --  2
+				"b....",  --  3
+				"a....",  --  4
+				"c....",  --  5
+				"aabaa",  --  6
+
+				-- Level 4
+				"aabab",  --  0
+				"baaac",  --  1
+				"aacca",  --  2
+				"aabaa",  --  3
+				"aaaab",  --  4
+				"caaaa",  --  5
+				"baaba",  --  6
+
+			},
+		},  -- Fortress_249
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_250",
+				Name         = "Under 35",
+				GalleryName  = "Under",
+				GalleryIndex = "35",
+				ID           = "250",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 15,
+				y = 5,
+				z = 15,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 14,
+				MaxY = 4,
+				MaxZ = 14,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 14,
+					RelY = 1,
+					RelZ = 7,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 7,
+					RelY = 1,
+					RelZ = 14,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 7,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+				{
+					Type = 0,
+					RelX = 0,
+					RelY = 1,
+					RelZ = 7,
+					Direction = "x-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 2",  -- stonebricks
+				"c: 98: 1",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"mmmmmaabaammmmm",  --  0
+				"mmmmmabcaammmmm",  --  1
+				"mmmmmaacaammmmm",  --  2
+				"mmmmmaaaacmmmmm",  --  3
+				"mmmmmaaabammmmm",  --  4
+				"accbaaabcaccbaa",  --  5
+				"aaaaaaaaaaacaaa",  --  6
+				"aaaaaaacaaaaaaa",  --  7
+				"aaaaaaaaaaaaaaa",  --  8
+				"aaaaaaacaaabaaa",  --  9
+				"mmmmmbbaaammmmm",  -- 10
+				"mmmmmabacammmmm",  -- 11
+				"mmmmmbacaammmmm",  -- 12
+				"mmmmmaaabammmmm",  -- 13
+				"mmmmmaaaaammmmm",  -- 14
+
+				-- Level 1
+				"mmmmma...ammmmm",  --  0
+				"mmmmmb...ammmmm",  --  1
+				"mmmmma...ammmmm",  --  2
+				"mmmmma...ammmmm",  --  3
+				"mmmmma...bmmmmm",  --  4
+				"abaaaa...aaaaaa",  --  5
+				"...............",  --  6
+				"...............",  --  7
+				"...............",  --  8
+				"caaacb...aacaaa",  --  9
+				"mmmmma...cmmmmm",  -- 10
+				"mmmmma...ammmmm",  -- 11
+				"mmmmmb...ammmmm",  -- 12
+				"mmmmma...ammmmm",  -- 13
+				"mmmmma...ammmmm",  -- 14
+
+				-- Level 2
+				"mmmmma...ammmmm",  --  0
+				"mmmmmb...bmmmmm",  --  1
+				"mmmmma...ammmmm",  --  2
+				"mmmmma...ammmmm",  --  3
+				"mmmmmb...ammmmm",  --  4
+				"aaabaa...aaacaa",  --  5
+				"...............",  --  6
+				"...............",  --  7
+				"...............",  --  8
+				"caaaaa...aaabbc",  --  9
+				"mmmmma...bmmmmm",  -- 10
+				"mmmmmc...ammmmm",  -- 11
+				"mmmmmc...ammmmm",  -- 12
+				"mmmmmc...ammmmm",  -- 13
+				"mmmmma...ammmmm",  -- 14
+
+				-- Level 3
+				"mmmmma...ammmmm",  --  0
+				"mmmmmb...cmmmmm",  --  1
+				"mmmmma...bmmmmm",  --  2
+				"mmmmma...cmmmmm",  --  3
+				"mmmmmb...cmmmmm",  --  4
+				"aaacbc...acacaa",  --  5
+				"...............",  --  6
+				"...............",  --  7
+				"...............",  --  8
+				"aaaaaa...aaaaaa",  --  9
+				"mmmmma...bmmmmm",  -- 10
+				"mmmmmc...ammmmm",  -- 11
+				"mmmmmc...bmmmmm",  -- 12
+				"mmmmma...ammmmm",  -- 13
+				"mmmmma...ammmmm",  -- 14
+
+				-- Level 4
+				"mmmmmaaaaammmmm",  --  0
+				"mmmmmaacaammmmm",  --  1
+				"mmmmmaaabammmmm",  --  2
+				"mmmmmaacaammmmm",  --  3
+				"mmmmmababammmmm",  --  4
+				"bcaaaaaaabaaaab",  --  5
+				"acbbaaacbaaaaac",  --  6
+				"aaacacaaaaacaaa",  --  7
+				"aaacaacaacaaaac",  --  8
+				"caacaaaaabaabaa",  --  9
+				"mmmmmbaaaammmmm",  -- 10
+				"mmmmmaaaaammmmm",  -- 11
+				"mmmmmaaaaammmmm",  -- 12
+				"mmmmmaaacammmmm",  -- 13
+				"mmmmmcbabbmmmmm",  -- 14
+
+			},
+		},  -- Fortress_250
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_251",
+				Name         = "Under 36",
+				GalleryName  = "Under",
+				GalleryIndex = "36",
+				ID           = "251",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 11,
+				y = 5,
+				z = 11,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 10,
+				MaxY = 4,
+				MaxZ = 10,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 10,
+					RelY = 1,
+					RelZ = 5,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 5,
+					RelY = 1,
+					RelZ = 10,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 0,
+					RelY = 1,
+					RelZ = 5,
+					Direction = "x-",
+				},
+				{
+					Type = 0,
+					RelX = 5,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 1",  -- stonebricks
+				"b: 98: 0",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"mmmabbbbmmm",  --  0
+				"mmmbababmmm",  --  1
+				"mmmbbbbbmmm",  --  2
+				"aaabbcbbbbb",  --  3
+				"abbbbababbb",  --  4
+				"abbbbbbbbbb",  --  5
+				"bbcbabcaabb",  --  6
+				"bbbbbbbbbab",  --  7
+				"mmmbbabbmmm",  --  8
+				"mmmbbbbbmmm",  --  9
+				"mmmbabbbmmm",  -- 10
+
+				-- Level 1
+				"mmmb...bmmm",  --  0
+				"mmmb...bmmm",  --  1
+				"mmmc...bmmm",  --  2
+				"bbbb...abcb",  --  3
+				"...........",  --  4
+				"...........",  --  5
+				"...........",  --  6
+				"cabc...bbba",  --  7
+				"mmmb...bmmm",  --  8
+				"mmmb...bmmm",  --  9
+				"mmmc...bmmm",  -- 10
+
+				-- Level 2
+				"mmmb...cmmm",  --  0
+				"mmmb...cmmm",  --  1
+				"mmmb...bmmm",  --  2
+				"bcab...cbbb",  --  3
+				"...........",  --  4
+				"...........",  --  5
+				"...........",  --  6
+				"bbbb...bbbb",  --  7
+				"mmmb...cmmm",  --  8
+				"mmmb...bmmm",  --  9
+				"mmmc...bmmm",  -- 10
+
+				-- Level 3
+				"mmmb...bmmm",  --  0
+				"mmmb...bmmm",  --  1
+				"mmmc...bmmm",  --  2
+				"bcbb...ccbb",  --  3
+				"...........",  --  4
+				"...........",  --  5
+				"...........",  --  6
+				"bcbb...bbbb",  --  7
+				"mmmb...bmmm",  --  8
+				"mmmb...bmmm",  --  9
+				"mmmb...bmmm",  -- 10
+
+				-- Level 4
+				"mmmbbbbbmmm",  --  0
+				"mmmbcbbbmmm",  --  1
+				"mmmbbbbbmmm",  --  2
+				"abbbbbbabca",  --  3
+				"bcbcbaabbbc",  --  4
+				"bbbbbbbabbb",  --  5
+				"abbabbcbbbb",  --  6
+				"bbcbbbbbbbb",  --  7
+				"mmmbbbbcmmm",  --  8
+				"mmmacbbbmmm",  --  9
+				"mmmbbcbbmmm",  -- 10
+
+			},
+		},  -- Fortress_251
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_252",
+				Name         = "Under 37",
+				GalleryName  = "Under",
+				GalleryIndex = "37",
+				ID           = "252",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 7,
+				y = 5,
+				z = 7,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 6,
+				MaxY = 4,
+				MaxZ = 6,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 6,
+					RelY = 1,
+					RelZ = 3,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 3,
+					RelY = 1,
+					RelZ = 6,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 0,
+					RelY = 1,
+					RelZ = 3,
+					Direction = "x-",
+				},
+				{
+					Type = 0,
+					RelX = 3,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"maaaaam",  --  0
+				"aaabaab",  --  1
+				"aacaaca",  --  2
+				"aaaaaca",  --  3
+				"aaaccab",  --  4
+				"abacaac",  --  5
+				"mabaccm",  --  6
+
+				-- Level 1
+				"ma...am",  --  0
+				"ba...aa",  --  1
+				".......",  --  2
+				".......",  --  3
+				".......",  --  4
+				"aa...aa",  --  5
+				"ma...am",  --  6
+
+				-- Level 2
+				"mb...am",  --  0
+				"aa...ab",  --  1
+				".......",  --  2
+				".......",  --  3
+				".......",  --  4
+				"aa...aa",  --  5
+				"ma...am",  --  6
+
+				-- Level 3
+				"ma...bm",  --  0
+				"aa...aa",  --  1
+				".......",  --  2
+				".......",  --  3
+				".......",  --  4
+				"aa...ca",  --  5
+				"ma...am",  --  6
+
+				-- Level 4
+				"maaaabm",  --  0
+				"acbaaaa",  --  1
+				"aaacaaa",  --  2
+				"aaaacaa",  --  3
+				"aaaaaab",  --  4
+				"aaaaaba",  --  5
+				"maaaabm",  --  6
+
+			},
+		},  -- Fortress_252
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_256",
+				Name         = "Under 40",
+				GalleryName  = "Under",
+				GalleryIndex = "40",
+				ID           = "256",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 15,
+				y = 7,
+				z = 15,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 14,
+				MaxY = 6,
+				MaxZ = 14,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 7,
+					RelY = 1,
+					RelZ = -1,
+					Direction = "z-",
+				},
+				{
+					Type = 0,
+					RelX = 14,
+					RelY = 1,
+					RelZ = 7,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 7,
+					RelY = 1,
+					RelZ = 14,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 0,
+					RelY = 1,
+					RelZ = 7,
+					Direction = "x-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 1",  -- stonebricks
+				"b: 98: 2",  -- stonebricks
+				"c: 98: 0",  -- stonebricks
+				"d:109: 0",  -- stonebrickstairs
+				"e:109: 2",  -- stonebrickstairs
+				"f:  8: 1",  -- water
+				"g:  8: 8",  -- water
+				"h:109: 1",  -- stonebrickstairs
+				"i:109: 3",  -- stonebrickstairs
+				"j:  8: 0",  -- water
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"abcbcccbaccaccc",  --  0
+				"cacccbcccbccbcc",  --  1
+				"cccacccccaccccc",  --  2
+				"acccacccbccabcc",  --  3
+				"ccccccbcccccccc",  --  4
+				"acccbcccacccccb",  --  5
+				"ccccccacccbccbc",  --  6
+				"ccbcccccccccccc",  --  7
+				"cccccccccbcccbc",  --  8
+				"cccbabaccbbacca",  --  9
+				"cccaccccbcccbca",  -- 10
+				"ccccccccaccccbc",  -- 11
+				"cbcccaccaccccca",  -- 12
+				"cacccccccaccccc",  -- 13
+				"cccccacccccccbc",  -- 14
+
+				-- Level 1
+				"cbcccc...cccabc",  --  0
+				"c.............c",  --  1
+				"c.............c",  --  2
+				"c.............c",  --  3
+				"c.............c",  --  4
+				"b....decee....c",  --  5
+				".....dfgfh.....",  --  6
+				".....cgcgc.....",  --  7
+				".....dfgfh.....",  --  8
+				"c....dicih....c",  --  9
+				"a.............c",  -- 10
+				"c.............c",  -- 11
+				"c.............c",  -- 12
+				"a.............c",  -- 13
+				"acbccc...ccccbb",  -- 14
+
+				-- Level 2
+				"ccbcbc...ccbccc",  --  0
+				"c.............a",  --  1
+				"c.............c",  --  2
+				"c.............c",  --  3
+				"c.............a",  --  4
+				"c.............c",  --  5
+				".......g.......",  --  6
+				"......gcg......",  --  7
+				".......g.......",  --  8
+				"c.............c",  --  9
+				"c.............c",  -- 10
+				"c.............c",  -- 11
+				"c.............c",  -- 12
+				"c.............c",  -- 13
+				"bcbccc...cccccc",  -- 14
+
+				-- Level 3
+				"cccbcc...cccccb",  --  0
+				"a.............c",  --  1
+				"c.............c",  --  2
+				"c.............c",  --  3
+				"c.............c",  --  4
+				"c.............c",  --  5
+				".......g.......",  --  6
+				"......gcg......",  --  7
+				".......g.......",  --  8
+				"c.............c",  --  9
+				"c.............c",  -- 10
+				"b.............c",  -- 11
+				"c.............c",  -- 12
+				"c.............c",  -- 13
+				"cacccc...cbcbac",  -- 14
+
+				-- Level 4
+				"ccccacccccccccc",  --  0
+				"c.............c",  --  1
+				"c.............c",  --  2
+				"a.............c",  --  3
+				"c.............a",  --  4
+				"c.............c",  --  5
+				"c......f......c",  --  6
+				"a.....fjf.....c",  --  7
+				"c......f......b",  --  8
+				"c.............c",  --  9
+				"a.............c",  -- 10
+				"b.............a",  -- 11
+				"c.............a",  -- 12
+				"c.............c",  -- 13
+				"caccccbccbccccb",  -- 14
+
+				-- Level 5
+				"cccccbccbacabcb",  --  0
+				"c.............a",  --  1
+				"c.............c",  --  2
+				"c.............c",  --  3
+				"a.............c",  --  4
+				"c.............c",  --  5
+				"b.............c",  --  6
+				"c.............a",  --  7
+				"c.............a",  --  8
+				"c.............c",  --  9
+				"c.............c",  -- 10
+				"a.............c",  -- 11
+				"c.............c",  -- 12
+				"b.............a",  -- 13
+				"baccccccccaccab",  -- 14
+
+				-- Level 6
+				"cccabcccaccbccc",  --  0
+				"ccccbccccccccbb",  --  1
+				"ccbacccacaccccc",  --  2
+				"ccccccbaccbcccc",  --  3
+				"ccccabccccccccc",  --  4
+				"bcaccccccccaccc",  --  5
+				"cccccbccccccbac",  --  6
+				"ccccccccacccccc",  --  7
+				"cacccbacccccaac",  --  8
+				"acccbcccccacbac",  --  9
+				"acbcccccccccbbc",  -- 10
+				"cacacccccccbccc",  -- 11
+				"acccccaccaaacac",  -- 12
+				"cbabcbccbcccccc",  -- 13
+				"caaccccabcccccc",  -- 14
+
+			},
+		},  -- Fortress_256
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_301",
+				Name         = "Under 41",
+				GalleryName  = "Under",
+				GalleryIndex = "41",
+				ID           = "301",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 9,
+				y = 5,
+				z = 11,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 8,
+				MaxY = 4,
+				MaxZ = 10,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 10,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"d: 71: 0",  -- irondoorblock
+				"e:101: 0",  -- ironbars
+				"f: 71: 8",  -- irondoorblock
+				"g: 77: 2",  -- stonebutton
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"abaaaaacc",  --  0
+				"abaacaaac",  --  1
+				"acaaaaacc",  --  2
+				"bacabaaab",  --  3
+				"aaaaaacba",  --  4
+				"aaacaaaab",  --  5
+				"aacaaabac",  --  6
+				"acaaaaaba",  --  7
+				"aaaaaabba",  --  8
+				"aaaaacaaa",  --  9
+				"aaaaaaaaa",  -- 10
+
+				-- Level 1
+				"a...baaac",  --  0
+				"c...a...a",  --  1
+				"a...d...a",  --  2
+				"a...a...a",  --  3
+				"c...e...a",  --  4
+				"a...eeeec",  --  5
+				"a...e...a",  --  6
+				"a...a...a",  --  7
+				"c...d...a",  --  8
+				"a...a...a",  --  9
+				"a...aaaba",  -- 10
+
+				-- Level 2
+				"a...aaaaa",  --  0
+				"a...a...b",  --  1
+				"b...f...c",  --  2
+				"a..ga...c",  --  3
+				"a...e...a",  --  4
+				"a...eeeea",  --  5
+				"a...e...a",  --  6
+				"a...a...a",  --  7
+				"c...f...a",  --  8
+				"a..ga...a",  --  9
+				"a...acaaa",  -- 10
+
+				-- Level 3
+				"a...cacac",  --  0
+				"a...a...a",  --  1
+				"a...a...b",  --  2
+				"a...a...b",  --  3
+				"a...e...a",  --  4
+				"a...eeeea",  --  5
+				"b...e...c",  --  6
+				"a...a...c",  --  7
+				"a...a...a",  --  8
+				"a...a...b",  --  9
+				"a...aacaa",  -- 10
+
+				-- Level 4
+				"baaaabaab",  --  0
+				"aaaacaaaa",  --  1
+				"aaabaaaaa",  --  2
+				"aaaaccaaa",  --  3
+				"aabaaaaaa",  --  4
+				"caaaaacba",  --  5
+				"aabcacaaa",  --  6
+				"aaacaabac",  --  7
+				"cabaababa",  --  8
+				"bcaacaaca",  --  9
+				"abaaacccb",  -- 10
+
+			},
+		},  -- Fortress_301
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_52",
+				Name         = "Under 5",
+				GalleryName  = "Under",
+				GalleryIndex = "5",
+				ID           = "52",
+				CreatorName  = "STR_Warrior",
+			},
+			Size =
+			{
+				x = 15,
+				y = 11,
+				z = 16,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 14,
+				MaxY = 10,
+				MaxZ = 15,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 7,
+					RelY = 1,
+					RelZ = 15,
+					Direction = "z+",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"d: 65: 3",  -- ladder
+				"e: 47: 0",  -- bookshelf
+				"f: 30: 0",  -- web
+				"g: 54: 5",  -- chest
+				"h: 54: 4",  -- chest
+				"i:  5: 0",  -- planks
+				"j: 85: 0",  -- fence
+				"k: 50: 5",  -- torch
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaaaaaaabaaaaa",  --  0
+				"ababaaaaacaacaa",  --  1
+				"acaaaaaaaaaaaac",  --  2
+				"abaabaaaabaaacc",  --  3
+				"baabaaaabaccaac",  --  4
+				"cabcbaaaabaaaaa",  --  5
+				"aaaaacbbaaaaaaa",  --  6
+				"baaaaabaaaaaaaa",  --  7
+				"abcccaaabaaaaaa",  --  8
+				"aacaaaaaabbcaaa",  --  9
+				"abaaaccaaaaaaba",  -- 10
+				"aaaacaaaaaaaaaa",  -- 11
+				"aaaaaaabaaaaaab",  -- 12
+				"aabcabaaaaaaaaa",  -- 13
+				"aabaabaaaacabaa",  -- 14
+				"aabaaaccaaaaaca",  -- 15
+
+				-- Level 1
+				"aacabcaaccaaabb",  --  0
+				"a......d......c",  --  1
+				"bee.ee...ee.eea",  --  2
+				"a........f....a",  --  3
+				"aee.ee...ee.eea",  --  4
+				"a...f.........b",  --  5
+				"cee.ee...ee.eeb",  --  6
+				"b.........f...a",  --  7
+				"b..f..........a",  --  8
+				"aee.ee...ee.eea",  --  9
+				"af............c",  -- 10
+				"cee.ee...ee.eec",  -- 11
+				"a.............b",  -- 12
+				"aee.ee...ee.eea",  -- 13
+				"a.f.f......f..a",  -- 14
+				"cabaac...aacaac",  -- 15
+
+				-- Level 2
+				"aaaaabaaaaaacaa",  --  0
+				"a......d......a",  --  1
+				"aee.ee...ee.eeb",  --  2
+				"a.............a",  --  3
+				"aee.ee...ee.eea",  --  4
+				"a.............a",  --  5
+				"cee.ee...ee.eeb",  --  6
+				"a.............a",  --  7
+				"a.............b",  --  8
+				"aee.ee...ee.eea",  --  9
+				"c........f....a",  -- 10
+				"cee.ee...ee.eea",  -- 11
+				"a.............a",  -- 12
+				"aee.ee...ee.eea",  -- 13
+				"a.............b",  -- 14
+				"aaabaa...aaaaaa",  -- 15
+
+				-- Level 3
+				"aaaaaaaaaaabaaa",  --  0
+				"c......d.f....a",  --  1
+				"aee.ee...ee.eea",  --  2
+				"a.............c",  --  3
+				"aee.ee...eefeea",  --  4
+				"a.........f...b",  --  5
+				"aee.ee...ee.eec",  --  6
+				"c.............a",  --  7
+				"a........f....a",  --  8
+				"beg.ee...ee.heb",  --  9
+				"b.f...........a",  -- 10
+				"aee.ee...eefeea",  -- 11
+				"af............a",  -- 12
+				"aee.ee...ee.eea",  -- 13
+				"a........f...fc",  -- 14
+				"bcbaaa...baaaab",  -- 15
+
+				-- Level 4
+				"aaaaaaaaccaaaba",  --  0
+				"af.f...d.....fb",  --  1
+				"c.........f...a",  --  2
+				"b.............a",  --  3
+				"a.f..f........a",  --  4
+				"b.............a",  --  5
+				"a..f..f.....f.a",  --  6
+				"c.............c",  --  7
+				"b.............a",  --  8
+				"a..f..f..f.f..b",  --  9
+				"c.............a",  -- 10
+				"a....f...f...fc",  -- 11
+				"a.............a",  -- 12
+				"c..f......f...a",  -- 13
+				"a...f.........a",  -- 14
+				"abaaaacabaaacca",  -- 15
+
+				-- Level 5
+				"caaaaacaababaac",  --  0
+				"aiiiiiidiiiiiia",  --  1
+				"aiiiiiiiiiiiiia",  --  2
+				"aiiiiiiiiiiiiia",  --  3
+				"aiiii.....iiiia",  --  4
+				"aiii.......iiia",  --  5
+				"ciii.......iiic",  --  6
+				"aiii...f...iiia",  --  7
+				"aiii.......iiia",  --  8
+				"biii....f..iiia",  --  9
+				"biii.......iiia",  -- 10
+				"aiiii.....iiiia",  -- 11
+				"ciiiiiiiiiiiiia",  -- 12
+				"biiiiiiiiiiiiia",  -- 13
+				"aiiiiiiiiiiiiia",  -- 14
+				"aaaaabaaaaaaaaa",  -- 15
+
+				-- Level 6
+				"aaaaaaaaaaaaaaa",  --  0
+				"c......d......a",  --  1
+				"e.............e",  --  2
+				"e...jjjjjjj...e",  --  3
+				"i..jj.....jj..i",  --  4
+				"e..j.......j..e",  --  5
+				"e..j.......j..e",  --  6
+				"a..j.......j..b",  --  7
+				"a..j...f...j..a",  --  8
+				"e..j.......j..e",  --  9
+				"e..j.......j..e",  -- 10
+				"i..jj.....jj..i",  -- 11
+				"e...jjjjjjj...e",  -- 12
+				"e.............e",  -- 13
+				"a.............a",  -- 14
+				"aacaaaaaaabaaaa",  -- 15
+
+				-- Level 7
+				"aacaacaabaaaaca",  --  0
+				"a......d......b",  --  1
+				"e.............e",  --  2
+				"e.............e",  --  3
+				"i.............i",  --  4
+				"e.............e",  --  5
+				"e......j......e",  --  6
+				"a.....jjj.....a",  --  7
+				"a.....jjj.....a",  --  8
+				"e......j......e",  --  9
+				"e.............e",  -- 10
+				"i.............i",  -- 11
+				"e.............e",  -- 12
+				"e.............e",  -- 13
+				"a...f.......f.a",  -- 14
+				"abcabaabaaccaaa",  -- 15
+
+				-- Level 8
+				"aaacaaaaabaaaaa",  --  0
+				"a..f...d....f.a",  --  1
+				"e.............e",  --  2
+				"e.............e",  --  3
+				"i.............i",  --  4
+				"e.............e",  --  5
+				"e......k......e",  --  6
+				"a.....kjk.....a",  --  7
+				"a.....kjk.....a",  --  8
+				"e......k......e",  --  9
+				"e.............e",  -- 10
+				"i.............i",  -- 11
+				"e.............e",  -- 12
+				"e.............e",  -- 13
+				"a.............a",  -- 14
+				"aaaaaaaaaaacaac",  -- 15
+
+				-- Level 9
+				"aaaacaabaaaaaab",  --  0
+				"a......d.....fa",  --  1
+				"ef............e",  --  2
+				"e.............e",  --  3
+				"i.............i",  --  4
+				"e.............e",  --  5
+				"e.............e",  --  6
+				"c......j......a",  --  7
+				"a......j......a",  --  8
+				"e.............e",  --  9
+				"e.............e",  -- 10
+				"i.............i",  -- 11
+				"e.............e",  -- 12
+				"e.............e",  -- 13
+				"bf...........fa",  -- 14
+				"aaaaaaaaaacacaa",  -- 15
+
+				-- Level 10
+				"aaaaabaaaacaaaa",  --  0
+				"aabaaaacabaaaaa",  --  1
+				"acaaaacaaaaaaab",  --  2
+				"aaaaaaaaaaaaaac",  --  3
+				"abaaaaaaaaaacaa",  --  4
+				"abaaabaaaabbbba",  --  5
+				"aaaaaaccacaaaaa",  --  6
+				"aaaabaaaaacaaab",  --  7
+				"aaaacacbacaaaaa",  --  8
+				"baababaaacacaac",  --  9
+				"aaaaaaaabaaaaaa",  -- 10
+				"aaaaaaaaaaaaaba",  -- 11
+				"aaabbacaaaaaaaa",  -- 12
+				"baabaababaaaaaa",  -- 13
+				"baaaaacaaaaabac",  -- 14
+				"aabcaaccaabbaaa",  -- 15
+
+			},
+		},  -- Fortress_52
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_53",
+				Name         = "Under 6",
+				GalleryName  = "Under",
+				GalleryIndex = "6",
+				ID           = "53",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 5,
+				y = 5,
+				z = 16,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 4,
+				MaxY = 4,
+				MaxZ = 15,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 15,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "-10000",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"d:101: 0",  -- ironbars
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaaa",  --  0
+				"baaaa",  --  1
+				"caaab",  --  2
+				"aaaaa",  --  3
+				"aaaba",  --  4
+				"aaaaa",  --  5
+				"acaaa",  --  6
+				"caaaa",  --  7
+				"baaaa",  --  8
+				"aacaa",  --  9
+				"baaaa",  -- 10
+				"aaaab",  -- 11
+				"aaaaa",  -- 12
+				"aaaaa",  -- 13
+				"aabab",  -- 14
+				"aacaa",  -- 15
+
+				-- Level 1
+				"b...a",  --  0
+				"ad.dc",  --  1
+				"c...a",  --  2
+				"a...b",  --  3
+				"b...a",  --  4
+				"a...b",  --  5
+				"a...a",  --  6
+				"c...b",  --  7
+				"a...a",  --  8
+				"b...a",  --  9
+				"a...b",  -- 10
+				"b...a",  -- 11
+				"b...a",  -- 12
+				"b...a",  -- 13
+				"ad.da",  -- 14
+				"b...c",  -- 15
+
+				-- Level 2
+				"a...a",  --  0
+				"ad.da",  --  1
+				"a...a",  --  2
+				"a...a",  --  3
+				"a...a",  --  4
+				"a...a",  --  5
+				"a...b",  --  6
+				"a...c",  --  7
+				"a...a",  --  8
+				"a...a",  --  9
+				"a...a",  -- 10
+				"a...a",  -- 11
+				"a...a",  -- 12
+				"b...a",  -- 13
+				"ad.da",  -- 14
+				"c...a",  -- 15
+
+				-- Level 3
+				"a...c",  --  0
+				"addda",  --  1
+				"a...a",  --  2
+				"a...b",  --  3
+				"a...a",  --  4
+				"a...a",  --  5
+				"a...a",  --  6
+				"b...a",  --  7
+				"a...a",  --  8
+				"b...a",  --  9
+				"a...a",  -- 10
+				"a...c",  -- 11
+				"a...a",  -- 12
+				"a...a",  -- 13
+				"bddda",  -- 14
+				"c...a",  -- 15
+
+				-- Level 4
+				"aaaca",  --  0
+				"cacaa",  --  1
+				"aaaab",  --  2
+				"aaaaa",  --  3
+				"aaaab",  --  4
+				"baaaa",  --  5
+				"aaaaa",  --  6
+				"aaaaa",  --  7
+				"baaca",  --  8
+				"babaa",  --  9
+				"abaaa",  -- 10
+				"caaaa",  -- 11
+				"aaaca",  -- 12
+				"caaaa",  -- 13
+				"baaaa",  -- 14
+				"aaaaa",  -- 15
+
+			},
+		},  -- Fortress_53
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "Fortress_6",
+				Name         = "Under 0",
+				GalleryName  = "Under",
+				GalleryIndex = "0",
+				ID           = "6",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 9,
+				y = 5,
+				z = 11,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 8,
+				MaxY = 4,
+				MaxZ = 10,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 10,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"d:101: 0",  -- ironbars
+				"e: 71: 0",  -- irondoorblock
+				"f: 71: 8",  -- irondoorblock
+				"g: 77: 2",  -- stonebutton
+				"h: 50: 2",  -- torch
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"abaaaaacc",  --  0
+				"abaacaaac",  --  1
+				"acaaaaacc",  --  2
+				"bacabaaab",  --  3
+				"aaaaaacba",  --  4
+				"aaacaaaab",  --  5
+				"aacaaabac",  --  6
+				"acaaaaaba",  --  7
+				"aaaaaabba",  --  8
+				"aaaaacaaa",  --  9
+				"aaaaaaaaa",  -- 10
+
+				-- Level 1
+				"a...baaac",  --  0
+				"c...d...a",  --  1
+				"a...d...a",  --  2
+				"a...d...a",  --  3
+				"c...b...a",  --  4
+				"a...e...c",  --  5
+				"a...a...a",  --  6
+				"a...d...a",  --  7
+				"c...d...a",  --  8
+				"a...d...a",  --  9
+				"a...aaaba",  -- 10
+
+				-- Level 2
+				"a...aaaaa",  --  0
+				"a...d...b",  --  1
+				"b...d...c",  --  2
+				"a...d...c",  --  3
+				"a...a...a",  --  4
+				"a...f...a",  --  5
+				"a..ga...a",  --  6
+				"a...d...a",  --  7
+				"c...d...a",  --  8
+				"a...d...a",  --  9
+				"a...acaaa",  -- 10
+
+				-- Level 3
+				"a...cacac",  --  0
+				"a...d...a",  --  1
+				"a...d...b",  --  2
+				"a...d...b",  --  3
+				"a..ha...a",  --  4
+				"a...c...a",  --  5
+				"b..hb...c",  --  6
+				"a...d...c",  --  7
+				"a...d...a",  --  8
+				"a...d...b",  --  9
+				"a...aacaa",  -- 10
+
+				-- Level 4
+				"baaaabaab",  --  0
+				"aaaacaaaa",  --  1
+				"aaabaaaaa",  --  2
+				"aaaaccaaa",  --  3
+				"aabaaaaaa",  --  4
+				"caaaaacba",  --  5
+				"aabcacaaa",  --  6
+				"aaacaabac",  --  7
+				"cabaababa",  --  8
+				"bcaacaaca",  --  9
+				"abaaacccb",  -- 10
+
+			},
+		},  -- Fortress_6
+
+
+
+		{
+			OriginData =
+			{
+				ExportName   = "XCrossing",
+				Name         = "Under 69",
+				GalleryName  = "Under",
+				GalleryIndex = "69",
+				ID           = "977",
+				CreatorName  = "Aloe_vera",
+			},
+			Size =
+			{
+				x = 16,
+				y = 5,
+				z = 16,
+			},
+			Hitbox =
+			{
+				MinX = 0,
+				MinY = 0,
+				MinZ = 0,
+				MaxX = 15,
+				MaxY = 4,
+				MaxZ = 15,
+			},
+			Connectors =
+			{
+				{
+					Type = 0,
+					RelX = 0,
+					RelY = 1,
+					RelZ = 2,
+					Direction = "x-",
+				},
+				{
+					Type = 0,
+					RelX = 15,
+					RelY = 1,
+					RelZ = 13,
+					Direction = "x+",
+				},
+				{
+					Type = 0,
+					RelX = 2,
+					RelY = 1,
+					RelZ = 15,
+					Direction = "z+",
+				},
+				{
+					Type = 0,
+					RelX = 13,
+					RelY = 1,
+					RelZ = 0,
+					Direction = "z-",
+				},
+			},
+			Metadata =
+			{
+				["AddWeightIfSame"] = "0",
+				["AllowedRotations"] = "7",
+				["DefaultWeight"] = "100",
+				["DepthWeight"] = "",
+				["ExpandFloorStrategy"] = "None",
+				["IsStarting"] = "0",
+				["MergeStrategy"] = "msSpongePrint",
+				["MoveToGround"] = "0",
+			},
+			BlockDefinitions =
+			{
+				".:  0: 0",  -- air
+				"a: 98: 0",  -- stonebricks
+				"b: 98: 1",  -- stonebricks
+				"c: 98: 2",  -- stonebricks
+				"m: 19: 0",  -- sponge
+			},
+			BlockData =
+			{
+				-- Level 0
+				"aaaammmmmmmaaaaa",  --  0
+				"abcbammmmmaaaaaa",  --  1
+				"baaaaammmaaacaaa",  --  2
+				"ccabacbmaaabaaba",  --  3
+				"acacbaaacacacabm",  --  4
+				"maaaaaacabacbbmm",  --  5
+				"mmabcaaaaaaabmmm",  --  6
+				"mmmaabcaabacmmmm",  --  7
+				"mmmmcbaabaccammm",  --  8
+				"mmmaabaaaaaabamm",  --  9
+				"mmaaaacaaaaaabam",  -- 10
+				"maabaabaaabacaca",  -- 11
+				"accaaaaamcbccaaa",  -- 12
+				"cbcacacmmmacaaab",  -- 13
+				"baabaammmmmbaaaa",  -- 14
+				"aaaaammmmmmmaacb",  -- 15
+
+				-- Level 1
+				"aaaammmmmmma...a",  --  0
+				"....cmmmmma....a",  --  1
+				".....ammma.....a",  --  2
+				"......ama......a",  --  3
+				"a......a......am",  --  4
+				"ma...........amm",  --  5
+				"mma.........ammm",  --  6
+				"mmma.......ammmm",  --  7
+				"mmmma.......bmmm",  --  8
+				"mmmc.........amm",  --  9
+				"mma...........am",  -- 10
+				"ma......a......a",  -- 11
+				"c......cmb......",  -- 12
+				"a.....ammma.....",  -- 13
+				"b....ammmmma....",  -- 14
+				"a...ammmmmmmaaaa",  -- 15
+
+				-- Level 2
+				"aaaammmmmmma...a",  --  0
+				"....ammmmma....a",  --  1
+				".....ammma.....a",  --  2
+				"......ama......c",  --  3
+				"a......a......am",  --  4
+				"mc...........amm",  --  5
+				"mma.........ammm",  --  6
+				"mmma.......ammmm",  --  7
+				"mmmma.......ammm",  --  8
+				"mmma.........amm",  --  9
+				"mma...........cm",  -- 10
+				"mb......c......c",  -- 11
+				"a......bma......",  -- 12
+				"c.....ammmc.....",  -- 13
+				"a....bmmmmma....",  -- 14
+				"a...ammmmmmmaacb",  -- 15
+
+				-- Level 3
+				"aaaammmmmmma...a",  --  0
+				"....ammmmma....a",  --  1
+				".....ammma.....a",  --  2
+				"......ama......a",  --  3
+				"a......a......am",  --  4
+				"mc...........amm",  --  5
+				"mma.........ammm",  --  6
+				"mmma.......ammmm",  --  7
+				"mmmmc.......cmmm",  --  8
+				"mmmb.........bmm",  --  9
+				"mma...........cm",  -- 10
+				"mb......a......c",  -- 11
+				"c......ama......",  -- 12
+				"c.....ammma.....",  -- 13
+				"a....cmmmmma....",  -- 14
+				"c...ammmmmmmaaca",  -- 15
+
+				-- Level 4
+				"aaaammmmmmmaaaaa",  --  0
+				"abbbbmmmmmaaaabb",  --  1
+				"aaaabcmmmaaaccac",  --  2
+				"caaaabamacaacbaa",  --  3
+				"aaacacabcbcaaabm",  --  4
+				"mbacabcacaaaaamm",  --  5
+				"mmaaaaaaabcbcmmm",  --  6
+				"mmmaacabbbabmmmm",  --  7
+				"mmmmcaaaabaaammm",  --  8
+				"mmmbbbccbaacbcmm",  --  9
+				"mmabaabcaaababcm",  -- 10
+				"mabaaaabaaabaaaa",  -- 11
+				"bcaabaaamacaaaac",  -- 12
+				"aacbbaammmacbaaa",  -- 13
+				"aabcaammmmmaabcc",  -- 14
+				"aababmmmmmmmaaaa",  -- 15
+
+			},
+		},  -- XCrossing
+	},  -- Pieces
+}
+
+
+
+

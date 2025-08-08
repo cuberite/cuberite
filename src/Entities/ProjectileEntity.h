@@ -37,6 +37,7 @@ public:
 		pkEgg,
 		pkGhastFireball,
 		pkFireCharge,
+		pkEnderEye,
 		pkEnderPearl,
 		pkExpBottle,
 		pkSplashPotion,
