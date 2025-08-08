@@ -8,9 +8,10 @@ class TagManager
 public:
 	void SetupTags()
 	{
-		m_ItemTags.LoadFromFiles("Protocol/1.21.4/tags/item/", "item");
-		m_BlockTags.LoadFromFiles("Protocol/1.21.4/tags/block/", "block");
-		m_FluidTags.LoadFromFiles("Protocol/1.21.4/tags/fluid/", "fluid");
+		// TODO: Make so versions aren't hardcoded
+		m_ItemTags.LoadFromFiles("Protocol/1.21.6/tags/item/", "item");
+		m_BlockTags.LoadFromFiles("Protocol/1.21.6/tags/block/", "block");
+		m_FluidTags.LoadFromFiles("Protocol/1.21.6/tags/fluid/", "fluid");
 	}
 
 	const TagRegistry::cTagRegistry<Item, &NamespaceSerializer::ToItem, ItemTags, &TagTranslation::GetItem> & GetItemTags() const { return m_ItemTags; }
