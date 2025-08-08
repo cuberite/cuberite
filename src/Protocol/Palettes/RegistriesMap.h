@@ -43,7 +43,7 @@ public:
 
 		void LoadBlockTypes(const Json::Value & a_Root, const AString & file_name)
 		{
-			auto items = a_Root.get("minecraft:block_type", Json::Value());
+			auto items = a_Root.get("minecraft:block", Json::Value());
 			if (items.type() == Json::nullValue)
 			{
 				LOGERROR(fmt::format(FMT_STRING("Failed to get minecraft:block_type object in json file registries file {}."), file_name));
