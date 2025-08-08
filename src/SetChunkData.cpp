@@ -23,7 +23,7 @@ void SetChunkData::UpdateHeightMap()
 					break;
 				}
 			}  // for y
-			auto idx = x + cChunkDef::Width * z;
+			auto idx = static_cast<size_t>(x + cChunkDef::Width * z);
 			HeightMap[idx] = Height;
 		}  // for z
 	}  // for x

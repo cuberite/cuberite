@@ -16,7 +16,7 @@
 
 
 
-template <class ElementType, size_t ElementCount, ElementType DefaultValue>
+template <class ElementType, size_t ElementCount, auto DefaultValue>
 struct ChunkDataStore
 {
 	using Type = std::array<ElementType, ElementCount>;
@@ -30,7 +30,7 @@ struct ChunkDataStore
 
 	/** Returns a raw pointer to the internal representation of the specified section.
 	Will be nullptr if the section is not allocated. */
-	Type * GetSection(size_t a_Y) const;
+	const std::unique_ptr<Type> & GetSection(size_t a_Y) const;
 
 	/** Sets one value at the given position.
 	Allocates a section if needed for the operation. */
@@ -38,11 +38,11 @@ struct ChunkDataStore
 
 	/** Copies the data from the specified flat section array into the internal representation.
 	Allocates a section if needed for the operation. */
-	void SetSection(const ElementType (& a_Source)[ElementCount], size_t a_Y);
+	void SetSection(const Type & a_Source, size_t a_Y);
 
 	/** Copies the data from the specified flat array into the internal representation.
 	Allocates sections that are needed for the operation. */
-	void SetAll(const ElementType (& a_Source)[cChunkDef::NumSections * ElementCount]);
+	void SetAll(const std::array<ElementType, cChunkDef::NumSections * ElementCount> & a_Source);
 
 	/** Contains all the sections this ChunkDataStore manages. */
 	std::unique_ptr<Type> Store[cChunkDef::NumSections];
@@ -62,26 +62,28 @@ public:
 	static constexpr BLOCKTYPE DefaultValue = 0x00;
 	static constexpr NIBBLETYPE DefaultMetaValue = 0x00;
 
-	using SectionType = BLOCKTYPE[SectionBlockCount];
-	using SectionMetaType = NIBBLETYPE[SectionMetaCount];
+	using SectionType     = std::array<BLOCKTYPE,  SectionBlockCount>;
+	using SectionMetaType = std::array<NIBBLETYPE, SectionMetaCount>;
 
 private:
 
-	ChunkDataStore<BLOCKTYPE, SectionBlockCount, DefaultValue> m_Blocks;
-	ChunkDataStore<NIBBLETYPE, SectionMetaCount, DefaultMetaValue> m_Metas;
+	ChunkDataStore<BLOCKTYPE,  SectionBlockCount, DefaultValue>     m_Blocks;
+	ChunkDataStore<NIBBLETYPE, SectionMetaCount,  DefaultMetaValue> m_Metas;
 
 public:
 
 	using BlockArray = decltype(m_Blocks)::Type;
+	using BlockArrayPtr = std::unique_ptr<BlockArray>;
 	using MetaArray = decltype(m_Metas)::Type;
+	using MetaArrayPtr = std::unique_ptr<MetaArray>;
 
 	void Assign(const ChunkBlockData & a_Other);
 
 	BLOCKTYPE GetBlock(Vector3i a_Position) const { return m_Blocks.Get(a_Position); }
 	NIBBLETYPE GetMeta(Vector3i a_Position) const { return m_Metas.Get(a_Position); }
 
-	BlockArray * GetSection(size_t a_Y) const { return m_Blocks.GetSection(a_Y); }
-	MetaArray * GetMetaSection(size_t a_Y) const { return m_Metas.GetSection(a_Y); }
+	const BlockArrayPtr & GetSection(size_t a_Y) const { return m_Blocks.GetSection(a_Y); }
+	const std::unique_ptr<MetaArray> & GetMetaSection(size_t a_Y) const { return m_Metas.GetSection(a_Y); }
 
 	void SetBlock(Vector3i a_Position, BLOCKTYPE a_Block) { m_Blocks.Set(a_Position, a_Block); }
 	void SetMeta(Vector3i a_Position, NIBBLETYPE a_Meta) { m_Metas.Set(a_Position, a_Meta); }
@@ -103,7 +105,7 @@ public:
 	static constexpr NIBBLETYPE DefaultBlockLightValue = 0x00;
 	static constexpr NIBBLETYPE DefaultSkyLightValue = 0xFF;
 
-	using SectionType = NIBBLETYPE[SectionLightCount];
+	using SectionType = std::array<NIBBLETYPE, SectionLightCount>;
 
 private:
 
@@ -113,14 +115,15 @@ private:
 public:
 
 	using LightArray = decltype(m_BlockLights)::Type;
+	using LightArrayPtr = std::unique_ptr<LightArray>;
 
 	void Assign(const ChunkLightData & a_Other);
 
 	NIBBLETYPE GetBlockLight(Vector3i a_Position) const { return m_BlockLights.Get(a_Position); }
 	NIBBLETYPE GetSkyLight(Vector3i a_Position) const { return m_SkyLights.Get(a_Position); }
 
-	LightArray * GetBlockLightSection(size_t a_Y) const { return m_BlockLights.GetSection(a_Y); }
-	LightArray * GetSkyLightSection(size_t a_Y) const { return m_SkyLights.GetSection(a_Y); }
+	const LightArrayPtr & GetBlockLightSection(size_t a_Y) const { return m_BlockLights.GetSection(a_Y); }
+	const LightArrayPtr & GetSkyLightSection(size_t a_Y) const { return m_SkyLights.GetSection(a_Y); }
 
 	void SetAll(const cChunkDef::BlockNibbles & a_BlockLightSource, const cChunkDef::BlockNibbles & a_SkyLightSource);
 	void SetSection(const SectionType & a_BlockLightSource, const SectionType & a_SkyLightSource, size_t a_Y);
@@ -138,10 +141,10 @@ In macro form to work around a Visual Studio 2017 ICE bug. */
 	{ \
 		for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y) \
 		{ \
-			const auto Blocks = BlockData.GetSection(Y); \
-			const auto Metas = BlockData.GetMetaSection(Y); \
-			const auto BlockLights = LightData.GetBlockLightSection(Y); \
-			const auto SkyLights = LightData.GetSkyLightSection(Y); \
+			const auto & Blocks = BlockData.GetSection(Y); \
+			const auto & Metas = BlockData.GetMetaSection(Y); \
+			const auto & BlockLights = LightData.GetBlockLightSection(Y); \
+			const auto & SkyLights = LightData.GetSkyLightSection(Y); \
 			if ((Blocks != nullptr) || (Metas != nullptr) || (BlockLights != nullptr) || (SkyLights != nullptr)) \
 			{ \
 				Callback \

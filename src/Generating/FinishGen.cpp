@@ -1158,9 +1158,9 @@ void cFinishGenIce::GenFinish(cChunkDesc & a_ChunkDesc)
 int cFinishGenSingleTopBlock::GetNumToGen(const cChunkDef::BiomeMap & a_BiomeMap)
 {
 	int res = 0;
-	for (size_t i = 0; i < ARRAYCOUNT(a_BiomeMap); i++)
+	for (const auto & Biome : a_BiomeMap)
 	{
-		if (IsAllowedBiome(a_BiomeMap[i]))
+		if (IsAllowedBiome(Biome))
 		{
 			res++;
 		}
@@ -1354,7 +1354,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 		{
 			for (int y = cChunkDef::GetHeight(a_HeightMap, x, z); y >= 0; y--)
 			{
-				BLOCKTYPE Block = cChunkDef::GetBlock(a_BlockTypes, x, y, z);
+				BLOCKTYPE Block = cChunkDef::GetBlock(a_BlockTypes.data(), x, y, z);
 				if ((Block != a_Fluid) && (Block != a_StationaryFluid))
 				{
 					continue;
@@ -1377,7 +1377,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 					{
 						continue;
 					}
-					BLOCKTYPE Neighbor = cChunkDef::GetBlock(a_BlockTypes, x + Coords[i].x, y + Coords[i].y, z + Coords[i].z);
+					BLOCKTYPE Neighbor = cChunkDef::GetBlock(a_BlockTypes.data(), x + Coords[i].x, y + Coords[i].y, z + Coords[i].z);
 					if ((Neighbor == E_BLOCK_AIR) || cFluidSimulator::CanWashAway(Neighbor))
 					{
 						// There is an air / washable neighbor, simulate this block
@@ -1385,7 +1385,7 @@ void cFinishGenPreSimulator::StationarizeFluid(
 						break;
 					}
 				}  // for i - Coords[]
-				cChunkDef::SetBlock(a_BlockTypes, x, y, z, BlockToSet);
+				cChunkDef::SetBlock(a_BlockTypes.data(), x, y, z, BlockToSet);
 			}  // for y
 		}  // for x
 	}  // for z
@@ -1395,21 +1395,21 @@ void cFinishGenPreSimulator::StationarizeFluid(
 	{
 		for (int i = 0; i < cChunkDef::Width; i++)  // i stands for both x and z here
 		{
-			if (cChunkDef::GetBlock(a_BlockTypes, 0, y, i) == a_StationaryFluid)
+			if (cChunkDef::GetBlock(a_BlockTypes.data(), 0, y, i) == a_StationaryFluid)
 			{
-				cChunkDef::SetBlock(a_BlockTypes, 0, y, i, a_Fluid);
+				cChunkDef::SetBlock(a_BlockTypes.data(), 0, y, i, a_Fluid);
 			}
-			if (cChunkDef::GetBlock(a_BlockTypes, i, y, 0) == a_StationaryFluid)
+			if (cChunkDef::GetBlock(a_BlockTypes.data(), i, y, 0) == a_StationaryFluid)
 			{
-				cChunkDef::SetBlock(a_BlockTypes, i, y, 0, a_Fluid);
+				cChunkDef::SetBlock(a_BlockTypes.data(), i, y, 0, a_Fluid);
 			}
-			if (cChunkDef::GetBlock(a_BlockTypes, cChunkDef::Width - 1, y, i) == a_StationaryFluid)
+			if (cChunkDef::GetBlock(a_BlockTypes.data(), cChunkDef::Width - 1, y, i) == a_StationaryFluid)
 			{
-				cChunkDef::SetBlock(a_BlockTypes, cChunkDef::Width - 1, y, i, a_Fluid);
+				cChunkDef::SetBlock(a_BlockTypes.data(), cChunkDef::Width - 1, y, i, a_Fluid);
 			}
-			if (cChunkDef::GetBlock(a_BlockTypes, i, y, cChunkDef::Width - 1) == a_StationaryFluid)
+			if (cChunkDef::GetBlock(a_BlockTypes.data(), i, y, cChunkDef::Width - 1) == a_StationaryFluid)
 			{
-				cChunkDef::SetBlock(a_BlockTypes, i, y, cChunkDef::Width - 1, a_Fluid);
+				cChunkDef::SetBlock(a_BlockTypes.data(), i, y, cChunkDef::Width - 1, a_Fluid);
 			}
 		}
 	}
