@@ -6,15 +6,6 @@
 
 
 
-/** Dummy BlockState implementation */
-class BlockState
-{
-public:
-	BlockState() = default;
-};
-
-
-
 
 /** Dummy cBlockHandler implementation that allows simple checking for equality through mIdent. */
 class cBlockHandler

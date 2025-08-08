@@ -96,6 +96,10 @@ public:
 	/** Called when spectation stops, because the player crouched or when the entity we're spectating gets removed from the world. */
 	void OnLoseSpectated();
 
+	/** Resend the RenderDistanceCenter packet to the player */
+	void ResendRenderDistanceCenter();
+
+	void SendPlayerInventoryJoin();
 	// tolua_begin
 
 	/** Sets the experience total
@@ -566,7 +570,7 @@ public:
 	// tolua_end
 
 	/** Attempts to place the block in the world with a call to PlaceBlocks. */
-	bool PlaceBlock(Vector3i a_Position, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta);
+	bool PlaceBlock(Vector3i a_Pos, BlockState a_Block);
 
 	/** Calls the block placement hooks and places the blocks in the world.
 	First the "placing" hooks for all the blocks are called, then the blocks are placed, and finally the "placed" hooks are called.
@@ -583,14 +587,14 @@ public:
 	/** Returns the progress mined per tick for the block a_Block as a fraction
 	(1 would be completely mined)
 	Depends on hardness values so check those are correct.
-	Source: https://minecraft.wiki/w/Breaking#Calculation */
-	float GetMiningProgressPerTick(BLOCKTYPE a_Block);
+	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
+	float GetMiningProgressPerTick(BlockState a_Block);
 
 	/** Given tool, enchantments, status effects, and world position
 	returns whether a_Block would be instantly mined.
 	Depends on hardness values so check those are correct.
-	Source: https://minecraft.wiki/w/Breaking#Instant_breaking */
-	bool CanInstantlyMine(BLOCKTYPE a_Block);
+	Source: https://minecraft.gamepedia.com/Breaking#Instant_breaking */
+	bool CanInstantlyMine(BlockState a_Block);
 
 	/** Adds an Item to the list of known items.
 	If the item is already known, does nothing. */
@@ -771,7 +775,7 @@ private:
 	void FreezeInternal(const Vector3d & a_Location, bool a_ManuallyFrozen);
 
 	/** Returns how high the liquid is in percent. Used by IsInsideWater */
-	float GetLiquidHeightPercent(NIBBLETYPE a_Meta);
+	float GetLiquidHeightPercent(BlockState a_Block);
 
 	/** Checks if the player is inside of water */
 	bool IsInsideWater();
@@ -782,8 +786,8 @@ private:
 	If he has an enchanted tool with efficiency or he has a haste or mining fatique effect it gets multiplied by a specific factor depending on the strength of the effect or enchantment.
 	In he is in water it gets divided by 5 except if his tool is enchanted with aqua affinity.
 	If he is not on ground it also gets divided by 5.
-	Source: https://minecraft.wiki/w/Breaking#Calculation */
-	float GetDigSpeed(BLOCKTYPE a_Block);
+	Source: https://minecraft.gamepedia.com/Breaking#Calculation */
+	float GetDigSpeed(BlockState a_Block);
 
 	/** Add the recipe Id to the known recipes.
 	If the recipe is already known, does nothing. */

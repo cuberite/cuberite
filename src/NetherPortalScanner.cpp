@@ -5,6 +5,7 @@
 #include "BlockInfo.h"
 #include "Entities/Entity.h"
 #include "World.h"
+#include "Blocks/BlockAir.h"
 
 
 
@@ -68,7 +69,7 @@ void cNetherPortalScanner::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 		{
 			for (size_t Y = 0; Y < cChunkDef::NumSections; ++Y)
 			{
-				const auto Blocks = a_BlockData.GetSection(Y);
+				const auto & Blocks = a_BlockData.GetSection(Y);
 				if (Blocks == nullptr)
 				{
 					continue;
@@ -77,7 +78,7 @@ void cNetherPortalScanner::OnChunkAvailable(int a_ChunkX, int a_ChunkZ)
 				// Iterate through all of the blocks in the chunk:
 				for (size_t i = 0; i < ChunkBlockData::SectionBlockCount; i++)
 				{
-					if ((*Blocks)[i] != E_BLOCK_NETHER_PORTAL)
+					if ((*Blocks)[i].Type() != BlockType::NetherPortal)
 					{
 						continue;
 					}
@@ -128,8 +129,8 @@ bool cNetherPortalScanner::IsValidBuildLocation(Vector3i a_BlockPos)
 	{
 		for (int j = 0; j < PortalLength; j++)
 		{
-			BLOCKTYPE blocktype = m_World.GetBlock(a_BlockPos.addedXZ(i, j));
-			if (!cBlockInfo::IsSolid(blocktype))
+			auto BlockToCheck = m_World.GetBlock(a_BlockPos.addedXZ(i, j));
+			if (!cBlockInfo::IsSolid(BlockToCheck))
 			{
 				return false;
 			}
@@ -137,8 +138,8 @@ bool cNetherPortalScanner::IsValidBuildLocation(Vector3i a_BlockPos)
 			// Check the airspace
 			for (int k = 1; k < PortalHeight; k++)
 			{
-				blocktype = m_World.GetBlock(a_BlockPos + Vector3i(i, k, j));
-				if (blocktype != E_BLOCK_AIR)
+				BlockToCheck = m_World.GetBlock(a_BlockPos + Vector3i(i, k, j));
+				if (cBlockAirHandler::IsBlockAir(BlockToCheck))
 				{
 					return false;
 				}
@@ -157,16 +158,16 @@ bool cNetherPortalScanner::OnAllChunksAvailable(void)
 	if (m_FoundPortal)
 	{
 		// Find the bottom of this portal
-		while (m_World.GetBlock(m_PortalLoc) == E_BLOCK_NETHER_PORTAL)
+		while (m_World.GetBlock(m_PortalLoc).Type() == BlockType::NetherPortal)
 		{
 			m_PortalLoc.y -= 1;
 		}
 		m_PortalLoc.y += 1;
 
 		// Figure out which way the portal is facing
-		int BXP = m_World.GetBlock(m_PortalLoc.addedX(1));
-		int BXM = m_World.GetBlock(m_PortalLoc.addedX(-1));
-		if ((BXP == E_BLOCK_NETHER_PORTAL) || (BXM == E_BLOCK_NETHER_PORTAL))
+		auto BlockXP = m_World.GetBlock(m_PortalLoc.addedX(1));
+		auto BlockXM = m_World.GetBlock(m_PortalLoc.addedX(-1));
+		if ((BlockXP.Type() == BlockType::NetherPortal) || (BlockXM.Type() == BlockType::NetherPortal))
 		{
 			// The long axis is along X
 			m_Dir = Direction::X;
@@ -244,11 +245,11 @@ void cNetherPortalScanner::BuildNetherPortal(Vector3i a_Location, Direction a_Di
 			{
 				if (a_Direction == Direction::Y)
 				{
-					m_World.SetBlock({ x + i, y + k, z + j }, E_BLOCK_AIR, 0);
+					m_World.SetBlock({ x + i, y + k, z + j }, Block::Air::Air());
 				}
 				else if (a_Direction == Direction::X)
 				{
-					m_World.SetBlock({ x + j, y + k, z + i }, E_BLOCK_AIR, 0);
+					m_World.SetBlock({ x + j, y + k, z + i }, Block::Air::Air());
 				}
 			}
 		}
@@ -262,11 +263,11 @@ void cNetherPortalScanner::BuildNetherPortal(Vector3i a_Location, Direction a_Di
 			// +2 on the short axis because that's where we deposit the entity
 			if (a_Direction == Direction::Y)
 			{
-				m_World.SetBlock({ x + 2, y, z + j }, E_BLOCK_OBSIDIAN, 0);
+				m_World.SetBlock({ x + 2, y, z + j }, Block::Obsidian::Obsidian());
 			}
 			else if (a_Direction == Direction::X)
 			{
-				m_World.SetBlock({ x + j, y, z + 2 }, E_BLOCK_OBSIDIAN, 0);
+				m_World.SetBlock({ x + j, y, z + 2 }, Block::Obsidian::Obsidian());
 			}
 		}
 	}
@@ -276,31 +277,31 @@ void cNetherPortalScanner::BuildNetherPortal(Vector3i a_Location, Direction a_Di
 	{
 		if (a_Direction == Direction::Y)
 		{
-			m_World.SetBlock({ x + 1, y + i, z }, E_BLOCK_OBSIDIAN, 0);
-			m_World.SetBlock({ x + 1, y + i, z + 3 }, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({ x + 1, y + i, z }, Block::Obsidian::Obsidian());
+			m_World.SetBlock({ x + 1, y + i, z + 3 }, Block::Obsidian::Obsidian());
 		}
 		else if (a_Direction == Direction::X)
 		{
-			m_World.SetBlock({ x, y + i, z + 1 }, E_BLOCK_OBSIDIAN, 0);
-			m_World.SetBlock({ x + 3, y + i, z + 1 }, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({ x, y + i, z + 1 }, Block::Obsidian::Obsidian());
+			m_World.SetBlock({ x + 3, y + i, z + 1 }, Block::Obsidian::Obsidian());
 		}
 	}
 	for (int i = 0; i < PortalLength; i++)
 	{
 		if (a_Direction == Direction::Y)
 		{
-			m_World.SetBlock({ x + 1, y + 4, z + i }, E_BLOCK_OBSIDIAN, 0);
-			m_World.SetBlock({ x + 1, y, z + i }, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({ x + 1, y + 4, z + i }, Block::Obsidian::Obsidian());
+			m_World.SetBlock({ x + 1, y, z + i }, Block::Obsidian::Obsidian());
 		}
 		else if (a_Direction == Direction::X)
 		{
-			m_World.SetBlock({ x + i, y + 4, z + 1 }, E_BLOCK_OBSIDIAN, 0);
-			m_World.SetBlock({ x + i, y, z + 1 }, E_BLOCK_OBSIDIAN, 0);
+			m_World.SetBlock({ x + i, y + 4, z + 1 }, Block::Obsidian::Obsidian());
+			m_World.SetBlock({ x + i, y, z + 1 }, Block::Obsidian::Obsidian());
 		}
 	}
 
 	// Fill the frame (place a fire in the bottom)
-	m_World.PlaceBlock(Vector3<int>(x + 1, y + 1, z + 1), E_BLOCK_FIRE, 0);
+	m_World.PlaceBlock(Vector3<int>(x + 1, y + 1, z + 1), Block::Fire::Fire());
 }
 
 

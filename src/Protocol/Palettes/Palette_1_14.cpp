@@ -7,7 +7,7 @@ namespace Palette_1_14
 {
 	UInt32 From(const BlockState Block)
 	{
-		using namespace Block;
+		/* using namespace Block;
 
 		switch (Block.ID)
 		{
@@ -8617,7 +8617,8 @@ namespace Palette_1_14
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XM).ID: return 6012;
 			case ZombieWallHead::ZombieWallHead(eBlockFace::BLOCK_FACE_XP).ID: return 6013;
 			default: return 0;
-		}
+		} */
+		return 0;
 	}
 
 	UInt32 From(const Item ID)
@@ -9335,7 +9336,7 @@ namespace Palette_1_14
 			case Item::SandstoneStairs: return 235;
 			case Item::SandstoneWall: return 256;
 			case Item::Scaffolding: return 505;
-			case Item::Scute: return 519;
+			case Item::TurtleScute: return 519;
 			case Item::SeaLantern: return 367;
 			case Item::SeaPickle: return 80;
 			case Item::Seagrass: return 79;
@@ -10297,7 +10298,7 @@ namespace Palette_1_14
 			case 235: return Item::SandstoneStairs;
 			case 256: return Item::SandstoneWall;
 			case 505: return Item::Scaffolding;
-			case 519: return Item::Scute;
+			case 519: return Item::TurtleScute;
 			case 367: return Item::SeaLantern;
 			case 80: return Item::SeaPickle;
 			case 79: return Item::Seagrass;

@@ -68,6 +68,7 @@ public:
 		wtHopper      = 9,
 		wtDropper     = 10,
 		wtAnimalChest = 11,
+		wtCrafter     = 12,
 	};
 
 	// tolua_end
@@ -118,7 +119,8 @@ public:
 	virtual void Clicked(
 		cPlayer & a_Player, int a_WindowID,
 		short a_SlotNum, eClickAction a_ClickAction,
-		const cItem & a_ClickedItem
+		const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta,
+		const cItem & a_DraggedItem
 	);
 
 	virtual void OpenedByPlayer(cPlayer & a_Player);

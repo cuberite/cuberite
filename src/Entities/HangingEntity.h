@@ -28,7 +28,7 @@ public:  // tolua_export
 	Byte GetProtocolFacing() const { return m_Facing; }
 
 	/** Returns if the given block can support hanging entity placements. */
-	static bool IsValidSupportBlock(BLOCKTYPE a_BlockType);  // tolua_export
+	static bool IsValidSupportBlock(BlockState a_Block);  // tolua_export
 
 	/** Set the direction in which the entity is facing. */
 	void SetFacing(eBlockFace a_Facing) { m_Facing = cHangingEntity::BlockFaceToProtocolFace(a_Facing); }  // tolua_export
@@ -36,7 +36,7 @@ public:  // tolua_export
 	/** Set the direction in which the entity is facing. */
 	void SetProtocolFacing(Byte a_Facing)
 	{
-		ASSERT(a_Facing <= 3);
+		ASSERT((2 <= a_Facing) && (a_Facing <= 5));
 		m_Facing = a_Facing;
 	}
 
@@ -54,10 +54,10 @@ protected:
 		// The client uses different values for item frame directions and block faces. Our constants are for the block faces, so we convert them here to item frame faces
 		switch (a_ProtocolFace)
 		{
-			case 0: return BLOCK_FACE_ZP;
+			case 3: return BLOCK_FACE_ZP;
 			case 2: return BLOCK_FACE_ZM;
-			case 1: return BLOCK_FACE_XM;
-			case 3: return BLOCK_FACE_XP;
+			case 4: return BLOCK_FACE_XM;
+			case 5: return BLOCK_FACE_XP;
 			default:
 			{
 				LOGINFO("Invalid facing (%d) in a cHangingEntity, adjusting to BLOCK_FACE_XP.", a_ProtocolFace);
@@ -75,10 +75,10 @@ protected:
 		// The client uses different values for item frame directions and block faces. Our constants are for the block faces, so we convert them here to item frame faces
 		switch (a_BlockFace)
 		{
-			case BLOCK_FACE_ZP: return 0;
+			case BLOCK_FACE_ZP: return 3;
 			case BLOCK_FACE_ZM: return 2;
-			case BLOCK_FACE_XM: return 1;
-			case BLOCK_FACE_XP: return 3;
+			case BLOCK_FACE_XM: return 4;
+			case BLOCK_FACE_XP: return 5;
 			case BLOCK_FACE_YP:
 			case BLOCK_FACE_YM:
 			case BLOCK_FACE_NONE:

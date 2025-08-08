@@ -23,7 +23,7 @@ public:
 
 	/** Creates a new PBA of the specified size filled with the specified block.
 	Throws if there is an error (memory allocation etc.) */
-	static PalettedBlockArea createFilled(Vector3i aSize, const AString & aBlockTypeName, const BlockState & aBlockState);
+	static PalettedBlockArea createFilled(Vector3i aSize, const AString & aBlockTypeName, const CustomBlockState & aCustomBlockState);
 
 	/** Returns the actual size of the area in all 3 axes. */
 	const Vector3i & size() const { return mSize; }
@@ -35,7 +35,7 @@ public:
 	/** Sets a single block using its full blockspec.
 	The position must be valid (ASSERTed).
 	If the block is not already in palette, it is added. */
-	void setBlock(Vector3i aPos, const AString & aBlockTypeName, const BlockState & aBlockState);
+	void setBlock(Vector3i aPos, const AString & aBlockTypeName, const CustomBlockState & aCustomBlockState);
 
 	/** Sets a single block using an index to the palette (retrieved earlier by paletteIndex()).
 	The position must be valid (ASSERTed).
@@ -44,11 +44,11 @@ public:
 
 	/** Returns the index into the palette that is used by the specified full blockspec.
 	Adds the blockspec to palette if not already there. */
-	UInt32 paletteIndex(const AString & aBlockTypeName, const BlockState & aBlockState);
+	UInt32 paletteIndex(const AString & aBlockTypeName, const CustomBlockState & aCustomBlockState);
 
 	/** Returns the <index, true> into the palette that is used by the specified full blockspec.
 	Returns <undefined, false> if blockspec not in palette. */
-	std::pair<UInt32, bool> maybePaletteIndex(const AString & aBlockTypeName, const BlockState & aBlockState) const;
+	std::pair<UInt32, bool> maybePaletteIndex(const AString & aBlockTypeName, const CustomBlockState & aCustomBlockState) const;
 
 	/** Returns the index into the palette for the block at the specified pos.
 	The position must be valid (ASSERTed). */
@@ -56,18 +56,18 @@ public:
 
 	/** Returns the full blockspec of the block at the specified position.
 	The position must be valid (ASSERTed). */
-	const std::pair<AString, BlockState> & block(Vector3i aPos) const;
+	const std::pair<AString, CustomBlockState> & block(Vector3i aPos) const;
 
 	/** Returns the blockspec represented by the specified palette index.
 	The index must be valid (ASSERTed). */
-	const std::pair<AString, BlockState> & paletteEntry(UInt32 aPaletteIndex) const;
+	const std::pair<AString, CustomBlockState> & paletteEntry(UInt32 aPaletteIndex) const;
 
 	/** Returns true if the specified position is within the size bounds of the area. */
 	bool isPositionValid(Vector3i aPos) const;
 
 	/** Fills the entire PBA with a single block of the specified type.
 	The palette is reset to one containing only the single block. */
-	void fill(const AString & aBlockTypeName, const BlockState & aBlockState);
+	void fill(const AString & aBlockTypeName, const CustomBlockState & aCustomBlockState);
 
 	/** Pastes (copies verbatim) a cCuboid out of the src PBA into this PBA.
 	aSrcCuboid is the coord range in aSrc that will be copied (min-coord is inclusive, max-coord is exclusive).

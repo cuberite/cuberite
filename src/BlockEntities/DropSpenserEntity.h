@@ -42,7 +42,7 @@ public:
 
 	// tolua_end
 
-	cDropSpenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cDropSpenserEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World);
 
 	// cBlockEntity overrides:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
@@ -52,9 +52,6 @@ public:
 	virtual bool UsedBy(cPlayer * a_Player) override;
 
 	// tolua_begin
-
-	/** Modifies the block coords to match the dropspenser direction given (where the dropspensed pickups should materialize) */
-	void AddDropSpenserDir(Vector3i & a_RelCoord, NIBBLETYPE a_Direction);
 
 	/** Sets the dropspenser to dropspense an item in the next tick */
 	void Activate(void);

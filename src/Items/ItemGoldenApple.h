@@ -14,7 +14,7 @@ class cItemGoldenAppleHandler final:
 
 public:
 
-	constexpr cItemGoldenAppleHandler(int a_ItemType):
+	constexpr cItemGoldenAppleHandler(Item a_ItemType):
 		Super(a_ItemType, FoodInfo(4, 9.6))
 	{
 	}
@@ -29,7 +29,7 @@ public:
 		}
 
 		// Enchanted golden apples have stronger effects:
-		if (a_Item->m_ItemDamage >= E_META_GOLDEN_APPLE_ENCHANTED)
+		if (a_Item->m_ItemType == Item::EnchantedGoldenApple)
 		{
 			a_Player->AddEntityEffect(cEntityEffect::effAbsorption, 2400, 3);
 			a_Player->AddEntityEffect(cEntityEffect::effRegeneration, 400, 1);

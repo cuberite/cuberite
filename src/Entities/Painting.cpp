@@ -10,9 +10,10 @@
 
 
 
-cPainting::cPainting(const AString & a_Name, eBlockFace a_Direction, Vector3d a_Pos):
+cPainting::cPainting(const AString & a_Name, eBlockFace a_Direction, Vector3d a_Pos, UInt32 a_id):
 	Super(etPainting, a_Direction, a_Pos),
-	m_Name(a_Name)
+	m_Name(a_Name),
+	m_id(a_id)
 {
 }
 
@@ -34,7 +35,7 @@ void cPainting::SpawnOn(cClientHandle & a_Client)
 
 void cPainting::GetDrops(cItems & a_Items, cEntity * a_Killer)
 {
-	a_Items.emplace_back(E_ITEM_PAINTING);
+	a_Items.emplace_back(Item::Painting);
 }
 
 

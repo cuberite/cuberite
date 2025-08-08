@@ -72,7 +72,6 @@ protected:
 	virtual UInt32 GetPacketID(ePacketType a_Packet) const override;
 	virtual unsigned char GetProtocolEntityAnimation(EntityAnimation a_Animation) const override;
 	virtual signed char GetProtocolEntityStatus(EntityAnimation a_Animation) const override;
-	virtual UInt32 GetProtocolMobType(eMonsterType a_MobType) const override;
 	virtual Version GetProtocolVersion() const override;
 
 	virtual bool HandlePacket                       (cByteBuffer & a_ByteBuffer, UInt32 a_PacketType) override;
@@ -97,9 +96,8 @@ protected:
 	virtual void ParseItemMetadata(cItem & a_Item, ContiguousByteBufferView a_Metadata) const override;
 	virtual void SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_ObjectType, const Int32 a_ObjectData) override;
 	virtual void WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const override;
-	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const override;
+	virtual void WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity, bool a_WriteCommon = true) const override;
 	virtual void WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const override;
-	virtual void WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const override;
 
 	/** Types used within metadata */
 	enum eMetadataType

@@ -25,7 +25,7 @@ class cMobSpawnerEntity :
 
 public:  // tolua_export
 
-	cMobSpawnerEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cMobSpawnerEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World);
 
 	// cBlockEntity overrides:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;
@@ -45,10 +45,10 @@ public:  // tolua_export
 	void SpawnEntity(void);
 
 	// Getters
-	int GetNearbyMonsterNum(eMonsterType a_EntityType);
+	int GetNearbyMonsterNum(eEntityType a_EntityType);
 	int GetNearbyPlayersNum(void);
 
-	eMonsterType GetEntity(void) const       { return m_Entity; }
+	eEntityType GetEntity(void) const       { return m_Entity; }
 	short GetSpawnCount(void) const          { return m_SpawnCount; }
 	short GetSpawnRange(void) const          { return m_SpawnRange; }
 	short GetSpawnDelay(void) const          { return m_SpawnDelay; }
@@ -58,7 +58,7 @@ public:  // tolua_export
 	short GetRequiredPlayerRange(void) const { return m_RequiredPlayerRange; }
 
 	// Setters
-	void SetEntity(eMonsterType a_EntityType)                { m_Entity = a_EntityType; }
+	void SetEntity(eEntityType a_EntityType)                { m_Entity = a_EntityType; }
 	void SetSpawnDelay(short a_Delay)                        { m_SpawnDelay = a_Delay; }
 	void SetSpawnCount(short a_SpawnCount)                   { m_SpawnCount = a_SpawnCount; }
 	void SetSpawnRange(short a_SpawnRange)                   { m_SpawnRange = a_SpawnRange; }
@@ -72,7 +72,7 @@ public:  // tolua_export
 private:
 
 	/** The entity to spawn. */
-	eMonsterType m_Entity;
+	eEntityType m_Entity;
 
 	/** Time in ticks until the next entity spawns */
 	short m_SpawnDelay;

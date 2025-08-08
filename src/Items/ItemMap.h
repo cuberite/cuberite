@@ -20,7 +20,8 @@ public:
 
 	virtual void OnUpdate(cWorld * a_World, cPlayer * a_Player, const cItem & a_Item) const override
 	{
-		cMap * Map = a_World->GetMapManager().GetMapData(static_cast<unsigned>(a_Item.m_ItemDamage));
+		// TODO: map item component
+		cMap * Map = a_World->GetMapManager().GetMapData(0);
 
 		if (Map == nullptr)
 		{

@@ -25,7 +25,7 @@ bool cLuaChunkStay::AddChunks(const cLuaState::cStackTable & a_ChunkCoordsTable)
 	ASSERT(m_Chunks.empty());
 
 	// Add each set of coords:
-	a_ChunkCoordsTable.ForEachArrayElement([=](cLuaState & a_LuaState, int a_Index)
+	a_ChunkCoordsTable.ForEachArrayElement([this](cLuaState & a_LuaState, int a_Index)
 		{
 			if (!lua_istable(a_LuaState, -1))
 			{
