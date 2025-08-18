@@ -13415,6 +13415,10 @@ end
 				{
 					Notes = "A villager trade window",
 				},
+				wtShulkerBox =
+				{
+					Notes = "A shulker box window",
+				},
 				wtWorkbench =
 				{
 					Notes = "A workbench (crafting table) window",
