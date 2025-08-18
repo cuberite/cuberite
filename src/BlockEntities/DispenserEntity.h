@@ -18,7 +18,7 @@ class cDispenserEntity :
 public:  // tolua_export
 
 	/** Constructor used for normal operation */
-	cDispenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cDispenserEntity(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	// tolua_begin
 
@@ -47,7 +47,7 @@ public:  // tolua_export
 	}
 
 	/** Returns a unit vector in the cardinal direction of where the dispenser with the specified meta would be facing. */
-	static Vector3d GetShootVector(NIBBLETYPE a_BlockMeta);
+	static Vector3d GetShootVector(BLOCKMETATYPE a_BlockMeta);
 
 	// tolua_end
 

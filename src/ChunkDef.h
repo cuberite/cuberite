@@ -40,6 +40,9 @@ using cEntityList = std::vector<OwnedEntity>;
 /** The datatype used by blockdata */
 typedef unsigned char BLOCKTYPE;
 
+/** The datatype used by block metadata */
+typedef unsigned char BLOCKMETATYPE;
+
 /** The datatype used by nibbledata (meta, light, skylight) */
 typedef unsigned char NIBBLETYPE;
 
@@ -388,9 +391,9 @@ struct sSetBlock
 	int m_RelX, m_RelY, m_RelZ;
 	int m_ChunkX, m_ChunkZ;
 	BLOCKTYPE m_BlockType;
-	NIBBLETYPE m_BlockMeta;
+	BLOCKMETATYPE m_BlockMeta;
 
-	sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta):
+	sSetBlock(int a_BlockX, int a_BlockY, int a_BlockZ, BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta):
 		m_RelX(a_BlockX),
 		m_RelY(a_BlockY),
 		m_RelZ(a_BlockZ),
@@ -400,12 +403,12 @@ struct sSetBlock
 		cChunkDef::AbsoluteToRelative(m_RelX, m_RelY, m_RelZ, m_ChunkX, m_ChunkZ);
 	}
 
-	sSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
+	sSetBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta) :
 		sSetBlock(a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockType, a_BlockMeta)
 	{
 	}
 
-	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) :
+	sSetBlock(int a_ChunkX, int a_ChunkZ, int a_RelX, int a_RelY, int a_RelZ, BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta) :
 		m_RelX(a_RelX), m_RelY(a_RelY), m_RelZ(a_RelZ),
 		m_ChunkX(a_ChunkX), m_ChunkZ(a_ChunkZ),
 		m_BlockType(a_BlockType),
