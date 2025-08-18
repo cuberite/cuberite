@@ -635,7 +635,7 @@ void cProtocol_1_13::HandlePacketNameItem(cByteBuffer & a_ByteBuffer)
 {
 	HANDLE_READ(a_ByteBuffer, ReadVarUTF8String, AString, NewItemName);
 
-	LOGD("New item name : %s", NewItemName);
+	m_Client->HandleAnvilItemName(NewItemName);
 }
 
 
