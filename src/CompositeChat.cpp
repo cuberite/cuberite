@@ -15,6 +15,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cCompositeChat:
 
+cCompositeChat cCompositeChat::FromText(const AString & a_Text)
+{
+	cCompositeChat component;
+	component.AddTextPart(a_Text);
+	return component;
+}
+
+
+
+
+
 cCompositeChat::cCompositeChat(void) :
 	m_MessageType(mtCustom)
 {
@@ -370,7 +381,7 @@ AString cCompositeChat::CreateJsonString(bool a_ShouldUseChatPrefixes) const
 		return JsonUtils::WriteFastString(Message);
 	#else
 		// Serialize as human-readable string (pretty-printed):
-		return JsonUtils::WriteStyledString(msg);
+		return JsonUtils::WriteStyledString(Message);
 	#endif
 }
 
