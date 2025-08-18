@@ -1433,7 +1433,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 	{
 		// TODO: CanCauseFire gets reset to false for some reason, (plugin has ability to change it, might be related)
 
-		const cEntity * Entity;
+		cEntity * Entity;
 		switch (a_Source)
 		{
 			case eExplosionSource::esEnderCrystal:
@@ -1444,7 +1444,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 			case eExplosionSource::esWitherBirth:
 			case eExplosionSource::esWitherSkull:
 			{
-				Entity = static_cast<const cEntity *>(a_SourceData);
+				Entity = static_cast<cEntity *>(a_SourceData);
 				break;
 			}
 			default:
@@ -1453,7 +1453,7 @@ void cWorld::DoExplosionAt(double a_ExplosionSize, double a_BlockX, double a_Blo
 			}
 		}
 
-		Explodinator::Kaboom(*this, Vector3d(a_BlockX, a_BlockY, a_BlockZ), FloorC(a_ExplosionSize), a_CanCauseFire, Entity);
+		Explodinator::Kaboom(*this, Vector3d(a_BlockX, a_BlockY, a_BlockZ), FloorC(a_ExplosionSize), a_CanCauseFire, Entity, a_Source);
 		cPluginManager::Get()->CallHookExploded(*this, a_ExplosionSize, a_CanCauseFire, a_BlockX, a_BlockY, a_BlockZ, a_Source, a_SourceData);
 	}
 }
