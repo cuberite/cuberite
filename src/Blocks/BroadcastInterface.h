@@ -7,6 +7,7 @@
 // fwd:
 class cClientHandle;
 class cCompositeChat;
+class cPawn;
 class cPlayer;
 class cWorld;
 enum class EffectID : Int32;
@@ -33,7 +34,7 @@ public:
 	virtual void BroadcastChatFatal                  (const AString & a_Message, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastChatDeath                  (const AString & a_Message, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastChat                       (const cCompositeChat & a_Message, const cClientHandle * a_Exclude = nullptr) = 0;
-	virtual void BroadcastCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count, const cClientHandle * a_Exclude = nullptr) = 0;
+	virtual void BroadcastCollectEntity              (const cEntity & a_Collected, const cPawn & a_Collector, unsigned a_Count, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastDestroyEntity              (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) = 0;
 	virtual void BroadcastDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) = 0;
 	virtual void BroadcastEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration, const cClientHandle * a_Exclude = nullptr) = 0;
