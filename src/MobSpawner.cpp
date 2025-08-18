@@ -196,6 +196,9 @@ bool cMobSpawner::CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType
 
 		case mtGuardian:
 		{
+			if (a_Biome != biDeepOcean) {
+				return false;
+			}
 			return
 			(
 				IsBlockWater(TargetBlock) &&
@@ -368,12 +371,29 @@ std::set<eMonsterType> cMobSpawner::GetAllowedMobTypes(EMCSBiome a_Biome)
 
 		// Add Squid in ocean and river biomes
 		case biOcean:
+				{
+			ListOfSpawnables.insert(mtSquid);
+			break;
+		}
 		case biFrozenOcean:
+				{
+			ListOfSpawnables.insert(mtSquid);
+			break;
+		}
 		case biFrozenRiver:
+				{
+			ListOfSpawnables.insert(mtSquid);
+			break;
+		}
 		case biRiver:
+				{
+			ListOfSpawnables.insert(mtSquid);
+			break;
+		}
 		case biDeepOcean:
 		{
 			ListOfSpawnables.insert(mtGuardian);
+			ListOfSpawnables.insert(mtSquid);
 			break;
 		}
 
