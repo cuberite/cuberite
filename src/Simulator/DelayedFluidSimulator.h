@@ -35,10 +35,9 @@ public:
 	} ;
 
 	cDelayedFluidSimulatorChunkData(int a_TickDelay);
-	virtual ~cDelayedFluidSimulatorChunkData() override;
 
 	/** Slots, one for each delay tick, each containing the blocks to simulate */
-	cSlot * m_Slots;
+	std::unique_ptr<cSlot[]> m_Slots;
 } ;
 
 
@@ -52,20 +51,20 @@ class cDelayedFluidSimulator:
 
 public:
 
-	cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, int a_TickDelay);
+	cDelayedFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE a_StationaryFluid, size_t a_TickDelay);
 
 protected:
 
 	virtual void Simulate(float a_Dt) override;
 	virtual void SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX, int a_ChunkZ, cChunk * a_Chunk) override;
 	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) override;
-	virtual cFluidSimulatorData * CreateChunkData(void) override { return new cDelayedFluidSimulatorChunkData(m_TickDelay); }
+	virtual std::unique_ptr<cFluidSimulatorData> CreateChunkData(void) override { return std::make_unique<cDelayedFluidSimulatorChunkData>(m_TickDelay); }
 
-	int m_TickDelay;   // Count of the m_Slots array in each ChunkData
-	int m_AddSlotNum;  // Index into m_Slots[] where to add new blocks in each ChunkData
-	int m_SimSlotNum;  // Index into m_Slots[] where to simulate blocks in each ChunkData
+	size_t m_TickDelay;       // Count of the m_Slots array in each ChunkData
+	size_t m_AddSlotNum;      // Index into m_Slots[] where to add new blocks in each ChunkData
+	size_t m_SimSlotNum = 0;  // Index into m_Slots[] where to simulate blocks in each ChunkData
 
-	int m_TotalBlocks;  // Statistics only: the total number of blocks currently queued
+	size_t m_TotalBlocks = 0;  // Statistics only: the total number of blocks currently queued
 
 	/* Slots:
 	| 0 | 1 | ... | m_AddSlotNum | m_SimSlotNum | ... | m_TickDelay - 1 |
