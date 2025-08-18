@@ -568,7 +568,7 @@ void cPlayer::ClearInventoryPaintSlots(void)
 
 
 
-void cPlayer::AddInventoryPaintSlot(int a_SlotNum)
+void cPlayer::AddInventoryPaintSlot(std::size_t a_SlotNum)
 {
 	// Add a slot to the list for inventory painting. Used by cWindow only
 	m_InventoryPaintSlots.push_back(a_SlotNum);
@@ -1341,7 +1341,7 @@ void cPlayer::SetGameMode(eGameMode a_GameMode)
 	}
 
 	m_ClientHandle->SendGameMode(a_GameMode);
-	m_ClientHandle->SendInventorySlot(-1, -1, m_DraggingItem);
+	m_ClientHandle->SendInventorySlot(-1, ILLEGAL_SLOT_NUMBER, m_DraggingItem);
 	m_World->BroadcastPlayerListUpdateGameMode(*this);
 	m_World->BroadcastEntityMetadata(*this);
 }
@@ -1716,7 +1716,7 @@ void cPlayer::SetDraggingItem(const cItem & a_Item)
 	if (GetWindow() != nullptr)
 	{
 		m_DraggingItem = a_Item;
-		GetClientHandle()->SendInventorySlot(-1, -1, m_DraggingItem);
+		GetClientHandle()->SendInventorySlot(-1, ILLEGAL_SLOT_NUMBER, m_DraggingItem);
 	}
 }
 
@@ -1889,7 +1889,7 @@ void cPlayer::LoadFromDisk()
 	m_GameMode = static_cast<eGameMode>(Root.get("gamemode", eGameMode_NotSet).asInt());
 
 	m_Inventory.LoadFromJson(Root["inventory"]);
-	m_Inventory.SetEquippedSlotNum(Root.get("equippedItemSlot", 0).asInt());
+	m_Inventory.SetEquippedSlotNum(Root.get("equippedItemSlot", 0).asUInt());
 
 	cEnderChestEntity::LoadFromJson(Root["enderchestinventory"], m_EnderChestContents);
 
@@ -2067,7 +2067,7 @@ void cPlayer::UseEquippedItem(cItemHandler::eDurabilityLostAction a_Action)
 
 
 
-void cPlayer::UseItem(int a_SlotNumber, short a_Damage)
+void cPlayer::UseItem(std::size_t a_SlotNumber, short a_Damage)
 {
 	const cItem & Item = m_Inventory.GetSlot(a_SlotNumber);
 
@@ -2857,7 +2857,7 @@ void cPlayer::ApplyArmorDamage(int a_DamageBlocked)
 {
 	short ArmorDamage = static_cast<short>(std::max(a_DamageBlocked / 4, 1));
 
-	for (int i = 0; i < 4; i++)
+	for (std::size_t i = 0; i < 4; i++)
 	{
 		UseItem(cInventory::invArmorOffset + i, ArmorDamage);
 	}
