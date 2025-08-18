@@ -19,9 +19,9 @@ set (SRCS
 
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
-add_executable(BoundingBox-exe ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
-target_link_libraries(BoundingBox-exe fmt::fmt)
-add_test(NAME BoundingBox-test COMMAND BoundingBox-exe)
+add_executable(BoundingBoxTest ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
+target_link_libraries(BoundingBoxTest fmt::fmt gtest gmock gtest_main)
+add_test_executable(BoundingBoxTest)
 
 
 
@@ -29,6 +29,6 @@ add_test(NAME BoundingBox-test COMMAND BoundingBox-exe)
 
 # Put the projects into solution folders (MSVC):
 set_target_properties(
-	BoundingBox-exe
+	BoundingBoxTest
 	PROPERTIES FOLDER Tests
 )

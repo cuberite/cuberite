@@ -21,16 +21,16 @@ target_link_libraries(OSSupport PUBLIC fmt::fmt)
 
 # Define individual tests:
 
-# StressEvent: Stress-test the cEvent implementation:
-add_executable(StressEvent-exe StressEvent.cpp)
-target_link_libraries(StressEvent-exe OSSupport fmt::fmt Threads::Threads)
-add_test(NAME StressEvent-test COMMAND StressEvent-exe)
+# StressEvent: StressTest the cEvent implementation:
+add_executable(StressEventTest StressEvent.cpp)
+target_link_libraries(StressEventTest OSSupport fmt::fmt Threads::Threads)
+add_test_executable(StressEventTest)
 
 
 
 # Put all the tests into a solution folder (MSVC):
 set_target_properties(
-	StressEvent-exe
+	StressEventTest
 	PROPERTIES FOLDER Tests/OSSupport
 )
 set_target_properties(
