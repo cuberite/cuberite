@@ -752,6 +752,7 @@ public:
 	template <typename FnT, typename... Args>
 	bool Call(const FnT & a_Function, Args &&... args)
 	{
+		VERIFY(IsValid());
 		cStackBalancePopper balancer(*this);
 		m_NumCurrentFunctionArgs = -1;
 		if (!PushFunction(std::forward<const FnT &>(a_Function)))
