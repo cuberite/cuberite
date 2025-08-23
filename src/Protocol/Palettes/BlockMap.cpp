@@ -77,7 +77,8 @@ namespace BlockMap
 		{
 			LOGERROR("Server/Protocol directory does not exist. Unable to load BlockMap");
 			return;
-		} else if (!is_directory(dir))
+		}
+		else if (!is_directory(dir))
 		{
 			LOGERROR("Server/Protocol is not a directory. Unable to load BlockMap");
 			return;
