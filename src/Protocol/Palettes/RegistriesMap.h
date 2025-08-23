@@ -101,6 +101,16 @@ public:
 		{
 			using namespace std::filesystem;
 			auto dir = path("Protocol/");
+			if (!exists(dir))
+			{
+				LOGERROR("Server/Protocol directory does not exist. Unable to load RegistriesMap");
+				return;
+			}
+			else if (!is_directory(dir))
+			{
+				LOGERROR("Server/Protocol is not a directory. Unable to load RegistriesMap");
+				return;
+			}
 			directory_iterator end_itr(dir);
 			for (auto version : end_itr)
 			{
