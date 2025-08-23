@@ -126,7 +126,12 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOG("from commit " BUILD_COMMIT_ID " built at: " BUILD_DATETIME);
 #endif
 
-	if (!std::filesystem::exists(std::filesystem::current_path().concat("/cuberite")) && !std::filesystem::exists(std::filesystem::current_path().concat("/cuberite.exe")))
+
+	if (
+		!std::filesystem::exists(std::filesystem::current_path().concat("/cuberite")) &&
+		!std::filesystem::exists(std::filesystem::current_path().concat("/cuberite.exe")) &&
+		!std::filesystem::exists(std::filesystem::current_path().concat("/Cuberite")) &&
+		!std::filesystem::exists(std::filesystem::current_path().concat("/Cuberite.exe")))
 	{
 		LOGERROR("Working directory set outside of the directory of the Cuberite binary\n Files required to run probably will not be loaded.");
 	}
