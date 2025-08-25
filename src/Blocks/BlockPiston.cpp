@@ -46,7 +46,7 @@ inline Vector3i cBlockPistonHandler::GetExtensionDirection(BlockState a_Block)
 
 
 
-inline Byte cBlockPistonHandler::GetExtensionByte(BlockState a_Block)
+inline Byte cBlockPistonHandler::GetPistonNetworkDirection(BlockState a_Block)
 {
 	eBlockFace Facing;
 	switch (a_Block.Type())
@@ -59,12 +59,12 @@ inline Byte cBlockPistonHandler::GetExtensionByte(BlockState a_Block)
 	switch (Facing)
 	{
 		case BLOCK_FACE_NONE: return std::numeric_limits<Byte>::max();
-		case BLOCK_FACE_XM:   return 3;  // West
+		case BLOCK_FACE_XM:   return 4;  // West
 		case BLOCK_FACE_XP:   return 5;  // East
 		case BLOCK_FACE_YM:   return 0;  // Down
 		case BLOCK_FACE_YP:   return 1;  // Up
-		case BLOCK_FACE_ZM:   return 4;  // North
-		case BLOCK_FACE_ZP:   return 2;  // South
+		case BLOCK_FACE_ZM:   return 2;  // North
+		case BLOCK_FACE_ZP:   return 3;  // South
 	}
 	return std::numeric_limits<Byte>::max();
 }
@@ -79,7 +79,7 @@ void cBlockPistonHandler::ExtendPiston(Vector3i a_BlockPos, cWorld & a_World)
 
 	{
 		auto Self = a_World.GetBlock(a_BlockPos);
-		auto DirectionByte = GetExtensionByte(Self);
+		auto DirectionByte = GetPistonNetworkDirection(Self);
 		if (DirectionByte == std::numeric_limits<Byte>::max())
 		{
 			return;
@@ -151,7 +151,7 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 {
 	{
 		auto Self = a_World.GetBlock(a_BlockPos);
-		auto DirectionByte = GetExtensionByte(Self);
+		auto DirectionByte = GetPistonNetworkDirection(Self);
 		if (DirectionByte == std::numeric_limits<Byte>::max())
 		{
 			return;
@@ -198,7 +198,7 @@ void cBlockPistonHandler::RetractPiston(Vector3i a_BlockPos, cWorld & a_World)
 			}
 			case BlockType::StickyPiston:
 			{
-				World.SetBlock(a_BlockPos,   StickyPiston::StickyPiston(true, StickyPiston::Facing(Self)));
+				World.SetBlock(a_BlockPos,   StickyPiston::StickyPiston(false, StickyPiston::Facing(Self)));
 				break;
 			}
 			default: return;

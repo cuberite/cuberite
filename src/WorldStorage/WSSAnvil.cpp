@@ -2922,7 +2922,7 @@ void cWSSAnvil::LoadHorseFromNBT(cEntityList & a_Entities, const cParsedNBT & a_
 		return;
 	}
 
-	int Type = a_NBT.GetInt(a_TagIdx);
+	int Type = a_NBT.GetInt(Variant);
 
 	std::unique_ptr<cHorse> Monster = std::make_unique<cHorse>(0, Type & 0xFF, Type >> 8, 1);
 

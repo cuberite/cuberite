@@ -97,7 +97,6 @@
 			case BlockType::Observer: \
 				return ObserverHandler::Callback; \
 			case BlockType::Piston: \
-			case BlockType::PistonHead: \
 			case BlockType::StickyPiston: \
 			case BlockType::MovingPiston: \
 				return PistonHandler::Callback; \

@@ -117,7 +117,7 @@ namespace RedstoneComparatorHandler
 		Data.ExchangeUpdateOncePowerData(a_Position, FrontPower);
 
 		using namespace Block;
-		a_Chunk.SetBlock(a_Position, Comparator::Comparator(Comparator::Facing(a_Block), Comparator::Mode(a_Block), FrontPower > 0));
+		a_Chunk.FastSetBlock(a_Position, Comparator::Comparator(Comparator::Facing(a_Block), Comparator::Mode(a_Block), FrontPower > 0));
 		Data.m_MechanismDelays.erase(a_Position);
 
 		// Assume that an update (to front power) is needed:

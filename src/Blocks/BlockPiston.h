@@ -39,13 +39,21 @@ public:
 	static inline Vector3i GetExtensionDirection(BlockState a_Block);
 
 	/** Returns UCHAR_MAX on error. */
-	static inline Byte GetExtensionByte(BlockState a_Block);
+	static inline Byte GetPistonNetworkDirection(BlockState a_Block);
 
 	static void ExtendPiston(Vector3i a_BlockPos, cWorld & a_World);
 	static void RetractPiston(Vector3i a_BlockPos, cWorld & a_World);
 
 	/** Returns true if the piston (with the specified meta) is extended */
-	static inline bool IsExtended(BlockState a_Block) { return Block::Piston::Extended(a_Block); }
+	static inline bool IsExtended(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::Piston: return Block::Piston::Extended(a_Block);
+			case BlockType::StickyPiston: return Block::StickyPiston::Extended(a_Block);
+			default: UNREACHABLE("Given Block is not a Piston" + __FUNCTION__);
+		}
+	}
 
 private:
 
