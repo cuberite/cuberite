@@ -73,6 +73,50 @@ eBlockFace MirrorBlockFaceY(eBlockFace a_BlockFace)
 
 
 
+eBlockFace MirrorBlockFaceXY(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_XM;
+		case BLOCK_FACE_XP: return BLOCK_FACE_XP;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_ZP;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_ZM;
+		case BLOCK_FACE_NONE:
+		case BLOCK_FACE_YM:
+		case BLOCK_FACE_YP:
+		{
+			return a_BlockFace;
+		}
+	}
+	UNREACHABLE("Unsupported block face");
+}
+
+
+
+
+
+eBlockFace MirrorBlockFaceYZ(eBlockFace a_BlockFace)
+{
+	switch (a_BlockFace)
+	{
+		case BLOCK_FACE_XM: return BLOCK_FACE_XP;
+		case BLOCK_FACE_XP: return BLOCK_FACE_XM;
+		case BLOCK_FACE_ZM: return BLOCK_FACE_ZM;
+		case BLOCK_FACE_ZP: return BLOCK_FACE_ZP;
+		case BLOCK_FACE_NONE:
+		case BLOCK_FACE_YM:
+		case BLOCK_FACE_YP:
+		{
+			return a_BlockFace;
+		}
+	}
+	UNREACHABLE("Unsupported block face");
+}
+
+
+
+
+
 /** Returns a blockface rotated around the Y axis counter-clockwise. */
 eBlockFace RotateBlockFaceCCW(eBlockFace a_BlockFace)
 {
@@ -157,34 +201,179 @@ AString BlockFaceToString(eBlockFace a_BlockFace)
 
 
 
-bool IsValidBlock(int a_BlockType)
+/** Here so core plugin can initialize, otherwise useless and deprecated */
+bool IsValidItem(Item a_ItemType)
 {
-	return (
-		((a_BlockType > -1) && (a_BlockType <= E_BLOCK_MAX_TYPE_ID)) ||
-		(a_BlockType == 255)  // the blocks 253-254 don't exist yet -> https://minecraft.wiki/w/Data_values#Block_IDs
-	);
+	return true;
 }
 
 
 
 
 
-bool IsValidItem(int a_ItemType)
+eBlockFace RotationToBlockFace(double a_Rotation, bool a_Inverse)
+{
+	if (a_Inverse)
+	{
+		if ((a_Rotation > 135) || (a_Rotation < -135))  // -180/180
+		{
+			return eBlockFace::BLOCK_FACE_NORTH;
+		}
+		if ((-45 > a_Rotation) && (a_Rotation >= -135))  // -90
+		{
+			return eBlockFace::BLOCK_FACE_EAST;
+		}
+		if ((45 > a_Rotation)  && (a_Rotation >= -45))  // 0
+		{
+			return eBlockFace::BLOCK_FACE_SOUTH;
+		}
+		if ((135 > a_Rotation) && (a_Rotation >= 45))  // 90
+		{
+			return eBlockFace::BLOCK_FACE_WEST;
+		}
+	}
+	else
+	{
+		if ((a_Rotation > 135) || (a_Rotation < -135))    // -180/180
+		{
+			return eBlockFace::BLOCK_FACE_SOUTH;
+		}
+		if ((-45 > a_Rotation) && (a_Rotation >= -135))   // -90
+		{
+			return eBlockFace::BLOCK_FACE_WEST;
+		}
+		if ((45 > a_Rotation)  && (a_Rotation >= -45))    // 0
+		{
+			return eBlockFace::BLOCK_FACE_NORTH;
+		}
+		if ((135 > a_Rotation) && (a_Rotation >= 45))      // 90
+		{
+			return eBlockFace::BLOCK_FACE_EAST;
+		}
+	}
+	return BLOCK_FACE_NONE;
+}
+
+
+
+
+
+unsigned char RotationToFineFace(double a_Rotation, bool a_Invert)
+{
+	unsigned char ret = 0;
+	if ((a_Rotation >= - 11.25f) && (a_Rotation < 11.25f))
+	{
+		// South
+		ret = 8;
+	}
+	else if ((a_Rotation >= 11.25f) && (a_Rotation < 33.75f))
+	{
+		// SouthSouthWest
+		ret = 9;
+	}
+	else if ((a_Rotation >= 23.75f) && (a_Rotation < 56.25f))
+	{
+		// SouthWest
+		ret = 10;
+	}
+	else if ((a_Rotation >= 56.25f) && (a_Rotation < 78.75f))
+	{
+		// WestSouthWest
+		ret = 11;
+	}
+	else if ((a_Rotation >= 78.75f) && (a_Rotation < 101.25f))
+	{
+		// West
+		ret = 12;
+	}
+	else if ((a_Rotation >= 101.25f) && (a_Rotation < 123.75f))
+	{
+		// WestNorthWest
+		ret = 13;
+	}
+	else if ((a_Rotation >= 123.75f) && (a_Rotation < 146.25f))
+	{
+		// NorthWest
+		ret = 14;
+	}
+	else if ((a_Rotation >= 146.25f) && (a_Rotation < 168.75f))
+	{
+		// NorthNorthWest
+		ret = 15;
+	}
+	else if ((a_Rotation >= -168.75f) && (a_Rotation < -146.25f))
+	{
+		// NorthNorthEast
+		ret = 1;
+	}
+	else if ((a_Rotation >= -146.25f) && (a_Rotation < -123.75f))
+	{
+		// NorthEast
+		ret = 2;
+	}
+	else if ((a_Rotation >= -123.75f) && (a_Rotation < -101.25f))
+	{
+		// EastNorthEast
+		ret = 3;
+	}
+	else if ((a_Rotation >= -101.25) && (a_Rotation < -78.75f))
+	{
+		// East
+		ret = 4;
+	}
+	else if ((a_Rotation >= -78.75) && (a_Rotation < -56.25f))
+	{
+		// EastSouthEast
+		ret = 5;
+	}
+	else if ((a_Rotation >= -56.25f) && (a_Rotation < -33.75f))
+	{
+		// SouthEast
+		ret = 6;
+	}
+	else if ((a_Rotation >= -33.75f) && (a_Rotation < -11.25f))
+	{
+		// SouthSouthEast
+		ret = 7;
+	}
+	else  // degrees jumping from 180 to -180
+	{
+		// North
+		ret = 0;
+	}
+	if (a_Invert)
+	{
+		return (ret + 8) % 16;
+	}
+	else
+	{
+		return ret;
+	}
+}
+
+
+
+
+
+eBlockFace DisplacementYawToFacing(Vector3d a_PlacePosition, Vector3d a_EyePosition, double a_Yaw)
 {
 	if (
-		((a_ItemType >= E_ITEM_FIRST) && (a_ItemType <= E_ITEM_MAX_CONSECUTIVE_TYPE_ID)) ||  // Basic items range
-		((a_ItemType >= E_ITEM_FIRST_DISC) && (a_ItemType <= E_ITEM_LAST_DISC))   // Music discs' special range
-	)
+		const auto Displacement = a_EyePosition - a_PlacePosition.addedXZ(0.5, 0.5);
+			(std::abs(Displacement.x) < 2) && (std::abs(Displacement.z) < 2)
+			)
 	{
-		return true;
+		if (Displacement.y > 2)
+		{
+			return BLOCK_FACE_TOP;
+		}
+
+		if (Displacement.y < 0)
+		{
+			return BLOCK_FACE_BOTTOM;
+		}
 	}
 
-	if (a_ItemType == 0)
-	{
-		return false;
-	}
-
-	return IsValidBlock(a_ItemType);
+	return RotationToBlockFace(a_Yaw);
 }
 
 
@@ -401,7 +590,12 @@ Vector3i AddFaceDirection(const Vector3i a_Position, const eBlockFace a_BlockFac
 		case BLOCK_FACE_ZP: return a_Position.addedZ(+Offset);
 		case BLOCK_FACE_XP: return a_Position.addedX(+Offset);
 		case BLOCK_FACE_XM: return a_Position.addedX(-Offset);
-		case BLOCK_FACE_NONE: break;
+		case BLOCK_FACE_NONE:
+		{
+			LOGWARNING("%s: Unknown face: %s", __FUNCTION__, BlockFaceToString(a_BlockFace));
+			ASSERT(!"AddFaceDirection(): Unknown face");
+			break;
+		}
 	}
 
 	UNREACHABLE("Unsupported block face");
@@ -411,15 +605,15 @@ Vector3i AddFaceDirection(const Vector3i a_Position, const eBlockFace a_BlockFac
 
 
 
-bool ItemCategory::IsPickaxe(short a_ItemType)
+bool ItemCategory::IsPickaxe(Item a_ItemType)
 {
 	switch (a_ItemType)
 	{
-		case E_ITEM_WOODEN_PICKAXE:
-		case E_ITEM_STONE_PICKAXE:
-		case E_ITEM_IRON_PICKAXE:
-		case E_ITEM_GOLD_PICKAXE:
-		case E_ITEM_DIAMOND_PICKAXE:
+		case Item::WoodenPickaxe:
+		case Item::StonePickaxe:
+		case Item::IronPickaxe:
+		case Item::GoldenPickaxe:
+		case Item::DiamondPickaxe:
 		{
 			return true;
 		}
@@ -434,22 +628,17 @@ bool ItemCategory::IsPickaxe(short a_ItemType)
 
 
 
-bool ItemCategory::IsAxe(short a_ItemType)
+bool ItemCategory::IsAxe(Item a_ItemType)
 {
 	switch (a_ItemType)
 	{
-		case E_ITEM_WOODEN_AXE:
-		case E_ITEM_STONE_AXE:
-		case E_ITEM_IRON_AXE:
-		case E_ITEM_GOLD_AXE:
-		case E_ITEM_DIAMOND_AXE:
-		{
+		case Item::WoodenAxe:
+		case Item::StoneAxe:
+		case Item::IronAxe:
+		case Item::GoldenAxe:
+		case Item::DiamondAxe:
 			return true;
-		}
-		default:
-		{
-			return false;
-		}
+		default: return false;
 	}
 }
 
@@ -457,46 +646,61 @@ bool ItemCategory::IsAxe(short a_ItemType)
 
 
 
-bool ItemCategory::IsSword(short a_ItemID)
+bool ItemCategory::IsSword(Item a_ItemID)
 {
-	return (a_ItemID == E_ITEM_WOODEN_SWORD)
-		|| (a_ItemID == E_ITEM_STONE_SWORD)
-		|| (a_ItemID == E_ITEM_IRON_SWORD)
-		|| (a_ItemID == E_ITEM_GOLD_SWORD)
-		|| (a_ItemID == E_ITEM_DIAMOND_SWORD);
+	switch (a_ItemID)
+	{
+		case Item::WoodenSword:
+		case Item::StoneSword:
+		case Item::IronSword:
+		case Item::GoldenSword:
+		case Item::DiamondSword:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsHoe(short a_ItemID)
+bool ItemCategory::IsHoe(Item a_ItemID)
 {
-	return (a_ItemID == E_ITEM_WOODEN_HOE)
-		|| (a_ItemID == E_ITEM_STONE_HOE)
-		|| (a_ItemID == E_ITEM_IRON_HOE)
-		|| (a_ItemID == E_ITEM_GOLD_HOE)
-		|| (a_ItemID == E_ITEM_DIAMOND_HOE);
+	switch (a_ItemID)
+	{
+		case Item::WoodenHoe:
+		case Item::StoneHoe:
+		case Item::IronHoe:
+		case Item::GoldenHoe:
+		case Item::DiamondHoe:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsShovel(short a_ItemID)
+bool ItemCategory::IsShovel(Item a_ItemID)
 {
-	return (a_ItemID == E_ITEM_WOODEN_SHOVEL)
-		|| (a_ItemID == E_ITEM_STONE_SHOVEL)
-		|| (a_ItemID == E_ITEM_IRON_SHOVEL)
-		|| (a_ItemID == E_ITEM_GOLD_SHOVEL)
-		|| (a_ItemID == E_ITEM_DIAMOND_SHOVEL);
+	switch (a_ItemID)
+	{
+		case Item::WoodenShovel:
+		case Item::StoneShovel:
+		case Item::IronShovel:
+		case Item::GoldenShovel:
+		case Item::DiamondShovel:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsTool(short a_ItemID)
+bool ItemCategory::IsTool(Item a_ItemID)
 {
 	return IsPickaxe( a_ItemID)
 		|| IsAxe    ( a_ItemID)
@@ -509,83 +713,98 @@ bool ItemCategory::IsTool(short a_ItemID)
 
 
 
-bool ItemCategory::IsHelmet(short a_ItemType)
+bool ItemCategory::IsHelmet(Item a_ItemType)
 {
-	return (
-		(a_ItemType == E_ITEM_LEATHER_CAP) ||
-		(a_ItemType == E_ITEM_GOLD_HELMET) ||
-		(a_ItemType == E_ITEM_CHAIN_HELMET) ||
-		(a_ItemType == E_ITEM_IRON_HELMET) ||
-		(a_ItemType == E_ITEM_DIAMOND_HELMET)
-	);
+	switch (a_ItemType)
+	{
+		case Item::LeatherHelmet:
+		case Item::GoldenHelmet:
+		case Item::ChainmailHelmet:
+		case Item::IronHelmet:
+		case Item::DiamondHelmet:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsChestPlate(short a_ItemType)
+bool ItemCategory::IsChestPlate(Item a_ItemType)
 {
-	return (
-		(a_ItemType == E_ITEM_ELYTRA) ||
-		(a_ItemType == E_ITEM_LEATHER_TUNIC) ||
-		(a_ItemType == E_ITEM_GOLD_CHESTPLATE) ||
-		(a_ItemType == E_ITEM_CHAIN_CHESTPLATE) ||
-		(a_ItemType == E_ITEM_IRON_CHESTPLATE) ||
-		(a_ItemType == E_ITEM_DIAMOND_CHESTPLATE)
-	);
+	switch (a_ItemType)
+	{
+		case Item::Elytra:
+		case Item::LeatherChestplate:
+		case Item::GoldenChestplate:
+		case Item::ChainmailChestplate:
+		case Item::IronChestplate:
+		case Item::DiamondChestplate:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsLeggings(short a_ItemType)
+bool ItemCategory::IsLeggings(Item a_ItemType)
 {
-	return (
-		(a_ItemType == E_ITEM_LEATHER_PANTS) ||
-		(a_ItemType == E_ITEM_GOLD_LEGGINGS) ||
-		(a_ItemType == E_ITEM_CHAIN_LEGGINGS) ||
-		(a_ItemType == E_ITEM_IRON_LEGGINGS) ||
-		(a_ItemType == E_ITEM_DIAMOND_LEGGINGS)
-	);
+	switch (a_ItemType)
+	{
+		case Item::LeatherLeggings:
+		case Item::GoldenLeggings:
+		case Item::ChainmailLeggings:
+		case Item::IronLeggings:
+		case Item::DiamondLeggings:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsBoots(short a_ItemType)
+bool ItemCategory::IsBoots(Item a_ItemType)
 {
-	return (
-		(a_ItemType == E_ITEM_LEATHER_BOOTS) ||
-		(a_ItemType == E_ITEM_GOLD_BOOTS) ||
-		(a_ItemType == E_ITEM_CHAIN_BOOTS) ||
-		(a_ItemType == E_ITEM_IRON_BOOTS) ||
-		(a_ItemType == E_ITEM_DIAMOND_BOOTS)
-	);
+	switch (a_ItemType)
+	{
+		case Item::LeatherBoots:
+		case Item::GoldenBoots:
+		case Item::ChainmailBoots:
+		case Item::IronBoots:
+		case Item::DiamondBoots:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsMinecart(short a_ItemType)
+bool ItemCategory::IsMinecart(Item a_ItemType)
 {
-	return (
-		(a_ItemType == E_ITEM_MINECART) ||
-		(a_ItemType == E_ITEM_CHEST_MINECART) ||
-		(a_ItemType == E_ITEM_FURNACE_MINECART) ||
-		(a_ItemType == E_ITEM_MINECART_WITH_TNT) ||
-		(a_ItemType == E_ITEM_MINECART_WITH_HOPPER)
-	);
+	switch (a_ItemType)
+	{
+		case Item::Minecart:
+		case Item::ChestMinecart:
+		case Item::FurnaceMinecart:
+		case Item::TNTMinecart:
+		case Item::HopperMinecart:
+			return true;
+		default: return false;
+	}
 }
 
 
 
 
 
-bool ItemCategory::IsArmor(short a_ItemType)
+bool ItemCategory::IsArmor(Item a_ItemType)
 {
 	return (
 		IsHelmet(a_ItemType) ||
@@ -599,20 +818,15 @@ bool ItemCategory::IsArmor(short a_ItemType)
 
 
 
-bool ItemCategory::IsHorseArmor(short a_ItemType)
+bool ItemCategory::IsHorseArmor(Item a_ItemType)
 {
 	switch (a_ItemType)
 	{
-		case E_ITEM_IRON_HORSE_ARMOR:
-		case E_ITEM_GOLD_HORSE_ARMOR:
-		case E_ITEM_DIAMOND_HORSE_ARMOR:
-		{
+		case Item::IronHorseArmor:
+		case Item::GoldenHorseArmor:
+		case Item::DiamondHorseArmor:
 			return true;
-		}
-		default:
-		{
-			return false;
-		}
+		default: return false;
 	}
 }
 
@@ -620,17 +834,17 @@ bool ItemCategory::IsHorseArmor(short a_ItemType)
 
 
 
-bool ItemCategory::IsVillagerFood(short a_ItemType)
+bool ItemCategory::IsVillagerFood(Item a_ItemType)
 {
 	switch (a_ItemType)
 	{
-		case E_ITEM_CARROT:
-		case E_ITEM_POTATO:
-		case E_ITEM_BREAD:
-		case E_ITEM_BEETROOT:
-		case E_ITEM_SEEDS:
-		case E_ITEM_BEETROOT_SEEDS:
-		case E_ITEM_WHEAT:
+		case Item::Carrot:
+		case Item::Potato:
+		case Item::Bread:
+		case Item::Beetroot:
+		case Item::WheatSeeds:
+		case Item::BeetrootSeeds:
+		case Item::Wheat:
 		{
 			return true;
 		}

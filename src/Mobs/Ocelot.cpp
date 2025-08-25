@@ -21,7 +21,7 @@
 */
 
 cOcelot::cOcelot(void) :
-	Super("Ocelot", mtOcelot, "entity.cat.hurt", "entity.cat.death", "entity.cat.ambient", 0.6f, 0.7f),
+	Super("Ocelot", etOcelot, "entity.cat.hurt", "entity.cat.death", "entity.cat.ambient", 0.6f, 0.7f),
 	m_IsSitting(false),
 	m_IsTame(false),
 	m_IsBegging(false),
@@ -52,7 +52,7 @@ void cOcelot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 			{
 				cItems Items;
 				GetBreedingItems(Items);
-				if (Items.ContainsType(a_Player.GetEquippedItem().m_ItemType))
+				if (Items.ContainsType(a_Player.GetEquippedItem()))
 				{
 					if (!IsBegging())
 					{
@@ -149,7 +149,7 @@ void cOcelot::OnRightClicked(cPlayer & a_Player)
 		{
 			cItems Items;
 			GetBreedingItems(Items);
-			if (Items.ContainsType(a_Player.GetEquippedItem().m_ItemType))
+			if (Items.ContainsType(a_Player.GetEquippedItem()))
 			{
 				if (!a_Player.IsGameModeCreative())
 				{
@@ -200,8 +200,8 @@ bool cOcelot::IsCatSittingOnBlock(cWorld * a_World, Vector3d a_BlockPosition)
 		[=](cEntity & a_Entity)
 		{
 			return (
-				(a_Entity.GetEntityType() == cEntity::etMonster) &&
-				(static_cast<cMonster &>(a_Entity).GetMobType() == eMonsterType::mtOcelot) &&
+				(a_Entity.IsMob()) &&
+				(static_cast<cMonster &>(a_Entity).GetEntityType() == etOcelot) &&
 				(static_cast<cOcelot &>(a_Entity).IsSitting())
 			);
 		}

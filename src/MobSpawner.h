@@ -19,10 +19,10 @@ public :
 	a_MobFamily is the Family of mobs that this spawner will spawn
 	a_AllowedTypes is the set of types allowed for mobs it will spawn. Empty set would result in no spawn at all
 	Allowed mobs thah are not of the right Family will not be include (no warning). */
-	cMobSpawner(cMonster::eFamily MobFamily, const std::set<eMonsterType> & a_AllowedTypes);
+	cMobSpawner(cMonster::eFamily MobFamily, const std::set<eEntityType> & a_AllowedTypes);
 
 	/** Check if specified block can be a Pack center for this spawner */
-	bool CheckPackCenter(BLOCKTYPE a_BlockType);
+	bool CheckPackCenter(BlockState a_Block);
 
 	/** Try to create a monster here
 	If this is the first of a Pack, determine the type of monster
@@ -43,22 +43,22 @@ public :
 	}
 
 	/** Returns true if specified type of mob can spawn on specified block */
-	static bool CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eMonsterType a_MobType, EMCSBiome a_Biome, bool a_DisableSolidBelowCheck = false);
+	static bool CanSpawnHere(cChunk * a_Chunk, Vector3i a_RelPos, eEntityType a_MobType, EMCSBiome a_Biome, bool a_DisableSolidBelowCheck = false);
 
 	/** Returns all mob types that can spawn that biome */
-	static std::set<eMonsterType> GetAllowedMobTypes(EMCSBiome a_Biome);
+	static std::set<eEntityType> GetAllowedMobTypes(EMCSBiome a_Biome);
 
 
 protected :
 
 	/** Returns a random type that can spawn in the specified biome.
 	Returns mtInvalidType if none is possible. */
-	eMonsterType ChooseMobType(EMCSBiome a_Biome);
+	eEntityType ChooseMobType(EMCSBiome a_Biome);
 
 	cMonster::eFamily m_MonsterFamily;
-	std::set<eMonsterType> m_AllowedTypes;
+	std::set<eEntityType> m_AllowedTypes;
 	bool m_NewPack;
-	eMonsterType m_MobType;
+	eEntityType m_MobType;
 	std::vector<std::unique_ptr<cMonster>> m_Spawned;
 } ;
 

@@ -69,7 +69,7 @@ int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int
 	}
 	if ((a_EndSlotNum < 0) || (a_EndSlotNum >= invNumSlots))
 	{
-		LOGWARNING("%s: Bad EndSlotNum, got %d, there are %d slots; correcting to %d.", __FUNCTION__, a_BeginSlotNum, invNumSlots, invNumSlots - 1);
+		LOGWARNING("%s: Bad EndSlotNum, got %d, there are %d slots; correcting to %d.", __FUNCTION__, a_BeginSlotNum, static_cast<UInt32>(invNumSlots), static_cast<UInt32>(invNumSlots) - 1);
 		a_EndSlotNum = invNumSlots - 1;
 	}
 	if (a_BeginSlotNum > a_EndSlotNum)
@@ -501,7 +501,7 @@ char cInventory::ChangeSlotCount(int a_SlotNum, char a_AddToCount)
 	cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
 	if (Grid == nullptr)
 	{
-		LOGWARNING("%s: invalid slot number, expected 0 .. %d, got %d; ignoring", __FUNCTION__, invNumSlots, a_SlotNum);
+		LOGWARNING("%s: invalid slot number, expected 0 .. %d, got %d; ignoring", __FUNCTION__, static_cast<UInt32>(invNumSlots), a_SlotNum);
 		return -1;
 	}
 	return Grid->ChangeSlotCount(GridSlotNum, a_AddToCount);

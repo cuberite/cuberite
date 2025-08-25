@@ -90,7 +90,8 @@ protected:
 	virtual void Clicked(
 		cPlayer & a_Player, int a_WindowID,
 		short a_SlotNum, eClickAction a_ClickAction,
-		const cItem & a_ClickedItem
+		const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta,
+		const cItem & a_DraggedItem
 	) override;
 	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse) override;
 	virtual void Destroy(void) override;

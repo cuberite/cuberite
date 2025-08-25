@@ -8,7 +8,9 @@
 #include "Protocol/MojangAPI.h"
 #include "RankManager.h"
 #include "ChunkDef.h"
-
+#include "Protocol/Palettes/BlockMap.h"
+#include <AllTags/TagManager.h>
+#include "Protocol/Palettes/RegistriesMap.h"
 
 
 
@@ -67,6 +69,9 @@ public:
 	/** Interrupts the server and restarts it, as if "/restart" was typed in the console. */
 	static void Restart();
 
+	BlockMap::cBlockMap * GetBlockMap(void) const { return m_BlockMap; }
+	TagManager * GetTagManager(void) const { return m_TagManager; }
+	RegistriesMap::cRegistryHandler * GetRegistryMap(void) const { return m_RegistriesMap; }
 	// tolua_begin
 	cServer * GetServer(void) { return m_Server; }
 	cWorld *  GetDefaultWorld(void);
@@ -217,6 +222,9 @@ private:
 
 	cServer *        m_Server;
 	cMonsterConfig * m_MonsterConfig;
+	BlockMap::cBlockMap * m_BlockMap;
+	TagManager * m_TagManager;
+	RegistriesMap::cRegistryHandler * m_RegistriesMap;
 
 	cCraftingRecipes * m_CraftingRecipes;
 	std::unique_ptr<cRecipeMapper> m_RecipeMapper;

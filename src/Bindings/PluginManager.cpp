@@ -11,9 +11,8 @@
 
 #include "../IniFile.h"
 #include "../Entities/Player.h"
-
-
-
+#include "Commands/CommandArguments.h"
+#include "Commands/CommandManager.h"
 
 
 cPluginManager * cPluginManager::Get(void)
@@ -270,7 +269,7 @@ bool cPluginManager::CallHookBlockSpread(cWorld & a_World, Vector3i a_BlockPos, 
 bool cPluginManager::CallHookBlockToPickups(
 	cWorld & a_World,
 	Vector3i a_BlockPos,
-	BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta,
+	BlockState a_Block,
 	const cBlockEntity * a_BlockEntity,
 	const cEntity * a_Digger,
 	const cItem * a_Tool,
@@ -279,7 +278,7 @@ bool cPluginManager::CallHookBlockToPickups(
 {
 	return GenericCallHook(HOOK_BLOCK_TO_PICKUPS, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnBlockToPickups(a_World, a_BlockPos, a_BlockType, a_BlockMeta, a_BlockEntity, a_Digger, a_Tool, a_Pickups);
+			return a_Plugin->OnBlockToPickups(a_World, a_BlockPos, a_Block, a_BlockEntity, a_Digger, a_Tool, a_Pickups);
 		}
 	);
 }
@@ -710,11 +709,11 @@ bool cPluginManager::CallHookPlayerAnimation(cPlayer & a_Player, int a_Animation
 
 
 
-bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BlockState a_Block)
 {
 	return GenericCallHook(HOOK_PLAYER_BREAKING_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerBreakingBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerBreakingBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_Block);
 		}
 	);
 }
@@ -723,11 +722,11 @@ bool cPluginManager::CallHookPlayerBreakingBlock(cPlayer & a_Player, Vector3i a_
 
 
 
-bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerBrokenBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, BlockState a_Block)
 {
 	return GenericCallHook(HOOK_PLAYER_BROKEN_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerBrokenBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerBrokenBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_Block);
 		}
 	);
 }
@@ -957,11 +956,11 @@ bool cPluginManager::CallHookPlayerTossingItem(cPlayer & a_Player)
 
 
 
-bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerUsedBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BlockState a_Block)
 {
 	return GenericCallHook(HOOK_PLAYER_USED_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsedBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerUsedBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z, a_Block);
 		}
 	);
 }
@@ -983,11 +982,11 @@ bool cPluginManager::CallHookPlayerUsedItem(cPlayer & a_Player, Vector3i a_Block
 
 
 
-bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+bool cPluginManager::CallHookPlayerUsingBlock(cPlayer & a_Player, Vector3i a_BlockPos, eBlockFace a_BlockFace, Vector3i a_CursorPos, BlockState a_Block)
 {
 	return GenericCallHook(HOOK_PLAYER_USING_BLOCK, [&](cPlugin * a_Plugin)
 		{
-			return a_Plugin->OnPlayerUsingBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z, a_BlockType, a_BlockMeta);
+			return a_Plugin->OnPlayerUsingBlock(a_Player, a_BlockPos.x, a_BlockPos.y, a_BlockPos.z, a_BlockFace, a_CursorPos.x, a_CursorPos.y, a_CursorPos.z, a_Block);
 		}
 	);
 }
@@ -1255,11 +1254,32 @@ bool cPluginManager::CallHookWorldTick(cWorld & a_World, std::chrono::millisecon
 
 cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, const AString & a_Command, bool a_ShouldCheckPermissions)
 {
+	// To true here and in send command tree
+#define NEW_COMMANDS 1
+#if NEW_COMMANDS
+	if (a_Command.empty())
+	{
+		return crUnknownCommand;
+	}
+	if (!a_Command.empty() && (a_Command[0] != '/'))
+	{
+		return crUnknownCommand;
+	}
+	auto r = BasicStringReader(a_Command.substr(1));
+	auto ctx = cCommandExecutionContext(&a_Player);
+	if (!GetRootCommandNode()->Parse(r, ctx))
+	{
+		return crError;
+	}
+	return crExecuted;
+#else
 	AStringVector Split(StringSplit(a_Command, " "));
 	if (Split.empty())
 	{
 		return crUnknownCommand;
 	}
+
+	a_ShouldCheckPermissions = false;
 
 	CommandMap::iterator cmd = m_Commands.find(Split[0]);
 	if (cmd == m_Commands.end())
@@ -1304,6 +1324,7 @@ cPluginManager::CommandResult cPluginManager::HandleCommand(cPlayer & a_Player, 
 	}
 
 	return crExecuted;
+#endif
 }
 
 
@@ -1718,6 +1739,85 @@ AString cPluginManager::GetPluginFolderName(const AString & a_PluginName)
 		}
 	}
 	return AString();
+}
+
+
+
+
+
+void cPluginManager::SetupNewCommands(void)
+{
+#define LITERAL(name) cCommandManager::cCommandNode::Literal(name)
+#define ARGUMENT(name, arg) cCommandManager::cCommandNode::Argument(name, std::make_shared<arg>())
+// #define ARGUMENT_ARGS(name, arg, args) cCommandManager::cCommandNode::Argument(name, std::make_shared<arg>(args))
+#define EXECUTE(exe) [](const cCommandExecutionContext & a_Ctx) -> bool {exe return true;}
+	auto node = cCommandManager::cCommandNode();
+	node.Then(
+		cCommandManager::cCommandNode::Literal("testcmd")
+			.Executable([](const cCommandExecutionContext & a_Ctx) -> bool
+			{
+				a_Ctx.SendFeedback("test cmd success");
+				return true;
+			})
+			->Then(cCommandManager::cCommandNode::Argument("test float", std::make_shared<cCommandFloatArgument>()).Executable([](const cCommandExecutionContext & a_Ctx) -> bool
+			{
+				a_Ctx.SendFeedback("test cmd success2 " + std::to_string(cCommandFloatArgument::GetFloatFromCtx(a_Ctx, "test float")));
+				return true;
+			})
+		)
+	);
+	node.Then(LITERAL("weather").Then(
+		LITERAL("rain")
+			.Executable(EXECUTE(
+				cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Rain);))
+				->Then(ARGUMENT("duration", cCommandTimeArgument)
+					.Executable(EXECUTE(
+						cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Rain);
+						cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)
+					)
+				)
+			)->Then(
+		LITERAL("clear")
+			.Executable(EXECUTE(
+				cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Sunny);))
+				->Then(ARGUMENT("duration", cCommandTimeArgument)
+					.Executable(EXECUTE(
+						cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_Sunny);
+						cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)
+					)
+				)
+			)->Then(
+		LITERAL("thunder")
+			.Executable(EXECUTE(
+				cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_ThunderStorm);))
+				->Then(ARGUMENT("duration", cCommandTimeArgument)
+					.Executable(EXECUTE(
+						cRoot::Get()->GetDefaultWorld()->SetWeather(eWeather_ThunderStorm);
+						cRoot::Get()->GetDefaultWorld()->SetTicksUntilWeatherChange(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "duration"));)
+					)
+				)
+			)
+		);
+	node.Then(LITERAL("gamemode")
+			.Then(ARGUMENT("gamemode", cCommandGameModeArgument)
+				.Executable(EXECUTE(a_Ctx.GetPlayer()->SetGameMode(
+					cCommandGameModeArgument::GetGameModeFromCtx(a_Ctx, "gamemode"));
+				)
+			)
+		)
+	);
+	node.Then(LITERAL("time")
+		.Then(LITERAL("set")
+			.Then(ARGUMENT("time", cCommandTimeArgument)
+				.Executable(EXECUTE(
+					cRoot::Get()->GetDefaultWorld()->SetTimeOfDay(cTickTime(cCommandTimeArgument::GetTimeTicksFromCtx(a_Ctx, "time")));
+				)))
+			->Then(LITERAL("day").Executable(EXECUTE(cRoot::Get()->GetDefaultWorld()->SetTimeOfDay(cTickTime(1000));)))
+			->Then(LITERAL("night").Executable(EXECUTE(cRoot::Get()->GetDefaultWorld()->SetTimeOfDay(cTickTime(13000));)))
+			->Then(LITERAL("noon").Executable(EXECUTE(cRoot::Get()->GetDefaultWorld()->SetTimeOfDay(cTickTime(6000));)))
+			->Then(LITERAL("midnight").Executable(EXECUTE(cRoot::Get()->GetDefaultWorld()->SetTimeOfDay(cTickTime(18000));)))));
+
+	m_RootCommandNode = node;
 }
 
 

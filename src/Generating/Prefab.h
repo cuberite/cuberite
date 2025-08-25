@@ -157,15 +157,9 @@ public:
 	void SetHitBox(const cCuboid & a_HitBox) { m_HitBox = a_HitBox; }
 
 protected:
-	/** Packs complete definition of a single block, for per-letter assignment. */
-	struct sBlockTypeDef
-	{
-		BLOCKTYPE  m_BlockType;
-		NIBBLETYPE m_BlockMeta;
-	};
 
 	/** Maps letters in the sDef::m_Image onto a sBlockTypeDef block type definition. */
-	typedef sBlockTypeDef CharMap[256];
+	typedef BlockState CharMap[256];
 
 	/** Maps generator tree depth to weight. */
 	typedef std::map<int, int> cDepthWeight;

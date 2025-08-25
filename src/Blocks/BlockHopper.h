@@ -8,9 +8,9 @@
 
 
 class cBlockHopperHandler final :
-	public cClearMetaOnDrop<cMetaRotator<cBlockEntityHandler, 0x7, E_META_HOPPER_FACING_ZP, E_META_HOPPER_FACING_XM, E_META_HOPPER_FACING_ZM, E_META_HOPPER_FACING_XP>>
+	public cBlockEntityHandler
 {
-	using Super = cClearMetaOnDrop<cMetaRotator<cBlockEntityHandler, 0x7, E_META_HOPPER_FACING_ZP, E_META_HOPPER_FACING_XM, E_META_HOPPER_FACING_ZM, E_META_HOPPER_FACING_XP>>;
+	using Super = cBlockEntityHandler;
 
 public:
 
@@ -18,9 +18,8 @@ public:
 
 private:
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		UNUSED(a_Meta);
 		return 11;
 	}
 } ;

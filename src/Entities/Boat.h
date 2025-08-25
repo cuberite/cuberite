@@ -55,6 +55,8 @@ public:
 
 	float GetDamageTaken(void) const { return m_DamageTaken; }
 
+	virtual bool IsBoat() const override { return true; }
+
 	// tolua_begin
 
 	/** Returns the eMaterial of the boat */

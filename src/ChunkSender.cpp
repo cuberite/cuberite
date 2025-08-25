@@ -238,16 +238,17 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, const WeakClients & a_C
 	}
 
 	// Send:
-	m_Serializer.SendToClients(a_ChunkX, a_ChunkZ, m_BlockData, m_LightData, m_BiomeMap, Clients);
+	m_Serializer.SendToClients(a_ChunkX, a_ChunkZ, m_BlockData, m_LightData, m_BiomeMap, m_BlockEntities, m_HeightMap, Clients);
 
 	for (const auto & Client : Clients)
 	{
+		/*
 		// Send block-entity packets:
 		for (const auto & Pos : m_BlockEntities)
 		{
 			m_World.SendBlockEntity(Pos.x, Pos.y, Pos.z, *Client);
 		}  // for itr - m_Packets[]
-
+		*/
 		// Send entity packets:
 		for (const auto EntityID : m_EntityIDs)
 		{
@@ -287,7 +288,16 @@ void cChunkSender::SendChunk(int a_ChunkX, int a_ChunkZ, const WeakClients & a_C
 
 void cChunkSender::BlockEntity(cBlockEntity * a_Entity)
 {
-	m_BlockEntities.push_back(a_Entity->GetPos());
+	m_BlockEntities.push_back(a_Entity);
+}
+
+
+
+
+
+void cChunkSender::HeightMap(const cChunkDef::HeightMap & a_HeightMap)
+{
+	m_HeightMap = a_HeightMap;
 }
 
 

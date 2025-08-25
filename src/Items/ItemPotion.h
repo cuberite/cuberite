@@ -38,7 +38,8 @@ public:
 		eBlockFace a_ClickedBlockFace
 	) const override
 	{
-		short PotionDamage = a_HeldItem.m_ItemDamage;
+		// TODO: potion item component
+		short PotionDamage = 0;  // a_HeldItem.m_ItemDamage;
 
 		// Do not throw non-splash potions:
 		if (cEntityEffect::IsPotionDrinkable(PotionDamage))
@@ -52,7 +53,7 @@ public:
 		// Play sound
 		a_World->BroadcastSoundEffect("entity.arrow.shoot", a_Player->GetPosition() - Vector3d(0, a_Player->GetHeight(), 0), 0.5f, 0.4f / GetRandomProvider().RandReal(0.8f, 1.2f));
 
-		if (a_World->CreateProjectile(Pos.x, Pos.y, Pos.z, cProjectileEntity::pkSplashPotion, a_Player, &a_Player->GetEquippedItem(), &Speed) == cEntity::INVALID_ID)
+		if (a_World->CreateProjectile(Pos, etPotion, a_Player, &a_Player->GetEquippedItem(), &Speed) == cEntity::INVALID_ID)
 		{
 			return false;
 		}
@@ -71,10 +72,11 @@ public:
 
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) const override
 	{
-		short PotionDamage = a_Item->m_ItemDamage;
+		// TODO: potion item component
+		short PotionDamage = 0;  // a_Item->m_ItemDamage;
 
 		// Do not drink undrinkable potions:
-		if (!cEntityEffect::IsPotionDrinkable(a_Item->m_ItemDamage))
+		if (!cEntityEffect::IsPotionDrinkable(PotionDamage))
 		{
 			return false;
 		}
@@ -87,7 +89,7 @@ public:
 
 		if (!a_Player->IsGameModeCreative())
 		{
-			a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_GLASS_BOTTLE));
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(Item::GlassBottle));
 		}
 		return true;
 	}

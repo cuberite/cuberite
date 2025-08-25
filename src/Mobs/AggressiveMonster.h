@@ -16,7 +16,7 @@ public:
 
 	cAggressiveMonster(
 		const AString & a_ConfigName,
-		eMonsterType a_MobType,
+		eEntityType a_MobType,
 		const AString & a_SoundHurt,
 		const AString & a_SoundDeath,
 		const AString & a_SoundAmbient,
@@ -38,7 +38,7 @@ public:
 	*
 	* @return pointer to the mob found
 	*/
-	cMonster * GetMonsterOfTypeInSight(eMonsterType a_mobtype, unsigned int SightDistance=16);
+	cMonster * GetMonsterOfTypeInSight(eEntityType a_mobtype, unsigned int SightDistance=16);
 
 	/** Try to perform attack
 	returns true if attack was deemed successful (hit player, fired projectile, creeper exploded, etc.) even if it didn't actually do damage

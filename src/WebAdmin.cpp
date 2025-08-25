@@ -274,6 +274,12 @@ bool cWebAdmin::HasUsers()
 
 void cWebAdmin::HandleWebadminRequest(cHTTPServerConnection & a_Connection, cHTTPIncomingRequest & a_Request)
 {
+	if (!m_TemplateScript.IsValid())
+	{
+		LOGERROR("m_TemplateScript does not have a valid m_LuaState\n Most likely you are missing the Server/webadmin/template.lua and login_template.html files \n WebAdmin is not available");
+		return;
+	}
+
 	if (!a_Request.HasAuth())
 	{
 		a_Connection.SendNeedAuth("Cuberite WebAdmin");

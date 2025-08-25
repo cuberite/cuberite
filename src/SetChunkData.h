@@ -2,6 +2,7 @@
 
 #include "ChunkData.h"
 #include "BlockEntities/BlockEntity.h"
+#include "Entities/Entity.h"
 
 
 
@@ -20,6 +21,7 @@ struct SetChunkData
 	cChunkCoords Chunk;
 
 	ChunkBlockData BlockData;
+
 	ChunkLightData LightData;
 
 	cChunkDef::BiomeMap BiomeMap;
