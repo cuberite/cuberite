@@ -197,9 +197,9 @@ AString ItemToString(const cItem & a_Item)
 
 
 
-AString ItemTypeToString(short a_ItemType)
+AString ItemTypeToString(Item a_ItemType)
 {
-	return AString(NamespaceSerializer::From(PaletteUpgrade::FromItem(a_ItemType, 0)));
+	return AString(NamespaceSerializer::From(a_ItemType));
 }
 
 

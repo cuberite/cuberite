@@ -41,7 +41,7 @@ namespace Explodinator
 
 	/** Returns how much of an explosion Destruction Lazor's (tm) intensity the given block attenuates.
 	Values are scaled as 0.3 * (0.3 + Wiki) since some compilers miss the constant folding optimisation.
-	Wiki values are https://minecraft.gamepedia.com/Explosion#Blast_resistance as of 2021-02-06. */
+	Wiki values are https://minecraft.wiki/w/Explosion#Blast_resistance as of 2021-02-06. */
 	static float GetExplosionAbsorption(const BlockState a_Block)
 	{
 		switch (a_Block.Type())

@@ -293,8 +293,6 @@ void cWindow::Clicked(
 		LocalSlotNum -= itr->GetNumSlots();
 	}
 
-
-
 	LOGWARNING("Slot number higher than available window slots: %d, max %d received from \"%s\"; ignoring.",
 		a_SlotNum, GetNumSlots(), a_Player.GetName().c_str()
 	);

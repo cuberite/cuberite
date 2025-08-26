@@ -35,8 +35,6 @@ public:
 	cWSSAnvil(cWorld * a_World, int a_CompressionFactor);
 	virtual ~cWSSAnvil() override;
 
-	const static bool newFormat = true;
-
 protected:
 
 	enum

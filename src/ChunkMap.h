@@ -114,10 +114,6 @@ public:
 	LIGHTTYPE  GetBlockSkyLight  (Vector3i a_BlockPos) const;
 	LIGHTTYPE  GetBlockBlockLight(Vector3i a_BlockPos) const;
 
-	/** Sets the meta for the specified block, while keeping the blocktype.
-	Ignored if the chunk is invalid. */
-	// void SetBlockMeta(Vector3i a_BlockPos, NIBBLETYPE a_BlockMeta);
-
 	void SetBlock     (Vector3i a_BlockPos, BlockState a_Block);
 	bool GetBlockInfo (Vector3i, BlockState & a_Block, LIGHTTYPE & a_SkyLight, LIGHTTYPE & a_BlockLight) const;
 

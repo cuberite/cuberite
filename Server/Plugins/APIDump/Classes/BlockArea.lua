@@ -566,33 +566,6 @@ return
 				Notes = "Returns the blocklight (emissive light) at the specified absolute coords",
 			},
 
-			GetBlockMeta =
-			{
-				Params =
-				{
-					{
-						Name = "BlockX",
-						Type = "number",
-					},
-					{
-						Name = "BlockY",
-						Type = "number",
-					},
-					{
-						Name = "BlockZ",
-						Type = "number",
-					},
-				},
-				Returns =
-				{
-					{
-						Name = "BlockMeta",
-						Type = "number",
-					},
-				},
-				Notes = "Returns the block meta at the specified absolute coords",
-			},
-
 			GetBlockSkyLight =
 			{
 				Params =
@@ -618,33 +591,6 @@ return
 					},
 				},
 				Notes = "Returns the skylight at the specified absolute coords",
-			},
-
-			GetBlockType =
-			{
-				Params =
-				{
-					{
-						Name = "BlockX",
-						Type = "number",
-					},
-					{
-						Name = "BlockY",
-						Type = "number",
-					},
-					{
-						Name = "BlockZ",
-						Type = "number",
-					},
-				},
-				Returns =
-				{
-					{
-						Name = "BLOCKTYPE",
-						Type = "number",
-					},
-				},
-				Notes = "Returns the block type at the specified absolute coords",
 			},
 
 			GetBlockTypeMeta =
@@ -842,33 +788,6 @@ return
 				Notes = "Returns the blocklight at the specified relative coords",
 			},
 
-			GetRelBlockMeta =
-			{
-				Params =
-				{
-					{
-						Name = "RelBlockX",
-						Type = "number",
-					},
-					{
-						Name = "RelBlockY",
-						Type = "number",
-					},
-					{
-						Name = "RelBlockZ",
-						Type = "number",
-					},
-				},
-				Returns =
-				{
-					{
-						Name = "NIBBLETYPE",
-						Type = "number",
-					},
-				},
-				Notes = "Returns the block meta at the specified relative coords",
-			},
-
 			GetRelBlockSkyLight =
 			{
 				Params =
@@ -894,34 +813,6 @@ return
 					},
 				},
 				Notes = "Returns the skylight at the specified relative coords",
-			},
-
-
-			GetRelBlockType =
-			{
-				Params =
-				{
-					{
-						Name = "RelBlockX",
-						Type = "number",
-					},
-					{
-						Name = "RelBlockY",
-						Type = "number",
-					},
-					{
-						Name = "RelBlockZ",
-						Type = "number",
-					},
-				},
-				Returns =
-				{
-					{
-						Name = "BLOCKTYPE",
-						Type = "number",
-					},
-				},
-				Notes = "Returns the block type at the specified relative coords",
 			},
 
 			GetRelBlockTypeMeta =
@@ -1641,30 +1532,7 @@ return
 					},
 				},
 				Notes = "Sets the block at the specified absolute coords",
-			},
-			SetBlockMeta =
-			{
-				Params =
-				{
-					{
-						Name = "BlockX",
-						Type = "number",
-					},
-					{
-						Name = "BlockY",
-						Type = "number",
-					},
-					{
-						Name = "BlockZ",
-						Type = "number",
-					},
-					{
-						Name = "BlockMeta",
-						Type = "number",
-					},
-				},
-				Notes = "Sets the block meta at the specified absolute coords.",
-			},
+            },
 			SetBlockSkyLight =
 			{
 				Params =
@@ -1687,29 +1555,6 @@ return
 					},
 				},
 				Notes = "Sets the skylight at the specified absolute coords",
-			},
-			SetBlockType =
-			{
-				Params =
-				{
-					{
-						Name = "BlockX",
-						Type = "number",
-					},
-					{
-						Name = "BlockY",
-						Type = "number",
-					},
-					{
-						Name = "BlockZ",
-						Type = "number",
-					},
-					{
-						Name = "BlockType",
-						Type = "number",
-					},
-				},
-				Notes = "Sets the block type at the specified absolute coords",
 			},
 			SetBlockTypeMeta =
 			{
@@ -1792,29 +1637,6 @@ return
 				},
 				Notes = "Sets the blocklight at the specified relative coords",
 			},
-			SetRelBlockMeta =
-			{
-				Params =
-				{
-					{
-						Name = "RelBlockX",
-						Type = "number",
-					},
-					{
-						Name = "RelBlockY",
-						Type = "number",
-					},
-					{
-						Name = "RelBlockZ",
-						Type = "number",
-					},
-					{
-						Name = "BlockMeta",
-						Type = "number",
-					},
-				},
-				Notes = "Sets the block meta at the specified relative coords",
-			},
 			SetRelBlockSkyLight =
 			{
 				Params =
@@ -1837,29 +1659,6 @@ return
 					},
 				},
 				Notes = "Sets the skylight at the specified relative coords",
-			},
-			SetRelBlockType =
-			{
-				Params =
-				{
-					{
-						Name = "RelBlockX",
-						Type = "number",
-					},
-					{
-						Name = "RelBlockY",
-						Type = "number",
-					},
-					{
-						Name = "RelBlockZ",
-						Type = "number",
-					},
-					{
-						Name = "BlockType",
-						Type = "number",
-					},
-				},
-				Notes = "Sets the block type at the specified relative coords",
 			},
 			SetRelBlockTypeMeta =
 			{

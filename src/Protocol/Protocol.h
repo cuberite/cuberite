@@ -16,7 +16,6 @@
 #include "../EffectID.h"
 #include "../World.h"
 #include "../WorldStorage/FastNBT.h"
-//#include "../ClientHandle.h"
 
 
 

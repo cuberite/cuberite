@@ -16,7 +16,7 @@
 #include "Palettes/Palette_1_20.h"
 #include "UI/HorseWindow.h"
 #include "../Entities/Entity.h"
-#include "AllTags/BlockTags.h"
+#include "../Tags/BlockTags.h"
 #include "BlockEntities/SignEntity.h"
 #include "Generating/BioGen.h"
 

@@ -538,6 +538,7 @@ private:
 	We are therefore guaranteed that while m_State < Destroyed, that is when when we need to access m_Player, m_Player is valid. */
 	cPlayer * m_Player;
 
+	// Used to store the player during the configuration phase
 	std::unique_ptr<cPlayer> m_temp_player;
 
 	/** This is an optimization which saves you an iteration of m_SentChunks if you just want to know

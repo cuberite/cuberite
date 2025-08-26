@@ -351,434 +351,264 @@ Compression::Result cWSSAnvil::SaveChunkToData(const cChunkCoords & a_Chunk)
 bool cWSSAnvil::LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, const ContiguousByteBufferView a_RawChunkData)
 {
 	struct SetChunkData Data(a_Chunk);
-	if (newFormat)
-	{
-		// LOGD("LOADING chunk X %d Z %d", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
-		int Level = a_NBT.FindChildByName(0, "Level");
-		if (Level < 0)
-		{
-			Level = 0;  // in 1.18+? tag level does not exist
-			// ChunkLoadFailed(a_Chunk, "Missing NBT tag: Level", a_RawChunkData);
-			// return false;
-		}
-		int DataVersionTag = a_NBT.FindChildByName(0, "DataVersion");
-		if (DataVersionTag < 0)
-		{
-			ChunkLoadFailed(a_Chunk, "Missing NBT tag: DataVersion", a_RawChunkData);
-			return false;
-		}
-		int DataVersion = a_NBT.GetInt(DataVersionTag);
-		const bool usepadding = DataVersion >= 2566;  // Enable padding for worlds generated in 1.16+
-		int Sections = a_NBT.FindChildByName(Level, "Sections");
-		if (Sections < 0)
-		{
-			// renamed in 1.18+?
-			Sections = a_NBT.FindChildByName(Level, "sections");
-		}
-		if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List))
-		{
-			ChunkLoadFailed(a_Chunk, "Missing NBT tag: Sections", a_RawChunkData);
-			return false;
-		}
-		eTagType SectionsType = a_NBT.GetChildrenType(Sections);
-		if ((SectionsType != TAG_Compound) && (SectionsType != TAG_End))
-		{
-			ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Sections", a_RawChunkData);
-			return false;
-		}
-
-		for (int Child = a_NBT.GetFirstChild(Sections); Child >= 0; Child = a_NBT.GetNextSibling(Child))
-		{
-			const int SectionYTag = a_NBT.FindChildByName(Child, "Y");
-			// in 1.18+? Y can be an int
-			if ((SectionYTag < 0) || ((a_NBT.GetType(SectionYTag) != TAG_Byte) && (a_NBT.GetType(SectionYTag) != TAG_Int)))
-			{
-				ChunkLoadFailed(a_Chunk, "NBT tag missing or has wrong: Y", a_RawChunkData);
-				return false;
-			}
-			// Y level can go negative in 1.13+ worlds
-			// in 1.18 it goes to -4
-			// Section num can go higher in newer versions
-			const int Y = a_NBT.GetType(SectionYTag) == TAG_Int ? a_NBT.GetInt(SectionYTag) : static_cast<signed char>(a_NBT.GetByte(SectionYTag));
-			if ((Y < 0) || (Y > static_cast<int>(cChunkDef::NumSections - 1)))
-			{
-				LOGWARN("Cuberite currently does not support chunk sections below Y 0 or above 256 blocks. Ignoring X: %d Y: %d Z: %d", a_Chunk.m_ChunkX, Y, a_Chunk.m_ChunkZ);
-				continue;
-			}
-			// in 1.18+? versions the palette and data are in a separate compound tag
-			int PaletteList = -1;
-			int block_states_compound = a_NBT.FindChildByName(Child, "block_states");
-			if (block_states_compound > 0)
-			{
-				PaletteList = a_NBT.FindChildByName(block_states_compound, "palette");
-			}
-			else
-			{
-				PaletteList = a_NBT.FindChildByName(Child, "Palette");
-			}
-			if (PaletteList < 0)
-			{
-				// The palette does not have to exists but that also means that the section is empty and should be ignored
-				continue;
-			}
-			if (a_NBT.GetType(PaletteList) != TAG_List)
-			{
-				ChunkLoadFailed(a_Chunk, "Missing NBT tag: Palette", a_RawChunkData);
-				return false;
-			}
-
-			eTagType PaletteListType = a_NBT.GetChildrenType(PaletteList);
-			if ((PaletteListType != TAG_Compound) && (PaletteListType != TAG_End))
-			{
-				ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Palette", a_RawChunkData);
-				return false;
-			}
-
-			AStringList Palette;
-
-			std::vector<BlockState> Paletteids;
-			for (int Child1 = a_NBT.GetFirstChild(PaletteList); Child1 >= 0; Child1 = a_NBT.GetNextSibling(Child1))
-			{
-				const int NameTagId = a_NBT.FindChildByName(Child1, "Name");
-				if ((NameTagId < 0) || (a_NBT.GetType(NameTagId) != TAG_String))
-				{
-					ChunkLoadFailed(a_Chunk, "NBT tag missing or has wrong type: Name", a_RawChunkData);
-					return false;
-				}
-				AString blockid = a_NBT.GetString(NameTagId);
-				if (blockid.compare(0, 10, "minecraft:") != 0)
-				{
-					ChunkLoadFailed(a_Chunk, "Invalid namespace: " + blockid + " Mods arent supported", a_RawChunkData);
-					return false;
-				}
-
-				// AString bls;
-				// std::vector<AString> strs;
-				#define READ_BLOCK_STATES 1
-				#if READ_BLOCK_STATES
-				static auto bp = cRoot::Get()->GetBlockMap()->GetPalette(cProtocol::Version::Latest);
-				const int BlockStatesId = a_NBT.FindChildByName(Child1, "Properties");
-				if (BlockStatesId > 0)
-				{
-					std::map<AString, AString> state;
-					if (a_NBT.GetType(BlockStatesId) != TAG_Compound)
-					{
-						ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Properties", a_RawChunkData);
-						return false;
-					}
-					for (int ProChild = a_NBT.GetFirstChild(BlockStatesId); ProChild >= 0; ProChild = a_NBT.GetNextSibling(ProChild))
-					{
-						AString name = a_NBT.GetName(ProChild);
-						AString value = a_NBT.GetString(ProChild);
-						state[name] = value;
-						// bls = name + ": " + value + ", ";
-						// strs.push_back(bls);
-					}
-					auto rez = bp.maybeIndex(blockid, state);
-					if (rez.second)
-					{
-						Paletteids.emplace_back(static_cast<UInt16>(rez.first));
-					}
-					else
-					{
-						Paletteids.emplace_back(0);
-						LOGWARNING(fmt::format(FMT_STRING("Failed to load block {}"), blockid));
-					}
-				}
-				else  // block has no block states
-				{
-					std::map<AString, AString> state;
-					// auto rez = bp.maybeIndex(blockid, state);
-					AString tosearch = blockid.substr(10, std::string::npos);
-					BlockState cnt = NamespaceSerializer::ToBlockType(tosearch);
-					Paletteids.push_back(cnt);
-					/*
-					if (rez.second)
-					{
-						Paletteids.emplace_back(static_cast<UInt16>(rez.first));
-					}
-					else
-					{
-						Paletteids.emplace_back(0);
-						LOGWARNING(fmt::format(FMT_STRING("Failed to load block {}"), blockid));
-					}
-					*/
-				}
-				#endif
-				/*
-				std::sort(strs.begin(), strs.end());
-				AString tosearch = blockid.substr(10, std::string::npos);  // substr to remove the "minecraft:"
-				if (strs.size() != 0)
-				{
-					tosearch += " ";
-				}
-				for (const auto & itm : strs)
-				{
-					tosearch += itm;
-				}
-				if (strs.size() != 0)
-				{
-					tosearch = tosearch.substr(0, tosearch.size() - 2);
-				}
-				// LOGD("%d hash tbl size", (*BlockMap::BlMap::GetMap()).size());
-				BlockState cnt = NamespaceSerializer::ToBlockType(tosearch);  // ( *BlockMap::BlMap::GetMap()).count(tosearch);
-
-				if (cnt == BlockType::Air)
-				{
-					// UNREACHABLE("Could find given block while loading chunk X: " + a_Chunk.m_ChunkX + " Z: " a_Chunk.m_ChunkZ + " Y Section: " + Y);
-				}
-				Paletteids.push_back(cnt);
-				*/
-
-				Palette.emplace_back(blockid.substr(strlen("minecraft:"), std::string::npos));
-			}
-			int IndexBitSize = std::max(4, static_cast<int>(std::ceil(std::log2(Paletteids.size()))));  // How many bits is one index in length. Min is 4 bits, maximum 12 bits
-			ASSERT((12 >= IndexBitSize) && (IndexBitSize >= 4));
-
-			int SectionBlockLongCount = -1;
-
-			if (usepadding)
-			{
-				int blocks_per_long = FloorC(64.0 / IndexBitSize);
-				SectionBlockLongCount = CeilC(4096.0 / blocks_per_long);
-			}
-			else
-			{
-				SectionBlockLongCount = IndexBitSize * 4096 / 8 / 8;
-			}
-
-			const std::byte* BlockStateData = nullptr;
-
-			if (block_states_compound > 0)
-			{
-				BlockStateData = GetSectionDataLong(a_NBT, block_states_compound, "data", static_cast<size_t>(SectionBlockLongCount));
-				if (BlockStateData != nullptr)
-				{
-					VERIFY(static_cast<size_t>(SectionBlockLongCount) * 8 == a_NBT.GetDataLength(a_NBT.FindChildByName(block_states_compound, "data")));
-				}
-			}
-			else
-			{
-				BlockStateData = GetSectionDataLong(a_NBT, Child, "BlockStates", static_cast<size_t>(SectionBlockLongCount));
-				if (BlockStateData != nullptr)
-				{
-					VERIFY(static_cast<size_t>(SectionBlockLongCount) * 8 == a_NBT.GetDataLength(a_NBT.FindChildByName(Child, "BlockStates")));
-				}
-			}
-
-			const auto BlockLightData = GetSectionData(a_NBT, Child, "BlockLight", ChunkLightData::SectionLightCount);  // Still exists but does not have to be present for a valid section
-			const auto SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount);  // Still exists but does not have to be present for a valid section
-
-			if (BlockStateData != nullptr)
-			{
-				ASSERT(SectionBlockLongCount > 0);
-				UInt64 * LEstates = new UInt64[static_cast<UInt64>(SectionBlockLongCount)];
-
-				for (size_t i = 0; i < static_cast<size_t>(SectionBlockLongCount); i++)
-				{
-					LEstates[i] = NetworkBufToHost<UInt64>(BlockStateData + i * 8);
-				}
-
-				BlockState resolveddata[4096] = { BlockType::Air };
-				int numblockdataindex = 0;
-
-				int BitIndex = 0;
-				int arrindex = 0;
-				while (numblockdataindex < 4096)
-				{
-					UInt64 finalv = 0;
-					if (BitIndex + IndexBitSize <= 64)
-					{
-						finalv = (LEstates[arrindex] >> BitIndex) & ((static_cast<UInt64>(1) << IndexBitSize) - 1);
-						BitIndex += IndexBitSize;
-						if (BitIndex == 64)
-						{
-							BitIndex = 0;
-							arrindex++;
-						}
-					}
-					else  // BitIndex + IndexBitSize > 64
-					{
-						if (usepadding)
-						{
-							BitIndex = 0;
-							arrindex++;
-							continue;
-						}
-						UInt64 lowerpart = LEstates[arrindex] >> BitIndex;
-						arrindex++;
-						int BitsRead = (64 - BitIndex);
-						BitIndex = IndexBitSize - BitsRead;
-						UInt64 upperpart = (LEstates[arrindex] & ((static_cast<UInt64>(1) << BitIndex) - 1)) << BitsRead;
-						finalv = lowerpart | upperpart;
-						ASSERT(finalv < Paletteids.size());
-					}
-					resolveddata[numblockdataindex] = Paletteids[finalv];
-					numblockdataindex++;
-				}
-				Data.BlockData.SetSection(resolveddata, static_cast<size_t>(Y));
-				delete[] LEstates;
-			}
-			else if (Paletteids.size() == 1)  // if there is only one block in the palette, we can just fill the section with it
-			{
-				std::array<BlockState, 4096> Oneblock;
-				std::fill(Oneblock.begin(), Oneblock.end(), Paletteids[0]);
-				Data.BlockData.SetSection(reinterpret_cast<ChunkBlockData::SectionType &>(Oneblock), static_cast<size_t>(Y));
-			}
-			if ((BlockLightData != nullptr) && (SkyLightData != nullptr))
-			{
-				Data.LightData.SetSection(*reinterpret_cast<const ChunkLightData::SectionType *>(BlockLightData), *reinterpret_cast<const ChunkLightData::SectionType *>(SkyLightData), static_cast<size_t>(Y));
-				Data.IsLightValid = true;
-			}
-			else
-			{
-				Data.IsLightValid = false;
-			}
-		}  // for itr - LevelSections[]
-
-		// Load the Height maps, if it fails, recalculate it:
-		if (!LoadHeightMapFromNBT(Data.HeightMap, a_NBT, a_NBT.FindChildByName(Level, "Heightmaps")))
-		{
-			Data.UpdateHeightMap();
-		}
-		memset(&Data.BiomeMap, 0, 1024);  // temp
-
-		// Load the entities from NBT:
-		int entities = a_NBT.FindChildByName(Level, "Entities");
-		if (entities < 0)
-		{
-			entities = a_NBT.FindChildByName(Level, "entities");
-		}
-		LoadEntitiesFromNBT(Data.Entities, a_NBT, entities);
-		LoadBlockEntitiesFromNBT(Data.BlockEntities, a_NBT, a_NBT.FindChildByName(Level, "block_entities"), Data.BlockData);
-	}
-
-	m_World->QueueSetChunkData(std::move(Data));
-	return true;
-
-	/*
-	// Load the blockdata, blocklight and skylight:
+	// LOGD("LOADING chunk X %d Z %d", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ);
 	int Level = a_NBT.FindChildByName(0, "Level");
 	if (Level < 0)
 	{
-		ChunkLoadFailed(a_Chunk, "Missing NBT tag: Level", a_RawChunkData);
+		Level = 0;  // in 1.18+? tag level does not exist
+		// ChunkLoadFailed(a_Chunk, "Missing NBT tag: Level", a_RawChunkData);
+		// return false;
+	}
+	int DataVersionTag = a_NBT.FindChildByName(0, "DataVersion");
+	if (DataVersionTag < 0)
+	{
+		ChunkLoadFailed(a_Chunk, "Missing NBT tag: DataVersion", a_RawChunkData);
 		return false;
 	}
-
+	int DataVersion = a_NBT.GetInt(DataVersionTag);
+	const bool usepadding = DataVersion >= 2566;  // Enable padding for worlds generated in 1.16+
 	int Sections = a_NBT.FindChildByName(Level, "Sections");
+	if (Sections < 0)
+	{
+		// renamed in 1.18+?
+		Sections = a_NBT.FindChildByName(Level, "sections");
+	}
 	if ((Sections < 0) || (a_NBT.GetType(Sections) != TAG_List))
 	{
 		ChunkLoadFailed(a_Chunk, "Missing NBT tag: Sections", a_RawChunkData);
 		return false;
 	}
-
 	eTagType SectionsType = a_NBT.GetChildrenType(Sections);
 	if ((SectionsType != TAG_Compound) && (SectionsType != TAG_End))
 	{
 		ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Sections", a_RawChunkData);
 		return false;
 	}
+
 	for (int Child = a_NBT.GetFirstChild(Sections); Child >= 0; Child = a_NBT.GetNextSibling(Child))
 	{
 		const int SectionYTag = a_NBT.FindChildByName(Child, "Y");
-		if ((SectionYTag < 0) || (a_NBT.GetType(SectionYTag) != TAG_Byte))
+		// in 1.18+? Y can be an int
+		if ((SectionYTag < 0) || ((a_NBT.GetType(SectionYTag) != TAG_Byte) && (a_NBT.GetType(SectionYTag) != TAG_Int)))
 		{
 			ChunkLoadFailed(a_Chunk, "NBT tag missing or has wrong: Y", a_RawChunkData);
 			return false;
 		}
-
-		const int Y = a_NBT.GetByte(SectionYTag);
+		// Y level can go negative in 1.13+ worlds
+		// in 1.18 it goes to -4
+		// Section num can go higher in newer versions
+		const int Y = a_NBT.GetType(SectionYTag) == TAG_Int ? a_NBT.GetInt(SectionYTag) : static_cast<signed char>(a_NBT.GetByte(SectionYTag));
 		if ((Y < 0) || (Y > static_cast<int>(cChunkDef::NumSections - 1)))
 		{
-			ChunkLoadFailed(a_Chunk, "NBT tag exceeds chunk bounds: Y", a_RawChunkData);
-			return false;
+			LOGWARN("Cuberite currently does not support chunk sections below Y 0 or above 256 blocks. Ignoring X: %d Y: %d Z: %d", a_Chunk.m_ChunkX, Y, a_Chunk.m_ChunkZ);
+			continue;
 		}
-
-		const auto
-			BlockData = GetSectionData(a_NBT, Child, "Blocks", ChunkBlockData::SectionBlockCount),
-			MetaData = GetSectionData(a_NBT, Child, "Data", ChunkBlockData::SectionMetaCount),
-			BlockLightData = GetSectionData(a_NBT, Child, "BlockLight", ChunkLightData::SectionLightCount),
-			SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount);
-		if ((BlockData != nullptr) && (SkyLightData != nullptr) && (BlockLightData != nullptr))
+		// in 1.18+? versions the palette and data are in a separate compound tag
+		int PaletteList = -1;
+		int block_states_compound = a_NBT.FindChildByName(Child, "block_states");
+		if (block_states_compound > 0)
 		{
-			BlockState Blocks[ChunkBlockData::SectionBlockCount];
-			for (size_t I = 0; I < ChunkBlockData::SectionBlockCount; I++)
-			{
-				unsigned char Meta = 0;
-				if (MetaData != nullptr)
-				{
-					Meta = static_cast<unsigned char>(MetaData[I]);
-				}
-
-				Blocks[I] = PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockData[I]), Meta);
-				ASSERT(PaletteUpgrade::ToBlock(Blocks[I]).first == static_cast<unsigned char>(BlockData[I]) || Blocks[I].Type() == PaletteUpgrade::FromBlock(static_cast<unsigned char>(BlockData[I]), 0).Type());  // Make shure the block is still the same
-			}
-			Data.BlockData.SetSection(Blocks, static_cast<size_t>(Y));
-			Data.LightData.SetSection(*reinterpret_cast<const ChunkLightData::SectionType *>(BlockLightData), *reinterpret_cast<const ChunkLightData::SectionType *>(SkyLightData), static_cast<size_t>(Y));
+			PaletteList = a_NBT.FindChildByName(block_states_compound, "palette");
 		}
 		else
 		{
-			ChunkLoadFailed(a_Chunk, "Missing chunk block/light data", a_RawChunkData);
+			PaletteList = a_NBT.FindChildByName(Child, "Palette");
+		}
+		if (PaletteList < 0)
+		{
+			// The palette does not have to exists but that also means that the section is empty and should be ignored
+			continue;
+		}
+		if (a_NBT.GetType(PaletteList) != TAG_List)
+		{
+			ChunkLoadFailed(a_Chunk, "Missing NBT tag: Palette", a_RawChunkData);
 			return false;
+		}
+
+		eTagType PaletteListType = a_NBT.GetChildrenType(PaletteList);
+		if ((PaletteListType != TAG_Compound) && (PaletteListType != TAG_End))
+		{
+			ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Palette", a_RawChunkData);
+			return false;
+		}
+
+		AStringList Palette;
+
+		std::vector<BlockState> Paletteids;
+		for (int Child1 = a_NBT.GetFirstChild(PaletteList); Child1 >= 0; Child1 = a_NBT.GetNextSibling(Child1))
+		{
+			const int NameTagId = a_NBT.FindChildByName(Child1, "Name");
+			if ((NameTagId < 0) || (a_NBT.GetType(NameTagId) != TAG_String))
+			{
+				ChunkLoadFailed(a_Chunk, "NBT tag missing or has wrong type: Name", a_RawChunkData);
+				return false;
+			}
+			AString blockid = a_NBT.GetString(NameTagId);
+			if (blockid.compare(0, 10, "minecraft:") != 0)
+			{
+				ChunkLoadFailed(a_Chunk, "Invalid namespace: " + blockid + " Mods arent supported", a_RawChunkData);
+				return false;
+			}
+
+			static auto bp = cRoot::Get()->GetBlockMap()->GetPalette(cProtocol::Version::Latest);
+			const int BlockStatesId = a_NBT.FindChildByName(Child1, "Properties");
+			if (BlockStatesId > 0)
+			{
+				std::map<AString, AString> state;
+				if (a_NBT.GetType(BlockStatesId) != TAG_Compound)
+				{
+					ChunkLoadFailed(a_Chunk, "NBT tag has wrong type: Properties", a_RawChunkData);
+					return false;
+				}
+				for (int ProChild = a_NBT.GetFirstChild(BlockStatesId); ProChild >= 0; ProChild = a_NBT.GetNextSibling(ProChild))
+				{
+					AString name = a_NBT.GetName(ProChild);
+					AString value = a_NBT.GetString(ProChild);
+					state[name] = value;
+				}
+				auto rez = bp.maybeIndex(blockid, state);
+				if (rez.second)
+				{
+					Paletteids.emplace_back(static_cast<UInt16>(rez.first));
+				}
+				else
+				{
+					Paletteids.emplace_back(0);
+					LOGWARNING(fmt::format(FMT_STRING("Failed to load block {}"), blockid));
+				}
+			}
+			else  // block has no block states
+			{
+				std::map<AString, AString> state;
+				AString tosearch = blockid.substr(10, std::string::npos);
+				BlockState cnt = NamespaceSerializer::ToBlockType(tosearch);
+				Paletteids.push_back(cnt);
+			}
+
+			Palette.emplace_back(blockid.substr(strlen("minecraft:"), std::string::npos));
+		}
+		int IndexBitSize = std::max(4, static_cast<int>(std::ceil(std::log2(Paletteids.size()))));  // How many bits is one index in length. Min is 4 bits, maximum 12 bits
+		VERIFY((12 >= IndexBitSize) && (IndexBitSize >= 4));
+
+		int SectionBlockLongCount = -1;
+
+		if (usepadding)
+		{
+			int blocks_per_long = FloorC(64.0 / IndexBitSize);
+			SectionBlockLongCount = CeilC(4096.0 / blocks_per_long);
+		}
+		else
+		{
+			SectionBlockLongCount = IndexBitSize * 4096 / 8 / 8;
+		}
+
+		const std::byte* BlockStateData = nullptr;
+
+		if (block_states_compound > 0)
+		{
+			BlockStateData = GetSectionDataLong(a_NBT, block_states_compound, "data", static_cast<size_t>(SectionBlockLongCount));
+			if (BlockStateData != nullptr)
+			{
+				VERIFY(static_cast<size_t>(SectionBlockLongCount) * 8 == a_NBT.GetDataLength(a_NBT.FindChildByName(block_states_compound, "data")));
+			}
+		}
+		else
+		{
+			BlockStateData = GetSectionDataLong(a_NBT, Child, "BlockStates", static_cast<size_t>(SectionBlockLongCount));
+			if (BlockStateData != nullptr)
+			{
+				VERIFY(static_cast<size_t>(SectionBlockLongCount) * 8 == a_NBT.GetDataLength(a_NBT.FindChildByName(Child, "BlockStates")));
+			}
+		}
+
+		const auto BlockLightData = GetSectionData(a_NBT, Child, "BlockLight", ChunkLightData::SectionLightCount);  // Still exists but does not have to be present for a valid section
+		const auto SkyLightData = GetSectionData(a_NBT, Child, "SkyLight", ChunkLightData::SectionLightCount);  // Still exists but does not have to be present for a valid section
+
+		if (BlockStateData != nullptr)
+		{
+			ASSERT(SectionBlockLongCount > 0);
+			UInt64 * LEstates = new UInt64[static_cast<UInt64>(SectionBlockLongCount)];
+
+			for (size_t i = 0; i < static_cast<size_t>(SectionBlockLongCount); i++)
+			{
+				LEstates[i] = NetworkBufToHost<UInt64>(BlockStateData + i * 8);
+			}
+
+			BlockState resolveddata[4096] = { BlockType::Air };
+			int numblockdataindex = 0;
+
+			int BitIndex = 0;
+			int arrindex = 0;
+			while (numblockdataindex < 4096)
+			{
+				UInt64 finalv = 0;
+				if (BitIndex + IndexBitSize <= 64)
+				{
+					finalv = (LEstates[arrindex] >> BitIndex) & ((static_cast<UInt64>(1) << IndexBitSize) - 1);
+					BitIndex += IndexBitSize;
+					if (BitIndex == 64)
+					{
+						BitIndex = 0;
+						arrindex++;
+					}
+				}
+				else  // BitIndex + IndexBitSize > 64
+				{
+					if (usepadding)
+					{
+						BitIndex = 0;
+						arrindex++;
+						continue;
+					}
+					UInt64 lowerpart = LEstates[arrindex] >> BitIndex;
+					arrindex++;
+					int BitsRead = (64 - BitIndex);
+					BitIndex = IndexBitSize - BitsRead;
+					UInt64 upperpart = (LEstates[arrindex] & ((static_cast<UInt64>(1) << BitIndex) - 1)) << BitsRead;
+					finalv = lowerpart | upperpart;
+					ASSERT(finalv < Paletteids.size());
+				}
+				resolveddata[numblockdataindex] = Paletteids[finalv];
+				numblockdataindex++;
+			}
+			Data.BlockData.SetSection(resolveddata, static_cast<size_t>(Y));
+			delete[] LEstates;
+		}
+		else if (Paletteids.size() == 1)  // if there is only one block in the palette, we can just fill the section with it
+		{
+			std::array<BlockState, 4096> Oneblock;
+			std::ranges::fill(Oneblock, Paletteids[0]);
+			Data.BlockData.SetSection(reinterpret_cast<ChunkBlockData::SectionType &>(Oneblock), static_cast<size_t>(Y));
+		}
+		if ((BlockLightData != nullptr) && (SkyLightData != nullptr))
+		{
+			Data.LightData.SetSection(*reinterpret_cast<const ChunkLightData::SectionType *>(BlockLightData), *reinterpret_cast<const ChunkLightData::SectionType *>(SkyLightData), static_cast<size_t>(Y));
+			Data.IsLightValid = true;
+		}
+		else
+		{
+			Data.IsLightValid = false;
 		}
 	}  // for itr - LevelSections[]
 
-	// Load the biomes from NBT, if present and valid:
-	if (!LoadBiomeMapFromNBT(Data.BiomeMap, a_NBT, a_NBT.FindChildByName(Level, "Biomes")))
-	{
-		ChunkLoadFailed(a_Chunk, "Missing chunk biome data", a_RawChunkData);
-		return false;
-	}
-
-	// Load the Height map, if it fails, recalculate it:
-	if (!LoadHeightMapFromNBT(Data.HeightMap, a_NBT, a_NBT.FindChildByName(Level, "HeightMap")))
+	// Load the Height maps, if it fails, recalculate it:
+	if (!LoadHeightMapFromNBT(Data.HeightMap, a_NBT, a_NBT.FindChildByName(Level, "Heightmaps")))
 	{
 		Data.UpdateHeightMap();
 	}
+	memset(&Data.BiomeMap, 0, 1024);  // temp
 
 	// Load the entities from NBT:
-	LoadEntitiesFromNBT     (Data.Entities,      a_NBT, a_NBT.FindChildByName(Level, "Entities"));
-	LoadBlockEntitiesFromNBT(Data.BlockEntities, a_NBT, a_NBT.FindChildByName(Level, "TileEntities"), Data.BlockData);
-
-	Data.IsLightValid = (a_NBT.FindChildByName(Level, "MCSIsLightValid") > 0);
-
-	// Uncomment this block for really cool stuff :)
-	// DEBUG magic: Invert the underground, so that we can see the MC generator in action :)
-	bool ShouldInvert[cChunkDef::Width * cChunkDef::Width];
-	memset(ShouldInvert, 0, sizeof(ShouldInvert));
-	for (int y = cChunkDef::Height - 1; y >= 0; y--)
+	int entities = a_NBT.FindChildByName(Level, "Entities");
+	if (entities < 0)
 	{
-		for (int x = 0; x < cChunkDef::Width; x++) for (int z = 0; z < cChunkDef::Width; z++)
-		{
-			const auto Index = cChunkDef::MakeIndex(x, y, z);
-			if (ShouldInvert[x + cChunkDef::Width * z])
-			{
-				BlockTypes[Index] = (BlockTypes[Index] == E_BLOCK_AIR) ? E_BLOCK_STONE : E_BLOCK_AIR;
-			}
-			else
-			{
-				switch (BlockTypes[Index])
-				{
-					case E_BLOCK_AIR:
-					case E_BLOCK_LEAVES:
-					case E_BLOCK_NEW_LEAVES:
-					{
-						// nothing needed
-						break;
-					}
-					default:
-					{
-						ShouldInvert[x + cChunkDef::Width * z] = true;
-					}
-				}
-				BlockTypes[Index] = E_BLOCK_AIR;
-			}
-		}
-	}  // for y
-	//
+		entities = a_NBT.FindChildByName(Level, "entities");
+	}
+	LoadEntitiesFromNBT(Data.Entities, a_NBT, entities);
+	LoadBlockEntitiesFromNBT(Data.BlockEntities, a_NBT, a_NBT.FindChildByName(Level, "block_entities"), Data.BlockData);
 
 	m_World->QueueSetChunkData(std::move(Data));
-	return true; */
+	return true;
 }
 
 
@@ -2126,18 +1956,20 @@ void cWSSAnvil::LoadEnderCrystalFromNBT(cEntityList & a_Entities, const cParsedN
 
 void cWSSAnvil::LoadFallingBlockFromNBT(cEntityList & a_Entities, const cParsedNBT & a_NBT, int a_TagIdx)
 {
-	int TypeIdx = a_NBT.FindChildByName(a_TagIdx, "TileID");
-	int MetaIdx = a_NBT.FindChildByName(a_TagIdx, "Data");
-
-	if ((TypeIdx < 0) || (MetaIdx < 0))
+	int block_comp_id = a_NBT.FindChildByName(a_TagIdx, "BlockState");
+	if (block_comp_id < 0)
 	{
 		return;
 	}
+	int block_name_id = a_NBT.FindChildByName(a_TagIdx, "Name");
+	if (block_name_id < 0)
+	{
+		return;
+	}
+	BlockState block = NamespaceSerializer::ToBlockType(a_NBT.GetStringView(block_name_id));
+	// TODO: read block states
 
-	auto Type = static_cast<unsigned char>(a_NBT.GetInt(TypeIdx));
-	auto Meta = static_cast<unsigned char>(a_NBT.GetByte(MetaIdx));
-
-	auto FallingBlock = std::make_unique<cFallingBlock>(Vector3i(0, 0, 0), PaletteUpgrade::FromBlock(Type, Meta));
+	auto FallingBlock = std::make_unique<cFallingBlock>(Vector3i(0, 0, 0), block);
 	if (!LoadEntityBaseFromNBT(*FallingBlock.get(), a_NBT, a_TagIdx))
 	{
 		return;

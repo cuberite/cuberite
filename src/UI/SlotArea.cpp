@@ -788,23 +788,7 @@ cCraftingRecipe & cSlotAreaCrafting::GetRecipeForPlayer(cPlayer & a_Player)
 
 void cSlotAreaCrafting::HandleCraftItem(const cItem & a_Result, cPlayer & a_Player)
 {
-	ASSERT("UNCOMMENT THIS");
-	/*
-	switch (a_Result.m_ItemType)
-	{
-		case E_BLOCK_WORKBENCH:         a_Player.AwardAchievement(CustomStatistic::AchBuildWorkBench);      break;
-		case E_BLOCK_FURNACE:           a_Player.AwardAchievement(CustomStatistic::AchBuildFurnace);        break;
-		case E_BLOCK_CAKE:              a_Player.AwardAchievement(CustomStatistic::AchBakeCake);            break;
-		case E_BLOCK_ENCHANTMENT_TABLE: a_Player.AwardAchievement(CustomStatistic::AchEnchantments);        break;
-		case E_BLOCK_BOOKCASE:          a_Player.AwardAchievement(CustomStatistic::AchBookcase);            break;
-		case Item::WOODEN_PICKAXE:     a_Player.AwardAchievement(CustomStatistic::AchBuildPickaxe);        break;
-		case Item::WOODEN_SWORD:       a_Player.AwardAchievement(CustomStatistic::AchBuildSword);          break;
-		case Item::STONE_PICKAXE:      a_Player.AwardAchievement(CustomStatistic::AchBuildBetterPickaxe);  break;
-		case Item::WOODEN_HOE:         a_Player.AwardAchievement(CustomStatistic::AchBuildHoe);            break;
-		case Item::BREAD:              a_Player.AwardAchievement(CustomStatistic::AchMakeBread);           break;
-		default: break;
-	}
-	*/
+
 }
 
 

@@ -9,7 +9,7 @@
 #include "RankManager.h"
 #include "ChunkDef.h"
 #include "Protocol/Palettes/BlockMap.h"
-#include <AllTags/TagManager.h>
+#include <Tags/TagManager.h>
 #include "Protocol/Palettes/RegistriesMap.h"
 
 

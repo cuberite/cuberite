@@ -1908,8 +1908,7 @@ AString cFinishGenOres::OreInfosToString(const cFinishGenOres::OreInfos & a_OreI
 			res.append(" | ");
 		}
 
-		auto NumericBlock = PaletteUpgrade::ToBlock(Ore.m_OreBlock);
-		res = fmt::format(FMT_STRING("%s:%d:%d:%d:%d"), NamespaceSerializer::From(Ore.m_OreBlock), NumericBlock.second, Ore.m_MaxHeight, Ore.m_NumNests, Ore.m_NestSize);
+		res = fmt::format(FMT_STRING("%s:%d:%d:%d"), NamespaceSerializer::From(Ore.m_OreBlock), Ore.m_MaxHeight, Ore.m_NumNests, Ore.m_NestSize);
 	}  // for ore - a_OreInfos[]
 	return res;
 }
@@ -1962,7 +1961,7 @@ void cFinishGenOreNests::GenerateOre(
 	}
 
 	// Gold ores are generated more often in Mesa-Type-Biomes:
-	// https://minecraft.gamepedia.com/Gold_Ore
+	// https://minecraft.wiki/w/Gold_Ore
 	if (a_OreBlock.Type() == BlockType::GoldOre)
 	{
 		const auto BiomeSampleOne =   a_ChunkDesc.GetBiome( 4,  4);

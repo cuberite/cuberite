@@ -8,7 +8,7 @@
 #include "../Entities/LeashKnot.h"
 #include "../BoundingBox.h"
 #include "../Mobs/PassiveMonster.h"
-#include "AllTags/BlockTags.h"
+#include "../Tags/BlockTags.h"
 
 
 class cBlockFenceHandler final :

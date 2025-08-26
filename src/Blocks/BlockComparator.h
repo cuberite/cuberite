@@ -160,7 +160,7 @@ private:
 
 	virtual bool CanBeAt(const cChunk & a_Chunk, Vector3i a_Position, BlockState a_Self) const override
 	{
-		if (a_Position.y <= 0)
+		if (cChunkDef::IsValidHeight(a_Position))
 		{
 			return false;
 		}

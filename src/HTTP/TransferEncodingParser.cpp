@@ -47,8 +47,6 @@ protected:
 	/** The current state of the parser (parsing chunk length / chunk data). */
 	eState m_State;
 
-	auto format_as(eState f) { return fmt::underlying(f); }
-
 	/** Number of bytes that still belong to the chunk currently being parsed.
 	When in psChunkLength, the value is the currently parsed length digits. */
 	size_t m_ChunkDataLengthLeft;

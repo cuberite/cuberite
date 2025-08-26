@@ -48,7 +48,7 @@ public:
 	/** Is this block solid (player cannot walk through)? */
 	static bool IsSolid(BlockState a_Block);
 
-	/** Is a block transparent? (https://minecraft.gamepedia.com/Opacity) */
+	/** Is a block transparent? (https://minecraft.wiki/w/Opacity) */
 	static bool IsTransparent(BlockState a_Block);
 
 	/** Can a spectator interact with this block? */

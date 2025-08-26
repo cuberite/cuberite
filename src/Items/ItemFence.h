@@ -1,5 +1,5 @@
 #pragma once
-#include "AllTags/BlockTags.h"
+#include "../Tags/BlockTags.h"
 
 class cItemFenceHandler final :
 	public cSimplePlaceableItemHandler

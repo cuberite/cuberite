@@ -8,7 +8,7 @@
 #include "../UI/BeaconWindow.h"
 #include "../ClientHandle.h"
 
-#include "../AllTags/BlockTags.h"
+#include "../Tags/BlockTags.h"
 
 
 

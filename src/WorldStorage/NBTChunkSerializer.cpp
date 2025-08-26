@@ -805,12 +805,12 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicEntity(a_FallingBlock, "falling_block");
-			auto BlockData = PaletteUpgrade::ToBlock(a_FallingBlock->GetBlock());
-			mWriter.AddInt("TileID", BlockData.first);
-			mWriter.AddByte("Data", static_cast<unsigned char>(BlockData.second));
+			mWriter.BeginCompound("BlockState");
+				mWriter.AddString("Name", "minecraft:" + AString(NamespaceSerializer::From(a_FallingBlock->GetBlock().Type())));
+			mWriter.EndCompound();
 			mWriter.AddByte("Time", 1);  // Unused in Cuberite, Vanilla said to need nonzero
 			mWriter.AddByte("DropItem", 1);
-			mWriter.AddByte("HurtEntities", IsBlockAnvil(a_FallingBlock->GetBlock()));
+			mWriter.AddByte("HurtEntities", IsBlockAnvil(a_FallingBlock->GetBlock()) || a_FallingBlock->GetBlock().Type() == BlockType::PointedDripstone);
 		mWriter.EndCompound();
 	}
 

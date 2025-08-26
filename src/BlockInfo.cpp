@@ -2116,7 +2116,7 @@ float cBlockInfo::GetBlockHeight(BlockState a_Block)
 
 float cBlockInfo::GetHardness(BlockState a_Block)
 {
-	// source: https://minecraft.fandom.com/wiki/Module:Hardness_values
+	// source: https://minecraft.wiki/w/Module:Hardness_values
 	// Block hardness:
 	switch (a_Block.Type())
 	{

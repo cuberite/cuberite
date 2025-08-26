@@ -12,7 +12,7 @@
 #include "../EffectID.h"
 #include "../Mobs/Monster.h"
 #include "../Protocol/Palettes/Upgrade.h"
-#include "../AllTags/BlockTags.h"
+#include "../Tags/BlockTags.h"
 #include "Root.h"
 
 
@@ -453,7 +453,6 @@ void cPawn::HandleFalling(void)
 
 			// Fall particles
 			// TODO: falling on a partial (e.g. slab) block shouldn't broadcast particles of the block below
-			// auto NumericBlock = PaletteUpgrade::ToBlock(GetWorld()->GetBlock(Below));
 
 			GetWorld()->BroadcastParticleEffect(
 				"blockdust",

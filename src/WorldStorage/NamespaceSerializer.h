@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Defines.h"
-// #include "Entities/Entity.h"
 #include "Entities/EntityEffect.h"
 #include "Mobs/MonsterTypes.h"
 #include "Registries/CustomStatistics.h"

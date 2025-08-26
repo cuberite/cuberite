@@ -50,7 +50,7 @@
 #include "OverridesSettingsRepository.h"
 #include "Logger.h"
 #include "ClientHandle.h"
-#include "AllTags/AbstractTag.h"
+#include "Tags/AbstractTag.h"
 
 // temp
 #include "DataComponents/JsonDataCompLoader.h"

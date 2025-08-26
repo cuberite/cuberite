@@ -89,7 +89,7 @@ private:
 					return cItem(Item::Carrot);
 				}
 				cItems Res;
-				// https://minecraft.gamepedia.com/Carrot#Breaking
+				// https://minecraftwiki/w/Carrot#Breaking
 				const auto CarrotCount = CalculateSeedCount(1, 4, ToolFortuneLevel(a_Tool));
 				Res.Add(Item::Carrot, CarrotCount);
 				return Res;
@@ -101,7 +101,7 @@ private:
 					return cItem(Item::Potato);
 				}
 				cItems Res;
-				// https://minecraft.gamepedia.com/Potato#Breaking
+				// https://minecraft.wiki/w/Potato#Breaking
 				const auto PotatoCount = CalculateSeedCount(2, 3, ToolFortuneLevel(a_Tool));
 				Res.Add(Item::Potato, PotatoCount);
 				if (Rand.RandBool(0.02))
@@ -119,7 +119,7 @@ private:
 					return cItem(Item::WheatSeeds);
 				}
 				cItems Res;
-				// https://minecraft.fandom.com/wiki/Seeds_(Wheat)
+				// https://minecraft.wiki/w/Wheat_Seeds
 				Res.Add(Item::Wheat);
 				const auto SeedCount = CalculateSeedCount(1, 3, ToolFortuneLevel(a_Tool));
 				Res.Add(Item::WheatSeeds, SeedCount);

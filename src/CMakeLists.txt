@@ -157,8 +157,7 @@ set(FOLDERS
 	Generating HTTP Items mbedTLS++ Mobs Noise
 	OSSupport Physics Protocol Registries Simulator
 	Simulator/IncrementalRedstoneSimulator UI WorldStorage
-	Commands
-	AllTags DataComponents
+	Commands Tags DataComponents
 )
 
 # Add all child source directories:

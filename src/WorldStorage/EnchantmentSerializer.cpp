@@ -10,8 +10,6 @@ void EnchantmentSerializer::WriteToNBTCompound(const cEnchantments & a_Enchantme
 	// Write the enchantments into the specified NBT writer
 	// begin with the LIST tag of the specified name ("ench" or "StoredEnchantments")
 
-	// bool stringmode = true;  //  a_ListTagName != "ench" ? true : false;
-
 	a_Writer.BeginList(a_ListTagName, TAG_Compound);
 	for (cEnchantments::cMap::const_iterator itr = a_Enchantments.m_Enchantments.begin(), end = a_Enchantments.m_Enchantments.end(); itr != end; ++itr)
 	{

@@ -11,8 +11,6 @@
 
 #include "BiomeDef.h"
 
-//#include "BlockType.h";
-
 // Used to smoothly convert to new axis ordering. One will be removed when deemed stable.
 #define AXIS_ORDER_YZX 1  // Original (1.1-)
 #define AXIS_ORDER_XZY 2  // New (1.2+)
@@ -37,12 +35,7 @@ using cEntityList = std::vector<OwnedEntity>;
 
 // tolua_begin
 
-/** The datatype used by blockdata */
-// typedef unsigned char BLOCKTYPE;
-
-/** The datatype used by nibbledata (meta, light, skylight) */
-// typedef unsigned char NIBBLETYPE;
-
+/** The datatype used by the light and skylight */
 typedef unsigned char LIGHTTYPE;
 
 /** The type used by the heightmap */
