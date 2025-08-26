@@ -25,7 +25,9 @@ namespace RedstoneRepeaterHandler
 		}
 
 		if (State.Type() != BlockType::Repeater)
+		{
 			return std::make_pair(false, BlockState(BlockType::Air));
+		}
 
 		return std::make_pair(IsOn(State), State);
 	}
