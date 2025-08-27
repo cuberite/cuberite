@@ -3,13 +3,14 @@
 #include "FireworkEntity.h"
 #include "../World.h"
 #include "../Chunk.h"
+#include "BlockInfo.h"
 
 
 
 
 
 cFireworkEntity::cFireworkEntity(cEntity * a_Creator, Vector3d a_Pos, const cItem & a_Item) :
-	Super(pkFirework, a_Creator, a_Pos, 0.25f, 0.25f),
+	Super(etFireworkRocket, a_Creator, a_Pos, 0.25f, 0.25f),
 	m_TicksToExplosion(a_Item.m_FireworkItem.m_FlightTimeInTicks),
 	m_FireworkItem(a_Item)
 {
@@ -36,7 +37,7 @@ void cFireworkEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_C
 
 	if (m_IsInGround)
 	{
-		if (a_Chunk.GetBlock(RelX, POSY_TOINT + 1, RelZ) == E_BLOCK_AIR)
+		if (IsBlockAir(a_Chunk.GetBlock(RelX, POSY_TOINT + 1, RelZ)))
 		{
 			m_IsInGround = false;
 		}
@@ -47,7 +48,7 @@ void cFireworkEntity::HandlePhysics(std::chrono::milliseconds a_Dt, cChunk & a_C
 	}
 	else
 	{
-		if (a_Chunk.GetBlock(RelX, POSY_TOINT + 1, RelZ) != E_BLOCK_AIR)
+		if (IsBlockAir(a_Chunk.GetBlock(RelX, POSY_TOINT + 1, RelZ)))
 		{
 			OnHitSolidBlock(GetPosition(), BLOCK_FACE_YM);
 			return;

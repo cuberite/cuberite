@@ -10,7 +10,9 @@
 #include "../ItemGrid.h"
 #include "../StringCompression.h"
 #include "../UUID.h"
+#include "../BlockInfo.h"
 #include "FastNBT.h"
+#include "../Blocks/BlockAnvil.h"
 
 #include "../BlockEntities/BannerEntity.h"
 #include "../BlockEntities/BeaconEntity.h"
@@ -48,9 +50,11 @@
 #include "../Entities/Painting.h"
 
 #include "../Mobs/IncludeAllMonsters.h"
+#include "../Mobs/MonsterTypes.h"
+#include "../Protocol/Palettes/Upgrade.h"
+#include <Protocol/Palettes/BlockMap.h>
 
-
-
+#include "JsonUtils.h"
 
 
 /** Collects and stores the chunk data via the cChunkDataCallback interface */
@@ -159,26 +163,35 @@ public:
 		mIsTagOpen = true;
 		mHasHadEntity = true;
 
-		switch (a_Entity->GetEntityType())
+		if (a_Entity->IsMob())
 		{
-			case cEntity::etBoat:         AddBoatEntity        (static_cast<cBoat *>            (a_Entity)); break;
-			case cEntity::etEnderCrystal: AddEnderCrystalEntity(static_cast<cEnderCrystal *>    (a_Entity)); break;
-			case cEntity::etFallingBlock: AddFallingBlockEntity(static_cast<cFallingBlock *>    (a_Entity)); break;
-			case cEntity::etMinecart:     AddMinecartEntity    (static_cast<cMinecart *>        (a_Entity)); break;
-			case cEntity::etMonster:      AddMonsterEntity     (static_cast<cMonster *>         (a_Entity)); break;
-			case cEntity::etPickup:       AddPickupEntity      (static_cast<cPickup *>          (a_Entity)); break;
-			case cEntity::etProjectile:   AddProjectileEntity  (static_cast<cProjectileEntity *>(a_Entity)); break;
-			case cEntity::etTNT:          AddTNTEntity         (static_cast<cTNTEntity *>       (a_Entity)); break;
-			case cEntity::etExpOrb:       AddExpOrbEntity      (static_cast<cExpOrb *>          (a_Entity)); break;
-			case cEntity::etItemFrame:    AddItemFrameEntity   (static_cast<cItemFrame *>       (a_Entity)); break;
-			case cEntity::etLeashKnot:    AddLeashKnotEntity   (static_cast<cLeashKnot *>       (a_Entity)); break;
-			case cEntity::etPainting:     AddPaintingEntity    (static_cast<cPainting *>        (a_Entity)); break;
-			case cEntity::etPlayer: return;  // Players aren't saved into the world
-			case cEntity::etFloater: return;  // Floaters aren't saved either
-			default:
+			AddMonsterEntity(dynamic_cast<cMonster *> (a_Entity));
+		}
+		else if (a_Entity->IsProjectile())
+		{
+			AddProjectileEntity(dynamic_cast<cProjectileEntity *>(a_Entity));
+		}
+		else
+		{
+			switch (a_Entity->GetEntityType())
 			{
-				ASSERT(!"Unhandled entity type is being saved");
-				break;
+				case etOakBoat:         AddBoatEntity        (static_cast<cBoat *>            (a_Entity)); break;
+				case etEndCrystal:      AddEnderCrystalEntity(static_cast<cEnderCrystal *>    (a_Entity)); break;
+				case etFallingBlock: AddFallingBlockEntity(static_cast<cFallingBlock *>    (a_Entity)); break;
+				case etMinecart:     AddMinecartEntity    (static_cast<cMinecart *>        (a_Entity)); break;
+				case etItem:       AddPickupEntity      (static_cast<cPickup *>          (a_Entity)); break;
+				case etTnt:          AddTNTEntity         (static_cast<cTNTEntity *>       (a_Entity)); break;
+				case etExperienceOrb:       AddExpOrbEntity      (static_cast<cExpOrb *>          (a_Entity)); break;
+				case etItemFrame:    AddItemFrameEntity   (static_cast<cItemFrame *>       (a_Entity)); break;
+				case etLeashKnot:    AddLeashKnotEntity   (static_cast<cLeashKnot *>       (a_Entity)); break;
+				case etPainting:     AddPaintingEntity    (static_cast<cPainting *>        (a_Entity)); break;
+				case etPlayer:        return;  // Players aren't saved into the world
+				case etFishingBobber: return;  // Floaters aren't saved either
+				default:
+				{
+					ASSERT(!"Unhandled entity type is being saved");
+					break;
+				}
 			}
 		}
 	}
@@ -194,47 +207,162 @@ public:
 			if (!mHasHadBlockEntity)
 			{
 				mWriter.EndList();
-				mWriter.BeginList("TileEntities", TAG_Compound);
+				mWriter.BeginList("block_entities", TAG_Compound);
 			}
 		}
 		else
 		{
-			mWriter.BeginList("TileEntities", TAG_Compound);
+			mWriter.BeginList("block_entities", TAG_Compound);
 		}
 		mIsTagOpen = true;
 
 		// Add tile-entity into NBT:
-		switch (a_Entity->GetBlockType())
+		auto type = a_Entity->GetBlockType();
+		switch (type)
 		{
-			// Banners:
-			case E_BLOCK_STANDING_BANNER:
-			case E_BLOCK_WALL_BANNER:       AddBannerEntity         (static_cast<cBannerEntity *>         (a_Entity)); break;
+			case BlockType::BlackBanner:
+			case BlockType::BlueBanner:
+			case BlockType::BrownBanner:
+			case BlockType::CyanBanner:
+			case BlockType::GrayBanner:
+			case BlockType::GreenBanner:
+			case BlockType::LightBlueBanner:
+			case BlockType::LightGrayBanner:
+			case BlockType::LimeBanner:
+			case BlockType::MagentaBanner:
+			case BlockType::OrangeBanner:
+			case BlockType::PinkBanner:
+			case BlockType::PurpleBanner:
+			case BlockType::RedBanner:
+			case BlockType::WhiteBanner:
+			case BlockType::YellowBanner:
 
-			// Others:
-			case E_BLOCK_BEACON:            AddBeaconEntity         (static_cast<cBeaconEntity *>         (a_Entity)); break;
-			case E_BLOCK_BED:               AddBedEntity            (static_cast<cBedEntity *>            (a_Entity)); break;
-			case E_BLOCK_BREWING_STAND:     AddBrewingstandEntity   (static_cast<cBrewingstandEntity *>   (a_Entity)); break;
-			case E_BLOCK_CHEST:             AddChestEntity          (static_cast<cChestEntity *>          (a_Entity), a_Entity->GetBlockType()); break;
-			case E_BLOCK_COMMAND_BLOCK:     AddCommandBlockEntity   (static_cast<cCommandBlockEntity *>   (a_Entity)); break;
-			case E_BLOCK_DISPENSER:         AddDispenserEntity      (static_cast<cDispenserEntity *>      (a_Entity)); break;
-			case E_BLOCK_DROPPER:           AddDropperEntity        (static_cast<cDropperEntity *>        (a_Entity)); break;
-			case E_BLOCK_ENCHANTMENT_TABLE: AddEnchantingTableEntity(static_cast<cEnchantingTableEntity *>(a_Entity)); break;
-			case E_BLOCK_ENDER_CHEST:       AddEnderchestEntity     (static_cast<cEnderChestEntity *>     (a_Entity)); break;
-			case E_BLOCK_END_PORTAL:        AddEndPortalEntity      (static_cast<cEndPortalEntity *>      (a_Entity)); break;
-			case E_BLOCK_FLOWER_POT:        AddFlowerPotEntity      (static_cast<cFlowerPotEntity *>      (a_Entity)); break;
-			case E_BLOCK_FURNACE:           AddFurnaceEntity        (static_cast<cFurnaceEntity *>        (a_Entity)); break;
-			case E_BLOCK_HEAD:              AddMobHeadEntity        (static_cast<cMobHeadEntity *>        (a_Entity)); break;
-			case E_BLOCK_HOPPER:            AddHopperEntity         (static_cast<cHopperEntity *>         (a_Entity)); break;
-			case E_BLOCK_JUKEBOX:           AddJukeboxEntity        (static_cast<cJukeboxEntity *>        (a_Entity)); break;
-			case E_BLOCK_LIT_FURNACE:       AddFurnaceEntity        (static_cast<cFurnaceEntity *>        (a_Entity)); break;
-			case E_BLOCK_MOB_SPAWNER:       AddMobSpawnerEntity     (static_cast<cMobSpawnerEntity *>     (a_Entity)); break;
-			case E_BLOCK_NOTE_BLOCK:        AddNoteEntity           (static_cast<cNoteEntity *>           (a_Entity)); break;
-			case E_BLOCK_SIGN_POST:         AddSignEntity           (static_cast<cSignEntity *>           (a_Entity)); break;
-			case E_BLOCK_TRAPPED_CHEST:     AddChestEntity          (static_cast<cChestEntity *>          (a_Entity), a_Entity->GetBlockType()); break;
-			case E_BLOCK_WALLSIGN:          AddSignEntity           (static_cast<cSignEntity *>           (a_Entity)); break;
+			case BlockType::BlackWallBanner:
+			case BlockType::BlueWallBanner:
+			case BlockType::BrownWallBanner:
+			case BlockType::CyanWallBanner:
+			case BlockType::GrayWallBanner:
+			case BlockType::GreenWallBanner:
+			case BlockType::LightBlueWallBanner:
+			case BlockType::LightGrayWallBanner:
+			case BlockType::LimeWallBanner:
+			case BlockType::MagentaWallBanner:
+			case BlockType::OrangeWallBanner:
+			case BlockType::PinkWallBanner:
+			case BlockType::PurpleWallBanner:
+			case BlockType::RedWallBanner:
+			case BlockType::WhiteWallBanner:
+			case BlockType::YellowWallBanner: AddBannerEntity         (static_cast<cBannerEntity *>         (a_Entity)); break;
+
+			case BlockType::Beacon:         AddBeaconEntity         (static_cast<cBeaconEntity *>         (a_Entity)); break;
+			case BlockType::BlackBed:
+			case BlockType::BlueBed:
+			case BlockType::BrownBed:
+			case BlockType::CyanBed:
+			case BlockType::GrayBed:
+			case BlockType::GreenBed:
+			case BlockType::LightBlueBed:
+			case BlockType::LightGrayBed:
+			case BlockType::LimeBed:
+			case BlockType::MagentaBed:
+			case BlockType::OrangeBed:
+			case BlockType::PinkBed:
+			case BlockType::PurpleBed:
+			case BlockType::RedBed:
+			case BlockType::WhiteBed:
+			case BlockType::YellowBed:       AddBedEntity            (static_cast<cBedEntity *>            (a_Entity)); break;
+
+
+			case BlockType::BrewingStand:    AddBrewingstandEntity   (static_cast<cBrewingstandEntity *>   (a_Entity)); break;
+			case BlockType::Chest:           AddChestEntity          (static_cast<cChestEntity *>          (a_Entity), a_Entity->GetBlockType()); break;
+			case BlockType::RepeatingCommandBlock:
+			case BlockType::ChainCommandBlock:
+			case BlockType::CommandBlock:    AddCommandBlockEntity   (static_cast<cCommandBlockEntity *>   (a_Entity)); break;
+			case BlockType::Dispenser:       AddDispenserEntity      (static_cast<cDispenserEntity *>      (a_Entity)); break;
+			case BlockType::Dropper:         AddDropperEntity        (static_cast<cDropperEntity *>        (a_Entity)); break;
+			case BlockType::EnchantingTable: AddEnchantingTableEntity(static_cast<cEnchantingTableEntity *>(a_Entity)); break;
+			case BlockType::EnderChest:      AddEnderchestEntity     (static_cast<cEnderChestEntity *>     (a_Entity)); break;
+			case BlockType::EndPortal:       AddEndPortalEntity      (static_cast<cEndPortalEntity *>      (a_Entity)); break;
+			case BlockType::FlowerPot:       AddFlowerPotEntity      (static_cast<cFlowerPotEntity *>      (a_Entity)); break;
+			case BlockType::Furnace:         AddFurnaceEntity        (static_cast<cFurnaceEntity *>        (a_Entity)); break;
+
+			case BlockType::CreeperHead:
+			case BlockType::CreeperWallHead:
+			case BlockType::DragonHead:
+			case BlockType::DragonWallHead:
+			case BlockType::PlayerHead:
+			case BlockType::PlayerWallHead:
+			case BlockType::ZombieHead:
+			case BlockType::ZombieWallHead:
+			case BlockType::SkeletonSkull:
+			case BlockType::SkeletonWallSkull:
+			case BlockType::WitherSkeletonSkull:
+			case BlockType::WitherSkeletonWallSkull: AddMobHeadEntity        (static_cast<cMobHeadEntity *>        (a_Entity)); break;
+
+			case BlockType::Hopper:          AddHopperEntity         (static_cast<cHopperEntity *>         (a_Entity)); break;
+			case BlockType::Jukebox:         AddJukeboxEntity        (static_cast<cJukeboxEntity *>        (a_Entity)); break;
+			case BlockType::Spawner:         AddMobSpawnerEntity     (static_cast<cMobSpawnerEntity *>     (a_Entity)); break;
+			case BlockType::NoteBlock:       AddNoteEntity           (static_cast<cNoteEntity *>           (a_Entity)); break;
+
+			case BlockType::AcaciaSign:
+			case BlockType::AcaciaWallSign:
+			case BlockType::BirchSign:
+			case BlockType::BirchWallSign:
+			case BlockType::CrimsonSign:
+			case BlockType::CrimsonWallSign:
+			case BlockType::DarkOakSign:
+			case BlockType::DarkOakWallSign:
+			case BlockType::JungleSign:
+			case BlockType::JungleWallSign:
+			case BlockType::OakSign:
+			case BlockType::OakWallSign:
+			case BlockType::SpruceSign:
+			case BlockType::SpruceWallSign:
+			case BlockType::WarpedSign:
+			case BlockType::WarpedWallSign:  AddSignEntity           (static_cast<cSignEntity *>           (a_Entity)); break;
+
+			case BlockType::TrappedChest:    AddChestEntity          (static_cast<cChestEntity *>          (a_Entity), a_Entity->GetBlockType()); break;
+
+			case BlockType::PottedAcaciaSapling:
+			case BlockType::PottedAzureBluet:
+			case BlockType::PottedBamboo:
+			case BlockType::PottedBirchSapling:
+			case BlockType::PottedBlueOrchid:
+			case BlockType::PottedBrownMushroom:
+			case BlockType::PottedCactus:
+			case BlockType::PottedCornflower:
+			case BlockType::PottedCrimsonRoots:
+			case BlockType::PottedCrimsonFungus:
+			case BlockType::PottedDandelion:
+			case BlockType::PottedDarkOakSapling:
+			case BlockType::PottedDeadBush:
+			case BlockType::PottedFern:
+			case BlockType::PottedJungleSapling:
+			case BlockType::PottedLilyOfTheValley:
+			case BlockType::PottedOakSapling:
+			case BlockType::PottedOrangeTulip:
+			case BlockType::PottedOxeyeDaisy:
+			case BlockType::PottedPinkTulip:
+			case BlockType::PottedPoppy:
+			case BlockType::PottedRedMushroom:
+			case BlockType::PottedRedTulip:
+			case BlockType::PottedSpruceSapling:
+			case BlockType::PottedWarpedFungus:
+			case BlockType::PottedWarpedRoots:
+			case BlockType::PottedWhiteTulip:
+			case BlockType::PottedWitherRose:
+			case BlockType::PottedAllium:
+			case BlockType::PottedAzaleaBush:
+			case BlockType::PottedCherrySapling:
+			case BlockType::PottedFloweringAzaleaBush:
+			case BlockType::PottedMangrovePropagule:
+			case BlockType::PottedPaleOakSapling:
+			case BlockType::PottedTorchflower:  /* Flower pots aren't block entities anymore however, but old code thinks they are, so it tries to save them. This is to prevent crashes */
+				FLOGWARNING("Tried to save a flower pot {} as block entity ignoring. TODO: fix flower pots", NamespaceSerializer::From(a_Entity->GetBlockType())); break;
 			default:
 			{
-				ASSERT(!"Unhandled block entity saved into Anvil");
+				FLOGERROR("{}: Got unintended block entity to save: {}", __FUNCTION__, a_Entity->GetBlockType());
+				UNREACHABLE("Unhandled block entity saved into Anvil");
 			}
 		}
 		mHasHadBlockEntity = true;
@@ -259,7 +387,7 @@ public:
 		}
 		if (!mHasHadBlockEntity)
 		{
-			mWriter.BeginList("TileEntities", TAG_Compound);
+			mWriter.BeginList("block_entities", TAG_Compound);
 			mWriter.EndList();
 		}
 	}
@@ -274,62 +402,16 @@ public:
 	void AddItem(const cItem & a_Item, int a_Slot, const AString & a_CompoundName = AString())
 	{
 		mWriter.BeginCompound(a_CompoundName);
-		mWriter.AddShort("id",         static_cast<Int16>(a_Item.m_ItemType));
-		mWriter.AddShort("Damage",     static_cast<Int16>((a_Item.m_ItemDamage)));
-		mWriter.AddByte ("Count",      static_cast<Byte>(a_Item.m_ItemCount));
+		mWriter.AddString("id",         NamespaceSerializer::From(a_Item.m_ItemType));
+		mWriter.AddInt ("Count",      a_Item.m_ItemCount);
 		if (a_Slot >= 0)
 		{
 			mWriter.AddByte ("Slot", static_cast<unsigned char>(a_Slot));
 		}
 
-		// Write the tag compound (for enchantment, firework, custom name and repair cost):
-		if (
-			(!a_Item.m_Enchantments.IsEmpty()) ||
-			((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR)) ||
-			(a_Item.m_RepairCost > 0) ||
-			(a_Item.m_CustomName != "") ||
-			(!a_Item.m_LoreTable.empty())
-		)
-		{
-			mWriter.BeginCompound("tag");
-				if (a_Item.m_RepairCost > 0)
-				{
-					mWriter.AddInt("RepairCost", a_Item.m_RepairCost);
-				}
-
-				if ((a_Item.m_CustomName != "") || (!a_Item.m_LoreTable.empty()))
-				{
-					mWriter.BeginCompound("display");
-					if (a_Item.m_CustomName != "")
-					{
-						mWriter.AddString("Name", a_Item.m_CustomName);
-					}
-					if (!a_Item.m_LoreTable.empty())
-					{
-						mWriter.BeginList("Lore", TAG_String);
-
-						for (const auto & Line : a_Item.m_LoreTable)
-						{
-							mWriter.AddString("", Line);
-						}
-
-						mWriter.EndList();
-					}
-					mWriter.EndCompound();
-				}
-
-				if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
-				{
-					cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, mWriter, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
-				}
-
-				if (!a_Item.m_Enchantments.IsEmpty())
-				{
-					const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-					EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, mWriter, TagName);
-				}
-			mWriter.EndCompound();
-		}
+		mWriter.BeginCompound("components");
+		// TODO: item components
+		mWriter.EndCompound();
 
 		mWriter.EndCompound();
 	}
@@ -374,8 +456,7 @@ public:
 	void AddBannerEntity(cBannerEntity * a_Entity)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_Entity,"Banner");
-			mWriter.AddInt("Base", static_cast<int>(a_Entity->GetBaseColor()));
+			AddBasicTileEntity(a_Entity,"minecraft:banner");
 			if (!a_Entity->GetCustomName().empty())
 			{
 				mWriter.AddString("CustomName", a_Entity->GetCustomName());
@@ -390,10 +471,15 @@ public:
 	void AddBeaconEntity(cBeaconEntity * a_Entity)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_Entity, "Beacon");
-			mWriter.AddInt("Levels", a_Entity->GetBeaconLevel());
-			mWriter.AddInt("Primary", static_cast<int>(a_Entity->GetPrimaryEffect()));
-			mWriter.AddInt("Secondary", static_cast<int>(a_Entity->GetSecondaryEffect()));
+			AddBasicTileEntity(a_Entity, "minecraft:beacon");
+			if (a_Entity->GetPrimaryEffect() != cEntityEffect::effNoEffect)
+			{
+				mWriter.AddString("primary_effect", "minecraft:" + AString(NamespaceSerializer::From(a_Entity->GetPrimaryEffect())));
+			}
+			if (a_Entity->GetSecondaryEffect() != cEntityEffect::effNoEffect)
+			{
+				mWriter.AddString("secondary_effect", "minecraft:" + AString(NamespaceSerializer::From(a_Entity->GetSecondaryEffect())));
+			}
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
@@ -407,8 +493,7 @@ public:
 	void AddBedEntity(cBedEntity * a_Entity)
 	{
 		mWriter.BeginCompound("");
-		AddBasicTileEntity(a_Entity, "Bed");
-		mWriter.AddInt("color", a_Entity->GetColor());
+		AddBasicTileEntity(a_Entity, "minecraft:bed");
 		mWriter.EndCompound();
 	}
 
@@ -419,12 +504,12 @@ public:
 	void AddBrewingstandEntity(cBrewingstandEntity * a_Brewingstand)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_Brewingstand, "Brewingstand");
+			AddBasicTileEntity(a_Brewingstand, "minecraft:brewing_stand");
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Brewingstand->GetContents());
 			mWriter.EndList();
 			mWriter.AddShort("BrewTime", a_Brewingstand->GetTimeBrewed());
-			mWriter.AddShort("Fuel", a_Brewingstand->GetRemainingFuel());
+			mWriter.AddByte("Fuel", static_cast<unsigned char>(a_Brewingstand->GetRemainingFuel()));
 		mWriter.EndCompound();
 	}
 
@@ -432,10 +517,10 @@ public:
 
 
 
-	void AddChestEntity(cChestEntity * a_Entity, BLOCKTYPE a_ChestType)
+	void AddChestEntity(cChestEntity * a_Entity, BlockType a_ChestType)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_Entity, "Chest");
+			AddBasicTileEntity(a_Entity, "minecraft:chest");
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
@@ -449,7 +534,7 @@ public:
 	void AddDispenserEntity(cDispenserEntity * a_Entity)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_Entity, "Trap");
+			AddBasicTileEntity(a_Entity, "minecraft:dispenser");
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
@@ -463,7 +548,7 @@ public:
 	void AddDropperEntity(cDropperEntity * a_Entity)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_Entity, "Dropper");
+			AddBasicTileEntity(a_Entity, "minecraft:dropper");
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
@@ -477,7 +562,7 @@ public:
 	void AddEnchantingTableEntity(cEnchantingTableEntity * a_Entity)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_Entity, "EnchantingTable");
+			AddBasicTileEntity(a_Entity, "minecraft:enchanting_table");
 			if (!a_Entity->GetCustomName().empty())
 			{
 				mWriter.AddString("CustomName", a_Entity->GetCustomName());
@@ -491,7 +576,7 @@ public:
 	void AddEnderchestEntity(cEnderChestEntity * a_Entity)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_Entity, "EnderChest");
+			AddBasicTileEntity(a_Entity, "minecraft:ender_chest");
 		mWriter.EndCompound();
 	}
 
@@ -501,7 +586,7 @@ public:
 	void AddEndPortalEntity(cEndPortalEntity * a_Entity)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_Entity, "EndPortal");
+			AddBasicTileEntity(a_Entity, "minecraft:end_portal");
 		mWriter.EndCompound();
 	}
 
@@ -512,12 +597,12 @@ public:
 	void AddFurnaceEntity(cFurnaceEntity * a_Furnace)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_Furnace, "Furnace");
+			AddBasicTileEntity(a_Furnace, "minecraft:furnace");
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Furnace->GetContents());
 			mWriter.EndList();
-			mWriter.AddShort("BurnTime", static_cast<Int16>(a_Furnace->GetFuelBurnTimeLeft()));
-			mWriter.AddShort("CookTime", static_cast<Int16>(a_Furnace->GetTimeCooked()));
+			mWriter.AddShort("lit_time_remaining", static_cast<Int16>(a_Furnace->GetFuelBurnTimeLeft()));
+			mWriter.AddShort("cooking_time_spent", static_cast<Int16>(a_Furnace->GetTimeCooked()));
 		mWriter.EndCompound();
 	}
 
@@ -528,7 +613,7 @@ public:
 	void AddHopperEntity(cHopperEntity * a_Entity)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_Entity, "Hopper");
+			AddBasicTileEntity(a_Entity, "minecraft:hopper");
 			mWriter.BeginList("Items", TAG_Compound);
 				AddItemGrid(a_Entity->GetContents());
 			mWriter.EndList();
@@ -542,8 +627,8 @@ public:
 	void AddJukeboxEntity(cJukeboxEntity * a_Jukebox)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_Jukebox, "RecordPlayer");
-			mWriter.AddInt("Record", a_Jukebox->GetRecord());
+			AddBasicTileEntity(a_Jukebox, "minecraft:jukebox");
+			AddItem(a_Jukebox->GetRecord(), -1);
 		mWriter.EndCompound();
 	}
 
@@ -554,8 +639,8 @@ public:
 	void AddMobSpawnerEntity(cMobSpawnerEntity * a_MobSpawner)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_MobSpawner, "MobSpawner");
-			mWriter.AddString("EntityId", NamespaceSerializer::From(a_MobSpawner->GetEntity()));
+			AddBasicTileEntity(a_MobSpawner, "minecraft:mob_spawner");
+			// mWriter.AddString("EntityId", NamespaceSerializer::From(a_MobSpawner->GetEntity()));
 			mWriter.AddShort("SpawnCount", a_MobSpawner->GetSpawnCount());
 			mWriter.AddShort("SpawnRange", a_MobSpawner->GetSpawnRange());
 			mWriter.AddShort("Delay", a_MobSpawner->GetSpawnDelay());
@@ -573,7 +658,7 @@ public:
 	void AddNoteEntity(cNoteEntity * a_Note)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_Note, "Music");
+			AddBasicTileEntity(a_Note, "minecraft:noteblock");
 			mWriter.AddByte("note", static_cast<Byte>(a_Note->GetNote()));
 		mWriter.EndCompound();
 	}
@@ -585,7 +670,7 @@ public:
 	void AddCommandBlockEntity(cCommandBlockEntity * a_CmdBlock)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_CmdBlock, "Control");
+			AddBasicTileEntity(a_CmdBlock, "minecraft:command_block");
 			mWriter.AddString("Command",      a_CmdBlock->GetCommand());
 			mWriter.AddInt   ("SuccessCount", a_CmdBlock->GetResult());
 			mWriter.AddString("LastOutput",   a_CmdBlock->GetLastOutput());
@@ -600,11 +685,18 @@ public:
 	void AddSignEntity(cSignEntity * a_Sign)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_Sign, "Sign");
-			mWriter.AddString("Text1",   a_Sign->GetLine(0));
-			mWriter.AddString("Text2",   a_Sign->GetLine(1));
-			mWriter.AddString("Text3",   a_Sign->GetLine(2));
-			mWriter.AddString("Text4",   a_Sign->GetLine(3));
+			AddBasicTileEntity(a_Sign, "minecraft:sign");
+			mWriter.BeginCompound("front_text");
+				mWriter.AddString("color", "black");
+				mWriter.AddByte("has_glowing_text", false);
+				mWriter.BeginList("messages", eTagType::TAG_String);
+					mWriter.AddString("", a_Sign->GetLine(0));
+					mWriter.AddString("", a_Sign->GetLine(1));
+					mWriter.AddString("", a_Sign->GetLine(2));
+					mWriter.AddString("", a_Sign->GetLine(3));
+				mWriter.EndList();
+			mWriter.EndCompound();
+			mWriter.AddByte("is_waxed", false);
 		mWriter.EndCompound();
 	}
 
@@ -615,23 +707,24 @@ public:
 	void AddMobHeadEntity(cMobHeadEntity * a_MobHead)
 	{
 		mWriter.BeginCompound("");
-			AddBasicTileEntity(a_MobHead, "Skull");
-			mWriter.AddByte  ("SkullType", a_MobHead->GetType() & 0xFF);
-			mWriter.AddByte  ("Rot",       a_MobHead->GetRotation() & 0xFF);
-
-			// The new Block Entity format for a Mob Head. See: https://minecraft.wiki/w/Head#Block_entity
-			mWriter.BeginCompound("Owner");
-				mWriter.AddString("Id", a_MobHead->GetOwnerUUID().ToShortString());
-				mWriter.AddString("Name", a_MobHead->GetOwnerName());
-				mWriter.BeginCompound("Properties");
-					mWriter.BeginList("textures", TAG_Compound);
-						mWriter.BeginCompound("");
-							mWriter.AddString("Signature", a_MobHead->GetOwnerTextureSignature());
-							mWriter.AddString("Value", a_MobHead->GetOwnerTexture());
-						mWriter.EndCompound();
-					mWriter.EndList();
-				mWriter.EndCompound();
+		AddBasicTileEntity(a_MobHead, "minecraft:skull");
+		if (a_MobHead->GetType() == Item::PlayerHead)
+		{
+			mWriter.BeginCompound("profile");
+				mWriter.AddIntArray("id", reinterpret_cast<const Int32 *>(a_MobHead->GetOwnerUUID().ToRaw().data()), 4);
+				mWriter.AddString("name", a_MobHead->GetOwnerName());
+				mWriter.BeginList("properties", TAG_Compound);
+					mWriter.BeginCompound("");
+						mWriter.AddString("name", "textures");
+						if (!a_MobHead->GetOwnerTextureSignature().empty())
+						{
+							mWriter.AddString("signature", a_MobHead->GetOwnerTextureSignature());
+						}
+						mWriter.AddString("value", a_MobHead->GetOwnerTexture());
+					mWriter.EndCompound();
+				mWriter.EndList();
 			mWriter.EndCompound();
+		}
 		mWriter.EndCompound();
 	}
 
@@ -644,7 +737,6 @@ public:
 		mWriter.BeginCompound("");
 			AddBasicTileEntity(a_FlowerPot, "FlowerPot");
 			mWriter.AddInt   ("Item", static_cast<Int32>(a_FlowerPot->GetItem().m_ItemType));
-			mWriter.AddInt   ("Data", static_cast<Int32>(a_FlowerPot->GetItem().m_ItemDamage));
 		mWriter.EndCompound();
 	}
 
@@ -712,12 +804,13 @@ public:
 	void AddFallingBlockEntity(cFallingBlock * a_FallingBlock)
 	{
 		mWriter.BeginCompound("");
-			AddBasicEntity(a_FallingBlock, "FallingSand");
-			mWriter.AddInt("TileID", a_FallingBlock->GetBlockType());
-			mWriter.AddByte("Data", a_FallingBlock->GetBlockMeta());
+			AddBasicEntity(a_FallingBlock, "falling_block");
+			mWriter.BeginCompound("BlockState");
+				mWriter.AddString("Name", "minecraft:" + AString(NamespaceSerializer::From(a_FallingBlock->GetBlock().Type())));
+			mWriter.EndCompound();
 			mWriter.AddByte("Time", 1);  // Unused in Cuberite, Vanilla said to need nonzero
 			mWriter.AddByte("DropItem", 1);
-			mWriter.AddByte("HurtEntities", a_FallingBlock->GetBlockType() == E_BLOCK_ANVIL);
+			mWriter.AddByte("HurtEntities", IsBlockAnvil(a_FallingBlock->GetBlock()) || a_FallingBlock->GetBlock().Type() == BlockType::PointedDripstone);
 		mWriter.EndCompound();
 	}
 
@@ -772,7 +865,7 @@ public:
 	void AddMonsterEntity(cMonster * a_Monster)
 	{
 		mWriter.BeginCompound("");
-			AddBasicEntity(a_Monster, NamespaceSerializer::From(a_Monster->GetMobType()));
+			AddBasicEntity(a_Monster, NamespaceSerializer::From(a_Monster->GetEntityType()));
 			mWriter.BeginList("DropChances", TAG_Float);
 				mWriter.AddFloat("", a_Monster->GetDropChanceWeapon());
 				mWriter.AddFloat("", a_Monster->GetDropChanceHelmet());
@@ -810,47 +903,46 @@ public:
 				}
 			}
 
-			switch (a_Monster->GetMobType())
+			switch (a_Monster->GetEntityType())
 			{
-				case mtBat:
+				case etBat:
 				{
 					mWriter.AddByte("BatFlags", static_cast<const cBat *>(a_Monster)->IsHanging());
 					break;
 				}
-				case mtCreeper:
+				case etCreeper:
 				{
 					const cCreeper *Creeper = static_cast<const cCreeper *>(a_Monster);
 					mWriter.AddByte("powered", Creeper->IsCharged());
 					mWriter.AddByte("ignited", Creeper->IsBlowing());
 					break;
 				}
-				case mtEnderman:
+				case etEnderman:
 				{
 					const cEnderman *Enderman = static_cast<const cEnderman *>(a_Monster);
-					mWriter.AddShort("carried",     static_cast<Int16>(Enderman->GetCarriedBlock()));
-					mWriter.AddShort("carriedData", static_cast<Int16>(Enderman->GetCarriedMeta()));
+					auto NumericBlock = PaletteUpgrade::ToBlock(Enderman->GetCarriedBlock());
+					mWriter.AddShort("carried",     static_cast<Int16>(NumericBlock.first));
+					mWriter.AddShort("carriedData", static_cast<Int16>(NumericBlock.second));
 					break;
 				}
-				case mtHorse:
+				case etHorse:
 				{
 					const cHorse *Horse = static_cast<const cHorse *>(a_Monster);
 					mWriter.AddByte("ChestedHorse",   Horse->IsChested()? 1 : 0);
 					mWriter.AddByte("EatingHaystack", Horse->IsEating()? 1 : 0);
 					mWriter.AddByte("Tame",           Horse->IsTame()? 1: 0);
-					mWriter.AddInt ("Type",           Horse->GetHorseType());
-					mWriter.AddInt ("Color",          Horse->GetHorseColor());
-					mWriter.AddInt ("Style",          Horse->GetHorseStyle());
+					mWriter.AddInt ("Variant",        Horse->GetHorseColor() | (Horse->GetHorseStyle() << 8));
 					mWriter.AddInt ("ArmorType",      Horse->GetHorseArmour());
 					mWriter.AddByte("Saddle",         Horse->IsSaddled()? 1 : 0);
 					mWriter.AddInt ("Age",            Horse->GetAge());
 					break;
 				}
-				case mtMagmaCube:
+				case etMagmaCube:
 				{
 					mWriter.AddInt("Size", static_cast<const cMagmaCube *>(a_Monster)->GetSize());
 					break;
 				}
-				case mtOcelot:
+				case etOcelot:
 				{
 					const auto *Ocelot = static_cast<const cOcelot *>(a_Monster);
 					if (!Ocelot->GetOwnerName().empty())
@@ -866,12 +958,12 @@ public:
 					mWriter.AddInt("Age", Ocelot->GetAge());
 					break;
 				}
-				case mtPig:
+				case etPig:
 				{
 					mWriter.AddInt("Age", static_cast<const cPig *>(a_Monster)->GetAge());
 					break;
 				}
-				case mtRabbit:
+				case etRabbit:
 				{
 					const cRabbit * Rabbit = static_cast<const cRabbit *>(a_Monster);
 					mWriter.AddInt("RabbitType", static_cast<Int32>(Rabbit->GetRabbitType()));
@@ -879,7 +971,7 @@ public:
 					mWriter.AddInt("Age", Rabbit->GetAge());
 					break;
 				}
-				case mtSheep:
+				case etSheep:
 				{
 					const cSheep *Sheep = static_cast<const cSheep *>(a_Monster);
 					mWriter.AddByte("Sheared", Sheep->IsSheared()? 1 : 0);
@@ -887,27 +979,26 @@ public:
 					mWriter.AddInt ("Age",     Sheep->GetAge());
 					break;
 				}
-				case mtSlime:
+				case etSlime:
 				{
 					mWriter.AddInt("Size", static_cast<const cSlime *>(a_Monster)->GetSize());
 					break;
 				}
-				case mtVillager:
+				case etVillager:
 				{
 					const cVillager *Villager = static_cast<const cVillager *>(a_Monster);
-					mWriter.AddInt("Profession", Villager->GetVilType());
 					mWriter.AddInt("Age",        Villager->GetAge());
 					mWriter.BeginList("Inventory", TAG_Compound);
 						AddItemGrid(Villager->GetInventory());
 					mWriter.EndList();
 					break;
 				}
-				case mtWither:
+				case etWither:
 				{
 					mWriter.AddInt("Invul", static_cast<Int32>(static_cast<const cWither *>(a_Monster)->GetWitherInvulnerableTicks()));
 					break;
 				}
-				case mtWolf:
+				case etWolf:
 				{
 					const cWolf *Wolf = static_cast<const cWolf *>(a_Monster);
 					if (!Wolf->GetOwnerName().empty())
@@ -924,87 +1015,87 @@ public:
 					mWriter.AddInt ("Age",         Wolf->GetAge());
 					break;
 				}
-				case mtZombie:
+				case etZombie:
 				{
 					mWriter.AddInt("Age", static_cast<const cZombie *>(a_Monster)->GetAge());
 					break;
 				}
-				case mtZombiePigman:
+				case etZombifiedPiglin:
 				{
 					mWriter.AddInt("Age", static_cast<const cZombiePigman *>(a_Monster)->GetAge());
 					break;
 				}
-				case mtZombieVillager:
+				case etZombieVillager:
 				{
 					const cZombieVillager *ZombieVillager = reinterpret_cast<const cZombieVillager *>(a_Monster);
-					mWriter.AddInt("Profession",     ZombieVillager->GetProfession());
 					mWriter.AddInt("ConversionTime", ZombieVillager->ConversionTime());
 					mWriter.AddInt("Age",            ZombieVillager->GetAge());
 					break;
 				}
-				case mtBlaze:
-				case mtCaveSpider:
-				case mtChicken:
-				case mtCow:
-				case mtEnderDragon:
-				case mtGhast:
-				case mtGiant:
-				case mtGuardian:
-				case mtIronGolem:
-				case mtMooshroom:
-				case mtSilverfish:
-				case mtSkeleton:
-				case mtSnowGolem:
-				case mtSpider:
-				case mtSquid:
-				case mtWitch:
-				case mtWitherSkeleton:
+				case etBlaze:
+				case etCaveSpider:
+				case etChicken:
+				case etCow:
+				case etEnderDragon:
+				case etGhast:
+				case etGiant:
+				case etGuardian:
+				case etIronGolem:
+				case etMooshroom:
+				case etSilverfish:
+				case etSkeleton:
+				case etSnowGolem:
+				case etSpider:
+				case etSquid:
+				case etWitch:
+				case etWitherSkeleton:
 				{
 					// Other mobs have no special tags.
 					break;
 				}
-				case mtCat:
-				case mtCod:
-				case mtDolphin:
-				case mtDonkey:
-				case mtDrowned:
-				case mtElderGuardian:
-				case mtEndermite:
-				case mtEvoker:
-				case mtFox:
-				case mtHoglin:
-				case mtHusk:
-				case mtIllusioner:
-				case mtLlama:
-				case mtMule:
-				case mtPanda:
-				case mtParrot:
-				case mtPhantom:
-				case mtPiglin:
-				case mtPiglinBrute:
-				case mtPillager:
-				case mtPolarBear:
-				case mtPufferfish:
-				case mtRavager:
-				case mtSalmon:
-				case mtShulker:
-				case mtSkeletonHorse:
-				case mtStray:
-				case mtStrider:
-				case mtTraderLlama:
-				case mtTropicalFish:
-				case mtTurtle:
-				case mtVex:
-				case mtVindicator:
-				case mtWanderingTrader:
-				case mtZoglin:
-				case mtZombieHorse:
+				case etCat:
+				case etCod:
+				case etDolphin:
+				case etDonkey:
+				case etDrowned:
+				case etElderGuardian:
+				case etEndermite:
+				case etEvoker:
+				case etFox:
+				case etHoglin:
+				case etHusk:
+				case etIllusioner:
+				case etLlama:
+				case etMule:
+				case etPanda:
+				case etParrot:
+				case etPhantom:
+				case etPiglin:
+				case etPiglinBrute:
+				case etPillager:
+				case etPolarBear:
+				case etPufferfish:
+				case etRavager:
+				case etSalmon:
+				case etShulker:
+				case etSkeletonHorse:
+				case etStray:
+				case etStrider:
+				case etTraderLlama:
+				case etTropicalFish:
+				case etTurtle:
+				case etVex:
+				case etVindicator:
+				case etWanderingTrader:
+				case etZoglin:
+				case etZombieHorse:
+				case etBee:
 				{
 					// All the entities not added
-					LOGD("Saving unimplemented entity type: %d", NamespaceSerializer::From(a_Monster->GetMobType()));
+					LOGD("Saving unimplemented entity type: %d", NamespaceSerializer::From(a_Monster->GetEntityType()));
 					break;
 				}
-				case mtInvalidType:
+				case etInvalid:
 				{
 					ASSERT(!"NBTChunkSerializer::SerializerCollector::AddMonsterEntity: Recieved mob of invalid type");
 					break;
@@ -1036,9 +1127,9 @@ public:
 			AddBasicEntity(a_Projectile, a_Projectile->GetMCAClassName());
 			mWriter.AddByte("inGround", a_Projectile->IsInGround() ? 1 : 0);
 
-			switch (a_Projectile->GetProjectileKind())
+			switch (a_Projectile->GetEntityType())
 			{
-				case cProjectileEntity::pkArrow:
+				case etArrow:
 				{
 					cArrowEntity * Arrow = static_cast<cArrowEntity *>(a_Projectile);
 
@@ -1049,7 +1140,7 @@ public:
 					mWriter.AddDouble("damage", Arrow->GetDamageCoeff());
 					break;
 				}
-				case cProjectileEntity::pkSplashPotion:
+				case etPotion:
 				{
 					cSplashPotionEntity * Potion = static_cast<cSplashPotionEntity *>(a_Projectile);
 
@@ -1060,15 +1151,15 @@ public:
 					mWriter.AddInt("PotionName",                Potion->GetPotionColor());
 					break;
 				}
-				case cProjectileEntity::pkGhastFireball:
+				case etFireball:
 				{
 					mWriter.AddInt("ExplosionPower", 1);
 					break;
 				}
-				case cProjectileEntity::pkFireCharge:
-				case cProjectileEntity::pkWitherSkull:
-				case cProjectileEntity::pkEnderPearl:
-				case cProjectileEntity::pkSnowball:
+				case etSmallFireball:
+				case etWitherSkull:
+				case etEnderPearl:
+				case etSnowball:
 				{
 					break;
 				}
@@ -1192,41 +1283,143 @@ public:
 void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, cFastNBTWriter & aWriter)
 {
 	SerializerCollector serializer(aWriter);
-	aWriter.BeginCompound("Level");
+	// set to 1.21.1
+	aWriter.AddInt("DataVersion", 3955);  // to which game version does this save correspond to
+
 	aWriter.AddInt("xPos", aCoords.m_ChunkX);
 	aWriter.AddInt("zPos", aCoords.m_ChunkZ);
 	[[maybe_unused]] const bool Result = aWorld.GetChunkData(aCoords, serializer);  // Chunk must be present in order to save
 	ASSERT(Result);
 	serializer.Finish();  // Close NBT tags
 
-	// Save biomes:
-	aWriter.AddByteArray("Biomes", reinterpret_cast<const char *>(serializer.Biomes), ARRAYCOUNT(serializer.Biomes));
+	aWriter.BeginList("sections", TAG_Compound);
 
-	// Save heightmap (Vanilla require this):
-	aWriter.AddIntArray("HeightMap", reinterpret_cast<const int *>(serializer.Heights), ARRAYCOUNT(serializer.Heights));
+	const auto & bp = cRoot::Get()->GetBlockMap()->GetPalette(cProtocol::Version::Latest);
 
-	// Save blockdata:
-	aWriter.BeginList("Sections", TAG_Compound);
-	ChunkDef_ForEachSection(serializer.m_BlockData, serializer.m_LightData,
+	const bool use_padding = true;  // used in 1.16+
+	for (size_t Y = 0; Y < cChunkDef::NumSections; Y++)
 	{
+		const auto Blocks = serializer.m_BlockData.GetSection(Y);
+		const auto BlockLights = serializer.m_LightData.GetBlockLightSection(Y);
+		const auto SkyLights = serializer.m_LightData.GetSkyLightSection(Y);
 		aWriter.BeginCompound("");
-
+		aWriter.AddInt("Y", static_cast<Int32>(Y));
 		if (Blocks != nullptr)
 		{
-			aWriter.AddByteArray("Blocks", reinterpret_cast<const char *>(Blocks->data()), Blocks->size());
-		}
-		else
-		{
-			aWriter.AddByteArray("Blocks", ChunkBlockData::SectionBlockCount, ChunkBlockData::DefaultValue);
-		}
+			ChunkBlockData::BlockArray temparr;
+			std::copy(Blocks->begin(), Blocks->end(), temparr.begin());
+			std::sort(temparr.begin(), temparr.end());
+			auto newlistend = std::unique(temparr.begin(), temparr.end());
+			int newsize = static_cast<int>(newlistend - temparr.begin());
+			int bitused = Clamp(CeilC(log2(newsize)), 4, 16);
 
-		if (Metas != nullptr)
-		{
-			aWriter.AddByteArray("Data", reinterpret_cast<const char *>(Metas->data()), Metas->size());
-		}
-		else
-		{
-			aWriter.AddByteArray("Data", ChunkBlockData::SectionMetaCount, ChunkBlockData::DefaultMetaValue);
+			int longarrsize = -1;
+
+			if (use_padding)
+			{
+				int blocks_per_long = FloorC(64.0 / bitused);
+				int longs_needed = CeilC(4096.0 / blocks_per_long);
+				longarrsize = longs_needed;
+			}
+			else
+			{
+				longarrsize = CeilC((bitused * 4096) / 8 / 8);
+			}
+
+			aWriter.BeginCompound("block_states");
+			aWriter.BeginList("palette", eTagType::TAG_Compound);
+
+			for (size_t i = 0; i < static_cast<size_t>(newsize); i++)
+			{
+				aWriter.BeginCompound("");
+				auto val = temparr[i];
+
+				auto vls = bp.entry(val.ID);
+				auto map = vls.second.getMap();
+				aWriter.AddString("Name", vls.first);
+				if (!map.empty())
+				{
+					aWriter.BeginCompound("Properties");
+					for (const auto & block_state : vls.second.getMap())
+					{
+						aWriter.AddString(block_state.first, block_state.second);
+					}
+					aWriter.EndCompound();
+				}
+				aWriter.EndCompound();
+			}
+			aWriter.EndList();
+
+			Int64 * arr = new Int64[static_cast<UInt64>(longarrsize)];
+
+			UInt64 tbuf = 0;
+			int BitIndex = 0;
+			int longindex = 0;
+			auto toloop = Blocks->size();
+			// int bitswritten = 0;
+			// std::vector<int> bw = {0};
+			for (size_t i = 0; i < toloop; i++)
+			{
+				auto & v = Blocks->at(i);
+				auto ind = std::find(temparr.begin(), newlistend, v);
+				UInt64 towrite = static_cast<UInt64>(ind - temparr.begin());
+				tbuf |= static_cast<UInt64>(towrite << BitIndex);
+				BitIndex += bitused;
+				// bitswritten += bitused;
+				// ASSERT(bitswritten >= bw[bw.size() - 1]);
+				// bw.push_back(bitswritten);
+				// LOGD(std::to_string(bitswritten) + " - bits written");
+				// ASSERT(bitswritten == (longindex * 64 + BitIndex));
+				if (((BitIndex + bitused) > 64) || (i == (toloop - 1)))  // not enough bits in current long for the next value?
+				{
+					if (use_padding)
+					{
+						BitIndex = 0;
+						ASSERT(longindex < longarrsize);
+						arr[longindex] = static_cast<Int64>(tbuf);
+						tbuf = 0;
+						longindex++;
+					}
+					else
+					{
+						ASSERT(longindex < longarrsize);
+						UInt64 upperpart = 0;
+						if (BitIndex != 64)
+						{
+							upperpart = towrite >> (64 - BitIndex);
+							UInt64 lowerpart = towrite & ((static_cast<UInt64>(1) << (64 - BitIndex)) - 1);
+							tbuf |= lowerpart;
+							// bitswritten += 64 - BitIndex;
+							BitIndex = bitused - (64 - BitIndex);
+							// bitswritten += BitIndex;
+							// ASSERT(bitswritten >= bw[bw.size() - 1]);
+							// bw.push_back(bitswritten);
+							i++;
+						}
+						else
+						{
+							BitIndex = 0;
+							tbuf = 0;
+						}
+						arr[longindex] = static_cast<Int64>(tbuf);
+						longindex++;
+						tbuf = 0;
+						tbuf |= upperpart;
+						// ASSERT(bitswritten == ((longindex * 64) + BitIndex));
+					}
+				}
+			}
+
+			if (Blocks != nullptr)
+			{
+				aWriter.AddLongArray("data", arr, static_cast<UInt64>(longindex));
+			}
+			else
+			{
+				// aWriter.AddByteArray("BlockStates", ChunkBlockData::SectionBlockCount, ChunkBlockData::DefaultValue);  // BROKEN
+			}
+			aWriter.EndCompound();
+			delete[] arr;
 		}
 
 		if (BlockLights != nullptr)
@@ -1246,24 +1439,17 @@ void NBTChunkSerializer::Serialize(const cWorld & aWorld, cChunkCoords aCoords, 
 		{
 			aWriter.AddByteArray("SkyLight", ChunkLightData::SectionLightCount, ChunkLightData::DefaultSkyLightValue);
 		}
-
-		aWriter.AddByte("Y", static_cast<unsigned char>(Y));
 		aWriter.EndCompound();
-	});
+	}
 	aWriter.EndList();  // "Sections"
 
-	// Store the information that the lighting is valid.
-	// For compatibility reason, the default is "invalid" (missing) - this means older data is re-lighted upon loading.
-	if (serializer.mIsLightValid)
-	{
-		aWriter.AddByte("MCSIsLightValid", 1);
-	}
-
-	// Save the world age to the chunk data. Required by vanilla and mcedit.
 	aWriter.AddLong("LastUpdate", aWorld.GetWorldAge().count());
 
-	// Store the flag that the chunk has all the ores, trees, dungeons etc. Cuberite chunks are always complete.
-	aWriter.AddByte("TerrainPopulated", 1);
+	aWriter.AddLong("InhabitedTime", 0);
 
-	aWriter.EndCompound();  // "Level"
+	aWriter.AddString("Status", "minecraft:full");
+
+	aWriter.AddByte("isLightOn", 1);
+
+	// TODO: height maps not implemented yet
 }

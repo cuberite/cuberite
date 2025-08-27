@@ -8,7 +8,7 @@
 
 
 cGiant::cGiant(void) :
-	Super("Giant", mtGiant, "entity.zombie.hurt", "entity.zombie.death", "entity.zombie.ambient", 3.6f, 12)
+	Super("Giant", etGiant, "entity.zombie.hurt", "entity.zombie.death", "entity.zombie.ambient", 3.6f, 12)
 {
 
 }
@@ -19,7 +19,7 @@ cGiant::cGiant(void) :
 
 void cGiant::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 {
-	AddRandomDropItem(a_Drops, 10, 50, E_ITEM_ROTTEN_FLESH);
+	AddRandomDropItem(a_Drops, 10, 50, Item::RottenFlesh);
 }
 
 

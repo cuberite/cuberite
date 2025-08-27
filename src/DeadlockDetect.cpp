@@ -56,7 +56,7 @@ void cDeadlockDetect::Start(int a_IntervalSec)
 	m_IntervalSec = a_IntervalSec;
 
 	// Read the initial world data:
-	cRoot::Get()->ForEachWorld([=](cWorld & a_World)
+	cRoot::Get()->ForEachWorld([this](cWorld & a_World)
 	{
 		SetWorldAge(a_World.GetName(), a_World.GetWorldAge());
 		return false;
@@ -102,7 +102,7 @@ void cDeadlockDetect::Execute(void)
 	while (!m_ShouldTerminate)
 	{
 		// Check the world ages:
-		cRoot::Get()->ForEachWorld([=](cWorld & a_World)
+		cRoot::Get()->ForEachWorld([this](cWorld & a_World)
 		{
 			CheckWorldAge(a_World.GetName(), a_World.GetWorldAge());
 			return false;

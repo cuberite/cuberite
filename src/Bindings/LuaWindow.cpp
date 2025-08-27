@@ -212,8 +212,10 @@ void cLuaWindow::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 
 
-void cLuaWindow::Clicked(cPlayer & a_Player, int a_WindowID, short a_SlotNum, eClickAction a_ClickAction, const cItem & a_ClickedItem)
+void cLuaWindow::Clicked(cPlayer & a_Player, int a_WindowID, short a_SlotNum, eClickAction a_ClickAction, const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta, const cItem & a_DraggedItem)
 {
+	// TODO: fix binding
+	/*
 	if (m_OnClicked != nullptr)
 	{
 		// Plugin can stop a click
@@ -226,8 +228,9 @@ void cLuaWindow::Clicked(cPlayer & a_Player, int a_WindowID, short a_SlotNum, eC
 			return;
 		}
 	}
+	*/
 
-	cWindow::Clicked(a_Player, a_WindowID, a_SlotNum, a_ClickAction, a_ClickedItem);
+	cWindow::Clicked(a_Player, a_WindowID, a_SlotNum, a_ClickAction, a_ItemDelta, a_DraggedItem);
 }
 
 

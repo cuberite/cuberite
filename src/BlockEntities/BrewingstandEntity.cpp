@@ -11,12 +11,13 @@
 
 
 
-cBrewingstandEntity::cBrewingstandEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
+cBrewingstandEntity::cBrewingstandEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_IsBrewing(false),
 	m_TimeBrewed(0),
 	m_RemainingFuel(0)
 {
+	ASSERT(a_Block.Type() == BlockType::BrewingStand);
 	m_Contents.AddListener(*this);
 }
 
@@ -191,6 +192,11 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 
 	ASSERT(a_ItemGrid == &m_Contents);
 
+	if ((a_SlotNum == 0) || (a_SlotNum == 1) || (a_SlotNum == 2))
+	{
+		m_World->FastSetBlock(m_Pos, Block::BrewingStand::BrewingStand(!m_Contents.GetSlot(0).IsEmpty(), !m_Contents.GetSlot(1).IsEmpty(), !m_Contents.GetSlot(2).IsEmpty()));
+	}
+
 	// Check for fuel
 	if (m_RemainingFuel <= 0)
 	{
@@ -233,7 +239,7 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		if (GetSlot(static_cast<int>(i)).IsEmpty())
 		{
 			m_CurrentBrewingRecipes[i] = nullptr;
-			m_Results[i].Clear();
+			m_Results[i].Empty();
 			continue;
 		}
 
@@ -268,7 +274,6 @@ void cBrewingstandEntity::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 		}
 		return;
 	}
-
 	// Start brewing process, if not running
 	if (!m_IsBrewing)
 	{

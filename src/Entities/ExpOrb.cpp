@@ -6,7 +6,7 @@
 
 
 cExpOrb::cExpOrb(Vector3d a_Pos, int a_Reward):
-	Super(etExpOrb, a_Pos, 0.5f, 0.5f),
+	Super(etExperienceOrb, a_Pos, 0.5f, 0.5f),
 	m_Reward(a_Reward),
 	m_Timer(0)
 {

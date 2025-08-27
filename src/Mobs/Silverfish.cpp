@@ -13,7 +13,7 @@
 
 
 cSilverfish::cSilverfish() :
-	Super("Silverfish", mtSilverfish, "entity.silverfish.hurt", "entity.silverfish.death", "entity.silverfish.ambient", 0.4f, 0.3f)
+	Super("Silverfish", etSilverfish, "entity.silverfish.hurt", "entity.silverfish.death", "entity.silverfish.ambient", 0.4f, 0.3f)
 {
 }
 
@@ -58,7 +58,7 @@ bool cSilverfish::DoTakeDamage(TakeDamageInfo &a_TDI)
 	auto CheckInfested = [this, &Random, Position = GetPosition().Floor()](const Vector3i Offset) mutable
 	{
 		const auto Block = Position + Offset;
-		if (m_World->GetBlock(Block) == E_BLOCK_SILVERFISH_EGG)
+		if (cBlockInfestedHandler::IsBlockInfested(m_World->GetBlock(Block)))
 		{
 			m_World->DigBlock(Block);
 			return Random.RandBool();

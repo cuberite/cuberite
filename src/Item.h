@@ -1,4 +1,5 @@
 
+
 // Item.h
 
 // Declares the cItem class representing an item (in the inventory sense)
@@ -13,6 +14,9 @@
 #include "Enchantments.h"
 #include "WorldStorage/FireworksSerializer.h"
 #include "Color.h"
+#include "DataComponents/DataComponents.h"
+#include "Registries/Items.h"
+#include "Protocol/Palettes/Upgrade.h"
 
 
 
@@ -41,11 +45,10 @@ public:
 
 	/** Creates an item of the specified type, by default 1 piece with no damage and no enchantments */
 	cItem(
-		short a_ItemType,
+		enum Item a_ItemType,
 		char a_ItemCount = 1,
-		short a_ItemDamage = 0,
+		const DataComponents::DataComponentMap & a_DataComponents = DataComponents::DataComponentMap(),
 		const AString & a_Enchantments = "",
-		const AString & a_CustomName = "",
 		const AStringVector & a_LoreTable = {}
 	);
 
@@ -61,14 +64,13 @@ public:
 	/** Empties the item and frees up any dynamic storage used by the internals. */
 	void Empty(void);
 
-	/** Empties the item and frees up any dynamic storage used by the internals.
-	TODO: What is the usage difference? Merge with Empty()? */
-	void Clear(void);
+	// Deprecated - for compatibility with old plugins
+	void Clear(void) { Empty(); }
 
 	/** Returns true if the item represents an empty stack - either the type is invalid, or count is zero. */
 	bool IsEmpty(void) const
 	{
-		return ((m_ItemType <= 0) || (m_ItemCount <= 0));
+		return ((m_ItemType == Item::Air) || (m_ItemCount <= 0));
 	}
 
 	/* Returns true if this itemstack can stack with the specified stack (types match, enchantments etc.)
@@ -77,11 +79,12 @@ public:
 	{
 		return (
 			IsSameType(a_Item) &&
-			(m_ItemDamage == a_Item.m_ItemDamage) &&
+			// (m_ItemDamage == a_Item.m_ItemDamage) &&
 			(m_Enchantments == a_Item.m_Enchantments) &&
-			(m_CustomName == a_Item.m_CustomName) &&
+			// (m_CustomName == a_Item.m_CustomName) &&
 			(m_LoreTable == a_Item.m_LoreTable) &&
-			m_FireworkItem.IsEqualTo(a_Item.m_FireworkItem)
+			m_FireworkItem.IsEqualTo(a_Item.m_FireworkItem) &&
+			m_ItemComponents.m_data == a_Item.m_ItemComponents.m_data
 		);
 	}
 
@@ -94,11 +97,11 @@ public:
 
 	bool IsBothNameAndLoreEmpty(void) const
 	{
-		return (m_CustomName.empty() && m_LoreTable.empty());
+		return (IsCustomNameEmpty() && IsLoreEmpty());
 	}
 
 
-	bool IsCustomNameEmpty(void) const { return (m_CustomName.empty()); }
+	bool IsCustomNameEmpty(void) const { return (!HasComponent<DataComponents::CustomNameComponent>()); }
 	bool IsLoreEmpty(void) const { return (m_LoreTable.empty()); }
 
 	/** Returns a copy of this item with m_ItemCount set to 1. Useful to preserve enchantments etc. on stacked items */
@@ -108,7 +111,7 @@ public:
 	cItem & AddCount(char a_AmountToAdd);
 
 	/** Returns the maximum damage value that this item can have; zero if damage is not applied */
-	short GetMaxDamage(void) const;
+	UInt32 GetMaxDamage(void) const;
 
 	/** Damages a weapon / tool. Returns true when damage reaches max value and the item should be destroyed */
 	bool DamageItem(short a_Amount = 1);
@@ -123,6 +126,8 @@ public:
 
 	// tolua_end
 
+	bool operator == (const cItem & rhs) const { return this->IsEqual(rhs); }
+
 	/** Returns the cItemHandler responsible for this item type */
 	const cItemHandler & GetHandler(void) const;
 
@@ -135,7 +140,7 @@ public:
 	/** Returns true if the specified item type is enchantable.
 	If FromBook is true, the function is used in the anvil inventory with book enchantments.
 	So it checks the "only book enchantments" too. Example: You can only enchant a hoe with a book. */
-	static bool IsEnchantable(short a_ItemType, bool a_FromBook = false);  // tolua_export
+	static bool IsEnchantable(Item a_ItemType, bool a_FromBook = false);  // tolua_export
 
 	/** Returns the enchantability of the item. When the item hasn't a enchantability, it will returns 0 */
 	unsigned GetEnchantability();  // tolua_export
@@ -160,11 +165,11 @@ public:
 
 	// tolua_begin
 
-	short          m_ItemType;
+	Item           m_ItemType;
 	char           m_ItemCount;
-	short          m_ItemDamage;
+	// short          m_ItemDamage;
 	cEnchantments  m_Enchantments;
-	AString        m_CustomName;
+	// AString        m_CustomName;
 
 	// tolua_end
 
@@ -187,17 +192,81 @@ public:
 			{
 				return (a_Lhs.m_ItemType < a_Rhs.m_ItemType);
 			}
-			if ((a_Lhs.m_ItemDamage == -1) || (a_Rhs.m_ItemDamage == -1))
-			{
-				return false;  // -1 is a wildcard, damage of -1 alway compares equal
-			}
-			return (a_Lhs.m_ItemDamage < a_Rhs.m_ItemDamage);
+			return true;  // TODO: compare components
 		}
 	};
 
+	const std::map<size_t, DataComponents::DataComponent> & GetDefaultItemComponents(void) const;
+
+	template <typename TypeToFind> TypeToFind & GetOrAdd()
+	{
+		if (HasComponent<TypeToFind>())
+		{
+			return std::get<TypeToFind>(m_ItemComponents.m_data[DataComponents::GetIndexOfDataComponent<TypeToFind, 0>()]);
+		}
+		DataComponents::DataComponent def;
+		def.emplace<DataComponents::GetIndexOfDataComponent<TypeToFind>()>();
+		SetComponent(def);
+		return std::get<TypeToFind>(m_ItemComponents.m_data[DataComponents::GetIndexOfDataComponent<TypeToFind, 0>()]);
+	}
+
+	void SetComponent(const DataComponents::DataComponent & a_comp)
+	{
+		auto comps = GetDefaultItemComponents();
+
+		size_t ind = a_comp.index();
+		if (comps.contains(ind) && (a_comp == comps.at(ind)))
+		{
+			auto rez = m_ItemComponents.m_data.find(ind);
+			if (rez != m_ItemComponents.m_data.end())
+			{
+				m_ItemComponents.m_data.erase(rez);
+			}
+			return;
+		}
+
+		m_ItemComponents.AddComp(a_comp);
+	}
+
+	template <typename TypeToFind> const TypeToFind & GetComponentOrDefault() const
+	{
+		const auto & comps = GetDefaultItemComponents();
+		if (m_ItemComponents.HasComponent<TypeToFind>())
+		{
+			return m_ItemComponents.GetComp<TypeToFind>();
+		}
+		if (comps.contains(DataComponents::GetIndexOfDataComponent<TypeToFind>()))
+		{
+			return std::get<TypeToFind>(comps.at(DataComponents::GetIndexOfDataComponent<TypeToFind>()));
+		}
+		VERIFY("Component not found on item");
+		throw std::runtime_error("Component not found on item");
+	}
+
+	// Check if the given component is present or is a default component
+	template <typename TypeToFind> bool HasComponent() const
+	{
+		auto comps = GetDefaultItemComponents();
+		return m_ItemComponents.HasComponent<TypeToFind>() || comps.contains(DataComponents::GetIndexOfDataComponent<TypeToFind>());
+	}
+
+	template <typename TypeToFind> void RemoveComp()
+	{
+		if (m_ItemComponents.HasComponent<TypeToFind>())
+		{
+			m_ItemComponents.RemoveComp<TypeToFind>();
+		}
+		// TODO: default item component removal
+	}
+
+	const DataComponents::DataComponentMap & GetDataComponents(void) const { return m_ItemComponents; }
+
+private:
+	DataComponents::DataComponentMap m_ItemComponents;
+public:
 	// tolua_begin
 
-	int            m_RepairCost;
+	// int            m_RepairCost;
 	cFireworkItem  m_FireworkItem;
 	cColor         m_ItemColor;
 };
@@ -230,20 +299,15 @@ public:
 
 	cItem * Get   (int a_Idx);
 	void    Set   (int a_Idx, const cItem & a_Item);
-	void    Add   (const cItem & a_Item) {push_back(a_Item); }
-	void    Add   (short a_ItemType) { emplace_back(a_ItemType); }
-	void    Add   (short a_ItemType, char a_ItemCount) { emplace_back(a_ItemType, a_ItemCount); }
+	void    Add   (const cItem & a_Item) { push_back(a_Item); }
+	void    Add   (enum Item a_ItemType) { emplace_back(a_ItemType); }
+	void    Add   (enum Item a_ItemType, char a_ItemCount) { emplace_back(a_ItemType, a_ItemCount); }
 	void    Delete(int a_Idx);
 	void    Clear (void) {clear(); }
 	size_t  Size  (void) const { return size(); }
-	void    Set   (int a_Idx, short a_ItemType, char a_ItemCount, short a_ItemDamage);
+	void    Set   (int a_Idx, Item a_Item, char a_ItemCount);
 	bool    Contains(const cItem & a_Item);
 	bool    ContainsType(const cItem & a_Item);
-
-	void    Add   (short a_ItemType, char a_ItemCount, short a_ItemDamage)
-	{
-		emplace_back(a_ItemType, a_ItemCount, a_ItemDamage);
-	}
 
 	/** Adds a copy of all items in a_ItemGrid. */
 	void AddItemGrid(const cItemGrid & a_ItemGrid);
@@ -264,3 +328,13 @@ public:
 	int   m_MaxAmount;
 	int   m_Weight;
 } ;
+
+template<> class fmt::formatter<Item> : public fmt::formatter<std::string_view>
+{
+public:
+	template <typename FormatContext>
+	auto format(const Item & a_Item, FormatContext & a_Ctx) const
+	{
+		return fmt::format_to(a_Ctx.out(), "{}", NamespaceSerializer::From(a_Item));
+	}
+};

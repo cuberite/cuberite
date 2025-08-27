@@ -1,4 +1,5 @@
 #include "Bat.h"
+#include "Bee.h"
 #include "Blaze.h"
 #include "CaveSpider.h"
 #include "Chicken.h"

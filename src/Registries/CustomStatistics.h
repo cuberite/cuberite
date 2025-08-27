@@ -67,6 +67,7 @@ enum class CustomStatistic
 	FillCauldron,
 	FishCaught,
 	FlyOneCm,
+	HappyGhastOneCm,
 	HorseOneCm,
 	InspectDispenser,
 	InspectDropper,
@@ -95,8 +96,8 @@ enum class CustomStatistic
 	OpenShulkerBox,
 	PigOneCm,
 	PlayNoteblock,
-	PlayOneMinute,
 	PlayRecord,
+	PlayTime,
 	PlayerKills,
 	PotFlower,
 	RaidTrigger,
@@ -110,6 +111,7 @@ enum class CustomStatistic
 	TargetHit,
 	TimeSinceDeath,
 	TimeSinceRest,
+	TotalWorldTime,
 	TradedWithVillager,
 	TriggerTrappedChest,
 	TuneNoteblock,
@@ -118,8 +120,11 @@ enum class CustomStatistic
 	WalkOneCm,
 	WalkUnderWaterOneCm,
 
+	// Deprecated
+	PlayOneMinute = PlayTime,
+
 	// Old ones just for compatibility
-	JunkFished,
-	TreasureFished,
+	JunkFished = 110,
+	TreasureFished = 109,
 };
 // tolua_end

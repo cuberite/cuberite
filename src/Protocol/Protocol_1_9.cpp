@@ -17,6 +17,7 @@ Implements the 1.9 protocol classes:
 #include "Protocol_1_9.h"
 #include "../mbedTLS++/Sha1Checksum.h"
 #include "Packetizer.h"
+#include "Palettes/Upgrade.h"
 
 #include "../ClientHandle.h"
 #include "../Root.h"
@@ -381,7 +382,7 @@ void cProtocol_1_9_0::SendKeepAlive(UInt32 a_PingID)
 	// Drop the packet if the protocol is not in the Game state yet (caused a client crash):
 	if (m_State != 3)
 	{
-		LOG("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class prevented the packet.", m_State);
+		LOG("Trying to send a KeepAlive packet to a player who's not yet fully logged in (%d). The protocol class prevented the packet.", static_cast<UInt32>(m_State));
 		return;
 	}
 
@@ -589,7 +590,8 @@ void cProtocol_1_9_0::SendSoundEffect(const AString & a_SoundName, Vector3d a_Or
 void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 {
 	ASSERT(m_State == 3);  // In game mode?
-
+	return;
+	/*
 	const auto MobType = GetProtocolMobType(a_Mob.GetMobType());
 
 	// If the type is not valid in this protocol bail out:
@@ -616,6 +618,7 @@ void cProtocol_1_9_0::SendSpawnMob(const cMonster & a_Mob)
 	Pkt.WriteBEInt16(static_cast<Int16>(a_Mob.GetSpeedZ() * 400));
 	WriteEntityMetadata(Pkt, a_Mob);
 	Pkt.WriteBEUInt8(0xff);  // Metadata terminator
+	*/
 }
 
 
@@ -641,7 +644,6 @@ void cProtocol_1_9_0::SendThunderbolt(Vector3i a_Origin)
 void cProtocol_1_9_0::SendUnloadChunk(int a_ChunkX, int a_ChunkZ)
 {
 	ASSERT(m_State == 3);  // In game mode?
-
 	cPacketizer Pkt(*this, pktUnloadChunk);
 	Pkt.WriteBEInt32(a_ChunkX);
 	Pkt.WriteBEInt32(a_ChunkZ);
@@ -771,19 +773,6 @@ signed char cProtocol_1_9_0::GetProtocolEntityStatus(const EntityAnimation a_Ani
 		case EntityAnimation::PawnShieldBreaks: return 30;
 		case EntityAnimation::PawnThornsPricks: return 33;
 		default: return Super::GetProtocolEntityStatus(a_Animation);
-	}
-}
-
-
-
-
-
-UInt32 cProtocol_1_9_0::GetProtocolMobType(const eMonsterType a_MobType) const
-{
-	switch (a_MobType)
-	{
-		case mtShulker: return 69;
-		default:        return Super::GetProtocolMobType(a_MobType);
 	}
 }
 
@@ -933,7 +922,7 @@ void cProtocol_1_9_0::HandlePacketBoatSteer(cByteBuffer & a_ByteBuffer)
 
 	if (Vehicle)
 	{
-		if (Vehicle->GetEntityType() == cEntity::etBoat)
+		if (Vehicle->IsBoat())
 		{
 			auto * Boat = static_cast<cBoat *>(Vehicle);
 			Boat->UpdatePaddles(RightPaddle, LeftPaddle);
@@ -1079,7 +1068,7 @@ void cProtocol_1_9_0::HandlePacketTabComplete(cByteBuffer & a_ByteBuffer)
 		HANDLE_READ(a_ByteBuffer, ReadBEInt64, Int64, Position);
 	}
 
-	m_Client->HandleTabCompletion(Text);
+	m_Client->HandleTabCompletion(Text, 0);
 }
 
 
@@ -1240,7 +1229,7 @@ void cProtocol_1_9_0::HandlePacketWindowClick(cByteBuffer & a_ByteBuffer)
 		}
 	}
 
-	m_Client->HandleWindowClick(WindowID, SlotNum, Action, Item);
+	m_Client->HandleWindowClick(WindowID, SlotNum, Action, {}, cItem());
 }
 
 
@@ -1321,7 +1310,7 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 		{
 			case TAG_List:
 			{
-				if ((TagName == "ench") || (TagName == "StoredEnchantments"))  // Enchantments tags
+				if ((TagName == "ench") || (TagName == "StoredEnchantments") || (TagName == "Enchantments"))  // Enchantments tags
 				{
 					EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
 				}
@@ -1335,7 +1324,7 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 					{
 						if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name"))  // Custon name tag
 						{
-							a_Item.m_CustomName = NBT.GetString(displaytag);
+							a_Item.SetComponent(DataComponents::CustomNameComponent(NBT.GetString(displaytag)));
 						}
 						else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore"))  // Lore tag
 						{
@@ -1353,7 +1342,7 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 				}
 				else if ((TagName == "Fireworks") || (TagName == "Explosion"))
 				{
-					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, a_Item.m_ItemType);
 				}
 				else if (TagName == "EntityTag")
 				{
@@ -1363,8 +1352,8 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 						{
 							AString NBTName = NBT.GetString(entitytag);
 							ReplaceString(NBTName, "minecraft:", "");
-							eMonsterType MonsterType = cMonster::StringToMobType(NBTName);
-							a_Item.m_ItemDamage = static_cast<short>(GetProtocolMobType(MonsterType));
+							// auto MonsterType = cMonster::StringToMobType(NBTName);
+							// a_Item.m_ItemDamage = static_cast<short>(GetProtocolEntityType(MonsterType));
 
 						}
 					}
@@ -1375,7 +1364,7 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 			{
 				if (TagName == "RepairCost")
 				{
-					a_Item.m_RepairCost = NBT.GetInt(tag);
+					a_Item.SetComponent(DataComponents::RepairCostComponent { static_cast<UInt32>(NBT.GetInt(tag)) });
 				}
 				break;
 			}
@@ -1384,12 +1373,14 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 				if (TagName == "Potion")
 				{
 					AString PotionEffect = NBT.GetString(tag);
+					LOGD("%s", PotionEffect);
 					if (PotionEffect.find("minecraft:") == AString::npos)
 					{
 						LOGD("Unknown or missing domain on potion effect name %s!", PotionEffect.c_str());
 						continue;
 					}
 
+					/*
 					if (PotionEffect.find("empty") != AString::npos)
 					{
 						a_Item.m_ItemDamage = 0;
@@ -1458,6 +1449,14 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 					{
 						a_Item.m_ItemDamage = 14;
 					}
+					else if (PotionEffect.find("slow_falling") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 15;
+					}
+					else if (PotionEffect.find("turtle_master") != AString::npos)
+					{
+						a_Item.m_ItemDamage = 17;
+					}
 					else if (PotionEffect.find("water") != AString::npos)
 					{
 						a_Item.m_ItemDamage = 0;
@@ -1479,18 +1478,20 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 					{
 						a_Item.m_ItemDamage |= 0x40;
 					}
-
+					*/
+					/* TODO(12xx12)
 					// Ugly special case with the changed splash potion ID in 1.9
 					if ((a_Item.m_ItemType == 438) || (a_Item.m_ItemType == 441))
 					{
 						// Splash or lingering potions - change the ID to the normal one and mark as splash potions
-						a_Item.m_ItemType = E_ITEM_POTION;
+						a_Item.m_ItemType = Item::Potion;
 						a_Item.m_ItemDamage |= 0x4000;  // Is splash potion
 					}
 					else
 					{
 						a_Item.m_ItemDamage |= 0x2000;  // Is drinkable
 					}
+					*/
 				}
 				break;
 			}
@@ -1532,7 +1533,7 @@ void cProtocol_1_9_0::SendEntitySpawn(const cEntity & a_Entity, const UInt8 a_Ob
 
 void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
 {
-	if (a_BlockEntity.GetBlockType() == E_BLOCK_MOB_SPAWNER)
+	if (a_BlockEntity.GetBlockType() == BlockType::Spawner)
 	{
 		auto & MobSpawnerEntity = static_cast<const cMobSpawnerEntity &>(a_BlockEntity);
 		a_Writer.AddInt("x", a_BlockEntity.GetPosX());
@@ -1553,7 +1554,7 @@ void cProtocol_1_9_0::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEn
 
 
 
-void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity) const
+void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_Entity, bool a_WriteCommon) const
 {
 	// Common metadata:
 	Int8 Flags = 0;
@@ -1584,191 +1585,6 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 	a_Pkt.WriteBEUInt8(0);  // Index 0
 	a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);  // Type
 	a_Pkt.WriteBEInt8(Flags);
-
-	switch (a_Entity.GetEntityType())
-	{
-		case cEntity::etPlayer:
-		{
-			auto & Player = static_cast<const cPlayer &>(a_Entity);
-
-			// TODO Set player custom name to their name.
-			// Then it's possible to move the custom name of mobs to the entities
-			// and to remove the "special" player custom name.
-			a_Pkt.WriteBEUInt8(2);  // Index 2: Custom name
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
-			a_Pkt.WriteString(Player.GetName());
-
-			a_Pkt.WriteBEUInt8(6);  // Index 6: Health
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
-			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
-
-			a_Pkt.WriteBEUInt8(12);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEUInt8(static_cast<UInt8>(Player.GetSkinParts()));
-
-			a_Pkt.WriteBEUInt8(13);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEUInt8(Player.IsLeftHanded() ? 0 : 1);
-			break;
-		}
-		case cEntity::etPickup:
-		{
-			a_Pkt.WriteBEUInt8(5);  // Index 5: Item
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
-			WriteItem(a_Pkt, static_cast<const cPickup &>(a_Entity).GetItem());
-			break;
-		}
-		case cEntity::etMinecart:
-		{
-			a_Pkt.WriteBEUInt8(5);  // Index 5: Shaking power
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-
-			// The following expression makes Minecarts shake more with less health or higher damage taken
-			auto & Minecart = static_cast<const cMinecart &>(a_Entity);
-			auto maxHealth = a_Entity.GetMaxHealth();
-			auto curHealth = a_Entity.GetHealth();
-			a_Pkt.WriteVarInt32(static_cast<UInt32>((maxHealth - curHealth) * Minecart.LastDamage() * 4));
-
-			a_Pkt.WriteBEUInt8(6);  // Index 6: Shaking direction (doesn't seem to effect anything)
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(1);
-
-			a_Pkt.WriteBEUInt8(7);  // Index 7: Shake multiplier / damage taken
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
-			a_Pkt.WriteBEFloat(static_cast<float>(Minecart.LastDamage() + 10));
-
-			if (Minecart.GetPayload() == cMinecart::mpNone)
-			{
-				auto & RideableMinecart = static_cast<const cRideableMinecart &>(Minecart);
-				const cItem & MinecartContent = RideableMinecart.GetContent();
-				if (!MinecartContent.IsEmpty())
-				{
-					a_Pkt.WriteBEUInt8(8);  // Index 8: Block ID and damage
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-					int Content = MinecartContent.m_ItemType;
-					Content |= MinecartContent.m_ItemDamage << 8;
-					a_Pkt.WriteVarInt32(static_cast<UInt32>(Content));
-
-					a_Pkt.WriteBEUInt8(9);  // Index 9: Block ID and damage
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-					a_Pkt.WriteVarInt32(static_cast<UInt32>(RideableMinecart.GetBlockHeight()));
-
-					a_Pkt.WriteBEUInt8(10);  // Index 10: Show block
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-					a_Pkt.WriteBool(true);
-				}
-			}
-			else if (Minecart.GetPayload() == cMinecart::mpFurnace)
-			{
-				a_Pkt.WriteBEUInt8(11);  // Index 11: Is powered
-				a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-				a_Pkt.WriteBool(static_cast<const cMinecartWithFurnace &>(Minecart).IsFueled());
-			}
-			break;
-		}  // case etMinecart
-
-		case cEntity::etProjectile:
-		{
-			auto & Projectile = static_cast<const cProjectileEntity &>(a_Entity);
-			switch (Projectile.GetProjectileKind())
-			{
-				case cProjectileEntity::pkArrow:
-				{
-					a_Pkt.WriteBEUInt8(5);  // Index 5: Is critical
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-					a_Pkt.WriteBEInt8(static_cast<const cArrowEntity &>(Projectile).IsCritical() ? 1 : 0);
-					break;
-				}
-				case cProjectileEntity::pkFirework:
-				{
-					a_Pkt.WriteBEUInt8(5);  // Index 5: Firework item used for this firework
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
-					WriteItem(a_Pkt, static_cast<const cFireworkEntity &>(Projectile).GetItem());
-					break;
-				}
-				case cProjectileEntity::pkSplashPotion:
-				{
-					a_Pkt.WriteBEUInt8(5);  // Index 5: Potion item which was thrown
-					a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
-					WriteItem(a_Pkt, static_cast<const cSplashPotionEntity &>(Projectile).GetItem());
-				}
-				default:
-				{
-					break;
-				}
-			}
-			break;
-		}  // case etProjectile
-
-		case cEntity::etMonster:
-		{
-			WriteMobMetadata(a_Pkt, static_cast<const cMonster &>(a_Entity));
-			break;
-		}
-
-		case cEntity::etBoat:
-		{
-			auto & Boat = static_cast<const cBoat &>(a_Entity);
-
-			a_Pkt.WriteBEInt8(5);  // Index 6: Time since last hit
-			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetLastDamage()));
-
-			a_Pkt.WriteBEInt8(6);  // Index 7: Forward direction
-			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetForwardDirection()));
-
-			a_Pkt.WriteBEInt8(7);  // Index 8: Damage taken
-			a_Pkt.WriteBEInt8(METADATA_TYPE_FLOAT);
-			a_Pkt.WriteBEFloat(Boat.GetDamageTaken());
-
-			a_Pkt.WriteBEInt8(8);  // Index 9: Type
-			a_Pkt.WriteBEInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Boat.GetMaterial()));
-
-			a_Pkt.WriteBEInt8(9);  // Index 10: Right paddle turning
-			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Boat.IsRightPaddleUsed());
-
-			a_Pkt.WriteBEInt8(10);  // Index 11: Left paddle turning
-			a_Pkt.WriteBEInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Boat.IsLeftPaddleUsed());
-
-			break;
-		}  // case etBoat
-
-		case cEntity::etItemFrame:
-		{
-			auto & Frame = static_cast<const cItemFrame &>(a_Entity);
-			a_Pkt.WriteBEUInt8(5);  // Index 5: Item
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_ITEM);
-			WriteItem(a_Pkt, Frame.GetItem());
-			a_Pkt.WriteBEUInt8(6);  // Index 6: Rotation
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Frame.GetItemRotation());
-			break;
-		}  // case etItemFrame
-
-		case cEntity::etEnderCrystal:
-		{
-			const auto & EnderCrystal = static_cast<const cEnderCrystal &>(a_Entity);
-			a_Pkt.WriteBEUInt8(5);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_OPTIONAL_POSITION);
-			a_Pkt.WriteBool(EnderCrystal.DisplaysBeam());
-			if (EnderCrystal.DisplaysBeam())
-			{
-				a_Pkt.WriteXYZPosition64(EnderCrystal.GetBeamTarget());
-			}
-			a_Pkt.WriteBEUInt8(6);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(EnderCrystal.ShowsBottom());
-			break;
-		}  // case etEnderCrystal
-		default:
-		{
-			break;
-		}
-	}
 }
 
 
@@ -1777,7 +1593,7 @@ void cProtocol_1_9_0::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a
 
 void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 {
-	short ItemType = a_Item.m_ItemType;
+	short ItemType = PaletteUpgrade::ToItem(a_Item.m_ItemType).first;
 	ASSERT(ItemType >= -1);  // Check validity of packets in debug runtime
 	if (ItemType <= 0)
 	{
@@ -1791,7 +1607,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		return;
 	}
 
-	if ((ItemType == E_ITEM_POTION) && ((a_Item.m_ItemDamage & 0x4000) != 0))
+	if (a_Item.m_ItemType == Item::SplashPotion)
 	{
 		// Ugly special case for splash potion ids which changed in 1.9; this can be removed when the new 1.9 ids are implemented
 		a_Pkt.WriteBEInt16(438);  // minecraft:splash_potion
@@ -1802,17 +1618,25 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		a_Pkt.WriteBEInt16(ItemType);
 	}
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
-	if ((ItemType == E_ITEM_POTION) || (ItemType == E_ITEM_SPAWN_EGG))
+	// TODO: Check for spawn eggs properly
+	if ((a_Item.m_ItemType == Item::Potion) /* || ((a_Item.m_ItemType == Item::SpawnEgg) */)
 	{
 		// These items lost their metadata; if it is sent they don't render correctly.
 		a_Pkt.WriteBEInt16(0);
 	}
 	else
 	{
-		a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
+		// a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
 	}
 
-	if (a_Item.m_Enchantments.IsEmpty() && a_Item.IsBothNameAndLoreEmpty() && (ItemType != E_ITEM_FIREWORK_ROCKET) && (ItemType != E_ITEM_FIREWORK_STAR) && !a_Item.m_ItemColor.IsValid() && (ItemType != E_ITEM_POTION) && (ItemType != E_ITEM_SPAWN_EGG))
+	if (
+		a_Item.m_Enchantments.IsEmpty() &&
+		a_Item.IsBothNameAndLoreEmpty() &&
+		(a_Item.m_ItemType != Item::FireworkRocket) &&
+		(a_Item.m_ItemType != Item::FireworkStar) &&
+		!a_Item.m_ItemColor.IsValid() &&
+		(a_Item.m_ItemType != Item::Potion) &&
+		(cItemSpawnEggHandler::IsSpawnEgg(a_Item.m_ItemType)))
 	{
 		a_Pkt.WriteBEInt8(0);
 		return;
@@ -1821,14 +1645,14 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 
 	// Send the enchantments and custom names:
 	cFastNBTWriter Writer;
-	if (a_Item.m_RepairCost != 0)
+	if (a_Item.HasComponent<DataComponents::RepairCostComponent>())
 	{
-		Writer.AddInt("RepairCost", a_Item.m_RepairCost);
+		Writer.AddInt("RepairCost", static_cast<Int32>(a_Item.GetComponentOrDefault<DataComponents::RepairCostComponent>().RepairCost));
 	}
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
-		const char * TagName = (a_Item.m_ItemType == E_ITEM_BOOK) ? "StoredEnchantments" : "ench";
-		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName);
+		const char * TagName = (a_Item.m_ItemType == Item::EnchantedBook) ? "StoredEnchantments" : "ench";
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, Writer, TagName, false);
 	}
 	if (!a_Item.IsBothNameAndLoreEmpty() || a_Item.m_ItemColor.IsValid())
 	{
@@ -1840,7 +1664,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 
 		if (!a_Item.IsCustomNameEmpty())
 		{
-			Writer.AddString("Name", a_Item.m_CustomName);
+			Writer.AddString("Name", a_Item.GetComponentOrDefault<DataComponents::CustomNameComponent>().Name.ExtractText());
 		}
 		if (!a_Item.IsLoreEmpty())
 		{
@@ -1855,81 +1679,114 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		}
 		Writer.EndCompound();
 	}
-	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
+	if ((a_Item.m_ItemType == Item::FireworkRocket) || (a_Item.m_ItemType == Item::FireworkStar))
 	{
-		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, Writer, a_Item.m_ItemType);
 	}
-	if (a_Item.m_ItemType == E_ITEM_POTION)
-	{
-		// 1.9 potions use a different format.  In the future (when only 1.9+ is supported) this should be its own class
-		AString PotionID = "empty";  // Fallback of "Uncraftable potion" for unhandled cases
 
-		cEntityEffect::eType Type = cEntityEffect::GetPotionEffectType(a_Item.m_ItemDamage);
-		if (Type != cEntityEffect::effNoEffect)
+	switch (a_Item.m_ItemType)
+	{
+		case Item::Potion:
 		{
-			switch (Type)
+			// 1.9 potions use a different format.  In the future (when only 1.9+ is supported) this should be its own class
+			AString PotionID = "empty";  // Fallback of "Uncraftable potion" for unhandled cases
+			/*
+			cEntityEffect::eType Type = cEntityEffect::GetPotionEffectType(a_Item.m_ItemDamage);
+			if (Type != cEntityEffect::effNoEffect)
 			{
-				case cEntityEffect::effRegeneration: PotionID = "regeneration"; break;
-				case cEntityEffect::effSpeed: PotionID = "swiftness"; break;
-				case cEntityEffect::effFireResistance: PotionID = "fire_resistance"; break;
-				case cEntityEffect::effPoison: PotionID = "poison"; break;
-				case cEntityEffect::effInstantHealth: PotionID = "healing"; break;
-				case cEntityEffect::effNightVision: PotionID = "night_vision"; break;
-				case cEntityEffect::effWeakness: PotionID = "weakness"; break;
-				case cEntityEffect::effStrength: PotionID = "strength"; break;
-				case cEntityEffect::effSlowness: PotionID = "slowness"; break;
-				case cEntityEffect::effJumpBoost: PotionID = "leaping"; break;
-				case cEntityEffect::effInstantDamage: PotionID = "harming"; break;
-				case cEntityEffect::effWaterBreathing: PotionID = "water_breathing"; break;
-				case cEntityEffect::effInvisibility: PotionID = "invisibility"; break;
-				default: ASSERT(!"Unknown potion effect"); break;
-			}
-			if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1)
-			{
-				PotionID = "strong_" + PotionID;
-			}
-			else if (a_Item.m_ItemDamage & 0x40)
-			{
-				// Extended potion bit
-				PotionID = "long_" + PotionID;
-			}
-		}
-		else
-		{
-			// Empty potions: Water bottles and other base ones
-			if (a_Item.m_ItemDamage == 0)
-			{
-				// No other bits set; thus it's a water bottle
-				PotionID = "water";
+				switch (Type)
+				{
+					case cEntityEffect::effRegeneration: PotionID = "regeneration"; break;
+					case cEntityEffect::effSpeed: PotionID = "swiftness"; break;
+					case cEntityEffect::effFireResistance: PotionID = "fire_resistance"; break;
+					case cEntityEffect::effPoison: PotionID = "poison"; break;
+					case cEntityEffect::effInstantHealth: PotionID = "healing"; break;
+					case cEntityEffect::effNightVision: PotionID = "night_vision"; break;
+					case cEntityEffect::effWeakness: PotionID = "weakness"; break;
+					case cEntityEffect::effStrength: PotionID = "strength"; break;
+					case cEntityEffect::effSlowness: PotionID = "slowness"; break;
+					case cEntityEffect::effJumpBoost: PotionID = "leaping"; break;
+					case cEntityEffect::effInstantDamage: PotionID = "harming"; break;
+					case cEntityEffect::effWaterBreathing: PotionID = "water_breathing"; break;
+					case cEntityEffect::effInvisibility: PotionID = "invisibility"; break;
+					default: ASSERT(!"Unknown potion effect"); break;
+				}
+				if (cEntityEffect::GetPotionEffectIntensity(a_Item.m_ItemDamage) == 1)
+				{
+					PotionID = "strong_" + PotionID;
+				}
+				else if (a_Item.m_ItemDamage & 0x40)
+				{
+					// Extended potion bit
+					PotionID = "long_" + PotionID;
+				}
 			}
 			else
 			{
-				switch (a_Item.m_ItemDamage & 0x3f)
+				// Empty potions: Water bottles and other base ones
+				if (a_Item.m_ItemDamage == 0)
 				{
-					case 0x00: PotionID = "mundane"; break;
-					case 0x10: PotionID = "awkward"; break;
-					case 0x20: PotionID = "thick"; break;
+					// No other bits set; thus it's a water bottle
+					PotionID = "water";
 				}
-				// Default cases will use "empty" from before.
+				else
+				{
+					switch (a_Item.m_ItemDamage & 0x3f)
+					{
+						case 0x00: PotionID = "mundane"; break;
+						case 0x10: PotionID = "awkward"; break;
+						case 0x20: PotionID = "thick"; break;
+					}
+					// Default cases will use "empty" from before.
+				}
 			}
+
+			PotionID = "minecraft:" + PotionID;
+			*/
+			Writer.AddString("Potion", PotionID);
+			break;
 		}
-
-		PotionID = "minecraft:" + PotionID;
-
-		Writer.AddString("Potion", PotionID);
-	}
-	if (a_Item.m_ItemType == E_ITEM_SPAWN_EGG)
-	{
-		// Convert entity ID to the name.
-		eMonsterType MonsterType = cItemSpawnEggHandler::ItemDamageToMonsterType(a_Item.m_ItemDamage);
-		if (MonsterType != eMonsterType::mtInvalidType)
+		case Item::BatSpawnEgg:
+		case Item::BlazeSpawnEgg:
+		case Item::CaveSpiderSpawnEgg:
+		case Item::ChickenSpawnEgg:
+		case Item::CowSpawnEgg:
+		case Item::CreeperSpawnEgg:
+		case Item::EndermanSpawnEgg:
+		case Item::GhastSpawnEgg:
+		case Item::GuardianSpawnEgg:
+		case Item::HorseSpawnEgg:
+		case Item::MagmaCubeSpawnEgg:
+		case Item::MooshroomSpawnEgg:
+		case Item::OcelotSpawnEgg:
+		case Item::PigSpawnEgg:
+		case Item::RabbitSpawnEgg:
+		case Item::SheepSpawnEgg:
+		case Item::SilverfishSpawnEgg:
+		case Item::SkeletonSpawnEgg:
+		case Item::SlimeSpawnEgg:
+		case Item::SpiderSpawnEgg:
+		case Item::SquidSpawnEgg:
+		case Item::VillagerSpawnEgg:
+		case Item::WitchSpawnEgg:
+		case Item::WitherSkeletonSpawnEgg:
+		case Item::WolfSpawnEgg:
+		case Item::ZombieSpawnEgg:
+		case Item::ZombiePigmanSpawnEgg:
+		case Item::ZombieVillagerSpawnEgg:
 		{
-			Writer.BeginCompound("EntityTag");
-			Writer.AddString("id", "minecraft:" + cMonster::MobTypeToVanillaNBT(MonsterType));
-			Writer.EndCompound();
+			// Convert entity ID to the name.
+			auto MonsterType = cItemSpawnEggHandler::ItemToMonsterType(a_Item.m_ItemType);
+			if (MonsterType != etInvalid)
+			{
+				Writer.BeginCompound("EntityTag");
+				Writer.AddString("id", "minecraft:" + cMonster::MobTypeToVanillaNBT(MonsterType));
+				Writer.EndCompound();
+			}
+			break;
 		}
+		default: break;
 	}
-
 	Writer.Finish();
 
 	const auto Result = Writer.GetResult();
@@ -1939,416 +1796,6 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		return;
 	}
 	a_Pkt.WriteBuf(Result);
-}
-
-
-
-
-
-void cProtocol_1_9_0::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mob) const
-{
-	// Living entity metadata
-	if (a_Mob.HasCustomName())
-	{
-		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
-		a_Pkt.WriteBEUInt8(2);  // Index 2: Custom name
-		a_Pkt.WriteBEUInt8(METADATA_TYPE_STRING);
-		a_Pkt.WriteString(a_Mob.GetCustomName());
-
-		a_Pkt.WriteBEUInt8(3);  // Index 3: Custom name always visible
-		a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-		a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
-	}
-
-	a_Pkt.WriteBEUInt8(6);  // Index 6: Health
-	a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
-	a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
-
-	switch (a_Mob.GetMobType())
-	{
-		case mtBat:
-		{
-			auto & Bat = static_cast<const cBat &>(a_Mob);
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Bat flags - currently only hanging
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEInt8(Bat.IsHanging() ? 1 : 0);
-			break;
-		}  // case mtBat
-
-		case mtChicken:
-		{
-			auto & Chicken = static_cast<const cChicken &>(a_Mob);
-
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Chicken.IsBaby());
-			break;
-		}  // case mtChicken
-
-		case mtCow:
-		{
-			auto & Cow = static_cast<const cCow &>(a_Mob);
-
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Cow.IsBaby());
-			break;
-		}  // case mtCow
-
-		case mtCreeper:
-		{
-			auto & Creeper = static_cast<const cCreeper &>(a_Mob);
-			a_Pkt.WriteBEUInt8(11);  // Index 11: State (idle or "blowing")
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Creeper.IsBlowing() ? 1 : 0xffffffff);
-
-			a_Pkt.WriteBEUInt8(12);  // Index 12: Is charged
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Creeper.IsCharged());
-
-			a_Pkt.WriteBEUInt8(13);  // Index 13: Is ignited
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Creeper.IsBurnedWithFlintAndSteel());
-			break;
-		}  // case mtCreeper
-
-		case mtEnderman:
-		{
-			auto & Enderman = static_cast<const cEnderman &>(a_Mob);
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Carried block
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BLOCKID);
-			UInt32 Carried = 0;
-			Carried |= static_cast<UInt32>(Enderman.GetCarriedBlock() << 4);
-			Carried |= Enderman.GetCarriedMeta();
-			a_Pkt.WriteVarInt32(Carried);
-
-			a_Pkt.WriteBEUInt8(12);  // Index 12: Is screaming
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Enderman.IsScreaming());
-			break;
-		}  // case mtEnderman
-
-		case mtGhast:
-		{
-			auto & Ghast = static_cast<const cGhast &>(a_Mob);
-			a_Pkt.WriteBEUInt8(11);  // Is attacking
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Ghast.IsCharging());
-			break;
-		}  // case mtGhast
-
-		case mtHorse:
-		{
-			auto & Horse = static_cast<const cHorse &>(a_Mob);
-			Int8 Flags = 0;
-			if (Horse.IsTame())
-			{
-				Flags |= 0x02;
-			}
-			if (Horse.IsSaddled())
-			{
-				Flags |= 0x04;
-			}
-			if (Horse.IsChested())
-			{
-				Flags |= 0x08;
-			}
-			if (Horse.IsEating())
-			{
-				Flags |= 0x20;
-			}
-			if (Horse.IsRearing())
-			{
-				Flags |= 0x40;
-			}
-			if (Horse.IsMthOpen())
-			{
-				Flags |= 0x80;
-			}
-			a_Pkt.WriteBEUInt8(12);  // Index 12: flags
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEInt8(Flags);
-
-			a_Pkt.WriteBEUInt8(13);  // Index 13: Variant / type
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Horse.GetHorseType()));
-
-			a_Pkt.WriteBEUInt8(14);  // Index 14: Color / style
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			int Appearance = 0;
-			Appearance = Horse.GetHorseColor();
-			Appearance |= Horse.GetHorseStyle() << 8;
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Appearance));
-
-			a_Pkt.WriteBEUInt8(16);  // Index 16: Armor
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Horse.GetHorseArmour()));
-
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Horse.IsBaby());
-			break;
-		}  // case mtHorse
-
-		case mtMagmaCube:
-		{
-			auto & MagmaCube = static_cast<const cMagmaCube &>(a_Mob);
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Size
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(MagmaCube.GetSize()));
-			break;
-		}  // case mtMagmaCube
-
-		case mtOcelot:
-		{
-			auto & Ocelot = static_cast<const cOcelot &>(a_Mob);
-
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Ocelot.IsBaby());
-			break;
-		}  // case mtOcelot
-
-		case mtPig:
-		{
-			auto & Pig = static_cast<const cPig &>(a_Mob);
-
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Pig.IsBaby());
-
-			a_Pkt.WriteBEUInt8(12);  // Index 12: Is saddled
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Pig.IsSaddled());
-
-			break;
-		}  // case mtPig
-
-		case mtRabbit:
-		{
-			auto & Rabbit = static_cast<const cRabbit &>(a_Mob);
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Rabbit.IsBaby());
-
-			a_Pkt.WriteBEUInt8(12);  // Index 12: Type
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Rabbit.GetRabbitType()));
-			break;
-		}  // case mtRabbit
-
-		case mtSheep:
-		{
-			auto & Sheep = static_cast<const cSheep &>(a_Mob);
-
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Sheep.IsBaby());
-
-			a_Pkt.WriteBEUInt8(12);  // Index 12: sheared, color
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			Int8 SheepMetadata = 0;
-			SheepMetadata = static_cast<Int8>(Sheep.GetFurColor());
-			if (Sheep.IsSheared())
-			{
-				SheepMetadata |= 0x10;
-			}
-			a_Pkt.WriteBEInt8(SheepMetadata);
-			break;
-		}  // case mtSheep
-
-		case mtSkeleton:
-		{
-			auto & Skeleton = static_cast<const cSkeleton &>(a_Mob);
-			a_Pkt.WriteBEUInt8(11);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(0);
-
-			// Index 5 and 12 used for charging bow client animation.
-			a_Pkt.WriteBEUInt8(5);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEInt8(0x02 | (Skeleton.IsChargingBow() ? 0x01 : 0x00));
-
-			a_Pkt.WriteBEUInt8(12);
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBool(Skeleton.IsChargingBow());
-			break;
-		}
-
-		case mtSlime:
-		{
-			auto & Slime = static_cast<const cSlime &>(a_Mob);
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Size
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Slime.GetSize()));
-			break;
-		}  // case mtSlime
-
-		case mtVillager:
-		{
-			auto & Villager = static_cast<const cVillager &>(a_Mob);
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Villager.IsBaby());
-
-			a_Pkt.WriteBEUInt8(12);  // Index 12: Type
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Villager.GetVilType()));
-			break;
-		}  // case mtVillager
-
-		case mtWitch:
-		{
-			auto & Witch = static_cast<const cWitch &>(a_Mob);
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Is angry
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Witch.IsAngry());
-			break;
-		}  // case mtWitch
-
-		case mtWither:
-		{
-			auto & Wither = static_cast<const cWither &>(a_Mob);
-			a_Pkt.WriteBEUInt8(14);  // Index 14: Invulnerable ticks
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(Wither.GetWitherInvulnerableTicks());
-
-			// TODO: Use boss bar packet for health
-			break;
-		}  // case mtWither
-
-		case mtWitherSkeleton:
-		{
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Type
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(1);  // Is wither skeleton
-			break;
-		}  // case mtWitherSkeleton
-
-		case mtWolf:
-		{
-			auto & Wolf = static_cast<const cWolf &>(a_Mob);
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Wolf.IsBaby());
-
-			Int8 WolfStatus = 0;
-			if (Wolf.IsSitting())
-			{
-				WolfStatus |= 0x1;
-			}
-			if (Wolf.IsAngry())
-			{
-				WolfStatus |= 0x2;
-			}
-			if (Wolf.IsTame())
-			{
-				WolfStatus |= 0x4;
-			}
-			a_Pkt.WriteBEUInt8(12);  // Index 12: status
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BYTE);
-			a_Pkt.WriteBEInt8(WolfStatus);
-
-			a_Pkt.WriteBEUInt8(14);  // Index 14: Health
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_FLOAT);
-			a_Pkt.WriteBEFloat(static_cast<float>(a_Mob.GetHealth()));
-
-			a_Pkt.WriteBEUInt8(15);  // Index 15: Is begging
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Wolf.IsBegging());
-
-			a_Pkt.WriteBEUInt8(16);  // Index 16: Collar color
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(static_cast<UInt32>(Wolf.GetCollarColor()));
-			break;
-		}  // case mtWolf
-
-		case mtZombie:
-		{
-			auto & Zombie = static_cast<const cZombie &>(a_Mob);
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(Zombie.IsBaby());
-
-			a_Pkt.WriteBEUInt8(12);  // Index 12: Is a villager
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(0);
-
-			a_Pkt.WriteBEUInt8(13);  // Index 13: Is converting
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(false);
-			break;
-		}  // case mtZombie
-
-		case mtZombiePigman:
-		{
-			auto & ZombiePigman = static_cast<const cZombiePigman &>(a_Mob);
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(ZombiePigman.IsBaby());
-			break;
-		}  // case mtZombiePigman
-
-		case mtZombieVillager:
-		{
-			auto & ZombieVillager = reinterpret_cast<const cZombieVillager &>(a_Mob);
-			a_Pkt.WriteBEUInt8(11);  // Index 11: Is baby
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(ZombieVillager.IsBaby());
-
-			a_Pkt.WriteBEUInt8(12);  // Index 12: Is a villager
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_VARINT);
-			a_Pkt.WriteVarInt32(ZombieVillager.GetProfession());
-
-			a_Pkt.WriteBEUInt8(13);  // Index 13: Is converting
-			a_Pkt.WriteBEUInt8(METADATA_TYPE_BOOL);
-			a_Pkt.WriteBool(ZombieVillager.ConversionTime() != -1);
-			break;
-		}  // case mtZombieVillager
-
-		case mtBlaze:
-		case mtElderGuardian:
-		case mtGuardian:
-		{
-			// TODO: Mobs with extra fields that aren't implemented
-			break;
-		}
-
-		case mtCat:
-
-		case mtDonkey:
-
-		case mtMule:
-
-		case mtStray:
-
-		case mtSkeletonHorse:
-		case mtZombieHorse:
-
-		case mtShulker:
-		{
-			// Todo: Mobs not added yet. Grouped ones have the same metadata
-			ASSERT(!"cProtocol_1_9::WriteMobMetadata: received unimplemented type");
-			break;
-		}
-
-		case mtCaveSpider:
-		case mtEnderDragon:
-		case mtEndermite:
-		case mtGiant:
-		case mtIronGolem:
-		case mtMooshroom:
-		case mtSilverfish:
-		case mtSnowGolem:
-		case mtSpider:
-		case mtSquid:
-		{
-			// Entities without additional metadata
-			break;
-		}
-
-		default: UNREACHABLE("cProtocol_1_9::WriteMobMetadata: received mob of invalid type");
-	}  // switch (a_Mob.GetType())
 }
 
 

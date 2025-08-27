@@ -6,6 +6,7 @@ target_sources(
 	BiomeDef.cpp
 	BlockArea.cpp
 	BlockInfo.cpp
+	BlockState.cpp
 	BlockType.cpp
 	BrewingRecipes.cpp
 	Broadcaster.cpp
@@ -156,6 +157,7 @@ set(FOLDERS
 	Generating HTTP Items mbedTLS++ Mobs Noise
 	OSSupport Physics Protocol Registries Simulator
 	Simulator/IncrementalRedstoneSimulator UI WorldStorage
+	Commands Tags DataComponents
 )
 
 # Add all child source directories:

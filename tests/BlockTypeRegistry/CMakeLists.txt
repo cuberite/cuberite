@@ -12,6 +12,9 @@ add_executable(BlockStateTest
 	${PROJECT_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
 )
 target_link_libraries(BlockStateTest fmt::fmt)
+if (WIN32)
+	target_link_libraries(BlockStateTest ws2_32)
+endif()
 
 add_executable(BlockTypePaletteTest
 	BlockTypePaletteTest.cpp
@@ -24,6 +27,9 @@ add_executable(BlockTypePaletteTest
 	${PROJECT_SOURCE_DIR}/src/OSSupport/File.cpp
 )
 target_link_libraries(BlockTypePaletteTest fmt::fmt jsoncpp_static)
+if (WIN32)
+	target_link_libraries(BlockTypePaletteTest ws2_32)
+endif()
 
 # BlockTypeRegistryTest: Verify that the BlockTypeRegistry class works as intended:
 add_executable(BlockTypeRegistryTest
@@ -34,6 +40,9 @@ add_executable(BlockTypeRegistryTest
 	${PROJECT_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
 )
 target_link_libraries(BlockTypeRegistryTest fmt::fmt Threads::Threads)
+if (WIN32)
+	target_link_libraries(BlockTypeRegistryTest ws2_32)
+endif()
 
 # PalettedBlockAreaTest: Verify that the PalettedBlockArea class works as intended:
 add_executable(PalettedBlockAreaTest
@@ -49,6 +58,9 @@ add_executable(PalettedBlockAreaTest
 	${PROJECT_SOURCE_DIR}/src/OSSupport/CriticalSection.cpp
 )
 target_link_libraries(PalettedBlockAreaTest fmt::fmt jsoncpp_static)
+if (WIN32)
+	target_link_libraries(PalettedBlockAreaTest ws2_32)
+endif()
 
 # Extra files for BlockTypePalette test:
 file (COPY

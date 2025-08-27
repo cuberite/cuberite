@@ -16,15 +16,7 @@ class cItemLilypadHandler final:
 
 public:
 
-	constexpr cItemLilypadHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-
-	}
-
-
-
-
+	using Super::Super;
 
 	virtual bool IsPlaceable(void) const override
 	{
@@ -54,10 +46,9 @@ public:
 
 			// Lilypad should not replace non air and non water blocks:
 			if (
-				const auto BlockToReplace = a_World->GetBlock(PlacePos);
-				(BlockToReplace != E_BLOCK_AIR) &&
-				(BlockToReplace != E_BLOCK_WATER) &&
-				(BlockToReplace != E_BLOCK_STATIONARY_WATER)
+				auto BlockToReplace = a_World->GetBlock(PlacePos);
+				(BlockToReplace.Type() != BlockType::Air) &&
+				(BlockToReplace.Type() != BlockType::Water)
 			)
 			{
 				return false;
@@ -71,15 +62,14 @@ public:
 
 			// Lilypad should be placed only if there is a water block below:
 			if (
-				const auto BlockBelow = a_World->GetBlock(Below);
-				(BlockBelow != E_BLOCK_WATER) &&
-				(BlockBelow != E_BLOCK_STATIONARY_WATER)
+				auto BlockBelow = a_World->GetBlock(Below);
+				(BlockBelow.Type() != BlockType::Water)
 			)
 			{
 				return false;
 			}
 
-			a_World->SetBlock(PlacePos, E_BLOCK_LILY_PAD, 0);
+			a_World->SetBlock(PlacePos, Block::LilyPad::LilyPad());
 			if (!a_Player->IsGameModeCreative())
 			{
 				a_Player->GetInventory().RemoveOneEquippedItem();
@@ -93,11 +83,11 @@ public:
 		{
 		public:
 
-			virtual bool OnNextBlock(Vector3i a_CBBlockPos, BLOCKTYPE a_CBBlockType, NIBBLETYPE a_CBBlockMeta, eBlockFace a_CBEntryFace) override
+			virtual bool OnNextBlock(Vector3i a_CBBlockPos, BlockState a_CBBlock, eBlockFace a_CBEntryFace) override
 			{
 				if (
-					!IsBlockWater(a_CBBlockType) ||
-					(a_CBBlockMeta != 0)  // The hit block should be a source
+					(a_CBBlock.Type() != BlockType::Water) &&
+					(cBlockFluidHandler::GetFalloff(a_CBBlock) != 0)  // The hit block should be a source
 				)
 				{
 					// TODO: Vanilla stops the trace. However, we need to continue the trace, to work around our lack of block bounding box support
@@ -125,13 +115,13 @@ public:
 		}
 
 		const auto BlockToReplace = a_World->GetBlock(Callbacks.Position);
-		if (BlockToReplace != E_BLOCK_AIR)
+		if (BlockToReplace.Type() != BlockType::Air)
 		{
 			// Lilypad should not replace non air blocks:
 			return false;
 		}
 
-		a_World->SetBlock(Callbacks.Position, E_BLOCK_LILY_PAD, 0);
+		a_World->SetBlock(Callbacks.Position, Block::LilyPad::LilyPad());
 		if (!a_Player->IsGameModeCreative())
 		{
 			a_Player->GetInventory().RemoveOneEquippedItem();

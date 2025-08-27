@@ -50,9 +50,12 @@
 #include "OverridesSettingsRepository.h"
 #include "Logger.h"
 #include "ClientHandle.h"
+#include "Tags/AbstractTag.h"
 
-
-
+// temp
+#include "DataComponents/JsonDataCompLoader.h"
+#include "Protocol/Palettes/BlockMap.h"
+#include <fstream>
 
 
 #ifdef __clang__
@@ -123,6 +126,16 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOG("from commit " BUILD_COMMIT_ID " built at: " BUILD_DATETIME);
 #endif
 
+
+	if (
+		!std::filesystem::exists(std::filesystem::current_path().concat("/cuberite")) &&
+		!std::filesystem::exists(std::filesystem::current_path().concat("/cuberite.exe")) &&
+		!std::filesystem::exists(std::filesystem::current_path().concat("/Cuberite")) &&
+		!std::filesystem::exists(std::filesystem::current_path().concat("/Cuberite.exe")))
+	{
+		LOGERROR("Working directory set outside of the directory of the Cuberite binary\n Files required to run probably will not be loaded.");
+	}
+
 	cDeadlockDetect dd;
 	auto BeginTime = std::chrono::steady_clock::now();
 
@@ -138,6 +151,15 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	{
 		m_SettingsFilename = a_OverridesRepo.GetValue("Server","ConfigFile");
 	}
+
+	LOGD("Loading block palettes");
+	m_BlockMap = new BlockMap::cBlockMap();
+	m_BlockMap->LoadAll();
+
+	m_RegistriesMap = new RegistriesMap::cRegistryHandler();
+	m_RegistriesMap->LoadAll();
+	DataComponents::cDataComponents::LoadFromJson("Protocol/items.json");
+
 
 	auto IniFile = std::make_unique<cIniFile>();
 	bool IsNewIniFile = !IniFile->ReadFile(m_SettingsFilename);
@@ -168,6 +190,9 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	m_WebAdmin = new cWebAdmin();
 	m_WebAdmin->Init();
 
+	m_TagManager = new TagManager();
+	m_TagManager->SetupTags();
+
 	LOGD("Loading settings...");
 	m_RankManager.reset(new cRankManager());
 	m_RankManager->Initialize(*m_MojangAPI);
@@ -182,6 +207,9 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOGD("Loading plugin manager...");
 	m_PluginManager = new cPluginManager(dd);
 	m_PluginManager->ReloadPluginsNow(*settingsRepo);
+	m_PluginManager->SetupNewCommands();
+
+
 
 	LOGD("Loading MonsterConfig...");
 	m_MonsterConfig = new cMonsterConfig;
@@ -243,6 +271,13 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 
 	LOGD("Stopping plugin manager...");
 	delete m_PluginManager; m_PluginManager = nullptr;
+
+	LOGD("Unloading block palettes, tags, registries and removing all default item components");
+	delete m_BlockMap; m_BlockMap = nullptr;
+	delete m_TagManager; m_TagManager = nullptr;
+	delete m_RegistriesMap; m_RegistriesMap = nullptr;
+	DataComponents::cDataComponents::RemoveAllDefaultComponents();
+
 
 	LOG("Cleaning up...");
 	delete m_Server; m_Server = nullptr;
@@ -923,6 +958,7 @@ int cRoot::GetPhysicalRAMUsage(void)
 
 void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 {
+	/*
 	int SumNumValid = 0;
 	int SumNumDirty = 0;
 	int SumNumInLighting = 0;
@@ -939,14 +975,19 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 		int NumInLighting = 0;
 		World.GetChunkStats(NumValid, NumDirty, NumInLighting);
 		a_Output.OutLn(fmt::format(FMT_STRING("World {}:"), World.GetName()));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Num loaded chunks: {}"), NumValid));
+		a_Output.OutLn(fmt::format(FMT_STRING(" Num loaded chunks: {}"), NumValid));
 		a_Output.OutLn(fmt::format(FMT_STRING("  Num dirty chunks: {}"), NumDirty));
 		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in lighting queue: {}"), NumInLighting));
 		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in generator queue: {}"), NumInGenerator));
 		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in storage load queue: {}"), NumInLoadQueue));
 		a_Output.OutLn(fmt::format(FMT_STRING("  Num chunks in storage save queue: {}"), NumInSaveQueue));
 		int Mem = NumValid * static_cast<int>(sizeof(cChunk));
-		a_Output.OutLn(fmt::format(FMT_STRING("  Memory used by chunks: {} KiB ({} MiB)"), (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024)));
+		a_Output.Out("  Memory used by chunks: %d KiB (%d MiB)", (Mem + 1023) / 1024, (Mem + 1024 * 1024 - 1) / (1024 * 1024));
+		a_Output.Out("  Per-chunk memory size breakdown:");
+		a_Output.Out("    block types:    %6zu bytes (%3zu KiB)", sizeof(cChunkDef::BlockStates), (sizeof(cChunkDef::BlockStates) + 1023) / 1024);
+		a_Output.Out("    block lighting: %6zu bytes (%3zu KiB)", 2 * sizeof(cChunkDef::LightNibbles), (2 * sizeof(cChunkDef::LightNibbles) + 1023) / 1024);
+		a_Output.Out("    heightmap:      %6zu bytes (%3zu KiB)", sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024);
+		a_Output.Out("    biomemap:       %6zu bytes (%3zu KiB)", sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024);
 		SumNumValid += NumValid;
 		SumNumDirty += NumDirty;
 		SumNumInLighting += NumInLighting;
@@ -965,6 +1006,7 @@ void cRoot::LogChunkStats(cCommandOutputCallback & a_Output)
 	a_Output.OutLn(fmt::format(FMT_STRING("  block lighting: {:06} bytes ({:3} KiB)"), 2 * sizeof(cChunkDef::BlockNibbles), (2 * sizeof(cChunkDef::BlockNibbles) + 1023) / 1024));
 	a_Output.OutLn(fmt::format(FMT_STRING("  heightmap:      {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::HeightMap), (sizeof(cChunkDef::HeightMap) + 1023) / 1024));
 	a_Output.OutLn(fmt::format(FMT_STRING("  biomemap:       {:06} bytes ({:3} KiB)"), sizeof(cChunkDef::BiomeMap), (sizeof(cChunkDef::BiomeMap) + 1023) / 1024));
+	*/
 }
 
 

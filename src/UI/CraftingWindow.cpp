@@ -45,7 +45,7 @@ void cCraftingWindow::DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer &
 	else if (a_ClickedArea == m_SlotAreas[1])
 	{
 		// Inventory Area
-		AreasInOrder.push_back(m_SlotAreas[2]);  /* Hotbar */
+		AreasInOrder.push_back(m_SlotAreas[0]);  /* Hotbar */
 		Super::DistributeStackToAreas(a_ItemStack, a_Player, AreasInOrder, a_ShouldApply, false);
 	}
 	else

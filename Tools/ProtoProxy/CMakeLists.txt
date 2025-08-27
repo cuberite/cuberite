@@ -89,6 +89,14 @@ add_executable(ProtoProxy
 	${SHARED_OSS_HDR}
 )
 
+if(NOT WIN32)
+	target_compile_options(ProtoProxy PRIVATE -Wno-switch)
+	target_compile_options(ProtoProxy PRIVATE -Wno-switch-default)
+	target_compile_options(ProtoProxy PRIVATE -Wno-nan-infinity-disabled)
+	target_compile_options(ProtoProxy PRIVATE -Wno-duplicate-enum)
+	target_compile_options(ProtoProxy PRIVATE -Wno-float-equal)
+endif()
+
 target_link_libraries(ProtoProxy fmt::fmt libdeflate mbedtls Threads::Threads)
 
 include(../../SetFlags.cmake)

@@ -5,7 +5,8 @@
 // tolua_begin
 
 
-enum ENUM_BLOCK_TYPE : BLOCKTYPE
+
+enum ENUM_BLOCK_TYPE  // : unsigned char
 {
 	E_BLOCK_AIR = 0,
 	E_BLOCK_STONE = 1,
@@ -273,11 +274,12 @@ enum ENUM_BLOCK_TYPE : BLOCKTYPE
 	E_BLOCK_STRUCTURE_BLOCK = 255,
 
 	// Keep these two as the last values. Update the last block value to the last block with an id less than 255 when adding another block
-	// IsValidBlock() depends on this (255 gets checked additionally because there is a gap. See https://minecraft.wiki/w/Data_values#Block_IDs
-	E_BLOCK_NUMBER_OF_TYPES = E_BLOCK_CONCRETE_POWDER + 1,  ///< Number of individual (different) blocktypes
-	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
+	// IsValidBlock() depends on this (255 gets checked additionally because there is a gap. See https://minecraft.gamepedia.com/Data_values#Block_IDs
 
 	E_BLOCK_UNFINISHED = 254,  // Special type used as a placeholder, signifying that the block lacks implementation
+
+	E_BLOCK_NUMBER_OF_TYPES = E_BLOCK_CONCRETE_POWDER + 1,  ///< Number of individual (different) blocktypes
+	E_BLOCK_MAX_TYPE_ID = E_BLOCK_NUMBER_OF_TYPES - 1,  ///< Maximum BlockType number used
 
 	// Synonym or ID compatibility
 	E_BLOCK_YELLOW_FLOWER = E_BLOCK_DANDELION,
@@ -522,19 +524,21 @@ enum ENUM_ITEM_TYPE : short
 	E_ITEM_LAST_DISC = E_ITEM_LAST_DISC_PLUS_ONE - 1,  ///< Maximum disc itemtype number used
 
 	E_ITEM_LAST = E_ITEM_LAST_DISC,  ///< Maximum valid ItemType
+
 };
 
 
 
 
 
-enum ENUM_BLOCK_META : NIBBLETYPE
+enum ENUM_BLOCK_META
 {
 	// Please keep this list alpha-sorted by the blocktype part
 	// then number-sorted for the same block
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Block metas:
+
 
 	// E_BLOCK_ANVIL metas
 	E_BLOCK_ANVIL_Z = 0,
@@ -1019,6 +1023,8 @@ enum ENUM_ITEM_META : short
 	////////////////////////////////////////////////////////////////////////////////
 	// Item metas:
 
+
+
 	// E_ITEM_BANNER metas:
 	E_META_BANNER_BLACK      = 0,
 	E_META_BANNER_RED        = 1,
@@ -1144,9 +1150,11 @@ enum ENUM_ITEM_META : short
 	E_META_SPAWN_EGG_IRON_GOLEM       = 99,
 	E_META_SPAWN_EGG_HORSE            = 100,
 	E_META_SPAWN_EGG_RABBIT           = 101,
-	E_META_SPAWN_EGG_VILLAGER         = 120,
-	E_META_SPAWN_EGG_ENDER_CRYSTAL    = 200,
 } ;
+
+
+
+
 
 // tolua_end
 
@@ -1173,7 +1181,7 @@ extern bool StringToItem(const AString & a_ItemTypeString, cItem & a_Item);
 extern AString ItemToString(const cItem & a_Item);
 
 /** Translates itemtype into a string. If the type is not recognized, the itemtype number is output into the string. */
-extern AString ItemTypeToString(short a_ItemType);
+extern AString ItemTypeToString(Item a_ItemType);
 
 /** Translates a full item into a fully-specified string (including meta and count). If the ItemType is not recognized, the ItemType number is output into the string. */
 extern AString ItemToFullString(const cItem & a_Item);

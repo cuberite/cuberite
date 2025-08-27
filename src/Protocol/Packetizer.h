@@ -144,6 +144,12 @@ public:
 	}
 
 
+	inline void WriteVarInt64(UInt64 a_Value)
+	{
+		VERIFY(m_Out.WriteVarInt64(a_Value));
+	}
+
+
 	inline void WriteString(const AString & a_Value)
 	{
 		VERIFY(m_Out.WriteVarUTF8String(a_Value));
@@ -155,6 +161,12 @@ public:
 		VERIFY(m_Out.Write(a_Data.data(), a_Data.size()));
 	}
 
+	// TODO: implement a variant with max length
+	inline void WriteLengthPrefixedBuf(const ContiguousByteBufferView a_Data)
+	{
+		VERIFY(m_Out.WriteVarInt32(static_cast<UInt32>(a_Data.size())));
+		VERIFY(m_Out.Write(a_Data.data(), a_Data.size()));
+	}
 
 	/** Writes the specified block position as a single encoded 64-bit BigEndian integer.
 	The three coordinates are written in XYZ order. */

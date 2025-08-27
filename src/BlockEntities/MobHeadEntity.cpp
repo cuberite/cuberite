@@ -8,26 +8,27 @@
 #include "json/json.h"
 #include "../Entities/Player.h"
 #include "../ClientHandle.h"
+#include "../Blocks/BlockMobHead.h"
 
 
 
 
 
-cMobHeadEntity::cMobHeadEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
-	m_Type(SKULL_TYPE_SKELETON),
+cMobHeadEntity::cMobHeadEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, a_World),
+	m_Type(Item::SkeletonSkull),
 	m_Rotation(SKULL_ROTATION_NORTH)
 {
-	ASSERT(a_BlockType == E_BLOCK_HEAD);
+	ASSERT(cBlockMobHeadHandler::IsBlockMobHead(a_Block));
 }
 
 
 
 
 
-void cMobHeadEntity::SetType(const eMobHeadType & a_Type)
+void cMobHeadEntity::SetType(const Item & a_Type)
 {
-	if ((!m_OwnerName.empty()) && (a_Type != SKULL_TYPE_PLAYER))
+	if ((!m_OwnerName.empty()) && (a_Type != Item::PlayerHead))
 	{
 		m_OwnerName = m_OwnerTexture = m_OwnerTextureSignature = "";
 		m_OwnerUUID = cUUID{};
@@ -50,7 +51,7 @@ void cMobHeadEntity::SetRotation(eMobHeadRotation a_Rotation)
 
 void cMobHeadEntity::SetOwner(const cPlayer & a_Owner)
 {
-	if (m_Type != SKULL_TYPE_PLAYER)
+	if (m_Type != Item::PlayerHead)
 	{
 		return;
 	}
@@ -76,7 +77,7 @@ void cMobHeadEntity::SetOwner(const cPlayer & a_Owner)
 
 void cMobHeadEntity::SetOwner(const cUUID & a_OwnerUUID, const AString & a_OwnerName, const AString & a_OwnerTexture, const AString & a_OwnerTextureSignature)
 {
-	if (m_Type != SKULL_TYPE_PLAYER)
+	if (m_Type != Item::PlayerHead)
 	{
 		return;
 	}
@@ -93,7 +94,7 @@ void cMobHeadEntity::SetOwner(const cUUID & a_OwnerUUID, const AString & a_Owner
 
 cItems cMobHeadEntity::ConvertToPickups() const
 {
-	return cItem(E_ITEM_HEAD, 1, static_cast<short>(m_Type));
+	return cItems(m_Type);
 }
 
 
@@ -119,7 +120,7 @@ void cMobHeadEntity::CopyFrom(const cBlockEntity & a_Src)
 void cMobHeadEntity::SendTo(cClientHandle & a_Client)
 {
 	cWorld * World = a_Client.GetPlayer()->GetWorld();
-	a_Client.SendBlockChange(m_Pos, m_BlockType, World->GetBlockMeta(GetPos()));
+	a_Client.SendBlockChange(m_Pos, World->GetBlock(GetPos()));
 	a_Client.SendUpdateBlockEntity(*this);
 }
 
