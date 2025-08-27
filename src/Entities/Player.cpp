@@ -21,13 +21,13 @@
 #include "../WorldStorage/StatisticsSerializer.h"
 #include "../CompositeChat.h"
 
-#include "Blocks/BlockHandler.h"
-#include "Blocks/BlockBed.h"
-#include "Blocks/BlockSlab.h"
-#include "Blocks/ChunkInterface.h"
+#include "../Blocks/BlockHandler.h"
+#include "../Blocks/BlockBed.h"
+#include "../Blocks/BlockSlab.h"
+#include "../Blocks/ChunkInterface.h"
 
-#include "IniFile.h"
-#include "JsonUtils.h"
+#include "../IniFile.h"
+#include "../JsonUtils.h"
 #include "json/json.h"
 
 #include "../Blocks/BlockAir.h"

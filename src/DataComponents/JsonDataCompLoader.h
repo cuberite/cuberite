@@ -12,5 +12,6 @@ namespace DataComponents
 	public:
 		static void LoadFromJsonInternal(const Json::Value & a_FileRoot);
 		static void LoadFromJson(const AString & a_FileName);
+		static void RemoveAllDefaultComponents();
 	};
 }

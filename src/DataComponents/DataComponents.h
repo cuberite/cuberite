@@ -130,6 +130,11 @@ namespace DataComponents
 			}
 			m_data[a_Item] = a_Comps;
 		}
+
+		void ClearAllItems()
+		{
+			m_data.clear();
+		}
 		std::map<Item, std::map<size_t, DataComponent>> m_data;
 	};
 

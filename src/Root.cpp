@@ -272,10 +272,12 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LOGD("Stopping plugin manager...");
 	delete m_PluginManager; m_PluginManager = nullptr;
 
-	LOGD("Unloading block palettes, tags and registries");
+	LOGD("Unloading block palettes, tags, registries and removing all default item components");
 	delete m_BlockMap; m_BlockMap = nullptr;
 	delete m_TagManager; m_TagManager = nullptr;
 	delete m_RegistriesMap; m_RegistriesMap = nullptr;
+	DataComponents::cDataComponents::RemoveAllDefaultComponents();
+
 
 	LOG("Cleaning up...");
 	delete m_Server; m_Server = nullptr;

@@ -102,4 +102,9 @@ namespace DataComponents
 			cItemHandler::GetDefaultComponentsMap().AddItem(curr_item, ToAddComps);
 		}
 	}
-}
+
+	void cDataComponents::RemoveAllDefaultComponents()
+	{
+		cItemHandler::GetDefaultComponentsMap().ClearAllItems();
+	}
+}  // namespace DataComponents
