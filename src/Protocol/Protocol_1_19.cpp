@@ -2093,7 +2093,9 @@ void cProtocol_1_19_3::SendSoundEffect(const AString & a_SoundName, Vector3d a_O
 	ASSERT(m_State == 3);  // In game mode?
 
 	cPacketizer Pkt(*this, pktSoundEffect);
-	Pkt.WriteVarInt32(GetProtocolSoundID(a_SoundName));  // sound id
+	Pkt.WriteVarInt32(0);  // sound id
+	Pkt.WriteString(a_SoundName);
+	Pkt.WriteBool(false);  // Has Fixed range
 	Pkt.WriteVarInt32(0);  // Master sound category (may want to be changed to a parameter later)
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.x * 8.0));
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.y * 8.0));
