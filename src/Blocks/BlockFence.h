@@ -4,11 +4,12 @@
 #include "BlockHandler.h"
 #include "../BoundingBox.h"
 #include "ChunkInterface.h"
+#include "Root.h"
 #include "../EffectID.h"
 #include "../Entities/LeashKnot.h"
 #include "../BoundingBox.h"
 #include "../Mobs/PassiveMonster.h"
-#include "../Tags/BlockTags.h"
+#include "Tags/TagManager.h"
 
 
 class cBlockFenceHandler final :
@@ -237,7 +238,7 @@ private:
 			case BLOCK_FACE_YP:
 			case BLOCK_FACE_NONE: return;
 			case BLOCK_FACE_XM:
-			NewState = nBlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedX(-1)).Type());
+			NewState = cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::Fences, a_ChunkInterface.GetBlock(a_BlockPos.addedX(-1)).Type());
 			switch (m_BlockType)
 			{
 				case BlockType::OakFence: GET_FENCE_XM(OakFence, NewState)
@@ -256,7 +257,7 @@ private:
 			}
 			break;
 			case BLOCK_FACE_XP:
-			NewState = nBlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedX(1)).Type());
+			NewState = cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::Fences, a_ChunkInterface.GetBlock(a_BlockPos.addedX(1)).Type());
 			switch (m_BlockType)
 			{
 				case BlockType::OakFence: GET_FENCE_XP(OakFence, NewState)
@@ -275,7 +276,7 @@ private:
 			}
 			break;
 			case BLOCK_FACE_ZM:
-			NewState = nBlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedZ(-1)).Type());
+			NewState = cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::Fences, a_ChunkInterface.GetBlock(a_BlockPos.addedZ(-1)).Type());
 			switch (m_BlockType)
 			{
 				case BlockType::OakFence: GET_FENCE_ZM(OakFence, NewState)
@@ -294,7 +295,7 @@ private:
 			}
 			break;
 			case BLOCK_FACE_ZP:
-			NewState = nBlockTags::Fences(a_ChunkInterface.GetBlock(a_BlockPos.addedZ(1)).Type());
+			NewState = cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::Fences, a_ChunkInterface.GetBlock(a_BlockPos.addedZ(1)).Type());
 			switch (m_BlockType)
 			{
 				case BlockType::OakFence: GET_FENCE_ZP(OakFence, NewState)

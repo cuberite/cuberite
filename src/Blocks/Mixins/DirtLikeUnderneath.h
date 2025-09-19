@@ -1,8 +1,9 @@
 
 #pragma once
 
+#include "Root.h"
 #include "../../Chunk.h"
-#include "../../Tags/BlockTags.h"
+#include "././Tags/TagManager.h"
 
 /** Mixin to ensure the block has a dirt-like block underneath. */
 template <class Base>
@@ -38,6 +39,6 @@ protected:
 			return false;
 		}
 
-		return nBlockTags::Dirt(a_Chunk.GetBlock(BelowPos).Type());
+		return cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::Dirt, a_Chunk.GetBlock(BelowPos).Type());
 	}
 };

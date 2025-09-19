@@ -5,7 +5,6 @@
 #include "Server.h"
 #include "Entities/Player.h"
 #include <ClientHandle.h>
-#include "../Tags/BlockTags.h"
 #include "BlockEntities/BlockEntity.h"
 #include "WorldStorage/FastNBT.h"
 #include "Palettes/Palette_1_21.h"
@@ -67,23 +66,23 @@ void cProtocol_1_21::SendUpdateBlockEntity(cBlockEntity & a_BlockEntity)
 	Byte Action;
 
 	auto type = a_BlockEntity.GetBlockType();
-	if (nBlockTags::Banners(type))
+	if (cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::Banners, type))
 	{
 		Action = 19;
 	}
-	else if (nBlockTags::Beds(type))
+	else if (cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::Beds, type))
 	{
 		Action = 24;
 	}
-	else if (nBlockTags::AllHangingSigns(type))
+	else if (cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::AllHangingSigns, type))
 	{
 		Action = 8;
 	}
-	else if (nBlockTags::StandingSigns(type))
+	else if (cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::StandingSigns, type))
 	{
 		Action = 7;
 	}
-	else if (nBlockTags::FlowerPots(type))
+	else if (cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::FlowerPots, type))
 	{
 		return;  // temp fix
 	}
@@ -1534,23 +1533,23 @@ UInt32 cProtocol_1_21_2::GetBlockEntityID(const cBlockEntity & a_BlockEntity) co
 	Byte Action;
 
 	auto type = a_BlockEntity.GetBlockType();
-	if (nBlockTags::Banners(type))
+	if (cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::Banners, type))
 	{
 		Action = 20;
 	}
-	else if (nBlockTags::Beds(type))
+	else if (cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::Beds, type))
 	{
 		Action = 25;
 	}
-	else if (nBlockTags::AllHangingSigns(type))
+	else if (cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::AllHangingSigns, type))
 	{
 		Action = 8;
 	}
-	else if (nBlockTags::Signs(type))
+	else if (cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::Signs, type))
 	{
 		Action = 7;
 	}
-	else if (nBlockTags::FlowerPots(type) || (type == BlockType::NoteBlock))
+	else if (cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::FlowerPots, type) || (type == BlockType::NoteBlock))
 	{
 		return static_cast<UInt32>(-1);  // temp fix
 	}

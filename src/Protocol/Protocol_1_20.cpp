@@ -16,7 +16,6 @@
 #include "Palettes/Palette_1_20.h"
 #include "UI/HorseWindow.h"
 #include "../Entities/Entity.h"
-#include "../Tags/BlockTags.h"
 #include "BlockEntities/SignEntity.h"
 #include "Generating/BioGen.h"
 
@@ -323,7 +322,7 @@ void cProtocol_1_20::SendRespawn(eDimension a_Dimension)
 void cProtocol_1_20::WriteBlockEntity(cFastNBTWriter & a_Writer, const cBlockEntity & a_BlockEntity) const
 {
 	auto type = a_BlockEntity.GetBlockType();
-	if (nBlockTags::Signs(type))
+	if (cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::Signs, type))
 	{
 		const auto & sign = dynamic_cast<const cSignEntity &>(a_BlockEntity);
 		a_Writer.BeginCompound("front_text");

@@ -12,7 +12,6 @@
 #include "../EffectID.h"
 #include "../Mobs/Monster.h"
 #include "../Protocol/Palettes/Upgrade.h"
-#include "../Tags/BlockTags.h"
 #include "Root.h"
 
 

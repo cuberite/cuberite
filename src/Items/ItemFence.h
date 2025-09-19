@@ -1,5 +1,5 @@
 #pragma once
-#include "../Tags/BlockTags.h"
+#include "../Root.h"
 
 class cItemFenceHandler final :
 	public cSimplePlaceableItemHandler
@@ -14,10 +14,10 @@ class cItemFenceHandler final :
 		bool north = false, south = false, west = false, east = false;
 #define GET_DIR(FenceType) \
 	{ \
-		north = nBlockTags::Fences(a_Player.GetWorld()->GetBlock(a_PlacePosition.addedZ(-1)).Type()); \
-		south = nBlockTags::Fences(a_Player.GetWorld()->GetBlock(a_PlacePosition.addedZ(1)).Type()); \
-		west = nBlockTags::Fences(a_Player.GetWorld()->GetBlock(a_PlacePosition.addedX(-1)).Type()); \
-		east = nBlockTags::Fences(a_Player.GetWorld()->GetBlock(a_PlacePosition.addedX(1)).Type()); \
+		north = cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::Fences, a_Player.GetWorld()->GetBlock(a_PlacePosition.addedZ(-1)).Type()); \
+		south = cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::Fences, a_Player.GetWorld()->GetBlock(a_PlacePosition.addedZ(1)).Type()); \
+		west = cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::Fences, a_Player.GetWorld()->GetBlock(a_PlacePosition.addedX(-1)).Type()); \
+		east = cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::Fences, a_Player.GetWorld()->GetBlock(a_PlacePosition.addedX(1)).Type()); \
 		break; \
 	}
 

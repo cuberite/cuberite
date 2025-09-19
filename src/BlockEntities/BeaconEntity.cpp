@@ -2,13 +2,14 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BeaconEntity.h"
+
+#include "Root.h"
 #include "../BlockInfo.h"
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
 #include "../UI/BeaconWindow.h"
 #include "../ClientHandle.h"
-
-#include "../Tags/BlockTags.h"
+#include "../Tags/TagManager.h"
 
 
 
@@ -53,7 +54,7 @@ char cBeaconEntity::CalculatePyramidLevel(void)
 		{
 			for (int Z = MiddleXZ - Layer; Z <= (MiddleXZ + Layer); Z++)
 			{
-				if (!nBlockTags::BeaconBaseBlocks(Area.GetRelBlock({X, Y, Z}).Type()))
+				if (!cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::BeaconBaseBlocks, Area.GetRelBlock({X, Y, Z}).Type()))
 				{
 					return static_cast<char>(Layer - 1);
 				}
