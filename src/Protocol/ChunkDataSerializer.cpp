@@ -163,6 +163,11 @@ namespace
 	{
 		return cRoot::Get()->GetBlockMap()->GetProtocolBlockId(cProtocol::Version::v1_21_6, a_Block);
 	}
+
+	auto Palette772(const BlockState a_Block)
+	{
+		return cRoot::Get()->GetBlockMap()->GetProtocolBlockId(cProtocol::Version::v1_21_7, a_Block);
+	}
 }
 
 
@@ -324,9 +329,13 @@ void cChunkDataSerializer::SendToClients(const int a_ChunkX, const int a_ChunkZ,
 				continue;
 			}
 			case cProtocol::Version::v1_21_6:
-			case cProtocol::Version::v1_21_7:
 			{
 				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v771);
+				continue;
+			}
+			case cProtocol::Version::v1_21_7:
+			{
+				Serialize(Client, a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_SurfaceHeightMap, CacheVersion::v772);
 				continue;
 			}
 		}
@@ -470,6 +479,11 @@ inline void cChunkDataSerializer::Serialize(const ClientHandles::value_type & a_
 		case CacheVersion::v771:
 		{
 			Serialize770<&Palette771>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_Client, a_SurfaceHeightMap, 0x27);
+			break;
+		}
+		case CacheVersion::v772:
+		{
+			Serialize770<&Palette772>(a_ChunkX, a_ChunkZ, a_BlockData, a_LightData, a_BiomeMap, a_BlockEntities, a_Client, a_SurfaceHeightMap, 0x27);
 			break;
 		}
 	}

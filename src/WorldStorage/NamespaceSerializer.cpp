@@ -2197,6 +2197,7 @@ std::string_view NamespaceSerializer::From(const Item a_ID)
 		case Item::MusicDiscCreator:                   return "music_disc_creator";
 		case Item::MusicDiscCreatorMusicBox:           return "music_disc_creator_music_box";
 		case Item::MusicDiscFar:                       return "music_disc_far";
+		case Item::MusicDiscLavaChicken:               return "music_disc_lava_chicken";
 		case Item::MusicDiscMall:                      return "music_disc_mall";
 		case Item::MusicDiscMellohi:                   return "music_disc_mellohi";
 		case Item::MusicDiscOtherside:                 return "music_disc_otherside";
@@ -4978,6 +4979,7 @@ Item NamespaceSerializer::ToItem(const std::string_view a_ID)
 		{ "music_disc_creator",                    Item::MusicDiscCreator },
 		{ "music_disc_creator_music_box",          Item::MusicDiscCreatorMusicBox },
 		{ "music_disc_far",                        Item::MusicDiscFar },
+		{ "music_disc_lava_chicken",               Item::MusicDiscLavaChicken },
 		{ "music_disc_mall",                       Item::MusicDiscMall },
 		{ "music_disc_mellohi",                    Item::MusicDiscMellohi },
 		{ "music_disc_otherside",                  Item::MusicDiscOtherside },

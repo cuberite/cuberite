@@ -799,6 +799,7 @@ enum class Item : uint_least16_t
 	MusicDiscCreator,
 	MusicDiscCreatorMusicBox,
 	MusicDiscFar,
+	MusicDiscLavaChicken,
 	MusicDiscMall,
 	MusicDiscMellohi,
 	MusicDiscOtherside,
