@@ -1,5 +1,6 @@
 include_directories(${PROJECT_SOURCE_DIR}/src/)
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/)
+include_directories(${PROJECT_SOURCE_DIR}/lib/mbedtls/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set (SHARED_SRCS
@@ -69,7 +70,7 @@ endif()
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 add_executable(SchematicFileSerializer-exe ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
-target_link_libraries(SchematicFileSerializer-exe fmt::fmt libdeflate)
+target_link_libraries(SchematicFileSerializer-exe fmt::fmt libdeflate mbedtls)
 add_test(NAME SchematicFileSerializer-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND SchematicFileSerializer-exe)
 
 
