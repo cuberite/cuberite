@@ -5,7 +5,7 @@ find_package(Threads REQUIRED)
 # Set include paths to the used libraries:
 include_directories(SYSTEM "../../lib")
 include_directories("../../src")
-
+include_directories("../../lib/mbedtls/include")
 
 function(flatten_files arg1)
 	set(res "")
@@ -78,7 +78,7 @@ add_executable(MCADefrag
 	${SHARED_OSS_HDR}
 )
 
-target_link_libraries(MCADefrag fmt::fmt libdeflate Threads::Threads)
+target_link_libraries(MCADefrag fmt::fmt libdeflate Threads::Threads mbedtls)
 
 include(../../SetFlags.cmake)
 set_exe_flags(MCADefrag)
