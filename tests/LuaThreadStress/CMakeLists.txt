@@ -84,6 +84,16 @@ add_executable(LuaThreadStress ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS} Test.lua)
 target_link_libraries(LuaThreadStress fmt::fmt libdeflate lsqlite luaexpat Threads::Threads tolualib mbedtls)
 add_test(NAME LuaThreadStress-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND LuaThreadStress)
 
+# Necessary for the test to run.
+# Otherwise they crash with the error STATUS_DLL_NOT_FOUND (0xC0000135) because they can't find the lua51.dll
+
+if(WIN32)
+	add_custom_command(
+			TARGET LuaThreadStress  POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy
+			${CMAKE_BINARY_DIR}/Server/lua51.dll # Source
+			${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/) # Destination
+endif()
 
 
 
