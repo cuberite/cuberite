@@ -93,6 +93,7 @@ if(WIN32)
 			COMMAND ${CMAKE_COMMAND} -E copy
 			${CMAKE_BINARY_DIR}/Server/lua51.dll # Source
 			${CMAKE_RUNTIME_OUTPUT_DIRECTORY}) # Destination
+	message("Copying lua51.dll from " ${CMAKE_BINARY_DIR}/Server/lua51.dll to ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 endif()
 
 
