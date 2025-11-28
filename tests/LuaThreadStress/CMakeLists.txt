@@ -92,7 +92,7 @@ if(WIN32)
 			TARGET LuaThreadStress  POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy
 			${CMAKE_BINARY_DIR}/Server/lua51.dll # Source
-			${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/) # Destination
+			${CMAKE_RUNTIME_OUTPUT_DIRECTORY}) # Destination
 endif()
 
 
