@@ -25,7 +25,7 @@
 
 static void NonCtrlHandler(int a_Signal)
 {
-	LOGINFO("Terminate event raised from std::signal: %d", a_Signal);
+	LOGD("Terminate event raised from std::signal");
 
 	switch (a_Signal)
 	{
@@ -71,7 +71,6 @@ static void NonCtrlHandler(int a_Signal)
 		case SIGINT:
 		case SIGTERM:
 		{
-			LOGINFO("Signal %d received, shutting down...", a_Signal);
 			// Server is shutting down, wait for it...
 			cRoot::Stop();
 			return;

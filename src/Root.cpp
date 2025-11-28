@@ -259,7 +259,6 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 
 void cRoot::Stop()
 {
-	LOGINFO("cRoot::Stop() called");
 	TransitionNextState(NextState::Stop);
 }
 
@@ -1002,7 +1001,6 @@ void cRoot::HandleInput()
 {
 	if (g_RunAsService || g_DetachedStdin)
 	{
-		LOGINFO("Running with detached stdin (or as service), ignoring stdin");
 		// Ignore input when running as a service, cin was never opened in that case:
 		return;
 	}
@@ -1029,7 +1027,6 @@ void cRoot::HandleInput()
 
 		if (!std::getline(std::cin, Command))
 		{
-			LOGINFO("Standard input closed (EOF), shutting down...");
 			cRoot::Stop();
 			return;
 		}
