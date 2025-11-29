@@ -6,6 +6,7 @@ find_package(Threads REQUIRED)
 include_directories(SYSTEM "../../lib")
 include_directories("../../src")
 
+
 function(flatten_files arg1)
 	set(res "")
 	foreach(f ${${arg1}})
