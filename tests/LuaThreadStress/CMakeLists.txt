@@ -1,7 +1,6 @@
 find_package(Threads REQUIRED)
 include_directories(${PROJECT_SOURCE_DIR}/src/)
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/)
-include_directories(${PROJECT_SOURCE_DIR}/lib/mbedtls/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 set (SHARED_SRCS
@@ -81,7 +80,10 @@ source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 source_group("Lua files" FILES Test.lua)
 add_executable(LuaThreadStress ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS} Test.lua)
-target_link_libraries(LuaThreadStress fmt::fmt libdeflate lsqlite luaexpat Threads::Threads tolualib mbedtls)
+target_link_libraries(LuaThreadStress fmt::fmt libdeflate lsqlite luaexpat Threads::Threads tolualib)
+if (WIN32)
+	target_link_libraries(LuaThreadStress ws2_32)
+endif()
 add_test(NAME LuaThreadStress-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND LuaThreadStress)
 
 # Necessary for the test to run.

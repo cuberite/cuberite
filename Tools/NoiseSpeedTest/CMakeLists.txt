@@ -51,7 +51,10 @@ add_executable(NoiseSpeedTest
 	${SHARED_HDR}
 )
 
-target_link_libraries(NoiseSpeedTest fmt::fmt mbedtls)
+target_link_libraries(NoiseSpeedTest fmt::fmt)
+if (WIN32)
+	target_link_libraries(NoiseSpeedTest ws2_32)
+endif()
 
 set_target_properties(
 	NoiseSpeedTest
