@@ -212,9 +212,9 @@ void cRCONServer::cConnection::OnReceivedData(const char * a_Data, size_t a_Size
 	while (m_Buffer.size() >= 14)
 	{
 		UInt32 Length = UIntFromBuffer(m_Buffer.data());
-		if (Length > 1500)
+		if ((Length > 1500) || (Length < 10))
 		{
-			// Too long, drop the connection
+			// Too long or too short, drop the connection
 			LOGWARNING("Received an invalid RCON packet length (%d), dropping RCON connection to %s.",
 				Length, m_IPAddress.c_str()
 			);
@@ -269,7 +269,7 @@ bool cRCONServer::cConnection::ProcessPacket(UInt32 a_RequestID, UInt32 a_Packet
 	{
 		case RCON_PACKET_LOGIN:
 		{
-			if (strncmp(a_Payload, m_RCONServer.m_Password.c_str(), a_PayloadLength) != 0)
+			if ((a_PayloadLength == 0) || (strncmp(a_Payload, m_RCONServer.m_Password.c_str(), a_PayloadLength) != 0))
 			{
 				LOGINFO("RCON: Invalid password from client %s, dropping connection.", m_IPAddress.c_str());
 				SendResponse(0xffffffffU, RCON_PACKET_RESPONSE, 0, nullptr);
