@@ -23,41 +23,66 @@ public:
 
 	using Super::Super;
 
+	static inline bool IsBlockCarpet(BlockState a_Block)
+	{
+		switch (a_Block.Type())
+		{
+			case BlockType::BlackCarpet:
+			case BlockType::BlueCarpet:
+			case BlockType::BrownCarpet:
+			case BlockType::CyanCarpet:
+			case BlockType::GrayCarpet:
+			case BlockType::GreenCarpet:
+			case BlockType::LightBlueCarpet:
+			case BlockType::LightGrayCarpet:
+			case BlockType::LimeCarpet:
+			case BlockType::MagentaCarpet:
+			case BlockType::OrangeCarpet:
+			case BlockType::PinkCarpet:
+			case BlockType::PurpleCarpet:
+			case BlockType::RedCarpet:
+			case BlockType::WhiteCarpet:
+			case BlockType::YellowCarpet:
+				return true;
+			default: return false;
+		}
+	}
+
 private:
 
-	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const NIBBLETYPE a_Meta) const override
+	virtual bool CanBeAt(const cChunk & a_Chunk, const Vector3i a_Position, const BlockState a_Self) const override
 	{
 		const auto PosBelow = a_Position.addedY(-1);
-		return cChunkDef::IsValidHeight(PosBelow) && (a_Chunk.GetBlock(PosBelow) != E_BLOCK_AIR);
+		return cChunkDef::IsValidHeight(PosBelow) && IsBlockAir(a_Chunk.GetBlock(a_Position));
 	}
 
 
 
 
 
-	virtual ColourID GetMapBaseColourID(NIBBLETYPE a_Meta) const override
+	virtual ColourID GetMapBaseColourID() const override
 	{
-		switch (a_Meta)
+		switch (m_BlockType)
 		{
-			case E_META_CARPET_WHITE: return 14;
-			case E_META_CARPET_ORANGE: return 15;
-			case E_META_CARPET_MAGENTA: return 16;
-			case E_META_CARPET_LIGHTBLUE: return 17;
-			case E_META_CARPET_YELLOW: return 18;
-			case E_META_CARPET_LIGHTGREEN: return 19;
-			case E_META_CARPET_PINK: return 20;
-			case E_META_CARPET_GRAY: return 21;
-			case E_META_CARPET_LIGHTGRAY: return 22;
-			case E_META_CARPET_CYAN: return 23;
-			case E_META_CARPET_PURPLE: return 24;
-			case E_META_CARPET_BLUE: return 25;
-			case E_META_CARPET_BROWN: return 26;
-			case E_META_CARPET_GREEN: return 27;
-			case E_META_CARPET_RED: return 28;
-			case E_META_CARPET_BLACK: return 29;
+			case BlockType::WhiteCarpet: return 14;
+			case BlockType::OrangeCarpet: return 15;
+			case BlockType::MagentaCarpet: return 16;
+			case BlockType::LightBlueCarpet: return 17;
+			case BlockType::YellowCarpet: return 18;
+			case BlockType::LimeCarpet: return 19;
+			case BlockType::PinkCarpet: return 20;
+			case BlockType::GrayCarpet: return 21;
+			case BlockType::LightGrayCarpet: return 22;
+			case BlockType::CyanCarpet: return 23;
+			case BlockType::PurpleCarpet: return 24;
+			case BlockType::BlueCarpet: return 25;
+			case BlockType::BrownCarpet: return 26;
+			case BlockType::GreenCarpet: return 27;
+			case BlockType::RedCarpet: return 28;
+			case BlockType::BlackCarpet: return 29;
 			default:
 			{
-				ASSERT(!"Unhandled meta in carpet handler!");
+				ASSERT(!"Unhandled blocktyp in carpet handler!");
 				return 0;
 			}
 		}

@@ -8,7 +8,7 @@
 
 
 cThrownEggEntity::cThrownEggEntity(cEntity * a_Creator, Vector3d a_Pos, Vector3d a_Speed):
-	Super(pkEgg, a_Creator, a_Pos, a_Speed, 0.25f, 0.25f)
+	Super(etEgg, a_Creator, a_Pos, a_Speed, 0.25f, 0.25f)
 {
 }
 
@@ -21,7 +21,7 @@ void cThrownEggEntity::OnHitEntity(cEntity & a_EntityHit, Vector3d a_HitPos)
 	Super::OnHitEntity(a_EntityHit, a_HitPos);
 
 	int Damage = 0;
-	if (a_EntityHit.IsMob() && (static_cast<cMonster &>(a_EntityHit).GetMobType() == mtEnderDragon))
+	if (a_EntityHit.IsMob() && (static_cast<cMonster &>(a_EntityHit).GetEntityType() == etEnderDragon))
 	{
 		// Enderdragons take 1 damage:
 		Damage = 1;
@@ -62,13 +62,13 @@ void cThrownEggEntity::TrySpawnChicken(Vector3d a_HitPos)
 	auto & Random = GetRandomProvider();
 	if (Random.RandBool(0.125))
 	{
-		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, mtChicken, true);
+		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, etChicken, true);
 	}
 	else if (Random.RandBool(1.0 / 33.0))
 	{
-		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, mtChicken, true);
-		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, mtChicken, true);
-		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, mtChicken, true);
-		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, mtChicken, true);
+		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, etChicken, true);
+		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, etChicken, true);
+		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, etChicken, true);
+		m_World->SpawnMob(a_HitPos.x, a_HitPos.y, a_HitPos.z, etChicken, true);
 	}
 }

@@ -15,7 +15,7 @@ class cItemSoupHandler final:
 
 public:
 
-	constexpr cItemSoupHandler(int a_ItemType, FoodInfo a_FoodInfo):
+	constexpr cItemSoupHandler(Item a_ItemType, FoodInfo a_FoodInfo):
 		Super(a_ItemType, a_FoodInfo)
 	{
 
@@ -31,7 +31,7 @@ public:
 
 		if (!a_Player->IsGameModeCreative())
 		{
-			a_Player->ReplaceOneEquippedItemTossRest(cItem(E_ITEM_BOWL));
+			a_Player->ReplaceOneEquippedItemTossRest(cItem(Item::Bowl));
 		}
 
 		return true;

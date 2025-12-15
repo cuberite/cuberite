@@ -4,6 +4,7 @@
 #include "ItemHandler.h"
 #include "../World.h"
 #include "../Entities/Player.h"
+#include "BlockInfo.h"
 
 
 
@@ -38,7 +39,7 @@ public:
 
 		if (!a_Player->IsGameModeCreative())
 		{
-			if (m_ItemType == E_ITEM_FLINT_AND_STEEL)
+			if (m_ItemType == Item::FlintAndSteel)
 			{
 				a_Player->UseEquippedItem();
 			}
@@ -49,7 +50,7 @@ public:
 		}
 
 		// Activate TNT if we clicked on it while not crouched:
-		if ((a_World->GetBlock(a_ClickedBlockPos) == E_BLOCK_TNT) && !a_Player->IsCrouched())
+		if ((a_World->GetBlock(a_ClickedBlockPos).Type() == BlockType::Tnt) && !a_Player->IsCrouched())
 		{
 			a_World->DigBlock(a_ClickedBlockPos, a_Player);
 			a_World->SpawnPrimedTNT(Vector3d(a_ClickedBlockPos) + Vector3d(0.5, 0.5, 0.5));  // 80 ticks to boom
@@ -63,12 +64,12 @@ public:
 		}
 
 		// Light a fire next to / on top of the block if air:
-		if (a_World->GetBlock(FirePos) == E_BLOCK_AIR)
+		if (IsBlockAir(a_World->GetBlock(FirePos)))
 		{
-			a_World->PlaceBlock(FirePos, E_BLOCK_FIRE, 0);
+			a_World->PlaceBlock(FirePos, Block::Fire::Fire());
 
 			// The client plays flint and steel sounds, only need to handle fire charges:
-			if (m_ItemType == E_ITEM_FIRE_CHARGE)
+			if (m_ItemType == Item::FireCharge)
 			{
 				a_World->BroadcastSoundEffect("item.firecharge.use", FirePos, 1.0f, 1.04f);
 			}

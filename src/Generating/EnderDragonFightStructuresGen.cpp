@@ -171,35 +171,43 @@ void cEnderDragonFightStructuresGen::GenFinish(cChunkDesc &a_ChunkDesc)
 		a_ChunkDesc.GetEntities().emplace_back(std::move(EnderDragon));
 		*/  // Todo: 25.10.20 - Add the ender dragon spawning when the dragon behaves properly - 12xx12
 		a_ChunkDesc.WriteBlockArea(m_Fountain,
-			static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)),
-			62,
-			static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)),
+			{
+				static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)),
+				62,
+				static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)),
+			},
 			cBlockArea::msSpongePrint
 		);
 	}
 	else if (Coords == cChunkCoords({-1, 0}))
 	{
 		a_ChunkDesc.WriteBlockArea(m_Fountain,
-			cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeX() / 2)),
-			62,
-			static_cast<int>(FloorC(-m_Fountain.GetSizeZ() / 2)),
+			{
+				cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeX() / 2)),
+				62,
+				static_cast<int>(FloorC(-m_Fountain.GetSizeZ() / 2)),
+			},
 			cBlockArea::msSpongePrint
 		);
 	}
 	else if (Coords == cChunkCoords({0, -1}))
 	{
 		a_ChunkDesc.WriteBlockArea(m_Fountain,
-			static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)),
-			62,
-			cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeZ() / 2)),
+			{
+				static_cast<int>(FloorC(-m_Fountain.GetSizeX() / 2)),
+				62,
+				cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeZ() / 2)),
+			},
 			cBlockArea::msSpongePrint);
 	}
 	else if (Coords == cChunkCoords({-1, -1}))
 	{
 		a_ChunkDesc.WriteBlockArea(m_Fountain,
-			cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeX() / 2)),
-			62,
-			cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeZ() / 2)),
+			{
+				cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeX() / 2)),
+				62,
+				cChunkDef::Width - static_cast<int>(FloorC(m_Fountain.GetSizeZ() / 2)),
+			},
 			cBlockArea::msSpongePrint);
 	}
 	auto It = m_TowerPos.find(Coords);
@@ -233,7 +241,7 @@ void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const s
 				{
 					for (int Y = 0; Y <= a_Properties.m_Height - 2; Y++)
 					{
-						a_ChunkDesc.SetBlockType(NewPos.x, Y, NewPos.z, E_BLOCK_OBSIDIAN);
+						a_ChunkDesc.SetBlock({NewPos.x, Y, NewPos.z}, Block::Obsidian::Obsidian());
 					}
 				}
 			}
@@ -248,7 +256,7 @@ void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const s
 		{
 			if (cChunkDef::IsValidRelPos(Vector3d(Pos.x, a_Properties.m_Height, Pos.z) + Offset))
 			{
-				a_ChunkDesc.SetBlockType(Pos.x + Offset.x, a_Properties.m_Height + Offset.y, Pos.z + Offset.z, E_BLOCK_IRON_BARS);
+				a_ChunkDesc.SetBlock({Pos.x + Offset.x, a_Properties.m_Height + Offset.y, Pos.z + Offset.z}, Block::IronBars::IronBars());
 			}
 		}
 		// Remove any block that may generate inside the cage
@@ -256,7 +264,7 @@ void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const s
 		{
 			if (cChunkDef::IsValidRelPos(Pos + Offset))
 			{
-				a_ChunkDesc.SetBlockType(Pos.x + Offset.x, a_Properties.m_Height + Offset.y, Pos.z + Offset.z, E_BLOCK_AIR);
+				a_ChunkDesc.SetBlock({Pos.x + Offset.x, a_Properties.m_Height + Offset.y, Pos.z + Offset.z}, Block::Air::Air());
 			}
 		}
 		// Place roof
@@ -266,7 +274,7 @@ void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const s
 			{
 				if (cChunkDef::IsValidRelPos({Pos.x + X, 1, Pos.z + Z}))
 				{
-					a_ChunkDesc.SetBlockType(Pos.x + X, a_Properties.m_Height + 2, Pos.z + Z, E_BLOCK_IRON_BARS);
+					a_ChunkDesc.SetBlock({Pos.x + X, a_Properties.m_Height + 2, Pos.z + Z}, Block::IronBars::IronBars());
 				}
 			}
 		}
@@ -275,9 +283,9 @@ void cEnderDragonFightStructuresGen::PlaceTower(cChunkDesc &a_ChunkDesc, const s
 	if (cChunkDef::IsValidRelPos(Pos))
 	{
 		// Spawn the bedrock
-		a_ChunkDesc.SetBlockType(Pos.x, a_Properties.m_Height - 1, Pos.z, E_BLOCK_BEDROCK);
+		a_ChunkDesc.SetBlock({Pos.x, a_Properties.m_Height - 1, Pos.z}, Block::Bedrock::Bedrock());
 		// Spawn the fire
-		a_ChunkDesc.SetBlockType(Pos.x, a_Properties.m_Height, Pos.z, E_BLOCK_FIRE);
+		a_ChunkDesc.SetBlock({Pos.x, a_Properties.m_Height, Pos.z}, Block::Fire::Fire());
 		// Spawn the ender crystal of the origin position is in this chunk
 		auto EnderCrystal = std::make_unique<cEnderCrystal>(Vector3d(0.5, a_Properties.m_Height, 0.5) + a_Properties.m_Pos, true);
 		a_ChunkDesc.GetEntities().emplace_back(std::move(EnderCrystal));

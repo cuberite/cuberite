@@ -3,8 +3,7 @@
 
 #pragma once
 
-#include "ItemHandler.h"
-#include "Entities/ProjectileEntity.h"
+#include "../Blocks/BlockAir.h"
 
 
 
@@ -17,7 +16,7 @@ class cItemThrowableHandler:
 
 public:
 
-	constexpr cItemThrowableHandler(int a_ItemType, cProjectileEntity::eKind a_ProjectileKind, double a_SpeedCoeff):
+	constexpr cItemThrowableHandler(Item a_ItemType, eEntityType a_ProjectileKind, double a_SpeedCoeff):
 		Super(a_ItemType),
 		m_ProjectileKind(a_ProjectileKind),
 		m_SpeedCoeff(a_SpeedCoeff)
@@ -61,7 +60,7 @@ public:
 protected:
 
 	/** The kind of projectile to create when shooting */
-	cProjectileEntity::eKind m_ProjectileKind;
+	eEntityType m_ProjectileKind;
 
 	/** The speed multiplier (to the player's normalized look vector) to set for the new projectile. */
 	double m_SpeedCoeff;
@@ -80,8 +79,8 @@ class cItemEggHandler final:
 
 public:
 
-	constexpr cItemEggHandler(int a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkEgg, 30)
+	constexpr cItemEggHandler(Item a_ItemType):
+		Super(a_ItemType, etEgg, 30)
 	{
 	}
 } ;
@@ -96,8 +95,8 @@ class cItemSnowballHandler final:
 
 public:
 
-	constexpr cItemSnowballHandler(int a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkSnowball, 30)
+	constexpr cItemSnowballHandler(Item a_ItemType):
+		Super(a_ItemType, etSnowball, 30)
 	{
 	}
 } ;
@@ -113,8 +112,8 @@ class cItemEnderPearlHandler final:
 
 public:
 
-	constexpr cItemEnderPearlHandler(int a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkEnderPearl, 30)
+	constexpr cItemEnderPearlHandler(Item a_ItemType):
+		Super(a_ItemType, etEnderPearl, 30)
 	{
 	}
 } ;
@@ -130,8 +129,8 @@ class cItemBottleOEnchantingHandler final :
 
 public:
 
-	constexpr cItemBottleOEnchantingHandler(int a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkExpBottle, 14)
+	constexpr cItemBottleOEnchantingHandler(Item a_ItemType):
+		Super(a_ItemType, etExperienceBottle, 14)
 	{
 	}
 };
@@ -147,8 +146,8 @@ class cItemFireworkHandler final:
 
 public:
 
-	constexpr cItemFireworkHandler(int a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkFirework, 0)
+	constexpr cItemFireworkHandler(Item a_ItemType):
+		Super(a_ItemType, etFireworkRocket, 0)
 	{
 	}
 
@@ -165,7 +164,7 @@ public:
 		eBlockFace a_ClickedBlockFace
 	) const override
 	{
-		if (a_World->GetBlock(a_ClickedBlockPos) == E_BLOCK_AIR)
+		if (cBlockAirHandler::IsBlockAir(a_World->GetBlock(a_ClickedBlockPos)))
 		{
 			return false;
 		}

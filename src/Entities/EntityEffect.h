@@ -7,33 +7,39 @@ class cEntityEffect
 {
 public:
 
+	// TODO: implement missing effects
 	/** All types of entity effects (numbers correspond to protocol / storage types) */
-	enum eType
+	enum eType : short
 	{
-		effNoEffect       = 0,
-		effSpeed          = 1,
-		effSlowness       = 2,
-		effHaste          = 3,
-		effMiningFatigue  = 4,
-		effStrength       = 5,
-		effInstantHealth  = 6,
-		effInstantDamage  = 7,
-		effJumpBoost      = 8,
-		effNausea         = 9,
-		effRegeneration   = 10,
-		effResistance     = 11,
-		effFireResistance = 12,
-		effWaterBreathing = 13,
-		effInvisibility   = 14,
-		effBlindness      = 15,
-		effNightVision    = 16,
-		effHunger         = 17,
-		effWeakness       = 18,
-		effPoison         = 19,
-		effWither         = 20,
-		effHealthBoost    = 21,
-		effAbsorption     = 22,
-		effSaturation     = 23,
+		effNoEffect       = -1,
+		effSpeed          = 0,
+		effSlowness       = 1,
+		effHaste          = 2,
+		effMiningFatigue  = 3,
+		effStrength       = 4,
+		effInstantHealth  = 5,
+		effInstantDamage  = 6,
+		effJumpBoost      = 7,
+		effNausea         = 8,
+		effRegeneration   = 9,
+		effResistance     = 10,
+		effFireResistance = 11,
+		effWaterBreathing = 12,
+		effInvisibility   = 13,
+		effBlindness      = 14,
+		effNightVision    = 15,
+		effHunger         = 16,
+		effWeakness       = 17,
+		effPoison         = 18,
+		effWither         = 19,
+		effHealthBoost    = 20,
+		effAbsorption     = 21,
+		effSaturation     = 22,
+		effSlowFalling    = 27,
+		effConduitPower	  = 28,
+		effDolphinsGrace  = 29,
+		effBadOmen		  = 30,
+		effHeroOfTheVillage = 31,
 	} ;
 
 	/** Returns the potion color (used by the client for visuals), based on the potion's damage value */
@@ -552,3 +558,94 @@ public:
 
 
 
+
+class cEntityEffectSlowFalling:
+	public cEntityEffect
+{
+	using Super = cEntityEffect;
+
+public:
+
+	cEntityEffectSlowFalling(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+		Super(a_Duration, a_Intensity, a_DistanceModifier)
+	{
+	}
+
+	virtual void OnTick(cPawn & a_Target) override;
+};
+
+
+
+
+
+class cEntityEffectConduitPower:
+	public cEntityEffect
+{
+	using Super = cEntityEffect;
+
+public:
+
+	cEntityEffectConduitPower(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+		Super(a_Duration, a_Intensity, a_DistanceModifier)
+	{
+	}
+
+	virtual void OnTick(cPawn & a_Target) override;
+};
+
+
+
+
+
+class cEntityEffectDolphinsGrace:
+	public cEntityEffect
+{
+	using Super = cEntityEffect;
+
+public:
+
+	cEntityEffectDolphinsGrace(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+		Super(a_Duration, a_Intensity, a_DistanceModifier)
+	{
+	}
+
+	virtual void OnTick(cPawn & a_Target) override;
+};
+
+
+
+
+
+class cEntityEffectBadOmen:
+	public cEntityEffect
+{
+	using Super = cEntityEffect;
+
+public:
+
+	cEntityEffectBadOmen(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+		Super(a_Duration, a_Intensity, a_DistanceModifier)
+	{
+	}
+
+	virtual void OnTick(cPawn & a_Target) override;
+};
+
+
+
+
+
+class cEntityEffectHeroOfTheVillage:
+	public cEntityEffect
+{
+	using Super = cEntityEffect;
+
+public:
+
+	cEntityEffectHeroOfTheVillage(int a_Duration, short a_Intensity, double a_DistanceModifier = 1):
+		Super(a_Duration, a_Intensity, a_DistanceModifier)
+	{
+	}
+
+	virtual void OnTick(cPawn & a_Target) override;
+};

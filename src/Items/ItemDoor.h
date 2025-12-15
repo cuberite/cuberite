@@ -16,14 +16,10 @@ class cItemDoorHandler final:
 
 public:
 
-	constexpr cItemDoorHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
+	using Super::Super;
 
-	}
-
-
-
+#define GET_DOOR_TYPE(DoorType) \
+	BlockType = BlockType::DoorType;     break;
 
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
@@ -34,17 +30,34 @@ public:
 		}
 
 		// Get the block type of the door to place:
-		BLOCKTYPE BlockType;
+		BlockType BlockType;
 		switch (m_ItemType)
 		{
-			case E_ITEM_WOODEN_DOOR:   BlockType = E_BLOCK_OAK_DOOR;      break;
-			case E_ITEM_IRON_DOOR:     BlockType = E_BLOCK_IRON_DOOR;     break;
-			case E_ITEM_SPRUCE_DOOR:   BlockType = E_BLOCK_SPRUCE_DOOR;   break;
-			case E_ITEM_BIRCH_DOOR:    BlockType = E_BLOCK_BIRCH_DOOR;    break;
-			case E_ITEM_JUNGLE_DOOR:   BlockType = E_BLOCK_JUNGLE_DOOR;   break;
-			case E_ITEM_DARK_OAK_DOOR: BlockType = E_BLOCK_DARK_OAK_DOOR; break;
-			case E_ITEM_ACACIA_DOOR:   BlockType = E_BLOCK_ACACIA_DOOR;   break;
-			default: UNREACHABLE("Unhandled door type");
+			case Item::OakDoor:      BlockType = BlockType::OakDoor;     break;
+			case Item::IronDoor:     BlockType = BlockType::IronDoor;    break;
+			case Item::SpruceDoor:   BlockType = BlockType::SpruceDoor;  break;
+			case Item::BirchDoor:    BlockType = BlockType::BirchDoor;   break;
+			case Item::JungleDoor:   BlockType = BlockType::JungleDoor;  break;
+			case Item::DarkOakDoor:  BlockType = BlockType::DarkOakDoor; break;
+			case Item::AcaciaDoor:   BlockType = BlockType::AcaciaDoor;  break;
+			case Item::BambooDoor:               GET_DOOR_TYPE(BambooDoor)
+			case Item::CherryDoor:               GET_DOOR_TYPE(CherryDoor)
+			case Item::CopperDoor:               GET_DOOR_TYPE(CopperDoor)
+			case Item::MangroveDoor:             GET_DOOR_TYPE(MangroveDoor)
+			case Item::ExposedCopperDoor:        GET_DOOR_TYPE(ExposedCopperDoor)
+			case Item::WeatheredCopperDoor:      GET_DOOR_TYPE(WeatheredCopperDoor)
+			case Item::OxidizedCopperDoor:       GET_DOOR_TYPE(OxidizedCopperDoor)
+			case Item::WaxedCopperDoor:          GET_DOOR_TYPE(WaxedCopperDoor)
+			case Item::WaxedExposedCopperDoor:   GET_DOOR_TYPE(WaxedExposedCopperDoor)
+			case Item::WaxedWeatheredCopperDoor: GET_DOOR_TYPE(WaxedWeatheredCopperDoor)
+			case Item::WaxedOxidizedCopperDoor:  GET_DOOR_TYPE(WaxedOxidizedCopperDoor)
+			case Item::PaleOakDoor:              GET_DOOR_TYPE(PaleOakDoor)
+			default:
+			{
+				UNREACHABLE("Unhandled door type");
+				BlockType = BlockType::Air;
+				break;
+			}
 		}
 
 		const auto & World = *a_Player.GetWorld();
@@ -52,22 +65,21 @@ public:
 
 		// Check the block that will get replaced by the door:
 		{
-			BLOCKTYPE TopType;
-			NIBBLETYPE TopMeta;
-			if (!World.GetBlockTypeMeta(UpperBlockPosition, TopType, TopMeta))
+			BlockState UpperReplacedBlock;
+			if (!World.GetBlock(UpperBlockPosition, UpperReplacedBlock))
 			{
 				return false;
 			}
 
-			if (!cBlockHandler::For(TopType).DoesIgnoreBuildCollision(World, a_HeldItem, UpperBlockPosition, TopMeta, a_ClickedBlockFace, false))
+			if (!cBlockHandler::For(UpperReplacedBlock.Type()).DoesIgnoreBuildCollision(World, a_HeldItem, UpperBlockPosition, UpperReplacedBlock, a_ClickedBlockFace, false))
 			{
 				return false;
 			}
 		}
 
 		// Get the coords of the neighboring blocks:
-		NIBBLETYPE LowerBlockMeta = cBlockDoorHandler::YawToMetaData(a_Player.GetYaw());
-		Vector3i RelDirToOutside = cBlockDoorHandler::GetRelativeDirectionToOutside(LowerBlockMeta);
+		auto Facing = RotationToBlockFace(a_Player.GetYaw(), true);
+		Vector3i RelDirToOutside = cBlockDoorHandler::GetRelativeDirectionToOutside(World.GetBlock(a_PlacePosition));
 		Vector3i LeftNeighborPos = RelDirToOutside;
 		LeftNeighborPos.TurnCW();
 		LeftNeighborPos.Move(a_PlacePosition);
@@ -76,10 +88,9 @@ public:
 		RightNeighborPos.Move(a_PlacePosition);
 
 		// Decide whether the hinge is on the left (default) or on the right:
-		NIBBLETYPE UpperBlockMeta = 0x08;
-		BLOCKTYPE LeftNeighborBlock = World.GetBlock(LeftNeighborPos);
-		BLOCKTYPE RightNeighborBlock = World.GetBlock(RightNeighborPos);
-
+		auto LeftNeighborBlock = World.GetBlock(LeftNeighborPos);
+		auto RightNeighborBlock = World.GetBlock(RightNeighborPos);
+		bool HingeRight = false;
 		/*
 		// DEBUG:
 		FLOGD("Door being placed at {0}", a_PlacePosition);
@@ -89,24 +100,53 @@ public:
 		*/
 
 		if (
-			cBlockDoorHandler::IsDoorBlockType(LeftNeighborBlock) ||   // The block to the left is a door block
+			cBlockDoorHandler::IsBlockDoor(LeftNeighborBlock) ||     // The block to the left is a door block
 			(
-				!cBlockInfo::IsSolid(LeftNeighborBlock) &&               // Prioritize hinge on the left side
-				cBlockInfo::IsSolid(RightNeighborBlock) &&               // The block to the right is solid...
-				!cBlockDoorHandler::IsDoorBlockType(RightNeighborBlock)  // ... but not a door
+				!cBlockInfo::IsSolid(LeftNeighborBlock) &&           // Prioritize hinge on the left side
+				cBlockInfo::IsSolid(RightNeighborBlock) &&           // The block to the right is solid...
+				!cBlockDoorHandler::IsBlockDoor(RightNeighborBlock)  // ... but not a door
 			)
 		)
 		{
 			// DEBUG: LOGD("Setting hinge to right side");
-			UpperBlockMeta = 0x09;  // Upper block | hinge on right
+			HingeRight = true;
 		}
 
-		// Set the blocks:
-		return a_Player.PlaceBlocks(
+
+
+		using namespace Block;
+
+#define PLACE_DOOR(DoorType) \
+	{\
+		return a_Player.PlaceBlock(a_PlacePosition, DoorType::DoorType(Facing, DoorType::Half::Lower, HingeRight ? DoorType::Hinge::Right : DoorType::Hinge::Left, false, false)) && \
+		a_Player.PlaceBlock(UpperBlockPosition, DoorType::DoorType(Facing, DoorType::Half::Upper, HingeRight ? DoorType::Hinge::Right : DoorType::Hinge::Left, false, false));\
+	}\
+
+		switch (BlockType)
 		{
-			{ a_PlacePosition, BlockType, LowerBlockMeta },
-			{ UpperBlockPosition, BlockType, UpperBlockMeta }
-		});
+			case BlockType::AcaciaDoor:               PLACE_DOOR(AcaciaDoor)
+			case BlockType::BirchDoor:                PLACE_DOOR(BirchDoor)
+			case BlockType::DarkOakDoor:              PLACE_DOOR(DarkOakDoor)
+			case BlockType::JungleDoor:               PLACE_DOOR(JungleDoor)
+			case BlockType::OakDoor:                  PLACE_DOOR(OakDoor)
+			case BlockType::SpruceDoor:               PLACE_DOOR(SpruceDoor)
+			case BlockType::WarpedDoor:               PLACE_DOOR(WarpedDoor)
+			case BlockType::IronDoor:                 PLACE_DOOR(IronDoor)
+			case BlockType::BambooDoor:               PLACE_DOOR(BambooDoor)
+			case BlockType::CherryDoor:               PLACE_DOOR(CherryDoor)
+			case BlockType::CopperDoor:               PLACE_DOOR(CopperDoor)
+			case BlockType::MangroveDoor:             PLACE_DOOR(MangroveDoor)
+			case BlockType::ExposedCopperDoor:        PLACE_DOOR(ExposedCopperDoor)
+			case BlockType::WeatheredCopperDoor:      PLACE_DOOR(WeatheredCopperDoor)
+			case BlockType::OxidizedCopperDoor:       PLACE_DOOR(OxidizedCopperDoor)
+			case BlockType::WaxedCopperDoor:          PLACE_DOOR(WaxedCopperDoor)
+			case BlockType::WaxedExposedCopperDoor:   PLACE_DOOR(WaxedExposedCopperDoor)
+			case BlockType::WaxedWeatheredCopperDoor: PLACE_DOOR(WaxedWeatheredCopperDoor)
+			case BlockType::WaxedOxidizedCopperDoor:  PLACE_DOOR(WaxedOxidizedCopperDoor)
+			case BlockType::PaleOakDoor:              PLACE_DOOR(PaleOakDoor)
+			default: return false;
+		}
+		return true;
 	}
 
 

@@ -725,58 +725,6 @@ return
 					},
 					Notes = "Returns the block entity for the block at the specified coords. Creates it if it doesn't exist. Returns nil if the block has no block entity capability.",
 				},
-				GetBlockMeta =
-				{
-					Params =
-					{
-						{
-							Name = "RelX",
-							Type = "number",
-						},
-						{
-							Name = "RelY",
-							Type = "number",
-						},
-						{
-							Name = "RelZ",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Name = "NIBBLETYPE",
-							Type = "number",
-						},
-					},
-					Notes = "Returns the block meta at the specified relative coords",
-				},
-				GetBlockType =
-				{
-					Params =
-					{
-						{
-							Name = "RelX",
-							Type = "number",
-						},
-						{
-							Name = "RelY",
-							Type = "number",
-						},
-						{
-							Name = "RelZ",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Name = "BLOCKTYPE",
-							Type = "number",
-						},
-					},
-					Notes = "Returns the block type at the specified relative coords",
-				},
 				GetBlockTypeMeta =
 				{
 					Params =
@@ -1112,7 +1060,7 @@ return
 					},
 					Notes = "Sets the biome at the specified relative coords.",
 				},
-				SetBlockMeta =
+				SetBlock =
 				{
 					Params =
 					{
@@ -1129,61 +1077,11 @@ return
 							Type = "number",
 						},
 						{
-							Name = "BlockMeta",
+							Name = "Block",
 							Type = "number",
 						},
 					},
-					Notes = "Sets the block meta at the specified relative coords.",
-				},
-				SetBlockType =
-				{
-					Params =
-					{
-						{
-							Name = "RelX",
-							Type = "number",
-						},
-						{
-							Name = "RelY",
-							Type = "number",
-						},
-						{
-							Name = "RelZ",
-							Type = "number",
-						},
-						{
-							Name = "BlockType",
-							Type = "number",
-						},
-					},
-					Notes = "Sets the block type at the specified relative coords",
-				},
-				SetBlockTypeMeta =
-				{
-					Params =
-					{
-						{
-							Name = "RelX",
-							Type = "number",
-						},
-						{
-							Name = "RelY",
-							Type = "number",
-						},
-						{
-							Name = "RelZ",
-							Type = "number",
-						},
-						{
-							Name = "BlockType",
-							Type = "number",
-						},
-						{
-							Name = "BlockMeta",
-							Type = "number",
-						},
-					},
-					Notes = "Sets the block type and meta at the specified relative coords",
+					Notes = "Sets the block at the specified relative coords.",
 				},
 				SetHeight =
 				{
@@ -1301,7 +1199,7 @@ function OnChunkGenerated(a_World, a_ChunkX, a_ChunkZ, a_ChunkDesc)
 	local Height = a_ChunkDesc:GetHeight(0, 0);
 
 	-- Create a sign there:
-	a_ChunkDesc:SetBlockTypeMeta(0, Height + 1, 0, E_BLOCK_SIGN_POST, 0);
+	a_ChunkDesc:SetBlockTypeMeta(0, Height + 1, 0, E_ITEM_SIGN_POST, 0);
 	local BlockEntity = a_ChunkDesc:GetBlockEntity(0, Height + 1, 0);
 	if (BlockEntity ~= nil) then
 		LOG("Setting sign lines...");
@@ -1343,6 +1241,48 @@ end
 						},
 					},
 					Notes = "Generates an UUID based on the player name provided. This is used for the offline (non-auth) mode, when there's no UUID source. Each username generates a unique and constant UUID, so that when the player reconnects with the same name, their UUID is the same. Returns a 32-char UUID (no dashes).",
+				},
+				GetAllowListing =
+				{
+					Returns =
+					{
+						{
+							Type = "boolean",
+						},
+					},
+					Notes = "Returns whenever the client wanted to be listed on the player list",
+				},
+				SetAllowListing =
+				{
+					Params =
+					{
+						{
+							Name = "a_AllowsListing",
+							Type = "boolean",
+						},
+					},
+					Notes = "Should this player be displayed in the player list. Initaily set as requested by the player",
+				},
+				GetParticleMode =
+				{
+					Returns =
+					{
+						{
+							Type = "eParticleModeSetting",
+						},
+					},
+					Notes = "Gets the players particle mode",
+				},
+				SetParticleMode =
+				{
+					Params =
+					{
+						{
+							Name = "a_AllowsListing",
+							Type = "eParticleModeSetting",
+						},
+					},
+					Notes = "Currently only changes the internal variable does not send the change to the player. Initaily set as requested by the player",
 				},
 				GetClientBrand =
 				{
@@ -3530,7 +3470,7 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					{
 						{
 							Name = "EntityType",
-							Type = "cEntity#eEntityType",
+							Type = "number",
 						},
 					},
 					Notes = "Returns the type of the entity, one of the {{cEntity#eEntityType|etXXX}} constants. Note that to check specific entity type, you should use one of the IsXXX functions instead of comparing the value returned by this call.",
@@ -4726,78 +4666,6 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 				{
 					Notes = "Special value of an entity ID, indicating a failure. Used primarily in functions that create entities when the entity cannot be created.",
 				},
-				etBoat =
-				{
-					Notes = "The entity is a {{cBoat}}",
-				},
-				etEnderCrystal =
-				{
-					Notes = "The entity is a {{cEnderCrystal}}",
-				},
-				etEntity =
-				{
-					Notes = "No further specialization available",
-				},
-				etExpOrb =
-				{
-					Notes = "The entity is a {{cExpOrb}}",
-				},
-				etFallingBlock =
-				{
-					Notes = "The entity is a {{cFallingBlock}}",
-				},
-				etFloater =
-				{
-					Notes = "The entity is a fishing rod floater",
-				},
-				etItemFrame =
-				{
-					Notes = "The entity is an item frame",
-				},
-				etLeashKnot =
-				{
-					Notes = "The entity is a leash knot",
-				},
-				etMinecart =
-				{
-					Notes = "The entity is a {{cMinecart}} descendant",
-				},
-				etMob =
-				{
-					Notes = "The entity is a {{cMonster}} descendant",
-				},
-				etMonster =
-				{
-					Notes = "The entity is a {{cMonster}} descendant",
-				},
-				etPainting =
-				{
-					Notes = "The entity is a {{cPainting}}",
-				},
-				etPickup =
-				{
-					Notes = "The entity is a {{cPickup}}",
-				},
-				etPlayer =
-				{
-					Notes = "The entity is a {{cPlayer}}",
-				},
-				etProjectile =
-				{
-					Notes = "The entity is a {{cProjectileEntity}} descendant",
-				},
-				etTNT =
-				{
-					Notes = "The entity is a {{cTNTEntity}}",
-				},
-			},
-			ConstantGroups =
-			{
-				eEntityType =
-				{
-					Include = "et.*",
-					TextBefore = "The following constants are used to distinguish between different entity types:",
-				},
 			},
 		},
 		cEntityEffect =
@@ -4904,6 +4772,14 @@ local Hash = cCryptoHash.sha1HexString("DataToHash")
 					Include = { "eff.*" },
 				},
 			},  -- ConstantGroups
+			Constants =
+			{
+				effBadOmen = { Notes = "" },
+				effConduitPower = { Notes = "" },
+				effDolphinsGrace = { Notes = "" },
+				effHeroOfTheVillage = { Notes = "" },
+				effSlowFalling = { Notes = "" },
+			},
 		},  -- cEntityEffect
 
 		cFile =
@@ -7452,7 +7328,7 @@ These ItemGrids are available in the API and can be manipulated by the plugins, 
 				m_ItemType =
 				{
 					Type = "number",
-					Notes = "The item type. One of E_ITEM_ or E_BLOCK_ constants",
+					Notes = "The item type. One of E_ITEM_ or E_ITEM_ constants",
 				},
 				m_LoreTable =
 				{
@@ -9221,17 +9097,6 @@ a_Player:OpenWindow(Window);
 					},
 					Notes = "Returns this mob's family ({{cMonster#eFamily|mfXXX}} constant)",
 				},
-				GetMobType =
-				{
-					Returns =
-					{
-						{
-							Name = "MobType",
-							Type = "eMonsterType",
-						},
-					},
-					Notes = "Returns the type of this mob ({{Globals#eMonsterType|mtXXX}} constant)",
-				},
 				GetRelativeWalkSpeed =
 				{
 					Returns =
@@ -9963,27 +9828,16 @@ a_Player:OpenWindow(Window);
 			]],
 			Functions =
 			{
-				GetBlockType =
+				GetBlock =
 				{
 					Returns =
 					{
 						{
-							Name = "BlockType",
+							Name = "Block",
 							Type = "number",
 						}
 					},
-					Notes = "Returns the block type of the falling block.",
-				},
-				GetBlockMeta =
-				{
-					Returns =
-					{
-						{
-							Name = "BlockMeta",
-							Type = "number",
-						}
-					},
-					Notes = "Returns the block meta of the falling block.",
+					Notes = "Returns the block of the falling block.",
 				},
 			},
 			Inherits = "cEntity",
@@ -13391,6 +13245,10 @@ end
 				{
 					Notes = "A {{cChestEntity|chest}} or doublechest window",
 				},
+				wtCrafter =
+				{
+					Notes = "A crafter window -- currently not implemented",
+				},
 				wtDropSpenser =
 				{
 					Notes = "A {{cDropperEntity|dropper}} or a {{cDispenserEntity|dispenser}} window",
@@ -13630,6 +13488,27 @@ end
 				Piglin =
 				{
 					Notes = "A snoot."
+				},
+			},
+		},
+		eParticleModeSetting =
+		{
+			Desc = [[
+				How many particles should the client display. Puerly aesthetic only works in 1.21.2+
+			]],
+			Constants =
+			{
+				All =
+				{
+					Notes = ""
+				},
+				Decreased =
+				{
+					Notes = ""
+				},
+				Minimal =
+				{
+					Notes = ""
 				},
 			},
 		},
@@ -14254,6 +14133,18 @@ end
 				{
 					Notes = "The total distance walked underwater.",
 				},
+				TotalWorldTime =
+				{
+					Notes = "The total amount of time the world was opened (tracked in ticks) -- NOT IMPLEMENTED",
+				},
+				PlayTime =
+				{
+					Notes = "The total amount of time played (tracked in ticks) -- NOT IMPLEMENTED",
+                },
+                HappyGhastOneCm =
+                {
+                    Notes = "NOT IMPLEMENTED",
+                },
 			},
 		},
 		Globals =
@@ -14490,6 +14381,31 @@ end
 					},
 					Notes = "Converts an {{Globals#eDimension|eDimension}} to a string value. Returns Overworld on failure.",
 				},
+				DisplacementYawToFacing =
+				{
+					Params =
+					{
+						{
+							Name = "PlacePosition",
+							Type = "Vector3d",
+						},
+						{
+							Name = "EyePosition",
+							Type = "Vector3d",
+						},
+						{
+							Name = "Yaw",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace"
+						},
+					},
+					Notes = "Takes a position and the direction the player is looking at and returns a proper rotation",
+				},
 				EscapeString =
 				{
 					Params =
@@ -14660,23 +14576,6 @@ end
 						},
 					},
 					Notes = "Returns true if the biome is a type of Mesa (mutations of the Mesa biome)."
-				},
-				IsValidBlock =
-				{
-					Params =
-					{
-						{
-							Name = "BlockType",
-							Type = "number",
-						},
-					},
-					Returns =
-					{
-						{
-							Type = "boolean",
-						},
-					},
-					Notes = "Returns true if BlockType is a known block type",
 				},
 				IsValidItem =
 				{
@@ -14877,6 +14776,40 @@ end
 					},
 					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the Y axis (or rotating 180 degrees around it).",
 				},
+				MirrorBlockFaceXY =
+				{
+					Params =
+					{
+						{
+							Name = "eBlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the XY plane.",
+				},
+				MirrorBlockFaceYZ =
+				{
+					Params =
+					{
+						{
+							Name = "eBlockFace",
+							Type = "eBlockFace",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after mirroring it around the YZ plane.",
+				},
 				NoCaseCompare =
 				{
 					Params =
@@ -14991,6 +14924,45 @@ end
 						},
 					},
 					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that corresponds to the given {{Globals#BlockFaces|eBlockFace}} after rotating it around the Y axis 90 degrees clockwise.",
+				},
+				RotationToBlockFace =
+				{
+					Params =
+					{
+						{
+							Name = "player rotation",
+							Type = "number",
+						},
+						{
+							Name = "invert",
+							Type = "boolean",
+							IsOptional = true,
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "eBlockFace",
+						},
+					},
+					Notes = "Returns the {{Globals#BlockFaces|eBlockFace}} that is calculated from the player rotation. Can be inverted.",
+				},
+				RotationToFineFace =
+				{
+					Params =
+					{
+						{
+							Name = "player rotation",
+							Type = "number",
+						},
+					},
+					Returns =
+					{
+						{
+							Type = "number",
+						},
+					},
+					Notes = "Returns a value [0, 15] that indicates the rotation. Is used to calculate banner, singn, ... rotation.",
 				},
 				StringSplit =
 				{
@@ -16589,6 +16561,10 @@ end
 				{
 					Notes = "The blocktype for water"
 				},
+				E_BLOCK_WHEAT =
+				{
+					Notes = "The blocktype for wheat"
+				},
 				E_BLOCK_WHITE_GLAZED_TERRACOTTA =
 				{
 					Notes = "The blocktype for white glazed terracotta"
@@ -17971,283 +17947,618 @@ end
 				},
 
 				-- eMonsterType:
-				mtBat =
+				etAllay =
 				{
 					Notes = "",
 				},
-				mtBlaze =
+				etArmadillo =
 				{
 					Notes = "",
 				},
-				mtCaveSpider =
+				etAxolotl =
 				{
 					Notes = "",
 				},
-				mtCat =
+				etBat =
 				{
 					Notes = "",
 				},
-				mtChicken =
+				etBee =
 				{
 					Notes = "",
 				},
-				mtCod =
+				etBlaze =
 				{
 					Notes = "",
 				},
-				mtCow =
+				etBogged =
 				{
 					Notes = "",
 				},
-				mtCreeper =
+				etBreeze =
 				{
 					Notes = "",
 				},
-				mtDolphin =
+				etCreaking =
 				{
 					Notes = "",
 				},
-				mtDonkey =
+				etCamel =
 				{
 					Notes = "",
 				},
-				mtDrowned =
+				etCaveSpider =
 				{
 					Notes = "",
 				},
-				mtElderGuardian =
+				etCat =
 				{
 					Notes = "",
 				},
-				mtEnderDragon =
+				etChicken =
 				{
 					Notes = "",
 				},
-				mtEnderman =
+				etCod =
 				{
 					Notes = "",
 				},
-				mtEndermite =
+				etCow =
 				{
 					Notes = "",
 				},
-				mtEvoker =
+				etCreeper =
 				{
 					Notes = "",
 				},
-				mtFox =
+				etDolphin =
 				{
 					Notes = "",
 				},
-				mtGhast =
+				etDonkey =
 				{
 					Notes = "",
 				},
-				mtGiant =
+				etDrowned =
 				{
 					Notes = "",
 				},
-				mtHoglin =
+				etElderGuardian =
 				{
 					Notes = "",
 				},
-				mtHorse =
+				etEnderDragon =
 				{
 					Notes = "",
 				},
-				mtHusk =
+				etEnderman =
 				{
 					Notes = "",
 				},
-				mtIllusioner =
+				etEndermite =
 				{
 					Notes = "",
 				},
-				mtInvalidType =
+				etEvoker =
+				{
+					Notes = "",
+				},
+				etFox =
+				{
+					Notes = "",
+				},
+				etFrog =
+				{
+					Notes = "",
+				},
+				etGhast =
+				{
+					Notes = "",
+				},
+				etGiant =
+				{
+					Notes = "",
+				},
+				etGlowSquid =
+				{
+					Notes = "",
+				},
+				etGoat =
+				{
+					Notes = "",
+				},
+				etHoglin =
+				{
+					Notes = "",
+				},
+				etHorse =
+				{
+					Notes = "",
+				},
+				etHusk =
+				{
+					Notes = "",
+				},
+				etIllusioner =
+				{
+					Notes = "",
+				},
+				etInvalid =
 				{
 					Notes = "Invalid monster type. Returned when monster type not recognized",
 				},
-				mtIronGolem =
+				etIronGolem =
 				{
 					Notes = "",
 				},
-				mtLlama =
+				etLlama =
 				{
 					Notes = "",
 				},
-				mtMagmaCube =
+				etMagmaCube =
 				{
 					Notes = "",
 				},
-				mtMooshroom =
+				etMooshroom =
 				{
 					Notes = "",
 				},
-				mtMule =
+				etMule =
 				{
 					Notes = "",
 				},
-				mtOcelot =
+				etOcelot =
 				{
 					Notes = "",
 				},
-				mtPanda =
+				etPanda =
 				{
 					Notes = "",
 				},
-				mtParrot =
+				etParrot =
 				{
 					Notes = "",
 				},
-				mtPhantom =
+				etPhantom =
 				{
 					Notes = "",
 				},
-				mtPig =
+				etPig =
 				{
 					Notes = "",
 				},
-				mtPiglin =
+				etPiglin =
 				{
 					Notes = "",
 				},
-				mtPiglinBrute =
+				etPiglinBrute =
 				{
 					Notes = "",
 				},
-				mtPillager =
+				etPillager =
 				{
 					Notes = "",
 				},
-				mtPolarBear =
+				etPolarBear =
 				{
 					Notes = "",
 				},
-				mtPufferfish =
+				etPufferfish =
 				{
 					Notes = "",
 				},
-				mtRavager =
+				etRavager =
 				{
 					Notes = "",
 				},
-				mtSalmon =
+				etSalmon =
 				{
 					Notes = "",
 				},
-				mtSheep =
+				etSheep =
 				{
 					Notes = "",
 				},
-				mtShulker =
+				etShulker =
 				{
 					Notes = "",
 				},
-				mtSilverfish =
+				etSilverfish =
 				{
 					Notes = "",
 				},
-				mtSkeleton =
+				etSkeleton =
 				{
 					Notes = "",
 				},
-				mtSkeletonHorse =
+				etSkeletonHorse =
 				{
 					Notes = "",
 				},
-				mtSlime =
+				etSlime =
 				{
 					Notes = "",
 				},
-				mtStray =
+				etSniffer =
 				{
 					Notes = "",
 				},
-				mtStrider =
+				etStray =
 				{
 					Notes = "",
 				},
-				mtSnowGolem =
+				etStrider =
 				{
 					Notes = "",
 				},
-				mtSpider =
+				etSnowGolem =
 				{
 					Notes = "",
 				},
-				mtSquid =
+				etSpider =
 				{
 					Notes = "",
 				},
-				mtTraderLlama =
+				etTadpole =
 				{
 					Notes = "",
 				},
-				mtTropicalFish =
+				etSquid =
 				{
 					Notes = "",
 				},
-				mtTurtle =
+				etTraderLlama =
 				{
 					Notes = "",
 				},
-				mtVex =
+				etTropicalFish =
 				{
 					Notes = "",
 				},
-				mtVillager =
+				etTurtle =
 				{
 					Notes = "",
 				},
-				mtVindicator =
+				etVex =
 				{
 					Notes = "",
 				},
-				mtWanderingTrader =
+				etVillager =
 				{
 					Notes = "",
 				},
-				mtWitch =
+				etVindicator =
 				{
 					Notes = "",
 				},
-				mtWither =
+				etWanderingTrader =
 				{
 					Notes = "",
 				},
-				mtWitherSkeleton =
+				etWarden =
 				{
 					Notes = "",
 				},
-				mtWolf =
+				etWitch =
 				{
 					Notes = "",
 				},
-				mtZoglin =
+				etWither =
 				{
 					Notes = "",
 				},
-				mtZombie =
+				etWolf =
 				{
 					Notes = "",
 				},
-				mtZombieHorse =
+				etZoglin =
 				{
 					Notes = "",
 				},
-				mtZombiePigman =
+				etZombie =
 				{
 					Notes = "",
 				},
-				mtZombifiedPiglin =
+				etZombieHorse =
 				{
 					Notes = "",
 				},
-				mtZombieVillager =
+				etZombifiedPiglin =
 				{
 					Notes = "",
 				},
-
+				etZombieVillager =
+				{
+					Notes = "",
+				},
+				etAcaciaBoat =
+				{
+					Notes = "",
+				},
+				etAcaciaChestBoat =
+				{
+					Notes = "",
+				},
+				etAreaEffectCloud =
+				{
+					Notes = "",
+				},
+				etArmorStand =
+				{
+					Notes = "",
+				},
+				etArrow =
+				{
+					Notes = "",
+				},
+				etBambooChestRaft =
+				{
+					Notes = "",
+				},
+				etBambooRaft =
+				{
+					Notes = "",
+				},
+				etBirchBoat =
+				{
+					Notes = "",
+				},
+				etBirchChestBoat =
+				{
+					Notes = "",
+				},
+				etBlockDisplay =
+				{
+					Notes = "",
+				},
+				etBreezeWindCharge =
+				{
+					Notes = "",
+				},
+				etCherryBoat =
+				{
+					Notes = "",
+				},
+				etCherryChestBoat =
+				{
+					Notes = "",
+				},
+				etChestMinecart =
+				{
+					Notes = "",
+				},
+				etCommandBlockMinecart =
+				{
+					Notes = "",
+				},
+				etDarkOakBoat =
+				{
+					Notes = "",
+				},
+				etDarkOakChestBoat =
+				{
+					Notes = "",
+				},
+				etDragonFireball =
+				{
+					Notes = "",
+				},
+				etEgg =
+				{
+					Notes = "",
+				},
+				etEndCrystal =
+				{
+					Notes = "",
+				},
+				etEnderPearl =
+				{
+					Notes = "",
+				},
+				etEvokerFangs =
+				{
+					Notes = "",
+				},
+				etExperienceBottle =
+				{
+					Notes = "",
+				},
+				etExperienceOrb =
+				{
+					Notes = "",
+				},
+				etEyeOfEnder =
+				{
+					Notes = "",
+				},
+				etFallingBlock =
+				{
+					Notes = "",
+				},
+				etFireball =
+				{
+					Notes = "",
+				},
+				etFireworkRocket =
+				{
+					Notes = "",
+				},
+				etFishingBobber =
+				{
+					Notes = "",
+				},
+				etFurnaceMinecart =
+				{
+					Notes = "",
+				},
+				etGlowItemFrame =
+				{
+					Notes = "",
+				},
+				etGuardian =
+				{
+					Notes = "",
+				},
+				etHopperMinecart =
+				{
+					Notes = "",
+				},
+				etInteraction =
+				{
+					Notes = "",
+				},
+				etItem =
+				{
+					Notes = "",
+				},
+				etItemDisplay =
+				{
+					Notes = "",
+				},
+				etItemFrame =
+				{
+					Notes = "",
+				},
+				etJungleBoat =
+				{
+					Notes = "",
+				},
+				etJungleChestBoat =
+				{
+					Notes = "",
+				},
+				etLeashKnot =
+				{
+					Notes = "",
+				},
+				etLightningBolt =
+				{
+					Notes = "",
+				},
+				etLlamaSpit =
+				{
+					Notes = "",
+				},
+				etMangroveBoat =
+				{
+					Notes = "",
+				},
+				etMangroveChestBoat =
+				{
+					Notes = "",
+				},
+				etMarker =
+				{
+					Notes = "",
+				},
+				etMinecart =
+				{
+					Notes = "",
+				},
+				etOakBoat =
+				{
+					Notes = "",
+				},
+				etOakChestBoat =
+				{
+					Notes = "",
+				},
+				etOminousItemSpawner =
+				{
+					Notes = "",
+				},
+				etPainting =
+				{
+					Notes = "",
+				},
+				etPaleOakBoat =
+				{
+					Notes = "",
+				},
+				etPaleOakChestBoat =
+				{
+					Notes = "",
+				},
+				etPlayer =
+				{
+					Notes = "",
+				},
+				etPotion =
+				{
+					Notes = "Depracted. Use etSplashPotion instead",
+				},
+                etLingeringPotion =
+                {
+                    Notes = "",
+                },
+                etSplashPotion =
+                {
+                    Notes = "",
+                },
+				etRabbit =
+				{
+					Notes = "",
+				},
+				etShulkerBullet =
+				{
+					Notes = "",
+				},
+				etSmallFireball =
+				{
+					Notes = "",
+				},
+				etSnowball =
+				{
+					Notes = "",
+				},
+				etSpawnerMinecart =
+				{
+					Notes = "",
+				},
+				etSpectralArrow =
+				{
+					Notes = "",
+				},
+				etSpruceBoat =
+				{
+					Notes = "",
+				},
+				etSpruceChestBoat =
+				{
+					Notes = "",
+				},
+				etTextDisplay =
+				{
+					Notes = "",
+				},
+				etTnt =
+				{
+					Notes = "",
+				},
+				etTntMinecart =
+				{
+					Notes = "",
+				},
+				etTrident =
+				{
+					Notes = "",
+				},
+				etWindCharge =
+				{
+					Notes = "",
+				},
+				etWitherSkull =
+				{
+					Notes = "",
+				},
+				etWitherSkeleton =
+				{
+					Notes = ""
+                },
+                etHappyGhast =
+                {
+                    Notes = ""
+                },
 				-- eMessageType:
 				mtCustom =
 				{
@@ -18308,10 +18619,6 @@ end
 				mtWarning =
 				{
 					Notes = "Something concerning (i.e. reload) is about to happen",
-				},
-				mtWitherSkeleton =
-				{
-					Notes = ""
 				},
 				SKULL_TYPE_CREEPER =
 				{
@@ -18388,7 +18695,7 @@ end
 				},
 				eBlockType =
 				{
-					Include = "^E_BLOCK_.*",
+					Include = "^E_ITEM_.*",
 					TextBefore = [[
 						These constants are used for block types. They correspond directly with MineCraft's data values
 						for blocks.
@@ -19308,7 +19615,7 @@ end
 		"cLuaWindow.__cItemGrid__cListener__",
 		"Globals._CuberiteInternal_.*",
 		"Globals.esMax",
-		"Globals.E_BLOCK_*",
+		"Globals.E_ITEM_*",
 	},
 	IgnoreVariables =
 	{

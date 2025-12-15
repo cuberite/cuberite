@@ -30,17 +30,23 @@ public:
 	virtual ~cSimulator() {}
 
 	/** Contains offsets for direct adjacents of any position. */
-	static constexpr std::array<Vector3i, 6> AdjacentOffsets
+	static constexpr std::array<Vector3i, 4> FlatCrossCoords =
 	{
-		{
-			{  1,  0,  0 },
-			{ -1,  0,  0 },
-			{  0,  1,  0 },
-			{  0, -1,  0 },
-			{  0,  0,  1 },
-			{  0,  0, -1 },
-		}
-	};
+		Vector3i( 1, 0,  0),
+		Vector3i(-1, 0,  0),
+		Vector3i( 0, 0,  1),
+		Vector3i( 0, 0, -1),
+	} ;
+
+	static constexpr std::array<Vector3i, 6> ThreeDimensionalNeighborCoords =
+	{
+		Vector3i( 1,  0,  0),
+		Vector3i(-1,  0,  0),
+		Vector3i( 0,  1,  0),
+		Vector3i( 0, -1,  0),
+		Vector3i( 0,  0,  1),
+		Vector3i( 0,  0, -1),
+		};
 
 	/** For a given offset from a position, return the offsets that represent the adjacents of the newly offset position, excluding the old position. */
 	static std::array<Vector3i, 5> GetLinkedOffsets(Vector3i Offset);
@@ -55,18 +61,18 @@ protected:
 
 	/** Called to simulate a new block. Unlike WakeUp this function will perform minimal checking.
 	It queues the block to be simulated as fast as possible, suitable for area wakeups. */
-	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block) = 0;
+	virtual void AddBlock(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block) = 0;
 
 	/** Called to simulate a single new block, typically as a result of a single block break or change.
 	The simulator implementation may decide to perform additional checks or maintain consistency of internal state
 	before the block is added to the simulate queue. */
-	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BLOCKTYPE a_Block);
+	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, BlockState a_Block);
 
 	/** Called to simulate a single block, synthesised by the simulator manager.
 	The position represents the adjacents of the block that was actually changed, with the offset used given.
 	Simulators may use this information to update additional blocks that were affected by the change, or queue
 	farther, extra-adjacents blocks to be updated. The simulator manager calls this overload after the 3-argument WakeUp. */
-	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BLOCKTYPE a_Block);
+	virtual void WakeUp(cChunk & a_Chunk, Vector3i a_Position, Vector3i a_Offset, BlockState a_Block);
 
 	cWorld & m_World;
 } ;

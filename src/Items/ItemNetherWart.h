@@ -9,9 +9,9 @@
 
 
 class cItemNetherWartHandler final:
-	public cItemHandler
+	public cSimplePlaceableItemHandler
 {
-	using Super = cItemHandler;
+	using Super = cSimplePlaceableItemHandler;
 
 public:
 
@@ -29,15 +29,6 @@ public:
 			return true;
 		}
 
-		return a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_NETHER_WART, 0);
-	}
-
-
-
-
-
-	virtual bool IsPlaceable(void) const override
-	{
-		return true;
+		return a_Player.PlaceBlock(a_PlacePosition, Block::NetherWart::NetherWart());
 	}
 } ;

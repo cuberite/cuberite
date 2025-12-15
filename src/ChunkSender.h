@@ -117,8 +117,9 @@ protected:
 	// Data about the chunk that is being sent:
 	// NOTE that m_BlockData[] is inherited from the cChunkDataCollector
 	unsigned char m_BiomeMap[cChunkDef::Width * cChunkDef::Width];
-	std::vector<Vector3i> m_BlockEntities;  // Coords of the block entities to send
+	std::vector<cBlockEntity *> m_BlockEntities;  // Coords of the block entities to send
 	std::vector<UInt32> m_EntityIDs;        // Entity-IDs of the entities to send
+	cChunkDef::HeightMap  m_HeightMap;  // World Surface height map
 
 	// cIsThread override:
 	virtual void Execute(void) override;
@@ -128,6 +129,7 @@ protected:
 	virtual void BiomeMap     (const cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void Entity       (cEntity *      a_Entity) override;
 	virtual void BlockEntity  (cBlockEntity * a_Entity) override;
+	virtual void HeightMap    (const cChunkDef::HeightMap & a_HeightMap) override;
 
 	/** Sends the specified chunk to all the specified clients */
 	void SendChunk(int a_ChunkX, int a_ChunkZ, const WeakClients & a_Clients);

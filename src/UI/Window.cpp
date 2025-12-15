@@ -18,6 +18,8 @@
 #include "../Root.h"
 #include "../Bindings/PluginManager.h"
 
+#include <ranges>
+
 
 
 
@@ -197,7 +199,8 @@ void cWindow::GetSlots(cPlayer & a_Player, cItems & a_Slots) const
 void cWindow::Clicked(
 	cPlayer & a_Player,
 	int a_WindowID, short a_SlotNum, eClickAction a_ClickAction,
-	const cItem & a_ClickedItem
+	const std::vector<std::pair<UInt16, cItem>> & a_ItemDelta,
+	const cItem & a_DraggedItem
 )
 {
 	cPluginManager * PlgMgr = cRoot::Get()->GetPluginManager();
@@ -219,7 +222,7 @@ void cWindow::Clicked(
 			}
 			if (a_Player.IsGameModeCreative())
 			{
-				a_Player.TossPickup(a_ClickedItem);
+				a_Player.TossPickup(a_DraggedItem);
 			}
 
 			if (a_ClickAction == caLeftClickOutside)
@@ -266,7 +269,25 @@ void cWindow::Clicked(
 	{
 		if (LocalSlotNum < itr->GetNumSlots())
 		{
-			itr->Clicked(a_Player, LocalSlotNum, a_ClickAction, a_ClickedItem);
+			UInt16 total_delta = static_cast<UInt16>(a_SlotNum - LocalSlotNum);
+			using namespace std::ranges::views;
+			auto filter_func = [total_delta] (const std::pair<UInt16, cItem> & dlt) { return dlt.first - total_delta >= 0; };
+			auto adjust_ids = [total_delta] (const std::pair<UInt16, cItem> & dlt) -> std::pair<UInt16, cItem> { return { dlt.first - total_delta, dlt.second}; };
+
+			// GitHub actions still use GCC-13 but std::ranges::to is implemented in GCC-14. Remove this when GCC is updated.
+#ifdef __cpp_lib_ranges_to_container
+			// Filters out the slots that apply to this SlotArea and adjusts the ids accordingly
+			std::vector<std::pair<UInt16, cItem>> new_list = transform(filter(a_ItemDelta, filter_func), adjust_ids) | std::ranges::to<std::vector>();
+#else
+			std::vector<std::pair<UInt16, cItem>> new_list;
+			auto filtered = transform(filter(a_ItemDelta, filter_func), adjust_ids);
+			for (const auto & pair : filtered)
+			{
+				new_list.push_back(pair);
+			}
+#endif
+
+			itr->Clicked(a_Player, LocalSlotNum, a_ClickAction, new_list, a_DraggedItem);
 			return;
 		}
 		LocalSlotNum -= itr->GetNumSlots();
@@ -383,7 +404,7 @@ void cWindow::BroadcastSlot(cSlotArea * a_Area, int a_LocalSlotNum)
 
 void cWindow::SendWholeWindow(cClientHandle & a_Client)
 {
-	a_Client.SendWholeInventory(*this);
+	a_Client.SendWholeInventory(*this, a_Client.GetPlayer()->GetDraggingItem());
 }
 
 
@@ -636,6 +657,7 @@ void cWindow::OnLeftPaintEnd(cPlayer & a_Player)
 
 	const cSlotNums & SlotNums = a_Player.GetInventoryPaintSlots();
 	cItem ToDistribute(a_Player.GetDraggingItem());
+	ASSERT(SlotNums.size() > 0);
 	char ToEachSlot = ToDistribute.m_ItemCount / static_cast<char>(SlotNums.size());
 
 	char NumDistributed = DistributeItemToSlots(a_Player, ToDistribute, ToEachSlot, SlotNums);

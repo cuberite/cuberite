@@ -13,7 +13,7 @@
 	ignore = dirty
 [submodule "lib/SQLiteCpp"]
 	path = lib/SQLiteCpp
-	url = https://github.com/cuberite/SQLiteCpp.git
+	url = https://github.com/SRombauts/SQLiteCpp
 	ignore = dirty
 [submodule "lib/libevent"]
 	path = lib/libevent
@@ -25,7 +25,7 @@
 	ignore = dirty
 [submodule "lib/TCLAP"]
 	path = lib/TCLAP
-	url = https://github.com/cuberite/TCLAP.git
+	url = https://github.com/DAarno/tclap
 	ignore = dirty
 [submodule "lib/cmake-coverage"]
 	path = lib/cmake-coverage

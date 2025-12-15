@@ -8,11 +8,11 @@
 
 
 
-cEnchantingTableEntity::cEnchantingTableEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, AString a_CustomName) :
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+cEnchantingTableEntity::cEnchantingTableEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World, AString a_CustomName) :
+	Super(a_Block, a_Pos, a_World),
 	m_CustomName(std::move(a_CustomName))
 {
-	ASSERT(a_BlockType == E_BLOCK_ENCHANTMENT_TABLE);
+	ASSERT(a_Block.Type() == BlockType::EnchantingTable);
 }
 
 
@@ -21,8 +21,8 @@ cEnchantingTableEntity::cEnchantingTableEntity(BLOCKTYPE a_BlockType, NIBBLETYPE
 
 cItems cEnchantingTableEntity::ConvertToPickups() const
 {
-	cItem Item(E_BLOCK_ENCHANTMENT_TABLE);
-	Item.m_CustomName = m_CustomName;
+	cItem Item(Item::EnchantingTable);
+	Item.SetComponent(DataComponents::CustomNameComponent(m_CustomName));
 	return Item;
 }
 

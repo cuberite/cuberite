@@ -27,7 +27,7 @@ public:
 
 	virtual void GetFollowedItems(cItems & a_Items) override
 	{
-		a_Items.Add(E_ITEM_CARROT);
+		a_Items.Add(Item::Carrot);
 	}
 
 	bool IsSaddled(void) const { return m_bIsSaddled; }

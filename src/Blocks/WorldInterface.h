@@ -45,7 +45,7 @@ public:
 
 	/** Spawns a mob of the specified type.
 	Returns the mob's UniqueID if recognized and spawned, or cEntity::INVALID_ID on failure. */
-	virtual UInt32 SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eMonsterType a_MonsterType, bool a_Baby) = 0;
+	virtual UInt32 SpawnMob(double a_PosX, double a_PosY, double a_PosZ, eEntityType a_MonsterType, bool a_Baby) = 0;
 
 	/** Spawns an experience orb at the given location with the given reward.
 	Returns the UniqueID of the spawned experience orb, or cEntity::INVALID_ID on failure. */
@@ -100,5 +100,7 @@ public:
 
 	/** Wakes up the simulators for the specified block */
 	virtual void WakeUpSimulators(Vector3i a_Block) = 0;
+
+	virtual void FlushPendingBlockChanges() = 0;
 
 };

@@ -8,7 +8,7 @@
 
 
 cCaveSpider::cCaveSpider(void) :
-	Super("CaveSpider", mtCaveSpider, "entity.spider.hurt", "entity.spider.death", "entity.spider.ambient", 0.7f, 0.5f)
+	Super("CaveSpider", etCaveSpider, "entity.spider.hurt", "entity.spider.death", "entity.spider.ambient", 0.7f, 0.5f)
 {
 }
 
@@ -58,10 +58,10 @@ void cCaveSpider::GetDrops(cItems & a_Drops, cEntity * a_Killer)
 	{
 		LootingLevel = a_Killer->GetEquippedWeapon().m_Enchantments.GetLevel(cEnchantments::enchLooting);
 	}
-	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, E_ITEM_STRING);
+	AddRandomDropItem(a_Drops, 0, 2 + LootingLevel, Item::String);
 	if ((a_Killer != nullptr) && (a_Killer->IsPlayer() || a_Killer->IsA("cWolf")))
 	{
-		AddRandomUncommonDropItem(a_Drops, 33.0f, E_ITEM_SPIDER_EYE);
+		AddRandomUncommonDropItem(a_Drops, 33.0f, Item::SpiderEye);
 	}
 }
 

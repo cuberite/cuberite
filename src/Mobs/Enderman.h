@@ -24,13 +24,11 @@ public:
 	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 	bool IsScreaming(void) const {return m_bIsScreaming; }
-	BLOCKTYPE GetCarriedBlock(void) const {return m_CarriedBlock; }
-	NIBBLETYPE GetCarriedMeta(void) const {return m_CarriedMeta; }
+	BlockState GetCarriedBlock(void) const { return m_CarriedBlock; }
 
 private:
 
 	bool m_bIsScreaming;
-	BLOCKTYPE m_CarriedBlock;
-	NIBBLETYPE m_CarriedMeta;
+	BlockState m_CarriedBlock;
 
 } ;

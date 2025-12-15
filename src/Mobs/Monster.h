@@ -45,9 +45,11 @@ public:
 	a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs 2012_12_22))
 	a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
 	*/
-	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height);
+	cMonster(const AString & a_ConfigName, eEntityType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height);
 
 	CLASS_PROTODEF(cMonster)
+
+	virtual bool IsMob() const override { return true; }
 
 	virtual void OnRemoveFromWorld(cWorld & a_World) override;
 
@@ -67,7 +69,7 @@ public:
 	virtual void MoveToPosition(const Vector3d & a_Position);  // tolua_export
 
 	// tolua_begin
-	eMonsterType GetMobType(void) const { return m_MobType; }
+	// eMonsterType GetMobType(void) const { return m_MobType; }
 	eFamily GetMobFamily(void) const;
 	// tolua_end
 
@@ -182,16 +184,16 @@ public:
 	void SetCustomNameAlwaysVisible(bool a_CustomNameAlwaysVisible);
 
 	/** Translates MobType enum to a string, empty string if unknown */
-	static AString MobTypeToString(eMonsterType a_MobType);
+	static AString MobTypeToString(eEntityType a_MobType);
 
 	/** Translates MobType enum to the vanilla name of the mob, empty string if unknown. */
-	static AString MobTypeToVanillaName(eMonsterType a_MobType);
+	static AString MobTypeToVanillaName(eEntityType a_MobType);
 
 	/** Translates MobType string to the enum, mtInvalidType if not recognized */
-	static eMonsterType StringToMobType(const AString & a_MobTypeName);
+	static eEntityType StringToMobType(const AString & a_MobTypeName);
 
 	/** Returns the mob family based on the type */
-	static eFamily FamilyFromType(eMonsterType a_MobType);
+	static eFamily FamilyFromType(eEntityType a_MobType);
 
 	// tolua_end
 
@@ -199,7 +201,7 @@ public:
 	static cTickTime GetSpawnDelay(cMonster::eFamily a_MobFamily);
 
 	/**  Translates the MobType enum to the vanilla nbt name */
-	static AString MobTypeToVanillaNBT(eMonsterType a_MobType);
+	static AString MobTypeToVanillaNBT(eEntityType a_MobType);
 
 	/** Sets the target that this mob will chase. Pass a nullptr to unset. */
 	void SetTarget (cPawn * a_NewTarget);
@@ -215,7 +217,7 @@ public:
 	a_MobType is the type of the mob to be created
 	Asserts and returns null if mob type is not specified
 	*/
-	static std::unique_ptr<cMonster> NewMonsterFromType(eMonsterType a_MobType);
+	static std::unique_ptr<cMonster> NewMonsterFromType(eEntityType a_MobType);
 
 	/** Returns if this mob last target was a player to avoid destruction on player quit */
 	bool WasLastTargetAPlayer() const { return m_WasLastTargetAPlayer; }
@@ -302,7 +304,7 @@ protected:
 	std::chrono::milliseconds m_IdleInterval;
 	std::chrono::milliseconds m_DestroyTimer;
 
-	eMonsterType m_MobType;
+	// eMonsterType m_MobType;
 	AString m_CustomName;
 	bool m_CustomNameAlwaysVisible;
 
@@ -352,10 +354,10 @@ protected:
 	bool m_CanBeLeashed;
 
 	/** Adds a random number of a_Item between a_Min and a_Max to itemdrops a_Drops */
-	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, short a_Item, short a_ItemHealth = 0);
+	void AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned int a_Max, Item a_Item);
 
 	/** Adds a item a_Item with the chance of a_Chance (in percent) to itemdrops a_Drops */
-	void AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, short a_Item, short a_ItemHealth = 0);
+	void AddRandomUncommonDropItem(cItems & a_Drops, float a_Chance, enum Item a_Item);
 
 	/** Adds one rare item out of the list of rare items a_Items modified by the looting level a_LootingLevel(I-III or custom) to the itemdrop a_Drops */
 	void AddRandomRareDropItem(cItems & a_Drops, cItems & a_Items, unsigned int a_LootingLevel);

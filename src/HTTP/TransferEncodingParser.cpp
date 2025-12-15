@@ -296,7 +296,7 @@ protected:
 	{
 		if (m_State != psFinished)
 		{
-			Error(fmt::format(FMT_STRING("ChunkedTransferEncoding: Finish signal received before the data stream ended (state: {})"), m_State));
+			Error(fmt::format(FMT_STRING("ChunkedTransferEncoding: Finish signal received before the data stream ended (state: {})"), static_cast<UInt32>(m_State)));
 		}
 		m_State = psFinished;
 	}

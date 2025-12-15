@@ -8,15 +8,16 @@
 #include "../Entities/Player.h"
 #include "../ClientHandle.h"
 #include "../Item.h"
+#include "../Blocks/BlockFlowerPot.h"
 
 
 
 
 
-cFlowerPotEntity::cFlowerPotEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World)
+cFlowerPotEntity::cFlowerPotEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, a_World)
 {
-	ASSERT(a_BlockType == E_BLOCK_FLOWER_POT);
+	ASSERT(cBlockFlowerPotHandler::IsBlockFlowerPot(a_Block));
 }
 
 
@@ -53,7 +54,7 @@ bool cFlowerPotEntity::UsedBy(cPlayer * a_Player)
 	a_Player->GetStatistics().Custom[CustomStatistic::PotFlower]++;
 
 	cItem SelectedItem = a_Player->GetInventory().GetEquippedItem();
-	if (IsFlower(SelectedItem.m_ItemType, SelectedItem.m_ItemDamage))
+	if (IsFlower(SelectedItem.m_ItemType))
 	{
 		m_Item = SelectedItem.CopyOne();
 		if (!a_Player->IsGameModeCreative())
@@ -78,27 +79,31 @@ void cFlowerPotEntity::SendTo(cClientHandle & a_Client)
 
 
 
-bool cFlowerPotEntity::IsFlower(short m_ItemType, short m_ItemData)
+bool cFlowerPotEntity::IsFlower(Item m_ItemType)
 {
 	switch (m_ItemType)
 	{
-		case E_BLOCK_DANDELION:
-		case E_BLOCK_FLOWER:
-		case E_BLOCK_CACTUS:
-		case E_BLOCK_BROWN_MUSHROOM:
-		case E_BLOCK_RED_MUSHROOM:
-		case E_BLOCK_SAPLING:
-		case E_BLOCK_DEAD_BUSH:
-		{
+		case Item::Dandelion:
+		case Item::Cactus:
+		case Item::BrownMushroom:
+		case Item::RedMushroom:
+		case Item::AcaciaSapling:
+		case Item::BirchSapling:
+		case Item::JungleSapling:
+		case Item::DarkOakSapling:
+		case Item::OakSapling:
+		case Item::SpruceSapling:
+		case Item::DeadBush:
+		case Item::Lilac:
+		case Item::Peony:
+		case Item::RoseBush:
+		case Item::Sunflower:
+		case Item::CherrySapling:
+		case Item::MangrovePropagule:
+		case Item::Azalea:
+		case Item::FloweringAzalea:
+		case Item::Torchflower:
 			return true;
-		}
-		case E_BLOCK_TALL_GRASS:
-		{
-			return (m_ItemData == static_cast<short>(2));
-		}
-		default:
-		{
-			return false;
-		}
+		default: return false;
 	}
 }

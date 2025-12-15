@@ -14,27 +14,21 @@ class cItemRawFishHandler final:
 
 public:
 
-	constexpr cItemRawFishHandler(int a_ItemType):
+	constexpr cItemRawFishHandler(Item a_ItemType):
 		Super(a_ItemType, FoodInfo(0, 0))
 	{
 	}
 
 	virtual FoodInfo GetFoodInfo(const cItem * a_Item) const override
 	{
-		static const FoodInfo RawFishInfos[] =
+		switch (a_Item->m_ItemType)
 		{
-			FoodInfo(2, 0.4),  // Raw fish
-			FoodInfo(2, 0.2),  // Raw salmon
-			FoodInfo(1, 0.2),  // Clownfish
-			FoodInfo(1, 0.2),  // Pufferfish
-		};
-
-		if (a_Item->m_ItemDamage >= static_cast<short>(ARRAYCOUNT(RawFishInfos)))
-		{
-			LOGWARNING("Unknown raw fish type '%d'", a_Item->m_ItemDamage);
-			return FoodInfo(0, 0);
+			case Item::Cod:return FoodInfo(2, 0.4);
+			case Item::Salmon: return FoodInfo(2, 0.2);
+			case Item::TropicalFish:return FoodInfo(1, 0.2);
+			case Item::Pufferfish:return FoodInfo(1, 0.2);
+			default: LOGWARNING("Unknown raw fish type "); return FoodInfo(0, 0);
 		}
-		return RawFishInfos[a_Item->m_ItemDamage];
 	}
 
 	virtual bool EatItem(cPlayer * a_Player, cItem * a_Item) const override
@@ -44,7 +38,7 @@ public:
 			return false;
 		}
 
-		if (a_Item->m_ItemDamage == E_META_RAW_FISH_PUFFERFISH)
+		if (a_Item->m_ItemType == Item::Pufferfish)
 		{
 			a_Player->AddEntityEffect(cEntityEffect::effHunger, 20 * 15, 2);
 			a_Player->AddEntityEffect(cEntityEffect::effNausea, 20 * 15, 1);

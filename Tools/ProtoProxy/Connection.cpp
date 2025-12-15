@@ -288,10 +288,11 @@ void cConnection::Run(void)
 void cConnection::vLog(const char * a_Format, fmt::printf_args a_ArgList)
 {
 	// Log to file:
+	fmt::basic_string_view<char> s(a_Format);
 	cCSLock Lock(m_CSLog);
-	fmt::fprintf(m_LogFile, "[%5.3f] ", GetRelativeTime());
-	fmt::vfprintf(m_LogFile, a_Format, a_ArgList);
-	fmt::fprintf(m_LogFile, "\n");
+	// fmt::fprintf(m_LogFile, "[%5.3f] ", GetRelativeTime());
+	// fmt::vfprintf(m_LogFile, s, a_ArgList);  // TODO: fix
+	// fmt::fprintf(m_LogFile, "\n");
 	#ifdef _DEBUG
 		fflush(m_LogFile);
 	#endif  // _DEBUG
@@ -309,11 +310,12 @@ void cConnection::vDataLog(const void * a_Data, size_t a_Size, const char * a_Fo
 	AString Hex;
 	CreateHexDump(Hex, a_Data, a_Size, 16);
 
+	fmt::basic_string_view<char> s(a_Format);
 	// Log to file:
 	cCSLock Lock(m_CSLog);
-	fmt::fprintf(m_LogFile, "[%5.3f] ", GetRelativeTime());
-	fmt::vfprintf(m_LogFile, a_Format, a_ArgList);
-	fmt::fprintf(m_LogFile, "\n%s\n", Hex);
+	// fmt::fprintf(m_LogFile, "[%5.3f] ", GetRelativeTime());
+	// fmt::vfprintf(m_LogFile, s, a_ArgList);  // TODO: fix
+	// fmt::fprintf(m_LogFile, "\n%s\n", Hex);
 
 	// Log to screen:
 	// std::cout << FullMsg;

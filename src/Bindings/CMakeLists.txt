@@ -2,6 +2,8 @@ target_sources(
 	${CMAKE_PROJECT_NAME} PRIVATE
 
 	Bindings.cpp
+	BlockState.cpp
+	BlockTypePalette.cpp
 	DeprecatedBindings.cpp
 	LuaChunkStay.cpp
 	LuaJson.cpp
@@ -22,6 +24,8 @@ target_sources(
 	PluginManager.cpp
 
 	Bindings.h
+	BlockState.h
+	BlockTypePalette.h
 	DeprecatedBindings.h
 	LuaChunkStay.h
 	LuaFunctions.h

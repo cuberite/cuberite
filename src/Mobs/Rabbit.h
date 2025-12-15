@@ -37,9 +37,9 @@ public:
 	virtual void GetDrops(cItems & a_Drops, cEntity * a_Killer = nullptr) override;
 	virtual void GetFollowedItems(cItems & a_Items) override
 	{
-		a_Items.Add(E_ITEM_CARROT);
-		a_Items.Add(E_ITEM_GOLDEN_CARROT);
-		a_Items.Add(E_BLOCK_DANDELION);
+		a_Items.Add(Item::Carrot);
+		a_Items.Add(Item::GoldenCarrot);
+		// a_Items.Add(E_BLOCK_DANDELION);
 	}
 
 	eRabbitType GetRabbitType()         const { return m_Type; }

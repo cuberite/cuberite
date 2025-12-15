@@ -245,16 +245,6 @@ return
 				},
 				Notes = "Returns the string that identifies the projectile type (class name) in MCA files",
 			},
-			GetProjectileKind =
-			{
-				Returns =
-				{
-					{
-						Type = "cProjectileEntity#eKind",
-					},
-				},
-				Notes = "Returns the kind of this projectile (pkXXX constant)",
-			},
 			IsInGround =
 			{
 				Returns =
@@ -264,57 +254,6 @@ return
 					},
 				},
 				Notes = "Returns true if this projectile has hit the ground.",
-			},
-		},
-		Constants =
-		{
-			pkArrow =
-			{
-				Notes = "The projectile is an {{cArrowEntity|arrow}}",
-			},
-			pkEgg =
-			{
-				Notes = "The projectile is a {{cThrownEggEntity|thrown egg}}",
-			},
-			pkEnderPearl =
-			{
-				Notes = "The projectile is a {{cThrownEnderPearlEntity|thrown enderpearl}}",
-			},
-			pkExpBottle =
-			{
-				Notes = "The projectile is a {{cExpBottleEntity|thrown exp bottle}}",
-			},
-			pkFireCharge =
-			{
-				Notes = "The projectile is a {{cFireChargeEntity|fire charge}}",
-			},
-			pkFirework =
-			{
-				Notes = "The projectile is a (flying) {{cFireworkEntity|firework}}",
-			},
-			pkGhastFireball =
-			{
-				Notes = "The projectile is a {{cGhastFireballEntity|ghast fireball}}",
-			},
-			pkSnowball =
-			{
-				Notes = "The projectile is a {{cThrownSnowballEntity|thrown snowball}}",
-			},
-			pkSplashPotion =
-			{
-				Notes = "The projectile is a {{cSplashPotionEntity|thrown splash potion}}",
-			},
-			pkWitherSkull =
-			{
-				Notes = "The projectile is a {{cWitherSkullEntity|wither skull}}",
-			},
-		},
-		ConstantGroups =
-		{
-			eKind =
-			{
-				Include = "pk.*",
-				TextBefore = "The following constants are used to distinguish between the different projectile kinds:",
 			},
 		},
 		Inherits = "cEntity",

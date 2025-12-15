@@ -15,15 +15,7 @@ class cItemSeedsHandler:
 
 public:
 
-	constexpr cItemSeedsHandler(int a_ItemType):
-		Super(a_ItemType)
-	{
-
-	}
-
-
-
-
+	using Super::Super;
 
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
@@ -33,21 +25,25 @@ public:
 			return false;
 		}
 
-		BLOCKTYPE BlockType;
+		BlockState Block;
+
+		using namespace Block;
 
 		// Get the produce block based on the seed item:
 		switch (m_ItemType)
 		{
-			case E_ITEM_BEETROOT_SEEDS: BlockType = E_BLOCK_BEETROOTS;    break;
-			case E_ITEM_CARROT:         BlockType = E_BLOCK_CARROTS;      break;
-			case E_ITEM_MELON_SEEDS:    BlockType = E_BLOCK_MELON_STEM;   break;
-			case E_ITEM_POTATO:         BlockType = E_BLOCK_POTATOES;     break;
-			case E_ITEM_PUMPKIN_SEEDS:  BlockType = E_BLOCK_PUMPKIN_STEM; break;
-			case E_ITEM_SEEDS:          BlockType = E_BLOCK_CROPS;        break;
-			default:                    UNREACHABLE("Unsupported seed type");
+			case Item::BeetrootSeeds: Block = Beetroots::Beetroots();     break;
+			case Item::Carrot:        Block = Carrots::Carrots();         break;
+			case Item::MelonSeeds:    Block = MelonStem::MelonStem();     break;
+			case Item::Potato:        Block = Potatoes::Potatoes();       break;
+			case Item::PumpkinSeeds:  Block = PumpkinStem::PumpkinStem(); break;
+			case Item::WheatSeeds:    Block = Wheat::Wheat();             break;
+			case Item::TorchflowerSeeds:Block = TorchflowerCrop::TorchflowerCrop(); break;
+			case Item::PitcherPod:    Block = PitcherPlant::PitcherPlant(); break;
+			default:                  UNREACHABLE("Unsupported seed type");
 		}
 
-		return a_Player.PlaceBlock(a_PlacePosition, BlockType, 0);
+		return a_Player.PlaceBlock(a_PlacePosition, Block);
 	}
 
 

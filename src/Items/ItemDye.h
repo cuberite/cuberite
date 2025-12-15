@@ -19,7 +19,31 @@ public:
 	using Super::Super;
 
 
-
+	static inline bool IsDye(const cItem & a_Item)
+	{
+		switch (a_Item.m_ItemType)
+		{
+			case Item::BlackDye:
+			case Item::BlueDye:
+			case Item::BrownDye:
+			case Item::BoneMeal:
+			case Item::CyanDye:
+			case Item::GrayDye:
+			case Item::GreenDye:
+			case Item::LightBlueDye:
+			case Item::LightGrayDye:
+			case Item::LimeDye:
+			case Item::MagentaDye:
+			case Item::OrangeDye:
+			case Item::PinkDye:
+			case Item::PurpleDye:
+			case Item::RedDye:
+			case Item::WhiteDye:
+			case Item::YellowDye:
+				return true;
+			default: return false;
+		}
+	}
 
 
 	virtual bool OnItemUse(
@@ -31,7 +55,7 @@ public:
 		eBlockFace a_ClickedBlockFace
 	) const override
 	{
-		if ((a_HeldItem.m_ItemDamage == E_META_DYE_WHITE) && (a_ClickedBlockFace != BLOCK_FACE_NONE))
+		if ((a_HeldItem.m_ItemType == Item::BoneMeal) && (a_ClickedBlockFace != BLOCK_FACE_NONE))
 		{
 			// Bonemeal (white dye) is used to fertilize plants:
 			if (FertilizePlant(*a_World, a_ClickedBlockPos))
@@ -43,7 +67,7 @@ public:
 				}
 			}
 		}
-		else if ((a_HeldItem.m_ItemDamage == E_META_DYE_BROWN) && (a_ClickedBlockFace >= BLOCK_FACE_ZM) && (a_ClickedBlockFace <= BLOCK_FACE_XP))
+		else if ((a_HeldItem.m_ItemType == Item::CocoaBeans) && (a_ClickedBlockFace >= BLOCK_FACE_ZM) && (a_ClickedBlockFace <= BLOCK_FACE_XP))
 		{
 			// Players can't place blocks while in adventure mode.
 			if (a_Player->IsGameModeAdventure())
@@ -52,28 +76,29 @@ public:
 			}
 
 			// Cocoa (brown dye) can be planted on jungle logs:
-			BLOCKTYPE BlockType;
-			NIBBLETYPE BlockMeta;
+
+			BlockState ClickedBlock;
+			if (a_World->GetBlock(a_ClickedBlockPos, ClickedBlock))
+			{
+				return false;
+			}
 
 			// Check if the block that the player clicked is a jungle log.
-			if (
-				!a_World->GetBlockTypeMeta(a_ClickedBlockPos, BlockType, BlockMeta) ||
-				((BlockType != E_BLOCK_LOG) || ((BlockMeta & 0x03) != E_META_LOG_JUNGLE))
-			)
+			if (ClickedBlock.Type() != BlockType::JungleLog)
 			{
 				return false;
 			}
 
 			// Get the location from the new cocoa pod.
 			auto CocoaPos = AddFaceDirection(a_ClickedBlockPos, a_ClickedBlockFace, false);
-			BlockMeta = cBlockCocoaPodHandler::BlockFaceToMeta(a_ClickedBlockFace);
 
 			// Place the cocoa pod:
-			if (a_World->GetBlock(CocoaPos) != E_BLOCK_AIR)
+			if (a_World->GetBlock(CocoaPos) != Block::Air::Air())
 			{
 				return false;
 			}
-			if (a_Player->PlaceBlock(CocoaPos, E_BLOCK_COCOA_POD, BlockMeta))
+
+			if (a_Player->PlaceBlock(CocoaPos, Block::Cocoa::Cocoa(0, a_ClickedBlockFace)))
 			{
 				if (a_Player->IsGameModeSurvival())
 				{
@@ -101,22 +126,23 @@ public:
 	fertilization success is reported even in the case when the chance fails (bonemeal still needs to be consumed). */
 	static bool FertilizePlant(cWorld & a_World, Vector3i a_BlockPos)
 	{
-		BLOCKTYPE BlockType;
-		NIBBLETYPE BlockMeta;
-		if (!a_World.GetBlockTypeMeta(a_BlockPos, BlockType, BlockMeta))
+		BlockState DestBlock;
+		if (!a_World.GetBlock(a_BlockPos, DestBlock))
 		{
 			return false;
 		}
-		switch (BlockType)
+		switch (DestBlock.Type())
 		{
-			case E_BLOCK_WHEAT:
-			case E_BLOCK_CARROTS:
-			case E_BLOCK_POTATOES:
-			case E_BLOCK_MELON_STEM:
-			case E_BLOCK_PUMPKIN_STEM:
+			case BlockType::Wheat:
+			case BlockType::Carrots:
+			case BlockType::Potatoes:
+			case BlockType::MelonStem:
+			case BlockType::AttachedMelonStem:
+			case BlockType::PumpkinStem:
+			case BlockType::AttachedPumpkinStem:
 			{
 				// Grow by 2 - 5 stages:
-				auto NumStages = GetRandomProvider().RandInt(2, 5);
+				auto NumStages = static_cast<char>(GetRandomProvider().RandInt(2, 5));
 				if (a_World.GrowPlantAt(a_BlockPos, NumStages) <= 0)
 				{
 					return false;
@@ -125,7 +151,7 @@ public:
 				return true;
 			}  // case wheat, carrots, potatoes, melon stem, pumpkin stem
 
-			case E_BLOCK_BEETROOTS:
+			case BlockType::Beetroots:
 			{
 				// Fix GH #4805.
 				// Bonemeal should only advance growth, not spawn produce, and should not be consumed if plant at maturity:
@@ -142,7 +168,12 @@ public:
 				return true;
 			}  // case beetroots
 
-			case E_BLOCK_SAPLING:
+			case BlockType::AcaciaSapling:
+			case BlockType::BirchSapling:
+			case BlockType::JungleSapling:
+			case BlockType::DarkOakSapling:
+			case BlockType::OakSapling:
+			case BlockType::SpruceSapling:
 			{
 				// 45% chance of growing to the next stage / full tree:
 				if (GetRandomProvider().RandBool(0.45))
@@ -152,25 +183,14 @@ public:
 				a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_BlockPos, 0);
 				return true;
 			}  // case sapling
+			case BlockType::LargeFern: a_World.SpawnItemPickups(cItem(Item::LargeFern), a_BlockPos); return true;
+			case BlockType::Lilac:     a_World.SpawnItemPickups(cItem(Item::Lilac), a_BlockPos); return true;
+			case BlockType::Peony:     a_World.SpawnItemPickups(cItem(Item::Peony), a_BlockPos); return true;
+			case BlockType::RoseBush:  a_World.SpawnItemPickups(cItem(Item::RoseBush), a_BlockPos); return true;
+			case BlockType::Sunflower: a_World.SpawnItemPickups(cItem(Item::Sunflower), a_BlockPos); return true;
 
-			case E_BLOCK_BIG_FLOWER:
-			{
-				// Drop the corresponding flower item without destroying the block:
-				cItems Pickups;
-				switch (BlockMeta)
-				{
-					case E_META_BIG_FLOWER_SUNFLOWER: Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_SUNFLOWER); break;
-					case E_META_BIG_FLOWER_LILAC:     Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_LILAC);     break;
-					case E_META_BIG_FLOWER_ROSE_BUSH: Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_ROSE_BUSH); break;
-					case E_META_BIG_FLOWER_PEONY:     Pickups.Add(E_BLOCK_BIG_FLOWER, 1, E_META_BIG_FLOWER_PEONY);     break;
-				}
-				// TODO: Should we call any hook for this?
-				a_World.SpawnItemPickups(Pickups, a_BlockPos);
-				return true;
-			}  // big flower
-
-			case E_BLOCK_TALL_GRASS:
-			case E_BLOCK_COCOA_POD:
+			case BlockType::TallGrass:
+			case BlockType::Cocoa:
 			{
 				// Always try to grow 1 stage:
 				if (a_World.GrowPlantAt(a_BlockPos, 1) <= 0)
@@ -181,8 +201,8 @@ public:
 				return true;
 			}  // case tall grass
 
-			case E_BLOCK_RED_MUSHROOM:
-			case E_BLOCK_BROWN_MUSHROOM:
+			case BlockType::RedMushroom:
+			case BlockType::BrownMushroom:
 			{
 				// 40% chance of growing into a large mushroom:
 				if (GetRandomProvider().RandBool(0.6))
@@ -197,16 +217,17 @@ public:
 				return true;
 			}  // case red or brown mushroom
 
-			case E_BLOCK_GRASS:
+			case BlockType::ShortGrass:
 			{
 				GrowPlantsAround(a_World, a_BlockPos);
 				return true;
 			}
+			default: return false;
 
-			// TODO: case E_BLOCK_SWEET_BERRY_BUSH:
-			// TODO: case E_BLOCK_SEA_PICKLE:
-			// TODO: case E_BLOCK_KELP:
-			// TODO: case E_BLOCK_BAMBOO:
+			// TODO: case BlockType::SWEET_BERRY_BUSH:
+			// TODO: case BlockType::SEA_PICKLE:
+			// TODO: case BlockType::KELP:
+			// TODO: case BlockType::BAMBOO:
 		}  // switch (blockType)
 		return false;
 	}
@@ -258,64 +279,64 @@ public:
 
 	static void GrowDoubleTallGrass(cWorld & a_World, const Vector3i a_Position)
 	{
-		a_World.SetBlock(a_Position, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_DOUBLE_TALL_GRASS);
+		a_World.SetBlock(a_Position, Block::TallGrass::TallGrass(Block::TallGrass::Half::Lower));
 		a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_Position, 0);
 
 		const auto Above = a_Position.addedY(1);
-		a_World.SetBlock(Above, E_BLOCK_BIG_FLOWER, E_META_BIG_FLOWER_DOUBLE_TALL_GRASS | E_META_BIG_FLOWER_TOP);
+		a_World.SetBlock(Above, Block::TallGrass::TallGrass(Block::TallGrass::Half::Upper));
 		a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, Above, 0);
 	}
 
 	static void GrowTallGrass(cWorld & a_World, const Vector3i a_Position)
 	{
-		a_World.SetBlock(a_Position, E_BLOCK_TALL_GRASS, E_META_TALL_GRASS_GRASS);
+		a_World.SetBlock(a_Position, Block::ShortGrass::ShortGrass());
 		a_World.BroadcastSoundParticleEffect(EffectID::PARTICLE_HAPPY_VILLAGER, a_Position, 0);
 	}
 
 	/** Grows a biome-dependent flower according to https://minecraft.wiki/w/Flower#Flower_biomes */
 	static void GrowFlower(cWorld & a_World, const Vector3i a_Position)
 	{
+		using namespace Block;
+
 		auto & Random = GetRandomProvider();
 		switch (a_World.GetBiomeAt(a_Position.x, a_Position.z))
 		{
 			case biPlains:
 			case biSunflowerPlains:
 			{
-				switch (Random.RandInt(8))
+				switch (Random.RandInt(9))
 				{
-					case 0: a_World.SetBlock(a_Position, E_BLOCK_DANDELION, 0); break;
-					case 1: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_POPPY); break;
-					case 2: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_ALLIUM); break;
-					case 3: a_World.SetBlock(a_Position, E_BLOCK_RED_ROSE, 0); break;  // was renamed to Azure Bluet later
-					case 4: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_RED_TULIP); break;
-					case 5: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_PINK_TULIP); break;
-					case 6: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_WHITE_TULIP); break;
-					case 7: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_ORANGE_TULIP); break;
-					case 8: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_OXEYE_DAISY); break;
-					// TODO: Add cornflower
+					case 0: a_World.SetBlock(a_Position, Dandelion::Dandelion()); break;
+					case 1: a_World.SetBlock(a_Position, Poppy::Poppy()); break;
+					case 2: a_World.SetBlock(a_Position, Allium::Allium()); break;
+					case 3: a_World.SetBlock(a_Position, AzureBluet::AzureBluet()); break;
+					case 4: a_World.SetBlock(a_Position, RedTulip::RedTulip()); break;
+					case 5: a_World.SetBlock(a_Position, PinkTulip::PinkTulip()); break;
+					case 6: a_World.SetBlock(a_Position, WhiteTulip::WhiteTulip()); break;
+					case 7: a_World.SetBlock(a_Position, OrangeTulip::OrangeTulip()); break;
+					case 8: a_World.SetBlock(a_Position, OxeyeDaisy::OxeyeDaisy()); break;
+					case 9: a_World.SetBlock(a_Position, Cornflower::Cornflower()); break;
 				}
 				break;
 			}
 			case biSwampland:
 			case biSwamplandM:
-			{
-				a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_BLUE_ORCHID);
-				break;
-			}
+				a_World.SetBlock(a_Position, BlueOrchid::BlueOrchid()); break;
 			case biFlowerForest:
 			{
-				switch (Random.RandInt(8))
+				switch (Random.RandInt(10))
 				{
-					case 0: a_World.SetBlock(a_Position, E_BLOCK_DANDELION, 0); break;
-					case 1: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_POPPY); break;
-					case 2: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_ALLIUM); break;
-					case 3: a_World.SetBlock(a_Position, E_BLOCK_RED_ROSE, 0); break;  // was renamed to Azure Bluet later
-					case 4: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_RED_TULIP); break;
-					case 5: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_PINK_TULIP); break;
-					case 6: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_WHITE_TULIP); break;
-					case 7: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_ORANGE_TULIP); break;
-					case 8: a_World.SetBlock(a_Position, E_BLOCK_FLOWER, E_META_FLOWER_OXEYE_DAISY); break;
-					// TODO: Add cornflower, lily of the valley
+					case 0:  a_World.SetBlock(a_Position, Dandelion::Dandelion()); break;
+					case 1:  a_World.SetBlock(a_Position, Poppy::Poppy()); break;
+					case 2:  a_World.SetBlock(a_Position, Allium::Allium()); break;
+					case 3:  a_World.SetBlock(a_Position, AzureBluet::AzureBluet()); break;
+					case 4:  a_World.SetBlock(a_Position, RedTulip::RedTulip()); break;
+					case 5:  a_World.SetBlock(a_Position, PinkTulip::PinkTulip()); break;
+					case 6:  a_World.SetBlock(a_Position, WhiteTulip::WhiteTulip()); break;
+					case 7:  a_World.SetBlock(a_Position, OrangeTulip::OrangeTulip()); break;
+					case 8:  a_World.SetBlock(a_Position, OxeyeDaisy::OxeyeDaisy()); break;
+					case 9:  a_World.SetBlock(a_Position, Cornflower::Cornflower()); break;
+					case 10: a_World.SetBlock(a_Position, LilyOfTheValley::LilyOfTheValley()); break;
 				}
 				break;
 			}
@@ -336,8 +357,8 @@ public:
 			{
 				switch (Random.RandInt(1))
 				{
-					case 0: a_World.SetBlock(a_Position, E_BLOCK_DANDELION, 0); break;
-					case 1: a_World.SetBlock(a_Position, E_BLOCK_RED_ROSE, 0); break;
+					case 0: a_World.SetBlock(a_Position, Dandelion::Dandelion()); break;
+					case 1: a_World.SetBlock(a_Position, AzureBluet::AzureBluet()); break;
 				}
 				break;
 			}
@@ -368,7 +389,7 @@ public:
 		{
 			if (
 				!cChunkDef::IsValidHeight(Position) ||
-				(a_World.GetBlock(Position) != E_BLOCK_GRASS)  // Are we looking at grass?
+				(a_World.GetBlock(Position).Type() != BlockType::ShortGrass)  // Are we looking at grass?
 			)
 			{
 				// Not grass or invalid height, restart random walk and bail:
@@ -379,7 +400,7 @@ public:
 			if (Planter == GrowDoubleTallGrass)
 			{
 				const auto TwoAbove = Position.addedY(2);
-				if ((TwoAbove.y >= cChunkDef::Height) || (a_World.GetBlock(TwoAbove) != E_BLOCK_AIR))
+				if ((TwoAbove.y >= cChunkDef::Height) || (a_World.GetBlock(TwoAbove).Type() != BlockType::Air))
 				{
 					// Insufficient space for tall grass:
 					continue;
@@ -387,7 +408,7 @@ public:
 			}
 
 			const auto PlantBase = Position.addedY(1);
-			if ((PlantBase.y >= cChunkDef::Height) || (a_World.GetBlock(PlantBase) != E_BLOCK_AIR))
+			if ((PlantBase.y >= cChunkDef::Height) || (a_World.GetBlock(PlantBase).Type() != BlockType::Air))
 			{
 				// Insufficient space:
 				continue;

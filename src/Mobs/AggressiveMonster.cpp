@@ -11,7 +11,7 @@
 
 
 
-cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height) :
+cAggressiveMonster::cAggressiveMonster(const AString & a_ConfigName, eEntityType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height) :
 	Super(a_ConfigName, a_MobType, a_SoundHurt, a_SoundDeath, a_SoundAmbient, a_Width, a_Height)
 {
 	m_EMPersonality = AGGRESSIVE;
@@ -46,7 +46,7 @@ void cAggressiveMonster::EventSeePlayer(cPlayer * a_Player, cChunk & a_Chunk)
 
 
 
-cMonster * cAggressiveMonster::GetMonsterOfTypeInSight(eMonsterType a_MobType, unsigned int a_SightDistance)
+cMonster * cAggressiveMonster::GetMonsterOfTypeInSight(eEntityType a_MobType, unsigned int a_SightDistance)
 {
 
 	cMonster * FoundTarget = nullptr;
@@ -55,14 +55,13 @@ cMonster * cAggressiveMonster::GetMonsterOfTypeInSight(eMonsterType a_MobType, u
 	class cCallback : public cBlockTracer::cCallbacks
 	{
 		public:
-		bool OnNextBlock(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, eBlockFace a_EntryFace) override
+		bool OnNextBlock(Vector3i a_BlockPos, BlockState a_Block, eBlockFace a_EntryFace) override
 		{
-			return a_BlockType != E_BLOCK_AIR;
+			return a_Block != BlockType::Air;
 		}
 	};
 
 	auto Callbacks = cCallback();
-	auto Tracer = cLineBlockTracer(*GetWorld(), Callbacks);
 
 	cEntityCallback Callback = [&](cEntity & a_Entity)
 	{
@@ -72,7 +71,7 @@ cMonster * cAggressiveMonster::GetMonsterOfTypeInSight(eMonsterType a_MobType, u
 		}
 
 		auto & Other = dynamic_cast<cMonster &>(a_Entity);
-		if (Other.GetMobType() != a_MobType)
+		if (Other.GetEntityType() != a_MobType)
 		{
 			return false;
 		}
@@ -92,7 +91,7 @@ cMonster * cAggressiveMonster::GetMonsterOfTypeInSight(eMonsterType a_MobType, u
 		return false;
 	};
 
-	cBoundingBox CheckZone(GetPosition().addedXZ(-a_SightDistance, -a_SightDistance), GetPosition().addedXZ(a_SightDistance, a_SightDistance));
+	cBoundingBox CheckZone(GetPosition().addedXZ(-static_cast<int>(a_SightDistance), -static_cast<int>(a_SightDistance)), GetPosition().addedXZ(a_SightDistance, a_SightDistance));
 	m_World->ForEachEntityInBox(CheckZone, Callback);
 	return FoundTarget;
 }

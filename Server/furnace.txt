@@ -113,8 +113,8 @@ StoneBrick             = CrackedStoneBricks                 $ 0.1
 WetSponge              = Sponge                             $ 0.15
 WhiteTerracotta        = WhiteGlazedTerracotta              $ 0.1
 YellowTerracotta       = YellowGlazedTerracotta             $ 0.1
-
-
+raw_iron               = iron_ingot                         $ 0.7
+raw_gold               = gold_ingot                         $ 1
 
 
 #--------------------------

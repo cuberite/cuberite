@@ -2,24 +2,25 @@
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
 #include "BeaconEntity.h"
+
+#include "Root.h"
 #include "../BlockInfo.h"
 #include "../BlockArea.h"
 #include "../Entities/Player.h"
 #include "../UI/BeaconWindow.h"
 #include "../ClientHandle.h"
+#include "../Tags/TagManager.h"
 
 
 
-
-
-cBeaconEntity::cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, 1, 1, a_World),
+cBeaconEntity::cBeaconEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, 1, 1, a_World),
 	m_IsActive(false),
 	m_BeaconLevel(0),
 	m_PrimaryEffect(cEntityEffect::effNoEffect),
 	m_SecondaryEffect(cEntityEffect::effNoEffect)
 {
-	ASSERT(a_BlockType == E_BLOCK_BEACON);
+	ASSERT(a_Block.Type() == BlockType::Beacon);
 	if (m_World != nullptr)
 	{
 		UpdateBeacon();
@@ -41,7 +42,7 @@ char cBeaconEntity::CalculatePyramidLevel(void)
 		GetPosX() - 4, GetPosX() + 4,
 		MinY, MaxY,
 		GetPosZ() - 4, GetPosZ() + 4,
-		cBlockArea::baTypes
+		cBlockArea::baBlocks
 	);
 
 	int Layer = 1;
@@ -53,7 +54,7 @@ char cBeaconEntity::CalculatePyramidLevel(void)
 		{
 			for (int Z = MiddleXZ - Layer; Z <= (MiddleXZ + Layer); Z++)
 			{
-				if (!IsMineralBlock(Area.GetRelBlockType(X, Y, Z)))
+				if (!cRoot::Get()->GetTagManager()->GetBlockTags().HasTag(BlockTags::BeaconBaseBlocks, Area.GetRelBlock({X, Y, Z}).Type()))
 				{
 					return static_cast<char>(Layer - 1);
 				}
@@ -141,8 +142,8 @@ bool cBeaconEntity::IsBeaconBlocked(void)
 {
 	for (int Y = m_Pos.y; Y < cChunkDef::Height; ++Y)
 	{
-		BLOCKTYPE Block = m_World->GetBlock({m_Pos.x, Y, m_Pos.z});
-		if (!cBlockInfo::IsTransparent(Block))
+		auto Self = m_World->GetBlock({m_Pos.x, Y, m_Pos.z});
+		if (!cBlockInfo::IsTransparent(Self))
 		{
 			return true;
 		}
@@ -154,19 +155,17 @@ bool cBeaconEntity::IsBeaconBlocked(void)
 
 
 
-bool cBeaconEntity::IsMineralBlock(BLOCKTYPE a_BlockType)
+bool cBeaconEntity::IsMineralBlock(BlockState a_Block)
 {
-	switch (a_BlockType)
+	switch (a_Block.Type())
 	{
-		case E_BLOCK_DIAMOND_BLOCK:
-		case E_BLOCK_GOLD_BLOCK:
-		case E_BLOCK_IRON_BLOCK:
-		case E_BLOCK_EMERALD_BLOCK:
-		{
+		case BlockType::DiamondBlock:
+		case BlockType::GoldBlock:
+		case BlockType::IronBlock:
+		case BlockType::EmeraldBlock:
 			return true;
-		}
+		default: return false;
 	}
-	return false;
 }
 
 

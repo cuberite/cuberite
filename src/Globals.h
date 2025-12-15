@@ -19,6 +19,7 @@
 	// Use non-standard defines in <cmath>
 	#define _USE_MATH_DEFINES
 
+	/*
 	#ifndef NDEBUG
 		// Override the "new" operator to include file and line specification for debugging memory leaks
 		// Ref.: https://social.msdn.microsoft.com/Forums/en-US/ebc7dd7a-f3c6-49f1-8a60-e381052f21b6/debugging-memory-leaks?forum=vcgeneral#53f0cc89-62fe-45e8-bbf0-56b89f2a1901
@@ -34,6 +35,7 @@
 		// For some reason this works magically - each "new X" gets replaced as "new(_CLIENT_BLOCK, "file", line) X"
 		// The CRT has a definition for this operator new that stores the debugging info for leak-finding later.
 	#endif
+	*/
 
 	#define UNREACHABLE_INTRINSIC __assume(false)
 
@@ -206,7 +208,8 @@ template class SizeChecker<UInt8, 1>;
 		std::string_view a_Format, eLogLevel, fmt::printf_args a_ArgList
 	)
 	{
-		fmt::vprintf(a_Format, a_ArgList);
+		fmt::basic_string_view<char> s(a_Format);
+		fmt::vfprintf(stdout, s, a_ArgList);
 		putchar('\n');
 		fflush(stdout);
 	}
@@ -291,7 +294,7 @@ template class SizeChecker<UInt8, 1>;
 
 
 
-
+/*
 namespace cpp20
 {
 	template <class T>
@@ -306,6 +309,7 @@ namespace cpp20
 		return std::unique_ptr<T>(new T);
 	}
 }
+*/
 
 
 
@@ -408,3 +412,6 @@ constexpr std::string_view methodName(std::string_view a_PrettyFunction)
 
 // Common headers (part 2, with macros):
 #include "Vector3.h"
+#include "BlockState.h"
+#include "Registries/BlockStates.h"
+#include "Registries/Items.h"

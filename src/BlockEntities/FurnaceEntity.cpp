@@ -22,10 +22,10 @@ enum
 
 
 
-cFurnaceEntity::cFurnaceEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
+cFurnaceEntity::cFurnaceEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_CurrentRecipe(nullptr),
-	m_IsCooking(a_BlockType == E_BLOCK_LIT_FURNACE),
+	m_IsCooking(Block::Furnace::Lit(a_Block)),
 	m_NeedCookTime(0),
 	m_TimeCooked(0),
 	m_FuelBurnTime(0),
@@ -93,8 +93,7 @@ bool cFurnaceEntity::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		m_TimeCooked = std::max((m_TimeCooked - 2), 0);
 
 		// Reset progressbars, block type, and bail out
-		m_BlockType = E_BLOCK_FURNACE;
-		a_Chunk.FastSetBlock(GetRelPos(), E_BLOCK_FURNACE, m_BlockMeta);
+		a_Chunk.FastSetBlock(GetRelPos(), Block::Furnace::Furnace(Block::Furnace::Facing(a_Chunk.GetBlock(GetRelPos())), false));
 		UpdateProgressBars();
 		return false;
 	}
@@ -229,9 +228,9 @@ void cFurnaceEntity::BurnNewFuel(void)
 	// Burn one new fuel:
 	SetBurnTimes(NewTime, 0);
 	SetIsCooking(true);
-	if (m_Contents.GetSlot(fsFuel).m_ItemType == E_ITEM_LAVA_BUCKET)
+	if (m_Contents.GetSlot(fsFuel).m_ItemType == Item::LavaBucket)
 	{
-		m_Contents.SetSlot(fsFuel, cItem(E_ITEM_BUCKET));
+		m_Contents.SetSlot(fsFuel, cItem(Item::Bucket));
 	}
 	else
 	{
@@ -417,7 +416,6 @@ void cFurnaceEntity::SetIsCooking(bool a_IsCooking)
 	// Only light the furnace as it is extinguished only when the fuel runs out, not when cooking stops - handled in this::Tick()
 	if (m_IsCooking)
 	{
-		m_BlockType = E_BLOCK_LIT_FURNACE;
-		m_World->FastSetBlock(m_Pos, E_BLOCK_LIT_FURNACE, m_BlockMeta);
+		m_World->FastSetBlock(GetBlockPos(), Block::Furnace::Furnace(Block::Furnace::Facing(m_World->GetBlock(GetBlockPos())), true));
 	}
 }

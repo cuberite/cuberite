@@ -20,36 +20,54 @@ public:
 
 private:
 
-	/** Converts the block face of the neighbor to which the wallsign is attached to the wallsign block's meta. */
-	static NIBBLETYPE BlockFaceToMetaData(eBlockFace a_NeighborBlockFace)
-	{
-		switch (a_NeighborBlockFace)
-		{
-			case BLOCK_FACE_ZM: return 0x02;
-			case BLOCK_FACE_ZP: return 0x03;
-			case BLOCK_FACE_XM: return 0x04;
-			case BLOCK_FACE_XP: return 0x05;
-			case BLOCK_FACE_NONE:
-			case BLOCK_FACE_YP:
-			case BLOCK_FACE_YM:
-			{
-				break;
-			}
-		}
-		return 0x02;
-	}
-
-
 	virtual bool CommitPlacement(cPlayer & a_Player, const cItem & a_HeldItem, const Vector3i a_PlacePosition, const eBlockFace a_ClickedBlockFace, const Vector3i a_CursorPosition) const override
 	{
+		BlockState BlockToPlace;
+
+		bool IsPlacedInWater =a_Player.GetWorld()->GetBlock(a_PlacePosition).Type() == BlockType::Water;
+#define BLOCK_PLACE_SIGN(SignType)\
+	BlockToPlace = Block::SignType::SignType(RotationToFineFace(a_Player.GetYaw()), IsPlacedInWater); break;\
+
 		if (a_ClickedBlockFace == BLOCK_FACE_TOP)
 		{
-			if (!a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_SIGN_POST, RotationToMetaData(a_Player.GetYaw())))
+			switch (a_HeldItem.m_ItemType)
 			{
-				return false;
+				case Item::AcaciaSign:  BlockToPlace = Block::AcaciaSign::AcaciaSign(RotationToFineFace(a_Player.GetYaw()), IsPlacedInWater); break;
+				case Item::BirchSign:   BlockToPlace = Block::BirchSign::BirchSign(RotationToFineFace(a_Player.GetYaw()), IsPlacedInWater); break;
+				case Item::CrimsonSign: BlockToPlace = Block::CrimsonSign::CrimsonSign(RotationToFineFace(a_Player.GetYaw()), IsPlacedInWater); break;
+				case Item::DarkOakSign: BlockToPlace = Block::DarkOakSign::DarkOakSign(RotationToFineFace(a_Player.GetYaw()), IsPlacedInWater); break;
+				case Item::JungleSign:  BlockToPlace = Block::JungleSign::JungleSign(RotationToFineFace(a_Player.GetYaw()), IsPlacedInWater); break;
+				case Item::OakSign:     BlockToPlace = Block::OakSign::OakSign(RotationToFineFace(a_Player.GetYaw()), IsPlacedInWater); break;
+				case Item::SpruceSign:  BlockToPlace = Block::SpruceSign::SpruceSign(RotationToFineFace(a_Player.GetYaw()), IsPlacedInWater); break;
+				case Item::WarpedSign:  BlockToPlace = Block::WarpedSign::WarpedSign(RotationToFineFace(a_Player.GetYaw()), IsPlacedInWater); break;
+				case Item::CherrySign:  BLOCK_PLACE_SIGN(CherrySign)
+				case Item::BambooSign:  BLOCK_PLACE_SIGN(BambooSign)
+				case Item::MangroveSign: BLOCK_PLACE_SIGN(MangroveSign)
+				case Item::PaleOakSign: BLOCK_PLACE_SIGN(PaleOakSign)
+				default: return false;
 			}
 		}
-		else if (!a_Player.PlaceBlock(a_PlacePosition, E_BLOCK_WALLSIGN, BlockFaceToMetaData(a_ClickedBlockFace)))
+		else
+		{
+			switch (a_HeldItem.m_ItemType)
+			{
+				case Item::AcaciaSign:  BlockToPlace = Block::AcaciaWallSign::AcaciaWallSign(); break;
+				case Item::BirchSign:   BlockToPlace = Block::BirchWallSign::BirchWallSign(); break;
+				case Item::CrimsonSign: BlockToPlace = Block::CrimsonWallSign::CrimsonWallSign(); break;
+				case Item::DarkOakSign: BlockToPlace = Block::DarkOakWallSign::DarkOakWallSign(); break;
+				case Item::JungleSign:  BlockToPlace = Block::JungleWallSign::JungleWallSign(); break;
+				case Item::OakSign:     BlockToPlace = Block::OakWallSign::OakWallSign(); break;
+				case Item::SpruceSign:  BlockToPlace = Block::SpruceWallSign::SpruceWallSign(); break;
+				case Item::WarpedSign:  BlockToPlace = Block::WarpedWallSign::WarpedWallSign(); break;
+				case Item::CherrySign:  BlockToPlace = Block::CherrySign::CherrySign(); break;
+				case Item::BambooSign:  BlockToPlace = Block::BambooSign::BambooSign(); break;
+				case Item::MangroveSign: BlockToPlace = Block::MangroveSign::MangroveSign(); break;
+				case Item::PaleOakSign: BlockToPlace = Block::PaleOakSign::PaleOakSign(); break;
+				default: return false;
+			}
+		}
+
+		if (!a_Player.PlaceBlock(a_PlacePosition, BlockToPlace))
 		{
 			return false;
 		}
@@ -63,21 +81,6 @@ private:
 	virtual bool IsPlaceable(void) const override
 	{
 		return true;
-	}
-
-
-	/** Converts the (player) rotation to placed-signpost block meta. */
-	static NIBBLETYPE RotationToMetaData(double a_Rotation)
-	{
-		a_Rotation += 180 + (180.f / 16);  // So it's not aligned with axis.
-		if (a_Rotation > 360)
-		{
-			a_Rotation -= 360;
-		}
-
-		a_Rotation = (a_Rotation / 360) * 16;
-
-		return static_cast<NIBBLETYPE>(a_Rotation) % 16;
 	}
 } ;
 

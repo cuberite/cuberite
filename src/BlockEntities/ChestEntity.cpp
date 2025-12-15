@@ -14,8 +14,8 @@
 
 
 
-cChestEntity::cChestEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
-	Super(a_BlockType, a_BlockMeta, a_Pos, ContentsWidth, ContentsHeight, a_World),
+cChestEntity::cChestEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World):
+	Super(a_Block, a_Pos, ContentsWidth, ContentsHeight, a_World),
 	m_NumActivePlayers(0),
 	m_Neighbour(nullptr)
 {
@@ -65,7 +65,7 @@ bool cChestEntity::ScanNeighbour(cChunk & a_Chunk, Vector3i a_Position)
 
 	const auto BlockEntity = Chunk->GetBlockEntityRel(a_Position);
 
-	if ((BlockEntity == nullptr) || (BlockEntity->GetBlockType() != m_BlockType))
+	if ((BlockEntity == nullptr) || (BlockEntity->GetBlockType() != m_Block.Type()))
 	{
 		// Neighbouring block is not the same type of chest:
 		return false;
@@ -202,7 +202,7 @@ bool cChestEntity::UsedBy(cPlayer * a_Player)
 		return true;
 	}
 
-	if (m_BlockType == E_BLOCK_CHEST)
+	if (m_Block.Type() == BlockType::Chest)
 	{
 		a_Player->GetStatistics().Custom[CustomStatistic::OpenChest]++;
 	}

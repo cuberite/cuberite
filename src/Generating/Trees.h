@@ -25,25 +25,43 @@ logs can overwrite others(leaves), but others shouldn't overwrite logs. This is 
 
 // Blocks that don't block tree growth:
 #define CASE_TREE_ALLOWED_BLOCKS \
-	case E_BLOCK_AIR: \
-	case E_BLOCK_LEAVES: \
-	case E_BLOCK_NEW_LEAVES: \
-	case E_BLOCK_SNOW: \
-	case E_BLOCK_TALL_GRASS: \
-	case E_BLOCK_DEAD_BUSH: \
-	case E_BLOCK_SAPLING: \
-	case E_BLOCK_VINES
+	case BlockType::Air:            \
+	case BlockType::AcaciaLeaves: \
+	case BlockType::BirchLeaves: \
+	case BlockType::DarkOakLeaves: \
+	case BlockType::JungleLeaves: \
+	case BlockType::OakLeaves: \
+	case BlockType::SpruceLeaves: \
+	case BlockType::SnowBlock: \
+	case BlockType::TallGrass: \
+	case BlockType::DeadBush: \
+	case BlockType::AcaciaSapling: \
+	case BlockType::BirchSapling: \
+	case BlockType::JungleSapling: \
+	case BlockType::DarkOakSapling: \
+	case BlockType::OakSapling: \
+	case BlockType::SpruceSapling: \
+	case BlockType::Vine
 
 // Blocks that a tree may overwrite when growing:
 #define CASE_TREE_OVERWRITTEN_BLOCKS \
-	case E_BLOCK_AIR: \
-	/* case E_BLOCK_LEAVES: LEAVES are a special case, they can be overwritten only by log. Handled in cChunkMap::ReplaceTreeBlocks(). */ \
-	case E_BLOCK_SNOW: \
-	case E_BLOCK_TALL_GRASS: \
-	case E_BLOCK_BIG_FLOWER: \
-	case E_BLOCK_DEAD_BUSH: \
-	case E_BLOCK_SAPLING: \
-	case E_BLOCK_VINES
+	case BlockType::Air: \
+	/* case BlockType::LEAVES: LEAVES are a special case, they can be overwritten only by log. Handled in cChunkMap::ReplaceTreeBlocks(). */ \
+	case BlockType::Snow: \
+	case BlockType::TallGrass: \
+	case BlockType::LargeFern: \
+	case BlockType::Lilac: \
+	case BlockType::Peony: \
+	case BlockType::RoseBush: \
+	case BlockType::Sunflower: \
+	case BlockType::DeadBush: \
+	case BlockType::AcaciaSapling: \
+	case BlockType::BirchSapling: \
+	case BlockType::JungleSapling: \
+	case BlockType::DarkOakSapling: \
+	case BlockType::OakSapling: \
+	case BlockType::SpruceSapling: \
+	case BlockType::Vine
 
 
 
@@ -65,10 +83,10 @@ void GetLargeAppleTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sS
 The length of the branch can be changed with the a_BranchLength.
 The initial direction is a_StartDirection. The direction can be manipulated with a_Direction to create a curve.
 Returns the position of the last log block placed. */
-Vector3d GetTreeBranch(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_BlockPos, int a_BranchLength, Vector3d a_StartDirection, Vector3d a_Direction, sSetBlockVector & a_LogBlocks);
+Vector3d GetTreeBranch(BlockState a_Block, Vector3i a_BlockPos, int a_BranchLength, Vector3d a_StartDirection, Vector3d a_Direction, sSetBlockVector & a_LogBlocks);
 
 /** Returns the meta for a log from the given direction */
-NIBBLETYPE GetLogMetaFromDirection(NIBBLETYPE a_BlockMeta, Vector3d a_Direction);
+BlockState RotateLogForDirection(BlockState a_Block, Vector3d a_Direction);
 
 /** Fills a_LogBlocks and a_OtherBlocks (dirt & leaves) with the blocks required to form a random birch tree */
 void GetBirchTreeImage(Vector3i a_BlockPos, cNoise & a_Noise, int a_Seq, sSetBlockVector & a_LogBlocks, sSetBlockVector & a_OtherBlocks);

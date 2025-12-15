@@ -63,7 +63,7 @@ jobs:
       shell: bash
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
-   
+
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
@@ -75,7 +75,7 @@ jobs:
         -DBUILD_TOOLS=Yes
         -DSELF_TEST=Yes
         -S ${{ github.workspace }}
-        
+
     - name: Build
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
@@ -83,11 +83,11 @@ jobs:
     - if: runner.os == 'Windows'
       name: Create Zip Windows
       run:  powershell Compress-Archive build/Server Cuberite-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}.zip
-      
+
     - if: runner.os != 'Windows'
       name: Create Zip Linux
       run: zip -r Cuberite-${{ matrix.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}.zip build/Server
-      
+
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).

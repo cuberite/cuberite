@@ -8,16 +8,17 @@
 #include "../Entities/Player.h"
 #include "../ClientHandle.h"
 #include "../Blocks/BlockBed.h"
+#include "../Registries/BlockItemConverter.h"
 
 
 
 
 
-cBedEntity::cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World, short a_Color):
-	Super(a_BlockType, a_BlockMeta, a_Pos, a_World),
+cBedEntity::cBedEntity(BlockState a_Block, Vector3i a_Pos, cWorld * a_World, short a_Color):
+	Super(a_Block, a_Pos, a_World),
 	m_Color(a_Color)
 {
-	ASSERT(a_BlockType == E_BLOCK_BED);
+	ASSERT(cBlockBedHandler::IsBlockBed(a_Block.Type()));
 }
 
 
@@ -26,7 +27,7 @@ cBedEntity::cBedEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a
 
 cItems cBedEntity::ConvertToPickups() const
 {
-	return cItem(E_ITEM_BED, 1, m_Color);
+	return cItem(BlockItemConverter::FromBlock(m_Block.Type()));
 }
 
 
@@ -56,4 +57,33 @@ void cBedEntity::SendTo(cClientHandle & a_Client)
 void cBedEntity::SetColor(short a_Color)
 {
 	m_Color = a_Color;
+}
+
+
+
+#define CHECK_BED_HEAD(BedType) \
+	case BlockType::BedType: return Block::BedType::Part(m_Block) == Block::BedType::Part::Head;
+
+bool cBedEntity::IsPillowBlock(void) const
+{
+	switch (m_Block.Type())
+	{
+		CHECK_BED_HEAD(WhiteBed)
+		CHECK_BED_HEAD(LightGrayBed)
+		CHECK_BED_HEAD(GrayBed)
+		CHECK_BED_HEAD(BlackBed)
+		CHECK_BED_HEAD(BrownBed)
+		CHECK_BED_HEAD(RedBed)
+		CHECK_BED_HEAD(OrangeBed)
+		CHECK_BED_HEAD(YellowBed)
+		CHECK_BED_HEAD(LimeBed)
+		CHECK_BED_HEAD(GreenBed)
+		CHECK_BED_HEAD(CyanBed)
+		CHECK_BED_HEAD(LightBlueBed)
+		CHECK_BED_HEAD(BlueBed)
+		CHECK_BED_HEAD(PurpleBed)
+		CHECK_BED_HEAD(MagentaBed)
+		CHECK_BED_HEAD(PinkBed)
+		default: UNREACHABLE("Invalid bed type");
+	}
 }

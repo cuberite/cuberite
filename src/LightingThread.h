@@ -116,9 +116,9 @@ protected:
 	// The blobs are XZY organized as a whole, instead of 3x3 XZY-organized subarrays ->
 	//  -> This means data has to be scatterred when reading and gathered when writing!
 	static const int BlocksPerYLayer = cChunkDef::Width * cChunkDef::Width * 3 * 3;
-	BLOCKTYPE  m_BlockTypes[BlocksPerYLayer * cChunkDef::Height];
-	NIBBLETYPE m_BlockLight[BlocksPerYLayer * cChunkDef::Height];
-	NIBBLETYPE m_SkyLight  [BlocksPerYLayer * cChunkDef::Height];
+	BlockState m_Blocks    [BlocksPerYLayer * cChunkDef::Height];
+	LIGHTTYPE  m_BlockLight[BlocksPerYLayer * cChunkDef::Height];
+	LIGHTTYPE  m_SkyLight  [BlocksPerYLayer * cChunkDef::Height];
 	HEIGHTTYPE m_HeightMap [BlocksPerYLayer];
 
 	// Seed management (5.7 MiB)
@@ -147,20 +147,20 @@ protected:
 	void PrepareBlockLight(void);
 
 	/** Calculates light in the light array specified, using stored seeds */
-	void CalcLight(NIBBLETYPE * a_Light);
+	void CalcLight(LIGHTTYPE * a_Light);
 
 	/** Does one step in the light calculation - one seed propagation and seed recalculation */
 	void CalcLightStep(
-		NIBBLETYPE * a_Light,
+		LIGHTTYPE * a_Light,
 		size_t a_NumSeedsIn,    unsigned char * a_IsSeedIn,  unsigned int * a_SeedIdxIn,
 		size_t & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 	);
 
 	/** Compresses from 1-block-per-byte (faster calc) into 2-blocks-per-byte (MC storage): */
-	void CompressLight(NIBBLETYPE * a_LightArray, NIBBLETYPE * a_ChunkLight);
+	void CompressLight(LIGHTTYPE * a_LightArray, LIGHTTYPE * a_ChunkLight);
 
 	void PropagateLight(
-		NIBBLETYPE * a_Light,
+		LIGHTTYPE * a_Light,
 		unsigned int a_SrcIdx, unsigned int a_DstIdx,
 		size_t & a_NumSeedsOut, unsigned char * a_IsSeedOut, unsigned int * a_SeedIdxOut
 	);

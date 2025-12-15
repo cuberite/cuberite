@@ -21,6 +21,7 @@ It directly outputs a string containing the serialized NBT data.
 
 #include <system_error>
 #include "../Endianness.h"
+#include "../ByteBuffer.h"
 
 
 
@@ -41,7 +42,8 @@ enum eTagType
 	TAG_List      = 9,
 	TAG_Compound  = 10,
 	TAG_IntArray  = 11,
-	TAG_Max       = 11,  // The maximum value for a tag type
+	TAG_LongArray = 12,
+	TAG_Max       = 12,  // The maximum value for a tag type
 } ;
 
 
@@ -147,12 +149,14 @@ The data pointer passed in the constructor is assumed to be valid throughout the
 The parser decomposes the input data into a tree of tags that is stored as an array of cFastNBTTag items,
 and accessing the tree is done by using the array indices for tags. Each tag stores the indices for its parent,
 first child, last child, prev sibling and next sibling, a value of -1 indicates that the indice is not valid.
-Each primitive tag also stores the length of the contained data, in bytes.
+Each primitive tag also stores the length of the contained data, in bytes.F
 */
 class cParsedNBT
 {
 public:
 	cParsedNBT(ContiguousByteBufferView a_Data);
+
+	cParsedNBT(cByteBuffer & a_Data, ContiguousByteBuffer & a_Bfr, bool a_Network_1_21);
 
 	bool IsValid(void) const { return (m_Error == eNBTParseError::npSuccess); }
 
@@ -303,7 +307,7 @@ protected:
 	// Used while parsing:
 	size_t m_Pos;
 
-	eNBTParseError Parse(void);
+	eNBTParseError Parse(bool a_Network_1_21);
 	eNBTParseError ReadString(size_t & a_StringStart, size_t & a_StringLen);  // Reads a simple string (2 bytes length + data), sets the string descriptors
 	eNBTParseError ReadCompound(void);  // Reads the latest tag as a compound
 	eNBTParseError ReadList(eTagType a_ChildrenType);  // Reads the latest tag as a list of items of type a_ChildrenType
@@ -322,6 +326,7 @@ class cFastNBTWriter
 {
 public:
 	cFastNBTWriter(const AString & a_RootTagName = "");
+	cFastNBTWriter(bool Network1_21);
 
 	void BeginCompound(const AString & a_Name);
 	void EndCompound(void);
@@ -339,6 +344,7 @@ public:
 	void AddByteArray(const AString & a_Name, const char * a_Value, size_t a_NumElements);
 	void AddByteArray(const AString & a_Name, size_t a_NumElements, unsigned char a_Value);
 	void AddIntArray (const AString & a_Name, const Int32 * a_Value, size_t a_NumElements);
+	void AddLongArray(const AString & a_Name, const Int64 * a_Value, size_t a_NumElements);
 
 	void AddByteArray(const AString & a_Name, const AString & a_Value)
 	{

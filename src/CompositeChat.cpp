@@ -7,9 +7,7 @@
 #include "CompositeChat.h"
 #include "ClientHandle.h"
 #include "JsonUtils.h"
-
-
-
+#include "WorldStorage/FastNBT.h"
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -28,6 +26,15 @@ cCompositeChat::cCompositeChat(const AString & a_ParseText, eMessageType a_Messa
 	m_MessageType(a_MessageType)
 {
 	ParseText(a_ParseText);
+}
+
+
+
+
+
+cCompositeChat::cCompositeChat(const cParsedNBT & a_ParsedNbt) : m_MessageType(mtCustom)
+{
+	ParseNBT(a_ParsedNbt);
 }
 
 
@@ -378,6 +385,152 @@ AString cCompositeChat::CreateJsonString(bool a_ShouldUseChatPrefixes) const
 
 
 
+void cCompositeChat::ParseNBT(const cParsedNBT & a_ParsedNbt)
+{
+	// TODO: read rest of the a_ParsedNbt = {const cParsedNBT &} data
+	if (const auto txt = a_ParsedNbt.FindChildByName(0, "text"); txt > 0)
+	{
+		AddTextPart(a_ParsedNbt.GetString(txt));
+	}
+	if (const auto extra = a_ParsedNbt.FindChildByName(0, "extra"); extra > 0 && (a_ParsedNbt.GetType(extra) == TAG_List))
+	{
+		for (int Child = a_ParsedNbt.GetFirstChild(extra); Child >= 0; Child = a_ParsedNbt.GetNextSibling(Child))
+		{
+			if (a_ParsedNbt.GetType(Child) == TAG_String)
+			{
+				AString str = a_ParsedNbt.GetString(Child);
+				if (str != "")  // Weird bugs happen if this is removed
+				{
+					AddTextPart(str);
+				}
+			}
+		}
+	}
+}
+
+
+
+
+
+void cCompositeChat::WriteAsNBT(cFastNBTWriter & a_Writer, bool a_ShouldUseChatPrefixes) const
+{
+	Json::Value Message;
+	a_Writer.AddString("text", cClientHandle::FormatMessageType(a_ShouldUseChatPrefixes, GetMessageType(), GetAdditionalMessageTypeData()));
+	if (m_Parts.empty())  // Lists cant be empty
+	{
+		a_Writer.Finish();
+		return;
+	}
+	a_Writer.BeginList("extra", eTagType::TAG_Compound);
+	for (const auto & Part : m_Parts)
+	{
+		a_Writer.BeginCompound("");
+		std::visit(OverloadedVariantAccess
+		{
+			[this, &a_Writer](const TextPart & a_Part)
+			{
+				a_Writer.AddString("text", a_Part.Text);
+				AddChatPartStyle(a_Writer, a_Part.Style);
+			},
+			[this, &a_Writer](const ClientTranslatedPart & a_Part)
+			{
+				a_Writer.AddString("translate", a_Part.Text);
+				a_Writer.BeginList("with", eTagType::TAG_String);
+				Json::Value With;
+				for (const auto & Parameter : a_Part.Parameters)
+				{
+					a_Writer.AddString("", Parameter);
+				}
+				AddChatPartStyle(a_Writer, a_Part.Style);
+			},
+			[this, &a_Writer](const UrlPart & a_Part)
+			{
+				a_Writer.AddString("text", a_Part.Text);
+				a_Writer.BeginCompound("click_event");
+				a_Writer.AddString("action", "open_url");
+				a_Writer.AddString("value", a_Part.Url);  // kept for backward compatibility
+				a_Writer.AddString("url", a_Part.Url);  // added in 1.21.5
+				a_Writer.EndCompound();
+				AddChatPartStyle(a_Writer, a_Part.Style);
+			},
+			[this, &a_Writer](const RunCommandPart & a_Part)
+			{
+				a_Writer.AddString("text", a_Part.Text);
+				a_Writer.BeginCompound("click_event");
+				a_Writer.AddString("action", "run_command");
+				a_Writer.AddString("value", a_Part.Command);  // same as url
+				a_Writer.AddString("command", a_Part.Command);
+				a_Writer.EndCompound();
+				AddChatPartStyle(a_Writer, a_Part.Style);
+			},
+			[this, &a_Writer](const SuggestCommandPart & a_Part)
+			{
+				a_Writer.AddString("text", a_Part.Text);
+				a_Writer.BeginCompound("click_event");
+				a_Writer.AddString("action", "suggest_command");
+				a_Writer.AddString("value", a_Part.Command);  // same as url
+				a_Writer.AddString("command", a_Part.Command);
+				a_Writer.EndCompound();
+				AddChatPartStyle(a_Writer, a_Part.Style);
+			},
+			[](const ShowAchievementPart & a_Part)
+			{
+				/*
+				a_Writer.AddString("text", a_Part.Text);
+				a_Writer.BeginCompound("click_event");
+				a_Writer.AddString("action", "suggest_command");
+				a_Writer.AddString("value", a_Part.Command);
+				a_Writer.EndCompound();
+				AddChatPartStyle(a_Writer, a_Part.Style);
+				*/
+			},
+		}, Part);
+		a_Writer.EndCompound();
+	}  // for itr - Parts[]
+	a_Writer.EndList();
+	a_Writer.Finish();
+}
+
+
+
+
+
+void cCompositeChat::AddChatPartStyle(cFastNBTWriter & a_Writer, const AString & a_PartStyle) const
+{
+	size_t len = a_PartStyle.length();
+	for (size_t i = 0; i < len; i++)
+	{
+		switch (a_PartStyle[i])
+		{
+			case 'k': a_Writer.AddByte("obfuscated", true); break;
+			case 'l': a_Writer.AddByte("bold", true); break;
+			case 'm': a_Writer.AddByte("strikethrough", true); break;
+			case 'n': a_Writer.AddByte("underlined", true); break;
+			case 'o': a_Writer.AddByte("italic", true); break;
+			case '0': a_Writer.AddString("color", "black"); break;
+			case '1': a_Writer.AddString("color", "dark_blue"); break;
+			case '2': a_Writer.AddString("color", "dark_green"); break;
+			case '3': a_Writer.AddString("color", "dark_aqua"); break;
+			case '4': a_Writer.AddString("color", "dark_red"); break;
+			case '5': a_Writer.AddString("color", "dark_purple"); break;
+			case '6': a_Writer.AddString("color", "gold"); break;
+			case '7': a_Writer.AddString("color", "gray"); break;
+			case '8': a_Writer.AddString("color", "dark_gray"); break;
+			case '9': a_Writer.AddString("color", "blue"); break;
+			case 'a': a_Writer.AddString("color", "green"); break;
+			case 'b': a_Writer.AddString("color", "aqua"); break;
+			case 'c': a_Writer.AddString("color", "red"); break;
+			case 'd': a_Writer.AddString("color", "light_purple"); break;
+			case 'e': a_Writer.AddString("color", "yellow"); break;
+			case 'f': a_Writer.AddString("color", "white"); break;
+		}  // switch (Style[i])
+	}  // for i - a_PartStyle[]
+}
+
+
+
+
+
 void cCompositeChat::AddChatPartStyle(Json::Value & a_Value, const AString & a_PartStyle) const
 {
 	size_t len = a_PartStyle.length();
@@ -389,12 +542,15 @@ void cCompositeChat::AddChatPartStyle(Json::Value & a_Value, const AString & a_P
 			case 'l': a_Value["bold"] = Json::Value(true); break;
 			case 's':  // Deprecated
 				LOGERROR("Value s in AddChatPartStyle() is deprecated");
+				[[fallthrough]];
 			case 'm': a_Value["strikethrough"] = Json::Value(true); break;
 			case 'u':  // Deprecated
 				LOGERROR("Value u in AddChatPartStyle() is deprecated");
+				[[fallthrough]];
 			case 'n': a_Value["underlined"] = Json::Value(true); break;
 			case 'i':  // Deprecated
 				LOGERROR("Value i in AddChatPartStyle() is deprecated");
+				[[fallthrough]];
 			case 'o': a_Value["italic"] = Json::Value(true); break;
 			case '0': a_Value["color"] = Json::Value("black"); break;
 			case '1': a_Value["color"] = Json::Value("dark_blue"); break;
