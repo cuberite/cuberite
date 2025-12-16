@@ -86,6 +86,7 @@ target_sources(
 	BlockSand.h
 	BlockSapling.h
 	BlockSeaLantern.h
+	BlockShulkerBox.h
 	BlockSideways.h
 	BlockSignPost.h
 	BlockSlab.h

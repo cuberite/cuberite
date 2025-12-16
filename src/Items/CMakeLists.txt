@@ -70,6 +70,7 @@ target_sources(
 	ItemSeeds.h
 	ItemShears.h
 	ItemShovel.h
+	ItemShulkerBox.h
 	ItemSideways.h
 	ItemSign.h
 	ItemSlab.h

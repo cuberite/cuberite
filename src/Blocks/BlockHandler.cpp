@@ -81,6 +81,7 @@
 #include "BlockSand.h"
 #include "BlockSapling.h"
 #include "BlockSeaLantern.h"
+#include "BlockShulkerBox.h"
 #include "BlockSideways.h"
 #include "BlockSignPost.h"
 #include "BlockSlab.h"
@@ -215,9 +216,9 @@ namespace
 	constexpr cBlockFenceHandler              BlockBirchFenceHandler            (E_BLOCK_BIRCH_FENCE);
 	constexpr cBlockStairsHandler             BlockBirchWoodStairsHandler       (E_BLOCK_BIRCH_WOOD_STAIRS);
 	constexpr cBlockGlazedTerracottaHandler   BlockBlackGlazedTerracottaHandler (E_BLOCK_BLACK_GLAZED_TERRACOTTA);
-	constexpr cDefaultBlockHandler            BlockBlackShulkerBoxHandler       (E_BLOCK_BLACK_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockBlackShulkerBoxHandler       (E_BLOCK_BLACK_SHULKER_BOX);
 	constexpr cBlockGlazedTerracottaHandler   BlockBlueGlazedTerracottaHandler  (E_BLOCK_BLUE_GLAZED_TERRACOTTA);
-	constexpr cDefaultBlockHandler            BlockBlueShulkerBoxHandler        (E_BLOCK_BLUE_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockBlueShulkerBoxHandler        (E_BLOCK_BLUE_SHULKER_BOX);
 	constexpr cDefaultBlockHandler            BlockBoneBlockHandler             (E_BLOCK_BONE_BLOCK);
 	constexpr cBlockBookShelfHandler          BlockBookcaseHandler              (E_BLOCK_BOOKCASE);
 	constexpr cBlockBrewingStandHandler       BlockBrewingStandHandler          (E_BLOCK_BREWING_STAND);
@@ -225,7 +226,7 @@ namespace
 	constexpr cBlockStairsHandler             BlockBrickStairsHandler           (E_BLOCK_BRICK_STAIRS);
 	constexpr cBlockGlazedTerracottaHandler   BlockBrownGlazedTerracottaHandler (E_BLOCK_BROWN_GLAZED_TERRACOTTA);
 	constexpr cBlockMushroomHandler           BlockBrownMushroomHandler         (E_BLOCK_BROWN_MUSHROOM);
-	constexpr cDefaultBlockHandler            BlockBrownShulkerBoxHandler       (E_BLOCK_BROWN_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockBrownShulkerBoxHandler       (E_BLOCK_BROWN_SHULKER_BOX);
 	constexpr cBlockCactusHandler             BlockCactusHandler                (E_BLOCK_CACTUS);
 	constexpr cBlockCakeHandler               BlockCakeHandler                  (E_BLOCK_CAKE);
 	constexpr cBlockCarpetHandler             BlockCarpetHandler                (E_BLOCK_CARPET);
@@ -248,7 +249,7 @@ namespace
 	constexpr cBlockConcretePowderHandler     BlockConcretePowderHandler        (E_BLOCK_CONCRETE_POWDER);
 	constexpr cBlockCropsHandler<7>           BlockCropsHandler                 (E_BLOCK_CROPS);  // 8 stages of growth
 	constexpr cBlockGlazedTerracottaHandler   BlockCyanGlazedTerracottaHandler  (E_BLOCK_CYAN_GLAZED_TERRACOTTA);
-	constexpr cDefaultBlockHandler            BlockCyanShulkerBoxHandler        (E_BLOCK_CYAN_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockCyanShulkerBoxHandler        (E_BLOCK_CYAN_SHULKER_BOX);
 	constexpr cBlockDoorHandler               BlockDarkOakDoorHandler           (E_BLOCK_DARK_OAK_DOOR);
 	constexpr cBlockFenceGateHandler          BlockDarkOakFenceGateHandler      (E_BLOCK_DARK_OAK_FENCE_GATE);
 	constexpr cBlockFenceHandler              BlockDarkOakFenceHandler          (E_BLOCK_DARK_OAK_FENCE);
@@ -290,9 +291,9 @@ namespace
 	constexpr cDefaultBlockHandler            BlockGrassPathHandler             (E_BLOCK_GRASS_PATH);
 	constexpr cBlockGravelHandler             BlockGravelHandler                (E_BLOCK_GRAVEL);
 	constexpr cBlockGlazedTerracottaHandler   BlockGrayGlazedTerracottaHandler  (E_BLOCK_GRAY_GLAZED_TERRACOTTA);
-	constexpr cDefaultBlockHandler            BlockGrayShulkerBoxHandler        (E_BLOCK_GRAY_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockGrayShulkerBoxHandler        (E_BLOCK_GRAY_SHULKER_BOX);
 	constexpr cBlockGlazedTerracottaHandler   BlockGreenGlazedTerracottaHandler (E_BLOCK_GREEN_GLAZED_TERRACOTTA);
-	constexpr cDefaultBlockHandler            BlockGreenShulkerBoxHandler       (E_BLOCK_GREEN_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockGreenShulkerBoxHandler       (E_BLOCK_GREEN_SHULKER_BOX);
 	constexpr cDefaultBlockHandler            BlockHardenedClayHandler          (E_BLOCK_HARDENED_CLAY);
 	constexpr cBlockSidewaysHandler           BlockHayBaleHandler               (E_BLOCK_HAY_BALE);
 	constexpr cBlockMobHeadHandler            BlockHeadHandler                  (E_BLOCK_HEAD);
@@ -321,17 +322,17 @@ namespace
 	constexpr cBlockLeavesHandler             BlockLeavesHandler                (E_BLOCK_LEAVES);
 	constexpr cBlockLeverHandler              BlockLeverHandler                 (E_BLOCK_LEVER);
 	constexpr cBlockGlazedTerracottaHandler   BlockLightBlueGlazedTerracoHandler(E_BLOCK_LIGHT_BLUE_GLAZED_TERRACOTTA);
-	constexpr cDefaultBlockHandler            BlockLightBlueShulkerBoxHandler   (E_BLOCK_LIGHT_BLUE_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockLightBlueShulkerBoxHandler   (E_BLOCK_LIGHT_BLUE_SHULKER_BOX);
 	constexpr cBlockGlazedTerracottaHandler   BlockLightGrayGlazedTerracoHandler(E_BLOCK_LIGHT_GRAY_GLAZED_TERRACOTTA);
-	constexpr cDefaultBlockHandler            BlockLightGrayShulkerBoxHandler   (E_BLOCK_LIGHT_GRAY_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockLightGrayShulkerBoxHandler   (E_BLOCK_LIGHT_GRAY_SHULKER_BOX);
 	constexpr cBlockPressurePlateHandler      BlockLightWeightedPressurePHandler(E_BLOCK_LIGHT_WEIGHTED_PRESSURE_PLATE);
 	constexpr cBlockLilypadHandler            BlockLilyPadHandler               (E_BLOCK_LILY_PAD);
 	constexpr cBlockGlazedTerracottaHandler   BlockLimeGlazedTerracottaHandler  (E_BLOCK_LIME_GLAZED_TERRACOTTA);
-	constexpr cDefaultBlockHandler            BlockLimeShulkerBoxHandler        (E_BLOCK_LIME_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockLimeShulkerBoxHandler        (E_BLOCK_LIME_SHULKER_BOX);
 	constexpr cBlockFurnaceHandler            BlockLitFurnaceHandler            (E_BLOCK_LIT_FURNACE);
 	constexpr cBlockSidewaysHandler           BlockLogHandler                   (E_BLOCK_LOG);
 	constexpr cBlockGlazedTerracottaHandler   BlockMagentaGlazedTerracottHandler(E_BLOCK_MAGENTA_GLAZED_TERRACOTTA);
-	constexpr cDefaultBlockHandler            BlockMagentaShulkerBoxHandler     (E_BLOCK_MAGENTA_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockMagentaShulkerBoxHandler     (E_BLOCK_MAGENTA_SHULKER_BOX);
 	constexpr cDefaultBlockHandler            BlockMagmaHandler                 (E_BLOCK_MAGMA);
 	constexpr cBlockMelonHandler              BlockMelonHandler                 (E_BLOCK_MELON);
 	constexpr cBlockMelonStemHandler          BlockMelonStemHandler             (E_BLOCK_MELON_STEM);
@@ -355,10 +356,10 @@ namespace
 	constexpr cBlockObserverHandler           BlockObserverHandler              (E_BLOCK_OBSERVER);
 	constexpr cDefaultBlockHandler            BlockObsidianHandler              (E_BLOCK_OBSIDIAN);
 	constexpr cBlockGlazedTerracottaHandler   BlockOrangeGlazedTerracottaHandler(E_BLOCK_ORANGE_GLAZED_TERRACOTTA);
-	constexpr cDefaultBlockHandler            BlockOrangeShulkerBoxHandler      (E_BLOCK_ORANGE_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockOrangeShulkerBoxHandler      (E_BLOCK_ORANGE_SHULKER_BOX);
 	constexpr cBlockPackedIceHandler          BlockPackedIceHandler             (E_BLOCK_PACKED_ICE);
 	constexpr cBlockGlazedTerracottaHandler   BlockPinkGlazedTerracottaHandler  (E_BLOCK_PINK_GLAZED_TERRACOTTA);
-	constexpr cDefaultBlockHandler            BlockPinkShulkerBoxHandler        (E_BLOCK_PINK_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockPinkShulkerBoxHandler        (E_BLOCK_PINK_SHULKER_BOX);
 	constexpr cBlockPistonHandler             BlockPistonHandler                (E_BLOCK_PISTON);
 	constexpr cBlockPistonHeadHandler         BlockPistonHeadHandler;
 	constexpr cDefaultBlockHandler            BlockPistonMovedBlockHandler      (E_BLOCK_PISTON_MOVED_BLOCK);
@@ -369,7 +370,7 @@ namespace
 	constexpr cBlockPumpkinHandler            BlockPumpkinHandler               (E_BLOCK_PUMPKIN);
 	constexpr cBlockPumpkinStemHandler        BlockPumpkinStemHandler           (E_BLOCK_PUMPKIN_STEM);
 	constexpr cBlockGlazedTerracottaHandler   BlockPurpleGlazedTerracottaHandler(E_BLOCK_PURPLE_GLAZED_TERRACOTTA);
-	constexpr cDefaultBlockHandler            BlockPurpleShulkerBoxHandler      (E_BLOCK_PURPLE_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockPurpleShulkerBoxHandler      (E_BLOCK_PURPLE_SHULKER_BOX);
 	constexpr cDefaultBlockHandler            BlockPurpurBlockHandler           (E_BLOCK_PURPUR_BLOCK);
 	constexpr cBlockDoubleSlabHandler         BlockPurpurDoubleSlabHandler      (E_BLOCK_PURPUR_DOUBLE_SLAB);
 	constexpr cDefaultBlockHandler            BlockPurpurPillarHandler          (E_BLOCK_PURPUR_PILLAR);
@@ -385,7 +386,7 @@ namespace
 	constexpr cDefaultBlockHandler            BlockRedSandstoneHandler          (E_BLOCK_RED_SANDSTONE);
 	constexpr cBlockSlabHandler               BlockRedSandstoneSlabHandler      (E_BLOCK_RED_SANDSTONE_SLAB);
 	constexpr cBlockStairsHandler             BlockRedSandstoneStairsHandler    (E_BLOCK_RED_SANDSTONE_STAIRS);
-	constexpr cDefaultBlockHandler            BlockRedShulkerBoxHandler         (E_BLOCK_RED_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockRedShulkerBoxHandler         (E_BLOCK_RED_SHULKER_BOX);
 	constexpr cDefaultBlockHandler            BlockRedstoneBlockHandler         (E_BLOCK_BLOCK_OF_REDSTONE);
 	constexpr cBlockRedstoneLampHandler       BlockRedstoneLampHandler          (E_BLOCK_REDSTONE_LAMP_ON);
 	constexpr cBlockGlowingRedstoneOreHandler BlockRedstoneOreGlowingHandler    (E_BLOCK_REDSTONE_ORE_GLOWING);
@@ -439,7 +440,7 @@ namespace
 	constexpr cBlockWallSignHandler           BlockWallsignHandler              (E_BLOCK_WALLSIGN);
 	constexpr cBlockWaterHandler              BlockWaterHandler                 (E_BLOCK_WATER);
 	constexpr cBlockGlazedTerracottaHandler   BlockWhiteGlazedTerracottaHandler (E_BLOCK_WHITE_GLAZED_TERRACOTTA);
-	constexpr cDefaultBlockHandler            BlockWhiteShulkerBoxHandler       (E_BLOCK_WHITE_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockWhiteShulkerBoxHandler       (E_BLOCK_WHITE_SHULKER_BOX);
 	constexpr cBlockButtonHandler             BlockWoodenButtonHandler          (E_BLOCK_WOODEN_BUTTON);
 	constexpr cBlockPressurePlateHandler      BlockWoodenPressurePlateHandler   (E_BLOCK_WOODEN_PRESSURE_PLATE);
 	constexpr cBlockSlabHandler               BlockWoodenSlabHandler            (E_BLOCK_WOODEN_SLAB);
@@ -447,7 +448,7 @@ namespace
 	constexpr cBlockWorkbenchHandler          BlockWorkbenchHandler             (E_BLOCK_WORKBENCH);
 	constexpr cBlockFlowerHandler             BlockYellowFlowerHandler          (E_BLOCK_YELLOW_FLOWER);
 	constexpr cBlockGlazedTerracottaHandler   BlockYellowGlazedTerracottaHandler(E_BLOCK_YELLOW_GLAZED_TERRACOTTA);
-	constexpr cDefaultBlockHandler            BlockYellowShulkerBoxHandler      (E_BLOCK_YELLOW_SHULKER_BOX);
+	constexpr cBlockShulkerBoxHandler         BlockYellowShulkerBoxHandler      (E_BLOCK_YELLOW_SHULKER_BOX);
 }
 
 

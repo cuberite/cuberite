@@ -23,6 +23,7 @@
 #include "../BlockEntities/NoteEntity.h"
 #include "../BlockEntities/MobHeadEntity.h"
 #include "../BlockEntities/FlowerPotEntity.h"
+#include "../BlockEntities/ShulkerBoxEntity.h"
 #include "../BoundingBox.h"
 #include "BuildInfo.h"
 #include "../ClientHandle.h"
