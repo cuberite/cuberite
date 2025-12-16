@@ -3157,9 +3157,9 @@ cFluidSimulator * cWorld::InitializeFluidSimulator(cIniFile & a_IniFile, const c
 	}
 	else
 	{
-		int Falloff               = a_IniFile.GetValueSetI(SimulatorSectionName, "Falloff",               IsWater ? 1 : 2);
-		int TickDelay             = a_IniFile.GetValueSetI(SimulatorSectionName, "TickDelay",             IsWater ? 5 : 30);
-		int NumNeighborsForSource = a_IniFile.GetValueSetI(SimulatorSectionName, "NumNeighborsForSource", IsWater ? 2 : -1);
+		int Falloff               = a_IniFile.GetValueSetI(SimulatorSectionName,                     "Falloff",               IsWater ? 1 : 2);
+		auto TickDelay            = static_cast<size_t>(a_IniFile.GetValueSetI(SimulatorSectionName, "TickDelay",             IsWater ? 5 : 30));
+		int NumNeighborsForSource = a_IniFile.GetValueSetI(SimulatorSectionName,                     "NumNeighborsForSource", IsWater ? 2 : -1);
 
 		if ((Falloff > 15) || (Falloff < 0))
 		{

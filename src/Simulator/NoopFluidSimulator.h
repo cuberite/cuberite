@@ -40,5 +40,5 @@ private:
 		UNUSED(a_Chunk);
 	}
 
-	virtual cFluidSimulatorData * CreateChunkData(void) override { return nullptr; }
+	virtual std::unique_ptr<cFluidSimulatorData> CreateChunkData(void) override { return nullptr; }
 } ;

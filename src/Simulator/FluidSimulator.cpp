@@ -18,7 +18,7 @@ cFluidSimulator::cFluidSimulator(cWorld & a_World, BLOCKTYPE a_Fluid, BLOCKTYPE 
 
 
 
-bool cFluidSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType)
+bool cFluidSimulator::IsAllowedBlock(BLOCKTYPE a_BlockType) const
 {
 	return ((a_BlockType == m_FluidBlock) || (a_BlockType == m_StationaryFluidBlock));
 }
@@ -75,7 +75,7 @@ bool cFluidSimulator::CanWashAway(BLOCKTYPE a_BlockType)
 
 
 
-bool cFluidSimulator::IsSolidBlock(BLOCKTYPE a_BlockType)
+bool cFluidSimulator::IsSolidBlock(BLOCKTYPE a_BlockType) const
 {
 	return !IsPassableForFluid(a_BlockType);
 }
@@ -84,7 +84,7 @@ bool cFluidSimulator::IsSolidBlock(BLOCKTYPE a_BlockType)
 
 
 
-bool cFluidSimulator::IsPassableForFluid(BLOCKTYPE a_BlockType)
+bool cFluidSimulator::IsPassableForFluid(BLOCKTYPE a_BlockType) const
 {
 	return (
 		(a_BlockType == E_BLOCK_AIR) ||
@@ -98,7 +98,7 @@ bool cFluidSimulator::IsPassableForFluid(BLOCKTYPE a_BlockType)
 
 
 
-bool cFluidSimulator::IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2)
+bool cFluidSimulator::IsHigherMeta(NIBBLETYPE a_Meta1, NIBBLETYPE a_Meta2) const
 {
 	if (a_Meta1 == 0)
 	{
@@ -143,14 +143,14 @@ Vector3f cFluidSimulator::GetFlowingDirection(Vector3i a_Pos)
 	}
 
 	const auto HeightFromMeta = [](NIBBLETYPE a_BlockMeta) -> NIBBLETYPE
-		{
-			// Falling water blocks are always full height (0)
-			return ((a_BlockMeta & 0x08) != 0) ? 0 : a_BlockMeta;
-		};
+	{
+		// Falling water blocks are always full height (0)
+		return ((a_BlockMeta & FALLING_BIT) != 0) ? 0 : a_BlockMeta;
+	};
 
 	auto BlockMeta = m_World.GetBlockMeta(a_Pos);
-	NIBBLETYPE CentralPoint = HeightFromMeta(BlockMeta);
-	NIBBLETYPE LevelPoint[4];
+	auto CentralPoint = HeightFromMeta(BlockMeta);
+	std::array<NIBBLETYPE, 4> LevelPoint;
 
 	// blocks around the checking pos
 	std::array<Vector3i, 4> Offsets
@@ -182,7 +182,7 @@ Vector3f cFluidSimulator::GetFlowingDirection(Vector3i a_Pos)
 	Direction.x = (LevelPoint[0] - LevelPoint[2]) / 2.0f;
 	Direction.z = (LevelPoint[1] - LevelPoint[3]) / 2.0f;
 
-	if ((BlockMeta & 0x08) != 0)  // Test falling bit
+	if ((BlockMeta & FALLING_BIT) != 0)  // Test falling bit
 	{
 		Direction.y = -1.0f;
 	}

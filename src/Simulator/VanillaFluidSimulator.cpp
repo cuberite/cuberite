@@ -26,7 +26,7 @@ cVanillaFluidSimulator::cVanillaFluidSimulator(
 	BLOCKTYPE a_Fluid,
 	BLOCKTYPE a_StationaryFluid,
 	NIBBLETYPE a_Falloff,
-	int a_TickDelay,
+	size_t a_TickDelay,
 	int a_NumNeighborsForSource
 ):
 	Super(a_World, a_Fluid, a_StationaryFluid, a_Falloff, a_TickDelay, a_NumNeighborsForSource)
@@ -40,19 +40,19 @@ cVanillaFluidSimulator::cVanillaFluidSimulator(
 void cVanillaFluidSimulator::SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, NIBBLETYPE a_NewMeta)
 {
 	// Calculate the distance to the nearest "hole" in each direction:
-	int Cost[4];
-	Cost[0] = CalculateFlowCost(a_Chunk, a_RelX + 1, a_RelY, a_RelZ,     X_PLUS);
-	Cost[1] = CalculateFlowCost(a_Chunk, a_RelX - 1, a_RelY, a_RelZ,     X_MINUS);
-	Cost[2] = CalculateFlowCost(a_Chunk, a_RelX,     a_RelY, a_RelZ + 1, Z_PLUS);
-	Cost[3] = CalculateFlowCost(a_Chunk, a_RelX,     a_RelY, a_RelZ - 1, Z_MINUS);
+	std::array<int, 4> Cost;
+	Cost[0] = CalculateFlowCost(a_Chunk, a_RelX + 1, a_RelY, a_RelZ,     eDirection::X_PLUS);
+	Cost[1] = CalculateFlowCost(a_Chunk, a_RelX - 1, a_RelY, a_RelZ,     eDirection::X_MINUS);
+	Cost[2] = CalculateFlowCost(a_Chunk, a_RelX,     a_RelY, a_RelZ + 1, eDirection::Z_PLUS);
+	Cost[3] = CalculateFlowCost(a_Chunk, a_RelX,     a_RelY, a_RelZ - 1, eDirection::Z_MINUS);
 
 	// Find the minimum distance:
 	int MinCost = InfiniteCost;
-	for (unsigned int i = 0; i < ARRAYCOUNT(Cost); ++i)
+	for (auto SingleCost : Cost)
 	{
-		if (Cost[i] < MinCost)
+		if (SingleCost < MinCost)
 		{
-			MinCost = Cost[i];
+			MinCost = SingleCost;
 		}
 	}
 
@@ -79,7 +79,7 @@ void cVanillaFluidSimulator::SpreadXZ(cChunk * a_Chunk, int a_RelX, int a_RelY, 
 
 
 
-int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, Direction a_Dir, unsigned a_Iteration)
+int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, int a_RelX, int a_RelY, int a_RelZ, eDirection a_Dir, unsigned a_Iteration)
 {
 	int Cost = InfiniteCost;
 
@@ -117,33 +117,33 @@ int cVanillaFluidSimulator::CalculateFlowCost(cChunk * a_Chunk, int a_RelX, int 
 	}
 
 	// Recurse
-	if (a_Dir != X_MINUS)
+	if (a_Dir != eDirection::X_MINUS)
 	{
-		int NextCost = CalculateFlowCost(a_Chunk, a_RelX + 1, a_RelY, a_RelZ, X_PLUS, a_Iteration + 1);
+		int NextCost = CalculateFlowCost(a_Chunk, a_RelX + 1, a_RelY, a_RelZ, eDirection::X_PLUS, a_Iteration + 1);
 		if (NextCost < Cost)
 		{
 			Cost = NextCost;
 		}
 	}
-	if (a_Dir != X_PLUS)
+	if (a_Dir != eDirection::X_PLUS)
 	{
-		int NextCost = CalculateFlowCost(a_Chunk, a_RelX - 1, a_RelY, a_RelZ, X_MINUS, a_Iteration + 1);
+		int NextCost = CalculateFlowCost(a_Chunk, a_RelX - 1, a_RelY, a_RelZ, eDirection::X_MINUS, a_Iteration + 1);
 		if (NextCost < Cost)
 		{
 			Cost = NextCost;
 		}
 	}
-	if (a_Dir != Z_MINUS)
+	if (a_Dir != eDirection::Z_MINUS)
 	{
-		int NextCost = CalculateFlowCost(a_Chunk, a_RelX, a_RelY, a_RelZ + 1, Z_PLUS, a_Iteration + 1);
+		int NextCost = CalculateFlowCost(a_Chunk, a_RelX, a_RelY, a_RelZ + 1, eDirection::Z_PLUS, a_Iteration + 1);
 		if (NextCost < Cost)
 		{
 			Cost = NextCost;
 		}
 	}
-	if (a_Dir != Z_PLUS)
+	if (a_Dir != eDirection::Z_PLUS)
 	{
-		int NextCost = CalculateFlowCost(a_Chunk, a_RelX, a_RelY, a_RelZ - 1, Z_MINUS, a_Iteration + 1);
+		int NextCost = CalculateFlowCost(a_Chunk, a_RelX, a_RelY, a_RelZ - 1, eDirection::Z_MINUS, a_Iteration + 1);
 		if (NextCost < Cost)
 		{
 			Cost = NextCost;
