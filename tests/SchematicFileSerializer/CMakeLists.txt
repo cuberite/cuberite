@@ -70,6 +70,9 @@ source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 add_executable(SchematicFileSerializer-exe ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
 target_link_libraries(SchematicFileSerializer-exe fmt::fmt libdeflate)
+if (WIN32)
+	target_link_libraries(SchematicFileSerializer-exe ws2_32)
+endif()
 add_test(NAME SchematicFileSerializer-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND SchematicFileSerializer-exe)
 
 

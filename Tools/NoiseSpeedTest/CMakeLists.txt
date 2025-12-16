@@ -52,6 +52,9 @@ add_executable(NoiseSpeedTest
 )
 
 target_link_libraries(NoiseSpeedTest fmt::fmt)
+if (WIN32)
+	target_link_libraries(NoiseSpeedTest ws2_32)
+endif()
 
 set_target_properties(
 	NoiseSpeedTest

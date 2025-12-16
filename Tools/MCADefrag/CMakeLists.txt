@@ -79,6 +79,9 @@ add_executable(MCADefrag
 )
 
 target_link_libraries(MCADefrag fmt::fmt libdeflate Threads::Threads)
+if (WIN32)
+	target_link_libraries(MCADefrag ws2_32)
+endif()
 
 include(../../SetFlags.cmake)
 set_exe_flags(MCADefrag)
