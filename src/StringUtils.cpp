@@ -642,7 +642,7 @@ AString & CreateHexDump(AString & a_Out, const void * a_Data, size_t a_Size, siz
 		auto HexStr = fmt::string_view(Hex.data(), Hex.size());
 		auto CharsStr = fmt::string_view(Chars.data(), Chars.size());
 		fmt::format_to(
-			Output, "{0:08x}: {1:{2}}   {3}\n",
+			std::back_inserter(Output), "{0:08x}: {1:{2}}   {3}\n",
 			i, HexStr, a_BytesPerLine * 3, CharsStr
 		);
 

@@ -1,6 +1,6 @@
 
 #pragma once
-
+#include "fmt/format.h"
 
 
 
@@ -86,3 +86,4 @@ enum eMonsterType
 } ;
 
 // tolua_end
+auto static format_as(eMonsterType f) { return fmt::underlying(f); }

@@ -104,7 +104,7 @@ namespace fmt
 {
 	template <> struct formatter<cChunkCoords>: formatter<int>
 	{
-		auto format(cChunkCoords a_Coords, format_context & a_Ctx)
+		auto format(cChunkCoords a_Coords, format_context & a_Ctx) const
 		{
 			return format_to(a_Ctx.out(), "[{}, {}]", a_Coords.m_ChunkX, a_Coords.m_ChunkZ);
 		}

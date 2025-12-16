@@ -22,6 +22,8 @@
 #include "Blocks/BroadcastInterface.h"
 #include "EffectID.h"
 
+#include <functional>
+
 
 
 

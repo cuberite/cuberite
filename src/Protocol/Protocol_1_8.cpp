@@ -1965,7 +1965,7 @@ UInt32 cProtocol_1_8_0::GetPacketID(ePacketType a_PacketType) const
 		case pktWindowProperty:         return 0x31;
 		default:
 		{
-			LOG("Unhandled outgoing packet type: %s (0x%02x)", cPacketizer::PacketTypeToStr(a_PacketType), a_PacketType);
+			LOG("Unhandled outgoing packet type: %s (0x%02x)", cPacketizer::PacketTypeToStr(a_PacketType), static_cast<int>(a_PacketType));
 			ASSERT(!"Unhandled outgoing packet type");
 			return 0;
 		}

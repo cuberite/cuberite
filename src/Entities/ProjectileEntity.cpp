@@ -286,7 +286,7 @@ std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(
 		}
 	}
 
-	LOGWARNING("%s: Unknown projectile kind: %d", __FUNCTION__, a_Kind);
+	LOGWARNING("%s: Unknown projectile kind: %d", __FUNCTION__, static_cast<int>(a_Kind));
 	return nullptr;
 }
 

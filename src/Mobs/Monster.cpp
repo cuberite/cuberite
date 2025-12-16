@@ -1433,7 +1433,7 @@ void cMonster::LoveTick(void)
 	{
 		if (m_LovePartner == nullptr)
 		{
-			m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8), [=](cEntity & a_Entity)
+			m_World->ForEachEntityInBox(cBoundingBox(GetPosition(), 8, 8), [this](cEntity & a_Entity)
 			{
 				// If the entity is not a monster, don't breed with it
 				// Also, do not self-breed

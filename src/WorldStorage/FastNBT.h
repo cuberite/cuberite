@@ -21,7 +21,7 @@ It directly outputs a string containing the serialized NBT data.
 
 #include <system_error>
 #include "../Endianness.h"
-
+#include <fmt/format.h>
 
 
 
@@ -45,7 +45,7 @@ enum eTagType
 } ;
 
 
-
+auto static format_as(eTagType f) { return fmt::underlying(f); }
 
 
 /** This structure is used for all NBT tags.
