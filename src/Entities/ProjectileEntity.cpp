@@ -16,6 +16,7 @@
 
 #include "ArrowEntity.h"
 #include "ThrownEggEntity.h"
+#include "ThrownEnderEyeEntity.h"
 #include "ThrownEnderPearlEntity.h"
 #include "ExpBottleEntity.h"
 #include "ThrownSnowballEntity.h"
@@ -267,6 +268,7 @@ std::unique_ptr<cProjectileEntity> cProjectileEntity::Create(
 	{
 		case pkArrow:         return std::make_unique<cArrowEntity>           (a_Creator, a_Pos, Speed);
 		case pkEgg:           return std::make_unique<cThrownEggEntity>       (a_Creator, a_Pos, Speed);
+		case pkEnderEye:      return std::make_unique<cThrownEnderEyeEntity>  (a_Creator, a_Pos, Speed);
 		case pkEnderPearl:    return std::make_unique<cThrownEnderPearlEntity>(a_Creator, a_Pos, Speed);
 		case pkSnowball:      return std::make_unique<cThrownSnowballEntity>  (a_Creator, a_Pos, Speed);
 		case pkGhastFireball: return std::make_unique<cGhastFireballEntity>   (a_Creator, a_Pos, Speed);
@@ -342,6 +344,7 @@ AString cProjectileEntity::GetMCAClassName(void) const
 		case pkEgg:           return "Egg";
 		case pkGhastFireball: return "Fireball";
 		case pkFireCharge:    return "SmallFireball";
+		case pkEnderEye:      return "EyeOfEnderSignal";
 		case pkEnderPearl:    return "ThrownEnderpearl";
 		case pkExpBottle:     return "ThrownExpBottle";
 		case pkSplashPotion:  return "SplashPotion";

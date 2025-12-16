@@ -1406,6 +1406,30 @@ void cProtocol_1_8_0::SendSoundEffect(const AString & a_SoundName, Vector3d a_Or
 
 
 
+void cProtocol_1_8_0::SendSoundEffect(SoundEvent a_SoundEvent, Vector3d a_Origin, float a_Volume, float a_Pitch)
+{
+	AString soundName = GetProtocolSoundEffectAsString(a_SoundEvent);
+	if (soundName.empty())
+	{
+		FLOGD("SoundEvent enum {0} is missing a related sound effect.", a_SoundEvent);
+		return;
+	}
+
+	ASSERT(m_State == 3);  // In game mode?
+
+	cPacketizer Pkt(*this, pktSoundEffect);
+	Pkt.WriteString(soundName);
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.x * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.y * 8.0));
+	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.z * 8.0));
+	Pkt.WriteBEFloat(a_Volume);
+	Pkt.WriteBEUInt8(static_cast<Byte>(a_Pitch * 63));
+}
+
+
+
+
+
 void cProtocol_1_8_0::SendSoundParticleEffect(const EffectID a_EffectID, Vector3i a_Origin, int a_Data)
 {
 	ASSERT(m_State == 3);  // In game mode?
@@ -3940,6 +3964,7 @@ UInt8 cProtocol_1_8_0::GetProtocolEntityType(const cEntity & a_Entity) const
 				case PType::pkGhastFireball: return 63;
 				case PType::pkFireCharge: return 64;
 				case PType::pkEnderPearl: return 65;
+				case PType::pkEnderEye: return 72;
 				case PType::pkExpBottle: return 75;
 				case PType::pkSplashPotion: return 73;
 				case PType::pkFirework: return 76;

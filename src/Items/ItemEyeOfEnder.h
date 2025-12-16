@@ -16,7 +16,7 @@ class cItemEyeOfEnderHandler final:
 public:
 
 	constexpr cItemEyeOfEnderHandler(int a_ItemType):
-		Super(a_ItemType, cProjectileEntity::pkSnowball, 30)
+		Super(a_ItemType, cProjectileEntity::pkEnderEye, 0)
 	{
 	}
 
@@ -53,12 +53,39 @@ public:
 					FindAndSetPortal(a_ClickedBlockPos, FacingMeta & 3, ChunkInterface, *a_World);
 					return true;
 				}
+				// TODO: Cancel the 1.8 protocol behavior of pure item using.
+				return true;
 			}
+			
+		}
+
+		// Throw Eye Of Ender instead:
+		Vector3d throwStartPos = a_Player->GetThrowStartPos();
+		Vector3i playerPos = a_Player->GetPosition();
+
+		Vector3d Speed = a_World->GetGenerator().GetNearestStructure(
+			"Fortress", playerPos);	 // HARDCODED: Fortress
+
+		// If can't find a fortress, quit out.
+		if (Speed == playerPos) return false;
+
+		if (a_World->CreateProjectile(throwStartPos, m_ProjectileKind, a_Player,
+			&a_Player->GetEquippedItem(), &Speed) == cEntity::INVALID_ID)
+		{
 			return false;
 		}
 
-		// TODO: Create projectile for Eye Of Ender
-		// return Super::OnItemUse(a_World, a_Player, a_PluginInterface, a_Item, a_ClickedBlockPos, a_ClickedBlockFace);
+		// Hardcoding pitch might pose a problem
+		a_World->BroadcastSoundEffect(
+			SoundEvent::EnderEyeLaunch,
+			a_Player->GetPosition() - Vector3d(0, a_Player->GetHeight(), 0),
+			1.f, 0.8f);
+		// Level event 1003
+
+		if (!a_Player->IsGameModeCreative())
+		{
+			a_Player->GetInventory().RemoveOneEquippedItem();
+		}
 
 		return false;
 	}
