@@ -692,6 +692,84 @@ void cProtocol_1_13::HandleVanillaPluginMessage(cByteBuffer & a_ByteBuffer, cons
 
 
 
+void cProtocol_1_13::ParseItemMetadata(cItem & a_Item, const ContiguousByteBufferView a_Metadata) const
+{
+	// Parse into NBT:
+	cParsedNBT NBT(a_Metadata);
+	if (!NBT.IsValid())
+	{
+		AString HexDump;
+		CreateHexDump(HexDump, a_Metadata.data(), std::max<size_t>(a_Metadata.size(), 1024), 16);
+		LOGWARNING("Cannot parse NBT item metadata: %s at (%zu / %zu bytes)\n%s",
+			NBT.GetErrorCode().message().c_str(), NBT.GetErrorPos(), a_Metadata.size(), HexDump.c_str()
+		);
+		return;
+	}
+
+	// Load enchantments and custom display names from the NBT data:
+	for (int tag = NBT.GetFirstChild(NBT.GetRoot()); tag >= 0; tag = NBT.GetNextSibling(tag))
+	{
+		AString TagName = NBT.GetName(tag);
+		switch (NBT.GetType(tag))
+		{
+			case TAG_List:
+			{
+				if ((TagName == "ench") || (TagName == "StoredEnchantments"))  // Enchantments tags
+				{
+					EnchantmentSerializer::ParseFromNBT(a_Item.m_Enchantments, NBT, tag);
+				}
+				break;
+			}
+			case TAG_Compound:
+			{
+				if (TagName == "display")  // Custom name and lore tag
+				{
+					for (int displaytag = NBT.GetFirstChild(tag); displaytag >= 0; displaytag = NBT.GetNextSibling(displaytag))
+					{
+						if ((NBT.GetType(displaytag) == TAG_String) && (NBT.GetName(displaytag) == "Name"))  // Custon name tag
+						{
+							a_Item.m_CustomName = NBT.GetString(displaytag);
+						}
+						else if ((NBT.GetType(displaytag) == TAG_List) && (NBT.GetName(displaytag) == "Lore"))  // Lore tag
+						{
+							for (int loretag = NBT.GetFirstChild(displaytag); loretag >= 0; loretag = NBT.GetNextSibling(loretag))  // Loop through array of strings
+							{
+								a_Item.m_LoreTable.push_back(NBT.GetString(loretag));
+							}
+						}
+						else if ((NBT.GetType(displaytag) == TAG_Int) && (NBT.GetName(displaytag) == "color"))
+						{
+							a_Item.m_ItemColor.m_Color = static_cast<unsigned int>(NBT.GetInt(displaytag));
+						}
+					}
+				}
+				else if ((TagName == "Fireworks") || (TagName == "Explosion"))
+				{
+					cFireworkItem::ParseFromNBT(a_Item.m_FireworkItem, NBT, tag, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+				}
+				break;
+			}
+			case TAG_Int:
+			{
+				if ((TagName == "Damage") || (TagName == "map"))
+				{
+					a_Item.m_ItemDamage = static_cast<short>(NBT.GetInt(tag));
+				}
+				else if (TagName == "RepairCost")
+				{
+					a_Item.m_RepairCost = NBT.GetInt(tag);
+				}
+				break;
+			}
+			default: LOGD("Unimplemented NBT data when parsing!"); break;
+		}
+	}
+}
+
+
+
+
+
 bool cProtocol_1_13::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_t a_KeepRemainingBytes) const
 {
 	HANDLE_PACKET_READ(a_ByteBuffer, ReadBEInt16, Int16, ItemID);
@@ -940,21 +1018,94 @@ void cProtocol_1_13::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	if (ItemType <= 0)
 	{
 		// Fix, to make sure no invalid values are sent.
-		ItemType = -1;
+		ItemType = E_ITEM_EMPTY;
 	}
 
-	if (a_Item.IsEmpty())
+	if (ItemType == E_ITEM_EMPTY)
 	{
 		a_Pkt.WriteBEInt16(-1);
 		return;
 	}
 
 	// Normal item
-	a_Pkt.WriteBEInt16(static_cast<Int16>(GetProtocolItemType(a_Item.m_ItemType, a_Item.m_ItemDamage)));
+	a_Pkt.WriteBEInt16(static_cast<Int16>(GetProtocolItemType(ItemType, (ItemType != E_ITEM_MAP ? a_Item.m_ItemDamage : 0))));
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 
-	// TODO: NBT
-	a_Pkt.WriteBEInt8(0);
+	WriteItemNBT(a_Pkt, a_Item);
+}
+
+
+
+
+
+void cProtocol_1_13::WriteItemNBT(cPacketizer & a_Pkt, const cItem & a_Item) const
+{
+	cFastNBTWriter NBT;
+
+	if (a_Item.IsDamageable() && (a_Item.m_ItemDamage != 0))
+	{
+		NBT.AddInt("Damage", a_Item.m_ItemDamage);
+	}
+
+	if (a_Item.m_RepairCost != 0)
+	{
+		NBT.AddInt("RepairCost", a_Item.m_RepairCost);
+	}
+
+	NBT.BeginCompound("display");
+	{
+		if (a_Item.m_ItemColor.IsValid())
+		{
+			NBT.AddInt("color", static_cast<int>(a_Item.m_ItemColor.m_Color));
+		}
+
+		if (!a_Item.m_LoreTable.empty())
+		{
+			NBT.BeginList("Lore", TAG_String);
+			for (auto & Lore : a_Item.m_LoreTable)
+			{
+				NBT.AddString("", Lore);
+			}
+			NBT.EndList();
+		}
+
+		if (!a_Item.m_CustomName.empty())
+		{
+			NBT.AddString("Name", a_Item.m_CustomName);
+		}
+	}
+	NBT.EndCompound();
+
+	if (!a_Item.m_Enchantments.IsEmpty())
+	{
+		EnchantmentSerializer::WriteToNBTCompound(a_Item.m_Enchantments, NBT, "ench");
+	}
+
+	if ((a_Item.m_ItemType == E_ITEM_FIREWORK_ROCKET) || (a_Item.m_ItemType == E_ITEM_FIREWORK_STAR))
+	{
+		cFireworkItem::WriteToNBTCompound(a_Item.m_FireworkItem, NBT, static_cast<ENUM_ITEM_TYPE>(a_Item.m_ItemType));
+	}
+
+	switch (a_Item.m_ItemType)
+	{
+		case E_ITEM_MAP:
+		{
+			NBT.AddInt("map", a_Item.m_ItemDamage);
+			break;
+		}
+	}
+
+	NBT.Finish();
+
+	ContiguousByteBufferView Data = NBT.GetResult();
+	if (Data.size() >= 2 /* 5 */)
+	{
+		a_Pkt.WriteBuf(Data);
+	}
+	else
+	{
+		a_Pkt.WriteBEInt8(0);
+	}
 }
 
 
@@ -1562,10 +1713,10 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 	if (ItemType <= 0)
 	{
 		// Fix, to make sure no invalid values are sent.
-		ItemType = -1;
+		ItemType = E_ITEM_EMPTY;
 	}
 
-	if (a_Item.IsEmpty())
+	if (ItemType == E_ITEM_EMPTY)
 	{
 		a_Pkt.WriteBool(false);
 		return;
@@ -1575,9 +1726,8 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 	a_Pkt.WriteBool(true);
 
 	// Normal item
-	a_Pkt.WriteVarInt32(GetProtocolItemType(a_Item.m_ItemType, a_Item.m_ItemDamage));
+	a_Pkt.WriteVarInt32(GetProtocolItemType(ItemType, (ItemType != E_ITEM_MAP ? a_Item.m_ItemDamage : 0)));
 	a_Pkt.WriteBEInt8(a_Item.m_ItemCount);
 
-	// TODO: NBT
-	a_Pkt.WriteBEInt8(0);
+	WriteItemNBT(a_Pkt, a_Item);
 }
