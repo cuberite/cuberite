@@ -1,3 +1,6 @@
+// Copyright 2024 Gavin John
+// TODO: This should include the copyright information of other contributors
+// SPDX-License-Identifier: Apache-2.0
 
 #include "Globals.h"  // NOTE: MSVC stupidness requires this to be the same across all modules
 
@@ -35,7 +38,13 @@ bool g_DetachedStdin;
 static void ParseArguments(int argc, char ** argv, cMemorySettingsRepository & a_Settings)
 {
 	// Parse the comand line args:
-	TCLAP::CmdLine cmd("Cuberite");
+#ifdef PROGRAM_VERSION
+	const char * version = PROGRAM_VERSION;
+#else
+	const char * version = "unknown";
+#endif
+
+	TCLAP::CmdLine cmd("Cuberite is a Minecraft-compatible multiplayer game server that is written in C++ and designed to be efficient with memory and CPU, as well as having a flexible Lua Plugin API. Cuberite is compatible with the Java Edition Minecraft client.", ' ', version);
 	TCLAP::ValueArg<int> slotsArg    ("s", "max-players",         "Maximum number of slots for the server to use, overrides setting in setting.ini", false, -1, "number", cmd);
 	TCLAP::ValueArg<AString> confArg ("c", "config-file",         "Config file to use", false, "settings.ini", "string", cmd);
 	TCLAP::MultiArg<int> portsArg    ("p", "port",                "The port number the server should listen to", false, "port", cmd);
