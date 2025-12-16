@@ -1715,7 +1715,7 @@ void cSlotAreaEnchanting::UpdateResult(cPlayer & a_Player)
 		std::max(Base, Bookshelves * 2)
 	};
 
-	// Properties set according to: https://wiki.vg/Protocol#Window_Property
+	// Properties set according to: https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol#Set_Container_Property
 	// Fake a "seed" for the client to draw Standard Galactic Alphabet glyphs:
 	m_ParentWindow.SetProperty(3, Random.RandInt<short>());
 

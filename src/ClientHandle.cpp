@@ -729,7 +729,7 @@ void cClientHandle::HandleOpenHorseInventory()
 void cClientHandle::HandlePing(void)
 {
 	/* TODO: unused function, handles Legacy Server List Ping
-	http://wiki.vg/Protocol#Legacy_Server_List_Ping suggests that servers SHOULD handle this packet */
+	https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol#Legacy_Server_List_Ping suggests that servers SHOULD handle this packet */
 
 	// Somebody tries to retrieve information about the server
 	const cServer & Server = *cRoot::Get()->GetServer();
