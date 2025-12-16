@@ -23,6 +23,11 @@ public:
 		float a_Width,
 		float a_Height
 	);
+	cAggressiveMonster(
+		const AString & a_ConfigName, eMonsterType a_MobType,
+		const eSoundEvent a_SoundHurt, const eSoundEvent a_SoundDeath,
+		const eSoundEvent a_SoundAmbient, float a_Width, float a_Height
+	);
 
 	virtual void Tick          (std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 	virtual void InStateChasing(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;

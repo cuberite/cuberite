@@ -83,7 +83,7 @@ void cLeashKnot::TiePlayersLeashedMobs(cPlayer & a_Player, bool a_ShouldBroadcas
 void cLeashKnot::KilledBy(TakeDamageInfo & a_TDI)
 {
 	Super::KilledBy(a_TDI);
-	m_World->BroadcastSoundEffect("entity.leashknot.break", GetPosition(), 1, 1);
+	m_World->BroadcastSoundEffect(eSoundEvent::LeashknotBreak, GetPosition(), 1, 1);
 	Destroy();
 }
 
@@ -130,7 +130,7 @@ void cLeashKnot::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		if (m_TicksToSelfDestroy <= 0)
 		{
 			Destroy();
-			m_World->BroadcastSoundEffect("entity.leashknot.break", GetPosition(), 1, 1);
+			m_World->BroadcastSoundEffect(eSoundEvent::LeashknotBreak, GetPosition(), 1, 1);
 		}
 	}
 }

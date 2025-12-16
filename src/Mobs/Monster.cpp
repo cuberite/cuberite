@@ -93,9 +93,9 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_MobType(a_MobType)
 	, m_CustomName()
 	, m_CustomNameAlwaysVisible(false)
-	, m_SoundHurt(a_SoundHurt)
-	, m_SoundDeath(a_SoundDeath)
-	, m_SoundAmbient(a_SoundAmbient)
+	, m_SoundHurtString(a_SoundHurt)
+	, m_SoundDeathString(a_SoundDeath)
+	, m_SoundAmbientString(a_SoundAmbient)
 	, m_AttackRate(3)
 	, m_AttackDamage(1)
 	, m_AttackRange(1)
@@ -122,6 +122,61 @@ cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const A
 	, m_LoveCooldown(0)
 	, m_MatingTimer(0)
 	, m_Target(nullptr)
+{
+	if (!a_ConfigName.empty())
+	{
+		GetMonsterConfig(a_ConfigName);
+	}
+
+	// Prevent mobs spawning at the same time from making sounds simultaneously
+	m_AmbientSoundTimer = GetRandomProvider().RandInt(0, 100);
+}
+
+
+
+
+
+cMonster::cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const eSoundEvent a_SoundHurt, const eSoundEvent a_SoundDeath, const eSoundEvent a_SoundAmbient, float a_Width, float a_Height) :
+	Super(etMonster, a_Width, a_Height),
+	m_EMState(IDLE),
+	m_EMPersonality(AGGRESSIVE),
+	m_PathFinder(a_Width, a_Height),
+	m_PathfinderActivated(false),
+	m_JumpCoolDown(0),
+	m_IdleInterval(0),
+	m_DestroyTimer(0),
+	m_MobType(a_MobType),
+	m_CustomName(),
+	m_CustomNameAlwaysVisible(false),
+	m_SoundHurt(a_SoundHurt),
+	m_SoundDeath(a_SoundDeath),
+	m_SoundAmbient(a_SoundAmbient),
+	m_AttackRate(3),
+	m_AttackDamage(1),
+	m_AttackRange(1),
+	m_AttackCoolDownTicksLeft(0),
+	m_SightDistance(25),
+	m_DropChanceWeapon(0.085f),
+	m_DropChanceHelmet(0.085f),
+	m_DropChanceChestplate(0.085f),
+	m_DropChanceLeggings(0.085f),
+	m_DropChanceBoots(0.085f),
+	m_CanPickUpLoot(true),
+	m_TicksSinceLastDamaged(100),
+	m_BurnsInDaylight(false),
+	m_RelativeWalkSpeed(1),
+	m_Age(1),
+	m_AgingTimer(TPS * 60 * 20),  // about 20 minutes
+	m_WasLastTargetAPlayer(false),
+	m_LeashedTo(nullptr),
+	m_LeashToPos(nullptr),
+	m_IsLeashActionJustDone(false),
+	m_CanBeLeashed(GetMobFamily() == eFamily::mfPassive),
+	m_LovePartner(nullptr),
+	m_LoveTimer(0),
+	m_LoveCooldown(0),
+	m_MatingTimer(0),
+	m_Target(nullptr)
 {
 	if (!a_ConfigName.empty())
 	{
@@ -383,14 +438,21 @@ void cMonster::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 	BroadcastMovementUpdate();
 
 	// Ambient mob sounds
-	if (!m_SoundAmbient.empty() && (--m_AmbientSoundTimer <= 0))
+	if (--m_AmbientSoundTimer <= 0)
 	{
 		auto & Random = GetRandomProvider();
 		auto ShouldPlaySound = Random.RandBool();
 		if (ShouldPlaySound)
 		{
 			auto SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
-			m_World->BroadcastSoundEffect(m_SoundAmbient, GetPosition(), 1.0f, SoundPitchMultiplier * 1.0f);
+			if (!m_SoundAmbientString.empty())
+			{
+				m_World->BroadcastSoundEffect(m_SoundAmbientString, GetPosition(), 1.0f, SoundPitchMultiplier * 1.0f);
+			}
+			else
+			{
+				m_World->BroadcastSoundEffect(m_SoundAmbient, GetPosition(), 1.0f, SoundPitchMultiplier * 1.0f);
+			}
 		}
 		m_AmbientSoundTimer = 100;
 	}
@@ -586,9 +648,16 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
-	if (!m_SoundHurt.empty() && (m_Health > 0))
+	if (m_Health > 0)
 	{
-		m_World->BroadcastSoundEffect(m_SoundHurt, GetPosition(), 1.0f, 0.8f);
+		if (!m_SoundHurtString.empty())
+		{
+			m_World->BroadcastSoundEffect(m_SoundHurtString, GetPosition(), 1.0f, 0.8f);
+		}
+		else
+		{
+			m_World->BroadcastSoundEffect(m_SoundHurt, GetPosition(), 1.0f, 0.8f);
+		}
 	}
 
 	if ((a_TDI.Attacker != nullptr) && a_TDI.Attacker->IsPawn())
@@ -612,7 +681,11 @@ bool cMonster::DoTakeDamage(TakeDamageInfo & a_TDI)
 void cMonster::KilledBy(TakeDamageInfo & a_TDI)
 {
 	Super::KilledBy(a_TDI);
-	if (m_SoundHurt != "")
+	if (m_SoundDeathString != "")
+	{
+		m_World->BroadcastSoundEffect(m_SoundDeathString, GetPosition(), 1.0f, 0.8f);
+	}
+	else
 	{
 		m_World->BroadcastSoundEffect(m_SoundDeath, GetPosition(), 1.0f, 0.8f);
 	}

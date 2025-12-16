@@ -9,7 +9,7 @@
 
 
 cGhast::cGhast(void) :
-	Super("Ghast", mtGhast, "entity.ghast.hurt", "entity.ghast.death", "entity.ghast.ambient", 4, 4),
+	Super("Ghast", mtGhast, eSoundEvent::EntityGhastHurt, eSoundEvent::EntityGhastDeath, eSoundEvent::EntityGhastAmbient, 4, 4),
 	m_IsCharging(false),
 	m_FlightCooldown(5),
 	m_TicksUntilShot(10)
@@ -29,7 +29,7 @@ bool cGhast::Attack(std::chrono::milliseconds a_Dt)
 		auto & Random = GetRandomProvider();
 		auto SoundPitchMultiplier = 1.0f + (Random.RandReal(1.0f) - Random.RandReal(1.0f)) * 0.2f;
 
-		m_World->BroadcastSoundEffect("entity.ghast.warn", GetPosition(), 4.0f, SoundPitchMultiplier * 0.9f);
+		m_World->BroadcastSoundEffect(eSoundEvent::EntityGhastWarn, GetPosition(), 4.0f, SoundPitchMultiplier * 0.9f);
 		m_IsCharging = true;
 		m_World->BroadcastEntityMetadata(*this);
 		return true;
@@ -93,7 +93,7 @@ void cGhast::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		auto GhastBallPtr = GhastBall.get();
 		GhastBallPtr->Initialize(std::move(GhastBall), *m_World);
 
-		m_World->BroadcastSoundEffect("entity.ghast.shoot", GetPosition(), 4.0f, 1.0f);
+		m_World->BroadcastSoundEffect(eSoundEvent::EntityGhastShoot, GetPosition(), 4.0f, 1.0f);
 
 		ResetAttackCooldown();
 	}

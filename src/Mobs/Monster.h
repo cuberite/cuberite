@@ -4,6 +4,7 @@
 #include "../Entities/Pawn.h"
 #include "../UUID.h"
 #include "MonsterTypes.h"
+#include "../Registries/SoundEvent.h"
 #include "PathFinder.h"
 
 
@@ -43,9 +44,10 @@ public:
 	/** Creates the mob object.
 	If a_ConfigName is not empty, the configuration is loaded using GetMonsterConfig()
 	a_MobType is the type of the mob (also used in the protocol ( http://wiki.vg/Entities#Mobs 2012_12_22))
-	a_SoundHurt and a_SoundDeath are assigned into m_SoundHurt and m_SoundDeath, respectively
+	a_SoundHurt and a_SoundDeath are assigned into m_SoundHurtString and m_SoundDeathString, respectively
 	*/
 	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const AString & a_SoundHurt, const AString & a_SoundDeath, const AString & a_SoundAmbient, float a_Width, float a_Height);
+	cMonster(const AString & a_ConfigName, eMonsterType a_MobType, const eSoundEvent a_SoundHurt, const eSoundEvent a_SoundDeath, const eSoundEvent a_SoundAmbient, float a_Width, float a_Height);
 
 	CLASS_PROTODEF(cMonster)
 
@@ -306,9 +308,13 @@ protected:
 	AString m_CustomName;
 	bool m_CustomNameAlwaysVisible;
 
-	AString m_SoundHurt;
-	AString m_SoundDeath;
-	AString m_SoundAmbient;
+	AString m_SoundHurtString;
+	AString m_SoundDeathString;
+	AString m_SoundAmbientString;
+
+	eSoundEvent m_SoundHurt;
+	eSoundEvent m_SoundDeath;
+	eSoundEvent m_SoundAmbient;
 
 	double m_AttackRate;
 	int m_AttackDamage;

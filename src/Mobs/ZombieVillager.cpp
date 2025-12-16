@@ -11,7 +11,7 @@
 
 
 cZombieVillager::cZombieVillager(cVillager::eVillagerType a_Profession) :
-	Super("ZombieVillager", mtZombieVillager, "entity.zombie_villager.hurt", "entity.zombie_villager.death", "entity.ambient", 0.6f, 1.95f),
+	Super("ZombieVillager", mtZombieVillager, eSoundEvent::EntityZombievillagerHurt, eSoundEvent::EntityZombievillagerDeath, eSoundEvent::EntityZombievillagerAmbient, 0.6f, 1.95f),
 	m_ConversionTime(-1),
 	m_Profession(a_Profession)
 {
@@ -56,7 +56,7 @@ void cZombieVillager::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 
 	if (m_ConversionTime == 0)
 	{
-		m_World->BroadcastSoundEffect("entity.zombie_villager.cure", GetPosition(), 1.0f, 1.0f);
+		m_World->BroadcastSoundEffect(eSoundEvent::EntityZombievillagerCure, GetPosition(), 1.0f, 1.0f);
 		Destroy();
 		m_World->SpawnMob(GetPosX(), GetPosY(), GetPosZ(), mtVillager, false);
 	}

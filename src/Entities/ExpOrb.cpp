@@ -48,7 +48,7 @@ void cExpOrb::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
 		{
 			a_Player.DeltaExperience(m_Reward);
 
-			m_World->BroadcastSoundEffect("entity.experience_orb.pickup", GetPosition(), 0.5f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+			m_World->BroadcastSoundEffect(eSoundEvent::ExporbPickup, GetPosition(), 0.5f, (0.75f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
 			Destroy();
 			return true;
 		}

@@ -70,7 +70,12 @@ public:
 			// The client plays flint and steel sounds, only need to handle fire charges:
 			if (m_ItemType == E_ITEM_FIRE_CHARGE)
 			{
-				a_World->BroadcastSoundEffect("item.firecharge.use", FirePos, 1.0f, 1.04f);
+				a_World->BroadcastSoundEffect(eSoundEvent::ItemFirechargeUse, FirePos, 1.0f, 1.04f);
+			}
+			else
+			{
+				// 1.8 doesn't play, we need to handle it here
+				a_World->BroadcastSoundEffect(eSoundEvent::ItemFlintsteelUse, FirePos, 1.0f, 1.04f);
 			}
 		}
 

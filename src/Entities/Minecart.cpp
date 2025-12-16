@@ -1556,7 +1556,7 @@ void cMinecartWithTNT::HandleActivatorRailPhysics(NIBBLETYPE a_RailMeta, std::ch
 	{
 		m_isTNTFused = true;
 		m_TNTFuseTicksLeft = 80;
-		m_World->BroadcastSoundEffect("entity.tnt.primed", GetPosition(), 1.0f, 1.0f);
+		m_World->BroadcastSoundEffect(eSoundEvent::TntPrimed, GetPosition(), 1.0f, 1.0f);
 		m_World->BroadcastEntityAnimation(*this, EntityAnimation::MinecartTNTIgnites);
 	}
 }

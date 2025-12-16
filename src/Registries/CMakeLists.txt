@@ -7,4 +7,5 @@ target_sources(
 	BlockTypes.h
 	CustomStatistics.h
 	Items.h
+	SoundEvent.h
 )

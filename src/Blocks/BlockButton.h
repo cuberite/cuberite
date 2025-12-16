@@ -53,7 +53,7 @@ public:
 		a_World.WakeUpSimulators(Pos);
 
 		// sound name is ok to be wood, because only wood gets triggered by arrow
-		a_World.GetBroadcastManager().BroadcastSoundEffect("block.wood_button.click_on", Pos, 0.5f, 0.6f);
+		a_World.GetBroadcastManager().BroadcastSoundEffect(eSoundEvent::BlockWoodbtnClickon, Pos, 0.5f, 0.6f);
 
 		// Queue a button reset
 		QueueButtonRelease(a_World, Pos, Type);

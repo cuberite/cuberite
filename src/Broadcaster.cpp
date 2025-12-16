@@ -553,6 +553,18 @@ void cWorld::BroadcastSoundEffect(const AString & a_SoundName, Vector3d a_Positi
 
 
 
+void cWorld::BroadcastSoundEffect(const eSoundEvent a_SoundEvent, Vector3d a_Position, float a_Volume, float a_Pitch, const cClientHandle * a_Exclude)
+{
+	ForClientsWithChunkAtPos(a_Position, *this, a_Exclude, [&](cClientHandle & a_Client)
+	{
+		a_Client.SendSoundEffect(a_SoundEvent, a_Position, a_Volume, a_Pitch);
+	});
+}
+
+
+
+
+
 void cWorld::BroadcastSoundParticleEffect(const EffectID a_EffectID, Vector3i a_SrcPos, int a_Data, const cClientHandle * a_Exclude)
 {
 	ForClientsWithChunkAtPos(a_SrcPos, *this, a_Exclude, [&](cClientHandle & a_Client)

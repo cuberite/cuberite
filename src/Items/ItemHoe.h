@@ -62,7 +62,7 @@ public:
 		// Transform:
 		auto NewBlockType = ((BlockType == E_BLOCK_DIRT) && (BlockMeta == E_META_DIRT_COARSE)) ? E_BLOCK_DIRT : E_BLOCK_FARMLAND;
 		a_World->SetBlock(a_ClickedBlockPos, NewBlockType, 0);
-		a_World->BroadcastSoundEffect("item.hoe.till", a_ClickedBlockPos + Vector3d(0.5, 0.5, 0.5), 1.0f, 0.8f);
+		a_World->BroadcastSoundEffect(eSoundEvent::ItemHoeTill, a_ClickedBlockPos + Vector3d(0.5, 0.5, 0.5), 1.0f, 0.8f);
 		a_Player->UseEquippedItem();
 		return true;
 	}

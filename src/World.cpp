@@ -470,7 +470,7 @@ void cWorld::CastThunderbolt(int a_BlockX, int a_BlockY, int a_BlockZ)
 void cWorld::CastThunderbolt(Vector3i a_Block)
 {
 	BroadcastThunderbolt(a_Block);
-	BroadcastSoundEffect("entity.lightning.thunder", a_Block, 50, 1);
+	BroadcastSoundEffect(eSoundEvent::LightningboltThunder, a_Block, 50, 1);
 }
 
 
@@ -2050,7 +2050,7 @@ UInt32 cWorld::SpawnPrimedTNT(Vector3d a_Pos, int a_FuseTicks, double a_InitialV
 
 	if (a_ShouldPlayFuseSound)
 	{
-		BroadcastSoundEffect("entity.tnt.primed", a_Pos, 1.0f, 1.0f);
+		BroadcastSoundEffect(eSoundEvent::TntPrimed, a_Pos, 1.0f, 1.0f);
 	}
 
 	auto & Random = GetRandomProvider();
