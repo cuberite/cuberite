@@ -775,8 +775,9 @@ void cProtocol_1_13::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & a_
 			// TODO Set player custom name to their name.
 			// Then it's possible to move the custom name of mobs to the entities
 			// and to remove the "special" player custom name.
-			WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::String);
-			a_Pkt.WriteString(Player.GetName());
+			WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::OptChat);
+			a_Pkt.WriteBool(true);
+			a_Pkt.WriteChat(cCompositeChat::FromText(Player.GetName()));
 
 			WriteEntityMetadata(a_Pkt, EntityMetadata::LivingHealth, EntityMetadataType::Float);
 			a_Pkt.WriteBEFloat(static_cast<float>(Player.GetHealth()));
@@ -969,7 +970,7 @@ void cProtocol_1_13::WriteMobMetadata(cPacketizer & a_Pkt, const cMonster & a_Mo
 		// TODO: As of 1.9 _all_ entities can have custom names; should this be moved up?
 		WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::OptChat);
 		a_Pkt.WriteBool(true);
-		a_Pkt.WriteString(a_Mob.GetCustomName());
+		a_Pkt.WriteChat(cCompositeChat::FromText(a_Mob.GetCustomName()));
 
 		WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomNameVisible, EntityMetadataType::Boolean);
 		a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
