@@ -211,7 +211,7 @@ void cProtocol_1_8_0::SendBlockBreakAnim(UInt32 a_EntityID, Vector3i a_BlockPos,
 
 
 
-void cProtocol_1_8_0::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cProtocol_1_8_0::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta)
 {
 	ASSERT(m_State == 3);  // In game mode?
 

@@ -25,7 +25,7 @@ class cBeaconEntity :
 
 public:  // tolua_export
 
-	cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
+	cBeaconEntity(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World);
 
 	// cBlockEntity overrides:
 	virtual void CopyFrom(const cBlockEntity & a_Src) override;

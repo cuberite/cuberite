@@ -12,7 +12,7 @@
 
 
 
-cBeaconEntity::cBeaconEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
+cBeaconEntity::cBeaconEntity(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta, Vector3i a_Pos, cWorld * a_World):
 	Super(a_BlockType, a_BlockMeta, a_Pos, 1, 1, a_World),
 	m_IsActive(false),
 	m_BeaconLevel(0),

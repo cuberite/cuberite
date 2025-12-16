@@ -34,7 +34,7 @@ public:  // tolua_export
 
 	cBlockEntityWithItems(
 		BLOCKTYPE a_BlockType,                      // Type of the block that the entity represents
-		NIBBLETYPE a_BlockMeta,                     // Meta of the block that the entity represents
+		BLOCKMETATYPE a_BlockMeta,                  // Meta of the block that the entity represents
 		Vector3i a_Pos,                             // Abs position of the block entity
 		int a_ItemGridWidth, int a_ItemGridHeight,  // Dimensions of the ItemGrid
 		cWorld * a_World                            // Optional world to assign to the entity

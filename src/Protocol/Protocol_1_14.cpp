@@ -84,7 +84,7 @@ void cProtocol_1_14::SendBlockBreakAnim(UInt32 a_EntityID, Vector3i a_BlockPos, 
 
 
 
-void cProtocol_1_14::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cProtocol_1_14::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta)
 {
 	cPacketizer Pkt(*this, pktBlockChange);
 	Pkt.WriteXZYPosition64(a_BlockPos);
@@ -656,7 +656,7 @@ std::pair<short, short> cProtocol_1_14::GetItemFromProtocolID(UInt32 a_ProtocolI
 
 
 
-UInt32 cProtocol_1_14::GetProtocolBlockType(BLOCKTYPE a_BlockType, NIBBLETYPE a_Meta) const
+UInt32 cProtocol_1_14::GetProtocolBlockType(BLOCKTYPE a_BlockType, BLOCKMETATYPE a_Meta) const
 {
 	return Palette_1_14::From(PaletteUpgrade::FromBlock(a_BlockType, a_Meta));
 }

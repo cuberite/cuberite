@@ -374,7 +374,7 @@ public:
 	virtual void SendAttachEntity               (const cEntity & a_Entity, const cEntity & a_Vehicle) = 0;
 	virtual void SendBlockAction                (Vector3i a_BlockPos, char a_Byte1, char a_Byte2, BLOCKTYPE a_BlockType) = 0;
 	virtual void SendBlockBreakAnim             (UInt32 a_EntityID, Vector3i a_BlockPos, char a_Stage) = 0;
-	virtual void SendBlockChange                (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta) = 0;
+	virtual void SendBlockChange                (Vector3i a_BlockPos, BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta) = 0;
 	virtual void SendBlockChanges               (int a_ChunkX, int a_ChunkZ, const sSetBlockVector & a_Changes) = 0;
 	virtual void SendBossBarAdd                 (UInt32 a_UniqueID, const cCompositeChat & a_Title, float a_FractionFilled, BossBarColor a_Color, BossBarDivisionType a_DivisionType, bool a_DarkenSky, bool a_PlayEndMusic, bool a_CreateFog) = 0;
 	virtual void SendBossBarRemove              (UInt32 a_UniqueID) = 0;

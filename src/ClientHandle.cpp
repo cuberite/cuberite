@@ -2282,7 +2282,7 @@ void cClientHandle::SendBlockBreakAnim(UInt32 a_EntityID, Vector3i a_BlockPos, c
 
 
 
-void cClientHandle::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta)
+void cClientHandle::SendBlockChange(Vector3i a_BlockPos, BLOCKTYPE a_BlockType, BLOCKMETATYPE a_BlockMeta)
 {
 	auto ChunkCoords = cChunkDef::BlockToChunk(a_BlockPos);
 
