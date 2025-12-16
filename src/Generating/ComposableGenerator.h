@@ -206,6 +206,7 @@ public:
 	virtual void Initialize(cIniFile & a_IniFile) override;
 	virtual void GenerateBiomes(cChunkCoords a_ChunkCoords, cChunkDef::BiomeMap & a_BiomeMap) override;
 	virtual void Generate(cChunkDesc & a_ChunkDesc) override;
+	virtual Vector3i GetNearestStructure(const AString & a_Structure, Vector3i a_Position) override;
 
 	/** If there's no particular sub-generator set in the INI file,
 	adds the default one, based on the dimension. */

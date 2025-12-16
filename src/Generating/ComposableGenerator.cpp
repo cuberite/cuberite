@@ -199,6 +199,22 @@ void cComposableGenerator::Generate(cChunkDesc & a_ChunkDesc)
 
 
 
+Vector3i cComposableGenerator::GetNearestStructure(const AString & a_Structure, Vector3i a_Position)
+{
+	for (const std::unique_ptr<cFinishGen> & Finisher : m_FinishGens)
+	{
+		if (cPieceStructuresGen * GridStructGen = dynamic_cast<cPieceStructuresGen *>(Finisher.get()))
+		{
+			return GridStructGen->GetNearestStructure(a_Structure, a_Position);
+		}
+	}
+	return a_Position;
+}
+
+
+
+
+
 void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDimension a_Dimension)
 {
 	switch (a_Dimension)
@@ -231,7 +247,8 @@ void cComposableGenerator::InitializeGeneratorDefaults(cIniFile & a_IniFile, eDi
 				"PreSimulator, "
 				"Animals, "
 				"OverworldClumpFlowers, "
-				"ForestRocks"
+				"ForestRocks, "
+				"PieceStructures: Fortress "
 			);
 			break;
 		}  // dimOverworld
