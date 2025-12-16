@@ -504,24 +504,24 @@ void cCaveTunnel::ProcessChunk(
 				int SqDist = (DifX - x) * (DifX - x) + (DifY - y) * (DifY - y) + (DifZ - z) * (DifZ - z);
 				if (4 * SqDist <= SqRad)
 				{
-					if (cBlockInfo::CanBeTerraformed(cChunkDef::GetBlock(a_BlockTypes, x, y, z)))
+					if (cBlockInfo::CanBeTerraformed(cChunkDef::GetBlock(a_BlockTypes.data(), x, y, z)))
 					{
-						cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_AIR);
+						cChunkDef::SetBlock(a_BlockTypes.data(), x, y, z, E_BLOCK_AIR);
 					}
 				}
 				else if (SqDist <= SqRad * 2)
 				{
-					if (cChunkDef::GetBlock(a_BlockTypes, x, y, z) == E_BLOCK_SAND)
+					if (cChunkDef::GetBlock(a_BlockTypes.data(), x, y, z) == E_BLOCK_SAND)
 					{
 						const auto Index = cChunkDef::MakeIndex(x, y, z);
 						if (a_BlockMetas[Index] == 1)
 						{
 							a_BlockMetas[Index] = 0;
-							cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_RED_SANDSTONE);
+							cChunkDef::SetBlock(a_BlockTypes.data(), x, y, z, E_BLOCK_RED_SANDSTONE);
 						}
 						else
 						{
-							cChunkDef::SetBlock(a_BlockTypes, x, y, z, E_BLOCK_SANDSTONE);
+							cChunkDef::SetBlock(a_BlockTypes.data(), x, y, z, E_BLOCK_SANDSTONE);
 						}
 					}
 				}
@@ -542,7 +542,7 @@ void cCaveTunnel::ProcessChunk(
 			(DifZ >= 0) && (DifZ < cChunkDef::Width)
 		)
 		{
-			cChunkDef::SetBlock(a_BlockTypes, DifX, itr->m_BlockY, DifZ, E_BLOCK_GLOWSTONE);
+			cChunkDef::SetBlock(a_BlockTypes.data(), DifX, itr->m_BlockY, DifZ, E_BLOCK_GLOWSTONE);
 		}
 	}  // for itr - m_Points[]
 	#endif  // !NDEBUG

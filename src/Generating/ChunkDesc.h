@@ -36,7 +36,7 @@ public:
 	typedef Byte Shape[256 * 16 * 16];
 
 	/** Uncompressed block metas, 1 meta per byte */
-	typedef NIBBLETYPE BlockNibbleBytes[cChunkDef::NumBlocks];
+	using BlockNibbleBytes = std::array<NIBBLETYPE, cChunkDef::NumBlocks>;
 
 
 	cChunkDesc(cChunkCoords a_Coords);
@@ -124,10 +124,16 @@ public:
 	void ReadBlockArea(cBlockArea & a_Dest, int a_MinRelX, int a_MaxRelX, int a_MinRelY, int a_MaxRelY, int a_MinRelZ, int a_MaxRelZ);
 
 	/** Returns the maximum height value in the heightmap. */
-	HEIGHTTYPE GetMaxHeight(void) const;
+	inline HEIGHTTYPE GetMaxHeight(void) const
+	{
+		return *std::max_element(m_HeightMap.begin(), m_HeightMap.end());
+	}
 
 	/** Returns the minimum height value in the heightmap. */
-	HEIGHTTYPE GetMinHeight(void) const;
+	inline HEIGHTTYPE GetMinHeight(void) const
+	{
+		return *std::min_element(m_HeightMap.begin(), m_HeightMap.end());
+	}
 
 	/** Fills the relative cuboid with specified block; allows cuboid out of range of this chunk */
 	void FillRelCuboid(

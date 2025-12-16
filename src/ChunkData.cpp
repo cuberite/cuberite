@@ -51,7 +51,7 @@ namespace
 
 
 
-template<class ElementType, size_t ElementCount, ElementType DefaultValue>
+template<class ElementType, size_t ElementCount, auto DefaultValue>
 void ChunkDataStore<ElementType, ElementCount, DefaultValue>::Assign(const ChunkDataStore<ElementType, ElementCount, DefaultValue> & a_Other)
 {
 	for (size_t Y = 0; Y != cChunkDef::NumSections; Y++)
@@ -69,7 +69,7 @@ void ChunkDataStore<ElementType, ElementCount, DefaultValue>::Assign(const Chunk
 
 
 
-template<class ElementType, size_t ElementCount, ElementType DefaultValue>
+template<class ElementType, size_t ElementCount, auto DefaultValue>
 ElementType ChunkDataStore<ElementType, ElementCount, DefaultValue>::Get(const Vector3i a_Position) const
 {
 	const auto Indices = IndicesFromRelPos(a_Position);
@@ -94,17 +94,17 @@ ElementType ChunkDataStore<ElementType, ElementCount, DefaultValue>::Get(const V
 
 
 
-template<class ElementType, size_t ElementCount, ElementType DefaultValue>
-typename ChunkDataStore<ElementType, ElementCount, DefaultValue>::Type * ChunkDataStore<ElementType, ElementCount, DefaultValue>::GetSection(const size_t a_Y) const
+template<class ElementType, size_t ElementCount, auto DefaultValue>
+const std::unique_ptr<typename ChunkDataStore<ElementType, ElementCount, DefaultValue>::Type> & ChunkDataStore<ElementType, ElementCount, DefaultValue>::GetSection(const size_t a_Y) const
 {
-	return Store[a_Y].get();
+	return Store[a_Y];
 }
 
 
 
 
 
-template<class ElementType, size_t ElementCount, ElementType DefaultValue>
+template<class ElementType, size_t ElementCount, auto DefaultValue>
 void ChunkDataStore<ElementType, ElementCount, DefaultValue>::Set(const Vector3i a_Position, const ElementType a_Value)
 {
 	const auto Indices = IndicesFromRelPos(a_Position);
@@ -135,20 +135,19 @@ void ChunkDataStore<ElementType, ElementCount, DefaultValue>::Set(const Vector3i
 
 
 
-template<class ElementType, size_t ElementCount, ElementType DefaultValue>
-void ChunkDataStore<ElementType, ElementCount, DefaultValue>::SetSection(const ElementType (& a_Source)[ElementCount], const size_t a_Y)
+template<class ElementType, size_t ElementCount, auto DefaultValue>
+void ChunkDataStore<ElementType, ElementCount, DefaultValue>::SetSection(const Type & a_Source, size_t a_Y)
 {
 	auto & Section = Store[a_Y];
-	const auto SourceEnd = std::end(a_Source);
 
 	if (Section != nullptr)
 	{
-		std::copy(a_Source, SourceEnd, Section->begin());
+		std::copy(a_Source.begin(), a_Source.end(), Section->begin());
 	}
-	else if (std::any_of(a_Source, SourceEnd, [](const auto Value) { return Value != DefaultValue; }))
+	else if (std::any_of(a_Source.begin(), a_Source.end(), [](const auto Value) { return Value != DefaultValue; }))
 	{
 		Section = cpp20::make_unique_for_overwrite<Type>();
-		std::copy(a_Source, SourceEnd, Section->begin());
+		std::copy(a_Source.begin(), a_Source.end(), Section->begin());
 	}
 }
 
@@ -156,12 +155,12 @@ void ChunkDataStore<ElementType, ElementCount, DefaultValue>::SetSection(const E
 
 
 
-template<class ElementType, size_t ElementCount, ElementType DefaultValue>
-void ChunkDataStore<ElementType, ElementCount, DefaultValue>::SetAll(const ElementType (& a_Source)[cChunkDef::NumSections * ElementCount])
+template<class ElementType, size_t ElementCount, auto DefaultValue>
+void ChunkDataStore<ElementType, ElementCount, DefaultValue>::SetAll(const std::array<ElementType, cChunkDef::NumSections * ElementCount> & a_Source)
 {
 	for (size_t Y = 0; Y != cChunkDef::NumSections; Y++)
 	{
-		SetSection(*reinterpret_cast<const ElementType (*)[ElementCount]>(a_Source + Y * ElementCount), Y);
+		SetSection(reinterpret_cast<const Type &>(a_Source.data()[Y * ElementCount]), Y);
 	}
 }
 

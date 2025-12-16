@@ -510,10 +510,9 @@ void cStructGenDirectOverhangs::GenFinish(cChunkDesc & a_ChunkDesc)
 
 bool cStructGenDirectOverhangs::HasWantedBiome(cChunkDesc & a_ChunkDesc) const
 {
-	cChunkDef::BiomeMap & Biomes = a_ChunkDesc.GetBiomeMap();
-	for (size_t i = 0; i < ARRAYCOUNT(Biomes); i++)
+	for (const auto & Biome : a_ChunkDesc.GetBiomeMap())
 	{
-		switch (Biomes[i])
+		switch (Biome)
 		{
 			case biExtremeHills:
 			case biExtremeHillsEdge:

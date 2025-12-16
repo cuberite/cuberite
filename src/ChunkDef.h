@@ -26,7 +26,6 @@
 class cBlockEntity;
 class cEntity;
 class cClientHandle;
-class cBlockEntity;
 class cChunkCoords;
 
 using OwnedEntity = std::unique_ptr<cEntity>;
@@ -121,26 +120,29 @@ class cChunkDef
 public:
 
 	// Chunk dimensions:
-	static const int Width = 16;
-	static const int Height = 256;
-	static const int NumBlocks = Width * Height * Width;
+	static constexpr int Width = 16;
+	static constexpr int Height = 256;
+	static constexpr int NumBlocks = Width * Height * Width;
 
 	static const int SectionHeight = 16;
 	static const size_t NumSections = (cChunkDef::Height / SectionHeight);
 
 	/** The type used for any heightmap operations and storage; idx = x + Width * z; Height points to the highest non-air block in the column */
-	typedef HEIGHTTYPE HeightMap[Width * Width];
+	using HeightMap = std::array<HEIGHTTYPE, Width * Width>;
 
 	/** The type used for any biomemap operations and storage inside Cuberite,
 	using Cuberite biomes (need not correspond to client representation!)
 	idx = x + Width * z */
-	typedef EMCSBiome BiomeMap[Width * Width];
+	using BiomeMap = std::array<EMCSBiome, Width * Width>;
 
 	/** The type used for block type operations and storage, AXIS_ORDER ordering */
-	typedef BLOCKTYPE BlockTypes[NumBlocks];
+	using BlockTypes = std::array<BLOCKTYPE, NumBlocks>;
 
 	/** The type used for block data in nibble format, AXIS_ORDER ordering */
-	typedef NIBBLETYPE BlockNibbles[NumBlocks / 2];
+	using BlockNibbles = std::array<NIBBLETYPE, NumBlocks / 2>;
+
+	/** The type used for nibble data with uncompressed values. Used in calculations */
+	using UncompressedNibbles = std::array<NIBBLETYPE, NumBlocks>;
 
 
 	/** Converts absolute block coords into relative (chunk + block) coords: */
@@ -206,7 +208,7 @@ public:
 	}
 
 
-	/** Converts absolute block coords to chunk coords: */
+	/** Converts absolute block coords to chunk coords: @deprecated */
 	inline static void BlockToChunk(int a_X, int a_Z, int & a_ChunkX, int & a_ChunkZ)
 	{
 		// This version is deprecated in favor of the vector version
@@ -240,6 +242,11 @@ public:
 	inline static size_t MakeIndex(Vector3i a_RelPos)
 	{
 		return MakeIndex(a_RelPos.x, a_RelPos.y, a_RelPos.z);
+	}
+
+	inline static size_t MakeIndex(int x, int z)
+	{
+		return static_cast<size_t>(x + (z * Width));
 	}
 
 
@@ -304,7 +311,7 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		return a_HeightMap[a_X + Width * a_Z];
+		return a_HeightMap[MakeIndex(a_X, a_Z)];
 	}
 
 
@@ -312,7 +319,7 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		a_HeightMap[a_X + Width * a_Z] = a_Height;
+		a_HeightMap[MakeIndex(a_X, a_Z)] = a_Height;
 	}
 
 
@@ -320,7 +327,7 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		return a_BiomeMap[a_X + Width * a_Z];
+		return a_BiomeMap[MakeIndex(a_X, a_Z)];
 	}
 
 
@@ -328,7 +335,7 @@ public:
 	{
 		ASSERT((a_X >= 0) && (a_X < Width));
 		ASSERT((a_Z >= 0) && (a_Z < Width));
-		a_BiomeMap[a_X + Width * a_Z] = a_Biome;
+		a_BiomeMap[MakeIndex(a_X, a_Z)] = a_Biome;
 	}
 
 
@@ -345,18 +352,21 @@ public:
 
 	inline static void PackNibble(NIBBLETYPE * const a_Buffer, const size_t a_Index, const NIBBLETYPE a_Nibble)
 	{
-		ASSERT((a_Nibble & 0xF) == a_Nibble);  // Only the lower bits should be set
+		constexpr unsigned char LOWER_BITS_MASK = 0x0f;
+		constexpr unsigned char UPPER_BITS_MASK = 0xf0;
+		ASSERT((a_Nibble & LOWER_BITS_MASK) == a_Nibble);  // Only the lower bits should be set
 
 		a_Buffer[a_Index / 2] = static_cast<NIBBLETYPE>(
-			(a_Buffer[a_Index / 2] & (0xf0 >> ((a_Index & 1) * 4))) |  // The untouched nibble
-			((a_Nibble & 0x0f) << ((a_Index & 1) * 4))  // The nibble being set
+			(a_Buffer[a_Index / 2] & (UPPER_BITS_MASK >> ((a_Index & 1) * 4))) |  // The untouched nibble
+			((a_Nibble & LOWER_BITS_MASK) << ((a_Index & 1) * 4))                 // The nibble being set
 		);
 	}
 
 
 	inline static NIBBLETYPE ExpandNibble(const NIBBLETYPE * const a_Buffer, const size_t a_Index)
 	{
-		return (a_Buffer[a_Index / 2] >> ((a_Index & 1) * 4)) & 0x0f;
+		constexpr unsigned char LOWER_BITS_MASK = 0x0f;
+		return (a_Buffer[a_Index / 2] >> ((a_Index & 1) * 4)) & LOWER_BITS_MASK;
 	}
 } ;
 
@@ -438,10 +448,9 @@ struct sSetBlock
 	}
 };
 
-typedef std::vector<sSetBlock> sSetBlockVector;
-
-typedef std::list<cChunkCoords> cChunkCoordsList;
-typedef std::vector<cChunkCoords> cChunkCoordsVector;
+using sSetBlockVector = std::vector<sSetBlock>;
+using cChunkCoordsList = std::list<cChunkCoords>;
+using cChunkCoordsVector = std::vector<cChunkCoords>;
 
 
 
@@ -497,7 +506,6 @@ public:
 	}
 } ;
 
-typedef cCoordWithData<int>        cCoordWithInt;
-
-typedef std::list<cCoordWithInt>   cCoordWithIntList;
-typedef std::vector<cCoordWithInt> cCoordWithIntVector;
+using cCoordWithInt       = cCoordWithData<int>;
+using cCoordWithIntList   = std::list<cCoordWithInt>;
+using cCoordWithIntVector = std::vector<cCoordWithInt>;
