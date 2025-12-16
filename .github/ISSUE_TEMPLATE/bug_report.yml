@@ -1,0 +1,91 @@
+name: Bug Report
+description: File a bug report.
+title: "[Bug]: "
+labels: ["bug"]
+projects: ["Cuberite"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: cuberite-commit
+    attributes:
+      label: Cuberite Commit ID of your version
+      description: "Commit ID"
+      placeholder: "commit ID here"
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behaviour
+    attributes:
+      label: Expected behavior
+      description: Expected behaviour
+      placeholder: Expected behaviour here
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behaviour
+    attributes:
+      label: Actual behaviour
+      description: Actual behaviour
+      placeholder: Actual behaviour here
+    validations:
+      required: true
+  - type: textarea
+    id: steps-reproduce
+    attributes:
+      label: Steps to reproduce the behaviour
+      description: Step-by-step instructions to reproduce the bug.
+      placeholder: Step 1. Do thing X, Step 2. Do thing Y, Step...
+    validations:
+      required: true
+  - type: dropdown
+    id: client-version
+    attributes:
+      label: Version
+      description: Which Minecraft version are you connecting with? 
+      options:
+        - 1.14.4 (498)
+        - 1.14.3 (490)
+        - 1.14.2 (485)
+        - 1.14.1 (480)
+        - 1.14 (477)
+        - 1.13.2 (404)
+        - 1.13.1 (401)
+        - 1.13 (393)
+        - 1.12.2 (340)
+        - 1.12.1 (338)
+        - 1.12 (335)
+        - 1.11.2 (316)
+        - 1.11.1 (316)
+        - 1.11 (315)
+        - 1.10.X (210)
+        - 1.9.4 (110)
+        - 1.9.3 (109)
+        - 1.9.2 (109)
+        - 1.9.1 (108)
+        - 1.9 (107)
+        - 1.8.X (47)
+      multiple: true
+    validations:
+      required: true
+  - type: dropdown
+    id: OS
+    attributes:
+      label: On which OS does the issue appear?
+      multiple: true
+      options:
+        - Windows
+        - Linux
+        - macOS
+        - BSD
+        - Other
+    validations:
+        required: true
+  - type: textarea
+    id: server-log
+    attributes:
+      label: Server log
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
