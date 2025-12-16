@@ -78,15 +78,10 @@ add_executable(MCADefrag
 	${SHARED_OSS_HDR}
 )
 
-if(NOT WIN32)
-	target_compile_options(MCADefrag PRIVATE -Wno-switch)
-	target_compile_options(MCADefrag PRIVATE -Wno-switch-default)
-	target_compile_options(MCADefrag PRIVATE -Wno-nan-infinity-disabled)
-	target_compile_options(MCADefrag PRIVATE -Wno-duplicate-enum)
-	target_compile_options(MCADefrag PRIVATE -Wno-float-equal)
+target_link_libraries(MCADefrag fmt::fmt libdeflate Threads::Threads)
+if (WIN32)
+	target_link_libraries(MCADefrag ws2_32)
 endif()
-
-target_link_libraries(MCADefrag fmt::fmt libdeflate Threads::Threads mbedtls)
 
 include(../../SetFlags.cmake)
 set_exe_flags(MCADefrag)

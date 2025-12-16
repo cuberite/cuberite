@@ -93,7 +93,10 @@ source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 source_group("Lua files" FILES Test.lua)
 add_executable(LuaThreadStress ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS} Test.lua)
-target_link_libraries(LuaThreadStress fmt::fmt libdeflate lsqlite luaexpat Threads::Threads tolualib mbedtls)
+target_link_libraries(LuaThreadStress fmt::fmt libdeflate lsqlite luaexpat Threads::Threads tolualib)
+if (WIN32)
+	target_link_libraries(LuaThreadStress ws2_32)
+endif()
 add_test(NAME LuaThreadStress-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMAND LuaThreadStress)
 
 # Necessary for the test to run.
@@ -104,9 +107,9 @@ if(WIN32)
 			TARGET LuaThreadStress  POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy
 			${CMAKE_BINARY_DIR}/Server/lua51.dll # Source
-			${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/) # Destination
+			${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/) # Destination
+	message("Copying lua51.dll from " ${CMAKE_BINARY_DIR}/Server/lua51.dll " to " ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/)
 endif()
-
 
 
 

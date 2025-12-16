@@ -31,7 +31,10 @@ set (SRCS
 source_group("Shared" FILES ${SHARED_SRCS} ${SHARED_HDRS})
 source_group("Sources" FILES ${SRCS})
 add_executable(CompositeChat-exe ${SRCS} ${SHARED_SRCS} ${SHARED_HDRS})
-target_link_libraries(CompositeChat-exe jsoncpp_static fmt::fmt mbedtls)
+target_link_libraries(CompositeChat-exe jsoncpp_static fmt::fmt)
+if (WIN32)
+	target_link_libraries(CompositeChat-exe ws2_32)
+endif()
 add_test(NAME CompositeChat-test COMMAND CompositeChat-exe)
 
 

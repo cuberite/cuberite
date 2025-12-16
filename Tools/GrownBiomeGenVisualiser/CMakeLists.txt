@@ -87,6 +87,9 @@ endif()
 
 target_link_libraries(GrownBiomeGenVisualiser fmt::fmt Threads::Threads mbedtls)
 set_target_properties(GrownBiomeGenVisualiser PROPERTIES FOLDER Tools)
+if (WIN32)
+	target_link_libraries(GrownBiomeGenVisualiser ws2_32)
+endif()
 
 include(../../SetFlags.cmake)
 set_exe_flags(GrownBiomeGenVisualiser)

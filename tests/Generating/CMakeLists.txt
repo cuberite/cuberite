@@ -213,7 +213,10 @@ add_executable(LoadablePieces
 	Test.cubeset
 	Test1.schematic
 )
-target_link_libraries(LoadablePieces GeneratorTestingSupport mbedtls)
+target_link_libraries(LoadablePieces GeneratorTestingSupport)
+if (WIN32)
+	target_link_libraries(LoadablePieces ws2_32)
+endif()
 add_test(
 	NAME LoadablePieces-test
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -229,6 +232,9 @@ add_executable(PieceRotation
 	PieceRotationTest.cpp
 )
 target_link_libraries(PieceRotation GeneratorTestingSupport mbedtls)
+if (WIN32)
+	target_link_libraries(PieceRotation ws2_32)
+endif()
 add_test(
 	NAME PieceRotation-test
 	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -244,6 +250,9 @@ add_executable(PieceGeneratorBFSTree
 	PieceGeneratorBFSTreeTest.cpp
 )
 target_link_libraries(PieceGeneratorBFSTree GeneratorTestingSupport mbedtls)
+if (WIN32)
+    target_link_libraries(PieceGeneratorBFSTree ws2_32)
+endif()
 add_test(
 	NAME PieceGeneratorBFSTree-test
 	WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/Server/Prefabs/PieceStructures
