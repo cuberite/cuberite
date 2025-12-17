@@ -6,7 +6,7 @@
 
 
 /** List of slot numbers, used for inventory-painting */
-typedef std::vector<int> cSlotNums;
+using cSlotNums = std::vector<std::size_t>;
 
 
 

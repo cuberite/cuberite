@@ -707,7 +707,7 @@ void cClientHandle::HandleAnimation(const bool a_SwingMainHand)
 
 
 
-void cClientHandle::HandleNPCTrade(int a_SlotNum)
+void cClientHandle::HandleNPCTrade(std::size_t a_SlotNum)
 {
 	// TODO
 	LOGWARNING("%s: Not implemented yet", __FUNCTION__);
@@ -781,7 +781,7 @@ bool cClientHandle::HandleLogin()
 
 
 
-void cClientHandle::HandleCreativeInventory(Int16 a_SlotNum, const cItem & a_HeldItem, eClickAction a_ClickAction)
+void cClientHandle::HandleCreativeInventory(std::size_t a_SlotNum, const cItem & a_HeldItem, eClickAction a_ClickAction)
 {
 	// This is for creative Inventory changes
 	if (!m_Player->IsGameModeCreative())
@@ -1652,7 +1652,7 @@ void cClientHandle::HandlePlayerMoveLook(Vector3d a_Pos, float a_Rotation, float
 
 void cClientHandle::HandleSlotSelected(Int16 a_SlotNum)
 {
-	m_Player->GetInventory().SetEquippedSlotNum(a_SlotNum);
+	m_Player->GetInventory().SetEquippedSlotNum(static_cast<std::size_t>(a_SlotNum));
 	m_Player->GetWorld()->BroadcastEntityEquipment(*m_Player, 0, m_Player->GetInventory().GetEquippedItem(), this);
 }
 
@@ -1715,7 +1715,7 @@ void cClientHandle::HandleWindowClose(UInt8 a_WindowID)
 
 
 
-void cClientHandle::HandleWindowClick(UInt8 a_WindowID, Int16 a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem)
+void cClientHandle::HandleWindowClick(UInt8 a_WindowID, std::size_t a_SlotNum, eClickAction a_ClickAction, const cItem & a_HeldItem)
 {
 	LOGD("WindowClick: WinID %d, SlotNum %d, action: %s, Item %s x %d",
 		a_WindowID, a_SlotNum, ClickActionToString(a_ClickAction),
@@ -2724,7 +2724,7 @@ void cClientHandle::SendHealth(void)
 
 
 
-void cClientHandle::SendHeldItemChange(int a_ItemIndex)
+void cClientHandle::SendHeldItemChange(std::size_t a_ItemIndex)
 {
 	m_Protocol->SendHeldItemChange(a_ItemIndex);
 }
@@ -2742,7 +2742,7 @@ void cClientHandle::SendHideTitle(void)
 
 
 
-void cClientHandle::SendInventorySlot(char a_WindowID, short a_SlotNum, const cItem & a_Item)
+void cClientHandle::SendInventorySlot(char a_WindowID, std::size_t a_SlotNum, const cItem & a_Item)
 {
 	m_Protocol->SendInventorySlot(a_WindowID, a_SlotNum, a_Item);
 }

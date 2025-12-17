@@ -58,16 +58,16 @@ int cInventory::HowManyCanFit(const cItem & a_ItemStack, bool a_ConsiderEmptySlo
 
 
 
-int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int a_EndSlotNum, bool a_ConsiderEmptySlots)
+int cInventory::HowManyCanFit(const cItem & a_ItemStack, std::size_t a_BeginSlotNum, std::size_t a_EndSlotNum, bool a_ConsiderEmptySlots)
 {
 
 	UNUSED(a_ConsiderEmptySlots);
-	if ((a_BeginSlotNum < 0) || (a_BeginSlotNum >= invNumSlots))
+	if (a_BeginSlotNum >= invNumSlots)
 	{
 		LOGWARNING("%s: Bad BeginSlotNum, got %d, there are %d slots; correcting to 0.", __FUNCTION__, a_BeginSlotNum, invNumSlots - 1);
 		a_BeginSlotNum = 0;
 	}
-	if ((a_EndSlotNum < 0) || (a_EndSlotNum >= invNumSlots))
+	if (a_EndSlotNum >= invNumSlots)
 	{
 		LOGWARNING("%s: Bad EndSlotNum, got %d, there are %d slots; correcting to %d.", __FUNCTION__, a_BeginSlotNum, invNumSlots, invNumSlots - 1);
 		a_EndSlotNum = invNumSlots - 1;
@@ -77,9 +77,10 @@ int cInventory::HowManyCanFit(const cItem & a_ItemStack, int a_BeginSlotNum, int
 		std::swap(a_BeginSlotNum, a_EndSlotNum);
 	}
 
-	char NumLeft = a_ItemStack.m_ItemCount;
-	char MaxStack = a_ItemStack.GetMaxStackSize();
-	for (int i = a_BeginSlotNum; i <= a_EndSlotNum; i++)
+
+	auto NumLeft = a_ItemStack.m_ItemCount;
+	auto MaxStack = a_ItemStack.GetMaxStackSize();
+	for (std::size_t i = a_BeginSlotNum; i <= a_EndSlotNum; i++)
 	{
 		const cItem & Slot = GetSlot(i);
 		if (Slot.IsEmpty())
@@ -113,7 +114,7 @@ char cInventory::AddItem(const cItem & a_Item, bool a_AllowNewStacks)
 	// When the item is a armor, try to set it directly to the armor slot.
 	if (ItemCategory::IsArmor(a_Item.m_ItemType))
 	{
-		for (int i = 0; i < m_ArmorSlots.GetNumSlots(); i++)
+		for (std::size_t i = 0; i < m_ArmorSlots.GetNumSlots(); i++)
 		{
 			if (m_ArmorSlots.GetSlot(i).IsEmpty() && cSlotAreaArmor::CanPlaceArmorInSlot(i, a_Item))
 			{
@@ -186,7 +187,7 @@ char cInventory::AddItems(cItems & a_ItemStackList, bool a_AllowNewStacks)
 
 
 
-int cInventory::RemoveItem(const cItem & a_ItemStack)
+char cInventory::RemoveItem(const cItem & a_ItemStack)
 {
 	char RemovedItems = m_ShieldSlots.RemoveItem(a_ItemStack);
 
@@ -310,15 +311,15 @@ bool cInventory::HasItems(const cItem & a_ItemStack)
 
 
 
-void cInventory::SetSlot(int a_SlotNum, const cItem & a_Item)
+void cInventory::SetSlot(std::size_t a_SlotNum, const cItem & a_Item)
 {
-	if ((a_SlotNum < 0) || (a_SlotNum >= invNumSlots))
+	if (a_SlotNum >= invNumSlots)
 	{
 		LOGWARNING("%s: requesting an invalid slot index: %d out of %d. Ignoring.", __FUNCTION__, a_SlotNum, invNumSlots - 1);
 		return;
 	}
 
-	int GridSlotNum = 0;
+	std::size_t GridSlotNum = 0;
 	cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
 	if (Grid == nullptr)
 	{
@@ -332,7 +333,7 @@ void cInventory::SetSlot(int a_SlotNum, const cItem & a_Item)
 
 
 
-void cInventory::SetArmorSlot(int a_ArmorSlotNum, const cItem & a_Item)
+void cInventory::SetArmorSlot(std::size_t a_ArmorSlotNum, const cItem & a_Item)
 {
 	m_ArmorSlots.SetSlot(a_ArmorSlotNum, a_Item);
 }
@@ -341,7 +342,7 @@ void cInventory::SetArmorSlot(int a_ArmorSlotNum, const cItem & a_Item)
 
 
 
-void cInventory::SetInventorySlot(int a_InventorySlotNum, const cItem & a_Item)
+void cInventory::SetInventorySlot(std::size_t a_InventorySlotNum, const cItem & a_Item)
 {
 	m_InventorySlots.SetSlot(a_InventorySlotNum, a_Item);
 }
@@ -350,7 +351,7 @@ void cInventory::SetInventorySlot(int a_InventorySlotNum, const cItem & a_Item)
 
 
 
-void cInventory::SetHotbarSlot(int a_HotBarSlotNum, const cItem & a_Item)
+void cInventory::SetHotbarSlot(std::size_t a_HotBarSlotNum, const cItem & a_Item)
 {
 	m_HotbarSlots.SetSlot(a_HotBarSlotNum, a_Item);
 }
@@ -379,7 +380,7 @@ void cInventory::SetEquippedItem(const cItem & a_Item)
 
 void cInventory::SendEquippedSlot()
 {
-	int EquippedSlotNum = cInventory::invArmorCount + cInventory::invInventoryCount + GetEquippedSlotNum();
+	std::size_t EquippedSlotNum = cInventory::invArmorCount + cInventory::invInventoryCount + GetEquippedSlotNum();
 	SendSlot(EquippedSlotNum);
 }
 
@@ -387,14 +388,14 @@ void cInventory::SendEquippedSlot()
 
 
 
-const cItem & cInventory::GetSlot(int a_SlotNum) const
+const cItem & cInventory::GetSlot(std::size_t a_SlotNum) const
 {
-	if ((a_SlotNum < 0) || (a_SlotNum >= invNumSlots))
+	if (a_SlotNum >= invNumSlots)
 	{
 		LOGWARNING("%s: requesting an invalid slot index: %d out of %d. Returning the first inventory slot instead.", __FUNCTION__, a_SlotNum, invNumSlots - 1);
 		return m_InventorySlots.GetSlot(0);
 	}
-	int GridSlotNum = 0;
+	std::size_t GridSlotNum = 0;
 	const cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
 	if (Grid == nullptr)
 	{
@@ -409,9 +410,9 @@ const cItem & cInventory::GetSlot(int a_SlotNum) const
 
 
 
-const cItem & cInventory::GetArmorSlot(int a_ArmorSlotNum) const
+const cItem & cInventory::GetArmorSlot(std::size_t a_ArmorSlotNum) const
 {
-	if ((a_ArmorSlotNum < 0) || (a_ArmorSlotNum >= invArmorCount))
+	if (a_ArmorSlotNum >= invArmorCount)
 	{
 		LOGWARNING("%s: requesting an invalid slot index: %d out of %d. Returning the first one instead", __FUNCTION__, a_ArmorSlotNum, invArmorCount - 1);
 		return m_ArmorSlots.GetSlot(0);
@@ -423,9 +424,9 @@ const cItem & cInventory::GetArmorSlot(int a_ArmorSlotNum) const
 
 
 
-const cItem & cInventory::GetInventorySlot(int a_InventorySlotNum) const
+const cItem & cInventory::GetInventorySlot(std::size_t a_InventorySlotNum) const
 {
-	if ((a_InventorySlotNum < 0) || (a_InventorySlotNum >= invInventoryCount))
+	if (a_InventorySlotNum >= invInventoryCount)
 	{
 		LOGWARNING("%s: requesting an invalid slot index: %d out of %d. Returning the first one instead", __FUNCTION__, a_InventorySlotNum, invInventoryCount - 1);
 		return m_InventorySlots.GetSlot(0);
@@ -437,9 +438,9 @@ const cItem & cInventory::GetInventorySlot(int a_InventorySlotNum) const
 
 
 
-const cItem & cInventory::GetHotbarSlot(int a_SlotNum) const
+const cItem & cInventory::GetHotbarSlot(std::size_t a_SlotNum) const
 {
-	if ((a_SlotNum < 0) || (a_SlotNum >= invHotbarCount))
+	if (a_SlotNum >= invHotbarCount)
 	{
 		LOGWARNING("%s: requesting an invalid slot index: %d out of %d. Returning the first one instead", __FUNCTION__, a_SlotNum, invHotbarCount - 1);
 		return m_HotbarSlots.GetSlot(0);
@@ -469,9 +470,9 @@ const cItem & cInventory::GetEquippedItem(void) const
 
 
 
-void cInventory::SetEquippedSlotNum(int a_SlotNum)
+void cInventory::SetEquippedSlotNum(std::size_t a_SlotNum)
 {
-	if ((a_SlotNum < 0) || (a_SlotNum >= invHotbarCount))
+	if (a_SlotNum >= invHotbarCount)
 	{
 		LOGWARNING("%s: requesting invalid slot index: %d out of %d. Setting 0 instead.", __FUNCTION__, a_SlotNum, invHotbarCount - 1);
 		m_EquippedSlotNum = 0;
@@ -495,9 +496,9 @@ bool cInventory::DamageEquippedItem(short a_Amount)
 
 
 
-char cInventory::ChangeSlotCount(int a_SlotNum, char a_AddToCount)
+char cInventory::ChangeSlotCount(std::size_t a_SlotNum, char a_AddToCount)
 {
-	int GridSlotNum = 0;
+	std::size_t GridSlotNum;
 	cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
 	if (Grid == nullptr)
 	{
@@ -511,9 +512,9 @@ char cInventory::ChangeSlotCount(int a_SlotNum, char a_AddToCount)
 
 
 
-bool cInventory::DamageItem(int a_SlotNum, short a_Amount)
+bool cInventory::DamageItem(std::size_t a_SlotNum, short a_Amount)
 {
-	if ((a_SlotNum < 0) || (a_SlotNum >= invNumSlots))
+	if (a_SlotNum >= invNumSlots)
 	{
 		LOGWARNING("%s: requesting an invalid slot index: %d out of %d", __FUNCTION__, a_SlotNum, invNumSlots - 1);
 		return false;
@@ -523,7 +524,7 @@ bool cInventory::DamageItem(int a_SlotNum, short a_Amount)
 		return false;
 	}
 
-	int GridSlotNum = 0;
+	std::size_t GridSlotNum = 0;
 	cItemGrid * Grid = GetGridForSlotNum(a_SlotNum, GridSlotNum);
 	if (Grid == nullptr)
 	{
@@ -557,7 +558,7 @@ void cInventory::CopyToItems(cItems & a_Items)
 
 
 
-void cInventory::SendSlot(int a_SlotNum)
+void cInventory::SendSlot(std::size_t a_SlotNum)
 {
 	cItem Item(GetSlot(a_SlotNum));
 	if (Item.IsEmpty())
@@ -565,7 +566,7 @@ void cInventory::SendSlot(int a_SlotNum)
 		// Sanitize items that are not completely empty (ie. count == 0, but type != empty)
 		Item.Empty();
 	}
-	m_Owner.GetClientHandle()->SendInventorySlot(0, static_cast<short>(a_SlotNum + 5), Item);  // Slots in the client are numbered "+ 5" because of crafting grid and result
+	m_Owner.GetClientHandle()->SendInventorySlot(0, a_SlotNum + 5, Item);  // Slots in the client are numbered "+ 5" because of crafting grid and result
 }
 
 
@@ -702,13 +703,13 @@ void cInventory::SaveToJson(Json::Value & a_Value)
 	cItem EmptyItem;
 	Json::Value EmptyItemJson;
 	EmptyItem.GetJson(EmptyItemJson);
-	for (int i = 0; i < 5; i++)
+	for (std::size_t i = 0; i < 5; i++)
 	{
 		a_Value.append(EmptyItemJson);
 	}
 
 	// The 4 armor slots follow:
-	for (int i = 0; i < invArmorCount; i++)
+	for (std::size_t i = 0; i < invArmorCount; i++)
 	{
 		Json::Value JSON_Item;
 		m_ArmorSlots.GetSlot(i).GetJson(JSON_Item);
@@ -716,7 +717,7 @@ void cInventory::SaveToJson(Json::Value & a_Value)
 	}
 
 	// Next comes the main inventory:
-	for (int i = 0; i < invInventoryCount; i++)
+	for (std::size_t i = 0; i < invInventoryCount; i++)
 	{
 		Json::Value JSON_Item;
 		m_InventorySlots.GetSlot(i).GetJson(JSON_Item);
@@ -724,7 +725,7 @@ void cInventory::SaveToJson(Json::Value & a_Value)
 	}
 
 	// The hotbar:
-	for (int i = 0; i < invHotbarCount; i++)
+	for (std::size_t i = 0; i < invHotbarCount; i++)
 	{
 		Json::Value JSON_Item;
 		m_HotbarSlots.GetSlot(i).GetJson(JSON_Item);
@@ -743,9 +744,9 @@ void cInventory::SaveToJson(Json::Value & a_Value)
 
 bool cInventory::LoadFromJson(Json::Value & a_Value)
 {
-	int SlotIdx = 0;
+	std::size_t SlotIdx = 0;
 
-	for (Json::Value::iterator itr = a_Value.begin(); itr != a_Value.end(); ++itr, SlotIdx++)
+	for (auto itr = a_Value.begin(); itr != a_Value.end(); ++itr, SlotIdx++)
 	{
 		cItem Item;
 		Item.FromJson(*itr);
@@ -762,7 +763,7 @@ bool cInventory::LoadFromJson(Json::Value & a_Value)
 			break;
 		}
 
-		int GridSlotNum = 0;
+		std::size_t GridSlotNum = 0;
 		cItemGrid * Grid = GetGridForSlotNum(SlotIdx - 5, GridSlotNum);
 		ASSERT(Grid != nullptr);
 		Grid->SetSlot(GridSlotNum, Item);
@@ -774,7 +775,7 @@ bool cInventory::LoadFromJson(Json::Value & a_Value)
 
 
 
-const cItemGrid * cInventory::GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum) const
+const cItemGrid * cInventory::GetGridForSlotNum(std::size_t a_SlotNum, std::size_t & a_GridSlotNum) const
 {
 	ASSERT(a_SlotNum >= 0);
 
@@ -803,7 +804,7 @@ const cItemGrid * cInventory::GetGridForSlotNum(int a_SlotNum, int & a_GridSlotN
 
 
 
-cItemGrid * cInventory::GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum)
+cItemGrid * cInventory::GetGridForSlotNum(std::size_t a_SlotNum, std::size_t & a_GridSlotNum)
 {
 	ASSERT(a_SlotNum >= 0);
 
@@ -832,7 +833,7 @@ cItemGrid * cInventory::GetGridForSlotNum(int a_SlotNum, int & a_GridSlotNum)
 
 
 
-void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
+void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, std::size_t a_SlotNum)
 {
 	// Send the neccessary updates to whoever needs them
 
@@ -859,7 +860,7 @@ void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	}
 
 	// Convert the grid-local a_SlotNum to our global SlotNum:
-	int Base = 0;
+	std::size_t Base = 0;
 	if (a_ItemGrid == &m_ArmorSlots)
 	{
 		Base = invArmorOffset;

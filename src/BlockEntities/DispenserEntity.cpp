@@ -24,7 +24,7 @@ cDispenserEntity::cDispenserEntity(BLOCKTYPE a_BlockType, NIBBLETYPE a_BlockMeta
 
 
 
-void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, int a_SlotNum)
+void cDispenserEntity::DropSpenseFromSlot(cChunk & a_Chunk, std::size_t a_SlotNum)
 {
 	Vector3i DispRelCoord(GetRelPos());
 	auto Meta = a_Chunk.GetMeta(DispRelCoord);
@@ -308,7 +308,7 @@ Vector3d cDispenserEntity::GetShootVector(NIBBLETYPE a_Meta)
 
 
 
-bool cDispenserEntity::ScoopUpLiquid(int a_SlotNum, short a_ResultingBucketItemType)
+bool cDispenserEntity::ScoopUpLiquid(std::size_t a_SlotNum, short a_ResultingBucketItemType)
 {
 	cItem LiquidBucket(a_ResultingBucketItemType);
 	if (m_Contents.GetSlot(a_SlotNum).m_ItemCount == 1)
@@ -334,7 +334,7 @@ bool cDispenserEntity::ScoopUpLiquid(int a_SlotNum, short a_ResultingBucketItemT
 
 
 
-bool cDispenserEntity::EmptyLiquidBucket(BLOCKTYPE a_BlockInFront, int a_SlotNum)
+bool cDispenserEntity::EmptyLiquidBucket(BLOCKTYPE a_BlockInFront, std::size_t a_SlotNum)
 {
 	if (
 		(a_BlockInFront != E_BLOCK_AIR) &&

@@ -7,6 +7,7 @@
 #include "CraftingRecipes.h"
 #include "Root.h"
 #include "Bindings/PluginManager.h"
+#include "ItemGrid.h"
 
 
 
@@ -15,7 +16,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // cCraftingGrid:
 
-cCraftingGrid::cCraftingGrid(int a_Width, int a_Height) :
+cCraftingGrid::cCraftingGrid(std::size_t a_Width, std::size_t a_Height) :
 	m_Width(a_Width),
 	m_Height(a_Height),
 	m_Items(new cItem[ToUnsigned(a_Width * a_Height)])
@@ -26,10 +27,10 @@ cCraftingGrid::cCraftingGrid(int a_Width, int a_Height) :
 
 
 
-cCraftingGrid::cCraftingGrid(const cItem * a_Items, int a_Width, int a_Height) :
+cCraftingGrid::cCraftingGrid(const cItem * a_Items, std::size_t a_Width, std::size_t a_Height) :
 	cCraftingGrid(a_Width, a_Height)
 {
-	for (int i = a_Width * a_Height - 1; i >= 0; i--)
+	for (std::size_t i = a_Width * a_Height - 1; i != 0; i--)
 	{
 		m_Items[i] = a_Items[i];
 	}
@@ -42,7 +43,7 @@ cCraftingGrid::cCraftingGrid(const cItem * a_Items, int a_Width, int a_Height) :
 cCraftingGrid::cCraftingGrid(const cCraftingGrid & a_Original) :
 	cCraftingGrid(a_Original.m_Width, a_Original.m_Height)
 {
-	for (int i = m_Width * m_Height - 1; i >= 0; i--)
+	for (std::size_t i = m_Width * m_Height - 1; i != 0; i--)
 	{
 		m_Items[i] = a_Original.m_Items[i];
 	}
@@ -62,10 +63,10 @@ cCraftingGrid::~cCraftingGrid()
 
 
 
-cItem & cCraftingGrid::GetItem(int x, int y) const
+cItem & cCraftingGrid::GetItem(std::size_t x, std::size_t y) const
 {
 	// Accessible through scripting, must verify parameters:
-	if ((x < 0) || (x >= m_Width) || (y < 0) || (y >= m_Height))
+	if ((x >= m_Width) || (y >= m_Height))
 	{
 		LOGERROR("Attempted to get an invalid item from a crafting grid: (%d, %d), grid dimensions: (%d, %d).",
 			x, y, m_Width, m_Height
@@ -79,10 +80,10 @@ cItem & cCraftingGrid::GetItem(int x, int y) const
 
 
 
-void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_TYPE a_ItemType, char a_ItemCount, short a_ItemHealth)
+void cCraftingGrid::SetItem(std::size_t x, std::size_t y, ENUM_ITEM_TYPE a_ItemType, char a_ItemCount, short a_ItemHealth)
 {
 	// Accessible through scripting, must verify parameters:
-	if ((x < 0) || (x >= m_Width) || (y < 0) || (y >= m_Height))
+	if ((x >= m_Width) || (y >= m_Height))
 	{
 		LOGERROR("Attempted to set an invalid item in a crafting grid: (%d, %d), grid dimensions: (%d, %d).",
 			x, y, m_Width, m_Height
@@ -97,10 +98,10 @@ void cCraftingGrid::SetItem(int x, int y, ENUM_ITEM_TYPE a_ItemType, char a_Item
 
 
 
-void cCraftingGrid::SetItem(int x, int y, const cItem & a_Item)
+void cCraftingGrid::SetItem(std::size_t x, std::size_t y, const cItem & a_Item)
 {
 	// Accessible through scripting, must verify parameters:
-	if ((x < 0) || (x >= m_Width) || (y < 0) || (y >= m_Height))
+	if ((x >= m_Width) || (y >= m_Height))
 	{
 		LOGERROR("Attempted to set an invalid item in a crafting grid: (%d, %d), grid dimensions: (%d, %d).",
 			x, y, m_Width, m_Height
@@ -117,7 +118,7 @@ void cCraftingGrid::SetItem(int x, int y, const cItem & a_Item)
 
 void cCraftingGrid::Clear(void)
 {
-	for (int y = 0; y < m_Height; y++) for (int x = 0; x < m_Width; x++)
+	for (std::size_t y = 0; y < m_Height; y++) for (std::size_t x = 0; x < m_Width; x++)
 	{
 		m_Items[x + m_Width * y].Empty();
 	}
@@ -135,16 +136,16 @@ void cCraftingGrid::ConsumeGrid(const cCraftingGrid & a_Grid)
 			a_Grid.m_Width, a_Grid.m_Height, m_Width, m_Height
 		);
 	}
-	int MinX = std::min(a_Grid.m_Width,  m_Width);
-	int MinY = std::min(a_Grid.m_Height, m_Height);
-	for (int y = 0; y <  MinY; y++) for (int x = 0; x < MinX; x++)
+	auto MinX = std::min<std::size_t>(a_Grid.m_Width,  m_Width);
+	auto MinY = std::min<std::size_t>(a_Grid.m_Height, m_Height);
+	for (std::size_t y = 0; y <  MinY; y++) for (std::size_t x = 0; x < MinX; x++)
 	{
-		int ThatIdx = x + a_Grid.m_Width * y;
+		auto ThatIdx = x + a_Grid.m_Width * y;
 		if (a_Grid.m_Items[ThatIdx].IsEmpty())
 		{
 			continue;
 		}
-		int ThisIdx = x + m_Width * y;
+		auto ThisIdx = x + m_Width * y;
 		if (a_Grid.m_Items[ThatIdx].m_ItemType != m_Items[ThisIdx].m_ItemType)
 		{
 			LOGWARNING("Consuming incompatible grids: item at (%d, %d) is %d in grid and %d in ingredients. Item not consumed.",
@@ -182,21 +183,21 @@ void cCraftingGrid::ConsumeGrid(const cCraftingGrid & a_Grid)
 
 void cCraftingGrid::CopyToItems(cItem * a_Items) const
 {
-	for (int i = m_Height * m_Width - 1; i >= 0; i--)
+	for (std::size_t i = 0; i < m_Height * m_Width; i++)
 	{
 		a_Items[i] = m_Items[i];
-	}  // for x, for y
+	}
 }
 
 
 
 
 
-void cCraftingGrid::Dump(void)
+void cCraftingGrid::Dump(void) const
 {
-	for (int y = 0; y < m_Height; y++) for (int x = 0; x < m_Width; x++)
+	for (std::size_t y = 0; y < m_Height; y++) for (std::size_t x = 0; x < m_Width; x++)
 	{
-		[[maybe_unused]] const int idx = x + m_Width * y;
+		[[maybe_unused]] const auto idx = x + m_Width * y;
 		LOGD("Slot (%d, %d): Type %d, health %d, count %d",
 			x, y, m_Items[idx].m_ItemType, m_Items[idx].m_ItemDamage, m_Items[idx].m_ItemCount
 		);
@@ -365,9 +366,10 @@ void cCraftingRecipes::GetRecipe(cPlayer & a_Player, cCraftingGrid & a_CraftingG
 		cRoot::Get()->GetPluginManager()->CallHookCraftingNoRecipe(a_Player, a_CraftingGrid, a_Recipe);
 		return;
 	}
-	for (cRecipeSlots::const_iterator itr = Recipe->m_Ingredients.begin(); itr != Recipe->m_Ingredients.end(); ++itr)
+
+	for (const auto & Ingredient : Recipe->m_Ingredients)
 	{
-		a_Recipe.SetIngredient(itr->x, itr->y, itr->m_Item);
+		a_Recipe.SetIngredient(Ingredient.x, Ingredient.y, Ingredient.m_Item);
 	}  // for itr
 	a_Recipe.SetResult(Recipe->m_Result);
 
@@ -579,8 +581,8 @@ bool cCraftingRecipes::ParseIngredient(const AString & a_String, cRecipe * a_Rec
 		{
 			cCraftingRecipes::cRecipeSlot Slot;
 			Slot.m_Item = Item;
-			Slot.x = -1;
-			Slot.y = -1;
+			Slot.x = ILLEGAL_SLOT_NUMBER;
+			Slot.y = ILLEGAL_SLOT_NUMBER;
 			TempSlots.push_back(Slot);
 			continue;
 		}
@@ -601,7 +603,7 @@ bool cCraftingRecipes::ParseIngredient(const AString & a_String, cRecipe * a_Rec
 			case '1': Slot.x = 0;  break;
 			case '2': Slot.x = 1;  break;
 			case '3': Slot.x = 2;  break;
-			case '*': Slot.x = -1; break;
+			case '*': Slot.x = ILLEGAL_SLOT_NUMBER; break;
 			default:
 			{
 				return false;
@@ -612,7 +614,7 @@ bool cCraftingRecipes::ParseIngredient(const AString & a_String, cRecipe * a_Rec
 			case '1': Slot.y = 0;  break;
 			case '2': Slot.y = 1;  break;
 			case '3': Slot.y = 2;  break;
-			case '*': Slot.y = -1; break;
+			case '*': Slot.y = ILLEGAL_SLOT_NUMBER; break;
 			default:
 			{
 				return false;
@@ -633,36 +635,38 @@ bool cCraftingRecipes::ParseIngredient(const AString & a_String, cRecipe * a_Rec
 void cCraftingRecipes::NormalizeIngredients(cCraftingRecipes::cRecipe * a_Recipe)
 {
 	// Calculate the minimum coords for ingredients, excluding the "anywhere" items:
-	int MinX = MAX_GRID_WIDTH, MaxX = 0;
-	int MinY = MAX_GRID_HEIGHT, MaxY = 0;
-	for (cRecipeSlots::const_iterator itr = a_Recipe->m_Ingredients.begin(); itr != a_Recipe->m_Ingredients.end(); ++itr)
+	std::size_t MinX = MAX_GRID_WIDTH;
+	std::size_t MaxX = 0;
+	std::size_t MinY = MAX_GRID_HEIGHT;
+	std::size_t MaxY = 0;
+	for (const auto & Ingredient : a_Recipe->m_Ingredients)
 	{
-		if (itr->x >= 0)
+		if (Ingredient.x != ILLEGAL_SLOT_NUMBER)
 		{
-			MinX = std::min(itr->x, MinX);
-			MaxX = std::max(itr->x, MaxX);
+			MinX = std::min<std::size_t>(Ingredient.x, MinX);
+			MaxX = std::max<std::size_t>(Ingredient.x, MaxX);
 		}
-		if (itr->y >= 0)
+		if (Ingredient.y != ILLEGAL_SLOT_NUMBER)
 		{
-			MinY = std::min(itr->y, MinY);
-			MaxY = std::max(itr->y, MaxY);
+			MinY = std::min<std::size_t>(Ingredient.y, MinY);
+			MaxY = std::max<std::size_t>(Ingredient.y, MaxY);
 		}
 	}  // for itr - a_Recipe->m_Ingredients[]
 
 	// Move ingredients so that the minimum coords are 0:0
-	for (cRecipeSlots::iterator itr = a_Recipe->m_Ingredients.begin(); itr != a_Recipe->m_Ingredients.end(); ++itr)
+	for (auto & Ingredient : a_Recipe->m_Ingredients)
 	{
-		if (itr->x >= 0)
+		if (Ingredient.x != ILLEGAL_SLOT_NUMBER)
 		{
-			itr->x -= MinX;
+			Ingredient.x -= MinX;
 		}
-		if (itr->y >= 0)
+		if (Ingredient.y != ILLEGAL_SLOT_NUMBER)
 		{
-			itr->y -= MinY;
+			Ingredient.y -= MinY;
 		}
 	}  // for itr - a_Recipe->m_Ingredients[]
-	a_Recipe->m_Width  = std::max(MaxX - MinX + 1, 1);
-	a_Recipe->m_Height = std::max(MaxY - MinY + 1, 1);
+	a_Recipe->m_Width  = std::max<std::size_t>(MaxX - MinX + 1, 1);
+	a_Recipe->m_Height = std::max<std::size_t>(MaxY - MinY + 1, 1);
 
 	// TODO: Compress two same ingredients with the same coords into a single ingredient with increased item count
 }
@@ -671,15 +675,15 @@ void cCraftingRecipes::NormalizeIngredients(cCraftingRecipes::cRecipe * a_Recipe
 
 
 
-cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipe(const cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight)
+cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipe(const cItem * a_CraftingGrid, std::size_t a_GridWidth, std::size_t a_GridHeight)
 {
 	ASSERT(a_GridWidth <= MAX_GRID_WIDTH);
 	ASSERT(a_GridHeight <= MAX_GRID_HEIGHT);
 
 	// Get the real bounds of the crafting grid:
-	int GridLeft = MAX_GRID_WIDTH, GridTop = MAX_GRID_HEIGHT;
-	int GridRight = 0,  GridBottom = 0;
-	for (int y = 0; y < a_GridHeight; y++) for (int x = 0; x < a_GridWidth; x++)
+	std::size_t GridLeft = MAX_GRID_WIDTH, GridTop = MAX_GRID_HEIGHT;
+	std::size_t GridRight = 0,  GridBottom = 0;
+	for (std::size_t y = 0; y < a_GridHeight; y++) for (std::size_t x = 0; x < a_GridWidth; x++)
 	{
 		if (!a_CraftingGrid[x + y * a_GridWidth].IsEmpty())
 		{
@@ -689,8 +693,8 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipe(const cItem * a_Craftin
 			GridTop    = std::min(y, GridTop);
 		}
 	}
-	int GridWidth = GridRight - GridLeft + 1;
-	int GridHeight = GridBottom - GridTop + 1;
+	auto GridWidth = GridRight - GridLeft + 1;
+	auto GridHeight = GridBottom - GridTop + 1;
 
 	// Search in the possibly minimized grid, but keep the stride:
 	const cItem * Grid = a_CraftingGrid + GridLeft + (a_GridWidth * GridTop);
@@ -714,9 +718,9 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipe(const cItem * a_Craftin
 
 
 
-cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipeCropped(const cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight, int a_GridStride)
+cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipeCropped(const cItem * a_CraftingGrid, std::size_t a_GridWidth, std::size_t a_GridHeight, std::size_t a_GridStride)
 {
-	for (cRecipes::const_iterator itr = m_Recipes.begin(); itr != m_Recipes.end(); ++itr)
+	for (const auto Recipe : m_Recipes)
 	{
 		// Both the crafting grid and the recipes are normalized. The only variable possible is the "anywhere" items.
 		// This still means that the "anywhere" item may be the one that is offsetting the grid contents to the right or downwards, so we need to check all possible positions.
@@ -724,14 +728,14 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipeCropped(const cItem * a_
 		// Calculate the maximum offsets for this recipe relative to the grid size, and iterate through all combinations of offsets.
 		// Also, this calculation automatically filters out recipes that are too large for the current grid - the loop won't be entered at all.
 
-		int MaxOfsX = a_GridWidth  - (*itr)->m_Width;
-		int MaxOfsY = a_GridHeight - (*itr)->m_Height;
-		for (int x = 0; x <= MaxOfsX; x++) for (int y = 0; y <= MaxOfsY; y++)
+		auto MaxOfsX = a_GridWidth  - Recipe->m_Width;
+		auto MaxOfsY = a_GridHeight - Recipe->m_Height;
+		for (std::size_t x = 0; x <= MaxOfsX; x++) for (std::size_t y = 0; y <= MaxOfsY; y++)
 		{
-			cRecipe * Recipe = MatchRecipe(a_CraftingGrid, a_GridWidth, a_GridHeight, a_GridStride, *itr, x, y);
-			if (Recipe != nullptr)
+			auto SearchRecipe = MatchRecipe(a_CraftingGrid, a_GridWidth, a_GridHeight, a_GridStride, Recipe, x, y);
+			if (SearchRecipe != nullptr)
 			{
-				return Recipe;
+				return SearchRecipe;
 			}
 		}  // for y, for x
 	}  // for itr - m_Recipes[]
@@ -744,26 +748,26 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::FindRecipeCropped(const cItem * a_
 
 
 
-cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_CraftingGrid, int a_GridWidth, int a_GridHeight, int a_GridStride, const cRecipe * a_Recipe, int a_OffsetX, int a_OffsetY)
+cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_CraftingGrid, std::size_t a_GridWidth, std::size_t a_GridHeight, std::size_t a_GridStride, const cRecipe * a_Recipe, std::size_t a_OffsetX, std::size_t a_OffsetY)
 {
 	// Check the regular items first:
-	bool HasMatched[MAX_GRID_WIDTH][MAX_GRID_HEIGHT];
-	memset(HasMatched, 0, sizeof(HasMatched));
-	for (cRecipeSlots::const_iterator itrS = a_Recipe->m_Ingredients.begin(); itrS != a_Recipe->m_Ingredients.end(); ++itrS)
+	std::array<std::array<bool, MAX_GRID_WIDTH>, MAX_GRID_HEIGHT> HasMatched;
+	memset(HasMatched.data(), 0, HasMatched.size());
+	for (const auto & Ingredient : a_Recipe->m_Ingredients)
 	{
-		if ((itrS->x < 0) || (itrS->y < 0))
+		if ((Ingredient.x == ILLEGAL_SLOT_NUMBER) || (Ingredient.y == ILLEGAL_SLOT_NUMBER))
 		{
 			// "Anywhere" item, process later
 			continue;
 		}
-		ASSERT(itrS->x + a_OffsetX < a_GridWidth);
-		ASSERT(itrS->y + a_OffsetY < a_GridHeight);
-		int GridID = (itrS->x + a_OffsetX) + a_GridStride * (itrS->y + a_OffsetY);
+		ASSERT(Ingredient.x + a_OffsetX < a_GridWidth);
+		ASSERT(Ingredient.y + a_OffsetY < a_GridHeight);
+		std::size_t GridID = (Ingredient.x + a_OffsetX) + a_GridStride * (Ingredient.y + a_OffsetY);
 
-		const cItem & Item = itrS->m_Item;
+		const cItem & Item = Ingredient.m_Item;
 		if (
-			(itrS->x >= a_GridWidth) ||
-			(itrS->y >= a_GridHeight) ||
+			(Ingredient.x >= a_GridWidth) ||
+			(Ingredient.y >= a_GridHeight) ||
 			(Item.m_ItemType != a_CraftingGrid[GridID].m_ItemType) ||   // same item type?
 			(Item.m_ItemCount > a_CraftingGrid[GridID].m_ItemCount) ||  // not enough items
 			(
@@ -775,54 +779,54 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 			// Doesn't match
 			return nullptr;
 		}
-		HasMatched[itrS->x + a_OffsetX][itrS->y + a_OffsetY] = true;
+		HasMatched[Ingredient.x + a_OffsetX][Ingredient.y + a_OffsetY] = true;
 	}  // for itrS - Recipe->m_Ingredients[]
 
 	// Process the "Anywhere" items now, and only in the cells that haven't matched yet
 	// The "anywhere" items are processed on a first-come-first-served basis.
 	// Do not use a recipe with one horizontal and one vertical "anywhere" ("*:1, 1:*") as it may not match properly!
 	cRecipeSlots MatchedSlots;  // Stores the slots of "anywhere" items that have matched, with the match coords
-	for (cRecipeSlots::const_iterator itrS = a_Recipe->m_Ingredients.begin(); itrS != a_Recipe->m_Ingredients.end(); ++itrS)
+	for (const auto & Ingredient : a_Recipe->m_Ingredients)
 	{
-		if ((itrS->x >= 0) && (itrS->y >= 0))
+		if ((Ingredient.x == ILLEGAL_SLOT_NUMBER) || (Ingredient.y == ILLEGAL_SLOT_NUMBER))
 		{
 			// Regular item, already processed
 			continue;
 		}
-		int StartX = 0, EndX = a_GridWidth  - 1;
-		int StartY = 0, EndY = a_GridHeight - 1;
-		if (itrS->x >= 0)
+		std::size_t StartX = 0, EndX = a_GridWidth  - 1;
+		std::size_t StartY = 0, EndY = a_GridHeight - 1;
+		if (Ingredient.x != ILLEGAL_SLOT_NUMBER)
 		{
-			StartX = itrS->x;
-			EndX = itrS->x;
+			StartX = Ingredient.x;
+			EndX = Ingredient.x;
 		}
-		else if (itrS->y >= 0)
+		else if (Ingredient.y != ILLEGAL_SLOT_NUMBER)
 		{
-			StartY = itrS->y;
-			EndY = itrS->y;
+			StartY = Ingredient.y;
+			EndY = Ingredient.y;
 		}
 		bool Found = false;
-		for (int x = StartX; x <= EndX; x++)
+		for (std::size_t x = StartX; x <= EndX; x++)
 		{
-			for (int y = StartY; y <= EndY; y++)
+			for (std::size_t y = StartY; y <= EndY; y++)
 			{
 				if (HasMatched[x][y])
 				{
 					// Already matched some other item
 					continue;
 				}
-				int GridIdx = x + a_GridStride * y;
+				std::size_t GridIdx = x + a_GridStride * y;
 				if (
-					(a_CraftingGrid[GridIdx].m_ItemType == itrS->m_Item.m_ItemType) &&
+					(a_CraftingGrid[GridIdx].m_ItemType == Ingredient.m_Item.m_ItemType) &&
 					(
-						(itrS->m_Item.m_ItemDamage < 0) ||  // doesn't want damage comparison
-						(itrS->m_Item.m_ItemDamage == a_CraftingGrid[GridIdx].m_ItemDamage)  // the damage matches
+						(Ingredient.m_Item.m_ItemDamage < 0) ||  // doesn't want damage comparison
+						(Ingredient.m_Item.m_ItemDamage == a_CraftingGrid[GridIdx].m_ItemDamage)  // the damage matches
 					)
 				)
 				{
 					HasMatched[x][y] = true;
 					Found = true;
-					MatchedSlots.push_back(*itrS);
+					MatchedSlots.push_back(Ingredient);
 					MatchedSlots.back().x = x;
 					MatchedSlots.back().y = y;
 					break;
@@ -840,7 +844,7 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 	}  // for itrS - a_Recipe->m_Ingredients[]
 
 	// Check if the whole grid has matched:
-	for (int x = 0; x < a_GridWidth; x++) for (int y = 0; y < a_GridHeight; y++)
+	for (std::size_t x = 0; x < a_GridWidth; x++) for (std::size_t y = 0; y < a_GridHeight; y++)
 	{
 		if (!HasMatched[x][y] && !a_CraftingGrid[x + a_GridStride * y].IsEmpty())
 		{
@@ -854,14 +858,14 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 	Recipe->m_Result = a_Recipe->m_Result;
 	Recipe->m_Width  = a_Recipe->m_Width;
 	Recipe->m_Height = a_Recipe->m_Height;
-	for (cRecipeSlots::const_iterator itrS = a_Recipe->m_Ingredients.begin(); itrS != a_Recipe->m_Ingredients.end(); ++itrS)
+	for (const auto & Ingredient : a_Recipe->m_Ingredients)
 	{
-		if ((itrS->x < 0) || (itrS->y < 0))
+	if ((Ingredient.x == ILLEGAL_SLOT_NUMBER) || (Ingredient.y == ILLEGAL_SLOT_NUMBER))
 		{
 			// "Anywhere" item, process later
 			continue;
 		}
-		Recipe->m_Ingredients.push_back(*itrS);
+		Recipe->m_Ingredients.push_back(Ingredient);
 		Recipe->m_Ingredients.back().x += a_OffsetX;
 		Recipe->m_Ingredients.back().y += a_OffsetY;
 	}
@@ -881,21 +885,21 @@ cCraftingRecipes::cRecipe * cCraftingRecipes::MatchRecipe(const cItem * a_Crafti
 
 
 
-void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, int a_GridStride, int a_OffsetX, int a_OffsetY)
+void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, std::size_t a_GridStride, std::size_t a_OffsetX, std::size_t a_OffsetY)
 {
 	// TODO: add support for more than one dye in the recipe
 	// A manual and temporary solution (listing everything) is in crafting.txt for fade colours, but a programmatic solutions needs to be done for everything else
 
 	if (a_Recipe->m_Result.m_ItemType == E_ITEM_FIREWORK_ROCKET)
 	{
-		for (cRecipeSlots::const_iterator itr = a_Recipe->m_Ingredients.begin(); itr != a_Recipe->m_Ingredients.end(); ++itr)
+		for (const auto & Ingredient : a_Recipe->m_Ingredients)
 		{
-			switch (itr->m_Item.m_ItemType)
+			switch (Ingredient.m_Item.m_ItemType)
 			{
 				case E_ITEM_FIREWORK_STAR:
 				{
 					// Result was a rocket, found a star - copy star data to rocket data
-					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
+					auto GridID = (Ingredient.x + a_OffsetX) + a_GridStride * (Ingredient.y + a_OffsetY);
 					a_Recipe->m_Result.m_FireworkItem.CopyFrom(a_CraftingGrid[GridID].m_FireworkItem);
 					break;
 				}
@@ -915,21 +919,21 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 		std::vector<int> DyeColours;
 		bool FoundStar = false;
 
-		for (cRecipeSlots::const_iterator itr = a_Recipe->m_Ingredients.begin(); itr != a_Recipe->m_Ingredients.end(); ++itr)
+		for (const auto & Ingredient : a_Recipe->m_Ingredients)
 		{
-			switch (itr->m_Item.m_ItemType)
+			switch (Ingredient.m_Item.m_ItemType)
 			{
 				case E_ITEM_FIREWORK_STAR:
 				{
 					// Result was star, found another star - probably adding fade colours, but copy data over anyhow
 					FoundStar = true;
-					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
+					auto GridID = (Ingredient.x + a_OffsetX) + a_GridStride * (Ingredient.y + a_OffsetY);
 					a_Recipe->m_Result.m_FireworkItem.CopyFrom(a_CraftingGrid[GridID].m_FireworkItem);
 					break;
 				}
 				case E_ITEM_DYE:
 				{
-					int GridID = (itr->x + a_OffsetX) + a_GridStride * (itr->y + a_OffsetY);
+					auto GridID = (Ingredient.x + a_OffsetX) + a_GridStride * (Ingredient.y + a_OffsetY);
 					DyeColours.push_back(cFireworkItem::GetVanillaColourCodeFromDye(static_cast<NIBBLETYPE>(a_CraftingGrid[GridID].m_ItemDamage & 0x0f)));
 					break;
 				}
@@ -962,7 +966,7 @@ void cCraftingRecipes::HandleFireworks(const cItem * a_CraftingGrid, cCraftingRe
 
 
 
-void cCraftingRecipes::HandleDyedLeather(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, int a_GridStride, int a_GridWidth, int a_GridHeight)
+void cCraftingRecipes::HandleDyedLeather(const cItem * a_CraftingGrid, cCraftingRecipes::cRecipe * a_Recipe, std::size_t a_GridStride, std::size_t a_GridWidth, std::size_t a_GridHeight)
 {
 	short result_type = a_Recipe->m_Result.m_ItemType;
 	if ((result_type == E_ITEM_LEATHER_CAP) || (result_type == E_ITEM_LEATHER_TUNIC) || (result_type == E_ITEM_LEATHER_PANTS) || (result_type == E_ITEM_LEATHER_BOOTS))
@@ -975,11 +979,11 @@ void cCraftingRecipes::HandleDyedLeather(const cItem * a_CraftingGrid, cCrafting
 		float blue = 0;
 		float dye_count = 0;
 
-		for (int x = 0; x < a_GridWidth; ++x)
+		for (std::size_t x = 0; x < a_GridWidth; ++x)
 		{
-			for (int y = 0; y < a_GridHeight; ++y)
+			for (std::size_t y = 0; y < a_GridHeight; ++y)
 			{
-				int GridIdx = x + a_GridStride * y;
+				auto GridIdx = x + a_GridStride * y;
 				if ((a_CraftingGrid[GridIdx].m_ItemType == result_type) && !found)
 				{
 					found = true;

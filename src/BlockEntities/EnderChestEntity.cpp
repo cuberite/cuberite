@@ -98,7 +98,7 @@ void cEnderChestEntity::OpenNewWindow()
 
 void cEnderChestEntity::LoadFromJson(const Json::Value & a_Value, cItemGrid & a_Grid)
 {
-	int SlotIdx = 0;
+	std::size_t SlotIdx = 0;
 	for (auto & Node : a_Value)
 	{
 		cItem Item;
@@ -114,7 +114,7 @@ void cEnderChestEntity::LoadFromJson(const Json::Value & a_Value, cItemGrid & a_
 
 void cEnderChestEntity::SaveToJson(Json::Value & a_Value, const cItemGrid & a_Grid)
 {
-	for (int i = 0; i < a_Grid.GetNumSlots(); i++)
+	for (size_t i = 0; i < a_Grid.GetNumSlots(); i++)
 	{
 		Json::Value Slot;
 		a_Grid.GetSlot(i).GetJson(Slot);

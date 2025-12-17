@@ -33,11 +33,11 @@ class cBlockEntityWithItems :
 public:  // tolua_export
 
 	cBlockEntityWithItems(
-		BLOCKTYPE a_BlockType,                      // Type of the block that the entity represents
-		NIBBLETYPE a_BlockMeta,                     // Meta of the block that the entity represents
-		Vector3i a_Pos,                             // Abs position of the block entity
-		int a_ItemGridWidth, int a_ItemGridHeight,  // Dimensions of the ItemGrid
-		cWorld * a_World                            // Optional world to assign to the entity
+		BLOCKTYPE a_BlockType,                                      // Type of the block that the entity represents
+		NIBBLETYPE a_BlockMeta,                                     // Meta of the block that the entity represents
+		Vector3i a_Pos,                                             // Abs position of the block entity
+		std::size_t a_ItemGridWidth, std::size_t a_ItemGridHeight,  // Dimensions of the ItemGrid
+		cWorld * a_World                                            // Optional world to assign to the entity
 	);
 
 	// cBlockEntity overrides:
@@ -46,11 +46,11 @@ public:  // tolua_export
 
 	// tolua_begin
 
-	const cItem & GetSlot(int a_SlotNum)    const { return m_Contents.GetSlot(a_SlotNum); }
-	const cItem & GetSlot(int a_X, int a_Y) const { return m_Contents.GetSlot(a_X, a_Y); }
+	const cItem & GetSlot(size_t a_SlotNum) const { return m_Contents.GetSlot(a_SlotNum); }
+	const cItem & GetSlot(std::size_t a_X, std::size_t a_Y) const { return m_Contents.GetSlot(a_X, a_Y); }
 
-	void SetSlot(int a_SlotNum,    const cItem & a_Item) { m_Contents.SetSlot(a_SlotNum, a_Item); }
-	void SetSlot(int a_X, int a_Y, const cItem & a_Item) { m_Contents.SetSlot(a_X, a_Y, a_Item); }
+	void SetSlot(size_t a_SlotNum, const cItem & a_Item) { m_Contents.SetSlot(a_SlotNum, a_Item); }
+	void SetSlot(std::size_t a_X, std::size_t a_Y, const cItem & a_Item) { m_Contents.SetSlot(a_X, a_Y, a_Item); }
 
 	/** Returns the ItemGrid used for storing the contents */
 	cItemGrid & GetContents(void) { return m_Contents; }
@@ -65,5 +65,5 @@ protected:
 	cItemGrid m_Contents;
 
 	// cItemGrid::cListener overrides:
-	virtual void OnSlotChanged(cItemGrid * a_Grid, int a_SlotNum) override;
+	virtual void OnSlotChanged(cItemGrid * a_Grid, std::size_t a_SlotNum) override;
 } ;  // tolua_export

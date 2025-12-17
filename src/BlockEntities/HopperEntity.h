@@ -78,7 +78,7 @@ protected:
 	bool MoveItemsFromGrid(cBlockEntityWithItems & a_Entity);
 
 	/** Moves one piece from the specified itemstack into this hopper. Returns true if contents have changed. Doesn't change the itemstack. */
-	bool MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_SrcSlotNum);
+	bool MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, std::size_t a_SrcSlotNum);
 
 	/** Moves items to the chest at the specified absolute coords. Returns true if contents have changed */
 	bool MoveItemsToChest(cChunk & a_Chunk, Vector3i a_Coords);
@@ -90,7 +90,7 @@ protected:
 	bool MoveItemsToGrid(cBlockEntityWithItems & a_Entity);
 
 	/** Moves one piece to the specified entity's contents' slot. Returns true if contents have changed. */
-	bool MoveItemsToSlot(cBlockEntityWithItems & a_Entity, int a_DstSlotNum);
+	bool MoveItemsToSlot(cBlockEntityWithItems & a_Entity, std::size_t a_DstSlotNum);
 
 private:
 

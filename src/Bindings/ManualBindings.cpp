@@ -2848,13 +2848,13 @@ static int Lua_ItemGrid_GetSlotCoords(lua_State * L)
 
 	{
 		const cItemGrid * self = static_cast<const cItemGrid *>(tolua_tousertype(L, 1, nullptr));
-		int SlotNum = static_cast<int>(tolua_tonumber(L, 2, 0));
+		auto SlotNum = static_cast<std::size_t>(tolua_tonumber(L, 2, 0));
 		if (self == nullptr)
 		{
 			tolua_error(L, "invalid 'self' in function 'cItemGrid:GetSlotCoords'", nullptr);
 			return 0;
 		}
-		int X, Y;
+		std::size_t X, Y;
 		self->GetSlotCoords(SlotNum, X, Y);
 		tolua_pushnumber(L, static_cast<lua_Number>(X));
 		tolua_pushnumber(L, static_cast<lua_Number>(Y));
@@ -3339,7 +3339,7 @@ static int tolua_cLuaWindow_new(lua_State * tolua_S)
 	}
 
 	// Read params:
-	int windowType, slotsX, slotsY;
+	std::size_t windowType, slotsX, slotsY;
 	AString title;
 	if (!L.GetStackValues(2, windowType, slotsX, slotsY, title))
 	{
@@ -3375,7 +3375,7 @@ static int tolua_cLuaWindow_new_local(lua_State * tolua_S)
 	}
 
 	// Read params:
-	int windowType, slotsX, slotsY;
+	std::size_t windowType, slotsX, slotsY;
 	AString title;
 	if (!L.GetStackValues(2, windowType, slotsX, slotsY, title))
 	{

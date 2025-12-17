@@ -240,7 +240,7 @@ bool cHopperEntity::MovePickupsIn(cChunk & a_Chunk)
 		{
 			cItem & Item = a_Pickup.GetItem();
 
-			for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
+			for (std::size_t i = 0; i < ContentsWidth * ContentsHeight; i++)
 			{
 				if (m_Contents.IsSlotEmpty(i))
 				{
@@ -429,9 +429,9 @@ bool cHopperEntity::MoveItemsFromFurnace(cChunk & a_Chunk)
 bool cHopperEntity::MoveItemsFromGrid(cBlockEntityWithItems & a_Entity)
 {
 	auto & Grid = a_Entity.GetContents();
-	int NumSlots = Grid.GetNumSlots();
+	size_t NumSlots = Grid.GetNumSlots();
 
-	for (int i = 0; i < NumSlots; i++)
+	for (size_t i = 0; i < NumSlots; i++)
 	{
 		if (Grid.IsSlotEmpty(i))
 		{
@@ -450,10 +450,10 @@ bool cHopperEntity::MoveItemsFromGrid(cBlockEntityWithItems & a_Entity)
 
 
 
-bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, int a_SlotNum)
+bool cHopperEntity::MoveItemsFromSlot(cBlockEntityWithItems & a_Entity, std::size_t a_SlotNum)
 {
 	cItem One(a_Entity.GetSlot(a_SlotNum).CopyOne());
-	for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
+	for (std::size_t i = 0; i < ContentsWidth * ContentsHeight; i++)
 	{
 		if (m_Contents.IsSlotEmpty(i))
 		{
@@ -537,8 +537,8 @@ bool cHopperEntity::MoveItemsToFurnace(cChunk & a_Chunk, Vector3i a_Coords, NIBB
 bool cHopperEntity::MoveItemsToGrid(cBlockEntityWithItems & a_Entity)
 {
 	// Iterate through our slots, try to move from each one:
-	int NumSlots = a_Entity.GetContents().GetNumSlots();
-	for (int i = 0; i < NumSlots; i++)
+	auto NumSlots = a_Entity.GetContents().GetNumSlots();
+	for (std::size_t i = 0; i < NumSlots; i++)
 	{
 		if (MoveItemsToSlot(a_Entity, i))
 		{
@@ -552,13 +552,13 @@ bool cHopperEntity::MoveItemsToGrid(cBlockEntityWithItems & a_Entity)
 
 
 
-bool cHopperEntity::MoveItemsToSlot(cBlockEntityWithItems & a_Entity, int a_DstSlotNum)
+bool cHopperEntity::MoveItemsToSlot(cBlockEntityWithItems & a_Entity, std::size_t a_DstSlotNum)
 {
 	cItemGrid & Grid = a_Entity.GetContents();
 	if (Grid.IsSlotEmpty(a_DstSlotNum))
 	{
 		// The slot is empty, move the first non-empty slot from our contents:
-		for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
+		for (std::size_t i = 0; i < ContentsWidth * ContentsHeight; i++)
 		{
 			if (!m_Contents.IsSlotEmpty(i))
 			{
@@ -582,7 +582,7 @@ bool cHopperEntity::MoveItemsToSlot(cBlockEntityWithItems & a_Entity, int a_DstS
 		{
 			return false;
 		}
-		for (int i = 0; i < ContentsWidth * ContentsHeight; i++)
+		for (std::size_t i = 0; i < ContentsWidth * ContentsHeight; i++)
 		{
 			if (m_Contents.GetSlot(i).IsEqual(DestSlot))
 			{

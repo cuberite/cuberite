@@ -4,20 +4,21 @@
 /** A dynamic array that defers allocation to the first modifying access.
 Const references from the array before allocation will all be to the same default constructed value.
 It is therefore important that default constructed values are indistinguishable from each other. */
-template <typename T>
+template <typename T, typename size_type=int>
 class cLazyArray
 {
 	static_assert((!std::is_reference<T>::value && !std::is_array<T>::value),
 		"cLazyArray<T>: T must be a value type");
 	static_assert(std::is_default_constructible<T>::value,
 		"cLazyArray<T>: T must be default constructible");
+	static_assert(std::is_integral<size_type>::value,
+		"cLazyArray<T, size_type>: size_type must be a integral type");
 public:
 	using value_type = T;
 	using pointer = T *;
 	using const_pointer = const T *;
 	using reference = T &;
 	using const_reference = const T &;
-	using size_type = int;
 	using iterator = pointer;
 	using const_iterator = const_pointer;
 

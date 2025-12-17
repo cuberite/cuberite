@@ -271,13 +271,13 @@ public:
 	/** Writes an item into the writer.
 	If aSlot >= 0, adds the Slot tag.
 	The compound is named as requested (empty name by default). */
-	void AddItem(const cItem & a_Item, int a_Slot, const AString & a_CompoundName = AString())
+	void AddItem(const cItem & a_Item, std::size_t a_Slot, const AString & a_CompoundName = AString())
 	{
 		mWriter.BeginCompound(a_CompoundName);
 		mWriter.AddShort("id",         static_cast<Int16>(a_Item.m_ItemType));
 		mWriter.AddShort("Damage",     static_cast<Int16>((a_Item.m_ItemDamage)));
 		mWriter.AddByte ("Count",      static_cast<Byte>(a_Item.m_ItemCount));
-		if (a_Slot >= 0)
+		if (a_Slot != ILLEGAL_SLOT_NUMBER)
 		{
 			mWriter.AddByte ("Slot", static_cast<unsigned char>(a_Slot));
 		}
@@ -341,10 +341,9 @@ public:
 	/** Writes an item grid into the writer.
 	Begins the stored slot numbers with a_BeginSlotNum.
 	Note that it doesn't begin nor end the list tag, so that multiple grids may be concatenated together using this function. */
-	void AddItemGrid(const cItemGrid & a_Grid, int a_BeginSlotNum = 0)
+	void AddItemGrid(const cItemGrid & a_Grid, std::size_t a_BeginSlotNum = 0)
 	{
-		int NumSlots = a_Grid.GetNumSlots();
-		for (int i = 0; i < NumSlots; i++)
+		for (std::size_t i = 0; i < a_Grid.GetNumSlots(); i++)
 		{
 			const cItem & Item = a_Grid.GetSlot(i);
 			if (Item.IsEmpty())
@@ -1021,8 +1020,8 @@ public:
 	{
 		mWriter.BeginCompound("");
 			AddBasicEntity(a_Pickup, "Item");
-			AddItem(a_Pickup->GetItem(), -1, "Item");
-			mWriter.AddShort("Age",    static_cast<Int16>(a_Pickup->GetAge()));
+			AddItem(a_Pickup->GetItem(), ILLEGAL_SLOT_NUMBER, "Item");
+			mWriter.AddShort("Age", static_cast<Int16>(a_Pickup->GetAge()));
 		mWriter.EndCompound();
 	}
 
@@ -1131,7 +1130,7 @@ public:
 		mWriter.BeginCompound("");
 			AddBasicEntity(a_ItemFrame, "ItemFrame");
 			AddHangingEntity(a_ItemFrame);
-			AddItem(a_ItemFrame->GetItem(), -1, "Item");
+			AddItem(a_ItemFrame->GetItem(), ILLEGAL_SLOT_NUMBER, "Item");
 			mWriter.AddByte("ItemRotation", static_cast<Byte>(a_ItemFrame->GetItemRotation()));
 			mWriter.AddFloat("ItemDropChance", 1.0F);
 		mWriter.EndCompound();
@@ -1169,7 +1168,7 @@ public:
 	void AddMinecartChestContents(cMinecartWithChest * a_Minecart)
 	{
 		mWriter.BeginList("Items", TAG_Compound);
-			for (int i = 0; i < cMinecartWithChest::ContentsHeight * cMinecartWithChest::ContentsWidth; i++)
+			for (std::size_t i = 0; i < cMinecartWithChest::ContentsHeight * cMinecartWithChest::ContentsWidth; i++)
 			{
 				const cItem & Item = a_Minecart->GetSlot(i);
 				if (Item.IsEmpty())

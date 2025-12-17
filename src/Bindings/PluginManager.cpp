@@ -606,7 +606,7 @@ bool cPluginManager::CallHookHandshake(cClientHandle & a_ClientHandle, const ASt
 
 
 
-bool cPluginManager::CallHookHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum)
+bool cPluginManager::CallHookHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper, std::size_t a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, std::size_t a_SrcSlotNum)
 {
 	return GenericCallHook(HOOK_HOPPER_PULLING_ITEM, [&](cPlugin * a_Plugin)
 		{
@@ -619,7 +619,7 @@ bool cPluginManager::CallHookHopperPullingItem(cWorld & a_World, cHopperEntity &
 
 
 
-bool cPluginManager::CallHookHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum)
+bool cPluginManager::CallHookHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper, std::size_t a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, std::size_t a_DstSlotNum)
 {
 	return GenericCallHook(HOOK_HOPPER_PUSHING_ITEM, [&](cPlugin * a_Plugin)
 		{
@@ -632,7 +632,7 @@ bool cPluginManager::CallHookHopperPushingItem(cWorld & a_World, cHopperEntity &
 
 
 
-bool cPluginManager::CallHookDropSpense(cWorld & a_World, cDropSpenserEntity & a_DropSpenser, int a_SlotNum)
+bool cPluginManager::CallHookDropSpense(cWorld & a_World, cDropSpenserEntity & a_DropSpenser, std::size_t a_SlotNum)
 {
 	return GenericCallHook(HOOK_DROPSPENSE, [&](cPlugin * a_Plugin)
 		{

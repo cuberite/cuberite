@@ -47,9 +47,9 @@ void cDropSpenserEntity::AddDropSpenserDir(Vector3i & a_RelCoord, NIBBLETYPE a_D
 void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 {
 	// Pick one of the occupied slots:
-	std::array<int, 9> OccupiedSlots;
+	std::array<std::size_t, 9> OccupiedSlots;
 	size_t SlotsCnt = 0;
-	for (int i = m_Contents.GetNumSlots() - 1; i >= 0; i--)
+	for (auto i = m_Contents.GetNumSlots() - 1; i > 0; i--)
 	{
 		if (!m_Contents.GetSlot(i).IsEmpty())
 		{
@@ -65,8 +65,8 @@ void cDropSpenserEntity::DropSpense(cChunk & a_Chunk)
 		return;
 	}
 
-	const size_t RandomSlot = GetRandomProvider().RandInt(SlotsCnt - 1);
-	const int SpenseSlot = OccupiedSlots[RandomSlot];
+	const auto RandomSlot = GetRandomProvider().RandInt(SlotsCnt - 1);
+	const auto SpenseSlot = OccupiedSlots[RandomSlot];
 
 	if (cPluginManager::Get()->CallHookDropSpense(*m_World, *this, SpenseSlot))
 	{
@@ -191,7 +191,7 @@ bool cDropSpenserEntity::UsedBy(cPlayer * a_Player)
 
 
 
-void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, int a_SlotNum)
+void cDropSpenserEntity::DropFromSlot(cChunk & a_Chunk, std::size_t a_SlotNum)
 {
 	Vector3i dispCoord(m_Pos);
 	auto Meta = a_Chunk.GetMeta(GetRelPos());

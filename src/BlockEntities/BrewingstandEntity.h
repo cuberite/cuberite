@@ -78,7 +78,7 @@ public:
 	const cItem & GetFuelSlot(void) const { return GetSlot(bsFuel); }
 
 	/** Get the expected result item for the given slot number */
-	const cItem & GetResultItem(size_t a_SlotNumber) { return m_Results[a_SlotNumber]; }
+	const cItem & GetResultItem(std::size_t a_SlotNumber) { return m_Results[a_SlotNumber]; }
 
 	/** Sets the item in the left bottle slot  */
 	void SetLeftBottleSlot(const cItem & a_Item) { SetSlot(bsLeftBottle, a_Item); }
@@ -136,5 +136,5 @@ protected:
 	void UpdateProgressBars(bool a_ForceUpdate = false);
 
 	// cItemGrid::cListener overrides:
-	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
+	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, std::size_t a_SlotNum) override;
 } ;  // tolua_export

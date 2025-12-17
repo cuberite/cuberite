@@ -39,7 +39,7 @@ class cLuaWindow :
 public:
 	/** Create a window of the specified type, with a slot grid of a_SlotsX * a_SlotsY size.
 	Exported in ManualBindings.cpp */
-	cLuaWindow(cLuaState & a_LuaState, cWindow::WindowType a_WindowType, int a_SlotsX, int a_SlotsY, const AString & a_Title);
+	cLuaWindow(cLuaState & a_LuaState, cWindow::WindowType a_WindowType, std::size_t a_SlotsX, std::size_t a_SlotsY, const AString & a_Title);
 
 	// tolua_begin
 	virtual ~cLuaWindow() override;
@@ -89,15 +89,15 @@ protected:
 	virtual void OpenedByPlayer(cPlayer & a_Player) override;
 	virtual void Clicked(
 		cPlayer & a_Player, int a_WindowID,
-		short a_SlotNum, eClickAction a_ClickAction,
+		std::size_t a_SlotNum, eClickAction a_ClickAction,
 		const cItem & a_ClickedItem
 	) override;
 	virtual bool ClosedByPlayer(cPlayer & a_Player, bool a_CanRefuse) override;
 	virtual void Destroy(void) override;
-	virtual void DistributeStack(cItem & a_ItemStack, int a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
+	virtual void DistributeStack(cItem & a_ItemStack, std::size_t a_Slot, cPlayer & a_Player, cSlotArea * a_ClickedArea, bool a_ShouldApply) override;
 
 	// cItemGrid::cListener overrides:
-	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum) override;
+	virtual void OnSlotChanged(cItemGrid * a_ItemGrid, std::size_t a_SlotNum) override;
 } ;  // tolua_export
 
 

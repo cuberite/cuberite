@@ -507,27 +507,27 @@ bool cPluginLua::OnHandshake(cClientHandle & a_Client, const AString & a_Usernam
 
 
 
-bool cPluginLua::OnHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, int a_SrcSlotNum)
+bool cPluginLua::OnHopperPullingItem(cWorld & a_World, cHopperEntity & a_Hopper, std::size_t a_DstSlotNum, cBlockEntityWithItems & a_SrcEntity, std::size_t a_SrcSlotNum)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_HOPPER_PULLING_ITEM, &a_World, &a_Hopper, a_DstSlotNum, &a_SrcEntity, a_SrcSlotNum);
+	return CallSimpleHooks(cPluginManager::HOOK_HOPPER_PULLING_ITEM, &a_World, &a_Hopper, static_cast<UInt32>(a_DstSlotNum), &a_SrcEntity, static_cast<UInt32>(a_SrcSlotNum));
 }
 
 
 
 
 
-bool cPluginLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper, int a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, int a_DstSlotNum)
+bool cPluginLua::OnHopperPushingItem(cWorld & a_World, cHopperEntity & a_Hopper, std::size_t a_SrcSlotNum, cBlockEntityWithItems & a_DstEntity, std::size_t a_DstSlotNum)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_HOPPER_PUSHING_ITEM, &a_World, &a_Hopper, a_SrcSlotNum, &a_DstEntity, a_DstSlotNum);
+	return CallSimpleHooks(cPluginManager::HOOK_HOPPER_PUSHING_ITEM, &a_World, &a_Hopper, static_cast<UInt32>(a_SrcSlotNum), &a_DstEntity, static_cast<UInt32>(a_DstSlotNum));
 }
 
 
 
 
 
-bool cPluginLua::OnDropSpense(cWorld & a_World, cDropSpenserEntity & a_DropSpenser, int a_SlotNum)
+bool cPluginLua::OnDropSpense(cWorld & a_World, cDropSpenserEntity & a_DropSpenser, std::size_t a_SlotNum)
 {
-	return CallSimpleHooks(cPluginManager::HOOK_DROPSPENSE, &a_World, &a_DropSpenser, a_SlotNum);
+	return CallSimpleHooks(cPluginManager::HOOK_DROPSPENSE, &a_World, &a_DropSpenser, static_cast<UInt32>(a_SlotNum));
 }
 
 

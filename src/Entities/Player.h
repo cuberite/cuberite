@@ -445,7 +445,7 @@ public:
 
 	/** Damage the item in a_SlotNumber by a_Damage, possibly less if the
 	equipped item is enchanted. */
-	void UseItem(int a_SlotNumber, short a_Damage = 1);
+	void UseItem(std::size_t a_SlotNumber, short a_Damage = 1);
 
 	/** In UI windows, get the item that the player is dragging */
 	cItem & GetDraggingItem(void) {return m_DraggingItem; }  // tolua_export
@@ -458,7 +458,7 @@ public:
 	void ClearInventoryPaintSlots(void);
 
 	/** Adds a slot to the list for inventory painting. To be used by cWindow only */
-	void AddInventoryPaintSlot(int a_SlotNum);
+	void AddInventoryPaintSlot(std::size_t a_SlotNum);
 
 	/** Returns the list of slots currently stored for inventory painting. To be used by cWindow only */
 	const cSlotNums & GetInventoryPaintSlots(void) const;

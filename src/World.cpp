@@ -3030,6 +3030,24 @@ int cWorld::GetTickRandomNumber(int a_Range)
 
 
 
+std::size_t cWorld::GetTickRandomNumber(std::size_t a_Range)
+{
+	return GetRandomProvider().RandInt(a_Range);
+}
+
+
+
+
+
+short cWorld::GetTickRandomNumber(short a_Range)
+{
+	return GetRandomProvider().RandInt(a_Range);
+}
+
+
+
+
+
 void cWorld::TabCompleteUserName(const AString & a_Text, AStringVector & a_Results)
 {
 	typedef std::pair<AString::size_type, AString> pair_t;

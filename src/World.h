@@ -882,6 +882,10 @@ public:
 	/** Returns a random number in range [0 .. a_Range]. */
 	int GetTickRandomNumber(int a_Range);
 
+	std::size_t GetTickRandomNumber(std::size_t a_Range);
+
+	short GetTickRandomNumber(short a_Range);
+
 	/** Appends all usernames starting with a_Text (case-insensitive) into Results */
 	void TabCompleteUserName(const AString & a_Text, AStringVector & a_Results);
 
