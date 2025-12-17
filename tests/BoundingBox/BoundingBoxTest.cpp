@@ -40,7 +40,7 @@ static int Test(void)
 			LOGERROR("LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d",
 				Line1.x, Line1.y, Line1.z,
 				Line2.x, Line2.y, Line2.z,
-				res ? 1 : 0, LineCoeff, Face
+				res ? 1 : 0, LineCoeff, static_cast<int>(Face)
 			);
 			NumFailed += 1;
 		}
@@ -51,7 +51,7 @@ static int Test(void)
 				LOGERROR("LineIntersection({%.02f, %.02f, %.02f}, {%.02f, %.02f, %.02f}) -> %d, %.05f, %d",
 					Line1.x, Line1.y, Line1.z,
 					Line2.x, Line2.y, Line2.z,
-					res ? 1 : 0, LineCoeff, Face
+					res ? 1 : 0, LineCoeff, static_cast<int>(Face)
 				);
 				NumFailed += 1;
 			}
