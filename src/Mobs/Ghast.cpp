@@ -49,6 +49,28 @@ bool cGhast::DoTakeDamage(TakeDamageInfo & a_TDI)
 		return false;
 	}
 
+	if ((a_TDI.Attacker != nullptr) && (a_TDI.DamageType == dtExplosion) && (a_TDI.ExplosionSource == esGhastFireball))
+	{
+		a_TDI.FinalDamage = 1000.0F;
+
+		cGhastFireballEntity * GhastFireball = static_cast<cGhastFireballEntity *>(a_TDI.Attacker);
+
+		if (GhastFireball != nullptr)
+		{
+			cEntity * Shooter = GhastFireball->GetShooter();
+
+			if ((Shooter != nullptr) && Shooter->IsPlayer())
+			{
+				cPlayer * Player = static_cast<cPlayer *>(Shooter);
+
+				if (Player != nullptr)
+				{
+					Player->AwardAchievement(CustomStatistic::AchGhast);  // Return to Sender!
+				}
+			}
+		}
+	}
+
 	return Super::DoTakeDamage(a_TDI);
 }
 
