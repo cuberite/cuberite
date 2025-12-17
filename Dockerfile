@@ -16,7 +16,9 @@ WORKDIR /build
 COPY . .
 
 # Build using the project's helper script (handles deps and submodules)
-RUN ./compile.sh -n yes -t AUTO
+RUN sed -i 's/\r$//' compile.sh && \
+    chmod +x compile.sh && \
+    ./compile.sh -n yes -t AUTO
 
 # Runtime stage
 FROM debian:bookworm-slim
@@ -41,7 +43,8 @@ VOLUME /server
 
 # Copy entrypoint
 COPY entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh && \
+    chmod +x /usr/local/bin/entrypoint.sh
 
 # Expose ports
 # 25565: Minecraft Server
