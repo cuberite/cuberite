@@ -90,10 +90,10 @@ public:
 	int GetTicksUntilWeatherChange(void) const { return m_WeatherInterval; }
 
 	/** Is the daylight cycle enabled? */
-	virtual bool IsDaylightCycleEnabled(void) const { return m_IsDaylightCycleEnabled; }
+	bool IsDaylightCycleEnabled(void) const { return m_IsDaylightCycleEnabled; }
 
 	/** Sets the daylight cycle to true / false. */
-	virtual void SetDaylightCycleEnabled(bool a_IsDaylightCycleEnabled)
+	void SetDaylightCycleEnabled(bool a_IsDaylightCycleEnabled)
 	{
 		m_IsDaylightCycleEnabled = a_IsDaylightCycleEnabled;
 		BroadcastTimeUpdate();

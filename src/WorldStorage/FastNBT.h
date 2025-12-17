@@ -45,7 +45,7 @@ enum eTagType
 } ;
 
 
-auto static format_as(eTagType f) { return fmt::underlying(f); }
+
 
 
 /** This structure is used for all NBT tags.

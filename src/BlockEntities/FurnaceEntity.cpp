@@ -206,7 +206,7 @@ void cFurnaceEntity::FinishOne()
 	{
 		m_Contents.ChangeSlotCount(fsOutput, m_CurrentRecipe->Out->m_ItemCount);
 	}
-	m_Contents.ChangeSlotCount(fsInput, -m_CurrentRecipe->In->m_ItemCount);
+	m_Contents.ChangeSlotCount(fsInput, static_cast<char>(-m_CurrentRecipe->In->m_ItemCount));
 }
 
 

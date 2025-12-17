@@ -30,7 +30,7 @@ static void WriteLogOpener(fmt::memory_buffer & Buffer)
 	);
 #else
 	fmt::format_to(
-		Buffer, "[{0:02d}:{1:02d}:{2:02d}] ",
+		std::back_inserter(Buffer), "[{0:02d}:{1:02d}:{2:02d}] ",
 		timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec
 	);
 #endif

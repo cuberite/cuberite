@@ -494,4 +494,3 @@ protected:
 	virtual void SendPacket(cPacketizer & a_Packet) = 0;
 } ;
 
-auto static format_as(cProtocol::State f) { return fmt::underlying(f); }

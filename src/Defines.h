@@ -449,9 +449,6 @@ enum class BossBarDivisionType
 };
 
 // tolua_end
-auto static format_as(eGameMode f) { return fmt::underlying(f); }
-auto static format_as(eClickAction f) { return fmt::underlying(f); }
-auto static format_as(eBlockFace f) { return fmt::underlying(f); }
 
 
 enum class EntityAnimation
