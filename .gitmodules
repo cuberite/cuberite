@@ -25,7 +25,7 @@
 	ignore = dirty
 [submodule "lib/TCLAP"]
 	path = lib/TCLAP
-	url = https://github.com/cuberite/TCLAP.git
+	url = https://github.com/DAarno/tclap.git
 	ignore = dirty
 [submodule "lib/cmake-coverage"]
 	path = lib/cmake-coverage
