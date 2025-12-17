@@ -32,7 +32,7 @@ public:
 
 protected:
 
-	virtual void SendCollectEntity    (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count) override;
+	virtual void SendCollectEntity    (const cEntity & a_Collected, const cPawn & a_Collector, unsigned a_Count) override;
 	virtual void SendEntityAnimation  (const cEntity & a_Entity, EntityAnimation a_Animation) override;
 	virtual void SendHideTitle        (void) override;
 	virtual void SendResetTitle       (void) override;

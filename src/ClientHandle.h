@@ -169,7 +169,7 @@ public:  // tolua_export
 	void SendChatSystem                 (const AString & a_Message, eMessageType a_ChatPrefix, const AString & a_AdditionalData = "");
 	void SendChatSystem                 (const cCompositeChat & a_Message);
 	void SendChunkData                  (int a_ChunkX, int a_ChunkZ, ContiguousByteBufferView a_ChunkData);
-	void SendCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count);   // tolua_export
+	void SendCollectEntity              (const cEntity & a_Collected, const cPawn & a_Collector, unsigned a_Count);   // tolua_export
 	void SendDestroyEntity              (const cEntity & a_Entity);   // tolua_export
 	void SendDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle);   // tolua_export
 	void SendDisconnect                 (const AString & a_Reason);

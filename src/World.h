@@ -31,6 +31,7 @@ class cFluidSimulator;
 class cSandSimulator;
 class cRedstoneSimulator;
 class cItem;
+class cPawn;
 class cPlayer;
 class cClientHandle;
 class cEntity;
@@ -166,7 +167,7 @@ public:
 	virtual void BroadcastChat       (const cCompositeChat & a_Message, const cClientHandle * a_Exclude = nullptr) override;
 	// tolua_end
 
-	virtual void BroadcastCollectEntity              (const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count, const cClientHandle * a_Exclude = nullptr) override;
+	virtual void BroadcastCollectEntity              (const cEntity & a_Collected, const cPawn & a_Collector, unsigned a_Count, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastDestroyEntity              (const cEntity & a_Entity, const cClientHandle * a_Exclude = nullptr) override;
 	virtual void BroadcastDetachEntity               (const cEntity & a_Entity, const cEntity & a_PreviousVehicle) override;
 	virtual void BroadcastEntityEffect               (const cEntity & a_Entity, int a_EffectID, int a_Amplifier, int a_Duration, const cClientHandle * a_Exclude = nullptr) override;
@@ -433,6 +434,20 @@ public:
 		return SpawnItemPickups(a_Pickups, {a_BlockX, a_BlockY, a_BlockZ}, {a_SpeedX, a_SpeedY, a_SpeedZ}, a_IsPlayerCreated);
 	}
 
+	// tolua_end
+
+	/** Spawns a pickup containing the specified item with the specified speed. */
+	UInt32 SpawnItemPickup(Vector3d a_Position, cItem && a_Item, Vector3d a_Speed, cTickTime a_CollectionDelay = 10_tick, cTickTime a_Lifetime = 6000_tick, bool a_CanCombine = true);
+
+	/** With a pickup containing the specified item, either attempt to combine it with another pickup within the given bounds in the entity spawn queue, or spawn a new pickup with the specified speed.
+	This variant is useful for avoiding heavy server load when spawning many pickups at once within a single tick, for example during explosions, by pre-emptively combining them. */
+	UInt32 SpawnItemPickup(Vector3d a_Position, cItem && a_Item, Vector3d a_Speed, cBoundingBox a_CombineBounds, cTickTime a_CollectionDelay = 10_tick, cTickTime a_Lifetime = 6000_tick);
+
+	/** Spawns a pickup containing the specified item with random initial speed. */
+	UInt32 SpawnItemPickup(Vector3d a_Position, cItem && a_Item, double a_SpeedMultiplier = 1.0, cTickTime a_CollectionDelay = 10_tick, cTickTime a_Lifetime = 6000_tick, bool a_CanCombine = true);
+
+	// tolua_begin
+
 	/** Spawns a single pickup containing the specified item. */
 	UInt32 SpawnItemPickup(Vector3d a_Pos, const cItem & a_Item, Vector3f a_Speed, int a_LifetimeTicks = 6000, bool a_CanCombine = true);
 
@@ -560,9 +575,9 @@ public:
 	}
 
 	/** Digs the specified block, and spawns the appropriate pickups for it.
+	The pickup is spawned in a random position at most 0.25 away from the centre of the block along each axis.
 	a_Digger is an optional entity causing the digging, usually the player.
-	a_Tool is an optional item used to dig up the block, used by the handlers (empty hand vs shears produce different pickups from leaves).
-	An empty hand is assumed if a_Tool is nullptr.
+	a_Tool is an optional item used to dig up the block, used by the handlers (empty hand vs shears produce different pickups from leaves). An empty hand is assumed if a_Tool is nullptr.
 	Returns true on success, false if the chunk is not loaded. */
 	bool DropBlockAsPickups(Vector3i a_BlockPos, const cEntity * a_Digger = nullptr, const cItem * a_Tool = nullptr);
 

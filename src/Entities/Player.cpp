@@ -17,6 +17,7 @@
 #include "../Items/ItemHandler.h"
 #include "../FastRandom.h"
 #include "../ClientHandle.h"
+#include "Entities/Pickup.h"
 
 #include "../WorldStorage/StatisticsSerializer.h"
 #include "../CompositeChat.h"
@@ -469,24 +470,6 @@ bool cPlayer::IsLeftHanded() const
 bool cPlayer::IsStanding() const
 {
 	return std::holds_alternative<BodyStanceStanding>(m_BodyStance);
-}
-
-
-
-
-
-void cPlayer::TossItems(const cItems & a_Items)
-{
-	if (IsGameModeSpectator())  // Players can't toss items in spectator
-	{
-		return;
-	}
-
-	m_Stats.Custom[CustomStatistic::Drop] += static_cast<StatisticsManager::StatValue>(a_Items.Size());
-
-	const auto Speed = (GetLookVector() + Vector3d(0, 0.2, 0)) * 6;  // A dash of height and a dollop of speed
-	const auto Position = GetEyePosition() - Vector3d(0, 0.2, 0);  // Correct for eye-height weirdness
-	m_World->SpawnItemPickups(a_Items, Position, Speed, true);  // 'true' because created by player
 }
 
 
@@ -1726,7 +1709,6 @@ void cPlayer::SetDraggingItem(const cItem & a_Item)
 
 void cPlayer::TossEquippedItem(char a_Amount)
 {
-	cItems Drops;
 	cItem DroppedItem(GetInventory().GetEquippedItem());
 	if (!DroppedItem.IsEmpty())
 	{
@@ -1739,10 +1721,8 @@ void cPlayer::TossEquippedItem(char a_Amount)
 		GetInventory().GetHotbarGrid().ChangeSlotCount(GetInventory().GetEquippedSlotNum() /* Returns hotbar subslot, which HotbarGrid takes */, -a_Amount);
 
 		DroppedItem.m_ItemCount = NewAmount;
-		Drops.push_back(DroppedItem);
+		TossPickup(DroppedItem);
 	}
-
-	TossItems(Drops);
 }
 
 
@@ -1770,13 +1750,12 @@ void cPlayer::ReplaceOneEquippedItemTossRest(const cItem & a_Item)
 
 void cPlayer::TossHeldItem(char a_Amount)
 {
-	cItems Drops;
 	cItem & Item = GetDraggingItem();
 	if (!Item.IsEmpty())
 	{
 		char OriginalItemAmount = Item.m_ItemCount;
 		Item.m_ItemCount = std::min(OriginalItemAmount, a_Amount);
-		Drops.push_back(Item);
+		TossPickup(Item);
 
 		if (OriginalItemAmount > a_Amount)
 		{
@@ -1787,8 +1766,6 @@ void cPlayer::TossHeldItem(char a_Amount)
 			Item.Empty();
 		}
 	}
-
-	TossItems(Drops);
 }
 
 
@@ -1797,10 +1774,16 @@ void cPlayer::TossHeldItem(char a_Amount)
 
 void cPlayer::TossPickup(const cItem & a_Item)
 {
-	cItems Drops;
-	Drops.push_back(a_Item);
+	if (IsGameModeSpectator())  // Players can't toss items in spectator
+	{
+		return;
+	}
 
-	TossItems(Drops);
+	m_Stats.Custom[CustomStatistic::Drop] += 1U;
+
+	const auto Speed = (GetLookVector() + Vector3d(0, 0.2, 0)) * 6;  // A dash of height and a dollop of speed.
+	const auto Position = GetEyePosition() - Vector3d(0, 0.2, 0);  // Eye position, corrected for eye-height weirdness.
+	m_World->SpawnItemPickup(Position, cItem(a_Item), Speed, 40_tick);  // 2s delay before vomited pickups can be collected.
 }
 
 

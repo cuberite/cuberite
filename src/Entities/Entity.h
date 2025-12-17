@@ -208,7 +208,7 @@ public:
 	int GetChunkZ(void) const { return FloorC(m_Position.z / cChunkDef::Width); }
 
 	// Get the Entity's axis aligned bounding box, with absolute (world-relative) coordinates.
-	cBoundingBox GetBoundingBox() const { return cBoundingBox(GetPosition(), GetWidth() / 2, GetHeight()); }
+	cBoundingBox GetBoundingBox() const { return cBoundingBox(m_Position, m_Width / 2, m_Height); }
 
 	void SetHeadYaw (double a_HeadYaw);
 	void SetMass    (double a_Mass);

@@ -1531,12 +1531,12 @@ void cMonster::AddRandomDropItem(cItems & a_Drops, unsigned int a_Min, unsigned 
 	auto MaxStackSize = static_cast<unsigned int>(cItem(a_Item).GetMaxStackSize());
 	while (Count > MaxStackSize)
 	{
-		a_Drops.emplace_back(a_Item, MaxStackSize, a_ItemHealth);
+		a_Drops.emplace_back(a_Item, static_cast<char>(MaxStackSize), a_ItemHealth);
 		Count -= MaxStackSize;
 	}
 	if (Count > 0)
 	{
-		a_Drops.emplace_back(a_Item, Count, a_ItemHealth);
+		a_Drops.emplace_back(a_Item, static_cast<char>(Count), a_ItemHealth);
 	}
 }
 

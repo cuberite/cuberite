@@ -101,7 +101,7 @@ void cBoundingBox::Expand(double a_ExpandX, double a_ExpandY, double a_ExpandZ)
 
 
 
-bool cBoundingBox::DoesIntersect(const cBoundingBox & a_Other)
+bool cBoundingBox::DoesIntersect(const cBoundingBox & a_Other) const
 {
 	return (
 		((a_Other.m_Min.x <= m_Max.x) && (a_Other.m_Max.x >= m_Min.x)) &&  // X coords intersect
@@ -114,7 +114,7 @@ bool cBoundingBox::DoesIntersect(const cBoundingBox & a_Other)
 
 
 
-cBoundingBox cBoundingBox::Union(const cBoundingBox & a_Other)
+cBoundingBox cBoundingBox::Union(const cBoundingBox & a_Other) const
 {
 	return cBoundingBox(
 		std::min(m_Min.x, a_Other.m_Min.x),
@@ -130,7 +130,7 @@ cBoundingBox cBoundingBox::Union(const cBoundingBox & a_Other)
 
 
 
-bool cBoundingBox::IsInside(Vector3d a_Point)
+bool cBoundingBox::IsInside(Vector3d a_Point) const
 {
 	return IsInside(m_Min, m_Max, a_Point);
 }
@@ -139,7 +139,7 @@ bool cBoundingBox::IsInside(Vector3d a_Point)
 
 
 
-bool cBoundingBox::IsInside(double a_X, double a_Y, double a_Z)
+bool cBoundingBox::IsInside(double a_X, double a_Y, double a_Z) const
 {
 	return IsInside(m_Min, m_Max, a_X, a_Y, a_Z);
 }
@@ -148,7 +148,7 @@ bool cBoundingBox::IsInside(double a_X, double a_Y, double a_Z)
 
 
 
-bool cBoundingBox::IsInside(cBoundingBox & a_Other)
+bool cBoundingBox::IsInside(cBoundingBox & a_Other) const
 {
 	// If both a_Other's coords are inside this, then the entire a_Other is inside
 	return (IsInside(a_Other.m_Min) && IsInside(a_Other.m_Max));
@@ -158,7 +158,7 @@ bool cBoundingBox::IsInside(cBoundingBox & a_Other)
 
 
 
-bool cBoundingBox::IsInside(Vector3d a_Min, Vector3d a_Max)
+bool cBoundingBox::IsInside(Vector3d a_Min, Vector3d a_Max) const
 {
 	// If both coords are inside this, then the entire a_Other is inside
 	return (IsInside(a_Min) && IsInside(a_Max));
@@ -287,7 +287,3 @@ bool cBoundingBox::Intersect(const cBoundingBox & a_Other, cBoundingBox & a_Inte
 	a_Intersection.m_Max.z = std::min(m_Max.z, a_Other.m_Max.z);
 	return (a_Intersection.m_Min.z < a_Intersection.m_Max.z);
 }
-
-
-
-

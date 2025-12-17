@@ -19,73 +19,94 @@
 
 
 
-class cPickupCombiningCallback
+class PickupCombiningCallback
 {
 public:
-	cPickupCombiningCallback(Vector3d a_Position, cPickup * a_Pickup) :
+
+	PickupCombiningCallback(cPickup * a_Pickup) :
+		m_Pickup(a_Pickup),
 		m_FoundMatchingPickup(false),
-		m_Position(a_Position),
-		m_Pickup(a_Pickup)
+		m_MaxStackSize(a_Pickup->GetItem().GetMaxStackSize())
 	{
 	}
 
-	bool operator () (cEntity & a_Entity)
+	~PickupCombiningCallback()
+	{
+		if (m_FoundMatchingPickup)
+		{
+			m_Pickup->GetWorld()->BroadcastEntityMetadata(*m_Pickup);
+		}
+	}
+
+	bool operator()(cEntity & a_Entity)
 	{
 		ASSERT(a_Entity.IsTicking());
-		if (!a_Entity.IsPickup() || (a_Entity.GetUniqueID() <= m_Pickup->GetUniqueID()) || !a_Entity.IsOnGround())
+
+		if (!a_Entity.IsPickup() || (&a_Entity == m_Pickup))
 		{
 			return false;
 		}
 
-
-		Vector3d EntityPos = a_Entity.GetPosition();
-		double Distance = (EntityPos - m_Position).Length();
-
 		auto & OtherPickup = static_cast<cPickup &>(a_Entity);
-		cItem & Item = OtherPickup.GetItem();
-		if ((Distance < 1.2) && Item.IsEqual(m_Pickup->GetItem()) && OtherPickup.CanCombine())
+		cItem & OtherItem = OtherPickup.GetItem();
+		cItem & Item = m_Pickup->GetItem();
+
+		if (!Item.IsEqual(OtherItem) || !OtherPickup.CanCombine() || OtherPickup.IsCollected())
 		{
-			short CombineCount = static_cast<short>(Item.m_ItemCount);
-			if ((CombineCount + static_cast<short>(m_Pickup->GetItem().m_ItemCount)) > static_cast<short>(Item.GetMaxStackSize()))
-			{
-				CombineCount = Item.GetMaxStackSize() - m_Pickup->GetItem().m_ItemCount;
-			}
-
-			if (CombineCount <= 0)
-			{
-				return false;
-			}
-
-			m_Pickup->GetItem().AddCount(static_cast<char>(CombineCount));
-			Item.m_ItemCount -= static_cast<char>(CombineCount);
-
-			if (Item.m_ItemCount <= 0)
-			{
-				a_Entity.GetWorld()->BroadcastCollectEntity(a_Entity, *m_Pickup, static_cast<unsigned>(CombineCount));
-				a_Entity.Destroy();
-
-				// Reset the timer
-				m_Pickup->SetAge(0);
-			}
-			else
-			{
-				a_Entity.GetWorld()->BroadcastEntityMetadata(a_Entity);
-			}
-			m_FoundMatchingPickup = true;
+			return false;
 		}
+
+		// The recipient pickup is the one with more items, and vice versa for the donor.
+		auto [Recipient, Donor] = Item.m_ItemCount > OtherItem.m_ItemCount ? std::make_pair(m_Pickup, &OtherPickup) : std::make_pair(&OtherPickup, m_Pickup);
+
+		// Try to combine, and stop if we're the one who is full:
+		if (!CombineInto(Recipient->GetItem(), Donor->GetItem(), m_MaxStackSize))
+		{
+			return Recipient == m_Pickup;
+		}
+
+		if (Donor->GetItem().m_ItemCount == 0)
+		{
+			Donor->Destroy();
+			m_Pickup = Recipient;
+		}
+		else
+		{
+			OtherPickup.GetWorld()->BroadcastEntityMetadata(OtherPickup);
+		}
+
+		m_FoundMatchingPickup = true;
 		return false;
 	}
 
-	inline bool FoundMatchingPickup()
+	static bool CombineInto(cItem & a_Recipient, cItem & a_Donor, const char a_MaxStackSize)
 	{
-		return m_FoundMatchingPickup;
+		// Check for plugin shenanigans:
+		if (a_Recipient.m_ItemCount > a_MaxStackSize)
+		{
+			return false;
+		}
+
+		const auto Move = std::min(a_Donor.m_ItemCount, static_cast<char>(a_MaxStackSize - a_Recipient.m_ItemCount));
+
+		// Stop if recipient full:
+		if (Move == 0)
+		{
+			return false;
+		}
+
+		a_Donor.m_ItemCount -= Move;
+		a_Recipient.m_ItemCount += Move;
+		return true;
 	}
 
-protected:
+private:
+
+	cPickup * m_Pickup;
+
 	bool m_FoundMatchingPickup;
 
-	Vector3d m_Position;
-	cPickup * m_Pickup;
+	char m_MaxStackSize;
 };
 
 
@@ -95,14 +116,12 @@ protected:
 ////////////////////////////////////////////////////////////////////////////////
 // cPickup:
 
-cPickup::cPickup(Vector3d a_Pos, const cItem & a_Item, bool IsPlayerCreated, Vector3f a_Speed, int a_LifetimeTicks, bool a_CanCombine):
-	Super(etPickup, a_Pos, 0.25f, 0.25f),
-	m_Timer(0),
-	m_Item(a_Item),
-	m_bCollected(false),
-	m_bIsPlayerCreated(IsPlayerCreated),
-	m_bCanCombine(a_CanCombine),
-	m_Lifetime(cTickTime(a_LifetimeTicks))
+cPickup::cPickup(Vector3d a_Position, cItem && a_Item, Vector3d a_Speed, cTickTime a_CollectionDelay, cTickTime a_Lifetime) :
+	Super(etPickup, a_Position, 0.25f, 0.25f),
+	m_Item(std::move(a_Item)),
+	m_RemainingCollectionDelay(a_CollectionDelay),
+	m_RemainingLifetime(a_Lifetime),
+	m_IsCollected(false)
 {
 	SetGravity(-16.0f);
 	SetAirDrag(0.02f);
@@ -115,81 +134,150 @@ cPickup::cPickup(Vector3d a_Pos, const cItem & a_Item, bool IsPlayerCreated, Vec
 
 
 
-void cPickup::SpawnOn(cClientHandle & a_Client)
+bool cPickup::CollectedBy(cEntity & a_Dest)
 {
-	a_Client.SendSpawnEntity(*this);
-	a_Client.SendEntityMetadata(*this);
+	if (m_IsCollected)
+	{
+		// It's already collected!
+		return false;
+	}
+
+	if (!a_Dest.IsPawn())
+	{
+		// Pawns can't pick up items:
+		return false;
+	}
+
+	if (m_RemainingCollectionDelay > m_RemainingCollectionDelay.zero())
+	{
+		// Not old enough to be collected!
+		return false;
+	}
+
+	if (a_Dest.IsMob())
+	{
+		auto & Mob = static_cast<cMonster &>(a_Dest);
+		if (Mob.GetMobType() == mtVillager)
+		{
+			// Villagers only pickup food
+			if (!ItemCategory::IsVillagerFood(m_Item.m_ItemType))
+			{
+				return false;
+			}
+
+			auto & Villager = static_cast<cVillager &>(Mob);
+			char NumAdded = Villager.GetInventory().AddItem(m_Item);
+			if (NumAdded > 0)
+			{
+				OnCollectedBy(Mob, NumAdded);
+				return true;
+			}
+		}
+	}
+	else if (a_Dest.IsPlayer())
+	{
+		auto & Player = static_cast<cPlayer &>(a_Dest);
+
+		// If the player is a spectator, he cannot collect anything
+		if (Player.IsGameModeSpectator())
+		{
+			return false;
+		}
+
+		if (cRoot::Get()->GetPluginManager()->CallHookCollectingPickup(Player, *this))
+		{
+			// Collection refused because a plugin has said no:
+			return false;
+		}
+
+		char NumAdded = Player.GetInventory().AddItem(m_Item);
+		if (NumAdded > 0)
+		{
+			// Check achievements
+			switch (m_Item.m_ItemType)
+			{
+				case E_BLOCK_LOG:      Player.AwardAchievement(CustomStatistic::AchMineWood); break;
+				case E_ITEM_LEATHER:   Player.AwardAchievement(CustomStatistic::AchKillCow);  break;
+				case E_ITEM_DIAMOND:   Player.AwardAchievement(CustomStatistic::AchDiamonds); break;
+				case E_ITEM_BLAZE_ROD: Player.AwardAchievement(CustomStatistic::AchBlazeRod); break;
+				default: break;
+			}
+
+			OnCollectedBy(Player, NumAdded);
+			return true;
+		}
+	}
+
+	// Either destination cannot collect, or no space in inventory:
+	return false;
 }
 
 
 
 
 
-void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+bool cPickup::TryCombineWithQueuedEntity(cEntity & a_Entity, const cBoundingBox & a_CombineBounds, cItem & a_Item, const char a_MaxStackSize)
 {
-	Super::Tick(a_Dt, a_Chunk);
-	if (!IsTicking())
+	if (!a_Entity.IsPickup())
 	{
-		// The base class tick destroyed us
-		return;
+		return false;
 	}
-	BroadcastMovementUpdate();  // Notify clients of position
 
-	m_Timer += a_Dt;
+	auto & Pickup = static_cast<cPickup &>(a_Entity);
+	auto & RecipientItem = Pickup.GetItem();
 
-	if (!m_bCollected)
+	if (!RecipientItem.IsEqual(a_Item) || !a_CombineBounds.DoesIntersect(Pickup.GetBoundingBox()))
 	{
-		int BlockY = POSY_TOINT;
-		int BlockX = POSX_TOINT;
-		int BlockZ = POSZ_TOINT;
+		return false;
+	}
 
-		if ((BlockY >= 0) && (BlockY < cChunkDef::Height))  // Don't do anything except for falling when outside the world
-		{
-			// Position might have changed due to physics. So we have to make sure we have the correct chunk.
-			GET_AND_VERIFY_CURRENT_CHUNK(CurrentChunk, BlockX, BlockZ);
+	PickupCombiningCallback::CombineInto(RecipientItem, a_Item, a_MaxStackSize);
 
-			// Destroy the pickup if it is on fire:
-			if (IsOnFire())
-			{
-				m_bCollected = true;
-				m_Timer = std::chrono::milliseconds(0);  // We have to reset the timer.
-				m_Timer += a_Dt;  // In case we have to destroy the pickup in the same tick.
-				if (m_Timer > std::chrono::milliseconds(500))
-				{
-					Destroy();
-					return;
-				}
-			}
+	return a_Item.m_ItemCount == 0;
+}
 
-			// Try to combine the pickup with adjacent same-item pickups:
-			if ((m_Item.m_ItemCount < m_Item.GetMaxStackSize()) && IsOnGround() && CanCombine())  // Don't combine if already full or not on ground
-			{
-				// By using a_Chunk's ForEachEntity() instead of cWorld's, pickups don't combine across chunk boundaries.
-				// That is a small price to pay for not having to traverse the entire world for each entity.
-				// The speedup in the tick thread is quite considerable.
-				cPickupCombiningCallback PickupCombiningCallback(GetPosition(), this);
-				a_Chunk.ForEachEntity(PickupCombiningCallback);
-				if (PickupCombiningCallback.FoundMatchingPickup())
-				{
-					m_World->BroadcastEntityMetadata(*this);
-				}
-			}
-		}
+
+
+
+
+void cPickup::OnCollectedBy(cPawn & a_Collector, char a_CollectionCount)
+{
+	m_Item.m_ItemCount -= a_CollectionCount;
+
+	if (m_Item.m_ItemCount <= 0)
+	{
+		// All of the pickup has been collected, schedule the pickup for destroying:
+		m_IsCollected = true;
+
+		// Play the collection animation (only when fully collected):
+		m_World->BroadcastCollectEntity(*this, a_Collector, static_cast<unsigned>(a_CollectionCount));
+
+		// Wait 0.5s for collection animation to play:
+		m_RemainingLifetime = std::chrono::milliseconds(500);
 	}
 	else
 	{
-		if (m_Timer > std::chrono::milliseconds(500))  // 0.5 second
-		{
-			Destroy();
-			return;
-		}
+		// Our count changed, so try to combine again:
+		TryCombineWithPickupsInWorld();
 	}
 
-	if (m_Timer > m_Lifetime)
+	// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
+	m_World->BroadcastSoundEffect("entity.item.pickup", GetPosition(), 0.3f, (1.2f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
+}
+
+
+
+
+
+void cPickup::TryCombineWithPickupsInWorld()
+{
+	if (!m_IsCombinable)
 	{
-		Destroy();
 		return;
 	}
+
+	PickupCombiningCallback PickupCombiningCallback(this);
+	m_World->ForEachEntityInBox({ GetPosition(), 0.25 / 2, 0.25 }, PickupCombiningCallback);
 }
 
 
@@ -211,105 +299,60 @@ bool cPickup::DoTakeDamage(TakeDamageInfo & a_TDI)
 
 
 
-bool cPickup::CollectedBy(cEntity & a_Dest)
+void cPickup::OnAddToWorld(cWorld & a_World)
 {
-	if (m_bCollected)
+	Super::OnAddToWorld(a_World);
+
+	// Say when going through a portal, try to combine:
+	TryCombineWithPickupsInWorld();
+}
+
+
+
+
+
+void cPickup::SpawnOn(cClientHandle & a_Client)
+{
+	a_Client.SendSpawnEntity(*this);
+	a_Client.SendEntityMetadata(*this);
+}
+
+
+
+
+
+void cPickup::Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	Super::Tick(a_Dt, a_Chunk);
+
+	if (!IsTicking())
 	{
-		// LOG("Pickup %d cannot be collected by \"%s\", because it has already been collected.", m_UniqueID, a_Dest->GetName().c_str());
-		return false;  // It's already collected!
+		// The base class tick destroyed us:
+		return;
 	}
 
-	// This type of entity can't pickup items
-	if (!a_Dest.IsPawn())
+	BroadcastMovementUpdate();  // Notify clients of position.
+
+	m_RemainingCollectionDelay -= a_Dt;
+	m_RemainingLifetime -= a_Dt;
+
+	if (m_RemainingLifetime <= m_RemainingLifetime.zero())
 	{
-		return false;
+		Destroy();
+		return;
 	}
 
-	// Two seconds if player created the pickup (vomiting), half a second if anything else
-	if (m_Timer < (m_bIsPlayerCreated ? std::chrono::seconds(2) : std::chrono::milliseconds(500)))
+	if (m_IsCollected)
 	{
-		// LOG("Pickup %d cannot be collected by \"%s\", because it is not old enough.", m_UniqueID, a_Dest->GetName().c_str());
-		return false;  // Not old enough
+		return;
 	}
 
-	// Checking for villagers
-	if (!a_Dest.IsPlayer() && a_Dest.IsMob())
+	// Don't combine if already full, we haven't moved, or combination is disabled:
+	if ((m_LastPosition == GetPosition()) || (m_Item.m_ItemCount >= m_Item.GetMaxStackSize()))
 	{
-
-		auto & Mob = static_cast<cMonster &>(a_Dest);
-		if (Mob.GetMobType() == mtVillager)
-		{
-			// Villagers only pickup food
-			if (!ItemCategory::IsVillagerFood(m_Item.m_ItemType))
-			{
-				return false;
-			}
-
-			auto & Villager = static_cast<cVillager &>(Mob);
-			char NumAdded = Villager.GetInventory().AddItem(m_Item);
-			if (NumAdded > 0)
-			{
-				m_Item.m_ItemCount -= NumAdded;
-				m_World->BroadcastCollectEntity(*this, a_Dest, static_cast<unsigned>(NumAdded));
-
-				// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
-				m_World->BroadcastSoundEffect("entity.item.pickup", GetPosition(), 0.3f, (1.2f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
-				if (m_Item.m_ItemCount <= 0)
-				{
-					// All of the pickup has been collected, schedule the pickup for destroying
-					m_bCollected = true;
-				}
-				m_Timer = std::chrono::milliseconds(0);
-				return true;
-			}
-			// Pickup cannot be collected because the entity has not enough space
-			return false;
-		}
-	}
-	else if (a_Dest.IsPlayer())
-	{
-		auto & Player = static_cast<cPlayer &>(a_Dest);
-
-		// If the player is a spectator, he cannot collect anything
-		if (Player.IsGameModeSpectator())
-		{
-			return false;
-		}
-
-		if (cRoot::Get()->GetPluginManager()->CallHookCollectingPickup(Player, *this))
-		{
-			// LOG("Pickup %d cannot be collected by \"%s\", because a plugin has said no.", m_UniqueID, a_Dest->GetName().c_str());
-			return false;
-		}
-
-		char NumAdded = Player.GetInventory().AddItem(m_Item);
-		if (NumAdded > 0)
-		{
-			// Check achievements
-			switch (m_Item.m_ItemType)
-			{
-				case E_BLOCK_LOG:      Player.AwardAchievement(CustomStatistic::AchMineWood); break;
-				case E_ITEM_LEATHER:   Player.AwardAchievement(CustomStatistic::AchKillCow);  break;
-				case E_ITEM_DIAMOND:   Player.AwardAchievement(CustomStatistic::AchDiamonds); break;
-				case E_ITEM_BLAZE_ROD: Player.AwardAchievement(CustomStatistic::AchBlazeRod); break;
-				default: break;
-			}
-
-			m_Item.m_ItemCount -= NumAdded;
-			m_World->BroadcastCollectEntity(*this, a_Dest, static_cast<unsigned>(NumAdded));
-
-			// Also send the "pop" sound effect with a somewhat random pitch (fast-random using EntityID ;)
-			m_World->BroadcastSoundEffect("entity.item.pickup", GetPosition(), 0.3f, (1.2f + (static_cast<float>((GetUniqueID() * 23) % 32)) / 64));
-			if (m_Item.m_ItemCount <= 0)
-			{
-				// All of the pickup has been collected, schedule the pickup for destroying
-				m_bCollected = true;
-			}
-			m_Timer = std::chrono::milliseconds(0);
-			return true;
-		}
+		return;
 	}
 
-	// LOG("Pickup %d cannot be collected by \"%s\", because there's no space in the inventory.", a_Dest->GetName().c_str(), m_UniqueID);
-	return false;
+	// Try to combine the pickup with adjacent same-item pickups:
+	TryCombineWithPickupsInWorld();
 }

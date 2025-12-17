@@ -8,7 +8,7 @@
 
 
 
-class cPlayer;
+class cPawn;
 
 
 
@@ -26,57 +26,61 @@ public:  // tolua_export
 
 	CLASS_PROTODEF(cPickup)
 
-	cPickup(Vector3d a_Pos, const cItem & a_Item, bool IsPlayerCreated, Vector3f a_Speed = Vector3f(), int a_LifetimeTicks = 6000, bool a_CanCombine = true);
+	cPickup(Vector3d a_Position, cItem && a_Item, Vector3d a_Speed, cTickTime a_CollectionDelay, cTickTime a_Lifetime);
 
 	cItem &       GetItem(void)       {return m_Item; }  // tolua_export
 	const cItem & GetItem(void) const {return m_Item; }
 
-	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
-
 	bool CollectedBy(cEntity & a_Dest);  // tolua_export
 
-	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
-
-	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
-
-	virtual bool DoesPreventBlockPlacement(void) const override { return false; }
+	static bool TryCombineWithQueuedEntity(cEntity & a_Entity, const cBoundingBox & a_CombineBounds, cItem & a_Item, const char a_MaxStackSize);
 
 	/** Returns whether this pickup is allowed to combine with other similar pickups */
-	bool CanCombine(void) const { return m_bCanCombine; }  // tolua_export
+	bool CanCombine(void) const { return m_IsCombinable; }  // tolua_export
 
 	/** Sets whether this pickup is allowed to combine with other similar pickups */
-	void SetCanCombine(bool a_CanCombine) { m_bCanCombine = a_CanCombine; }  // tolua_export
+	void SetCanCombine(bool a_CanCombine) { m_IsCombinable = a_CanCombine; }  // tolua_export
 
 	/** Returns the number of ticks that this entity has existed */
-	int GetAge(void) const { return std::chrono::duration_cast<cTickTime>(m_Timer).count(); }     // tolua_export
+	int GetAge(void) const { LOGWARNING("GetAge is deprecated, use GetTicksAlive");  return m_TicksAlive; }     // tolua_export
 
 	/** Set the number of ticks that this entity has existed */
-	void SetAge(int a_Age) { m_Timer = cTickTime(a_Age); }  // tolua_export
+	void SetAge(int a_Age) { LOGWARNING("SetAge is deprecated, use SetLifetime"); m_TicksAlive = a_Age; }  // tolua_export
 
 	/** Returns the number of ticks that this pickup should live for */
-	int GetLifetime(void) const { return std::chrono::duration_cast<cTickTime>(m_Lifetime).count(); }  // tolua_export
+	int GetLifetime(void) const { return std::chrono::duration_cast<cTickTime>(m_RemainingLifetime).count(); }  // tolua_export
 
 	/** Set the number of ticks that this pickup should live for */
-	void SetLifetime(int a_Lifetime) { m_Lifetime = cTickTime(a_Lifetime); }  // tolua_export
+	void SetLifetime(int a_Lifetime) { m_RemainingLifetime = cTickTime(a_Lifetime); }  // tolua_export
 
 	/** Returns true if the pickup has already been collected */
-	bool IsCollected(void) const { return m_bCollected; }  // tolua_export
+	bool IsCollected(void) const { return m_IsCollected; }  // tolua_export
 
 	/** Returns true if created by player (i.e. vomiting), used for determining picking-up delay time */
-	bool IsPlayerCreated(void) const { return m_bIsPlayerCreated; }  // tolua_export
+	bool IsPlayerCreated(void) const { LOGWARNING("IsPlayerCreated is deprecated");  return false; }  // tolua_export
 
 private:
 
-	/** The number of ticks that the entity has existed / timer between collect and destroy; in msec */
-	std::chrono::milliseconds m_Timer;
+	void OnCollectedBy(cPawn & a_Collector, char a_CollectionCount);
+
+	void TryCombineWithPickupsInWorld();
+
+	// cEntity overrides:
+	virtual bool DoesPreventBlockPlacement(void) const override { return false; }
+	virtual bool DoTakeDamage(TakeDamageInfo & a_TDI) override;
+	virtual void OnAddToWorld(cWorld & a_World) override;
+	virtual void SpawnOn(cClientHandle & a_ClientHandle) override;
+	virtual void Tick(std::chrono::milliseconds a_Dt, cChunk & a_Chunk) override;
 
 	cItem m_Item;
 
-	bool m_bCollected;
+	/** How much time left until the pickup can be picked up.
+	Two seconds if player created the pickup (vomiting), half a second if anything else, but plugin-customisable. */
+	std::chrono::milliseconds m_RemainingCollectionDelay;
 
-	bool m_bIsPlayerCreated;
+	/** You have thirty seconds to live. - Medic TF2 */
+	std::chrono::milliseconds m_RemainingLifetime;
 
-	bool m_bCanCombine;
-
-	std::chrono::milliseconds m_Lifetime;
+	bool m_IsCollected;
+	bool m_IsCombinable;
 };  // tolua_export

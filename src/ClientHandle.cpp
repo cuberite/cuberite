@@ -625,8 +625,8 @@ void cClientHandle::StreamNextChunks(void)
 
 void cClientHandle::UnloadOutOfRangeChunks(void)
 {
-	int ChunkPosX = FAST_FLOOR_DIV(static_cast<int>(m_Player->GetPosX()), cChunkDef::Width);
-	int ChunkPosZ = FAST_FLOOR_DIV(static_cast<int>(m_Player->GetPosZ()), cChunkDef::Width);
+	int ChunkPosX = FloorC(m_Player->GetPosX() / cChunkDef::Width);
+	int ChunkPosZ = FloorC(m_Player->GetPosZ() / cChunkDef::Width);
 
 	cChunkCoordsList ChunksToRemove;
 	{
@@ -2542,7 +2542,7 @@ void cClientHandle::SendChunkData(int a_ChunkX, int a_ChunkZ, const ContiguousBy
 
 
 
-void cClientHandle::SendCollectEntity(const cEntity & a_Collected, const cEntity & a_Collector, unsigned a_Count)
+void cClientHandle::SendCollectEntity(const cEntity & a_Collected, const cPawn & a_Collector, unsigned a_Count)
 {
 	m_Protocol->SendCollectEntity(a_Collected, a_Collector, a_Count);
 }
