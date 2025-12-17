@@ -10,6 +10,11 @@
 class cItem;
 class cClientHandle;
 
+namespace BehaviorTree
+{
+class cMoveToPosition;
+}
+
 
 
 // tolua_begin
@@ -392,4 +397,5 @@ private:
 	/** Leash calculations inside Tick function */
 	void CalcLeashActions(std::chrono::milliseconds a_Dt);
 
+	friend class BehaviorTree::cMoveToPosition;
 } ;  // tolua_export

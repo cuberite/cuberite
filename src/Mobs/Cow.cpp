@@ -9,8 +9,10 @@
 
 
 cCow::cCow(void) :
-	Super("Cow", mtCow, "entity.cow.hurt", "entity.cow.death", "entity.cow.ambient", 0.9f, 1.4f)
+	Super("Cow", mtCow, "entity.cow.hurt", "entity.cow.death", "entity.cow.ambient", 0.9f, 1.4f),
+	m_Blackboard(*this)
 {
+	m_BehaviorTree = BehaviorTree::CreateBehaviourTree(eMonsterType::mtCow);
 }
 
 
@@ -49,5 +51,17 @@ void cCow::OnRightClicked(cPlayer & a_Player)
 		{
 			a_Player.ReplaceOneEquippedItemTossRest(cItem(E_ITEM_MILK));
 		}
+	}
+}
+
+
+
+
+
+void cCow::InStateIdle(std::chrono::milliseconds a_Dt, cChunk & a_Chunk)
+{
+	if (m_BehaviorTree)
+	{
+		m_BehaviorTree->Tick(m_Blackboard);
 	}
 }
