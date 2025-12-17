@@ -274,6 +274,40 @@ std::string_view NamespaceSerializer::From(const BannerPattern a_Pattern)
 
 
 
+std::string_view NamespaceSerializer::From(ePoiType a_ID)
+{
+	switch (a_ID)
+	{
+		case ePoiType::poiArmorer:        return "minecraft:armorer";
+		case ePoiType::poiBeehive:        return "minecraft:beehive";
+		case ePoiType::poiBeeNest:        return "minecraft:beenest";
+		case ePoiType::poiButcher:        return "minecraft:butcher";
+		case ePoiType::poiCartographer:   return "minecraft:cartographer";
+		case ePoiType::poiCleric:         return "minecraft:cleric";
+		case ePoiType::poiFarmer:         return "minecraft:farmer";
+		case ePoiType::poiFisherman:      return "minecraft:fisherman";
+		case ePoiType::poiFletcher:       return "minecraft:fletcher";
+		case ePoiType::poiHome:           return "minecraft:home";
+		case ePoiType::poiLetherworker:   return "minecraft:letherworker";
+		case ePoiType::poiLibrairian:     return "minecraft:librairian";
+		case ePoiType::poiLightningRod:   return "minecraft:lightning_rod";
+		case ePoiType::poiLodestone:      return "minecraft:lodestone";
+		case ePoiType::poiMason:          return "minecraft:mason";
+		case ePoiType::poiMeeting:        return "minecraft:meeting";
+		case ePoiType::poiNetherPortal:   return "minecraft:nether_portal";
+		case ePoiType::poiShepherd:       return "minecraft:shepherd";
+		case ePoiType::poiToolsmith:      return "minecraft:toolsmith";
+		case ePoiType::poiWeaponsmith:    return "minecraft:weaponsmith";
+
+		case ePoiType::poiNone:    return "none";
+	}
+	UNREACHABLE("Unknown poi type");
+}
+
+
+
+
+
 CustomStatistic NamespaceSerializer::ToCustomStatistic(const std::string_view ID)
 {
 	static const std::unordered_map<std::string_view, CustomStatistic> CustomStatistics
@@ -545,6 +579,39 @@ eMonsterType NamespaceSerializer::ToMonsterType(const std::string_view a_ID)
 	};
 
 	return MonsterTypes.at(a_ID);
+}
+
+
+
+
+
+ePoiType NamespaceSerializer::ToPoiType(std::string_view a_ID)
+{
+	static const std::unordered_map<std::string_view, ePoiType> PoiTypes
+	{
+		{ "minecraft:armorer",          ePoiType::poiArmorer },
+		{ "minecraft:beehive",          ePoiType::poiBeehive },
+		{ "minecraft:beenest",          ePoiType::poiBeeNest },
+		{ "minecraft:butcher",          ePoiType::poiButcher },
+		{ "minecraft:cartographer",     ePoiType::poiCartographer },
+		{ "minecraft:cleric",           ePoiType::poiCleric },
+		{ "minecraft:farmer",           ePoiType::poiFarmer },
+		{ "minecraft:fisherman",        ePoiType::poiFisherman },
+		{ "minecraft:fletcher",         ePoiType::poiFletcher },
+		{ "minecraft:home",             ePoiType::poiHome },
+		{ "minecraft:letherworker",     ePoiType::poiLetherworker },
+		{ "minecraft:librairian",       ePoiType::poiLibrairian },
+		{ "minecraft:lightning_rod",    ePoiType::poiLightningRod },
+		{ "minecraft:lodestone",        ePoiType::poiLodestone },
+		{ "minecraft:mason",            ePoiType::poiMason },
+		{ "minecraft:meeting",          ePoiType::poiMeeting },
+		{ "minecraft:nether_portal",    ePoiType::poiNetherPortal },
+		{ "minecraft:shepherd",         ePoiType::poiShepherd },
+		{ "minecraft:toolsmith",        ePoiType::poiToolsmith },
+		{ "minecraft:weaponsmith",      ePoiType::poiWeaponsmith },
+	};
+
+	return PoiTypes.at(a_ID);
 }
 
 

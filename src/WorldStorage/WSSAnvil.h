@@ -116,6 +116,9 @@ protected:
 	a_RawChunkData is the raw (compressed) chunk data, used for offloading when chunk loading fails. */
 	bool LoadChunkFromNBT(const cChunkCoords & a_Chunk, const cParsedNBT & a_NBT, ContiguousByteBufferView a_RawChunkData);
 
+	/** Loads the chunk's poies into a_Pois if valid; returns false otherwise. */
+	bool LoadPoiFromNBT(cChunkPoiData::PoiArray & a_Poies, const cParsedNBT & a_NBT, int a_TagIdx);
+
 	/** Loads the chunk's biome map into a_BiomeMap if biomes present and valid; returns false otherwise. */
 	bool LoadBiomeMapFromNBT(cChunkDef::BiomeMap & a_BiomeMap, const cParsedNBT & a_NBT, int a_TagIdx);
 

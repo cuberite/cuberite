@@ -22,6 +22,8 @@ struct SetChunkData
 	ChunkBlockData BlockData;
 	ChunkLightData LightData;
 
+	cChunkPoiData PoiData;
+
 	cChunkDef::BiomeMap BiomeMap;
 	cChunkDef::HeightMap HeightMap;
 
