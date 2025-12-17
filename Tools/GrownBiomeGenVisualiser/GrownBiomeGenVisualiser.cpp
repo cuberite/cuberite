@@ -156,7 +156,7 @@ static const struct
 template <typename ... Args>
 void log(const char * a_Fmt, const Args & ... a_Args)
 {
-	fmt::printf(a_Fmt, a_Args...);
+	fmt::printf(fmt::detail::to_string_view(a_Fmt), a_Args...);
 	putchar('\n');
 	fflush(stdout);
 }

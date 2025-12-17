@@ -290,7 +290,7 @@ void cConnection::vLog(const char * a_Format, fmt::printf_args a_ArgList)
 	// Log to file:
 	cCSLock Lock(m_CSLog);
 	fmt::fprintf(m_LogFile, "[%5.3f] ", GetRelativeTime());
-	fmt::vfprintf(m_LogFile, a_Format, a_ArgList);
+	fmt::vfprintf(m_LogFile, fmt::detail::to_string_view(a_Format), a_ArgList);
 	fmt::fprintf(m_LogFile, "\n");
 	#ifdef _DEBUG
 		fflush(m_LogFile);
@@ -312,7 +312,7 @@ void cConnection::vDataLog(const void * a_Data, size_t a_Size, const char * a_Fo
 	// Log to file:
 	cCSLock Lock(m_CSLog);
 	fmt::fprintf(m_LogFile, "[%5.3f] ", GetRelativeTime());
-	fmt::vfprintf(m_LogFile, a_Format, a_ArgList);
+	fmt::vfprintf(m_LogFile, fmt::detail::to_string_view(a_Format), a_ArgList);
 	fmt::fprintf(m_LogFile, "\n%s\n", Hex);
 
 	// Log to screen:
