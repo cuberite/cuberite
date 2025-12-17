@@ -12,13 +12,13 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /build
 
-# Copy source code
-COPY . .
-
-# Build using the project's helper script (handles deps and submodules)
-RUN sed -i 's/\r$//' compile.sh && \
-    chmod +x compile.sh && \
-    ./compile.sh -n yes -t AUTO
+# Clone and build
+RUN git clone --depth 1 https://github.com/cuberite/cuberite.git . && \
+    git submodule sync && \
+    git submodule update --init --recursive && \
+    mkdir build && cd build && \
+    cmake .. -DCMAKE_BUILD_TYPE=Release && \
+    make -j$(nproc)
 
 # Runtime stage
 FROM debian:bookworm-slim
@@ -35,7 +35,10 @@ RUN useradd -m -U -d /server cuberite
 
 # Create app directory for template files
 WORKDIR /app
-COPY --from=builder /build/cuberite/build-cuberite/Server .
+# Copy the actual data files from source Server/ (not symlinked build/Server/)
+COPY --from=builder /build/Server/ /app/
+# Copy the compiled binary
+COPY --from=builder /build/build/Server/Cuberite /app/Cuberite
 
 # Setup server directory
 WORKDIR /server
