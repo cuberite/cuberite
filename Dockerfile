@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
     make \
     cmake \
     g++ \
+    python3 \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
@@ -14,9 +15,8 @@ WORKDIR /build
 # Copy source code
 COPY . .
 
-# Configure and build
-RUN cmake . -DCMAKE_BUILD_TYPE=Release && \
-    make -j$(nproc)
+# Build using the project's helper script (handles deps and submodules)
+RUN ./compile.sh -n yes -t AUTO
 
 # Runtime stage
 FROM debian:bookworm-slim
@@ -33,7 +33,7 @@ RUN useradd -m -U -d /server cuberite
 
 # Create app directory for template files
 WORKDIR /app
-COPY --from=builder /build/Server .
+COPY --from=builder /build/cuberite/build-cuberite/Server .
 
 # Setup server directory
 WORKDIR /server
