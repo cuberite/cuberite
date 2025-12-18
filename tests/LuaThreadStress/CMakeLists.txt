@@ -94,14 +94,8 @@ if(WIN32)
 			TARGET LuaThreadStress  POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy
 			${CMAKE_BINARY_DIR}/Server/lua51.dll # Source
-			${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/) # Destination
-	message("Copying lua51.dll from " ${CMAKE_BINARY_DIR}/Server/lua51.dll " to " ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_BUILD_TYPE}/)
-
-	get_cmake_property(_variableNames VARIABLES)
-	list (SORT _variableNames)
-	foreach (_variableName ${_variableNames})
-		message(STATUS "${_variableName}=${${_variableName}}")
-	endforeach()
+			${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/) # Destination
+	message("Copying lua51.dll from " ${CMAKE_BINARY_DIR}/Server/lua51.dll " to " ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/)
 endif()
 
 
