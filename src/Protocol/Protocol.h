@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <fmt/format.h>
 #include "../Defines.h"
 #include "../Scoreboard.h"
 #include "../ByteBuffer.h"
@@ -493,4 +492,3 @@ protected:
 	The cPacketizer's destructor calls this to send the contained packet; protocol may transform the data (compression in 1.8 etc). */
 	virtual void SendPacket(cPacketizer & a_Packet) = 0;
 } ;
-
