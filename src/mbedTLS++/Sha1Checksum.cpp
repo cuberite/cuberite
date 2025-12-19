@@ -111,7 +111,7 @@ void cSha1Checksum::DigestToJava(const Checksum & a_Digest, AString & a_Out)
 		bool carry = true;  // Add one to the whole number
 		for (int i = 19; i >= 0; i--)
 		{
-			Digest[i] = ~Digest[i];
+			Digest[i] = static_cast<Byte>(~Digest[i]);
 			if (carry)
 			{
 				carry = (Digest[i] == 0xff);

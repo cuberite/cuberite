@@ -89,7 +89,8 @@ add_test(NAME LuaThreadStress-test WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 # Necessary for the test to run.
 # Otherwise they crash with the error STATUS_DLL_NOT_FOUND (0xC0000135) because they can't find the lua51.dll
 
-if(WIN32)
+# Disable this for now
+if(WIN32 AND false)
 	add_custom_command(
 			TARGET LuaThreadStress  POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy

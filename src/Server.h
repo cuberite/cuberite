@@ -12,6 +12,7 @@
 #include "RCONServer.h"
 #include "OSSupport/IsThread.h"
 #include "OSSupport/Network.h"
+#include <functional>
 
 #ifdef _MSC_VER
 	#pragma warning(push)

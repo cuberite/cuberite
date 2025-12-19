@@ -60,7 +60,7 @@ void cThrownEnderPearlEntity::TeleportCreator(Vector3d a_HitPos)
 
 
 
-	GetWorld()->FindAndDoWithPlayer(m_CreatorData.m_Name, [=](cPlayer & a_Entity)
+	GetWorld()->FindAndDoWithPlayer(m_CreatorData.m_Name, [=, this](cPlayer & a_Entity)
 	{
 
 		auto & Random = GetRandomProvider();

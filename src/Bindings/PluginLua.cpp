@@ -1148,7 +1148,7 @@ const char * cPluginLua::GetHookFnName(int a_HookType)
 			break;
 		}
 	}  // switch (a_Hook)
-	LOGWARNING("Requested name of an unknown hook type function: %d (max is %d)", a_HookType, cPluginManager::HOOK_MAX);
+	LOGWARNING("Requested name of an unknown hook type function: %d (max is %d)", static_cast<int>(a_HookType), static_cast<int>(cPluginManager::HOOK_MAX));
 	ASSERT(!"Unknown hook requested!");
 	return nullptr;
 }

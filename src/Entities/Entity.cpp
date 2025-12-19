@@ -295,7 +295,7 @@ void cEntity::TakeDamage(eDamageType a_DamageType, cEntity * a_Attacker, int a_R
 
 void cEntity::TakeDamage(eDamageType a_DamageType, UInt32 a_AttackerID, int a_RawDamage, double a_KnockbackAmount)
 {
-	m_World->DoWithEntityByID(a_AttackerID, [=](cEntity & a_Attacker)
+	m_World->DoWithEntityByID(a_AttackerID, [=, this](cEntity & a_Attacker)
 		{
 			cPawn * Attacker;
 			if (a_Attacker.IsPawn())
