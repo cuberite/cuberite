@@ -2962,7 +2962,7 @@ void cProtocol_1_19_4::WriteEntityMetadata(cPacketizer & a_Pkt, const cEntity & 
 			{
 				WriteEntityMetadata(a_Pkt, EntityMetadata::EntityCustomName, EntityMetadataType::OptChat);
 				a_Pkt.WriteBool(true);
-				a_Pkt.WriteString(a_Mob.GetCustomName());
+				a_Pkt.WriteString(JsonUtils::SerializeSingleValueJsonObject("text", a_Mob.GetCustomName()));
 
 				WriteEntityMetadata(a_Pkt, EntityMetadata::EntityNameVisible, EntityMetadataType::Boolean);
 				a_Pkt.WriteBool(a_Mob.IsCustomNameAlwaysVisible());
