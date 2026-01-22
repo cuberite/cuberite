@@ -1366,6 +1366,14 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 				{
 					a_Item.SetComponent(DataComponents::RepairCostComponent { static_cast<UInt32>(NBT.GetInt(tag)) });
 				}
+				else if (TagName == "Damage")
+				{
+					auto damage = static_cast<UInt32>(NBT.GetInt(tag));
+					if (damage > 0)
+					{
+						a_Item.SetComponent(DataComponents::DamageComponent { damage });
+					}
+				}
 				break;
 			}
 			case TAG_String:
@@ -1489,13 +1497,22 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 					}
 					else
 					{
-						a_Item.m_ItemDamage |= 0x2000;  // Is drinkable
-					}
-					*/
+					a_Item.m_ItemDamage |= 0x2000;  // Is drinkable
+				}
+				*/
+			}
+			break;
+		}
+		case TAG_Byte:
+			{
+				if (TagName == "Unbreakable")
+				{
+					bool unbreakable = (NBT.GetByte(tag) != 0);
+					a_Item.SetComponent(DataComponents::UnbreakableComponent { unbreakable });
 				}
 				break;
 			}
-			default: LOGD("Unimplemented NBT data when parsing!"); break;
+		default: LOGD("Unimplemented NBT data when parsing!"); break;
 		}
 	}
 }
@@ -1626,7 +1643,14 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	}
 	else
 	{
-		// a_Pkt.WriteBEInt16(a_Item.m_ItemDamage);
+		// FIX FOR #5617: Write damage for 1.9-1.12.2 clients
+		// In these protocols, damage is sent as a separate field, not in NBT
+		short Damage = 0;
+		if (a_Item.HasComponent<DataComponents::DamageComponent>())
+		{
+			Damage = static_cast<short>(a_Item.GetComponentOrDefault<DataComponents::DamageComponent>().Damage);
+		}
+		a_Pkt.WriteBEInt16(Damage);
 	}
 
 	if (

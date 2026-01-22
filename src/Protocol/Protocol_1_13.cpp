@@ -2000,8 +2000,26 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 			finalname += "long_";
 		}
 		*/
-		finalname += potionname;
-		Writer.AddString("Potion", finalname);
+	finalname += potionname;
+	Writer.AddString("Potion", finalname);
+	}
+	// FIX FOR #5617: Serialize damage component to NBT
+	if (a_Item.HasComponent<DataComponents::DamageComponent>())
+	{
+		auto damage = a_Item.GetComponentOrDefault<DataComponents::DamageComponent>().Damage;
+		if (damage > 0)
+		{
+			Writer.AddInt("Damage", static_cast<Int32>(damage));
+		}
+	}
+	// Serialize unbreakable component
+	if (a_Item.HasComponent<DataComponents::UnbreakableComponent>())
+	{
+		auto unbreakable = a_Item.GetComponentOrDefault<DataComponents::UnbreakableComponent>().unbreakable;
+		if (unbreakable)
+		{
+			Writer.AddByte("Unbreakable", 1);
+		}
 	}
 	if (a_Item.HasComponent<DataComponents::RepairCostComponent>())
 	{
