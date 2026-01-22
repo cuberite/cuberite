@@ -150,6 +150,7 @@ public:
 	virtual bool ReadMaxDamageComponent    (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
 	virtual bool ReadDamageComponent       (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
 	virtual bool ReadRepairCostComponent   (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
+	virtual bool ReadMapIdComponent        (cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const;
 
 	//  Define all writer functions here
 	virtual void WriteMaxStackSizeComponent (cPacketizer & a_Pkt, const DataComponents::MaxStackSizeComponent & a_Comp) const;
@@ -158,4 +159,5 @@ public:
 	virtual void WriteMaxDamageComponent    (cPacketizer & a_Pkt, const DataComponents::MaxDamageComponent & a_Comp) const;
 	virtual void WriteDamageComponent       (cPacketizer & a_Pkt, const DataComponents::DamageComponent & a_Comp) const;
 	virtual void WriteRepairCostComponent   (cPacketizer & a_Pkt, const DataComponents::RepairCostComponent & a_Comp) const;
+	virtual void WriteMapIdComponent        (cPacketizer & a_Pkt, const DataComponents::MapIdComponent & a_Comp) const;
 };

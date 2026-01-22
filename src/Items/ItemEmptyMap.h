@@ -47,8 +47,10 @@ public:
 			return true;
 		}
 
-		// Replace map in the inventory:
-		a_Player->ReplaceOneEquippedItemTossRest(cItem(Item::Map, 1));
+		// Replace map in the inventory with the new map item containing the map ID:
+		cItem MapItem(Item::Map, 1);
+		MapItem.SetComponent(DataComponents::MapIdComponent { NewMap->GetID() });
+		a_Player->ReplaceOneEquippedItemTossRest(MapItem);
 		return true;
 	}
 } ;

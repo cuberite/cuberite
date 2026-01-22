@@ -3201,6 +3201,12 @@ bool cProtocol_1_8_0::ReadItem(cByteBuffer & a_ByteBuffer, cItem & a_Item, size_
 		// a_Item.m_ItemDamage += ItemDamage;
 	}
 
+	// FIX FOR #5566: Read map ID from damage field for pre-1.13 protocols
+	if (a_Item.m_ItemType == Item::Map)
+	{
+		a_Item.SetComponent(DataComponents::MapIdComponent { static_cast<UInt32>(ItemDamage) });
+	}
+
 	ContiguousByteBuffer Metadata;
 	if (!a_ByteBuffer.ReadSome(Metadata, a_ByteBuffer.GetReadableSpace() - a_KeepRemainingBytes) || Metadata.empty() || (Metadata[0] == std::byte(0)))
 	{

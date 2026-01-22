@@ -1360,22 +1360,26 @@ void cProtocol_1_9_0::ParseItemMetadata(cItem & a_Item, const ContiguousByteBuff
 				}
 				break;
 			}
-			case TAG_Int:
+		case TAG_Int:
+		{
+			if (TagName == "RepairCost")
 			{
-				if (TagName == "RepairCost")
-				{
-					a_Item.SetComponent(DataComponents::RepairCostComponent { static_cast<UInt32>(NBT.GetInt(tag)) });
-				}
-				else if (TagName == "Damage")
-				{
-					auto damage = static_cast<UInt32>(NBT.GetInt(tag));
-					if (damage > 0)
-					{
-						a_Item.SetComponent(DataComponents::DamageComponent { damage });
-					}
-				}
-				break;
+				a_Item.SetComponent(DataComponents::RepairCostComponent { static_cast<UInt32>(NBT.GetInt(tag)) });
 			}
+			else if (TagName == "Damage")
+			{
+				auto damage = static_cast<UInt32>(NBT.GetInt(tag));
+				if (damage > 0)
+				{
+					a_Item.SetComponent(DataComponents::DamageComponent { damage });
+				}
+			}
+			else if (TagName == "map")
+			{
+				a_Item.SetComponent(DataComponents::MapIdComponent { static_cast<UInt32>(NBT.GetInt(tag)) });
+			}
+			break;
+		}
 			case TAG_String:
 			{
 				if (TagName == "Potion")
@@ -1645,8 +1649,13 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 	{
 		// FIX FOR #5617: Write damage for 1.9-1.12.2 clients
 		// In these protocols, damage is sent as a separate field, not in NBT
+		// For maps, the map ID is stored in the damage field (pre-1.13 behavior)
 		short Damage = 0;
-		if (a_Item.HasComponent<DataComponents::DamageComponent>())
+		if (a_Item.m_ItemType == Item::Map && a_Item.HasComponent<DataComponents::MapIdComponent>())
+		{
+			Damage = static_cast<short>(a_Item.GetComponentOrDefault<DataComponents::MapIdComponent>().MapID);
+		}
+		else if (a_Item.HasComponent<DataComponents::DamageComponent>())
 		{
 			Damage = static_cast<short>(a_Item.GetComponentOrDefault<DataComponents::DamageComponent>().Damage);
 		}

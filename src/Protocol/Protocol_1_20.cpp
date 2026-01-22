@@ -2941,7 +2941,7 @@ bool cProtocol_1_20_5::ReadComponent(cByteBuffer & a_ByteBuffer, DataComponents:
 		// {23, &ReadStoredEnchantmentsComponent},
 		// {24, &ReadDyedColorComponent},
 		// {25, &ReadMapColorComponent},
-		// {26, &ReadMapIdComponent},
+		{26, &P::ReadMapIdComponent},
 		// {27, &ReadMapDecorationsComponent},
 		// {28, &ReadMapPostProcessingComponent},
 		// {29, &ReadChargedProjectilesComponent},
@@ -3087,6 +3087,17 @@ bool cProtocol_1_20_5::ReadRepairCostComponent(cByteBuffer & a_ByteBuffer, DataC
 
 
 
+bool cProtocol_1_20_5::ReadMapIdComponent(cByteBuffer & a_ByteBuffer, DataComponents::DataComponent & a_Result) const
+{
+	HANDLE_PACKET_READ(a_ByteBuffer, ReadVarInt, UInt32, MapID);
+	a_Result = DataComponents::MapIdComponent { MapID };
+	return true;
+}
+
+
+
+
+
 void cProtocol_1_20_5::WriteComponent(cPacketizer & a_Pkt, const DataComponents::DataComponent & a_Component) const
 {
 	// TODO: implement remaining components
@@ -3118,7 +3129,7 @@ void cProtocol_1_20_5::WriteComponent(cPacketizer & a_Pkt, const DataComponents:
 		// WRITE_DATA_COMPONENT(23, StoredEnchantmentsComponent)
 		// WRITE_DATA_COMPONENT(24, DyedColorComponent)
 		// WRITE_DATA_COMPONENT(25, MapColorComponent)
-		// WRITE_DATA_COMPONENT(26, MapIdComponent)
+		WRITE_DATA_COMPONENT(26, MapIdComponent)
 		// WRITE_DATA_COMPONENT(27, MapDecorationsComponent)
 		// WRITE_DATA_COMPONENT(28, MapPostProcessingComponent)
 		// WRITE_DATA_COMPONENT(29, ChargedProjectilesComponent)
@@ -3206,4 +3217,13 @@ void cProtocol_1_20_5::WriteMaxDamageComponent(cPacketizer & a_Pkt, const DataCo
 void cProtocol_1_20_5::WriteRepairCostComponent(cPacketizer & a_Pkt, const DataComponents::RepairCostComponent & a_Comp) const
 {
 	a_Pkt.WriteVarInt32(a_Comp.RepairCost);
+}
+
+
+
+
+
+void cProtocol_1_20_5::WriteMapIdComponent(cPacketizer & a_Pkt, const DataComponents::MapIdComponent & a_Comp) const
+{
+	a_Pkt.WriteVarInt32(a_Comp.MapID);
 }

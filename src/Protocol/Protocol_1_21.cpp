@@ -1815,6 +1815,7 @@ void cProtocol_1_21_2::WriteComponent(cPacketizer & a_Pkt, const DataComponents:
 		WRITE_DATA_COMPONENT(16, HideTooltipComponent)
 		*/
 	WRITE_DATA_COMPONENT(17, RepairCostComponent)
+	WRITE_DATA_COMPONENT(36, MapIdComponent)
 		/*
 		WRITE_DATA_COMPONENT(18, CreativeSlotLockComponent)
 		WRITE_DATA_COMPONENT(19, EnchantmentGlintOverrideComponent)
@@ -4014,6 +4015,7 @@ void cProtocol_1_21_5::WriteComponent(cPacketizer & a_Pkt, const DataComponents:
 	// WRITE_DATA_COMPONENT(14, CustomModelDataComponent)
 	// WRITE_DATA_COMPONENT(15, TooltipDisplayComponent)
 	WRITE_DATA_COMPONENT(16, RepairCostComponent)
+	WRITE_DATA_COMPONENT(37, MapIdComponent)
 	/*
 	WRITE_DATA_COMPONENT(17, CreativeSlotLockComponent)
 	WRITE_DATA_COMPONENT(18, EnchantmentGlintOverrideComponent)

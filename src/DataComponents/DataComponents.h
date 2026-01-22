@@ -73,14 +73,25 @@ namespace DataComponents
 		UInt32 RepairCost;
 	};
 
+	struct MapIdComponent
+	{
+		MapIdComponent() = default;
+		MapIdComponent(UInt32 a_MapID)
+		{
+			MapID = a_MapID;
+		}
+		UInt32 MapID;
+	};
+
 	COMP_EQU_OP(MaxDamageComponent, lhs.MaxDamage == rhs.MaxDamage);
 	COMP_EQU_OP(DamageComponent, lhs.Damage == rhs.Damage);
 	COMP_EQU_OP(MaxStackSizeComponent, lhs.maxStackSize == rhs.maxStackSize);
 	COMP_EQU_OP(UnbreakableComponent, lhs.unbreakable == rhs.unbreakable);
 	COMP_EQU_OP(CustomNameComponent, lhs.Name.ExtractText() == rhs.Name.ExtractText());  // TODO: proper comparison
 	COMP_EQU_OP(RepairCostComponent, lhs.RepairCost == rhs.RepairCost);
+	COMP_EQU_OP(MapIdComponent, lhs.MapID == rhs.MapID);
 
-	typedef std::variant<MaxStackSizeComponent, UnbreakableComponent, CustomNameComponent, DamageComponent, MaxDamageComponent, RepairCostComponent> DataComponent;
+	typedef std::variant<MaxStackSizeComponent, UnbreakableComponent, CustomNameComponent, DamageComponent, MaxDamageComponent, RepairCostComponent, MapIdComponent> DataComponent;
 
 	//  Original version taken from here: https://gist.github.com/nnaumenko/1db96f7e187979a057ee7ad757dee4f2
 	template <typename T, size_t I = 0>

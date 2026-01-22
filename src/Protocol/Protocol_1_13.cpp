@@ -2025,6 +2025,11 @@ void cProtocol_1_13_2::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) cons
 	{
 		Writer.AddInt("RepairCost", static_cast<Int32>(a_Item.GetComponentOrDefault<DataComponents::RepairCostComponent>().RepairCost));
 	}
+	// Serialize map ID component
+	if (a_Item.HasComponent<DataComponents::MapIdComponent>())
+	{
+		Writer.AddInt("map", static_cast<Int32>(a_Item.GetComponentOrDefault<DataComponents::MapIdComponent>().MapID));
+	}
 	if (!a_Item.m_Enchantments.IsEmpty())
 	{
 		const char * TagName = (a_Item.m_ItemType == Item::EnchantedBook) ? "StoredEnchantments" : "Enchantments";
