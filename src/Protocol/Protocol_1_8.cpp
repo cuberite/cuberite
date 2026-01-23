@@ -1461,8 +1461,15 @@ void cProtocol_1_8_0::SendSoundEffect(const AString & a_SoundName, Vector3d a_Or
 {
 	ASSERT(m_State == 3);  // In game mode?
 
+	// Translate 1.9+ sound names to 1.8 format
+	AString soundName = a_SoundName;
+	if (a_SoundName == "entity.item.pickup")
+	{
+		soundName = "random.pop";
+	}
+
 	cPacketizer Pkt(*this, pktSoundEffect);
-	Pkt.WriteString(a_SoundName);
+	Pkt.WriteString(soundName);
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.x * 8.0));
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.y * 8.0));
 	Pkt.WriteBEInt32(static_cast<Int32>(a_Origin.z * 8.0));
