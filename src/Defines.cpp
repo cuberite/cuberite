@@ -592,13 +592,17 @@ Vector3i AddFaceDirection(const Vector3i a_Position, const eBlockFace a_BlockFac
 		case BLOCK_FACE_XM: return a_Position.addedX(-Offset);
 		case BLOCK_FACE_NONE:
 		{
-			LOGWARNING("%s: Unknown face: %s", __FUNCTION__, BlockFaceToString(a_BlockFace));
-			ASSERT(!"AddFaceDirection(): Unknown face");
-			break;
+			// FIX FOR #5441: Return position unchanged instead of crashing
+			// BLOCK_FACE_NONE is a valid value (swinging in air, invalid API calls)
+			// Gracefully handle it by returning original position
+			return a_Position;
 		}
 	}
 
-	UNREACHABLE("Unsupported block face");
+	// If we reach here, an invalid block face was passed
+	// Log warning and return position unchanged instead of crashing
+	LOGWARNING("%s: Invalid block face value: %d", __FUNCTION__, static_cast<int>(a_BlockFace));
+	return a_Position;
 }
 
 

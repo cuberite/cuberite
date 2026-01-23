@@ -1442,6 +1442,11 @@ void cPlayer::TeleportToCoords(double a_PosX, double a_PosY, double a_PosZ)
 		FreezeInternal(GetPosition(), false);
 
 		m_ClientHandle->SendPlayerMoveLook();
+
+		// FIX FOR #5524: Broadcast spawn to nearby players after teleport
+		// When a player teleports, clients in the destination area need to receive
+		// the spawn packet or the player will be invisible to them
+		m_World->BroadcastSpawnEntity(*this, m_ClientHandle.get());
 	}
 }
 
