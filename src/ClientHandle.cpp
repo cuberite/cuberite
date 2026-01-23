@@ -1337,6 +1337,16 @@ void cClientHandle::HandleBlockDigFinished(Vector3i a_BlockPos, eBlockFace a_Blo
 		return;
 	}
 
+	// FIX FOR #5528: Prevent mining unbreakable blocks (bedrock, barriers, etc.)
+	// Blocks with negative hardness cannot be broken even in creative mode
+	if (cBlockInfo::GetHardness(DugBlock) < 0.0f)
+	{
+		LOGD("Player %s attempted to mine unbreakable block at %s", m_Player->GetName().c_str(), a_BlockPos);
+		m_Player->SendBlocksAround(a_BlockPos, 2);
+		SendPlayerPosition();
+		return;
+	}
+
 	if (!m_Player->IsGameModeCreative())
 	{
 		m_BreakProgress += m_Player->GetMiningProgressPerTick(DugBlock);
