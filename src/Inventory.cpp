@@ -846,9 +846,11 @@ void cInventory::OnSlotChanged(cItemGrid * a_ItemGrid, int a_SlotNum)
 	cWorld * World = m_Owner.GetWorld();
 	if ((a_ItemGrid == &m_ArmorSlots) && (World != nullptr))
 	{
+		// FIX FOR #5518: Send EntityEquipment to all players including owner
+		// This ensures armor renders even when the owner has a different window open (e.g. chest GUI)
 		World->BroadcastEntityEquipment(
 			m_Owner, static_cast<short>(ArmorSlotNumToEntityEquipmentID(static_cast<short>(a_SlotNum))),
-			m_ArmorSlots.GetSlot(a_SlotNum), m_Owner.GetClientHandle()
+			m_ArmorSlots.GetSlot(a_SlotNum), nullptr  // nullptr = don't exclude anyone, send to owner too
 		);
 	}
 
