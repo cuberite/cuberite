@@ -1651,7 +1651,7 @@ void cProtocol_1_9_0::WriteItem(cPacketizer & a_Pkt, const cItem & a_Item) const
 		// In these protocols, damage is sent as a separate field, not in NBT
 		// For maps, the map ID is stored in the damage field (pre-1.13 behavior)
 		short Damage = 0;
-		if (a_Item.m_ItemType == Item::Map && a_Item.HasComponent<DataComponents::MapIdComponent>())
+		if ((a_Item.m_ItemType == Item::Map) && a_Item.HasComponent<DataComponents::MapIdComponent>())
 		{
 			Damage = static_cast<short>(a_Item.GetComponentOrDefault<DataComponents::MapIdComponent>().MapID);
 		}
