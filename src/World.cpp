@@ -247,7 +247,24 @@ cWorld::cWorld(
 
 		// TODO: More descriptions for each key
 		IniFile.AddHeaderComment(" This is the per-world configuration file, managing settings such as generators, simulators, and spawn points");
-		IniFile.AddKeyComment(" LinkedWorlds", "This section governs portal world linkage; leave a value blank to disabled that associated method of teleportation");
+
+		// cIniFile::AddKeyComment requires the key (section) to already exist:
+		auto AddSectionComment = [&IniFile](const char * a_SectionName, const char * a_Comment)
+		{
+			IniFile.AddKeyName(a_SectionName);
+			IniFile.AddKeyComment(a_SectionName, a_Comment);
+		};
+
+		AddSectionComment("General",      "General world settings: dimension, time, weather, tick age, daylight cycle, etc.");
+		AddSectionComment("SpawnPosition","Spawn coordinates and pregeneration settings.");
+		AddSectionComment("Broadcasting", "Controls whether deaths and achievements are broadcast to all players.");
+		AddSectionComment("LinkedWorlds", "Portal linkage settings between worlds. Leave a value blank to disable that portal type.");
+		AddSectionComment("Storage",      "Chunk storage settings (schema and compression).");
+		AddSectionComment("Plants",       "Plant growth limits such as maximum cactus and sugarcane heights.");
+		AddSectionComment("Physics",      "Physics-related gameplay settings (lava fire, TNT shrapnel, deep snow, redstone / fluid simulators).");
+		AddSectionComment("Mechanics",    "Gameplay mechanics such as PVP, command blocks, portal sizes and chat prefixes.");
+		AddSectionComment("Monsters",     "Mob spawning settings (enabled families, allowed types, villager harvesting).");
+		AddSectionComment("Weather",      "Overworld weather timing configuration (sun, rain and thunderstorms).");
 	}
 
 	// The presence of a configuration value overrides everything
@@ -2653,15 +2670,13 @@ void cWorld::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ)
 
 
 
-
-bool cWorld::SetSignLines(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
+bool cWorld::SetSignLines(Vector3i a_BlockPos, AString && a_Line1, AString && a_Line2, AString && a_Line3, AString && a_Line4, cPlayer * a_Player)
 {
-	// TODO: rvalue these strings
-
-	AString Line1(a_Line1);
-	AString Line2(a_Line2);
-	AString Line3(a_Line3);
-	AString Line4(a_Line4);
+	// Rvalue overload: allows callers to avoid string copies when they already have temporaries.
+	AString Line1(std::move(a_Line1));
+	AString Line2(std::move(a_Line2));
+	AString Line3(std::move(a_Line3));
+	AString Line4(std::move(a_Line4));
 
 	if (cRoot::Get()->GetPluginManager()->CallHookUpdatingSign(*this, a_BlockPos, Line1, Line2, Line3, Line4, a_Player))
 	{
@@ -2671,7 +2686,7 @@ bool cWorld::SetSignLines(Vector3i a_BlockPos, const AString & a_Line1, const AS
 	if (
 		DoWithBlockEntityAt(a_BlockPos, [&Line1, &Line2, &Line3, &Line4](cBlockEntity & a_BlockEntity)
 		{
-			if (!cBlockWallSignHandler::IsBlockWallSign(a_BlockEntity.GetBlock()) && !cBlockSignPostHandler::IsBlockSignPost(a_BlockEntity.GetBlock()))
+			if ((a_BlockEntity.GetBlockType() != E_BLOCK_WALLSIGN) && (a_BlockEntity.GetBlockType() != E_BLOCK_SIGN_POST))
 			{
 				return false;  // Not a sign
 			}
@@ -2947,8 +2962,15 @@ void cWorld::TickQueuedBlocks(void)
 		Block->TicksToWait -= 1;
 		if (Block->TicksToWait <= 0)
 		{
-			// TODO: Handle the case when the chunk is already unloaded
-			m_ChunkMap.TickBlock({Block->X, Block->Y, Block->Z});
+			Vector3i BlockPos{Block->X, Block->Y, Block->Z};
+			int ChunkX = 0, ChunkZ = 0;
+			cChunkDef::BlockToChunk(Block->X, Block->Z, ChunkX, ChunkZ);
+
+			// If the chunk is already unloaded, the tick can't be executed. Drop it silently.
+			if (m_ChunkMap.IsChunkValid(ChunkX, ChunkZ))
+			{
+				m_ChunkMap.TickBlock(BlockPos);
+			}
 			delete Block;  // We don't have to remove it from the vector, this will happen automatically on the next tick
 		}
 		else
@@ -2957,6 +2979,7 @@ void cWorld::TickQueuedBlocks(void)
 		}
 	}  // for itr - m_BlockTickQueueCopy[]
 }
+
 
 
 
