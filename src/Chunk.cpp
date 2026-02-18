@@ -784,7 +784,7 @@ void cChunk::MoveEntityToNewChunk(OwnedEntity a_Entity)
 			__FUNCTION__, static_cast<void *>(a_Entity.get()), a_Entity->GetClass(), a_Entity->GetUniqueID()
 		);
 
-		// Use GetChunk instead of ConstructChunk to ensure the chunk is queued for loading/generation
+		// Use GetChunk instead of ConstructChunk to ensure the chunk is queued for loading / generation
 		// This prevents entities from being moved to completely empty chunks
 		Neighbor = &m_ChunkMap->GetChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
 	}
