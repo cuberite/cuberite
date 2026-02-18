@@ -314,6 +314,7 @@ public:
 
 	/** Sets the sign text, asking plugins for permission first. a_Player is the player who this change belongs to, may be nullptr. Returns true if sign text changed. */
 	bool SetSignLines(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player = nullptr);  // Exported in ManualBindings.cpp
+	bool SetSignLines(Vector3i a_BlockPos, AString && a_Line1, AString && a_Line2, AString && a_Line3, AString && a_Line4, cPlayer * a_Player = nullptr);
 
 	/** Sets the command block command. Returns true if command changed. */
 	bool SetCommandBlockCommand(int a_BlockX, int a_BlockY, int a_BlockZ, const AString & a_Command);  // tolua_export
