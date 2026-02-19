@@ -3001,7 +3001,6 @@ void cWorld::TickQueuedBlocks(void)
 		Block->TicksToWait -= 1;
 		if (Block->TicksToWait <= 0)
 		{
-			// TODO: Handle the case when the chunk is already unloaded
 			Vector3i BlockPos{Block->X, Block->Y, Block->Z};
 			int ChunkX = 0, ChunkZ = 0;
 			cChunkDef::BlockToChunk(Block->X, Block->Z, ChunkX, ChunkZ);
