@@ -871,25 +871,24 @@ void cChunkMap::RemoveClientFromChunks(cClientHandle * a_Client)
 
 
 
+
 void cChunkMap::AddEntity(OwnedEntity a_Entity)
 {
 	cCSLock Lock(m_CSChunks);
 	const auto ChunkX = a_Entity->GetChunkX();
 	const auto ChunkZ = a_Entity->GetChunkZ();
-	
 	if (FindChunk(ChunkX, ChunkZ) == nullptr)
 	{
 		LOGWARNING("%s: Entity at %p (%s, ID %d) spawning in a non-existent chunk. Queueing chunk for loading.",
 			__FUNCTION__, static_cast<void *>(a_Entity.get()), a_Entity->GetClass(), a_Entity->GetUniqueID()
 		);
-		// Use GetChunk instead of ConstructChunk to ensure the chunk is queued for loading/generation
-		// This prevents entities from being added to completely empty chunks
 	}
 
 	const auto EntityPtr = a_Entity.get();
 	ASSERT(EntityPtr->GetWorld() == m_World);
 
-	auto & Chunk = ConstructChunk(a_Entity->GetChunkX(), a_Entity->GetChunkZ());
+	// Use GetChunk instead of ConstructChunk to ensure the chunk is queued for loading / generation when needed.
+	auto & Chunk = GetChunk(ChunkX, ChunkZ);
 	Chunk.AddEntity(std::move(a_Entity));
 
 	EntityPtr->OnAddToWorld(*m_World);
