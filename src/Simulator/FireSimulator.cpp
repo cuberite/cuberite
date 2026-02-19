@@ -105,14 +105,23 @@ void cFireSimulator::SimulateChunk(std::chrono::milliseconds a_Dt, int a_ChunkX,
 
 		// FIRE_FLOG("FS: Fire at {0} is stepping", AbsPos);
 
-		// TODO: Add some randomness into this
-		const auto BurnStep = GetBurnStepTime(a_Chunk, RelPos);
+		// Add some randomness into the burn step timing to avoid large areas of fire stepping in lockstep.
+		auto BurnStep = GetBurnStepTime(a_Chunk, RelPos);
 		if (BurnStep == 0)
 		{
 			// Fire has no fuel or ground block, extinguish flame
 			a_Chunk->SetBlock(RelPos, Block::Air::Air());
 			itr = Data.erase(itr);
 			continue;
+		}
+		// Jitter the burn step a little bit (bounded) so the average behavior stays the same:
+		{
+			// Up to 20%, but no more than 1000 ms:
+			const int MaxJitter = std::min(1000, BurnStep / 5);
+			if (MaxJitter > 0)
+			{
+				BurnStep = std::max(1, BurnStep + GetRandomProvider().RandInt(-MaxJitter, MaxJitter));
+			}
 		}
 
 		// Has the fire burnt out?
