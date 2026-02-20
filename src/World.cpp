@@ -245,7 +245,6 @@ cWorld::cWorld(
 	{
 		LOGWARNING("Cannot read world settings from \"%s\", defaults will be used.", m_IniFileName);
 
-		// TODO: More descriptions for each key
 		IniFile.AddHeaderComment(" This is the per-world configuration file, managing settings such as generators, simulators, and spawn points");
 
 		// cIniFile::AddKeyComment requires the key (section) to already exist:
@@ -1909,6 +1908,20 @@ bool cWorld::GetBlockInfo(Vector3i a_BlockPos, BlockState & a_Block, LIGHTTYPE &
 
 
 
+LIGHTTYPE cWorld::GetBlockActualLight(Vector3i a_BlockPos) const
+{
+	// Sky light is reduced by the current sky darkness; block light is unaffected.
+	const auto Sky = GetBlockSkyLight(a_BlockPos);
+	const auto Block = GetBlockBlockLight(a_BlockPos);
+
+	// m_SkyDarkness is the number of light levels removed from sky light (0 = day, 8 = full night).
+	const auto EffectiveSky = (m_SkyDarkness >= Sky) ? static_cast<LIGHTTYPE>(0) : static_cast<LIGHTTYPE>(Sky - m_SkyDarkness);
+
+	return std::max(EffectiveSky, Block);
+}
+
+
+
 
 
 bool cWorld::WriteBlockArea(cBlockArea & a_Area, int a_MinBlockX, int a_MinBlockY, int a_MinBlockZ, int a_DataTypes)
@@ -2291,8 +2304,19 @@ void cWorld::MarkChunkSaved (int a_ChunkX, int a_ChunkZ)
 void cWorld::QueueSetChunkData(struct SetChunkData && a_SetChunkData)
 {
 	// Store a copy of the data in the queue:
-	// TODO: If the queue is too large, wait for it to get processed. Not likely, though.
 	cCSLock Lock(m_CSSetChunkDataQueue);
+
+	// If the queue grows too large, wait for the tick thread to drain it a bit.
+	// This bounds memory usage under heavy world generation / loading.
+	static constexpr size_t MaxQueuedSetChunkData = 512;
+	while (m_SetChunkDataQueue.size() >= MaxQueuedSetChunkData)
+	{
+		// Drop the lock while sleeping so the tick thread can make progress.
+		Lock.Unlock();
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		Lock.Lock();
+	}
+
 	m_SetChunkDataQueue.emplace_back(std::move(a_SetChunkData));
 }
 
@@ -2673,7 +2697,6 @@ void cWorld::ChunkLoadFailed(int a_ChunkX, int a_ChunkZ)
 
 bool cWorld::SetSignLines(Vector3i a_BlockPos, const AString & a_Line1, const AString & a_Line2, const AString & a_Line3, const AString & a_Line4, cPlayer * a_Player)
 {
-	// TODO: rvalue these strings
 
 	AString Line1(a_Line1);
 	AString Line2(a_Line2);
@@ -3001,6 +3024,7 @@ void cWorld::TickQueuedBlocks(void)
 		Block->TicksToWait -= 1;
 		if (Block->TicksToWait <= 0)
 		{
+
 			Vector3i BlockPos{Block->X, Block->Y, Block->Z};
 			int ChunkX = 0, ChunkZ = 0;
 			cChunkDef::BlockToChunk(Block->X, Block->Z, ChunkX, ChunkZ);
