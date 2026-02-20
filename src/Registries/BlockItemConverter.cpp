@@ -963,7 +963,7 @@ namespace BlockItemConverter
 			case Item::ZombieHead:                         return BlockType::ZombieHead;
 			default:
 			{
-				LOGERROR("{}: Got unintended item to convert to block: {}", __FUNCTION__, static_cast<UInt32>(a_Item));  // TODO: print string instead of int
+				LOGERROR("{}: Got unintended item to convert to block: {}", __FUNCTION__, static_cast<UInt32>(a_Item));
 				UNREACHABLE("Converting unintended item to block");
 			}
 		}
@@ -1927,7 +1927,7 @@ namespace BlockItemConverter
 			case BlockType::YellowWool:                      return Item::YellowWool;
 			case BlockType::ZombieHead:                      return Item::ZombieHead;
 		}
-		FLOGERROR("{}: Got unintended block to convert to item: {}", __FUNCTION__, static_cast<UInt32>(a_Block));  // TODO: print string instead of int
+		FLOGERROR("{}: Got unintended block to convert to item: {}", __FUNCTION__, NamespaceSerializer::From(a_Block));
 		UNREACHABLE("Converting unintended block to item");
 	}
 }
