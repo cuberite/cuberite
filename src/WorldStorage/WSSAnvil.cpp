@@ -14,6 +14,8 @@
 #include "../BlockType.h"
 #include "../JsonUtils.h"
 
+#include <set>
+
 #include "../Registries/BlockStates.h"
 #include "../Protocol/Palettes/Upgrade.h"
 
@@ -154,6 +156,8 @@ bool cWSSAnvil::LoadChunk(const cChunkCoords & a_Chunk)
 
 bool cWSSAnvil::SaveChunk(const cChunkCoords & a_Chunk)
 {
+	static std::set<cChunkCoords> ReportedSerializationFailures;
+
 	try
 	{
 		if (!SetChunkData(a_Chunk, SaveChunkToData(a_Chunk).GetView()))
@@ -164,7 +168,11 @@ bool cWSSAnvil::SaveChunk(const cChunkCoords & a_Chunk)
 	}
 	catch (const std::exception & Oops)
 	{
-		LOGWARNING("Cannot serialize chunk [%d, %d] into data: %s", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Oops.what());
+		// Avoid spamming the log with the same failing chunk over and over:
+		if (ReportedSerializationFailures.insert(a_Chunk).second)
+		{
+			LOGWARNING("Cannot serialize chunk [%d, %d] into data: %s", a_Chunk.m_ChunkX, a_Chunk.m_ChunkZ, Oops.what());
+		}
 		return false;
 	}
 
