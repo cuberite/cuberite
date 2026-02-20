@@ -1908,6 +1908,8 @@ bool cWorld::GetBlockInfo(Vector3i a_BlockPos, BlockState & a_Block, LIGHTTYPE &
 
 
 
+
+
 LIGHTTYPE cWorld::GetBlockActualLight(Vector3i a_BlockPos) const
 {
 	// Sky light is reduced by the current sky darkness; block light is unaffected.
