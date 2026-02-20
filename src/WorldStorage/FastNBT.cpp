@@ -762,8 +762,17 @@ void cFastNBTWriter::Finish(void)
 
 void cFastNBTWriter::WriteString(const std::string_view a_Data)
 {
-	// TODO check size <= short max
-	auto Length = HostToNetwork(static_cast<UInt16>(a_Data.size()));
+	// NBT strings are length-prefixed with a 16-bit unsigned integer.
+	if (a_Data.size() > std::numeric_limits<UInt16>::max())
+	{
+		LOGWARNING("cFastNBTWriter::WriteString: Truncating string of length {} to {} bytes to fit NBT length field",
+			static_cast<unsigned long long>(a_Data.size()),
+			static_cast<unsigned long long>(std::numeric_limits<UInt16>::max())
+		);
+	}
+
+	const auto ClampedSize = std::min<size_t>(a_Data.size(), std::numeric_limits<UInt16>::max());
+	auto Length = HostToNetwork(static_cast<UInt16>(ClampedSize));
 	m_Result.append(Length.begin(), Length.end());
-	m_Result.append(reinterpret_cast<const std::byte *>(a_Data.data()), a_Data.size());
+	m_Result.append(reinterpret_cast<const std::byte *>(a_Data.data()), ClampedSize);
 }
