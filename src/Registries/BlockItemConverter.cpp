@@ -1,6 +1,7 @@
 
 #include "Globals.h"
 #include "BlockItemConverter.h"
+#include "BlockType.h"
 
 namespace BlockItemConverter
 {
@@ -963,7 +964,7 @@ namespace BlockItemConverter
 			case Item::ZombieHead:                         return BlockType::ZombieHead;
 			default:
 			{
-				LOGERROR("{}: Got unintended item to convert to block: {}", __FUNCTION__, static_cast<UInt32>(a_Item));
+				LOGERROR("{}: Got unintended item to convert to block: {}", __FUNCTION__, ItemTypeToString(a_Item));
 				UNREACHABLE("Converting unintended item to block");
 			}
 		}
