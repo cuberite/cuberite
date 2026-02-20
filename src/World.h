@@ -384,7 +384,10 @@ public:
 	Exported in ManualBindings_World.cpp. */
 	bool GetBlockInfo(Vector3i a_BlockPos, BlockState & a_Block, LIGHTTYPE & a_SkyLight, LIGHTTYPE & a_BlockLight) const;
 
-	// TODO: NIBBLETYPE GetBlockActualLight(int a_BlockX, int a_BlockY, int a_BlockZ);
+	/** Returns the effective light level at the specified block position,
+	combining sky light and block light, and taking current sky darkness into account.
+	Returns 0 if the chunk is not valid. */
+	LIGHTTYPE GetBlockActualLight(Vector3i a_BlockPos) const;
 
 	/** Writes the block area into the specified coords.
 	Returns true if all chunks have been processed.
