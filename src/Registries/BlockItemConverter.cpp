@@ -965,7 +965,7 @@ namespace BlockItemConverter
 			default:
 			{
 				LOGERROR("{}: Got unintended item to convert to block: {}", __FUNCTION__, NamespaceSerializer::From(a_Item));
-				UNREACHABLE("Converting unintended item to block");
+				UNREACHABLE("Converting unintended item to block.");
 			}
 		}
 	}
