@@ -1,7 +1,7 @@
 
 #include "Globals.h"
 #include "BlockItemConverter.h"
-#include "BlockType.h"
+#include "WorldStorage/NamespaceSerializer.h"
 
 namespace BlockItemConverter
 {
@@ -964,7 +964,7 @@ namespace BlockItemConverter
 			case Item::ZombieHead:                         return BlockType::ZombieHead;
 			default:
 			{
-				LOGERROR("{}: Got unintended item to convert to block: {}", __FUNCTION__, ItemTypeToString(a_Item));
+				LOGERROR("{}: Got unintended item to convert to block: {}", __FUNCTION__, NamespaceSerializer::From(a_Item));
 				UNREACHABLE("Converting unintended item to block");
 			}
 		}
