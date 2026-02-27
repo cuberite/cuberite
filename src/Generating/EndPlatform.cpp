@@ -31,15 +31,15 @@ void cEndPlatform::Generate(cWorld * m_EndWorld)
 					for (int z = (coords.m_ChunkZ == 0 ? 0 : -2); z < (coords.m_ChunkZ == 0 ? 3 : 0); z++)
 					{
 						Vector3d currentBlockPos = m_PlatformPos.addedXZ(x, z);
-						m_World->FastSetBlock(currentBlockPos, E_BLOCK_OBSIDIAN, 0);
+						m_World->FastSetBlock(currentBlockPos, E_BLOCK_OBSIDIAN);
 						for (int y = 1; y <= 3; y++)
 						{
 							Vector3d blockToReplacePos = currentBlockPos.addedY(y);
-							BLOCKTYPE blockToReplaceType = m_World->GetBlock(blockToReplacePos);
-							if (blockToReplaceType != E_BLOCK_AIR)
+							BlockType blockToReplaceType = m_World->GetBlock(blockToReplacePos).Type();
+							if (blockToReplaceType != BlockType::Air)
 							{
 								// According to the Minecraft Wiki, the blocks above the platform should drop as items
-								if (blockToReplaceType == E_BLOCK_END_STONE)
+								if (blockToReplaceType == BlockType::EndStone)
 								{
 									// If the block is end stone, the platform will have spawned underground, so we don't want to drop the block as an item
 									m_World->DigBlock(blockToReplacePos);
