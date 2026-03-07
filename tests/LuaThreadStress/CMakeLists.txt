@@ -1,7 +1,6 @@
 find_package(Threads REQUIRED)
 include_directories(${PROJECT_SOURCE_DIR}/src/)
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/)
-include_directories(${PROJECT_SOURCE_DIR}/lib/mbedtls/include)
 include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/lib/jsoncpp/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 

@@ -1,7 +1,6 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/src/)
 include_directories(${PROJECT_SOURCE_DIR}/lib/jsoncpp/include)
-include_directories(${PROJECT_SOURCE_DIR}/lib/mbedtls/include)
 
 set (SHARED_SRCS
 	${PROJECT_SOURCE_DIR}/src/UUID.cpp

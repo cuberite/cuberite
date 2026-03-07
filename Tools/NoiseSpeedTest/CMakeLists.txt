@@ -52,8 +52,17 @@ add_executable(NoiseSpeedTest
 )
 
 target_link_libraries(NoiseSpeedTest fmt::fmt)
+
 if (WIN32)
 	target_link_libraries(NoiseSpeedTest ws2_32)
+endif()
+
+if(NOT WIN32)
+	target_compile_options(NoiseSpeedTest PRIVATE -Wno-switch)
+	target_compile_options(NoiseSpeedTest PRIVATE -Wno-switch-default)
+	target_compile_options(NoiseSpeedTest PRIVATE -Wno-nan-infinity-disabled)
+	target_compile_options(NoiseSpeedTest PRIVATE -Wno-duplicate-enum)
+	target_compile_options(NoiseSpeedTest PRIVATE -Wno-float-equal)
 endif()
 
 set_target_properties(

@@ -192,16 +192,6 @@ add_test(
 	COMMAND BasicGeneratorTest
 )
 
-# Necessary for some tests here to run.
-# Otherwise they crash with the error STATUS_DLL_NOT_FOUND (0xC0000135) because they can't find the lua51.dll
-
-if(WIN32)
-	add_custom_command(
-		TARGET BasicGeneratorTest  POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy
-		${CMAKE_BINARY_DIR}/Server/lua51.dll # Source
-		${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}/) # Destination
-endif()
 
 
 
