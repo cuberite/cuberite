@@ -1,0 +1,43 @@
+name: Tests
+on: [push, pull_request, workflow_dispatch]
+permissions: {}
+
+jobs:
+  tests:
+    timeout-minutes: 60
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        target: [linux-x86_64, linux-arm64, macos-x86_64, macos-arm64]
+        build_type: [Release, Debug]
+        c_compiler: [gcc, clang]
+        include:
+          - target: linux-x86_64
+            os: ubuntu-26.04
+          - target: linux-arm64
+            os: ubuntu-26.04-arm
+          - target: macos-x86_64
+            os: macos-26-intel
+          - target: macos-arm64
+            os: macos-26
+          - c_compiler: gcc
+            cpp_compiler: g++
+          - c_compiler: clang
+            cpp_compiler: clang++
+        exclude:
+          - target: macos-x86_64
+            c_compiler: gcc
+          - target: macos-arm64
+            c_compiler: gcc
+    env:
+      CI_CUBERITE_BUILD_TYPE: ${{ matrix.build_type }}
+      CI_JOB_NUMBER: ${{ github.run_number }}
+      CC: ${{ matrix.c_compiler }}
+      CXX: ${{ matrix.cpp_compiler }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: 'recursive'
+
+      - name: Build and run tests
+        run: ./cibuild.sh

@@ -1,0 +1,27 @@
+name: Lint
+on: [push, pull_request, workflow_dispatch]
+permissions: {}
+
+jobs:
+  build:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: Install dependencies
+        run: sudo apt install lua5.1
+
+      - name: Find files
+        run: cd src && find . -name "*.cpp" -or -name "*.h" > AllFiles.lst
+
+      - name: Check basic style
+        run: cd src && lua CheckBasicStyle.lua
+
+      - name: Check bindings and deps
+        run: cd src/Bindings && lua CheckBindingsDependencies.lua
+
+      - name: Run Clang-Tidy
+        run: ./clang-tidy.sh -j 4

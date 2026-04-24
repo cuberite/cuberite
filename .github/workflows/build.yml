@@ -1,0 +1,256 @@
+name: Build
+on: [push, pull_request, workflow_dispatch]
+permissions: {}
+
+jobs:
+  source:
+    timeout-minutes: 10
+    runs-on: ubuntu-slim
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: 'recursive'
+
+      - name: Prepare source tarball
+        run: |
+          tar -cvzf cuberite-source.tar.gz *
+          sha1sum cuberite-source.tar.gz > cuberite-source.tar.gz.sha1
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: cuberite-source.tar.gz
+          archive: false
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: cuberite-source.tar.gz.sha1
+          archive: false
+
+  build:
+    timeout-minutes: 60
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        target: [linux-x86_64, linux-arm64, macos-x86_64, macos-arm64]
+        include:
+          - target: linux-x86_64
+            os: ubuntu-22.04
+          - target: linux-arm64
+            os: ubuntu-22.04-arm
+          - target: macos-x86_64
+            os: macos-26-intel
+          - target: macos-arm64
+            os: macos-26
+    env:
+      MACOSX_DEPLOYMENT_TARGET: 11.0
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: 'recursive'
+
+      - name: Build
+        run: |
+          ./nightlybuild.sh \
+            -s "CI" -t ${{ matrix.target }} -b ${{ github.ref_name }} \
+            -c "clang" -cxx "clang++" -m "Release" -n ${{ github.run_number }}
+
+      - name: Prepare artifacts
+        run: |
+          mv Cuberite.tar.gz cuberite-${{ matrix.target }}.tar.gz
+          mv Cuberite.tar.gz.sha1 cuberite-${{ matrix.target }}.tar.gz.sha1
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: cuberite-${{ matrix.target }}.tar.gz
+          archive: false
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: cuberite-${{ matrix.target }}.tar.gz.sha1
+          archive: false
+
+  build-windows:
+    timeout-minutes: 60
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        target: [windows-x86_64]
+        build_type: [Release, Debug]
+        include:
+          - target: windows-x86_64
+            os: windows-2022
+    env:
+      CUBERITE_BUILD_SERIES_NAME: CI
+      CUBERITE_BUILD_ID: ${{ github.run_number }}
+      CUBERITE_BUILD_COMMIT_ID: ${{ github.sha }}
+      CUBERITE_BUILD_DATETIME: ${{ github.event.repository.updated_at }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: 'recursive'
+
+      - name: Build
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DSELF_TEST=Yes -DBUILD_TOOLS=Yes
+          cmake --build build --config ${{ matrix.build_type }}
+
+      - name: Prepare artifacts
+        run: |
+          cd build\Server
+          Install\PackWindowsExecutables.cmd
+          mv Cuberite.zip cuberite-${{ matrix.target }}.zip
+          mv AutoAPI.zip cuberite-autoapi.zip
+          mv ManualAPI.zip cuberite-manualapi.zip
+
+      - name: Upload artifact
+        if: matrix.build_type == 'Release'
+        uses: actions/upload-artifact@v7
+        with:
+          path: build\Server\cuberite-${{ matrix.target }}.zip
+          archive: false
+
+      - name: Upload artifact
+        if: matrix.target == 'windows-x86_64' && matrix.build_type == 'Release'
+        uses: actions/upload-artifact@v7
+        with:
+          path: build\Server\cuberite-autoapi.zip
+          archive: false
+
+      - name: Upload artifact
+        if: matrix.target == 'windows-x86_64' && matrix.build_type == 'Release'
+        uses: actions/upload-artifact@v7
+        with:
+          path: build\Server\cuberite-manualapi.zip
+          archive: false
+
+      - name: Upload artifact
+        if: matrix.target == 'windows-x86_64' && matrix.build_type == 'Release'
+        uses: actions/upload-artifact@v7
+        with:
+          path: build\Server\.luacheckrc
+          archive: false
+          include-hidden-files: true
+
+  build-android:
+    timeout-minutes: 60
+    runs-on: ubuntu-22.04
+    env:
+      CUBERITE_BUILD_SERIES_NAME: CI
+      CUBERITE_BUILD_ID: ${{ github.run_number }}
+      CUBERITE_BUILD_COMMIT_ID: ${{ github.sha }}
+      CUBERITE_BUILD_DATETIME: ${{ github.event.repository.updated_at }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: 'recursive'
+
+      - name: Install dependencies
+        run: sudo apt install lua5.1
+
+      - name: Build
+        run: CMAKE="$ANDROID_SDK_ROOT"/cmake/3.22.1/bin/cmake NDK="$ANDROID_NDK" android/compile.sh all
+
+      - name: Prepare artifacts
+        run: |
+          mv android/Server/server.zip android/Server/cuberite-android-server.zip
+          mv android/Server/server.zip.sha1 android/Server/cuberite-android-server.zip.sha1
+          mv android/Server/armeabi-v7a.zip android/Server/cuberite-android-armeabi-v7a.zip
+          mv android/Server/armeabi-v7a.zip.sha1 android/Server/cuberite-android-armeabi-v7a.zip.sha1
+          mv android/Server/arm64-v8a.zip android/Server/cuberite-android-arm64-v8a.zip
+          mv android/Server/arm64-v8a.zip.sha1 android/Server/cuberite-android-arm64-v8a.zip.sha1
+          mv android/Server/x86.zip android/Server/cuberite-android-x86.zip
+          mv android/Server/x86.zip.sha1 android/Server/cuberite-android-x86.zip.sha1
+          mv android/Server/x86_64.zip android/Server/cuberite-android-x86_64.zip
+          mv android/Server/x86_64.zip.sha1 android/Server/cuberite-android-x86_64.zip.sha1
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: android/Server/cuberite-android-server.zip
+          archive: false
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: android/Server/cuberite-android-server.zip.sha1
+          archive: false
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: android/Server/cuberite-android-armeabi-v7a.zip
+          archive: false
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: android/Server/cuberite-android-armeabi-v7a.zip.sha1
+          archive: false
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: android/Server/cuberite-android-arm64-v8a.zip
+          archive: false
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: android/Server/cuberite-android-arm64-v8a.zip.sha1
+          archive: false
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: android/Server/cuberite-android-x86.zip
+          archive: false
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: android/Server/cuberite-android-x86.zip.sha1
+          archive: false
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: android/Server/cuberite-android-x86_64.zip
+          archive: false
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: android/Server/cuberite-android-x86_64.zip.sha1
+          archive: false
+
+  release:
+    if: github.repository == 'cuberite/cuberite' && github.ref == 'refs/heads/master'
+    timeout-minutes: 10
+    needs: [build, build-windows, build-android]
+    runs-on: ubuntu-slim
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      TAG_NAME: cuberite-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: 'recursive'
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: dist/
+          merge-multiple: true
+          skip-decompress: true
+
+      - name: Create release
+        run: |
+          gh release delete "$TAG_NAME" --cleanup-tag || true
+          gh release create "$TAG_NAME" --title "$TAG_NAME" --target "$GITHUB_SHA" dist/*

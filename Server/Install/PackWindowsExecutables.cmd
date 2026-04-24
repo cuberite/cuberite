@@ -12,7 +12,7 @@ if defined APPVEYOR_PULL_REQUEST_NUMBER (
 )
 
 :: Main executables
-echo Cuberite %APPVEYOR_JOB_NAME%-#%APPVEYOR_BUILD_NUMBER%  1>buildinfo.txt
+echo Cuberite %CUBERITE_BUILD_SERIES_NAME%-#%CUBERITE_BUILD_ID%  1>buildinfo.txt
 7z a -tzip -y Cuberite.zip -scsWIN -i@Install\WindowsExecutables.list -xr!*.git*
 7z a -tzip -y PDBs.zip -scsWIN -i@Install/WindowsPDBs.list -xr!*.git*
 
@@ -30,8 +30,10 @@ Cuberite --port 32767  0<cmds.txt
 7z a -tzip -y AutoAPI.zip -scsWIN ".\BindingsDocs\*.lua" -x!_raw.lua
 
 :: Upload artifacts
-appveyor PushArtifact Cuberite.zip
-appveyor PushArtifact PDBs.zip
-appveyor PushArtifact AutoAPI.zip
-appveyor PushArtifact ManualAPI.zip
-appveyor PushArtifact .luacheckrc
+if defined APPVEYOR (
+	appveyor PushArtifact Cuberite.zip
+	appveyor PushArtifact PDBs.zip
+	appveyor PushArtifact AutoAPI.zip
+	appveyor PushArtifact ManualAPI.zip
+	appveyor PushArtifact .luacheckrc
+)
