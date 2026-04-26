@@ -1118,6 +1118,13 @@ cMonster::eFamily cMonster::FamilyFromType(eEntityType a_Type)
 	}
 	*/
 
+	// FIX FOR #5442: Validate entity type to prevent crash from invalid input
+	// Return mfNoSpawn for invalid entity types (e.g., -1 from bad Lua API calls)
+	if ((a_Type == etInvalid) || (a_Type < 0))
+	{
+		return mfNoSpawn;
+	}
+
 	switch (a_Type)
 	{
 		case etBat:             return mfAmbient;
