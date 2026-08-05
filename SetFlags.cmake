@@ -154,8 +154,9 @@ function(set_exe_flags TARGET)
 
 			# TODO: actually fix the warnings instead of disabling them
 			# or at least disable on a file-level basis:
-			-Wno-missing-noreturn -Wno-padded -Wno-implicit-fallthrough
-			-Wno-double-promotion
+			-Wno-error=missing-noreturn -Wno-padded -Wno-error=implicit-fallthrough
+			-Wno-error=double-promotion -Wno-error=switch-default -Wno-error=missing-include-dirs
+			-Wno-error=implicit-int-conversion
 
 			# This is a pretty useless warning, we've already got -Wswitch which is what we need:
 			-Wno-switch-enum
@@ -199,13 +200,39 @@ function(set_exe_flags TARGET)
 				${TARGET} PRIVATE
 
 				# TODO: fix
-				-Wno-reserved-identifier
+				-Wno-error=reserved-identifier
 			)
 		endif()
 		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 16)
 			target_compile_options(
 				${TARGET} PRIVATE
+
+				# TODO: fix
 				-Wno-unsafe-buffer-usage
+			)
+		endif()
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 17)
+			target_compile_options(
+				${TARGET} PRIVATE
+
+				# TODO: fix
+				-Wno-error=deprecated-literal-operator
+			)
+		endif()
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 18)
+			target_compile_options(
+				${TARGET} PRIVATE
+
+				# TODO: fix
+				-Wno-error=nan-infinity-disabled
+			)
+		endif()
+		if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 21)
+			target_compile_options(
+				${TARGET} PRIVATE
+
+				# TODO: fix
+				-Wno-error=ms-bitfield-padding -Wno-error=unnecessary-virtual-specifier -Wno-error=nrvo
 			)
 		endif()
 	endif()
