@@ -185,6 +185,7 @@ void cCommandBlockEntity::Execute()
 	if (
 		(RealCommand != "stop") &&
 		(RealCommand != "restart") &&
+		(RealCommand != "reload") &&
 		(RealCommand != "kick") &&
 		(RealCommand != "ban") &&
 		(RealCommand != "ipban")
